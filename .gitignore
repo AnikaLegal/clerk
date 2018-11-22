@@ -1,0 +1,11 @@
+# General
+*.log
+
+# Python
+*.pyc
+
+# NodeJS / Webpack
+node_modules/
+npm-debug.log.*
+build/
+webpack-stats.json

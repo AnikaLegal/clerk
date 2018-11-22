@@ -1,0 +1,16 @@
+# Backend
+django
+djangorestframework
+
+# Infra
+ipython
+psycopg2-binary
+django-extensions
+
+# Infra - prod
+#raven
+#gunicorn
+
+# Frontend
+whitenoise
+django-webpack-loader

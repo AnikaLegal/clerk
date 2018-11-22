@@ -1,0 +1,38 @@
+# CircleCI Build Script
+# TODO (build, test, deploy)
+#   - use an anika base image
+#   - install Python requirements
+#   - install Node requirements
+#   - JS linting
+#   - isort
+#   - PEP8 linting
+#   - python unit tests
+#   - JS unit tests
+#   - frontend build
+#   - collectstatic
+#   - figure out how to deploy to docker-swarm
+# ALSO NICE TOOD:
+#   - scheduled build of base image
+#   - run ansible / CF to spin up environment
+#   - schedule DB backups
+version: 2
+jobs:
+  build:
+    working_directory: ~/repo
+
+    steps:
+      # 1. Clone code from GitHub
+      - checkout
+
+      # 2. Setup remote Docker so we can run docker commands
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      # - run:
+
+
+      # Run prettier linting (.prettierrc)
+      # - run: yarn lint
+
+      # Run any tests defined in package.json
+      # - run: yarn test

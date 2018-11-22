@@ -1,0 +1,44 @@
+{
+  "name": "clerk",
+  "version": "1.0.0",
+  "description": "Build chain for clerk web app",
+  "scripts": {
+    "develop": "webpack --config /app/webpack.config.js --mode development --progress --watch",
+    "build": "webpack --config /app/webpack.config.js --mode production",
+    "lint": "prettier --list-different \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.js\"",
+    "test": "echo \"Pretend that this ran some unit tests\""
+  },
+  "author": "Matthew Segal",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "css-loader": "^1.0.1",
+    "mini-css-extract-plugin": "^0.4.5",
+    "node-sass": "^4.10.0",
+    "prettier": "^1.15.2",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.26.0",
+    "webpack-bundle-tracker": "^0.4.2-beta",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "bootstrap": "^4.1.3",
+    "camelize": "^1.0.0",
+    "graphdracula": "^1.2.1",
+    "moment": "^2.22.2",
+    "prop-types": "^15.6.2",
+    "raphael": "^2.2.7",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-redux": "^5.1.1",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0"
+  }
+}
