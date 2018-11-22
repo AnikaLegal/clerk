@@ -8,9 +8,11 @@ RUN \
   pip3 install -r requirements.txt
 
 # Install Node packages
-COPY app/package.json .
-COPY app/yarn.lock .
+WORKDIR /app/frontend
+COPY app/frontend/package.json .
+COPY app/frontend/yarn.lock .
 RUN yarn install
+WORKDIR /app
 
 # Mount the codebase
 ADD app /app

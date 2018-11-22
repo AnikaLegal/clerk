@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Build chain for clerk web app",
   "scripts": {
-    "develop": "webpack --config /app/webpack.config.js --mode development --progress --watch",
-    "build": "webpack --config /app/webpack.config.js --mode production",
+    "develop": "webpack --config webpack.config.js --mode development --progress --watch",
+    "build": "webpack --config webpack.config.js --mode production",
     "lint": "prettier --list-different \"src/**/*.js\"",
     "format": "prettier --write \"src/**/*.js\"",
     "test": "echo \"Pretend that this ran some unit tests\""
