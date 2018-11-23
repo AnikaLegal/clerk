@@ -27,13 +27,13 @@ jobs:
       # Generate the project checksum
       - run: ./scripts/checksum.sh
 
-      # Build the clerk Docker image
+      # Build the clerk Docker image (~1 minute)
       - run: docker build -t anikalaw/clerk .
 
-      # Save our image so we can share it between jobs
+      # Save our image so we can share it between jobs (~15s)
       - run: docker save -o image.tar anikalaw/clerk
 
-      # Save our image to the CircleCI job cache
+      # Save our image to the CircleCI job cache (~45s)
       - save_cache:
           paths:
             - image.tar
@@ -49,15 +49,15 @@ jobs:
       # Generate the project checksum
       - run: ./scripts/checksum.sh
 
-      # Pull docker image from cache
+      # Pull docker image from cache (~20s)
       - restore_cache:
           keys:
             - clerk-image-v1-{{ checksum ".checksum" }}
 
-      # Load our docker image from the .tar file
+      # Load our docker image from the .tar file (~30s)
       - run: docker load -i image.tar
 
-      # Run prettier linting (.prettierrc)
+      # Run code linting (<1s)
       - run: docker run anikalaw/clerk make lint
 
 workflows:
