@@ -20,8 +20,8 @@ services:
             - 8000:8000
         volumes:
           - ./app:/app
-          - build:/app/build
           - node_modules:/app/frontend/node_modules
+          - build:/app/frontend/build
         links:
             - database
         environment:
@@ -42,7 +42,7 @@ services:
         volumes:
             - ./app:/app
             - node_modules:/app/frontend/node_modules
-            - build:/app/build
+            - build:/app/frontend/build
 
 volumes:
     postgres-data:

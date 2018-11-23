@@ -1,9 +1,5 @@
 # CircleCI Build Script
 # TODO (build, test, deploy)
-#   - use an anika base image
-#   - install Python requirements
-#   - install Node requirements
-#   - JS linting
 #   - isort
 #   - PEP8 linting
 #   - python unit tests

@@ -14,3 +14,7 @@ django-extensions
 # Frontend
 whitenoise
 django-webpack-loader
+
+# Development
+flake8
+isort
