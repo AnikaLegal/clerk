@@ -19,20 +19,53 @@ version: 2
 jobs:
   build:
     working_directory: ~/repo
-
+    machine: true
     steps:
-      # 1. Clone code from GitHub
+      # Clone code from GitHub
       - checkout
 
-      # 2. Setup remote Docker so we can run docker commands
-      - setup_remote_docker:
-          docker_layer_caching: true
+      # Generate the project checksum
+      - run: ./scripts/checksum.sh
 
-      # - run:
+      # Build the clerk Docker image
+      - run: docker build -t anikalaw/clerk .
 
+      # Save our image so we can share it between jobs
+      - run: docker save -o image.tar anikalaw/clerk
+
+      # Save our image to the CircleCI job cache
+      - save_cache:
+          paths:
+            - image.tar
+          key: clerk-image-v1-{{ checksum ".checksum" }}
+
+  lint:
+    working_directory: ~/repo
+    machine: true
+    steps:
+      # Clone code from GitHub
+      - checkout
+
+      # Generate the project checksum
+      - run: ./scripts/checksum.sh
+
+      # Pull docker image from cache
+      - restore_cache:
+          keys:
+            - clerk-image-v1-{{ checksum ".checksum" }}
+
+      # Load our docker image from the .tar file
+      - run: docker load -i image.tar
 
       # Run prettier linting (.prettierrc)
-      # - run: yarn lint
+      - run: docker run anikalaw/clerk make lint
 
-      # Run any tests defined in package.json
-      # - run: yarn test
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - build
+      - lint:
+          requires:
+            - build
+

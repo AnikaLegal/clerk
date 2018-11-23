@@ -4,14 +4,9 @@ import { Link, Route, withRouter, Switch } from 'react-router-dom'
 
 import { actions } from 'state'
 
-const routes = [
-  {name: 'Build', path: '/',},
-  {name: 'View', path: '/graph'},
-  {name: 'Test', path: '/test'},
-]
+const routes = [{ name: 'Build', path: '/' }, { name: 'View', path: '/graph' }, { name: 'Test', path: '/test' }]
 
 class Header extends Component {
-
   onUploadClick = e => this.input.click()
   onUploadChange = e => {
     const files = e.target.files
@@ -22,7 +17,7 @@ class Header extends Component {
         const script = JSON.parse(e.target.result)
         this.props.uploadScript(script)
       }
-      reader.readAsText(file);
+      reader.readAsText(file)
     }
   }
 
@@ -43,7 +38,9 @@ class Header extends Component {
         <ul className="navbar-nav ml-auto">
           {routes.map(route => (
             <li key={route.path} className={`nav-item ${location.pathname === route.path && 'active'}`}>
-              <Link className="nav-link" to={route.path}>{route.name}</Link>
+              <Link className="nav-link" to={route.path}>
+                {route.name}
+              </Link>
             </li>
           ))}
           <li className="nav-item" onClick={this.onUploadClick}>
@@ -52,15 +49,15 @@ class Header extends Component {
             </a>
             <input
               type="file"
-              style={{display: 'none'}}
+              style={{ display: 'none' }}
               onChange={this.onUploadChange}
-              ref={r => { this.input = r; }}
+              ref={r => {
+                this.input = r
+              }}
             />
           </li>
           <li className="nav-item">
-            <DownloadLink script={script}>
-              Download
-            </DownloadLink>
+            <DownloadLink script={script}>Download</DownloadLink>
           </li>
         </ul>
       </nav>
@@ -68,22 +65,25 @@ class Header extends Component {
   }
 }
 
-
 const DownloadLink = ({ script, children }) => {
   const json = JSON.stringify(script, null, 2)
-  const data = "text/json;charset=utf-8," + encodeURIComponent(json);
-    return (
-      <a href={`data:${data}`} download="script.json" className="nav-link">
-        {children}
-      </a>
-    )
-  }
-
+  const data = 'text/json;charset=utf-8,' + encodeURIComponent(json)
+  return (
+    <a href={`data:${data}`} download="script.json" className="nav-link">
+      {children}
+    </a>
+  )
+}
 
 const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
-  uploadScript: (script) => dispatch(actions.script.upload(script)),
+  uploadScript: script => dispatch(actions.script.upload(script)),
 })
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Header))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Header)
+)

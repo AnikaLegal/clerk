@@ -36,10 +36,10 @@ class App extends Component {
               </div>
             </div>
           </div>
-       </BrowserRouter>
+        </BrowserRouter>
       </Provider>
     )
   }
 }
 
-ReactDOM.render(<App/>, document.getElementById('app'))
+ReactDOM.render(<App />, document.getElementById('app'))

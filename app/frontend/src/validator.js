@@ -1,9 +1,4 @@
-import {
-  FIELD_KEYS,
-  FIELD_TYPES,
-  CONDITIONS,
-  MANDATORY_FIELDS,
-} from 'consts'
+import { FIELD_KEYS, FIELD_TYPES, CONDITIONS, MANDATORY_FIELDS } from 'consts'
 
 // Used to validate new questions, which are added to the script.
 export default class ScriptValidator {
@@ -22,14 +17,14 @@ export default class ScriptValidator {
     if (this.hasErrors()) return false
     // Validate each field
     const fieldValidators = {
-      'name': this.validateName,
-      'start': this.validateStart,
-      'type': this.validateType,
-      'options': this.validateOptions,
-      'help': this.validateHelp,
-      'details': this.validateDetails,
-      'then': this.validateThen,
-      'prompt': this.validatePrompt,
+      name: this.validateName,
+      start: this.validateStart,
+      type: this.validateType,
+      options: this.validateOptions,
+      help: this.validateHelp,
+      details: this.validateDetails,
+      then: this.validateThen,
+      prompt: this.validatePrompt,
     }
     for (let fieldName of Object.keys(q)) {
       fieldValidators[fieldName](q)
@@ -47,7 +42,7 @@ export default class ScriptValidator {
   }
 
   // All fields should be from the whitelist
-  validateFieldWhitelist  = q => {
+  validateFieldWhitelist = q => {
     for (let fieldName of Object.keys(q)) {
       if (!FIELD_KEYS.includes(fieldName)) {
         this.addError(`Field "${fieldName}" is not allowed.`)
@@ -59,11 +54,11 @@ export default class ScriptValidator {
   validateStart = q => {
     const numStarts = Object.values(this.script)
       .filter(question => q.name !== question.name)
-      .map(question => question.start ? 1 : 0)
+      .map(question => (question.start ? 1 : 0))
       .reduce((count, num) => count + num, 0)
     if (numStarts > 0 && q.start) {
       this.addError('Cannot have two start questions.')
-    } else if (typeof(q.start) !== "boolean") {
+    } else if (typeof q.start !== 'boolean') {
       this.addError('Start field must be "true" or "false"')
     }
   }
@@ -74,21 +69,21 @@ export default class ScriptValidator {
       this.addError('Invalid value for "type')
     }
     const typeValidators = {
-      'text': q => {},
-      'email': q => {},
+      text: q => {},
+      email: q => {},
       'multiple choice': this.validateMultipleChoice,
       'single choice': this.validateSingleChoice,
-      'boolean': q => {},
-      'date': q => {},
-      'info': q => {},
-      'number': q => {},
+      boolean: q => {},
+      date: q => {},
+      info: q => {},
+      number: q => {},
     }
     typeValidators[q.type](q)
   }
 
   // Validate the 'options' field.
   validateOptions = q => {
-    if (typeof(q.options !== "object")) {
+    if (typeof (q.options !== 'object')) {
       this.addError('Options field must be a list')
     }
     if (!q.options.every(this.validateOption)) {
@@ -96,22 +91,22 @@ export default class ScriptValidator {
     }
   }
 
-  validateOption = option => (
-    typeof(option) === "object" &&
-    (!option.hint || typeof(option.hint) === "string") &&
-    option.text && typeof(option.text) === "string"
-  )
+  validateOption = option =>
+    typeof option === 'object' &&
+    (!option.hint || typeof option.hint === 'string') &&
+    option.text &&
+    typeof option.text === 'string'
 
   // Validate the 'help' field.
   validateHelp = q => {
-    if (q.help && typeof(q.help !== "string")) {
+    if (q.help && typeof (q.help !== 'string')) {
       this.addError('The "help" field must only contain text.')
     }
   }
 
   // Validate the 'details' field.
   validateDetails = q => {
-    if (typeof(q.details !== "object")) {
+    if (typeof (q.details !== 'object')) {
       this.addError('Details field must be a list')
     } else {
       for (let detail of q.details) {
@@ -122,11 +117,11 @@ export default class ScriptValidator {
 
   // Validate the 'then' field.
   validateThen = q => {
-    if (typeof(q.then === "string")) {
+    if (typeof (q.then === 'string')) {
       if (!this.getQuestionNames(q).includes(q.then)) {
         this.addError('The "then" field must reference another question')
       }
-    } else if (typeof(q.then === "object")) {
+    } else if (typeof (q.then === 'object')) {
       for (let then of q.then) {
         this.validateConditionalThen(q, then, 'then')
       }
@@ -156,14 +151,14 @@ export default class ScriptValidator {
 
   // Validate the 'prompt' field.
   validatePrompt = q => {
-    if (typeof(q.prompt) !== "string") {
+    if (typeof q.prompt !== 'string') {
       this.addError('The "prompt" field must only contain text.')
     }
   }
 
   // Validate the 'name' field.
   validateName = q => {
-    if (typeof(q.name) !== "string") {
+    if (typeof q.name !== 'string') {
       this.addError('The "name" field must only contain text.')
     }
   }
@@ -183,20 +178,14 @@ export default class ScriptValidator {
   }
 
   // Get a list of all possible question names
-  getQuestionNames = q => [
-    ...Object.keys(this.script),
-    q.name
-  ]
+  getQuestionNames = q => [...Object.keys(this.script), q.name]
 
   // Add error to the error list
-  addError = (msg) =>
-    this.errors.push(msg)
+  addError = msg => this.errors.push(msg)
 
   // Get a count for how many errors we have
-  getErrorCount = () =>
-    this.errors.length
+  getErrorCount = () => this.errors.length
 
   // Returns true if the validator has errors
-  hasErrors = () =>
-    this.errors.length > 0
+  hasErrors = () => this.errors.length > 0
 }

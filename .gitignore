@@ -9,3 +9,10 @@ node_modules/
 npm-debug.log.*
 build/
 webpack-stats.json
+
+# Docker stuff
+.docker_temp*
+image.tar
+
+# CircleCI stuff
+.checksum
