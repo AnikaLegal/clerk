@@ -73,7 +73,7 @@ docker-compose run web ./manage.py migrate
 docker-compose up web
 
 # In another console window/tab, run this to see webpack output
-docker-compose logs -f --tail 100 webpack
+docker-compose run --service-ports webpack
 ```
 
 Now you should be able to visit [`http://localhost:8000`](http://localhost:8000) and see the Clerk site.

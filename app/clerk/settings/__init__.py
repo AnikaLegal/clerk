@@ -6,7 +6,6 @@ import os
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,8 +37,7 @@ ROOT_URLCONF = 'clerk.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-        ],
+        'DIRS': ['/app/clerk/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -57,7 +55,6 @@ TEMPLATE_LOADERS = (
 
 WSGI_APPLICATION = 'clerk.wsgi.application'
 
-
 # Database
 DATABASES = {
     'default': {
@@ -72,20 +69,11 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -94,26 +82,23 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# TODO - double check all this stuff
 STATIC_URL = '/static/'
 STATIC_ROOT = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = (
     '/app/clerk/static/',
-    '/app/build/',
+    '/app/frontend/build/',
 )
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': '',
-        'STATS_FILE': '/app/webpack-stats.json',
+        'STATS_FILE': '/app/frontend/webpack-stats.json',
     }
 }
 
 # Enable iPython for shell_plus
 SHELL_PLUS = 'ipython'
-
 
 # TODO - Logging
 # LOGGING = { ... }

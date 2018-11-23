@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="120x120" href="{% static 'favicon.png' %}">
+    {% block extra_css %}{% endblock %}
+    {% block extra_meta %}{% endblock %}
+</head>
+<body>
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

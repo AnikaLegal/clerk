@@ -24,7 +24,6 @@ services:
           - node_modules:/app/frontend/node_modules
         links:
             - database
-            - webpack
         environment:
             PGDATABASE: postgres
             PGUSER: postgres

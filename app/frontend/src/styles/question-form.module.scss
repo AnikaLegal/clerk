@@ -1,0 +1,19 @@
+@import "main.global.scss";
+
+.questionForm {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    @extend .shadow;
+}
+
+.twoColumns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 0.5rem;
+    grid-row-gap: 0.5rem;
+}
+
+.changed {
+    @extend .border;
+    @extend .border-danger;
+}

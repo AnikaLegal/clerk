@@ -1,23 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Form Bulder</title>
-    <link rel="stylesheet" type="text/css" href="main.css">
-</head>
-<body>
+{% extends '_base.html' %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
 
+{% block title %}Clerk Form{% endblock %}
+
+{% block extra_css %}
+    {% render_bundle 'main' 'css' %}
+{% endblock %}
+
+{% block extra_js %}
+    {% render_bundle 'main' 'js' %}
+{% endblock %}
+
+{% block content %}
 <div id="app" width="100%">
+  <nav class="navbar navbar-expand navbar-light bg-light mb-3">
+    <a class="navbar-brand">Clerk</a>
+  </nav>
   <div class="container">
     <div class="row">
       <div class="col">
-        <div class="jumbotron">
-          <h1>Questionnaire Form Builder</h1>
-        </div>
-        <h2>loading...</h2>
+        <p>loading...</p>
       </div>
     </div>
   </div>
 </div>
-<script type="text/javascript" src="main.js"></script>
-</body>
-</html>
+{% endblock %}
+
