@@ -1,0 +1,11 @@
+[
+  {
+    "tests": {
+        "specs" : {
+            ".indexOn": ["id", "prompt"]
+        },
+        ".read": true,
+        ".write": true
+    }
+  }
+]
