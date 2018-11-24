@@ -1,10 +1,12 @@
 from flask import Flask, request
+from flask_cors import CORS
 from FirebaseAPI import filebaseAPI
 import json
 import constants
 import flask
 
 app = Flask(__name__)
+CORS(app, resources=r'/*')
 
 
 @app.route('/')
@@ -34,7 +36,13 @@ def insert(table_name):
     data = json.loads(data)
     db = filebaseAPI(constants.key, constants.mail)
     db.insert(database_name, table_name, data)
-    return "SUCCESS"
+    result_text = {"statusCode": 200, "message": "Insertion succeed."}
+    response = flask.make_response(flask.jsonify(result_text))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
+    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+    return response
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
