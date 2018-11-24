@@ -16,11 +16,7 @@ class filebaseAPI:
         return result
 
     def insert(self, database_name, table_name, data):
-        if isinstance(data, list):
-            for item in data:
-                self.app.post(database_name + "/" + table_name, item)
-        else:
-            self.app.post(database_name + "/" + table_name, data)
+        self.app.post(database_name + "/" + table_name, data)
 
 
 if __name__ == "__main__":
