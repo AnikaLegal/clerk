@@ -1,0 +1,28 @@
+[
+	{
+		"id": "1",
+		"prompt": "What is your name?",
+		"type": "text",
+		"follows": [],
+		"start": true,
+	},
+	{
+		"id": "2",
+		"prompt": "What is your email?",
+		"type": "email",
+		"follows": [
+			{"id": "1"}
+		]
+	},
+	{
+		"id": "3",
+		"prompt": "Are you cool?",
+		"type": "boolean",
+		"follows": [
+			{"id": "2", "when": {
+				"id": "2",
+				"value": "bob@gmail.com"
+			}}
+		]
+	},
+]
