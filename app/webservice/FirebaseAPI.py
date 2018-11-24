@@ -8,16 +8,21 @@ class filebaseAPI:
         authentication = FirebaseAuthentication(key, mailbox, True, True)
         self.app.authentication = authentication
         self.token = authentication.get_user().firebase_auth_token
-        print(self.token)
+        # print(self.token)
 
     def query(self, database_name, table_name):
         params = {"print": "pretty"}
-        result = self.app.get_async(database_name, table_name, params)
+        result = self.app.get(database_name, name=table_name, params=params)
         return result
 
-    def insert(self, database_name, table_name, data, callback_func):
-        self.app.put_async(database_name, table_name, data, callback=callback_func)
+    def insert(self, database_name, table_name, data):
+        if isinstance(data, list):
+            for item in data:
+                self.app.post(database_name + "/" + table_name, item)
+        else:
+            self.app.post(database_name + "/" + table_name, data)
 
 
 if __name__ == "__main__":
     app = filebaseAPI("oin3wrNHY1tBS9uj6EScGcdtwpZZhnT1KMt2XSX6", "wangzijian09@gmail.com")
+    print(app.query('/tests', "specs"))

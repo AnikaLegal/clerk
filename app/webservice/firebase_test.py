@@ -11,8 +11,7 @@ app.authentication = authentication
 
 user = authentication.get_user()
 
-result = app.get('/tests', name="specs",
-                 params={"orderBy": '"prompt"', "startAt": '"Are"', "endAt": '"Area"', "print": "pretty"})
+result = app.get('/tests', name="specs", params={"print": "pretty"})
 print("test")
 print(result)
 
