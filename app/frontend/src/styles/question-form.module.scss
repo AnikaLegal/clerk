@@ -6,9 +6,9 @@
     @extend .shadow;
 }
 
-.twoColumns {
+.inputs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-column-gap: 0.5rem;
     grid-row-gap: 0.5rem;
 }

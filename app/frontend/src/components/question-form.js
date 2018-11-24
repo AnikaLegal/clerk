@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
-import ListField from 'components/generic/list-field'
+import FollowsField from 'components/follows-field'
 import InputField from 'components/generic/input-field'
 import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
@@ -70,7 +70,7 @@ class QuestionForm extends Component {
     const { script } = this.props
     return (
       <div className={`${styles.questionForm} ${changed && styles.changed}`}>
-        <div className={styles.twoColumns}>
+        <div className={styles.inputs}>
           <InputField
             label="Prompt"
             type="text"
@@ -85,13 +85,10 @@ class QuestionForm extends Component {
             onChange={this.onInput('type')}
             options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
           />
-          <ListField
-            label="Follows"
-            placeholder="Previous question"
+          <FollowsField 
+            script={script}
+            questionId={id}
             onChange={this.onFollowsChange}
-            options={Object.keys(script)
-              .filter(k => k !== id && k !== this.props.question.id)
-              .map(k => [k, k])}
           />
           <CheckboxField
             label="Starting question"

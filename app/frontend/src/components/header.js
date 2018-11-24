@@ -7,7 +7,11 @@ import { actions } from 'state'
 const routes = [{ name: 'Build', path: '/' }, { name: 'View', path: '/graph' }, { name: 'Test', path: '/test' }]
 
 class Header extends Component {
+  onSaveClick = e => 
+    this.props.saveScript(this.props.script)
+
   onUploadClick = e => this.input.click()
+
   onUploadChange = e => {
     const files = e.target.files
     if (files.length > 0) {
@@ -59,6 +63,11 @@ class Header extends Component {
           <li className="nav-item">
             <DownloadLink script={script}>Download</DownloadLink>
           </li>
+          <li className="nav-item" onClick={this.onSaveClick}>
+            <a href="#" className="nav-link">
+              Save
+            </a>
+          </li>
         </ul>
       </nav>
     )
@@ -79,6 +88,7 @@ const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
+  saveScript: script => dispatch(actions.script.save(script)),
   uploadScript: script => dispatch(actions.script.upload(script)),
 })
 export default withRouter(

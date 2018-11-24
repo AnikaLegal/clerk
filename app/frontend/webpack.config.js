@@ -4,9 +4,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BundleTracker = require('webpack-bundle-tracker')
 
 module.exports = {
-  entry: '/app/frontend/src/index.js',
+  entry: path.resolve(__dirname, 'src/index.js'),
   output: {
-    path: '/app/frontend/build',
+    path: path.resolve(__dirname, '../webservice/static'),
     filename: 'main.js'
   },
   devtool: 'cheap-module-eval-source-map',
@@ -53,8 +53,8 @@ module.exports = {
   resolve: {
     extensions: ['*', '.js', '.jsx'],
     modules: [
-      '/app/frontend/src',
-      '/app/frontend/node_modules'
+      path.resolve(__dirname, 'src'),
+      path.resolve(__dirname, 'node_modules')
     ]
   },
 };

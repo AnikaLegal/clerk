@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_cors import CORS
 from FirebaseAPI import filebaseAPI
 import json
@@ -11,7 +11,7 @@ CORS(app, resources=r'/*')
 
 @app.route('/')
 def index():
-    return "Hello, World!"
+    return render_template('index.html')
 
 
 @app.route('/<string:table_name>', methods=["GET"])
