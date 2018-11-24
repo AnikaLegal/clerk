@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
-import ScriptValidator from 'validator'
 import InputField from 'components/generic/input-field'
 import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
@@ -27,7 +26,7 @@ const getInitialState = question => ({
   errors: [],
   changed: false,
   // Question fields
-  name: question.name || '',
+  id: question.id,
   prompt: question.prompt || '',
   type: question.type || '',
   then: question.then || '',
@@ -44,18 +43,12 @@ class QuestionForm extends Component {
 
   onSubmit = e => {
     const question = this.getQuestion()
-    const validator = new ScriptValidator(this.props.script)
-    const isValid = validator.canAddQuestion(question)
-    if (isValid) {
-      this.props.updateQuestion(this.props.question.name, question)
-      this.setState({ errors: validator.errors, changed: false })
-    } else {
-      this.setState({ errors: validator.errors })
-    }
+    this.props.updateQuestion(question)
+    this.setState({ errors: [], changed: false })
   }
 
   onRemove = e => {
-    this.props.removeQuestion(this.props.question.name)
+    this.props.removeQuestion(this.props.question.id)
   }
 
   onReset = e => {
@@ -68,18 +61,11 @@ class QuestionForm extends Component {
       .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {})
 
   render() {
-    const { name, start, prompt, type, then, validator, errors, changed } = this.state
+    const { id, start, prompt, type, then, errors, changed } = this.state
     const { script } = this.props
     return (
       <div className={`${styles.questionForm} ${changed && styles.changed}`}>
         <div className={styles.twoColumns}>
-          <InputField
-            label="Name"
-            type="text"
-            placeholder="A description of the question eg. 'Has contacted landlord'"
-            value={name}
-            onChange={this.onInput('name')}
-          />
           <InputField
             label="Prompt"
             type="text"
@@ -100,7 +86,7 @@ class QuestionForm extends Component {
             value={then}
             onChange={this.onInput('then')}
             options={Object.keys(script)
-              .filter(k => k !== name && k !== this.props.question.name)
+              .filter(k => k !== id && k !== this.props.question.id)
               .map(k => [k, k])}
           />
           <CheckboxField
@@ -112,7 +98,7 @@ class QuestionForm extends Component {
         </div>
         <ErrorList errors={errors} />
         <Button
-          btnStyle="light"
+          btnStyle="primary"
           onClick={this.onSubmit}
           className="mr-1"
           disabled={!MANDATORY_FIELDS.every(f => this.state[f])}
@@ -134,8 +120,8 @@ const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
-  updateQuestion: (prevName, question) => dispatch(actions.question.update(prevName, question)),
-  removeQuestion: name => dispatch(actions.question.remove(name)),
+  updateQuestion: (question) => dispatch(actions.question.update(question)),
+  removeQuestion: id => dispatch(actions.question.remove(id)),
 })
 export default connect(
   mapStateToProps,

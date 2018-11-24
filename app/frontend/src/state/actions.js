@@ -5,11 +5,11 @@ export default {
         .toString(36)
         .substring(4)
         .toUpperCase()
-      const name = `New Question ${randomString}`
-      return { type: 'CREATE_QUESTION', name }
+      const id = randomString
+      return { type: 'CREATE_QUESTION', id }
     },
-    update: (prevName, question) => ({ type: 'UPDATE_QUESTION', question, prevName }),
-    remove: name => ({ type: 'REMOVE_QUESTION', name }),
+    update: (question) => ({ type: 'UPDATE_QUESTION', question }),
+    remove: id => ({ type: 'REMOVE_QUESTION', id }),
   },
   script: {
     upload: script => ({ type: 'UPLOAD_SCRIPT', script }),

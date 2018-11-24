@@ -3,15 +3,14 @@ const question = {
     ...state,
     script: {
       ...state.script,
-      [action.name]: {
-        name: action.name,
+      [action.id]: {
+        id: action.id,
       },
     },
   }),
   UPDATE_QUESTION: (state, action) => {
     const script = { ...state.script }
-    delete script[action.prevName]
-    script[action.question.name] = action.question
+    script[action.question.id] = action.question
     return {
       ...state,
       script: script,
@@ -19,7 +18,7 @@ const question = {
   },
   REMOVE_QUESTION: (state, action) => {
     const script = { ...state.script }
-    delete script[action.name]
+    delete script[action.id]
     return {
       ...state,
       script: script,
