@@ -3,11 +3,12 @@ import { connect } from 'react-redux'
 import { Link, Route, withRouter, Switch } from 'react-router-dom'
 
 import { actions } from 'state'
+import { importScript, exportScript } from 'state/transform'
 
 const routes = [{ name: 'Build', path: '/' }, { name: 'View', path: '/graph' }, { name: 'Test', path: '/test' }]
 
 class Header extends Component {
-  onSaveClick = e => 
+  onSaveClick = e =>
     this.props.saveScript(this.props.script)
 
   onUploadClick = e => this.input.click()
@@ -18,7 +19,8 @@ class Header extends Component {
       const reader = new FileReader()
       const file = files[0]
       reader.onload = e => {
-        const script = JSON.parse(e.target.result)
+        const obj = JSON.parse(e.target.result)
+        const script = importScript(obj)
         this.props.uploadScript(script)
       }
       reader.readAsText(file)
@@ -75,7 +77,8 @@ class Header extends Component {
 }
 
 const DownloadLink = ({ script, children }) => {
-  const json = JSON.stringify(script, null, 2)
+  const exported = exportScript(script)
+  const json = JSON.stringify(exported, null, 2)
   const data = 'text/json;charset=utf-8,' + encodeURIComponent(json)
   return (
     <a href={`data:${data}`} download="script.json" className="nav-link">

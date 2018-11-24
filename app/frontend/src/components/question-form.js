@@ -23,92 +23,46 @@ const FIELD_TYPES_DISPLAY = {
   number: 'Number',
 }
 
-const getInitialState = question => ({
-  errors: [],
-  changed: false,
-  // Question fields
-  id: question.id,
-  prompt: question.prompt || '',
-  type: question.type || '',
-  follows: question.follows || '',
-  start: question.start || false,
-})
 
 class QuestionForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { ...getInitialState(props.question) }
-  }
 
-  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value, changed: true })
 
-  onSubmit = e => {
-    const question = this.getQuestion()
+  onInput = fieldName => e => {
+    const question = { ...this.props.question, [fieldName]: e.target.value }
     this.props.updateQuestion(question)
-    this.setState({ errors: [], changed: false })
-  }
-
-  onFollowsChange = follows => {
-    this.setState({ follows })
   }
 
   onRemove = e => {
     this.props.removeQuestion(this.props.question.id)
   }
 
-  onReset = e => {
-    this.setState({ ...getInitialState(this.props.question) })
-  }
-
-  getQuestion = () =>
-    FIELD_KEYS.filter(k => this.state[k])
-      .map(k => [k, this.state[k]])
-      .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {})
-
   render() {
-    const { id, start, prompt, type, then, errors, changed } = this.state
-    const { script } = this.props
+    const { script, question } = this.props
     return (
-      <div className={`${styles.questionForm} ${changed && styles.changed}`}>
+      <div className={styles.questionForm}>
         <div className={styles.inputs}>
           <InputField
             label="Prompt"
             type="text"
             placeholder="Question prompt - eg. 'Have you contacted your landlord?'"
-            value={prompt}
+            value={question.prompt}
             onChange={this.onInput('prompt')}
           />
           <DropdownField
             label="Type"
             placeholder="Select question data type"
-            value={type}
+            value={question.type}
             onChange={this.onInput('type')}
             options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
           />
-          <FollowsField 
-            script={script}
-            questionId={id}
-            onChange={this.onFollowsChange}
-          />
+          <FollowsField question={question} />
           <CheckboxField
             label="Starting question"
-            value={start}
+            value={question.start}
             disabled={Object.values(script).some(q => q.start)}
             onChange={this.onInput('start')}
           />
         </div>
-        <ErrorList errors={errors} />
-        <Button
-          btnStyle="primary"
-          onClick={this.onSubmit}
-          className="mr-1"
-          disabled={!MANDATORY_FIELDS.every(f => this.state[f])}
-        >
-          Update
-        </Button>
-        <Button btnStyle="light" onClick={this.onReset} className="mr-1">
-          Reset
-        </Button>
         <Button btnStyle="light" onClick={this.onRemove} className="mr-1">
           Remove
         </Button>

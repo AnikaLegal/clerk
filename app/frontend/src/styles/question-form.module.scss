@@ -12,8 +12,3 @@
     grid-column-gap: 0.5rem;
     grid-row-gap: 0.5rem;
 }
-
-.changed {
-    @extend .border;
-    @extend .border-danger;
-}

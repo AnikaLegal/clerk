@@ -1,7 +1,5 @@
 // import Cookies from 'universal-cookie'
 
-// import { API } from 'consts';
-
 // const getCSRF = () => new Cookies().get('csrftoken')
 
 const URL = 'http://localhost:5000/insert/specs/'

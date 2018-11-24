@@ -1,6 +1,9 @@
 # General
 *.log
 
+# IDE
+.idea/
+
 # Python
 *.pyc
 
