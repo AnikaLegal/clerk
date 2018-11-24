@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
+import ListField from 'components/generic/list-field'
 import InputField from 'components/generic/input-field'
 import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
@@ -29,7 +30,7 @@ const getInitialState = question => ({
   id: question.id,
   prompt: question.prompt || '',
   type: question.type || '',
-  then: question.then || '',
+  follows: question.follows || '',
   start: question.start || false,
 })
 
@@ -45,6 +46,10 @@ class QuestionForm extends Component {
     const question = this.getQuestion()
     this.props.updateQuestion(question)
     this.setState({ errors: [], changed: false })
+  }
+
+  onFollowsChange = follows => {
+    this.setState({ follows })
   }
 
   onRemove = e => {
@@ -80,11 +85,10 @@ class QuestionForm extends Component {
             onChange={this.onInput('type')}
             options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
           />
-          <DropdownField
-            label="Then"
-            placeholder="Select the next question"
-            value={then}
-            onChange={this.onInput('then')}
+          <ListField
+            label="Follows"
+            placeholder="Previous question"
+            onChange={this.onFollowsChange}
             options={Object.keys(script)
               .filter(k => k !== id && k !== this.props.question.id)
               .map(k => [k, k])}
