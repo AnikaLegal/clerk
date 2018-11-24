@@ -1,4 +1,4 @@
-const FIELD_KEYS = ['id', 'start', 'prompt', 'options', 'help', 'details', 'then', 'type']
+const FIELD_KEYS = ['id', 'start', 'prompt', 'options', 'help', 'details', 'follows', 'type']
 const FIELD_TYPES = ['text', 'email', 'multiple choice', 'single choice', 'boolean', 'date', 'info', 'number']
 const MANDATORY_FIELDS = ['prompt', 'type']
 const CONDITIONS = [
