@@ -16,12 +16,23 @@ export default {
   },
   script: {
     upload: script => ({ type: 'UPLOAD_SCRIPT', script }),
-    save: script => {
+    list: () => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'script' })
+      return api.script.list()
+        .then(r => r.json())
+        .then(json => dispatch({
+          type: 'RECEIVE_LIST',
+          key: 'script',
+          data: Object.values(json.data).map(el => ({...el, id: null}))
+        }))
+        .catch(console.error)
+    },
+    save: script => dispatch => {
       const exported = exportScript(script)
-      api.spec.upsert(exported)
-        // .then(() => console.warn('it worked!'))
-        // .catch(() => console.warn('it failed!'))
-      return {type: 'NULL_OP'}
+      dispatch({ type: 'SET_LOADING', key: 'script' })
+      return api.script.insert(exported)
+        .then(() => dispatch({ type: 'UNSET_LOADING', key: 'script' }))
+        .catch(console.error)
     }
   },
 }

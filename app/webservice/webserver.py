@@ -17,6 +17,14 @@ def index():
 def test():
     return render_template('index.html')
 
+@app.route('/graph')
+def graph():
+    return render_template('index.html')
+
+@app.route('/list')
+def list():
+    return render_template('index.html')
+
 
 @app.route('/<string:table_name>', methods=["GET"])
 def query_all(table_name):

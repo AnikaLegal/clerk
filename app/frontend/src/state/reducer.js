@@ -82,6 +82,54 @@ const script = {
 const reducers = {
   ...question,
   ...script,
+  UPSERT_ITEM: (state, action) => ({
+    ...state,
+    data: {
+      ...state.data,
+      [action.key]: {
+        ...state.data[action.key],
+        loading: action.loading || false,
+        lookup: { ...state.data[action.key].lookup, [action.item.id]: action.item },
+        list: isItemInList(action.item, state.data[action.key].list) ?
+          updateItemInList(action.item, state.data[action.key].list) :
+          addItemToList(action.item, state.data[action.key].list),
+      },
+    },
+  }),
+  // Mark a set of data items as "loading"
+  SET_LOADING: (state, action) => ({
+    ...state,
+    data: {
+      ...state.data,
+      [action.key]: {
+        ...state.data[action.key],
+        loading: true,
+      },
+    },
+  }),
+  UNSET_LOADING: (state, action) => ({
+    ...state,
+    data: {
+      ...state.data,
+      [action.key]: {
+        ...state.data[action.key],
+        loading: false,
+      },
+    },
+  }),
+  // Received a set of data items from the backend
+  RECEIVE_LIST: (state, action) => ({
+    ...state,
+    data: {
+      ...state.data,
+      [action.key]: {
+        isCached: true,
+        loading: false,
+        list: action.data,
+        lookup: action.data.reduce((obj, el) => { obj[el.id] = el; return obj; }, {}),
+      },
+    },
+  }),
 }
 
 export default (state, action) => {

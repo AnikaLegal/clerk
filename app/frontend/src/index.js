@@ -7,6 +7,7 @@ import { store } from 'state'
 import FormBuilder from 'components/form-builder'
 import FormGraph from 'components/form-graph'
 import Header from 'components/header'
+import ScriptList from 'components/script-list'
 import Questionnaire from 'components/questionnaire'
 
 import 'styles/main.global.scss'
@@ -22,6 +23,9 @@ class App extends Component {
               <div className="row">
                 <div className="col">
                   <Switch>
+                    <Route path="/list">
+                      <ScriptList />
+                    </Route>
                     <Route path="/test">
                       <Questionnaire />
                     </Route>

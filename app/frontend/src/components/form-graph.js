@@ -24,8 +24,10 @@ class FormGraph extends Component {
     }
     const graph = new Graph()
     for (let question of Object.values(script)) {
-      if (question.then) {
-        graph.addEdge(question.name, question.then, { directed: true })
+      for (let follow of question.follows) {
+        const fromQuestion = script[follow.id]
+        const toQuestion = question
+        graph.addEdge(fromQuestion.prompt, toQuestion.prompt, { directed: true })
       }
     }
     const layout = new Layout(graph)

@@ -15,11 +15,30 @@ const postJSON = (url, json) =>
     },
   })
 
+const get = url =>
+  fetch(url, { method: 'GET' })
+
+
+const insert = (table, data) =>
+  postJSON(`http://localhost:5000/insert/${table}`, data)
+
+
+const list = table =>
+  get(`http://localhost:5000/${table}`)
+
 
 // NB. this isn't used anywhere yet.
 export default {
-  spec: {
-    upsert: script =>
-      postJSON(URL, script)
+  answer: {
+    list: () =>
+      list('answers'),
+    insert: answers =>
+      insert('answers', answers),
+  },
+  script: {
+    list: () =>
+      list('scripts'),
+    insert: script =>
+      insert('scripts', script),
   },
 }
