@@ -6,77 +6,83 @@ import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
 import Button from 'components/generic/button'
 
-const Question = ({ value, label, prompt, onChange, readOnly, onNext }) => (
-  <div className="mb-4">
-    <p>{prompt}</p>
-    <InputField label={label} type="text" value={value} onChange={onChange} readOnly={readOnly} />
-    {!readOnly && (
-      <Button className="mt-2" onClick={onNext} disabled={!value}>
-        Next Question
-      </Button>
-    )}
-  </div>
-)
+const FINISHED = 'FINISHED'
+
 
 class Questionnaire extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: {},
-      currentStep: null,
-      currentAnswer: '',
-      answeredSteps: [],
+      answers: {},
+      currentStepId: null
     }
   }
 
   componentDidMount() {
-    const startQuestion = Object.values(this.props.script).find(q => q.start)
-    if (startQuestion) this.setState({ currentStep: startQuestion.name })
+    const startId = this.findStartId()
+    if (startId) this.setState({ currentStepId: startId })
   }
 
-  onNextClick = () => {
-    const { currentStep, currentAnswer, answeredSteps, data } = this.state
+  onChangeAnswer = id => e => {
+    const answers = this.state.answers
+    console.warn(answers)
+    this.setState({ answers: { ...answers, [id]: e.target.value } })
+  }
+
+  onNextClick = e => {
+    const { currentStepId } = this.state
     const { script } = this.props
-    if (currentAnswer) {
-      this.setState({
-        currentStep: script[currentStep].then,
-        data: { ...data, [currentStep]: currentAnswer },
-        answeredSteps: [...answeredSteps, currentStep],
-        currentAnswer: '',
-      })
+    // Find next step
+    let nextQuestionId = null
+    for(let question of Object.values(script)){
+      for(let follow of question.follows){
+        // todo - when
+        if (follow.id === currentStepId){
+          nextQuestionId = question.id;
+          break
+        }
+      }
+      if (nextQuestionId) break
+    }
+    // Update currentStepId
+    this.setState({ currentStepId: nextQuestionId })
+  }
+
+  findStartId = () => {
+    for (let i of Object.values(this.props.script)) {
+      if (i.start){
+        return i.id;
+      }
     }
   }
-
-  onAnswerChange = e => this.setState({ currentAnswer: e.target.value })
-
-  hasQuestions = () => Object.keys(this.props.script).length > 0
 
   render() {
-    const { data, currentStep, answeredSteps, currentAnswer } = this.state
+    const { answers, currentStepId } = this.state
     const { script } = this.props
-    if (!this.hasQuestions()) {
-      return <p>No questions to test</p>
-    }
+    if (Object.keys(script).length < 1) return <p>No questions to ask</p>
+    if (!currentStepId) return (
+      <div>
+        <h1>Your answers</h1>
+        {Object.keys(answers).map(id => (
+          <p key={id}><strong>{script[id].prompt}:</strong> {answers[id]}</p>
+        ))}
+      </div>
+    )
+    const currentStep = script[currentStepId]
     return (
       <div>
-        {answeredSteps.map(stepName => (
-          <Question
-            label={stepName}
-            key={stepName}
-            prompt={script[stepName].prompt}
-            value={data[stepName]}
-            readOnly={true}
-          />
-        ))}
-        {currentStep && (
-          <Question
-            label={currentStep}
-            prompt={script[currentStep].prompt}
-            value={currentAnswer}
-            onChange={this.onAnswerChange}
-            onNext={this.onNextClick}
-          />
-        )}
+        <InputField
+          label={currentStep.prompt}
+          type="text"
+          value={answers[currentStepId] || ''}
+          onChange={this.onChangeAnswer(currentStepId)}
+          readOnly={false}
+        />
+        {
+          <Button onClick={this.onNextClick}>
+            Next Step
+          </Button>
+        }
       </div>
     )
   }

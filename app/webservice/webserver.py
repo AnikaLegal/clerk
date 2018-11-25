@@ -13,6 +13,10 @@ CORS(app, resources=r'/*')
 def index():
     return render_template('index.html')
 
+@app.route('/test')
+def test():
+    return render_template('index.html')
+
 
 @app.route('/<string:table_name>', methods=["GET"])
 def query_all(table_name):
