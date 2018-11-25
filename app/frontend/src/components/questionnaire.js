@@ -30,14 +30,18 @@ class Questionnaire extends Component {
   }
 
   onNextClick = e => {
-    const { currentStepId } = this.state
+    const { currentStepId, answers } = this.state
     const { script } = this.props
     // Find next step
     let nextQuestionId = null
     for(let question of Object.values(script)){
       for(let follow of question.follows){
-        // todo - when
-        if (follow.id === currentStepId){
+        const isIdMatch = follow.id === currentStepId
+        const isWhenMatch = follow.when ?
+          answers[follow.when.id] === follow.when.value :
+          true
+
+        if (isIdMatch && isWhenMatch){
           nextQuestionId = question.id;
           break
         }

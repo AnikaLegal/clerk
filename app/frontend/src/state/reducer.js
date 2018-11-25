@@ -42,7 +42,7 @@ const question = {
             ...question.follows,
             {
               id: action.prev,
-              when: action.when ? { when: action.when, value: action.value} : null,
+              when: action.when ? { id: action.when, value: action.value} : null,
             },
           ]
         }
