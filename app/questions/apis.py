@@ -8,8 +8,6 @@ from .models import Question, Script, Submission
 from .serializers import (QuestionSerializer, ScriptSerializer,
                           SubmissionSerializer)
 
-# ListModelMixin, Retrive... Create..., Delete... viewsets.GenericViewSet
-
 
 class ScriptViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     """

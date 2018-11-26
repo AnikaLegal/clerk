@@ -1,3 +1,4 @@
+// All API requests made by the frontend
 import Cookies from 'universal-cookie'
 
 import urls from 'urls'

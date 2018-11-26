@@ -37,7 +37,7 @@ class TransitionSeializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     """
-    A signle question, pare of a script
+    A single question, part of a script
     """
     class Meta:
         model = Question
