@@ -6,7 +6,7 @@ const BundleTracker = require('webpack-bundle-tracker')
 module.exports = {
   entry: path.resolve(__dirname, 'src/index.js'),
   output: {
-    path: path.resolve(__dirname, '../webservice/static'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'main.js'
   },
   devtool: 'cheap-module-eval-source-map',
