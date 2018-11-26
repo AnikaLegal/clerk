@@ -1,44 +1,37 @@
-// import Cookies from 'universal-cookie'
+import Cookies from 'universal-cookie'
 
-// const getCSRF = () => new Cookies().get('csrftoken')
+import urls from 'urls'
 
-const URL = 'http://localhost:5000/insert/specs/'
+const getCSRF = () => new Cookies().get('csrftoken')
 
-const postJSON = (url, json) =>
+
+// POST a JSON to url
+const post = (url, data) =>
   fetch(url, {
     method: 'POST',
     credentials: 'include',
-    body: JSON.stringify(json),
+    body: JSON.stringify(data),
     headers: {
-      // 'X-CSRFToken': getCSRF(),
+      'X-CSRFToken': getCSRF(),
       'Content-Type': 'application/json',
     },
   })
 
+// GET a url
 const get = url =>
-  fetch(url, { method: 'GET' })
+  fetch(url, { credentials: 'include' });
 
 
-const insert = (table, data) =>
-  postJSON(`http://localhost:5000/insert/${table}`, data)
-
-
-const list = table =>
-  get(`http://localhost:5000/${table}`)
-
-
-// NB. this isn't used anywhere yet.
+// All HTTP API calls made by the frontend
 export default {
-  answer: {
-    list: () =>
-      list('answers'),
-    insert: answers =>
-      insert('answers', answers),
-  },
   script: {
+    // List all scripts
     list: () =>
-      list('scripts'),
-    insert: script =>
-      insert('scripts', script),
+      get(urls.api.script.list()),
   },
+  question: {
+    // List all questions
+    list: () =>
+      get(urls.api.question.list()),
+  }
 }

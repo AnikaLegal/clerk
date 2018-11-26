@@ -1,34 +1,40 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import uniqid from 'uniqid'
+import { Link } from 'react-router-dom'
 
 import { actions } from 'state'
+import urls from 'urls'
+
 
 class ScriptList extends Component {
   componentDidMount() {
-    this.props.listQuestions()
+    this.props.listScripts()
   }
+
   render() {
     const { scripts } = this.props
     return (
-    	<div>
-    		{Object.values(scripts).map(script => (
-					<ul key={uniqid()} className="list-group mb-3">
-						{Object.values(script).map(question => question && (
-					  	<li key={question.id} className="list-group-item">{question.prompt}</li>
-						))}
-					</ul>
-    		))}
-    	</div>
-  	)
+      <div>
+        {scripts.list.map(script => (
+          <Link
+            to={urls.client.script.details(script.id)}
+            key={script.id}
+          >
+            <ul className="list-group mb-3">
+              {script.id} - {script.name}
+            </ul>
+          </Link>
+        ))}
+      </div>
+    )
   }
 }
 
 const mapStateToProps = state => ({
-	scripts: state.data.script.list
+  scripts: state.data.script
 })
 const mapDispatchToProps = dispatch => ({
-  listQuestions: () => dispatch(actions.script.list()),
+  listScripts: () => dispatch(actions.script.list()),
 })
 export default connect(
   mapStateToProps,

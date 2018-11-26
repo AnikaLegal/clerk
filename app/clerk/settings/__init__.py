@@ -18,10 +18,12 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'webpack_loader',
+    'debug_toolbar',
     'questions',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -102,3 +104,10 @@ SHELL_PLUS = 'ipython'
 
 # TODO - Logging
 # LOGGING = { ... }
+
+# Django Debug Toolbar
+INTERNAL_IPS = ['127.0.0.1']
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+    'SHOW_TEMPLATE_CONTEXT': True,
+}

@@ -1,12 +1,13 @@
-from enum import Enum
-
+"""
+Questions app data models.
+"""
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 
 
-class FieldTypes(Enum):
+class FieldTypes:
     """
     The set of possible field data types for a question
     In the future, consider adding:
@@ -17,12 +18,11 @@ class FieldTypes(Enum):
     BOOLEAN = 'BOOLEAN'
 
 
-class ConditionTypes(Enum):
+class ConditionTypes:
     """
     The set of possible transition conditions,
     In the future, consider adding is not, equals, ??
     """
-    ALWAYS = 'ALWAYS'
     EQUALS = 'EQUALS'
 
 
@@ -41,7 +41,7 @@ class TimestampedModel(models.Model):
         super().save(*args, **kwargs)
 
 
-class Questionnaire(TimestampedModel):
+class Script(TimestampedModel):
     """
     A series of questions used to collect data from a user.
     Todo: add versions
@@ -51,7 +51,7 @@ class Questionnaire(TimestampedModel):
 
 class Question(TimestampedModel):
     """
-    A single question asked in a questionnaire
+    A single question asked in a script
     todo: options, hint
     """
     TYPE_CHOICES = (
@@ -59,13 +59,15 @@ class Question(TimestampedModel):
         (FieldTypes.NUMBER, 'Number'),
         (FieldTypes.BOOLEAN, 'Yes / No'),
     )
-    questionnaire = models.ForeignKey(
-        Questionnaire,
+    script = models.ForeignKey(
+        Script,
         on_delete=models.CASCADE,
         related_name='questions'
     )
     # A description of the question, used to store answers
     name = models.CharField(max_length=256)
+    # Decides whether this is the first question in the script
+    is_first = models.BooleanField(default=False)
     # The text presented to the user
     prompt = models.CharField(max_length=256)
     # The data type required for the answer
@@ -77,7 +79,6 @@ class Transition(TimestampedModel):
     A conditional jump from one question to the next.
     """
     CONDITION_CHOICES = (
-        (ConditionTypes.ALWAYS, 'always'),
         (ConditionTypes.EQUALS, 'equals'),
     )
     # The question that precedes the transition
@@ -93,26 +94,33 @@ class Transition(TimestampedModel):
         related_name='parent_transitions'
     )
     # The condition used to figure out whether we should follow this transition
-    condition = models.CharField(max_length=32, choices=CONDITION_CHOICES)
+    condition = models.CharField(
+        max_length=32,
+        choices=CONDITION_CHOICES,
+        null=True,
+        blank=True,
+    )
     # The answer variable used to evaluate the condition
     variable = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
-        related_name='variables'
+        related_name='variables',
+        null=True,
+        blank=True,
     )
     # The value used to evaluate the condition
-    value = models.CharField(max_length=256)
+    value = models.CharField(max_length=256, null=True, blank=True)
 
 
 class Submission(TimestampedModel):
     """
-    A set of answers to a Questionnaire
+    A set of answers to a Script
     I'm not sure the best way to store this for now,
     so let's just dump it in a JSON and figure it our later #YOLO.
     """
-    questionnaire = models.ForeignKey(
-        Questionnaire,
+    script = models.ForeignKey(
+        Script,
         on_delete=models.CASCADE,
-        related_name='questions'
+        related_name='submissions'
     )
     answers = JSONField(encoder=DjangoJSONEncoder)

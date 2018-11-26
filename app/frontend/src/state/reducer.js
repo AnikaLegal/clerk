@@ -1,3 +1,45 @@
+const isItemInList = (item, list) =>
+  list.map(el => el.id).includes(item.id);
+
+
+const addItemToList = (item, list) =>
+  [...list, item];
+
+
+const updateItemInList = (item, list) =>
+  list.map(el => (el.id === item.id ? item : el));
+
+
+// Update the state for error data
+const error = {
+  WRITE_ERROR: (state, action) => ({
+    ...state,
+    error: {
+      ...state.error,
+      errors: action.errors,
+    },
+  }),
+  SHOW_ERROR: state => ({
+    ...state,
+    error: {
+      ...state.error,
+      visible: true,
+    },
+  }),
+  CLEAR_ERROR: state => ({
+    ...state,
+    // Set all data items to 'not loading'
+    data: Object.entries(state.data)
+      .map(([key, data]) => [key, { ...data, loading: false }])
+      .reduce((obj, [key, data]) => { obj[key] = data; return obj; }, {}),
+    error: {
+      ...state.error,
+      errors: null,
+      visible: false,
+    },
+  }),
+};
+
 
 const buildNewQuestion = id => ({
   id: id,
@@ -7,6 +49,7 @@ const buildNewQuestion = id => ({
   follows: [],
   start: false,
 })
+
 
 const question = {
   CREATE_QUESTION: (state, action) => ({
@@ -72,16 +115,10 @@ const question = {
   },
 }
 
-const script = {
-  UPLOAD_SCRIPT: (state, action) => ({
-    ...state,
-    script: action.script,
-  }),
-}
 
-const reducers = {
-  ...question,
-  ...script,
+// Generic operations on backend API data
+const generic = {
+  // Update or insert a single data item, based on id
   UPSERT_ITEM: (state, action) => ({
     ...state,
     data: {
@@ -107,6 +144,7 @@ const reducers = {
       },
     },
   }),
+  // Mark a set of data items as not "loading"
   UNSET_LOADING: (state, action) => ({
     ...state,
     data: {
@@ -123,7 +161,6 @@ const reducers = {
     data: {
       ...state.data,
       [action.key]: {
-        isCached: true,
         loading: false,
         list: action.data,
         lookup: action.data.reduce((obj, el) => { obj[el.id] = el; return obj; }, {}),
@@ -132,8 +169,18 @@ const reducers = {
   }),
 }
 
+
+// Combine all our reducers into a single reducer lookup table.
+const reducer = {
+  ...question,
+  ...error,
+  ...generic,
+}
+
+
+// The final reducer function, which we pass to Redux.
 export default (state, action) => {
-  const func = reducers[action.type]
+  const func = reducer[action.type]
   if (!func) return { ...state }
   return func(state, action)
 }

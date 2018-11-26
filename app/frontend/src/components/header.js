@@ -2,30 +2,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link, Route, withRouter, Switch } from 'react-router-dom'
 
+import routes from 'routes'
 import { actions } from 'state'
-import { importScript, exportScript } from 'state/transform'
 
-const routes = [{ name: 'Build', path: '/' }, { name: 'View', path: '/graph' }, { name: 'Test', path: '/test' }]
+const headerRoutes = routes.filter(r => r.header)
 
 class Header extends Component {
   onSaveClick = e =>
     this.props.saveScript(this.props.script)
-
-  onUploadClick = e => this.input.click()
-
-  onUploadChange = e => {
-    const files = e.target.files
-    if (files.length > 0) {
-      const reader = new FileReader()
-      const file = files[0]
-      reader.onload = e => {
-        const obj = JSON.parse(e.target.result)
-        const script = importScript(obj)
-        this.props.uploadScript(script)
-      }
-      reader.readAsText(file)
-    }
-  }
 
   render() {
     const { script, location } = this.props
@@ -34,37 +18,21 @@ class Header extends Component {
         <a className="navbar-brand" href="#">
           Clerk
           <Switch>
-            {routes.map(route => (
-              <Route key={route.path} path={route.path} exact>
-                <span> - {route.name}</span>
+            {headerRoutes.map(({ path, name }) => (
+              <Route key={path} path={path} exact>
+                <span> - {name}</span>
               </Route>
             ))}
           </Switch>
         </a>
         <ul className="navbar-nav ml-auto">
-          {routes.map(route => (
-            <li key={route.path} className={`nav-item ${location.pathname === route.path && 'active'}`}>
-              <Link className="nav-link" to={route.path}>
-                {route.name}
+          {headerRoutes.map(({ path, name }) => (
+            <li key={path} className={`nav-item ${location.pathname === path && 'active'}`}>
+              <Link className="nav-link" to={path}>
+                {name}
               </Link>
             </li>
           ))}
-          <li className="nav-item" onClick={this.onUploadClick}>
-            <a href="#" className="nav-link">
-              Upload
-            </a>
-            <input
-              type="file"
-              style={{ display: 'none' }}
-              onChange={this.onUploadChange}
-              ref={r => {
-                this.input = r
-              }}
-            />
-          </li>
-          <li className="nav-item">
-            <DownloadLink script={script}>Download</DownloadLink>
-          </li>
           <li className="nav-item" onClick={this.onSaveClick}>
             <a href="#" className="nav-link">
               Save
@@ -76,23 +44,12 @@ class Header extends Component {
   }
 }
 
-const DownloadLink = ({ script, children }) => {
-  const exported = exportScript(script)
-  const json = JSON.stringify(exported, null, 2)
-  const data = 'text/json;charset=utf-8,' + encodeURIComponent(json)
-  return (
-    <a href={`data:${data}`} download="script.json" className="nav-link">
-      {children}
-    </a>
-  )
-}
 
 const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
   saveScript: script => dispatch(actions.script.save(script)),
-  uploadScript: script => dispatch(actions.script.upload(script)),
 })
 export default withRouter(
   connect(

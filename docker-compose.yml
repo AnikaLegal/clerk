@@ -11,8 +11,8 @@ services:
 
     # Django webserver.
     web:
-        image: localhost:5000/clerk
         command: make web-local
+        image: clerk:latest
         build:
             context: .
             dockerfile: Dockerfile
@@ -34,11 +34,8 @@ services:
 
     # Webpack build for frontend assets.
     webpack:
-        image: localhost:5000/clerk
         command: make webpack
-        build:
-            context: .
-            dockerfile: Dockerfile
+        image: clerk:latest
         volumes:
             - ./app:/app
             - node_modules:/app/frontend/node_modules
