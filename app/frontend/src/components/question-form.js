@@ -23,10 +23,7 @@ const FIELD_TYPES_DISPLAY = {
   number: 'Number',
 }
 
-
 class QuestionForm extends Component {
-
-
   onInput = fieldName => e => {
     const question = { ...this.props.question, [fieldName]: e.target.value }
     this.props.updateQuestion(question)
@@ -75,7 +72,7 @@ const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
-  updateQuestion: (question) => dispatch(actions.question.update(question)),
+  updateQuestion: question => dispatch(actions.question.update(question)),
   removeQuestion: id => dispatch(actions.question.remove(id)),
 })
 export default connect(

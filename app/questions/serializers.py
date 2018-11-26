@@ -4,7 +4,7 @@ Used to validate API requests and convert our models to/from JSON.
 """
 from rest_framework import serializers
 
-from .models import Script, Question, Transition, Submission
+from .models import Question, Script, Submission, Transition
 
 
 class ScriptSerializer(serializers.ModelSerializer):
@@ -79,5 +79,3 @@ class SubmissionSerializer(serializers.ModelSerializer):
         )
 
     answers = AnswerSerializer(many=True)
-
-

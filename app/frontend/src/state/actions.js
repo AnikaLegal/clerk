@@ -3,24 +3,25 @@ import uniqid from 'uniqid'
 import { api } from 'state'
 import { checkForError, handleJSONResponse, handleError } from './utils'
 
-
 export default {
   script: {
     list: () => dispatch => {
-      dispatch({ type: 'SET_LOADING', key: 'script' });
-      return api.script.list()
+      dispatch({ type: 'SET_LOADING', key: 'script' })
+      return api.script
+        .list()
         .then(handleJSONResponse(dispatch))
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'script', data }))
-        .catch(handleError(dispatch));
+        .catch(handleError(dispatch))
     },
   },
   question: {
     list: () => dispatch => {
-      dispatch({ type: 'SET_LOADING', key: 'question' });
-      return api.question.list()
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return api.question
+        .list()
         .then(handleJSONResponse(dispatch))
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'question', data }))
-        .catch(handleError(dispatch));
+        .catch(handleError(dispatch))
     },
     // create: () => {
     //   return { type: 'CREATE_QUESTION', id: `${uniqid()}-${uniqid()}` }
@@ -43,12 +44,12 @@ export default {
   //       }))
   //       .catch(console.error)
   //   },
-    // save: script => dispatch => {
-    //   const exported = exportScript(script)
-    //   dispatch({ type: 'SET_LOADING', key: 'script' })
-    //   return api.script.insert(exported)
-    //     .then(() => dispatch({ type: 'UNSET_LOADING', key: 'script' }))
-    //     .catch(console.error)
-    // }
+  // save: script => dispatch => {
+  //   const exported = exportScript(script)
+  //   dispatch({ type: 'SET_LOADING', key: 'script' })
+  //   return api.script.insert(exported)
+  //     .then(() => dispatch({ type: 'UNSET_LOADING', key: 'script' }))
+  //     .catch(console.error)
+  // }
   // },
 }

@@ -4,7 +4,7 @@ We can use these to easily create test data.
 """
 import factory
 
-from .models import Script, Question, FieldTypes, Transition, Submission
+from .models import FieldTypes, Question, Script, Submission, Transition
 
 
 class ScriptFactory(factory.django.DjangoModelFactory):

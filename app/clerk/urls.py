@@ -5,11 +5,8 @@ from django.urls import path
 from django.views.generic.base import RedirectView
 from rest_framework import routers
 
-import questions.views as question_views
 import questions.apis as question_apis
-
-
-
+import questions.views as question_views
 
 # TODO - get this into a context processort so we don't hardcode URLs in the frontend.
 router = routers.DefaultRouter()

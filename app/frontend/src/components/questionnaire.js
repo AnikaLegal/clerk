@@ -8,13 +8,12 @@ import Button from 'components/generic/button'
 
 const FINISHED = 'FINISHED'
 
-
 class Questionnaire extends Component {
   constructor(props) {
     super(props)
     this.state = {
       answers: {},
-      currentStepId: null
+      currentStepId: null,
     }
   }
 
@@ -34,15 +33,13 @@ class Questionnaire extends Component {
     const { script } = this.props
     // Find next step
     let nextQuestionId = null
-    for(let question of Object.values(script)){
-      for(let follow of question.follows){
+    for (let question of Object.values(script)) {
+      for (let follow of question.follows) {
         const isIdMatch = follow.id === currentStepId
-        const isWhenMatch = follow.when ?
-          answers[follow.when.id] === follow.when.value :
-          true
+        const isWhenMatch = follow.when ? answers[follow.when.id] === follow.when.value : true
 
-        if (isIdMatch && isWhenMatch){
-          nextQuestionId = question.id;
+        if (isIdMatch && isWhenMatch) {
+          nextQuestionId = question.id
           break
         }
       }
@@ -54,8 +51,8 @@ class Questionnaire extends Component {
 
   findStartId = () => {
     for (let i of Object.values(this.props.script)) {
-      if (i.start){
-        return i.id;
+      if (i.start) {
+        return i.id
       }
     }
   }
@@ -64,14 +61,17 @@ class Questionnaire extends Component {
     const { answers, currentStepId } = this.state
     const { script } = this.props
     if (Object.keys(script).length < 1) return <p>No questions to ask</p>
-    if (!currentStepId) return (
-      <div>
-        <h1>Your answers</h1>
-        {Object.keys(answers).map(id => (
-          <p key={id}><strong>{script[id].prompt}:</strong> {answers[id]}</p>
-        ))}
-      </div>
-    )
+    if (!currentStepId)
+      return (
+        <div>
+          <h1>Your answers</h1>
+          {Object.keys(answers).map(id => (
+            <p key={id}>
+              <strong>{script[id].prompt}:</strong> {answers[id]}
+            </p>
+          ))}
+        </div>
+      )
     const currentStep = script[currentStepId]
     return (
       <div>
@@ -82,11 +82,7 @@ class Questionnaire extends Component {
           onChange={this.onChangeAnswer(currentStepId)}
           readOnly={false}
         />
-        {
-          <Button onClick={this.onNextClick}>
-            Next Step
-          </Button>
-        }
+        {<Button onClick={this.onNextClick}>Next Step</Button>}
       </div>
     )
   }

@@ -4,8 +4,9 @@ These JSON HTTP APIs are consumed by the frontend app.
 """
 from rest_framework import mixins, viewsets
 
-from .models import Script, Question, Submission
-from .serializers import ScriptSerializer, QuestionSerializer, SubmissionSerializer
+from .models import Question, Script, Submission
+from .serializers import (QuestionSerializer, ScriptSerializer,
+                          SubmissionSerializer)
 
 # ListModelMixin, Retrive... Create..., Delete... viewsets.GenericViewSet
 

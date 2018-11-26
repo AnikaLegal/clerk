@@ -5,19 +5,19 @@ import PropTypes from 'prop-types'
 import { actions } from 'state'
 import DropdownField from 'components/generic/dropdown-field'
 
-
 class FollowsField extends Component {
-
   static propTypes = {
     question: PropTypes.shape({
-      follows: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        when: PropTypes.shape({
+      follows: PropTypes.arrayOf(
+        PropTypes.shape({
           id: PropTypes.string,
-          value: PropTypes.string,
+          when: PropTypes.shape({
+            id: PropTypes.string,
+            value: PropTypes.string,
+          }),
         })
-      }))
-    })
+      ),
+    }),
   }
 
   constructor(props) {
@@ -41,14 +41,9 @@ class FollowsField extends Component {
     this.setState({ prev: '', when: '', value: '' })
   }
 
-  onInput = fieldName => e =>
-    this.setState({ [fieldName]: e.target.value })
+  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
 
-  isValid = () => (
-    this.state.prev &&
-    ((!this.state.when && !this.state.value) ||
-      (this.state.when && this.state.value))
-  )
+  isValid = () => this.state.prev && ((!this.state.when && !this.state.value) || (this.state.when && this.state.value))
 
   render() {
     const { question, script } = this.props
@@ -61,7 +56,7 @@ class FollowsField extends Component {
               <span>&times;</span>
             </button>
             <span>
-              Follows "{script[f.id].prompt}"{f.when ? (<span> when it is "{f.when.value}"</span>) : null}
+              Follows "{script[f.id].prompt}"{f.when ? <span> when it is "{f.when.value}"</span> : null}
             </span>
           </div>
         ))}
@@ -69,20 +64,26 @@ class FollowsField extends Component {
           <span>Follows </span>
           <select value={this.state.prev} onChange={this.onInput('prev')}>
             <option value="">question</option>
-            {options.map(([val, display]) => <option key={val} value={val}>{display}</option>)}
+            {options.map(([val, display]) => (
+              <option key={val} value={val}>
+                {display}
+              </option>
+            ))}
           </select>
           <span> when </span>
           <select value={this.state.when} onChange={this.onInput('when')}>
             <option value="">question</option>
-            {options.map(([val, display]) => <option key={val} value={val}>{display}</option>)}
+            {options.map(([val, display]) => (
+              <option key={val} value={val}>
+                {display}
+              </option>
+            ))}
           </select>
           <span> is </span>
-          <input
-            type="text"
-            value={this.state.value}
-            onChange={this.onInput('value')}
-          />
-          <button onClick={this.onAdd} disabled={!this.isValid()} className="btn btn-primary">Add</button>
+          <input type="text" value={this.state.value} onChange={this.onInput('value')} />
+          <button onClick={this.onAdd} disabled={!this.isValid()} className="btn btn-primary">
+            Add
+          </button>
         </div>
       </div>
     )

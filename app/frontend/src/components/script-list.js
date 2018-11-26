@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import { actions } from 'state'
 import urls from 'urls'
 
-
 class ScriptList extends Component {
   componentDidMount() {
     this.props.listScripts()
@@ -16,10 +15,7 @@ class ScriptList extends Component {
     return (
       <div>
         {scripts.list.map(script => (
-          <Link
-            to={urls.client.script.details(script.id)}
-            key={script.id}
-          >
+          <Link to={urls.client.script.details(script.id)} key={script.id}>
             <ul className="list-group mb-3">
               {script.id} - {script.name}
             </ul>
@@ -31,7 +27,7 @@ class ScriptList extends Component {
 }
 
 const mapStateToProps = state => ({
-  scripts: state.data.script
+  scripts: state.data.script,
 })
 const mapDispatchToProps = dispatch => ({
   listScripts: () => dispatch(actions.script.list()),

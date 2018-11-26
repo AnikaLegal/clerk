@@ -8,8 +8,7 @@ import { actions } from 'state'
 const headerRoutes = routes.filter(r => r.header)
 
 class Header extends Component {
-  onSaveClick = e =>
-    this.props.saveScript(this.props.script)
+  onSaveClick = e => this.props.saveScript(this.props.script)
 
   render() {
     const { script, location } = this.props
@@ -43,7 +42,6 @@ class Header extends Component {
     )
   }
 }
-
 
 const mapStateToProps = state => ({
   script: state.script,

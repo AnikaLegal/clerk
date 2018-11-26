@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom'
 
 import { actions } from 'state'
 
-
 class ScriptDetails extends Component {
   componentDidMount() {
     this.props.listScripts()
@@ -13,18 +12,14 @@ class ScriptDetails extends Component {
 
   render() {
     const { scripts, questions } = this.props
-    const scriptId = Number(this.props.match.params.id) || null;
+    const scriptId = Number(this.props.match.params.id) || null
     if (!scriptId) {
       return null
     } else if (scripts.loading || questions.loading) {
       return <p>Loading...</p>
     }
     const script = scripts.lookup[scriptId]
-    return (
-      <div>
-        {script.id}
-      </div>
-    )
+    return <div>{script.id}</div>
   }
 }
 
@@ -36,7 +31,9 @@ const mapDispatchToProps = dispatch => ({
   listScripts: () => dispatch(actions.script.list()),
   listQuestions: () => dispatch(actions.question.list()),
 })
-export default withRouter(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ScriptDetails))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(ScriptDetails)
+)
