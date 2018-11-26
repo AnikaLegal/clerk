@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
@@ -8,22 +9,21 @@ import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
 import Button from 'components/generic/button'
 import ErrorList from 'components/generic/error-list'
-import { FIELD_KEYS, FIELD_TYPES, CONDITIONS, MANDATORY_FIELDS } from 'consts'
+import { FIELD_KEYS, FIELD_TYPES } from 'consts'
 
 import styles from 'styles/question-form.module.scss'
 
 const FIELD_TYPES_DISPLAY = {
   text: 'Text',
-  email: 'Email',
-  'multiple choice': 'Multiple Choice',
-  'single choice': 'Single Choice',
-  boolean: 'Yes / No',
-  date: 'Date',
-  info: 'Information',
   number: 'Number',
+  boolean: 'Yes / No',
 }
 
 class QuestionForm extends Component {
+  static propTypes = {
+
+  }
+
   onInput = fieldName => e => {
     const question = { ...this.props.question, [fieldName]: e.target.value }
     this.props.updateQuestion(question)

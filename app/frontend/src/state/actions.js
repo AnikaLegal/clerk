@@ -4,6 +4,11 @@ import { api } from 'state'
 import { checkForError, handleJSONResponse, handleError } from './utils'
 
 export default {
+  // Actions affecting error messages
+  error : {
+    clear: () => ({ type: 'CLEAR_ERROR' }),
+  },
+  // Actions affecting questionnaire scripts
   script: {
     list: () => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'script' })
@@ -13,16 +18,30 @@ export default {
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'script', data }))
         .catch(handleError(dispatch))
     },
+    create: name => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'script' })
+      return api.script.create(name)
+        .then(handleJSONResponse(dispatch))
+        .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'script', item }))
+        .catch(handleError(dispatch))
+    },
   },
+  // Actions affecting questions
   question: {
     list: () => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'question' })
-      return api.question
-        .list()
+      return api.question.list()
         .then(handleJSONResponse(dispatch))
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'question', data }))
         .catch(handleError(dispatch))
     },
+    create: (scriptId, name, isFirst, prompt, fieldType) => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return api.question.create(scriptId, name, isFirst, prompt, fieldType)
+        .then(handleJSONResponse(dispatch))
+        .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'question', item }))
+        .catch(handleError(dispatch))
+    }
     // create: () => {
     //   return { type: 'CREATE_QUESTION', id: `${uniqid()}-${uniqid()}` }
     // },
@@ -31,25 +50,4 @@ export default {
     // removeFollows: (id, follows) => ({ type: 'REMOVE_FOLLOWS', id, follows }),
     // addFollows: (id, prev, when, value) => ({ type: 'ADD_FOLLOWS', id, prev, when, value }),
   },
-  // script: {
-  //   upload: script => ({ type: 'UPLOAD_SCRIPT', script }),
-  //   list: () => dispatch => {
-  //     dispatch({ type: 'SET_LOADING', key: 'script' })
-  //     return api.script.list()
-  //       .then(r => r.json())
-  //       .then(json => dispatch({
-  //         type: 'RECEIVE_LIST',
-  //         key: 'script',
-  //         data: Object.values(json.data).map(el => ({...el, id: null}))
-  //       }))
-  //       .catch(console.error)
-  //   },
-  // save: script => dispatch => {
-  //   const exported = exportScript(script)
-  //   dispatch({ type: 'SET_LOADING', key: 'script' })
-  //   return api.script.insert(exported)
-  //     .then(() => dispatch({ type: 'UNSET_LOADING', key: 'script' }))
-  //     .catch(console.error)
-  // }
-  // },
 }

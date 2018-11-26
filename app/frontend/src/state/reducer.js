@@ -1,7 +1,6 @@
+// Helper functions
 const isItemInList = (item, list) => list.map(el => el.id).includes(item.id)
-
 const addItemToList = (item, list) => [...list, item]
-
 const updateItemInList = (item, list) => list.map(el => (el.id === item.id ? item : el))
 
 // Update the state for error data

@@ -14,15 +14,8 @@ class Header extends Component {
     const { script, location } = this.props
     return (
       <nav className="navbar navbar-expand navbar-light bg-light mb-3">
-        <a className="navbar-brand" href="#">
+        <a className="navbar-brand" href="/">
           Clerk
-          <Switch>
-            {headerRoutes.map(({ path, name }) => (
-              <Route key={path} path={path} exact>
-                <span> - {name}</span>
-              </Route>
-            ))}
-          </Switch>
         </a>
         <ul className="navbar-nav ml-auto">
           {headerRoutes.map(({ path, name }) => (
@@ -32,11 +25,6 @@ class Header extends Component {
               </Link>
             </li>
           ))}
-          <li className="nav-item" onClick={this.onSaveClick}>
-            <a href="#" className="nav-link">
-              Save
-            </a>
-          </li>
         </ul>
       </nav>
     )
@@ -46,9 +34,7 @@ class Header extends Component {
 const mapStateToProps = state => ({
   script: state.script,
 })
-const mapDispatchToProps = dispatch => ({
-  saveScript: script => dispatch(actions.script.save(script)),
-})
+const mapDispatchToProps = dispatch => ({})
 export default withRouter(
   connect(
     mapStateToProps,

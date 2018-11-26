@@ -1,22 +1,21 @@
 import urls from 'urls'
-import FormBuilder from 'components/form-builder'
-import FormGraph from 'components/form-graph'
-import ScriptList from 'components/script-list'
-import ScriptDetails from 'components/script-details'
-import Questionnaire from 'components/questionnaire'
+import ScriptListContainer from 'containers/script-list'
+import ScriptDetailsContainer from 'containers/script-details'
+// import FormGraph from 'components/form-graph'
+// import Questionnaire from 'components/questionnaire'
 
 // Routes for React Router
 const routes = [
   {
     name: 'Questionnaires',
     path: urls.client.script.list(),
-    RouteComponent: ScriptList,
+    RouteComponent: ScriptListContainer,
     header: true,
   },
   {
     name: 'Questionnaire',
     path: urls.client.script.details(':id'),
-    RouteComponent: ScriptDetails,
+    RouteComponent: ScriptDetailsContainer,
     header: false,
   },
   // {
@@ -30,10 +29,6 @@ const routes = [
   //   component: FormGraph,
   // },
   // {
-  //   name: 'Build Form',
-  //   path: '',
-  //   component: FormBuilder
-  // },
 ]
 
 export default routes

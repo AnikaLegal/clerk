@@ -3,12 +3,9 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { actions } from 'state'
+import CreateQuestionForm from 'components/forms/create-question'
 
 class ScriptDetails extends Component {
-  componentDidMount() {
-    this.props.listScripts()
-    this.props.listQuestions()
-  }
 
   render() {
     const { scripts, questions } = this.props
@@ -19,7 +16,18 @@ class ScriptDetails extends Component {
       return <p>Loading...</p>
     }
     const script = scripts.lookup[scriptId]
-    return <div>{script.id}</div>
+    return (
+      <div>
+        <h1 className="mb-3">{script.name}</h1>
+        <CreateQuestionForm script={script} />
+        {script.questions.map(id => (
+          <div key={id} className="mb-2">
+            {questions.lookup[id].name}
+            <small>{questions.lookup[id].prompt}</small>
+          </div>
+        ))}
+      </div>
+    )
   }
 }
 
@@ -27,10 +35,7 @@ const mapStateToProps = state => ({
   scripts: state.data.script,
   questions: state.data.question,
 })
-const mapDispatchToProps = dispatch => ({
-  listScripts: () => dispatch(actions.script.list()),
-  listQuestions: () => dispatch(actions.question.list()),
-})
+const mapDispatchToProps = dispatch => ({})
 export default withRouter(
   connect(
     mapStateToProps,

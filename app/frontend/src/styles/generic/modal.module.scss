@@ -1,0 +1,40 @@
+@import "styles/main.global.scss";
+@import "styles/colors.scss";
+
+.wrapper {
+  align-items: center;
+  background-color: rgba(20, 20, 20, 0.4);
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  opacity: 1;
+  animation: fade-in 0.3s linear;
+}
+
+.content {
+  @extend .shadow;
+  background-color: $lightest;
+  box-sizing: border-box;
+  border-radius: 5px;
+  color: $dark;
+  cursor: auto;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
+  max-width: 400px;
+  max-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+}

@@ -25,9 +25,16 @@ export default {
   script: {
     // List all scripts
     list: () => get(urls.api.script.list()),
+    // Create a new script
+    create: name => post(urls.api.script.list(), { name })
   },
   question: {
     // List all questions
     list: () => get(urls.api.question.list()),
+    // Create a new question
+    create: (scriptId, name, isFirst, prompt, fieldType) =>
+      post(urls.api.question.list(), {
+        // TODO
+      })
   },
 }

@@ -4,23 +4,27 @@ import { Link } from 'react-router-dom'
 
 import { actions } from 'state'
 import urls from 'urls'
+import CreateScriptForm from 'components/forms/create-script'
 
 class ScriptList extends Component {
-  componentDidMount() {
-    this.props.listScripts()
-  }
 
   render() {
     const { scripts } = this.props
     return (
       <div>
-        {scripts.list.map(script => (
-          <Link to={urls.client.script.details(script.id)} key={script.id}>
-            <ul className="list-group mb-3">
-              {script.id} - {script.name}
-            </ul>
-          </Link>
-        ))}
+        <h1 className="mb-3">Questionnaires</h1>
+        <ul className="list-group mb-2">
+          {scripts.list.map(script => (
+            <Link
+              to={urls.client.script.details(script.id)}
+              key={script.id}
+              className="list-group-item list-group-item-action"
+            >
+              {script.name}
+            </Link>
+          ))}
+        </ul>
+        <CreateScriptForm />
       </div>
     )
   }
@@ -29,9 +33,7 @@ class ScriptList extends Component {
 const mapStateToProps = state => ({
   scripts: state.data.script,
 })
-const mapDispatchToProps = dispatch => ({
-  listScripts: () => dispatch(actions.script.list()),
-})
+const mapDispatchToProps = dispatch => ({})
 export default connect(
   mapStateToProps,
   mapDispatchToProps

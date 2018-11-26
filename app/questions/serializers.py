@@ -13,7 +13,7 @@ class ScriptSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Script
-        read_only_fields = ('modified_at',)
+        read_only_fields = ('questions', 'modified_at')
         fields = ('id', 'name', 'questions', 'modified_at')
 
 
