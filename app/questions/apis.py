@@ -9,7 +9,10 @@ from .serializers import (QuestionSerializer, ScriptSerializer,
                           SubmissionSerializer)
 
 
-class ScriptViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class ScriptViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     """
     List or create scripts
     """

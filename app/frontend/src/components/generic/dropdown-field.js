@@ -6,7 +6,7 @@ export default ({ label, placeholder, value, onChange, options, disabled, readOn
       <span className="input-group-text">{label}</span>
     </div>
     <select disabled={disabled} className="form-control" onChange={onChange} value={value} readOnly={readOnly}>
-      <option value="">{placeholder}</option>
+      {!value && <option value="">{placeholder}</option>}
       {options.map(([val, display]) => (
         <option key={val} value={val}>
           {display}

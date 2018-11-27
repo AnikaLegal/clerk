@@ -15,6 +15,7 @@ const urls = {
   api: {
     script: {
       list: () => API.SCRIPT,
+      details: id => `${API.SCRIPT}${id}/`,
     },
     question: {
       list: () => API.QUESTION,

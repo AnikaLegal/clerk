@@ -18,8 +18,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # React single page app URLs
     re_path('^questionnaire/', question_views.IndexView.as_view(), name='index'),
-    # path('test/', question_views.IndexView.as_view(), name='index-test'),
-    # path('graph/', question_views.IndexView.as_view(), name='index-graph'),
     path('', RedirectView.as_view(url='/questionnaire/')),
 ]
 

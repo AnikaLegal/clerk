@@ -46,7 +46,18 @@ class Script(TimestampedModel):
     A series of questions used to collect data from a user.
     Todo: add versions
     """
+    # Internal name for this questionnaire script.
     name = models.CharField(max_length=64)
+    # The first question to be asked.
+    first_question = models.ForeignKey(
+        'questions.Question',
+        on_delete=models.SET_NULL,
+        related_name='first_for',
+        null=True,
+        blank=True
+    )
+    def __str__(self):
+        return self.name
 
 
 class Question(TimestampedModel):
@@ -59,19 +70,21 @@ class Question(TimestampedModel):
         (FieldTypes.NUMBER, 'Number'),
         (FieldTypes.BOOLEAN, 'Yes / No'),
     )
+    # The questionnaire script that this question belongs to.
     script = models.ForeignKey(
         Script,
         on_delete=models.CASCADE,
         related_name='questions'
     )
-    # A description of the question, used to store answers
+    # A description of the question.
     name = models.CharField(max_length=256)
-    # Decides whether this is the first question in the script
-    is_first = models.BooleanField(default=False)
-    # The text presented to the user
+    # The text presented to the user.
     prompt = models.CharField(max_length=256)
-    # The data type required for the answer
+    # The data type required for the answer.
     field_type = models.CharField(max_length=32, choices=TYPE_CHOICES)
+
+    def __str__(self):
+        return f'{self.name} of {self.script.name}'
 
 
 class Transition(TimestampedModel):
@@ -111,6 +124,9 @@ class Transition(TimestampedModel):
     # The value used to evaluate the condition
     value = models.CharField(max_length=256, null=True, blank=True)
 
+    def __str__(self):
+        return f'{self.previous.name} to {self.next.name}'
+
 
 class Submission(TimestampedModel):
     """
@@ -124,3 +140,6 @@ class Submission(TimestampedModel):
         related_name='submissions'
     )
     answers = JSONField(encoder=DjangoJSONEncoder)
+
+    def __str__(self):
+        return f'{self.script.name} on {self.modified_at}'

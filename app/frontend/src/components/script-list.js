@@ -4,14 +4,19 @@ import { Link } from 'react-router-dom'
 
 import { actions } from 'state'
 import urls from 'urls'
+import FadeIn from 'components/generic/fade-in'
 import CreateScriptForm from 'components/forms/create-script'
 
+// Page listing all questionnaire scripts.
 class ScriptList extends Component {
 
   render() {
     const { scripts } = this.props
+    if (scripts.loading) {
+      return <FadeIn duration="1"><p>Loading...</p></FadeIn>
+    }
     return (
-      <div>
+      <FadeIn duration="0.2">
         <h1 className="mb-3">Questionnaires</h1>
         <ul className="list-group mb-2">
           {scripts.list.map(script => (
@@ -25,7 +30,7 @@ class ScriptList extends Component {
           ))}
         </ul>
         <CreateScriptForm />
-      </div>
+      </FadeIn>
     )
   }
 }

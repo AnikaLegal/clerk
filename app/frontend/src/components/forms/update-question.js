@@ -3,79 +3,90 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
-import FollowsField from 'components/follows-field'
 import InputField from 'components/generic/input-field'
-import CheckboxField from 'components/generic/checkbox-field'
 import DropdownField from 'components/generic/dropdown-field'
 import Button from 'components/generic/button'
-import ErrorList from 'components/generic/error-list'
-import { FIELD_KEYS, FIELD_TYPES } from 'consts'
+import FadeIn from 'components/generic/fade-in'
+import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
 
-import styles from 'styles/question-form.module.scss'
 
-const FIELD_TYPES_DISPLAY = {
-  text: 'Text',
-  number: 'Number',
-  boolean: 'Yes / No',
-}
+// Key which we use to check whether the question has changed.
+const getQuestionKey = q => [
+  q.modifiedAt,
+  q.parentTransitions.map(getTransitionKey).join('-')
+].join('-')
 
-class QuestionForm extends Component {
+
+// Key which we use to check whether a transition has changed
+const getTransitionKey = t =>
+  t.modifiedAt
+
+
+// Form to update an existing question.
+class UpdateQuestionForm extends Component {
   static propTypes = {
-
+    script: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    }).isRequired,
+    question: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      prompt: PropTypes.string.isRequired,
+      fieldType: PropTypes.string.isRequired,
+      parentTransitions: PropTypes.array.isRequired,
+    }).isRequired,
   }
 
-  onInput = fieldName => e => {
-    const question = { ...this.props.question, [fieldName]: e.target.value }
-    this.props.updateQuestion(question)
+  constructor(props) {
+    super(props)
+    this.state = {
+      name: props.question.name,
+      prompt: props.question.prompt,
+      fieldType: props.question.fieldType,
+    }
   }
 
-  onRemove = e => {
-    this.props.removeQuestion(this.props.question.id)
-  }
+  onInput = fieldName => e =>
+    this.setState({ [fieldName]: e.target.value })
 
   render() {
     const { script, question } = this.props
+    const { name, isFirst, prompt, fieldType } = this.state
     return (
-      <div className={styles.questionForm}>
-        <div className={styles.inputs}>
-          <InputField
-            label="Prompt"
-            type="text"
-            placeholder="Question prompt - eg. 'Have you contacted your landlord?'"
-            value={question.prompt}
-            onChange={this.onInput('prompt')}
-          />
-          <DropdownField
+      <FadeIn className="mb-2">
+        <InputField
+          label="Name"
+          type="text"
+          placeholder="Question name (internal use)"
+          value={name}
+          onChange={this.onInput('name')}
+        />
+        <InputField
+          label="Prompt"
+          type="text"
+          placeholder="Prompt for the user to answer"
+          value={prompt}
+          onChange={this.onInput('prompt')}
+        />
+        <DropdownField
             label="Type"
             placeholder="Select question data type"
-            value={question.type}
-            onChange={this.onInput('type')}
+            value={fieldType}
+            onChange={this.onInput('fieldType')}
             options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
           />
-          <FollowsField question={question} />
-          <CheckboxField
-            label="Starting question"
-            value={question.start}
-            disabled={Object.values(script).some(q => q.start)}
-            onChange={this.onInput('start')}
-          />
-        </div>
-        <Button btnStyle="light" onClick={this.onRemove} className="mr-1">
-          Remove
-        </Button>
-      </div>
+      </FadeIn>
     )
   }
 }
 
 const mapStateToProps = state => ({
-  script: state.script,
+  scripts: state.data.script,
+  questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
-  updateQuestion: question => dispatch(actions.question.update(question)),
-  removeQuestion: id => dispatch(actions.question.remove(id)),
+  // updateQuestion: question => dispatch(actions.question.update(question)),
+  // removeQuestion: id => dispatch(actions.question.remove(id)),
 })
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(QuestionForm)
+export default connect(mapStateToProps, mapDispatchToProps)(UpdateQuestionForm)
+export { getQuestionKey }

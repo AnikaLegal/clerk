@@ -5,6 +5,7 @@ import { actions } from 'state'
 import ConfirmationModal from 'components/modals/confirm'
 import Button from 'components/generic/button'
 import InputField from 'components/generic/input-field'
+import FadeIn from 'components/generic/fade-in'
 
 const INITIAL_STATE = {
   loading: false, // Whether form is loading
@@ -55,13 +56,14 @@ class CreateScriptForm extends Component {
       )
     }
     return (
-      <div>
+      <FadeIn>
         <InputField
           label="Name"
           type="text"
           placeholder="Name your new questionnaire"
           value={name}
           onChange={this.onInputName}
+          autoFocus
         />
         <div className="mt-2">
           <Button
@@ -84,7 +86,7 @@ class CreateScriptForm extends Component {
           </p>
           <p>Create a new questionnaire named "{name}"?</p>
         </ConfirmationModal>
-      </div>
+      </FadeIn>
     )
   }
 }

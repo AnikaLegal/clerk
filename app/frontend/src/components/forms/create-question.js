@@ -2,25 +2,19 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { FIELD_TYPES } from 'consts'
+import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
 import { actions } from 'state'
 import Button from 'components/generic/button'
 import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
-import CheckboxField from 'components/generic/checkbox-field'
+import FadeIn from 'components/generic/fade-in'
 
-const FIELD_TYPES_DISPLAY = {
-  text: 'Text',
-  number: 'Number',
-  boolean: 'Yes / No',
-}
 
 const INITIAL_STATE = {
   loading: false, // Whether form is loading
   isOpen: false, // Whether the form is open / closed
   // Question fields
   name: '',
-  isFirst: false,
   prompt: '',
   fieldType: '',
 }
@@ -40,9 +34,9 @@ class CreateQuestionForm extends Component {
 
   onConfirm = () => {
     const { script, createQuestion } = this.props
-    const { name } = this.state
+    const { name, prompt, fieldType } = this.state
     this.setState({ loading: true })
-    createQuestion(script.id, name, isFirst, prompt, fieldType)
+    createQuestion(script.id, name, prompt, fieldType)
       .then(this.setState({ ...INITIAL_STATE }))
   }
 
@@ -59,7 +53,7 @@ class CreateQuestionForm extends Component {
     this.state.fieldType
 
   render() {
-    const { name, isFirst, prompt, fieldType, isOpen } = this.state
+    const { name, prompt, fieldType, isOpen } = this.state
     if (!isOpen) {
       return (
         <Button onClick={this.toggleOpen}>
@@ -68,13 +62,14 @@ class CreateQuestionForm extends Component {
       )
     }
     return (
-      <div>
+      <FadeIn>
         <InputField
           label="Name"
           type="text"
           placeholder="Question name (internal use)"
           value={name}
           onChange={this.onInput('name')}
+          autoFocus
         />
         <InputField
           label="Prompt"
@@ -90,11 +85,6 @@ class CreateQuestionForm extends Component {
             onChange={this.onInput('fieldType')}
             options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
           />
-        <CheckboxField
-          label="Is this the first question?"
-          value={isFirst}
-          onChange={this.onInput('isFirst')}
-        />
         <div className="mt-2">
           <Button
             className="mr-2"
@@ -110,7 +100,7 @@ class CreateQuestionForm extends Component {
             Close
           </Button>
         </div>
-      </div>
+      </FadeIn>
     )
   }
 }
@@ -118,6 +108,6 @@ class CreateQuestionForm extends Component {
 
 const mapStateToProps = () => ({})
 const mapDispatchToProps = dispatch => ({
-  createQuestion: name => dispatch(actions.question.create(name)),
+  createQuestion: (...args) => dispatch(actions.question.create(...args)),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CreateQuestionForm)

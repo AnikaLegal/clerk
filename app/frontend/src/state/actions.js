@@ -18,9 +18,16 @@ export default {
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'script', data }))
         .catch(handleError(dispatch))
     },
-    create: name => dispatch => {
+    create: (...args) => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'script' })
-      return api.script.create(name)
+      return api.script.create(...args)
+        .then(handleJSONResponse(dispatch))
+        .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'script', item }))
+        .catch(handleError(dispatch))
+    },
+    setFirstQuestion: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'script' })
+      return api.script.setFirstQuestion(...args)
         .then(handleJSONResponse(dispatch))
         .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'script', item }))
         .catch(handleError(dispatch))
@@ -35,16 +42,13 @@ export default {
         .then(data => dispatch({ type: 'RECEIVE_LIST', key: 'question', data }))
         .catch(handleError(dispatch))
     },
-    create: (scriptId, name, isFirst, prompt, fieldType) => {
+    create: (...args) => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'question' })
-      return api.question.create(scriptId, name, isFirst, prompt, fieldType)
+      return api.question.create(...args)
         .then(handleJSONResponse(dispatch))
         .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'question', item }))
         .catch(handleError(dispatch))
     }
-    // create: () => {
-    //   return { type: 'CREATE_QUESTION', id: `${uniqid()}-${uniqid()}` }
-    // },
     // update: (question) => ({ type: 'UPDATE_QUESTION', question }),
     // remove: id => ({ type: 'REMOVE_QUESTION', id }),
     // removeFollows: (id, follows) => ({ type: 'REMOVE_FOLLOWS', id, follows }),

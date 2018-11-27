@@ -13,8 +13,8 @@ class ScriptSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Script
-        read_only_fields = ('questions', 'modified_at')
-        fields = ('id', 'name', 'questions', 'modified_at')
+        read_only_fields = ('modified_at',)
+        fields = ('id', 'name', 'first_question', 'modified_at')
 
 
 class TransitionSeializer(serializers.ModelSerializer):
@@ -45,14 +45,14 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'is_first',
             'prompt',
+            'script',
             'field_type',
             'parent_transitions',
             'modified_at',
         )
 
-    parent_transitions = TransitionSeializer(many=True)
+    parent_transitions = TransitionSeializer(many=True, read_only=True)
 
 
 class AnswerSerializer(serializers.Serializer):
