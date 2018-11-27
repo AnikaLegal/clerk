@@ -7,7 +7,6 @@ import { actions } from 'state'
 import Button from 'components/generic/button'
 import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
-import FadeIn from 'components/generic/fade-in'
 
 // Form to create a new questionnaire script.
 class FirstQuestionForm extends Component {
@@ -38,7 +37,7 @@ class FirstQuestionForm extends Component {
     const { firstQuestion, loading } = this.state
     const { script, questions } = this.props
     return (
-      <FadeIn>
+      <div>
         <DropdownField
           label="Start"
           placeholder="Select the starting question"
@@ -49,7 +48,7 @@ class FirstQuestionForm extends Component {
             .filter(q => q.script === script.id)
             .map(q => [q.id, q.name])}
         />
-      </FadeIn>
+      </div>
     )
   }
 }

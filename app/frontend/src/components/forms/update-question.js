@@ -46,8 +46,9 @@ class UpdateQuestionForm extends Component {
   onSubmit = () => {
     const { question, updateQuestion } = this.props
     const { name, prompt, fieldType } = this.state
-    this.setState({ loading: true })
-    updateQuestion(question.id, name, prompt, fieldType)
+    this.setState({ loading: true }, () =>
+      updateQuestion(question.id, name, prompt, fieldType)
+    )
   }
 
   onInput = fieldName => e => {
@@ -99,7 +100,6 @@ const mapStateToProps = state => ({
 })
 const mapDispatchToProps = dispatch => ({
   updateQuestion: (...args) => dispatch(actions.question.update(...args)),
-  // TODO - remove question form
 })
 export default connect(
   mapStateToProps,

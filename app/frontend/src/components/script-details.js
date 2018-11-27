@@ -19,7 +19,7 @@ class ScriptDetails extends Component {
     const scriptId = Number(this.props.match.params.id) || null
     if (!scriptId) {
       return null
-    } else if (scripts.loading) {
+    } else if (scripts.list.length < 1) {
       return (
         <FadeIn duration="1">
           <p>Loading...</p>
@@ -34,17 +34,17 @@ class ScriptDetails extends Component {
           <FirstQuestionForm script={script} key={script.firstQuestion} />
         </div>
         <div className="mb-3">
-          <CreateQuestionForm script={script} />
+          {questions.list
+            .filter(q => q.script === script.id)
+            .map(q => (
+              <UpdateQuestionForm
+                script={script}
+                question={q}
+                key={getQuestionKey(q)}
+              />
+            ))}
         </div>
-        {questions.list
-          .filter(q => q.script === script.id)
-          .map(q => (
-            <UpdateQuestionForm
-              script={script}
-              question={q}
-              key={getQuestionKey(q)}
-            />
-          ))}
+        <CreateQuestionForm script={script} />
       </FadeIn>
     )
   }
