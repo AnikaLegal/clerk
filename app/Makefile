@@ -1,6 +1,7 @@
 # Allows us to run several commands in one bash shelll
 .ONESHELL:
 
+
 # Run webpack for local development
 webpack:
 	cd frontend
@@ -28,7 +29,6 @@ lint-frontend:
 	yarn lint
 
 
-
 # Auto-format frontend and backend code
 format: format-python format-frontend
 
@@ -42,3 +42,4 @@ format-frontend:
 # Auto-format Python code
 format-python:
 	isort --skip migrations --skip /app/frontend
+	black --exclude "frontend/|migrations/" --skip-string-normalization .

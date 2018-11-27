@@ -21,6 +21,7 @@ django-debug-toolbar
 # Testing
 flake8
 isort
+black
 pytest
 pytest-django
 pytest-factoryboy
