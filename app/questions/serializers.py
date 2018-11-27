@@ -26,7 +26,15 @@ class TransitionSeializer(serializers.ModelSerializer):
     class Meta:
         model = Transition
         read_only_fields = ('modified_at',)
-        fields = ('id', 'previous', 'next', 'condition', 'variable', 'value', 'modified_at')
+        fields = (
+            'id',
+            'previous',
+            'next',
+            'condition',
+            'variable',
+            'value',
+            'modified_at',
+        )
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -37,7 +45,15 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         read_only_fields = ('modified_at',)
-        fields = ('id', 'name', 'prompt', 'script', 'field_type', 'parent_transitions', 'modified_at')
+        fields = (
+            'id',
+            'name',
+            'prompt',
+            'script',
+            'field_type',
+            'parent_transitions',
+            'modified_at',
+        )
 
     parent_transitions = TransitionSeializer(many=True, read_only=True)
 

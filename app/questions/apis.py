@@ -8,7 +8,12 @@ from .models import Question, Script, Submission
 from .serializers import QuestionSerializer, ScriptSerializer, SubmissionSerializer
 
 
-class ScriptViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class ScriptViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     """
     List or create scripts
     """
@@ -17,7 +22,12 @@ class ScriptViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.Lis
     queryset = Script.objects.all()
 
 
-class QuestionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class QuestionViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     """
     List, create, questions.
     # TODO - we're going to need some pretty slick validation on
@@ -29,7 +39,9 @@ class QuestionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.G
     queryset = Question.objects.prefetch_related('parent_transitions').all()
 
 
-class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class SubmissionViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
     """
     List, create, answers.
     # TODO - filter by scripts so we don't pull all questions from DB

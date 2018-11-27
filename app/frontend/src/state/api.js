@@ -12,6 +12,7 @@ export default {
         name: name,
         first_question: null,
       }),
+    // Set a 'first question' on a script
     setFirstQuestion: (scriptId, firstQuestionId) =>
       http.patch(urls.api.script.details(scriptId), {
         first_question: firstQuestionId,
@@ -27,6 +28,13 @@ export default {
         prompt: prompt,
         field_type: fieldType,
         script: scriptId,
+      }),
+    // Update an existing question
+    update: (questionId, name, prompt, fieldType) =>
+      http.patch(urls.api.question.details(questionId), {
+        name: name,
+        prompt: prompt,
+        field_type: fieldType,
       }),
   },
 }

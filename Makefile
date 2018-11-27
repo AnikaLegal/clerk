@@ -27,24 +27,24 @@ psql:
 
 # Lint frontend and Python code
 lint:
-	docker-compose run web make lint
+	docker-compose run webpack make lint
 
 # Lint Python code
 lint-python:
-	docker-compose run web make lint-python
+	docker-compose run webpack make lint-python
 
 # Lint frontend code
 lint-frontend:
-	docker-compose run web make lint-frontend
+	docker-compose run webpack make lint-frontend
 
 # Auto-format frontend and backend code
 format:
-	docker-compose run web make format
+	docker-compose run webpack make format
 
 # Auto-format frontend code
 format-frontend:
-	docker-compose run web make format-frontend
+	docker-compose run webpack make format-frontend
 
 # Auto-format Python code
 format-python:
-	docker-compose run web make format-python
+	docker-compose run webpack make format-python

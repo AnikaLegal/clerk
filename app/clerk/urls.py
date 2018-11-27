@@ -12,7 +12,9 @@ import questions.views as question_views
 router = routers.DefaultRouter()
 router.register('questions/script', question_apis.ScriptViewSet, 'questions-script')
 router.register('questions/question', question_apis.QuestionViewSet, 'questions-question')
-router.register('questions/submission', question_apis.SubmissionViewSet, 'questions-submission')
+router.register(
+    'questions/submission', question_apis.SubmissionViewSet, 'questions-submission'
+)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),

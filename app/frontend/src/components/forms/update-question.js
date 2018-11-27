@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { actions } from 'state'
+import debounce from 'utils/debounce'
 import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
 import Button from 'components/generic/button'
-import FadeIn from 'components/generic/fade-in'
 import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
 
 // Key which we use to check whether the question has changed.
@@ -34,25 +34,40 @@ class UpdateQuestionForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      loading: false,
       name: props.question.name,
       prompt: props.question.prompt,
       fieldType: props.question.fieldType,
     }
   }
 
-  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
+  debounce = debounce(1600)
+
+  onSubmit = () => {
+    const { question, updateQuestion } = this.props
+    const { name, prompt, fieldType } = this.state
+    this.setState({ loading: true })
+    updateQuestion(question.id, name, prompt, fieldType)
+  }
+
+  onInput = fieldName => e => {
+    this.setState({ [fieldName]: e.target.value }, () =>
+      this.debounce(this.onSubmit)()
+    )
+  }
 
   render() {
     const { script, question } = this.props
-    const { name, isFirst, prompt, fieldType } = this.state
+    const { name, loading, prompt, fieldType } = this.state
     return (
-      <FadeIn className="mb-2">
+      <div className="mb-2">
         <InputField
           label="Name"
           type="text"
           placeholder="Question name (internal use)"
           value={name}
           onChange={this.onInput('name')}
+          readOnly={loading}
         />
         <InputField
           label="Prompt"
@@ -60,18 +75,20 @@ class UpdateQuestionForm extends Component {
           placeholder="Prompt for the user to answer"
           value={prompt}
           onChange={this.onInput('prompt')}
+          readOnly={loading}
         />
         <DropdownField
           label="Type"
           placeholder="Select question data type"
           value={fieldType}
           onChange={this.onInput('fieldType')}
+          disabled={loading}
           options={FIELD_TYPES.map(fieldType => [
             fieldType,
             FIELD_TYPES_DISPLAY[fieldType],
           ])}
         />
-      </FadeIn>
+      </div>
     )
   }
 }
@@ -81,9 +98,8 @@ const mapStateToProps = state => ({
   questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
-  // TO DO NEXT
-  // updateQuestion: question => dispatch(actions.question.update(question)),
-  // removeQuestion: id => dispatch(actions.question.remove(id)),
+  updateQuestion: (...args) => dispatch(actions.question.update(...args)),
+  // TODO - remove question form
 })
 export default connect(
   mapStateToProps,

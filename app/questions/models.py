@@ -54,7 +54,11 @@ class Script(TimestampedModel):
     name = models.CharField(max_length=64)
     # The first question to be asked.
     first_question = models.ForeignKey(
-        'questions.Question', on_delete=models.SET_NULL, related_name='first_for', null=True, blank=True
+        'questions.Question',
+        on_delete=models.SET_NULL,
+        related_name='first_for',
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -67,7 +71,11 @@ class Question(TimestampedModel):
     todo: options, hint
     """
 
-    TYPE_CHOICES = ((FieldTypes.TEXT, 'Text'), (FieldTypes.NUMBER, 'Number'), (FieldTypes.BOOLEAN, 'Yes / No'))
+    TYPE_CHOICES = (
+        (FieldTypes.TEXT, 'Text'),
+        (FieldTypes.NUMBER, 'Number'),
+        (FieldTypes.BOOLEAN, 'Yes / No'),
+    )
     # The questionnaire script that this question belongs to.
     script = models.ForeignKey(Script, on_delete=models.CASCADE, related_name='questions')
     # A description of the question.
@@ -88,13 +96,25 @@ class Transition(TimestampedModel):
 
     CONDITION_CHOICES = ((ConditionTypes.EQUALS, 'equals'),)
     # The question that precedes the transition
-    previous = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='child_transitions')
+    previous = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name='child_transitions'
+    )
     # The question that follows the transition
-    next = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='parent_transitions')
+    next = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name='parent_transitions'
+    )
     # The condition used to figure out whether we should follow this transition
-    condition = models.CharField(max_length=32, choices=CONDITION_CHOICES, null=True, blank=True)
+    condition = models.CharField(
+        max_length=32, choices=CONDITION_CHOICES, null=True, blank=True
+    )
     # The answer variable used to evaluate the condition
-    variable = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='variables', null=True, blank=True)
+    variable = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='variables',
+        null=True,
+        blank=True,
+    )
     # The value used to evaluate the condition
     value = models.CharField(max_length=256, null=True, blank=True)
 
@@ -109,7 +129,9 @@ class Submission(TimestampedModel):
     so let's just dump it in a JSON and figure it our later #YOLO.
     """
 
-    script = models.ForeignKey(Script, on_delete=models.CASCADE, related_name='submissions')
+    script = models.ForeignKey(
+        Script, on_delete=models.CASCADE, related_name='submissions'
+    )
     answers = JSONField(encoder=DjangoJSONEncoder)
 
     def __str__(self):

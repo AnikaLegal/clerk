@@ -24,11 +24,11 @@ lint: lint-python lint-frontend
 # Lint Python code
 lint-python:
 	flake8 \
-		--max-line-length=120 \
+		--max-line-length=90 \
 		--exclude='*migrations*,/app/frontend' \
 		.
 	isort \
-		-l 120 \
+		-l 90 \
 		--diff \
 		--check-only \
 		--skip migrations --skip /app/frontend
@@ -53,10 +53,10 @@ format-frontend:
 # Auto-format Python code
 format-python:
 	isort \
-		-l 120 \
+		-l 90 \
 		--skip migrations --skip /app/frontend
 	black \
-		--line-length 120 \
+		--line-length 90 \
 		--exclude "frontend/|migrations/" \
 		--skip-string-normalization \
 		.

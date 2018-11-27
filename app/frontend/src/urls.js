@@ -19,6 +19,7 @@ const urls = {
     },
     question: {
       list: () => API.QUESTION,
+      details: id => `${API.QUESTION}${id}/`,
     },
   },
   client: {
