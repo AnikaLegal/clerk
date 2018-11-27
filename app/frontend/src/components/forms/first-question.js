@@ -47,7 +47,7 @@ class FirstQuestionForm extends Component {
           onChange={this.onInput}
           options={questions.list
             .filter(q => q.script === script.id)
-            .map(q => [q.id, q.prompt])}
+            .map(q => [q.id, q.name])}
         />
       </FadeIn>
     )
