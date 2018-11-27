@@ -19,7 +19,10 @@ class Header extends Component {
         </a>
         <ul className="navbar-nav ml-auto">
           {headerRoutes.map(({ path, name }) => (
-            <li key={path} className={`nav-item ${location.pathname === path && 'active'}`}>
+            <li
+              key={path}
+              className={`nav-item ${location.pathname === path && 'active'}`}
+            >
               <Link className="nav-link" to={path}>
                 {name}
               </Link>

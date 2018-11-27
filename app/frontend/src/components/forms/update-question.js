@@ -9,18 +9,12 @@ import Button from 'components/generic/button'
 import FadeIn from 'components/generic/fade-in'
 import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
 
-
 // Key which we use to check whether the question has changed.
-const getQuestionKey = q => [
-  q.modifiedAt,
-  q.parentTransitions.map(getTransitionKey).join('-')
-].join('-')
-
+const getQuestionKey = q =>
+  [q.modifiedAt, q.parentTransitions.map(getTransitionKey).join('-')].join('-')
 
 // Key which we use to check whether a transition has changed
-const getTransitionKey = t =>
-  t.modifiedAt
-
+const getTransitionKey = t => t.modifiedAt
 
 // Form to update an existing question.
 class UpdateQuestionForm extends Component {
@@ -46,8 +40,7 @@ class UpdateQuestionForm extends Component {
     }
   }
 
-  onInput = fieldName => e =>
-    this.setState({ [fieldName]: e.target.value })
+  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
 
   render() {
     const { script, question } = this.props
@@ -69,12 +62,15 @@ class UpdateQuestionForm extends Component {
           onChange={this.onInput('prompt')}
         />
         <DropdownField
-            label="Type"
-            placeholder="Select question data type"
-            value={fieldType}
-            onChange={this.onInput('fieldType')}
-            options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
-          />
+          label="Type"
+          placeholder="Select question data type"
+          value={fieldType}
+          onChange={this.onInput('fieldType')}
+          options={FIELD_TYPES.map(fieldType => [
+            fieldType,
+            FIELD_TYPES_DISPLAY[fieldType],
+          ])}
+        />
       </FadeIn>
     )
   }
@@ -88,5 +84,8 @@ const mapDispatchToProps = dispatch => ({
   // updateQuestion: question => dispatch(actions.question.update(question)),
   // removeQuestion: id => dispatch(actions.question.remove(id)),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(UpdateQuestionForm)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UpdateQuestionForm)
 export { getQuestionKey }

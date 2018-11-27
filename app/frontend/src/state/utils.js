@@ -22,7 +22,9 @@ const checkForError = dispatch => response => {
   if (response.status === 400) {
     // Bad request, try and get details
     errorMessage = 'Bad request - invalid data.'
-    response.json().then(errorData => dispatch({ type: 'WRITE_ERROR', errors: errorData }))
+    response
+      .json()
+      .then(errorData => dispatch({ type: 'WRITE_ERROR', errors: errorData }))
   } else if (response.status === 401 || response.status === 403) {
     errorMessage = 'Forbidden - you do not have permission to do this.'
   }

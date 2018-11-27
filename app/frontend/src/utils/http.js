@@ -4,7 +4,7 @@ import Cookies from 'universal-cookie'
 const getCSRF = () => new Cookies().get('csrftoken')
 
 // HTTP helper functions.
-const http =  {
+const http = {
   // POST a JSON to URL (create new resource)
   post: (url, data) =>
     fetch(url, {
@@ -48,7 +48,7 @@ const http =  {
   // GET a URL (read resource)
   get: url =>
     fetch(url, {
-      credentials: 'include'
+      credentials: 'include',
     }),
 }
 

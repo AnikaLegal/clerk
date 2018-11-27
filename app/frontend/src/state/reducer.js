@@ -1,7 +1,8 @@
 // Helper functions
 const isItemInList = (item, list) => list.map(el => el.id).includes(item.id)
 const addItemToList = (item, list) => [...list, item]
-const updateItemInList = (item, list) => list.map(el => (el.id === item.id ? item : el))
+const updateItemInList = (item, list) =>
+  list.map(el => (el.id === item.id ? item : el))
 
 // Update the state for error data
 const error = {
@@ -84,7 +85,6 @@ const question = {
   //       (f.when && follows.when && f.when.id === follows.when.id && f.when.value === follows.when.value)
   //     return !(isMatchPrevId && isMatchWhen)
   //   })
-
   //   return {
   //     ...state,
   //     script: { ...state.script, [question.id]: question },
@@ -102,7 +102,10 @@ const generic = {
       [action.key]: {
         ...state.data[action.key],
         loading: action.loading || false,
-        lookup: { ...state.data[action.key].lookup, [action.item.id]: action.item },
+        lookup: {
+          ...state.data[action.key].lookup,
+          [action.item.id]: action.item,
+        },
         list: isItemInList(action.item, state.data[action.key].list)
           ? updateItemInList(action.item, state.data[action.key].list)
           : addItemToList(action.item, state.data[action.key].list),

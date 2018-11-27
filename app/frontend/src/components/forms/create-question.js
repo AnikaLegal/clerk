@@ -9,7 +9,6 @@ import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
 import FadeIn from 'components/generic/fade-in'
 
-
 const INITIAL_STATE = {
   loading: false, // Whether form is loading
   isOpen: false, // Whether the form is open / closed
@@ -24,7 +23,7 @@ class CreateQuestionForm extends Component {
   static propTypes = {
     script: PropTypes.shape({
       id: PropTypes.number.isRequired,
-    }).isRequired
+    }).isRequired,
   }
 
   constructor(props) {
@@ -36,15 +35,14 @@ class CreateQuestionForm extends Component {
     const { script, createQuestion } = this.props
     const { name, prompt, fieldType } = this.state
     this.setState({ loading: true })
-    createQuestion(script.id, name, prompt, fieldType)
-      .then(this.setState({ ...INITIAL_STATE }))
+    createQuestion(script.id, name, prompt, fieldType).then(
+      this.setState({ ...INITIAL_STATE })
+    )
   }
 
-  onInput = fieldName => e =>
-    this.setState({ [fieldName]: e.target.value })
+  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
 
-  toggleOpen = () =>
-    this.setState({ isOpen: !this.state.isOpen })
+  toggleOpen = () => this.setState({ isOpen: !this.state.isOpen })
 
   isFormValid = () =>
     !this.state.loading &&
@@ -55,11 +53,7 @@ class CreateQuestionForm extends Component {
   render() {
     const { name, prompt, fieldType, isOpen } = this.state
     if (!isOpen) {
-      return (
-        <Button onClick={this.toggleOpen}>
-          Add Question
-        </Button>
-      )
+      return <Button onClick={this.toggleOpen}>Add Question</Button>
     }
     return (
       <FadeIn>
@@ -79,12 +73,15 @@ class CreateQuestionForm extends Component {
           onChange={this.onInput('prompt')}
         />
         <DropdownField
-            label="Type"
-            placeholder="Select question data type"
-            value={fieldType}
-            onChange={this.onInput('fieldType')}
-            options={FIELD_TYPES.map(fieldType => [fieldType, FIELD_TYPES_DISPLAY[fieldType]])}
-          />
+          label="Type"
+          placeholder="Select question data type"
+          value={fieldType}
+          onChange={this.onInput('fieldType')}
+          options={FIELD_TYPES.map(fieldType => [
+            fieldType,
+            FIELD_TYPES_DISPLAY[fieldType],
+          ])}
+        />
         <div className="mt-2">
           <Button
             className="mr-2"
@@ -93,10 +90,7 @@ class CreateQuestionForm extends Component {
           >
             Add
           </Button>
-          <Button
-            onClick={this.toggleOpen}
-            btnStyle="danger"
-          >
+          <Button onClick={this.toggleOpen} btnStyle="danger">
             Close
           </Button>
         </div>
@@ -105,9 +99,11 @@ class CreateQuestionForm extends Component {
   }
 }
 
-
 const mapStateToProps = () => ({})
 const mapDispatchToProps = dispatch => ({
   createQuestion: (...args) => dispatch(actions.question.create(...args)),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(CreateQuestionForm)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateQuestionForm)

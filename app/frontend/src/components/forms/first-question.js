@@ -9,20 +9,19 @@ import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
 import FadeIn from 'components/generic/fade-in'
 
-
 // Form to create a new questionnaire script.
 class FirstQuestionForm extends Component {
   static propTypes = {
     script: PropTypes.shape({
       id: PropTypes.number.isRequired,
-    }).isRequired
+    }).isRequired,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       loading: false, // Whether form is loading
-      firstQuestion: props.script.firstQuestion || ''
+      firstQuestion: props.script.firstQuestion || '',
     }
   }
 
@@ -41,26 +40,28 @@ class FirstQuestionForm extends Component {
     return (
       <FadeIn>
         <DropdownField
-            label="Start"
-            placeholder="Select the starting question"
-            value={firstQuestion}
-            disabled={loading}
-            onChange={this.onInput}
-            options={questions.list
-              .filter(q => q.script === script.id)
-              .map(q => [q.id, q.prompt])
-            }
-          />
+          label="Start"
+          placeholder="Select the starting question"
+          value={firstQuestion}
+          disabled={loading}
+          onChange={this.onInput}
+          options={questions.list
+            .filter(q => q.script === script.id)
+            .map(q => [q.id, q.prompt])}
+        />
       </FadeIn>
     )
   }
 }
 
-
 const mapStateToProps = state => ({
   questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
-  setFirstQuestion: (...args) => dispatch(actions.script.setFirstQuestion(...args)),
+  setFirstQuestion: (...args) =>
+    dispatch(actions.script.setFirstQuestion(...args)),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(FirstQuestionForm)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FirstQuestionForm)

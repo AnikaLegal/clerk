@@ -1,5 +1,14 @@
 // TODO - pull these from backend rather than duplicating
-const FIELD_KEYS = ['id', 'start', 'prompt', 'options', 'help', 'details', 'follows', 'type']
+const FIELD_KEYS = [
+  'id',
+  'start',
+  'prompt',
+  'options',
+  'help',
+  'details',
+  'follows',
+  'type',
+]
 const FIELD_TYPES = ['TEXT', 'NUMBER', 'BOOLEAN']
 const FIELD_TYPES_DISPLAY = {
   TEXT: 'Text',

@@ -9,11 +9,14 @@ import CreateScriptForm from 'components/forms/create-script'
 
 // Page listing all questionnaire scripts.
 class ScriptList extends Component {
-
   render() {
     const { scripts } = this.props
     if (scripts.loading) {
-      return <FadeIn duration="1"><p>Loading...</p></FadeIn>
+      return (
+        <FadeIn duration="1">
+          <p>Loading...</p>
+        </FadeIn>
+      )
     }
     return (
       <FadeIn duration="0.2">

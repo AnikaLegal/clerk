@@ -13,7 +13,8 @@ const ErrorModal = ({ onClose, errors }) => (
     <div className={styles.message}>
       {Object.entries(errors || DEFAULT_ERROR).map(([name, messages]) => (
         <div key={name}>
-          {name.toUpperCase()}:{messages.reduce((str, msg) => `${str} ${msg}`, '')}
+          {name.toUpperCase()}:
+          {messages.reduce((str, msg) => `${str} ${msg}`, '')}
         </div>
       ))}
     </div>

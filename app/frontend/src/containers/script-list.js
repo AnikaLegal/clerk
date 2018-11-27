@@ -6,7 +6,6 @@ import ErrorBoundary from 'components/generic/error-boundary'
 import ErrorModal from 'components/modals/error'
 import ScriptList from 'components/script-list'
 
-
 class ScriptListContainer extends Component {
   componentDidMount() {
     this.props.listScripts()
@@ -16,9 +15,7 @@ class ScriptListContainer extends Component {
     const { errors, showError, clearError } = this.props
     return (
       <div>
-        {showError && (
-          <ErrorModal onClose={clearError} errors={errors} />
-        )}
+        {showError && <ErrorModal onClose={clearError} errors={errors} />}
         <ErrorBoundary>
           <ScriptList />
         </ErrorBoundary>
@@ -26,7 +23,6 @@ class ScriptListContainer extends Component {
     )
   }
 }
-
 
 const mapStateToProps = state => ({
   showError: state.error.visible,
@@ -36,4 +32,7 @@ const mapDispatchToProps = dispatch => ({
   clearError: () => dispatch(actions.error.clear()),
   listScripts: () => dispatch(actions.script.list()),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(ScriptListContainer)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ScriptListContainer)

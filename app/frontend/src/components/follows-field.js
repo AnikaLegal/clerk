@@ -43,7 +43,10 @@ class FollowsField extends Component {
 
   onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
 
-  isValid = () => this.state.prev && ((!this.state.when && !this.state.value) || (this.state.when && this.state.value))
+  isValid = () =>
+    this.state.prev &&
+    ((!this.state.when && !this.state.value) ||
+      (this.state.when && this.state.value))
 
   render() {
     const { question, script } = this.props
@@ -51,12 +54,19 @@ class FollowsField extends Component {
     return (
       <div>
         {question.follows.map(f => (
-          <div key={f.id + (f.when ? f.when.id + f.when.value : '')} className="mb-1">
-            <button className="close mr-3" onClick={this.onRemove(question.id, f)}>
+          <div
+            key={f.id + (f.when ? f.when.id + f.when.value : '')}
+            className="mb-1"
+          >
+            <button
+              className="close mr-3"
+              onClick={this.onRemove(question.id, f)}
+            >
               <span>&times;</span>
             </button>
             <span>
-              Follows "{script[f.id].prompt}"{f.when ? <span> when it is "{f.when.value}"</span> : null}
+              Follows "{script[f.id].prompt}"
+              {f.when ? <span> when it is "{f.when.value}"</span> : null}
             </span>
           </div>
         ))}
@@ -80,8 +90,16 @@ class FollowsField extends Component {
             ))}
           </select>
           <span> is </span>
-          <input type="text" value={this.state.value} onChange={this.onInput('value')} />
-          <button onClick={this.onAdd} disabled={!this.isValid()} className="btn btn-primary">
+          <input
+            type="text"
+            value={this.state.value}
+            onChange={this.onInput('value')}
+          />
+          <button
+            onClick={this.onAdd}
+            disabled={!this.isValid()}
+            className="btn btn-primary"
+          >
             Add
           </button>
         </div>
@@ -94,8 +112,10 @@ const mapStateToProps = state => ({
   script: state.script,
 })
 const mapDispatchToProps = dispatch => ({
-  onRemove: (id, follows) => dispatch(actions.question.removeFollows(id, follows)),
-  onAdd: (id, prev, when, value) => dispatch(actions.question.addFollows(id, prev, when, value)),
+  onRemove: (id, follows) =>
+    dispatch(actions.question.removeFollows(id, follows)),
+  onAdd: (id, prev, when, value) =>
+    dispatch(actions.question.addFollows(id, prev, when, value)),
 })
 export default connect(
   mapStateToProps,

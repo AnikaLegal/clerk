@@ -14,7 +14,6 @@ const INITIAL_STATE = {
   name: '', // New script name
 }
 
-
 // Form to create a new questionnaire script.
 class CreateScriptForm extends Component {
   constructor(props) {
@@ -22,38 +21,27 @@ class CreateScriptForm extends Component {
     this.state = { ...INITIAL_STATE }
   }
 
-  onSubmit = () =>
-    this.setState({ showModal: true })
+  onSubmit = () => this.setState({ showModal: true })
 
-  onCancel = () =>
-    this.setState({ showModal: false })
+  onCancel = () => this.setState({ showModal: false })
 
   onConfirm = () => {
     const { createScript } = this.props
     const { name } = this.state
     this.setState({ loading: true, showModal: false })
-    createScript(name)
-      .then(this.setState({ ...INITIAL_STATE }))
+    createScript(name).then(this.setState({ ...INITIAL_STATE }))
   }
 
-  onInputName = e =>
-    this.setState({ name: e.target.value })
+  onInputName = e => this.setState({ name: e.target.value })
 
-  toggleOpen = () =>
-    this.setState({ isOpen: !this.state.isOpen })
+  toggleOpen = () => this.setState({ isOpen: !this.state.isOpen })
 
-  isFormValid = () =>
-    !this.state.loading &&
-    this.state.name.length > 3
+  isFormValid = () => !this.state.loading && this.state.name.length > 3
 
   render() {
     const { name, isOpen, showModal } = this.state
     if (!isOpen) {
-      return (
-        <Button onClick={this.toggleOpen}>
-          Add Questionnaire
-        </Button>
-      )
+      return <Button onClick={this.toggleOpen}>Add Questionnaire</Button>
     }
     return (
       <FadeIn>
@@ -73,14 +61,15 @@ class CreateScriptForm extends Component {
           >
             Add
           </Button>
-          <Button
-            onClick={this.toggleOpen}
-            btnStyle="danger"
-          >
+          <Button onClick={this.toggleOpen} btnStyle="danger">
             Close
           </Button>
         </div>
-        <ConfirmationModal isVisible={showModal} onConfirm={this.onConfirm} onCancel={this.onCancel}>
+        <ConfirmationModal
+          isVisible={showModal}
+          onConfirm={this.onConfirm}
+          onCancel={this.onCancel}
+        >
           <p>
             <strong>Add Questionnaire</strong>
           </p>
@@ -91,9 +80,11 @@ class CreateScriptForm extends Component {
   }
 }
 
-
 const mapStateToProps = () => ({})
 const mapDispatchToProps = dispatch => ({
   createScript: name => dispatch(actions.script.create(name)),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(CreateScriptForm)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateScriptForm)

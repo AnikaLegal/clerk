@@ -14,11 +14,11 @@ Debounces user input. Example usage:
 
 */
 export default delay => {
-  let timer = null;
+  let timer = null
   return callback => {
     return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => callback(...args), delay);
-    };
-  };
-};
+      clearTimeout(timer)
+      timer = setTimeout(() => callback(...args), delay)
+    }
+  }
+}

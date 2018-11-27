@@ -36,7 +36,9 @@ class Questionnaire extends Component {
     for (let question of Object.values(script)) {
       for (let follow of question.follows) {
         const isIdMatch = follow.id === currentStepId
-        const isWhenMatch = follow.when ? answers[follow.when.id] === follow.when.value : true
+        const isWhenMatch = follow.when
+          ? answers[follow.when.id] === follow.when.value
+          : true
 
         if (isIdMatch && isWhenMatch) {
           nextQuestionId = question.id
