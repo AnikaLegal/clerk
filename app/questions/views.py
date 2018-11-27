@@ -8,4 +8,5 @@ class IndexView(TemplateView):
     """
     React single page app view
     """
+
     template_name = 'questions/index.html'
