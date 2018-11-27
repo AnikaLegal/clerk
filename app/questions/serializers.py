@@ -22,7 +22,7 @@ class TransitionSeializer(serializers.ModelSerializer):
     A transition that leads from one question to the next
     """
     class Meta:
-        model = Question
+        model = Transition
         read_only_fields = ('modified_at',)
         fields = (
             'id',

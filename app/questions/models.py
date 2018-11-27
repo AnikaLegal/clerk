@@ -56,6 +56,7 @@ class Script(TimestampedModel):
         null=True,
         blank=True
     )
+
     def __str__(self):
         return self.name
 
