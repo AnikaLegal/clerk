@@ -81,6 +81,7 @@ const mapStateToProps = state => ({
   questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
+  // TO DO NEXT
   // updateQuestion: question => dispatch(actions.question.update(question)),
   // removeQuestion: id => dispatch(actions.question.remove(id)),
 })
