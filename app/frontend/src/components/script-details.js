@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import classNames from 'classnames/bind'
 
 import { actions } from 'state'
 import FadeIn from 'components/generic/fade-in'
@@ -30,18 +31,20 @@ class ScriptDetails extends Component {
     return (
       <FadeIn duration="0.2">
         <h1 className="mb-3">{script.name}</h1>
-        <div className="mb-3">
-          <FirstQuestionForm script={script} key={script.firstQuestion} />
-        </div>
-        <div className="mb-3">
+        <div className="list-group mb-3">
+          <div className="list-group-item">
+            <FirstQuestionForm script={script} key={script.firstQuestion} />
+          </div>
           {questions.list
             .filter(q => q.script === script.id)
             .map(q => (
-              <UpdateQuestionForm
-                script={script}
-                question={q}
-                key={getQuestionKey(q)}
-              />
+              <div key={q.id} className="list-group-item">
+                <UpdateQuestionForm
+                  script={script}
+                  question={q}
+                  key={getQuestionKey(q)}
+                />
+              </div>
             ))}
         </div>
         <CreateQuestionForm script={script} />

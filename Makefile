@@ -1,6 +1,6 @@
 #
-# This Makefile contains commands which are run by developers,
-# outside of the the Docker containers
+# This Makefile contains commands which are run by developers, outside of Docker.
+# Most of these commands use the Makefile at ./app/Makefile
 #
 # If you find yourself running the same docker-compose command over and over,
 # then consider adding it here.

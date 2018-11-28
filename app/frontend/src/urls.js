@@ -4,6 +4,7 @@
 const API = {
   SCRIPT: '/api/questions/script/',
   QUESTION: '/api/questions/question/',
+  TRANSITION: '/api/questions/transition/',
 }
 // User facing endpoints
 const CLIENT = {
@@ -20,6 +21,10 @@ const urls = {
     question: {
       list: () => API.QUESTION,
       details: id => `${API.QUESTION}${id}/`,
+    },
+    transition: {
+      list: () => API.TRANSITION,
+      details: id => `${API.TRANSITION}${id}/`,
     },
   },
   client: {

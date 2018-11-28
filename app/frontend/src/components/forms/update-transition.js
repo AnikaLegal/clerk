@@ -5,19 +5,14 @@ import PropTypes from 'prop-types'
 import { actions } from 'state'
 import DropdownField from 'components/generic/dropdown-field'
 
-class FollowsField extends Component {
+class UpdateTransitionForm extends Component {
   static propTypes = {
-    question: PropTypes.shape({
-      follows: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          when: PropTypes.shape({
-            id: PropTypes.string,
-            value: PropTypes.string,
-          }),
-        })
-      ),
-    }),
+    id: PropTypes.string.isRequired,
+    previous: PropTypes.number.isRequired,
+    next: PropTypes.number.isRequired,
+    condition: PropTypes.string.isRequired,
+    variable: PropTypes.number.isRequired,
+    value: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -120,4 +115,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(FollowsField)
+)(UpdateTransitionForm)

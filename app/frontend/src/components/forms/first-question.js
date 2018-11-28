@@ -37,7 +37,7 @@ class FirstQuestionForm extends Component {
     const { firstQuestion, loading } = this.state
     const { script, questions } = this.props
     return (
-      <div>
+      <div className="mb-2">
         <DropdownField
           label="Start"
           placeholder="Select the starting question"

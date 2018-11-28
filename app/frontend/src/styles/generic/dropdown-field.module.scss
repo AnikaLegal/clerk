@@ -1,0 +1,18 @@
+@import "input.scss";
+
+.wrapper {
+  @extend ._wrapper;
+}
+
+.label {
+  @extend ._label;
+}
+
+.placeholder {
+  color: $neutral;
+}
+
+.input {
+  @extend ._input;
+  padding: 0.375rem 0.55rem;
+}

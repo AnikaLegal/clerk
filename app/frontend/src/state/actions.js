@@ -42,8 +42,16 @@ export default {
       upsert(dispatch, 'question', api.question.create, ...args),
     update: (...args) => dispatch =>
       upsert(dispatch, 'question', api.question.update, ...args),
-    // remove: id => ({ type: 'REMOVE_QUESTION', id }),
-    // removeFollows: (id, follows) => ({ type: 'REMOVE_FOLLOWS', id, follows }),
-    // addFollows: (id, prev, when, value) => ({ type: 'ADD_FOLLOWS', id, prev, when, value }),
+  },
+  // Actions affecting transitions
+  transition: {
+    create: dispatch => (...args) => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return api.transition.create(...args)
+        .then(handleJSONResponse(dispatch))
+        // We get a question back as a response, rather than just the transition.
+        .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'question', item }))
+        .catch(handleError(dispatch))
+      }
   },
 }

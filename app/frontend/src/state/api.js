@@ -37,4 +37,14 @@ export default {
         field_type: fieldType,
       }),
   },
+  transition: {
+    create: (questionId, previous, condition, variable, value) =>
+      http.post(urls.api.transition.list(), {
+        next: questionId,
+        previous: previous,
+        condition: condition,
+        variable: variable,
+        value: value,
+      }),
+  }
 }

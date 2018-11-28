@@ -34,9 +34,10 @@ class CreateQuestionForm extends Component {
   onConfirm = () => {
     const { script, createQuestion } = this.props
     const { name, prompt, fieldType } = this.state
-    this.setState({ loading: true })
-    createQuestion(script.id, name, prompt, fieldType).then(
-      this.setState({ ...INITIAL_STATE })
+    this.setState({ loading: true }, () =>
+      createQuestion(script.id, name, prompt, fieldType).then(
+        this.setState({ ...INITIAL_STATE })
+      )
     )
   }
 
@@ -57,38 +58,44 @@ class CreateQuestionForm extends Component {
     }
     return (
       <FadeIn>
-        <InputField
-          label="Name"
-          type="text"
-          placeholder="Question name (internal use)"
-          value={name}
-          onChange={this.onInput('name')}
-          autoFocus
-        />
-        <InputField
-          label="Prompt"
-          type="text"
-          placeholder="Prompt for the user to answer"
-          value={prompt}
-          onChange={this.onInput('prompt')}
-        />
-        <DropdownField
-          label="Type"
-          placeholder="Select question data type"
-          value={fieldType}
-          onChange={this.onInput('fieldType')}
-          options={FIELD_TYPES.map(fieldType => [
-            fieldType,
-            FIELD_TYPES_DISPLAY[fieldType],
-          ])}
-        />
-        <div className="mt-2">
+        <div className="mb-2">
+          <InputField
+            label="Name"
+            type="text"
+            placeholder="Question name"
+            value={name}
+            onChange={this.onInput('name')}
+            autoFocus
+          />
+        </div>
+        <div className="mb-2">
+          <InputField
+            label="Prompt"
+            type="text"
+            placeholder="Prompt for the user to answer"
+            value={prompt}
+            onChange={this.onInput('prompt')}
+          />
+        </div>
+       <div className="mb-2">
+          <DropdownField
+            label="Type"
+            placeholder="Select question data type"
+            value={fieldType}
+            onChange={this.onInput('fieldType')}
+            options={FIELD_TYPES.map(fieldType => [
+              fieldType,
+              FIELD_TYPES_DISPLAY[fieldType],
+            ])}
+          />
+        </div>
+        <div className="mt-3">
           <Button
             className="mr-2"
             onClick={this.onConfirm}
             disabled={!this.isFormValid()}
           >
-            Add
+            Add Question
           </Button>
           <Button onClick={this.toggleOpen} btnStyle="danger">
             Close

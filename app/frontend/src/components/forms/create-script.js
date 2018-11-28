@@ -59,7 +59,7 @@ class CreateScriptForm extends Component {
             onClick={this.onSubmit}
             disabled={!this.isFormValid()}
           >
-            Add
+            Add Questionnaire
           </Button>
           <Button onClick={this.toggleOpen} btnStyle="danger">
             Close

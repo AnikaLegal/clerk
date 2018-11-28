@@ -7,6 +7,8 @@ import debounce from 'utils/debounce'
 import InputField from 'components/generic/input-field'
 import DropdownField from 'components/generic/dropdown-field'
 import Button from 'components/generic/button'
+import ErrorBoundary from 'components/generic/error-boundary'
+import CreateTransitionForm from 'components/forms/create-transition'
 import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
 
 // Key which we use to check whether the question has changed.
@@ -27,8 +29,10 @@ class UpdateQuestionForm extends Component {
       name: PropTypes.string.isRequired,
       prompt: PropTypes.string.isRequired,
       fieldType: PropTypes.string.isRequired,
-      parentTransitions: PropTypes.array.isRequired,
-    }).isRequired,
+      parentTransitions: PropTypes.arrayOf(PropTypes.shape({
+        modifiedAt: PropTypes.string.isRequired,
+      })).isRequired,
+    })
   }
 
   constructor(props) {
@@ -61,34 +65,50 @@ class UpdateQuestionForm extends Component {
     const { script, question } = this.props
     const { name, loading, prompt, fieldType } = this.state
     return (
-      <div className="mb-2">
-        <InputField
-          label="Name"
-          type="text"
-          placeholder="Question name (internal use)"
-          value={name}
-          onChange={this.onInput('name')}
-          readOnly={loading}
-        />
-        <InputField
-          label="Prompt"
-          type="text"
-          placeholder="Prompt for the user to answer"
-          value={prompt}
-          onChange={this.onInput('prompt')}
-          readOnly={loading}
-        />
-        <DropdownField
-          label="Type"
-          placeholder="Select question data type"
-          value={fieldType}
-          onChange={this.onInput('fieldType')}
-          disabled={loading}
-          options={FIELD_TYPES.map(fieldType => [
-            fieldType,
-            FIELD_TYPES_DISPLAY[fieldType],
-          ])}
-        />
+      <div>
+        <div className="mb-2">
+          <InputField
+            label="Name"
+            type="text"
+            placeholder="Question name"
+            value={name}
+            onChange={this.onInput('name')}
+            disabled={loading}
+          />
+        </div>
+        <div className="mb-2">
+          <InputField
+            label="Prompt"
+            type="text"
+            placeholder="Prompt for the user to answer"
+            value={prompt}
+            onChange={this.onInput('prompt')}
+            disabled={loading}
+          />
+        </div>
+        <div className="mb-2">
+          <DropdownField
+            label="Type"
+            placeholder="Select question data type"
+            value={fieldType}
+            onChange={this.onInput('fieldType')}
+            disabled={loading}
+            options={FIELD_TYPES.map(fieldType => [
+              fieldType,
+              FIELD_TYPES_DISPLAY[fieldType],
+            ])}
+          />
+        </div>
+        <div className="mb-2">
+          <ErrorBoundary>
+            {question.parentTransitions.map(t => (
+              <div className="mb-2">
+                {t.modifiedAt}
+              </div>
+            ))}
+            <CreateTransitionForm script={script} question={question} />
+          </ErrorBoundary>
+        </div>
       </div>
     )
   }

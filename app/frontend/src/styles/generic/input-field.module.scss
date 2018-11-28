@@ -1,0 +1,13 @@
+@import "input.scss";
+
+.wrapper {
+  @extend ._wrapper;
+}
+
+.label {
+  @extend ._label;
+}
+
+.input {
+  @extend ._input;
+}
