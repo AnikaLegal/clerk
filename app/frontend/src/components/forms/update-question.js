@@ -31,6 +31,7 @@ class UpdateQuestionForm extends Component {
       fieldType: PropTypes.string.isRequired,
       parentTransitions: PropTypes.arrayOf(
         PropTypes.shape({
+          id: PropTypes.number.isRequired,
           modifiedAt: PropTypes.string.isRequired,
         })
       ).isRequired,
@@ -104,7 +105,9 @@ class UpdateQuestionForm extends Component {
         <div className="mb-2">
           <ErrorBoundary>
             {question.parentTransitions.map(t => (
-              <div className="mb-2">{t.modifiedAt}</div>
+              <div key={t.id} className="mb-2">
+                {t.modifiedAt}
+              </div>
             ))}
             <CreateTransitionForm script={script} question={question} />
           </ErrorBoundary>

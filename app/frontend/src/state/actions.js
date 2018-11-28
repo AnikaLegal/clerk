@@ -45,7 +45,7 @@ export default {
   },
   // Actions affecting transitions
   transition: {
-    create: dispatch => (...args) => {
+    create: (...args) => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'question' })
       return (
         api.transition

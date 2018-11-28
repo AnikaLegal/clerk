@@ -15,6 +15,9 @@ router.register('questions/question', question_apis.QuestionViewSet, 'questions-
 router.register(
     'questions/submission', question_apis.SubmissionViewSet, 'questions-submission'
 )
+router.register(
+    'questions/transition', question_apis.TransitionViewSet, 'questions-transition'
+)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),

@@ -2,7 +2,8 @@
 Questions app API endpoints.
 These JSON HTTP APIs are consumed by the frontend app.
 """
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
 
 from .models import Question, Script, Submission, Transition
 from .serializers import (QuestionSerializer, ScriptSerializer, SubmissionSerializer,
@@ -61,3 +62,13 @@ class TransitionViewSet(
 
     serializer_class = TransitionSeializer
     queryset = Transition.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new transition, return the 'next' question on success.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        transition = serializer.save()
+        question_data = QuestionSerializer(transition.next).data
+        return Response(question_data, status=status.HTTP_201_CREATED)

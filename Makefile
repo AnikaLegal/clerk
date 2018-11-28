@@ -13,6 +13,10 @@ webpack:
 web:
 	docker-compose up web
 
+# Run Django with debugging enabled
+debug:
+	docker-compose run --service-ports web
+
 # Get a bash shell in the docker container
 bash:
 	docker-compose run web bash
