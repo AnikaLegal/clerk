@@ -18,7 +18,22 @@ const generic = {
       },
     },
   }),
-  // Mark a set of data items as "loading"
+  // Remove a single data item, based on id
+  REMOVE_ITEM: (state, action) => ({
+    ...state,
+    data: {
+      ...state.data,
+      [action.key]: {
+        ...state.data[action.key],
+        loading: false,
+        lookup: removeItemFromLookup(
+          action.item,
+          state.data[action.key].lookup
+        ),
+        list: removeItemFromList(action.item, state.data[action.key].list),
+      },
+    },
+  }), // Mark a set of data items as "loading"
   SET_LOADING: (state, action) => ({
     ...state,
     data: {
@@ -62,5 +77,11 @@ const isItemInList = (item, list) => list.map(el => el.id).includes(item.id)
 const addItemToList = (item, list) => [...list, item]
 const updateItemInList = (item, list) =>
   list.map(el => (el.id === item.id ? item : el))
+const removeItemFromList = (item, list) => list.filter(el => el.id !== item.id)
+const removeItemFromLookup = (item, lookup) => {
+  const newLookup = { ...lookup }
+  delete newLookup[item.id]
+  return newLookup
+}
 
 export default generic

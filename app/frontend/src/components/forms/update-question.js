@@ -9,6 +9,7 @@ import SubField from 'components/generic/sub-field'
 import QuestionForm, { isFormValid } from 'components/forms/question'
 import Button from 'components/generic/button'
 import ErrorBoundary from 'components/generic/error-boundary'
+import ConfirmationModal from 'components/modals/confirm'
 import CreateTransitionForm from 'components/forms/create-transition'
 import UpdateTransitionForm from 'components/forms/update-transition'
 import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
@@ -47,6 +48,7 @@ class UpdateQuestionForm extends Component {
     super(props)
     this.state = {
       loading: false,
+      isDeleteOpen: false,
       name: props.question.name,
       prompt: props.question.prompt,
       fieldType: props.question.fieldType,
@@ -75,17 +77,23 @@ class UpdateQuestionForm extends Component {
     )
   }
 
+  onDelete = () =>
+    this.props.deleteQuestion({ questionId: this.props.question.id })
+
   onToggleOpen = () => this.props.toggleOpen(this.props.question.id)
 
+  onToggleDeleteOpen = () =>
+    this.setState({ isDeleteOpen: !this.state.isDeleteOpen })
+
   hasChanged = () =>
-    ['name', 'state', 'fieldType'].reduce(
+    ['name', 'prompt', 'fieldType'].reduce(
       (bool, field) => bool || this.props.question[field] !== this.state[field],
       false
     )
 
   render() {
     const { script, question, openQuestions } = this.props
-    const { name } = this.state
+    const { name, isDeleteOpen } = this.state
     if (!openQuestions[question.id]) {
       return (
         <div
@@ -113,14 +121,18 @@ class UpdateQuestionForm extends Component {
           <ErrorBoundary>
             <div className="list-group mb-2">
               {question.parentTransitions.length > 0 &&
-                question.parentTransitions.map(t => (
-                  <UpdateTransitionForm
-                    key={t.modifiedAt}
-                    question={question}
-                    script={script}
-                    transition={t}
-                  />
-                ))}
+                question.parentTransitions
+                  .sort((a, b) => (a.id > b.id ? 1 : -1))
+                  .map(t => (
+                    <div key={t.id}>
+                      <UpdateTransitionForm
+                        key={t.modifiedAt}
+                        question={question}
+                        script={script}
+                        transition={t}
+                      />
+                    </div>
+                  ))}
               {question.parentTransitions.length < 1 && (
                 <div className="list-group-item">
                   This question does not follow any other questions.
@@ -130,11 +142,23 @@ class UpdateQuestionForm extends Component {
             <CreateTransitionForm script={script} question={question} />
           </ErrorBoundary>
         </SubField>
-        <div className="mt-3">
+        <div className="mt-3 d-flex justify-content-between">
           <Button btnStyle="secondary" onClick={this.onToggleOpen}>
             Hide
           </Button>
+          <Button onClick={this.onToggleDeleteOpen} btnStyle="danger">
+            Delete
+          </Button>
         </div>
+        <ConfirmationModal
+          isVisible={isDeleteOpen}
+          onConfirm={this.onDelete}
+          onCancel={this.onToggleDeleteOpen}
+        >
+          <p>
+            <strong>Delete the question &ldquo;{name}&rdquo;?</strong>
+          </p>
+        </ConfirmationModal>
       </div>
     )
   }
@@ -145,6 +169,7 @@ const mapStateToProps = state => ({
 })
 const mapDispatchToProps = dispatch => ({
   updateQuestion: (...args) => dispatch(actions.question.update(...args)),
+  deleteQuestion: (...args) => dispatch(actions.question.delete(...args)),
   toggleOpen: (...args) =>
     dispatch(actions.selection.question.toggleOpen(...args)),
 })

@@ -3,19 +3,17 @@ Questions app API endpoints.
 These JSON HTTP APIs are consumed by the frontend app.
 """
 from rest_framework import mixins, status, viewsets
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin, ListModelMixin,
+                                   UpdateModelMixin)
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from .models import Question, Script, Submission, Transition
 from .serializers import (QuestionSerializer, ScriptSerializer, SubmissionSerializer,
                           TransitionSeializer)
 
 
-class ScriptViewSet(
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
+class ScriptViewSet(CreateModelMixin, UpdateModelMixin, ListModelMixin, GenericViewSet):
     """
     List or create scripts
     """
@@ -25,10 +23,7 @@ class ScriptViewSet(
 
 
 class QuestionViewSet(
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
+    CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet
 ):
     """
     List, create, questions.
@@ -40,10 +35,17 @@ class QuestionViewSet(
     serializer_class = QuestionSerializer
     queryset = Question.objects.prefetch_related('parent_transitions').all()
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete an existing question, return the deleted question id success.
+        """
+        question = self.get_object()
+        pk = question.pk
+        self.perform_destroy(question)
+        return Response({'id': pk})
 
-class SubmissionViewSet(
-    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
-):
+
+class SubmissionViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     """
     List, create, answers.
     # TODO - filter by scripts so we don't pull all questions from DB
@@ -54,7 +56,7 @@ class SubmissionViewSet(
 
 
 class TransitionViewSet(
-    mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
+    CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet
 ):
     """
     Create, update transitions.
@@ -82,4 +84,14 @@ class TransitionViewSet(
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         question_data = QuestionSerializer(transition.next).data
+        return Response(question_data)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete an existing transition, return the 'next' question on success.
+        """
+        transition = self.get_object()
+        question = transition.next
+        self.perform_destroy(transition)
+        question_data = QuestionSerializer(question).data
         return Response(question_data)

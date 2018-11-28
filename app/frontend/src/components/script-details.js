@@ -37,6 +37,7 @@ class ScriptDetails extends Component {
           </div>
           {questions.list
             .filter(q => q.script === script.id)
+            .sort((a, b) => (a.id > b.id ? 1 : -1))
             .map(q => (
               <UpdateQuestionForm
                 script={script}

@@ -21,6 +21,15 @@ const upsert = (dispatch, dataType, apiCall, ...args) => {
     .catch(handleError(dispatch))
 }
 
+// Generic action to delete a data item
+const remove = (dispatch, dataType, apiCall, ...args) => {
+  dispatch({ type: 'SET_LOADING', key: dataType })
+  return apiCall(...args)
+    .then(handleJSONResponse(dispatch))
+    .then(item => dispatch({ type: 'REMOVE_ITEM', key: dataType, item }))
+    .catch(handleError(dispatch))
+}
+
 // All actions performed by the frontend.
 export default {
   // Actions purely affecting the UI
@@ -51,9 +60,24 @@ export default {
       upsert(dispatch, 'question', api.question.create, ...args),
     update: (...args) => dispatch =>
       upsert(dispatch, 'question', api.question.update, ...args),
+    delete: (...args) => dispatch =>
+      remove(dispatch, 'question', api.question.delete, ...args),
   },
   // Actions affecting transitions
   transition: {
+    delete: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return (
+        api.transition
+          .delete(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
+    },
     create: (...args) => dispatch => {
       dispatch({ type: 'SET_LOADING', key: 'question' })
       return (

@@ -11,6 +11,7 @@ import TransitionForm, {
   isFormValid,
   getQuestionOptions,
 } from 'components/forms/transition'
+import ConfirmationModal from 'components/modals/confirm'
 import styles from 'styles/update-form.module.scss'
 
 const cx = classNames.bind(styles)
@@ -37,6 +38,7 @@ class UpdateTransitionForm extends Component {
     super(props)
     this.state = {
       loading: false,
+      isDeleteOpen: false,
       // Transition fields
       previous: props.transition.previous,
       condition: props.transition.condition || '',
@@ -52,6 +54,9 @@ class UpdateTransitionForm extends Component {
       this.debounce(this.onSubmit)()
     )
   }
+
+  onDelete = () =>
+    this.props.deleteTransition({ transitionId: this.props.transition.id })
 
   onSubmit = () => {
     const { transition, question, updateTransition } = this.props
@@ -71,6 +76,9 @@ class UpdateTransitionForm extends Component {
 
   onToggleOpen = () => this.props.toggleOpen(this.props.transition.id)
 
+  onToggleDeleteOpen = () =>
+    this.setState({ isDeleteOpen: !this.state.isDeleteOpen })
+
   hasChanged = () =>
     ['previous', 'condition', 'variable', 'value'].reduce((bool, field) => {
       const fieldHasChanged = this.props.transition[field] !== this.state[field]
@@ -79,8 +87,23 @@ class UpdateTransitionForm extends Component {
       return bool || (fieldHasChanged && !isInitialSetting)
     }, false)
 
+  renderDescription() {
+    const { questions } = this.props
+    const { previous, condition, variable, value } = this.state
+    return (
+      <div>
+        Follows the question &ldquo;{questions.lookup[previous].name}&rdquo;{' '}
+        {condition && (
+          <span>
+            if the answer to &ldquo;{questions.lookup[variable].name}&rdquo;{' '}
+            {CONDITIONS_DISPLAY[condition]} &ldquo;{value}&rdquo;
+          </span>
+        )}
+      </div>
+    )
+  }
+
   render() {
-    // TODO - check for valid before hitting API
     const {
       question,
       script,
@@ -88,7 +111,7 @@ class UpdateTransitionForm extends Component {
       questions,
       openTransitions,
     } = this.props
-    const { previous, condition, variable, value } = this.state
+    const { isDeleteOpen } = this.state
     if (!openTransitions[transition.id]) {
       return (
         <div
@@ -98,13 +121,7 @@ class UpdateTransitionForm extends Component {
           })}
           onClick={this.onToggleOpen}
         >
-          Follows the question &ldquo;{questions.lookup[previous].name}&rdquo;{' '}
-          {condition && (
-            <span>
-              if the answer to &ldquo;{questions.lookup[variable].name}&rdquo;{' '}
-              {CONDITIONS_DISPLAY[condition]} &ldquo;{value}&rdquo;
-            </span>
-          )}
+          {this.renderDescription()}
         </div>
       )
     }
@@ -121,11 +138,27 @@ class UpdateTransitionForm extends Component {
           questionOptions={options}
           {...this.state}
         />
-        <div className="mt-3">
+        <div className="mt-3 d-flex justify-content-between">
           <Button btnStyle="secondary" onClick={this.onToggleOpen}>
             Hide
           </Button>
+          <Button onClick={this.onToggleDeleteOpen} btnStyle="danger">
+            Delete
+          </Button>
         </div>
+        <ConfirmationModal
+          isVisible={isDeleteOpen}
+          onConfirm={this.onDelete}
+          onCancel={this.onToggleDeleteOpen}
+        >
+          <p>
+            <strong>
+              Delete this question transition from &ldquo;{question.name}
+              &rdquo;?
+            </strong>
+          </p>
+          {this.renderDescription()}
+        </ConfirmationModal>
       </div>
     )
   }
@@ -137,6 +170,7 @@ const mapStateToProps = state => ({
 })
 const mapDispatchToProps = dispatch => ({
   updateTransition: (...args) => dispatch(actions.transition.update(...args)),
+  deleteTransition: (...args) => dispatch(actions.transition.delete(...args)),
   toggleOpen: (...args) =>
     dispatch(actions.selection.transition.toggleOpen(...args)),
 })

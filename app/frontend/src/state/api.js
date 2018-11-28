@@ -36,6 +36,9 @@ export default {
         prompt: prompt,
         field_type: fieldType,
       }),
+    // Delete an existing question
+    delete: ({ questionId }) =>
+      http.delete(urls.api.question.details(questionId)),
   },
   transition: {
     // Create a new transition (returns a question object)
@@ -47,6 +50,9 @@ export default {
         variable: variable,
         value: value,
       }),
+    // Delete an existing transition (returns a question object)
+    delete: ({ transitionId }) =>
+      http.delete(urls.api.transition.details(transitionId)),
     // Update an existing transition (returns a question object)
     update: ({
       transitionId,
