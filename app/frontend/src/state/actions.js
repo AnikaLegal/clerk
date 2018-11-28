@@ -47,11 +47,16 @@ export default {
   transition: {
     create: dispatch => (...args) => {
       dispatch({ type: 'SET_LOADING', key: 'question' })
-      return api.transition.create(...args)
-        .then(handleJSONResponse(dispatch))
-        // We get a question back as a response, rather than just the transition.
-        .then(item => dispatch({ type: 'UPSERT_ITEM', key: 'question', item }))
-        .catch(handleError(dispatch))
-      }
+      return (
+        api.transition
+          .create(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
+    },
   },
 }

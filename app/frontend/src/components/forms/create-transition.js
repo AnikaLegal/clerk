@@ -18,7 +18,6 @@ const INITIAL_STATE = {
   value: '',
 }
 
-
 class CreateTransitionForm extends Component {
   static propTypes = {
     script: PropTypes.shape({
@@ -39,11 +38,11 @@ class CreateTransitionForm extends Component {
   onConfirm = () => {
     const { createTransition, question } = this.props
     const { previous, condition, variable, value } = this.state
-    this.setState({ loading: true }, () => (
+    this.setState({ loading: true }, () =>
       createTransition(question.id, previous, condition, variable, value).then(
         this.setState({ ...INITIAL_STATE })
       )
-    ))
+    )
   }
 
   toggleOpen = () => this.setState({ isOpen: !this.state.isOpen })
@@ -56,17 +55,9 @@ class CreateTransitionForm extends Component {
 
   isFormValid = () =>
     !this.state.loading &&
-    this.state.previous && (
-      (
-        this.state.condition &&
-        this.state.variable &&
-        this.state.value
-      ) || (
-        !this.state.condition &&
-        !this.state.variable &&
-        !this.state.value
-      )
-    )
+    this.state.previous &&
+    ((this.state.condition && this.state.variable && this.state.value) ||
+      (!this.state.condition && !this.state.variable && !this.state.value))
 
   render() {
     const { questions, question, script } = this.props
@@ -78,7 +69,7 @@ class CreateTransitionForm extends Component {
     return (
       <FadeIn>
         <div className="mb-1">
-         <div className="mb-2">
+          <div className="mb-2">
             <DropdownField
               label="Follows"
               placeholder="Select preceding question"
@@ -87,7 +78,7 @@ class CreateTransitionForm extends Component {
               options={options}
             />
           </div>
-         <div className="mb-2">
+          <div className="mb-2">
             <DropdownField
               label="answer"
               placeholder="Answer to check (optional)"
@@ -97,7 +88,7 @@ class CreateTransitionForm extends Component {
               nullable
             />
           </div>
-         <div className="mb-2">
+          <div className="mb-2">
             <DropdownField
               label="condition"
               placeholder="Condition type  (optional)"
@@ -138,8 +129,7 @@ const mapStateToProps = state => ({
   questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
-  createTransition: (...args) =>
-    dispatch(actions.transition.create(...args)),
+  createTransition: (...args) => dispatch(actions.transition.create(...args)),
 })
 export default connect(
   mapStateToProps,

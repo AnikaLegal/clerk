@@ -40,7 +40,6 @@ const error = {
   }),
 }
 
-
 // Generic operations on backend API data
 const generic = {
   // Update or insert a single data item, based on id

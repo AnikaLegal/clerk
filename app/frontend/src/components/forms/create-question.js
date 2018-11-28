@@ -77,7 +77,7 @@ class CreateQuestionForm extends Component {
             onChange={this.onInput('prompt')}
           />
         </div>
-       <div className="mb-2">
+        <div className="mb-2">
           <DropdownField
             label="Type"
             placeholder="Select question data type"

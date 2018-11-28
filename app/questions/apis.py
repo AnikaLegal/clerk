@@ -5,7 +5,8 @@ These JSON HTTP APIs are consumed by the frontend app.
 from rest_framework import mixins, viewsets
 
 from .models import Question, Script, Submission, Transition
-from .serializers import QuestionSerializer, ScriptSerializer, SubmissionSerializer, TransitionSeializer
+from .serializers import (QuestionSerializer, ScriptSerializer, SubmissionSerializer,
+                          TransitionSeializer)
 
 
 class ScriptViewSet(
@@ -51,10 +52,12 @@ class SubmissionViewSet(
     queryset = Submission.objects.all()
 
 
-class TransitionViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class TransitionViewSet(
+    mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
+):
     """
     Create, update transitions.
     """
+
     serializer_class = TransitionSeializer
     queryset = Transition.objects.all()
-

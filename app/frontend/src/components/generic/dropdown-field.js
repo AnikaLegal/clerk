@@ -18,7 +18,7 @@ const DropdownField = ({
     <div className={cx('label')}>{label}</div>
     <select
       disabled={disabled}
-      className={cx('input', {'placeholder': !value})}
+      className={cx('input', { placeholder: !value })}
       onChange={onChange}
       value={value}
       readOnly={readOnly}

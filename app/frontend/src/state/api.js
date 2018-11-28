@@ -46,5 +46,5 @@ export default {
         variable: variable,
         value: value,
       }),
-  }
+  },
 }
