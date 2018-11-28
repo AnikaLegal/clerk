@@ -72,3 +72,14 @@ class TransitionViewSet(
         transition = serializer.save()
         question_data = QuestionSerializer(transition.next).data
         return Response(question_data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Update an existing transition, return the 'next' question on success.
+        """
+        transition = self.get_object()
+        serializer = self.get_serializer(transition, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        question_data = QuestionSerializer(transition.next).data
+        return Response(question_data)

@@ -1,15 +1,20 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import classNames from 'classnames/bind'
 
 import { actions } from 'state'
 import debounce from 'utils/debounce'
-import InputField from 'components/generic/input-field'
-import DropdownField from 'components/generic/dropdown-field'
+import SubField from 'components/generic/sub-field'
+import QuestionForm, { isFormValid } from 'components/forms/question'
 import Button from 'components/generic/button'
 import ErrorBoundary from 'components/generic/error-boundary'
 import CreateTransitionForm from 'components/forms/create-transition'
+import UpdateTransitionForm from 'components/forms/update-transition'
 import { FIELD_TYPES, FIELD_TYPES_DISPLAY } from 'consts'
+import styles from 'styles/update-form.module.scss'
+
+const cx = classNames.bind(styles)
 
 // Key which we use to check whether the question has changed.
 const getQuestionKey = q =>
@@ -53,8 +58,14 @@ class UpdateQuestionForm extends Component {
   onSubmit = () => {
     const { question, updateQuestion } = this.props
     const { name, prompt, fieldType } = this.state
+    if (!isFormValid(this.state)) return
     this.setState({ loading: true }, () =>
-      updateQuestion(question.id, name, prompt, fieldType)
+      updateQuestion({
+        questionId: question.id,
+        name: name,
+        prompt: prompt,
+        fieldType: fieldType,
+      })
     )
   }
 
@@ -64,53 +75,65 @@ class UpdateQuestionForm extends Component {
     )
   }
 
+  onToggleOpen = () => this.props.toggleOpen(this.props.question.id)
+
+  hasChanged = () =>
+    ['name', 'state', 'fieldType'].reduce(
+      (bool, field) => bool || this.props.question[field] !== this.state[field],
+      false
+    )
+
   render() {
-    const { script, question } = this.props
-    const { name, loading, prompt, fieldType } = this.state
+    const { script, question, openQuestions } = this.props
+    const { name } = this.state
+    if (!openQuestions[question.id]) {
+      return (
+        <div
+          className={cx('list-group-item', 'closed', 'list-group-item-action', {
+            changed: this.hasChanged(),
+            invalid: !isFormValid(this.state),
+          })}
+          onClick={this.onToggleOpen}
+        >
+          <SubField label="name">
+            <div className={cx('closedLabel')}>{name}</div>
+          </SubField>
+        </div>
+      )
+    }
     return (
-      <div>
-        <div className="mb-2">
-          <InputField
-            label="Name"
-            type="text"
-            placeholder="Question name"
-            value={name}
-            onChange={this.onInput('name')}
-            disabled={loading}
-          />
-        </div>
-        <div className="mb-2">
-          <InputField
-            label="Prompt"
-            type="text"
-            placeholder="Prompt for the user to answer"
-            value={prompt}
-            onChange={this.onInput('prompt')}
-            disabled={loading}
-          />
-        </div>
-        <div className="mb-2">
-          <DropdownField
-            label="Type"
-            placeholder="Select question data type"
-            value={fieldType}
-            onChange={this.onInput('fieldType')}
-            disabled={loading}
-            options={FIELD_TYPES.map(fieldType => [
-              fieldType,
-              FIELD_TYPES_DISPLAY[fieldType],
-            ])}
-          />
-        </div>
-        <div className="mb-2">
+      <div
+        className={cx('list-group-item', 'open', {
+          changed: this.hasChanged(),
+          invalid: !isFormValid(this.state),
+        })}
+      >
+        <QuestionForm onInput={this.onInput} {...this.state} />
+        <SubField label="follows" className="mb-3">
           <ErrorBoundary>
-            {question.parentTransitions.map(t => (
-              <div key={t.id} className="mb-2">
-                {t.modifiedAt}
-              </div>
-            ))}
+            <div className="list-group mb-2">
+              {question.parentTransitions.length > 0 &&
+                question.parentTransitions.map(t => (
+                  <UpdateTransitionForm
+                    key={t.modifiedAt}
+                    question={question}
+                    script={script}
+                    transition={t}
+                  />
+                ))}
+              {question.parentTransitions.length < 1 && (
+                <div className="list-group-item">
+                  This question does not follow any other questions.
+                </div>
+              )}
+            </div>
             <CreateTransitionForm script={script} question={question} />
           </ErrorBoundary>
+        </SubField>
+        <div className="mt-3">
+          <Button btnStyle="secondary" onClick={this.onToggleOpen}>
+            Hide
+          </Button>
         </div>
       </div>
     )
@@ -118,11 +141,12 @@ class UpdateQuestionForm extends Component {
 }
 
 const mapStateToProps = state => ({
-  scripts: state.data.script,
-  questions: state.data.question,
+  openQuestions: state.selection.question.open,
 })
 const mapDispatchToProps = dispatch => ({
   updateQuestion: (...args) => dispatch(actions.question.update(...args)),
+  toggleOpen: (...args) =>
+    dispatch(actions.selection.question.toggleOpen(...args)),
 })
 export default connect(
   mapStateToProps,

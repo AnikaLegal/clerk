@@ -1,0 +1,32 @@
+@import "~bootstrap/scss/bootstrap";
+@import "styles/colors.scss";
+
+.closedLabel {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.closed {
+  &.changed {
+    background-color: rgba($yellow, 0.2);
+    &.invalid {
+      background-color: rgba($danger, 0.2);
+    }
+  }
+}
+
+.open {
+  @extend .shadow-lg;
+  &:hover {
+    // Override bootstrap default
+    z-index: 2 !important;
+  }
+  &.changed {
+    border-color: $yellow !important;
+    &.invalid {
+      border-color: $danger !important;
+    }
+  }  z-index: 2;
+}
+

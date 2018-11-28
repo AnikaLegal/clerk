@@ -3,7 +3,12 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { actions } from 'state'
+import { CONDITIONS, CONDITIONS_DISPLAY } from 'consts'
 import Button from 'components/generic/button'
+import TransitionForm, {
+  isFormValid,
+  getQuestionOptions,
+} from 'components/forms/transition'
 import DropdownField from 'components/generic/dropdown-field'
 import InputField from 'components/generic/input-field'
 import FadeIn from 'components/generic/fade-in'
@@ -39,81 +44,45 @@ class CreateTransitionForm extends Component {
     const { createTransition, question } = this.props
     const { previous, condition, variable, value } = this.state
     this.setState({ loading: true }, () =>
-      createTransition(question.id, previous, condition, variable, value).then(
-        this.setState({ ...INITIAL_STATE })
-      )
+      createTransition({
+        questionId: question.id,
+        previous: previous,
+        condition: condition,
+        variable: variable,
+        value: value,
+      }).then(this.setState({ ...INITIAL_STATE }))
     )
   }
 
   toggleOpen = () => this.setState({ isOpen: !this.state.isOpen })
 
-  getOptions = () =>
-    this.props.questions.list
-      .filter(q => q.script === this.props.script.id)
-      .filter(q => q.id !== this.props.question.id)
-      .map(q => [q.id, q.name])
-
-  isFormValid = () =>
-    !this.state.loading &&
-    this.state.previous &&
-    ((this.state.condition && this.state.variable && this.state.value) ||
-      (!this.state.condition && !this.state.variable && !this.state.value))
-
   render() {
     const { questions, question, script } = this.props
-    const { previous, condition, variable, value, isOpen } = this.state
+    const { loading, previous, condition, variable, value, isOpen } = this.state
     if (!isOpen) {
-      return <Button onClick={this.toggleOpen}>Add Parent</Button>
+      return (
+        <Button btnStyle="light" onClick={this.toggleOpen}>
+          Follow a Question
+        </Button>
+      )
     }
-    const options = this.getOptions()
+    const options = getQuestionOptions(questions, question, script)
     return (
       <FadeIn>
         <div className="mb-1">
-          <div className="mb-2">
-            <DropdownField
-              label="Follows"
-              placeholder="Select preceding question"
-              value={previous}
-              onChange={this.onInput('previous')}
-              options={options}
-            />
-          </div>
-          <div className="mb-2">
-            <DropdownField
-              label="answer"
-              placeholder="Answer to check (optional)"
-              value={variable}
-              onChange={this.onInput('variable')}
-              options={options}
-              nullable
-            />
-          </div>
-          <div className="mb-2">
-            <DropdownField
-              label="condition"
-              placeholder="Condition type  (optional)"
-              value={condition}
-              onChange={this.onInput('variable')}
-              options={['EQUALS']}
-              nullable
-            />
-          </div>
-          <div className="mb-2">
-            <InputField
-              label="value"
-              type="text"
-              placeholder="Value for condition"
-              value={value}
-              onChange={this.onInput('value')}
-            />
-          </div>
+          <TransitionForm
+            isCreate
+            onInput={this.onInput}
+            questionOptions={options}
+            {...this.state}
+          />
           <div className="mt-3">
             <Button
               className="mr-2"
               onClick={this.onConfirm}
-              disabled={!this.isFormValid()}
+              disabled={loading || !isFormValid(this.state)}
             >
-              Add Parent
+              Follow a Question
             </Button>
             <Button onClick={this.toggleOpen} btnStyle="danger">
               Close

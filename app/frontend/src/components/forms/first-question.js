@@ -30,7 +30,10 @@ class FirstQuestionForm extends Component {
     if (!input) return
     const firstQuestionId = Number(input)
     this.setState({ firstQuestion: firstQuestionId, loading: true })
-    setFirstQuestion(script.id, firstQuestionId)
+    setFirstQuestion({
+      scriptId: script.id,
+      firstQuestionId: firstQuestionId,
+    })
   }
 
   render() {

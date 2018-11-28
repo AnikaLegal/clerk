@@ -29,7 +29,7 @@ class CreateScriptForm extends Component {
     const { createScript } = this.props
     const { name } = this.state
     this.setState({ loading: true, showModal: false })
-    createScript(name).then(this.setState({ ...INITIAL_STATE }))
+    createScript({ name: name }).then(this.setState({ ...INITIAL_STATE }))
   }
 
   onInputName = e => this.setState({ name: e.target.value })

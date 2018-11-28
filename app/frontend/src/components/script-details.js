@@ -38,13 +38,11 @@ class ScriptDetails extends Component {
           {questions.list
             .filter(q => q.script === script.id)
             .map(q => (
-              <div key={q.id} className="list-group-item">
-                <UpdateQuestionForm
-                  script={script}
-                  question={q}
-                  key={getQuestionKey(q)}
-                />
-              </div>
+              <UpdateQuestionForm
+                script={script}
+                question={q}
+                key={getQuestionKey(q)}
+              />
             ))}
         </div>
         <CreateQuestionForm script={script} />

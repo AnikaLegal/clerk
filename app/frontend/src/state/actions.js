@@ -23,6 +23,15 @@ const upsert = (dispatch, dataType, apiCall, ...args) => {
 
 // All actions performed by the frontend.
 export default {
+  // Actions purely affecting the UI
+  selection: {
+    question: {
+      toggleOpen: id => ({ type: 'TOGGLE_QUESTION_OPEN', id }),
+    },
+    transition: {
+      toggleOpen: id => ({ type: 'TOGGLE_TRANSITION_OPEN', id }),
+    },
+  },
   // Actions affecting error messages
   error: {
     clear: () => ({ type: 'CLEAR_ERROR' }),
@@ -50,6 +59,19 @@ export default {
       return (
         api.transition
           .create(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
+    },
+    update: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return (
+        api.transition
+          .update(...args)
           .then(handleJSONResponse(dispatch))
           // We get a question back as a response, rather than just the transition.
           .then(item =>

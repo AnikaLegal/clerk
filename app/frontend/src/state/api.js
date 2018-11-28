@@ -7,13 +7,13 @@ export default {
     // List all scripts
     list: () => http.get(urls.api.script.list()),
     // Create a new script
-    create: name =>
+    create: ({ name }) =>
       http.post(urls.api.script.list(), {
         name: name,
         first_question: null,
       }),
     // Set a 'first question' on a script
-    setFirstQuestion: (scriptId, firstQuestionId) =>
+    setFirstQuestion: ({ scriptId, firstQuestionId }) =>
       http.patch(urls.api.script.details(scriptId), {
         first_question: firstQuestionId,
       }),
@@ -22,7 +22,7 @@ export default {
     // List all questions
     list: () => http.get(urls.api.question.list()),
     // Create a new question
-    create: (scriptId, name, prompt, fieldType) =>
+    create: ({ scriptId, name, prompt, fieldType }) =>
       http.post(urls.api.question.list(), {
         name: name,
         prompt: prompt,
@@ -30,7 +30,7 @@ export default {
         script: scriptId,
       }),
     // Update an existing question
-    update: (questionId, name, prompt, fieldType) =>
+    update: ({ questionId, name, prompt, fieldType }) =>
       http.patch(urls.api.question.details(questionId), {
         name: name,
         prompt: prompt,
@@ -38,8 +38,25 @@ export default {
       }),
   },
   transition: {
-    create: (questionId, previous, condition, variable, value) =>
+    // Create a new transition (returns a question object)
+    create: ({ questionId, previous, condition, variable, value }) =>
       http.post(urls.api.transition.list(), {
+        next: questionId,
+        previous: previous,
+        condition: condition,
+        variable: variable,
+        value: value,
+      }),
+    // Update an existing transition (returns a question object)
+    update: ({
+      transitionId,
+      questionId,
+      previous,
+      condition,
+      variable,
+      value,
+    }) =>
+      http.put(urls.api.transition.details(transitionId), {
         next: questionId,
         previous: previous,
         condition: condition,

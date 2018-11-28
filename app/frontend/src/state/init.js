@@ -13,6 +13,15 @@ export default {
     question: { ...dataDefault },
     submission: { ...dataDefault },
   },
+  // Selection data - whether elements are open / closed etc.
+  selection: {
+    question: {
+      open: {},
+    },
+    transition: {
+      open: {},
+    },
+  },
   // Error messages
   error: {
     errors: null,

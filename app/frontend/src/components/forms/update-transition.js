@@ -1,102 +1,130 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import classNames from 'classnames/bind'
 
 import { actions } from 'state'
-import DropdownField from 'components/generic/dropdown-field'
+import debounce from 'utils/debounce'
+import { CONDITIONS, CONDITIONS_DISPLAY } from 'consts'
+import Button from 'components/generic/button'
+import TransitionForm, {
+  isFormValid,
+  getQuestionOptions,
+} from 'components/forms/transition'
+import styles from 'styles/update-form.module.scss'
+
+const cx = classNames.bind(styles)
 
 class UpdateTransitionForm extends Component {
   static propTypes = {
-    id: PropTypes.string.isRequired,
-    previous: PropTypes.number.isRequired,
-    next: PropTypes.number.isRequired,
-    condition: PropTypes.string.isRequired,
-    variable: PropTypes.number.isRequired,
-    value: PropTypes.string.isRequired,
+    script: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    }).isRequired,
+    question: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    }).isRequired,
+    transition: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      previous: PropTypes.number.isRequired,
+      next: PropTypes.number.isRequired,
+      condition: PropTypes.string,
+      variable: PropTypes.number,
+      value: PropTypes.string,
+    }).isRequired,
   }
 
   constructor(props) {
     super(props)
-    this.state = { prev: '', when: '', value: '' }
+    this.state = {
+      loading: false,
+      // Transition fields
+      previous: props.transition.previous,
+      condition: props.transition.condition || '',
+      variable: props.transition.variable || '',
+      value: props.transition.value || '',
+    }
   }
 
-  getOptions = () =>
-    Object.keys(this.props.script)
-      .filter(id => id !== this.props.question.id)
-      .map(id => [id, this.props.script[id].prompt])
+  debounce = debounce(1600)
 
-  onRemove = (id, follows) => () => {
-    this.props.onRemove(id, follows)
+  onInput = fieldName => e => {
+    this.setState({ [fieldName]: e.target.value }, () =>
+      this.debounce(this.onSubmit)()
+    )
   }
 
-  onAdd = () => {
-    const { prev, when, value } = this.state
-    if (!this.isValid()) return
-    this.props.onAdd(this.props.question.id, prev, when, value)
-    this.setState({ prev: '', when: '', value: '' })
+  onSubmit = () => {
+    const { transition, question, updateTransition } = this.props
+    const { previous, condition, variable, value } = this.state
+    if (!isFormValid(this.state)) return
+    this.setState({ loading: true }, () =>
+      updateTransition({
+        transitionId: transition.id,
+        questionId: question.id,
+        previous: previous,
+        condition: condition,
+        variable: variable,
+        value: value,
+      })
+    )
   }
 
-  onInput = fieldName => e => this.setState({ [fieldName]: e.target.value })
+  onToggleOpen = () => this.props.toggleOpen(this.props.transition.id)
 
-  isValid = () =>
-    this.state.prev &&
-    ((!this.state.when && !this.state.value) ||
-      (this.state.when && this.state.value))
+  hasChanged = () =>
+    ['previous', 'condition', 'variable', 'value'].reduce((bool, field) => {
+      const fieldHasChanged = this.props.transition[field] !== this.state[field]
+      const isInitialSetting =
+        this.props.transition[field] === null && this.state[field] === ''
+      return bool || (fieldHasChanged && !isInitialSetting)
+    }, false)
 
   render() {
-    const { question, script } = this.props
-    const options = this.getOptions()
-    return (
-      <div>
-        {question.follows.map(f => (
-          <div
-            key={f.id + (f.when ? f.when.id + f.when.value : '')}
-            className="mb-1"
-          >
-            <button
-              className="close mr-3"
-              onClick={this.onRemove(question.id, f)}
-            >
-              <span>&times;</span>
-            </button>
+    // TODO - check for valid before hitting API
+    const {
+      question,
+      script,
+      transition,
+      questions,
+      openTransitions,
+    } = this.props
+    const { previous, condition, variable, value } = this.state
+    if (!openTransitions[transition.id]) {
+      return (
+        <div
+          className={cx('list-group-item', 'closed', 'list-group-item-action', {
+            changed: this.hasChanged(),
+            invalid: !isFormValid(this.state),
+          })}
+          onClick={this.onToggleOpen}
+        >
+          Follows the question &ldquo;{questions.lookup[previous].name}&rdquo;{' '}
+          {condition && (
             <span>
-              Follows "{script[f.id].prompt}"
-              {f.when ? <span> when it is "{f.when.value}"</span> : null}
+              if the answer to &ldquo;{questions.lookup[variable].name}&rdquo;{' '}
+              {CONDITIONS_DISPLAY[condition]} &ldquo;{value}&rdquo;
             </span>
-          </div>
-        ))}
-        <div className="mb-1">
-          <span>Follows </span>
-          <select value={this.state.prev} onChange={this.onInput('prev')}>
-            <option value="">question</option>
-            {options.map(([val, display]) => (
-              <option key={val} value={val}>
-                {display}
-              </option>
-            ))}
-          </select>
-          <span> when </span>
-          <select value={this.state.when} onChange={this.onInput('when')}>
-            <option value="">question</option>
-            {options.map(([val, display]) => (
-              <option key={val} value={val}>
-                {display}
-              </option>
-            ))}
-          </select>
-          <span> is </span>
-          <input
-            type="text"
-            value={this.state.value}
-            onChange={this.onInput('value')}
-          />
-          <button
-            onClick={this.onAdd}
-            disabled={!this.isValid()}
-            className="btn btn-primary"
-          >
-            Add
-          </button>
+          )}
+        </div>
+      )
+    }
+    const options = getQuestionOptions(questions, question, script)
+    return (
+      <div
+        className={cx('list-group-item', 'open', {
+          changed: this.hasChanged(),
+          invalid: !isFormValid(this.state),
+        })}
+      >
+        <TransitionForm
+          onInput={this.onInput}
+          questionOptions={options}
+          {...this.state}
+        />
+        <div className="mt-3">
+          <Button btnStyle="secondary" onClick={this.onToggleOpen}>
+            Hide
+          </Button>
         </div>
       </div>
     )
@@ -104,13 +132,13 @@ class UpdateTransitionForm extends Component {
 }
 
 const mapStateToProps = state => ({
-  script: state.script,
+  openTransitions: state.selection.transition.open,
+  questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({
-  onRemove: (id, follows) =>
-    dispatch(actions.question.removeFollows(id, follows)),
-  onAdd: (id, prev, when, value) =>
-    dispatch(actions.question.addFollows(id, prev, when, value)),
+  updateTransition: (...args) => dispatch(actions.transition.update(...args)),
+  toggleOpen: (...args) =>
+    dispatch(actions.selection.transition.toggleOpen(...args)),
 })
 export default connect(
   mapStateToProps,
