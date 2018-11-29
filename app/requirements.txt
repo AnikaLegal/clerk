@@ -2,12 +2,12 @@
 django
 djangorestframework
 
-# Infra
+# Infrastructure and tools
 ipython
 psycopg2-binary
 django-extensions
 
-# Infra - prod
+# Infrastructure and tools (production)
 #raven
 #gunicorn
 
@@ -16,5 +16,12 @@ whitenoise
 django-webpack-loader
 
 # Development
+django-debug-toolbar
+
+# Testing
 flake8
 isort
+black
+pytest
+pytest-django
+pytest-factoryboy

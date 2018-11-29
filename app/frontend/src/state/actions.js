@@ -1,38 +1,108 @@
 import uniqid from 'uniqid'
 
 import { api } from 'state'
-import { importScript, exportScript } from 'state/transform'
+import { checkForError, handleJSONResponse, handleError } from './utils'
 
+// Generic action to fetch a list of data
+const list = (dispatch, dataType, apiCall, ...args) => {
+  dispatch({ type: 'SET_LOADING', key: dataType })
+  return apiCall(...args)
+    .then(handleJSONResponse(dispatch))
+    .then(data => dispatch({ type: 'RECEIVE_LIST', key: dataType, data }))
+    .catch(handleError(dispatch))
+}
 
+// Generic action to upsert a data item
+const upsert = (dispatch, dataType, apiCall, ...args) => {
+  dispatch({ type: 'SET_LOADING', key: dataType })
+  return apiCall(...args)
+    .then(handleJSONResponse(dispatch))
+    .then(item => dispatch({ type: 'UPSERT_ITEM', key: dataType, item }))
+    .catch(handleError(dispatch))
+}
+
+// Generic action to delete a data item
+const remove = (dispatch, dataType, apiCall, ...args) => {
+  dispatch({ type: 'SET_LOADING', key: dataType })
+  return apiCall(...args)
+    .then(handleJSONResponse(dispatch))
+    .then(item => dispatch({ type: 'REMOVE_ITEM', key: dataType, item }))
+    .catch(handleError(dispatch))
+}
+
+// All actions performed by the frontend.
 export default {
-  question: {
-    create: () => {
-      return { type: 'CREATE_QUESTION', id: `${uniqid()}-${uniqid()}` }
+  // Actions purely affecting the UI
+  selection: {
+    question: {
+      toggleOpen: id => ({ type: 'TOGGLE_QUESTION_OPEN', id }),
     },
-    update: (question) => ({ type: 'UPDATE_QUESTION', question }),
-    remove: id => ({ type: 'REMOVE_QUESTION', id }),
-    removeFollows: (id, follows) => ({ type: 'REMOVE_FOLLOWS', id, follows }),
-    addFollows: (id, prev, when, value) => ({ type: 'ADD_FOLLOWS', id, prev, when, value }),
+    transition: {
+      toggleOpen: id => ({ type: 'TOGGLE_TRANSITION_OPEN', id }),
+    },
   },
+  // Actions affecting error messages
+  error: {
+    clear: () => ({ type: 'CLEAR_ERROR' }),
+  },
+  // Actions affecting questionnaire scripts
   script: {
-    upload: script => ({ type: 'UPLOAD_SCRIPT', script }),
-    list: () => dispatch => {
-      dispatch({ type: 'SET_LOADING', key: 'script' })
-      return api.script.list()
-        .then(r => r.json())
-        .then(json => dispatch({
-          type: 'RECEIVE_LIST',
-          key: 'script',
-          data: Object.values(json.data).map(el => ({...el, id: null}))
-        }))
-        .catch(console.error)
+    list: () => dispatch => list(dispatch, 'script', api.script.list),
+    create: (...args) => dispatch =>
+      upsert(dispatch, 'script', api.script.create, ...args),
+    setFirstQuestion: (...args) => dispatch =>
+      upsert(dispatch, 'script', api.script.setFirstQuestion, ...args),
+  },
+  // Actions affecting questions
+  question: {
+    list: () => dispatch => list(dispatch, 'question', api.question.list),
+    create: (...args) => dispatch =>
+      upsert(dispatch, 'question', api.question.create, ...args),
+    update: (...args) => dispatch =>
+      upsert(dispatch, 'question', api.question.update, ...args),
+    delete: (...args) => dispatch =>
+      remove(dispatch, 'question', api.question.delete, ...args),
+  },
+  // Actions affecting transitions
+  transition: {
+    delete: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return (
+        api.transition
+          .delete(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
     },
-    save: script => dispatch => {
-      const exported = exportScript(script)
-      dispatch({ type: 'SET_LOADING', key: 'script' })
-      return api.script.insert(exported)
-        .then(() => dispatch({ type: 'UNSET_LOADING', key: 'script' }))
-        .catch(console.error)
-    }
+    create: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return (
+        api.transition
+          .create(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
+    },
+    update: (...args) => dispatch => {
+      dispatch({ type: 'SET_LOADING', key: 'question' })
+      return (
+        api.transition
+          .update(...args)
+          .then(handleJSONResponse(dispatch))
+          // We get a question back as a response, rather than just the transition.
+          .then(item =>
+            dispatch({ type: 'UPSERT_ITEM', key: 'question', item })
+          )
+          .catch(handleError(dispatch))
+      )
+    },
   },
 }

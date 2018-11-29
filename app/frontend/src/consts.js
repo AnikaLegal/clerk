@@ -1,11 +1,28 @@
-const FIELD_KEYS = ['id', 'start', 'prompt', 'options', 'help', 'details', 'follows', 'type']
-const FIELD_TYPES = ['text', 'email', 'multiple choice', 'single choice', 'boolean', 'date', 'info', 'number']
-const MANDATORY_FIELDS = ['prompt', 'type']
-const CONDITIONS = [
-  'is',
-  'is not',
-  'is greater than', // (int)
-  'is less than', // (int)
+// TODO - pull these from backend rather than duplicating
+const FIELD_KEYS = [
+  'id',
+  'start',
+  'prompt',
+  'options',
+  'help',
+  'details',
+  'follows',
+  'type',
 ]
-
-export { FIELD_KEYS, FIELD_TYPES, MANDATORY_FIELDS, CONDITIONS }
+const FIELD_TYPES = ['TEXT', 'NUMBER', 'BOOLEAN']
+const CONDITIONS = ['EQUALS']
+const CONDITIONS_DISPLAY = {
+  EQUALS: 'equals',
+}
+const FIELD_TYPES_DISPLAY = {
+  TEXT: 'Text',
+  NUMBER: 'Number',
+  BOOLEAN: 'Yes / No',
+}
+export {
+  FIELD_KEYS,
+  FIELD_TYPES,
+  FIELD_TYPES_DISPLAY,
+  CONDITIONS,
+  CONDITIONS_DISPLAY,
+}

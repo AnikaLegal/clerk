@@ -1,12 +1,29 @@
 import React from 'react'
+import classNames from 'classnames/bind'
+import styles from 'styles/generic/dropdown-field.module.scss'
 
-export default ({ label, placeholder, value, onChange, options, disabled, readOnly }) => (
-  <div className="input-group">
-    <div className="input-group-prepend">
-      <span className="input-group-text">{label}</span>
-    </div>
-    <select disabled={disabled} className="form-control" onChange={onChange} value={value} readOnly={readOnly}>
-      <option value="">{placeholder}</option>
+const cx = classNames.bind(styles)
+
+const DropdownField = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  options,
+  disabled,
+  readOnly,
+  nullable,
+}) => (
+  <div className={cx('wrapper')}>
+    <div className={cx('label')}>{label}</div>
+    <select
+      disabled={disabled}
+      className={cx('input', { placeholder: !value })}
+      onChange={onChange}
+      value={value}
+      readOnly={readOnly}
+    >
+      {(!value || nullable) && <option value="">{placeholder}</option>}
       {options.map(([val, display]) => (
         <option key={val} value={val}>
           {display}
@@ -15,3 +32,8 @@ export default ({ label, placeholder, value, onChange, options, disabled, readOn
     </select>
   </div>
 )
+DropdownField.defualtProps = {
+  nullable: false,
+}
+
+export default DropdownField

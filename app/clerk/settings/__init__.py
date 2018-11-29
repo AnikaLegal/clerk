@@ -18,10 +18,12 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'webpack_loader',
+    'debug_toolbar',
     'questions',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -45,13 +47,11 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
+            ]
         },
-    },
+    }
 ]
-TEMPLATE_LOADERS = (
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATE_LOADERS = ('django.template.loaders.app_directories.Loader',)
 
 WSGI_APPLICATION = 'clerk.wsgi.application'
 
@@ -86,15 +86,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = (
-    '/app/clerk/static/',
-    '/app/frontend/build/',
-)
+STATICFILES_DIRS = ('/app/clerk/static/', '/app/frontend/build/')
 WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': '',
-        'STATS_FILE': '/app/frontend/webpack-stats.json',
-    }
+    'DEFAULT': {'BUNDLE_DIR_NAME': '', 'STATS_FILE': '/app/frontend/webpack-stats.json'}
 }
 
 # Enable iPython for shell_plus
@@ -102,3 +96,10 @@ SHELL_PLUS = 'ipython'
 
 # TODO - Logging
 # LOGGING = { ... }
+
+# Django Debug Toolbar
+INTERNAL_IPS = ['127.0.0.1']
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+    'SHOW_TEMPLATE_CONTEXT': True,
+}

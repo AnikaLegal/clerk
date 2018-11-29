@@ -4,11 +4,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import { store } from 'state'
-import FormBuilder from 'components/form-builder'
-import FormGraph from 'components/form-graph'
+import routes from 'routes'
 import Header from 'components/header'
-import ScriptList from 'components/script-list'
-import Questionnaire from 'components/questionnaire'
 
 import 'styles/main.global.scss'
 
@@ -23,18 +20,11 @@ class App extends Component {
               <div className="row">
                 <div className="col">
                   <Switch>
-                    <Route path="/list">
-                      <ScriptList />
-                    </Route>
-                    <Route path="/test">
-                      <Questionnaire />
-                    </Route>
-                    <Route path="/graph">
-                      <FormGraph />
-                    </Route>
-                    <Route path="/">
-                      <FormBuilder />
-                    </Route>
+                    {routes.map(({ path, exact, RouteComponent }) => (
+                      <Route key={path} path={path} exact={exact}>
+                        <RouteComponent />
+                      </Route>
+                    ))}
                   </Switch>
                 </div>
               </div>
