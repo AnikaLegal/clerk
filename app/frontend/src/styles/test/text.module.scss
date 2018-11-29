@@ -1,0 +1,28 @@
+@import "input.scss";
+
+.wrapper {
+  @extend ._wrapper;
+}
+
+.prompt {
+  @extend ._prompt;
+}
+
+$inputHeight: calc(2.25rem + 2px);
+
+.input {
+  @extend ._input;
+  height: $inputHeight;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  border: none;
+  border-bottom: 1px solid $grey;
+  &:focus {
+    outline: none;
+    border-color: $blue;
+  }
+  &:disabled {
+    color: $text;
+  }
+
+}

@@ -31,6 +31,8 @@ const urls = {
     script: {
       list: () => CLIENT.SCRIPT,
       details: id => `${CLIENT.SCRIPT}${id}/`,
+      graph: id => `${CLIENT.SCRIPT}${id}/view/`,
+      test: id => `${CLIENT.SCRIPT}${id}/test/`,
     },
   },
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { actions } from 'state'
 import ErrorBoundary from 'components/generic/error-boundary'
 import ErrorModal from 'components/modals/error'
-import ScriptList from 'components/script-list'
+import ScriptList from 'components/script/list'
 
 class ScriptListContainer extends Component {
   componentDidMount() {

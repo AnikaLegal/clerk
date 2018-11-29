@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Link, Route, withRouter, Switch } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import routes from 'routes'
 import { actions } from 'state'

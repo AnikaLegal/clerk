@@ -20,8 +20,8 @@ class App extends Component {
               <div className="row">
                 <div className="col">
                   <Switch>
-                    {routes.map(({ path, RouteComponent }) => (
-                      <Route key={path} path={path} exact>
+                    {routes.map(({ path, exact, RouteComponent }) => (
+                      <Route key={path} path={path} exact={exact}>
                         <RouteComponent />
                       </Route>
                     ))}

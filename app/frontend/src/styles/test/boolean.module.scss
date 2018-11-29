@@ -1,0 +1,14 @@
+@import "input.scss";
+
+.wrapper {
+  @extend ._wrapper;
+}
+
+.prompt {
+  @extend ._prompt;
+}
+
+.input {
+  width: 6rem;
+  margin: $inputPadding;
+}

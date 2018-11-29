@@ -1,34 +1,24 @@
 import urls from 'urls'
 import ScriptListContainer from 'containers/script-list'
 import ScriptDetailsContainer from 'containers/script-details'
-// import FormGraph from 'components/form-graph'
-// import Questionnaire from 'components/questionnaire'
 
-// Routes for React Router
+// Top level routes for React Router
+// Some routes will have sub-routes defined inside their components.
 const routes = [
   {
     name: 'Questionnaires',
     path: urls.client.script.list(),
     RouteComponent: ScriptListContainer,
     header: true,
+    exact: true,
   },
   {
-    name: 'Questionnaire',
+    name: 'Build Questionnaire',
     path: urls.client.script.details(':id'),
     RouteComponent: ScriptDetailsContainer,
     header: false,
+    exact: false,
   },
-  // {
-  //   name: 'Test Form',
-  //   path: '',
-  //   component: Questionnaire,
-  // },
-  // {
-  //   name: 'View Form',
-  //   path: '',
-  //   component: FormGraph,
-  // },
-  // {
 ]
 
 export default routes

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import classNames from 'classnames/bind'
 
 import { actions } from 'state'
@@ -14,23 +14,17 @@ import UpdateQuestionForm, {
 // Questionnaire script details page,
 // where a user can view and update a questionnaire.
 class ScriptDetails extends Component {
+  static propTypes = {
+    script: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      firstQuestion: PropTypes.number.isRequired,
+    }).isRequired,
+  }
+
   render() {
-    const { scripts, questions } = this.props
-    // Get script ID from the URL
-    const scriptId = Number(this.props.match.params.id) || null
-    if (!scriptId) {
-      return null
-    } else if (scripts.list.length < 1) {
-      return (
-        <FadeIn duration="1">
-          <p>Loading...</p>
-        </FadeIn>
-      )
-    }
-    const script = scripts.lookup[scriptId]
+    const { script, questions } = this.props
     return (
       <FadeIn duration="0.2">
-        <h1 className="mb-3">{script.name}</h1>
         <div className="list-group mb-3">
           <div className="list-group-item">
             <FirstQuestionForm script={script} key={script.firstQuestion} />
@@ -53,13 +47,10 @@ class ScriptDetails extends Component {
 }
 
 const mapStateToProps = state => ({
-  scripts: state.data.script,
   questions: state.data.question,
 })
 const mapDispatchToProps = dispatch => ({})
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(ScriptDetails)
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ScriptDetails)
