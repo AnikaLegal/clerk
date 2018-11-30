@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+    # Django webserver.
+    web:
+        command: make web-prod
+        image: anikalaw/clerk:latest
+        ports:
+            - 8000:8000
+        environment:
+            PGDATABASE: clerk
+            PGPORT: 5432
+            DJANGO_SETTINGS_MODULE: clerk.settings.prod
+            # Pass through
+            - PGHOST=$DOCKERHOST
+            - DJANGO_SECRET_KEY
+            - PGUSER
+            - PGPASSWORD

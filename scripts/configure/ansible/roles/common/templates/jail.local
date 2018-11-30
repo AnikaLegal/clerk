@@ -1,0 +1,20 @@
+[DEFAULT]
+bantime = 600  # Time to ban for
+findtime = 600  # Time range for failed attempts
+maxretry = 5  # Max login retries in findtime
+
+# Email settings
+destemail = mattdsegal@gmail.com
+sendername = Fail2Ban
+mta = sendmail
+
+[nginx-http-auth]
+enabled  = false
+port     = http,https
+logpath  = %(nginx_error_log)s
+
+[nginx-botsearch]
+enabled  = true
+port     = http,https
+logpath  = %(nginx_error_log)s
+maxretry = 2

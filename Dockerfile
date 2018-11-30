@@ -16,3 +16,12 @@ WORKDIR /app
 
 # Mount the codebase
 ADD app /app
+
+# Run frontend build
+WORKDIR /app/frontend
+RUN yarn build
+WORKDIR /app
+
+ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
+ARG DJANGO_SECRET_KEY=not-a-secret
+RUN mkdir -p /static/ && ./manage.py collectstatic --noinput

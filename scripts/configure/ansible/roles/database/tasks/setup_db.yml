@@ -1,0 +1,18 @@
+---
+- name: Setup database user for {{ db.name }}
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: "{{ db.owner }}"
+    password: "{{ db.password }}"
+
+- name: Setup database "{{ db.name }}"
+  become: true
+  become_user: postgres
+  postgresql_db:
+    name: "{{ db.name }}"
+    state: present
+    owner: "{{ db.owner }}"
+    port: 5432
+    lc_collate: C.UTF-8
+    lc_ctype: C.UTF-8

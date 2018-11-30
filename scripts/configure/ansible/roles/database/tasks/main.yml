@@ -1,0 +1,35 @@
+---
+# This role installs PostgreSQL and configures it.
+- include_vars: secrets.yml
+
+# Postgres
+- name: Install PostgreSQL
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - libpq-dev
+    - python-dev
+    - python-psycopg2
+
+
+- name: Copy postgres hosts config
+  template:
+    src: pg_hba.conf
+    dest: /etc/postgresql/10/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: 0640
+
+- include_tasks: setup_db.yml
+  loop_control:
+    loop_var: db
+  with_items:
+    - name: clerk
+      owner: "{{ PGUSER }}"
+      password: "{{ PGPASSWORD }}"
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted

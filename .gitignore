@@ -19,3 +19,7 @@ image.tar
 
 # CircleCI stuff
 .checksum
+
+# Ansible
+*.secret.*
+*.retry
