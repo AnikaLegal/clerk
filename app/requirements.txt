@@ -8,8 +8,8 @@ psycopg2-binary
 django-extensions
 
 # Infrastructure and tools (production)
-#raven
-#gunicorn
+gunicorn
+raven
 
 # Frontend
 whitenoise

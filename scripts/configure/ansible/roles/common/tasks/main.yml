@@ -1,0 +1,31 @@
+---
+# Common config
+- include_vars: secrets.yml
+
+- name: Install Fail2Ban
+  apt:
+    name: fail2ban
+    state: present
+- name: Copy fail2ban config
+  template:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+    mode: 0644
+- name: Restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+
+# Secrets / parameterized config
+- name: Write envar {{ item.key }}
+  lineinfile:
+    path: /etc/environment
+    regexp: '^{{ item.key }}'
+    line: '{{ item.key }}="{{ item.value }}"'
+  loop:
+    - key: DJANGO_SECRET_KEY
+      value: "{{ DJANGO_SECRET_KEY }}"
+    - key: PGUSER
+      value: "{{ PGUSER }}"
+    - key: PGPASSWORD
+      value: "{{ PGPASSWORD }}"

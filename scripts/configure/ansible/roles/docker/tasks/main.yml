@@ -1,0 +1,43 @@
+---
+# This role installs Docker and Docker Compose.
+- include_vars: secrets.yml
+
+- name: Install Docker dependencies
+  apt: name={{item}} state=installed
+  with_items:
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - python-pip
+    - gnupg2
+    - cron
+
+- name: Pip install docker so Ansible can use it
+  pip:
+    name: "docker"
+
+- name: Add Docker's GPG key
+  apt_key:
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    url: https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+
+- name: Configure Docker's APT repository
+  apt_repository:
+    update_cache: true
+    repo: >
+      deb [arch=amd64]
+      https://download.docker.com/linux/{{ ansible_distribution|lower }}
+      {{ ansible_distribution_release }} stable
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+
+- name: Install Docker Compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.23.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    force: true
+    owner: root
+    group: root
+    mode: 0755

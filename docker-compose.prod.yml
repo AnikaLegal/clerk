@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+    # Django webserver.
+    web:
+        command: make web-prod
+        image: anikalaw/clerk:latest
+        ports:
+            - 8000:8000
+        volumes:
+            - /var/run/postgresql:/app/postgres.sock
+        environment:
+            DJANGO_SETTINGS_MODULE: clerk.settings.prod
+            DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+            PGHOST: /app/postgres.sock
+            PGPORT: 5432
+            PGDATABASE: clerk
+            PGUSER: $PGUSER
+            PGPASSWORD: $PGPASSWORD

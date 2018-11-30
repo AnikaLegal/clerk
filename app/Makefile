@@ -17,6 +17,24 @@ web-local:
 	./manage.py runserver 0.0.0.0:8000
 
 
+# Run Django website using gunicorn production
+web-prod:
+	mkdir -p /var/log/gunicorn && \
+	touch /var/log/gunicorn/access.log && \
+	touch /var/log/gunicorn/error.log && \
+	echo "Running migrations" && \
+	./manage.py migrate && \
+	echo "Starting gunicorn" && \
+	gunicorn clerk.wsgi:application \
+	--name clerk \
+	--workers 2 \
+	--bind 0.0.0.0:8000 \
+	--capture-output \
+	--log-level info \
+	--error-logfile /var/log/gunicorn/error.log \
+	--access-logfile /var/log/gunicorn/access.log
+
+
 # Lint frontend and Python code
 lint: lint-python lint-frontend
 

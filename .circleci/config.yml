@@ -1,16 +1,14 @@
+#
 # CircleCI Build Script
+#
 # TODO (build, test, deploy)
-#   - isort
-#   - PEP8 linting
 #   - python unit tests
 #   - JS unit tests
-#   - frontend build
-#   - collectstatic
-#   - figure out how to deploy to docker-swarm
 # ALSO NICE TOOD:
 #   - scheduled build of base image
 #   - run ansible / CF to spin up environment
 #   - schedule DB backups
+#
 version: 2
 jobs:
   build:
@@ -21,7 +19,7 @@ jobs:
       - checkout
 
       # Generate the project checksum
-      - run: ./scripts/checksum.sh
+      - run: ./scripts/build/checksum.sh
 
       # Try pull the docker image from cache (~20s) or
       - restore_cache:
@@ -31,7 +29,7 @@ jobs:
       # Build the clerk Docker image (~1 minute)
       # then save it so we can share it between jobs (~15s)
       # unless there is a cached image already, in which case we skip this step.
-      - run: ./scripts/build_image_if_required.sh
+      - run: ./scripts/build/build_image_if_required.sh
 
       # Save our image to the CircleCI job cache (~45s)
       - save_cache:
@@ -47,7 +45,7 @@ jobs:
       - checkout
 
       # Generate the project checksum
-      - run: ./scripts/checksum.sh
+      - run: ./scripts/build/checksum.sh
 
       # Pull docker image from cache (~20s)
       - restore_cache:
@@ -60,6 +58,40 @@ jobs:
       # Run code linting (<1s)
       - run: docker run anikalaw/clerk make lint
 
+  push:
+    working_directory: ~/repo
+    machine: true
+    steps:
+      # Clone code from GitHub
+      - checkout
+
+      # Generate the project checksum
+      - run: ./scripts/build/checksum.sh
+
+      # Pull docker image from cache (~20s)
+      - restore_cache:
+          keys:
+            - clerk-image-v1-{{ checksum ".checksum" }}
+
+      # Load our docker image from the .tar file (~30s)
+      - run: docker load -i image.tar
+
+      # Login to Docker Hub
+      - run: docker login --username $DOCKER_ID --password $DOCKER_PASSWORD
+
+      # Push docker image to Docker Hub (~50s)
+      - run: docker push anikalaw/clerk
+
+  deploy:
+    working_directory: ~/repo
+    machine: true
+    steps:
+      # Clone code from GitHub
+      - checkout
+
+      # Deploy built container to Docker Swarm on webserver
+      - run: ./scripts/deploy/deploy.sh
+
 workflows:
   version: 2
   build_test_deploy:
@@ -68,4 +100,13 @@ workflows:
       - lint:
           requires:
             - build
-
+      - hold:
+          type: approval
+          requires:
+            - lint
+      - push:
+          requires:
+            - hold
+      - deploy:
+          requires:
+            - push

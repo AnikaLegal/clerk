@@ -10,7 +10,7 @@
 # NodeJS / Webpack
 node_modules/
 npm-debug.log.*
-build/
+frontend/build/
 webpack-stats.json
 
 # Docker stuff
@@ -19,3 +19,7 @@ image.tar
 
 # CircleCI stuff
 .checksum
+
+# Ansible
+*.secret.*
+*.retry
