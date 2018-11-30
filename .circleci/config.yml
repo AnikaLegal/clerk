@@ -18,6 +18,11 @@ jobs:
       # Clone code from GitHub
       - checkout
 
+      - run: ls -la
+      - run: ls -la scripts
+      - run: ls -la scripts/build
+
+
       # Generate the project checksum
       - run: ./scripts/build/checksum.sh
 
