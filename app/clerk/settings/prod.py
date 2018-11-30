@@ -4,9 +4,9 @@ from . import *
 DEBUG = False
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 ALLOWED_HOSTS = [
+    'clerk.anikalegal.com',
     'uat.clerk.anikalegal.com',
     'staging.clerk.anikalegal.com',
-    'clerk.anikalegal.com',
     '127.0.0.1',
     'localhost',
 ]
