@@ -22,18 +22,8 @@ Docker swarm hosts the application containers as 'stacks', generated from a dock
 ### NGINX
 
 NGINX is installed on the host server. It uses static port mapping to route requests to containers.
-HTTPS is enabled via NGINX using the LetsEncrypt certbot for the certificate
 
-Create cert
-
-    certbot --nginx -d uat.clerk.anikalegal.com
-    openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
-
-Renew expiring cert
-
-    certbot renew
-
-To flush dns cache
+To flush your local DNS cache
 
     sudo /etc/init.d/dns-clean restart
     sudo /etc/init.d/networking force-reload
