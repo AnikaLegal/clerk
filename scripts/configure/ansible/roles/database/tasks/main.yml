@@ -2,6 +2,22 @@
 # This role installs PostgreSQL and configures it.
 - include_vars: secrets.yml
 
+# To set up locales for Postgres
+#
+# dpkg-reconfigure locales
+#
+
+# To really really purge Postgres off of your server:
+#
+# apt-get --purge remove postgresql\*
+# rm -rf /etc/postgresql/
+# rm -rf /etc/postgresql-common/
+# rm -rf /var/lib/postgresql/
+# userdel -r postgres
+# groupdel postgres
+#
+
+
 # Postgres
 - name: Install PostgreSQL
   apt: name={{ item }} state=present
@@ -12,6 +28,13 @@
     - python-dev
     - python-psycopg2
 
+- name: Copy postgresql config
+  template:
+    src: postgresql.conf
+    dest: /etc/postgresql/10/main/postgresql.conf
+    owner: postgres
+    group: postgres
+    mode: 0644
 
 - name: Copy postgres hosts config
   template:

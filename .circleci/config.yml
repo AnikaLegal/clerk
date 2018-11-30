@@ -58,7 +58,7 @@ jobs:
       # Run code linting (<1s)
       - run: docker run anikalaw/clerk make lint
 
-  deploy:
+  push:
     working_directory: ~/repo
     machine: true
     steps:
@@ -79,8 +79,18 @@ jobs:
       # Login to Docker Hub
       - run: docker login --username $DOCKER_ID --password $DOCKER_PASSWORD
 
-      # Push docker image to Docker Hub
+      # Push docker image to Docker Hub (~50s)
       - run: docker push anikalaw/clerk
+
+  deploy:
+    working_directory: ~/repo
+    machine: true
+    steps:
+      # Clone code from GitHub
+      - checkout
+
+      # Deploy built container to Docker Swarm on webserver
+      - run: ./scripts/deploy/deploy.sh
 
 workflows:
   version: 2
@@ -94,7 +104,9 @@ workflows:
           type: approval
           requires:
             - lint
-      - deploy:
+      - push:
           requires:
             - hold
-
+      - deploy:
+          requires:
+            - push

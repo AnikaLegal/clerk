@@ -19,6 +19,12 @@ pip3 install -r requirements.txt
 
 Docker swarm hosts the application containers as 'stacks', generated from a docker-compose file. Web containers expose a static port for NGINX.
 
+You need to manually init the swarm using
+
+```
+docker swarm init
+```
+
 ### NGINX
 
 NGINX is installed on the host server. It uses static port mapping to route requests to containers.

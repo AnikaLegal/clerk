@@ -7,12 +7,13 @@ services:
         image: anikalaw/clerk:latest
         ports:
             - 8000:8000
+        volumes:
+            - /var/run/postgresql:/app/postgres.sock
         environment:
-            PGDATABASE: clerk
-            PGPORT: 5432
             DJANGO_SETTINGS_MODULE: clerk.settings.prod
-            # Pass through
-            - PGHOST=$DOCKERHOST
-            - DJANGO_SECRET_KEY
-            - PGUSER
-            - PGPASSWORD
+            DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+            PGHOST: /app/postgres.sock
+            PGPORT: 5432
+            PGDATABASE: clerk
+            PGUSER: $PGUSER
+            PGPASSWORD: $PGPASSWORD
