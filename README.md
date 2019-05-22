@@ -12,6 +12,8 @@ This is a speculative project built out for Random Hacks of Kindness (Melbourne,
 
 - add database backup script
 - add file backup script
+- add S3 file storage backend
+- deploy to Anika AWS
 
 # Development
 
