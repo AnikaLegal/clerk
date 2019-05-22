@@ -1,27 +1,27 @@
 # Backend
+requests
 django
-djangorestframework
 
-# Infrastructure and tools
-ipython
+# Infrastructure)
 psycopg2-binary
-django-extensions
-
-# Infrastructure and tools (production)
 gunicorn
 raven
 
-# Frontend
+# API
+djangorestframework
+django-cors-headers
+
+# Static files
 whitenoise
-django-webpack-loader
 
-# Development
-django-debug-toolbar
+# Admin
+django-extensions
+ipython
 
-# Testing
-flake8
+# File storage
+django-storages
+
+# Linting
 isort
 black
-pytest
-pytest-django
-pytest-factoryboy
+flake8

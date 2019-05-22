@@ -5,10 +5,6 @@
 # If you find yourself running the same docker-compose command over and over,
 # then consider adding it here.
 #
-# Run webpack for local development
-webpack:
-	docker-compose run --service-ports webpack
-
 # Run Django website for local development
 web:
 	docker-compose up web
@@ -29,26 +25,10 @@ shell:
 psql:
 	docker-compose run web psql
 
-# Lint frontend and Python code
-lint:
-	docker-compose run webpack make lint
-
 # Lint Python code
-lint-python:
-	docker-compose run webpack make lint-python
-
-# Lint frontend code
-lint-frontend:
-	docker-compose run webpack make lint-frontend
+lint:
+	docker-compose run test make lint
 
 # Auto-format frontend and backend code
 format:
-	docker-compose run webpack make format
-
-# Auto-format frontend code
-format-frontend:
-	docker-compose run webpack make format-frontend
-
-# Auto-format Python code
-format-python:
-	docker-compose run webpack make format-python
+	docker-compose run test make format

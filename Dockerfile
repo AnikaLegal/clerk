@@ -7,21 +7,6 @@ RUN \
   echo "Installing python packages..." && \
   pip3 install -r requirements.txt
 
-# Install Node packages
-WORKDIR /app/frontend
-COPY app/frontend/package.json .
-COPY app/frontend/yarn.lock .
-RUN yarn install
-WORKDIR /app
 
 # Mount the codebase
 ADD app /app
-
-# Run frontend build
-WORKDIR /app/frontend
-RUN yarn build
-WORKDIR /app
-
-ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
-ARG DJANGO_SECRET_KEY=not-a-secret
-RUN mkdir -p /static/ && ./manage.py collectstatic --noinput

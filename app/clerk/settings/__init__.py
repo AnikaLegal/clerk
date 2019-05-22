@@ -6,24 +6,29 @@ import os
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Application definition
+ALLOWED_HOSTS = []
+
 INSTALLED_APPS = [
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # Static files
     'whitenoise.runserver_nostatic',
-    'django.contrib.staticfiles',
+    # Dev tools
     'django_extensions',
+    # APIs
     'rest_framework',
-    'webpack_loader',
-    'debug_toolbar',
+    'corsheaders',
+    # Error logging
+    'raven.contrib.django.raven_compat',
+    # Internal apps
     'questions',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -36,10 +41,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'clerk.urls'
 
+WSGI_APPLICATION = 'clerk.wsgi.application'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/app/clerk/templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -51,9 +58,7 @@ TEMPLATES = [
         },
     }
 ]
-TEMPLATE_LOADERS = ('django.template.loaders.app_directories.Loader',)
 
-WSGI_APPLICATION = 'clerk.wsgi.application'
 
 # Database
 DATABASES = {
@@ -75,6 +80,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Email backend
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Australia/Melbourne'
@@ -82,24 +94,20 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = '/static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATICFILES_DIRS = ('/app/clerk/static/', '/app/frontend/build/')
-WEBPACK_LOADER = {
-    'DEFAULT': {'BUNDLE_DIR_NAME': '', 'STATS_FILE': '/app/frontend/webpack-stats.json'}
-}
-
 # Enable iPython for shell_plus
 SHELL_PLUS = 'ipython'
 
-# TODO - Logging
-# LOGGING = { ... }
 
-# Django Debug Toolbar
-INTERNAL_IPS = ['127.0.0.1']
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
-    'SHOW_TEMPLATE_CONTEXT': True,
-}
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = '/static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media storage
+AWS_S3_SECURE_URLS = False
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = 'private'
+AWS_REGION_NAME = 'ap-southeast-2'
+AWS_S3_FILE_OVERWRITE = False  # Files with the same name will not each other
+AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')

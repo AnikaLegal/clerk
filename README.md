@@ -8,6 +8,11 @@ This is a speculative project built out for Random Hacks of Kindness (Melbourne,
 
 [![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
 
+# TODO
+
+- add database backup script
+- add file backup script
+
 # Development
 
 ## Prerequisites
@@ -19,7 +24,7 @@ You will need:
 
 ## Getting Started
 
-You first want to build the Docker image that we'll be using. This Docker image is based on the [`ubuntu:bionic`](https://hub.docker.com/_/ubuntu/) base image, with the addition of Python 3 and NodeJS, which are installed in [`Dockerfile.base`](./Dockerfile.base). The Ubuntu + Python 3 + NodeJS image has been uploaded to Docker Hub as  [`anikalaw/clerkbase`](https://hub.docker.com/r/anikalaw/clerkbase/).
+You first want to build the Docker image that we'll be using. This Docker image is based on the [`ubuntu:bionic`](https://hub.docker.com/_/ubuntu/) base image, with the addition of Python 3 and NodeJS, which are installed in [`Dockerfile.base`](./Dockerfile.base). The Ubuntu + Python 3 + NodeJS image has been uploaded to Docker Hub as [`anikalaw/clerkbase`](https://hub.docker.com/r/anikalaw/clerkbase/).
 
 To build your local Docker image:
 

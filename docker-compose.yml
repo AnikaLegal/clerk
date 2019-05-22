@@ -1,47 +1,43 @@
-version: '3'
+version: "3"
 
 services:
-    # Local development database.
-    database:
-        image: postgres
-        volumes:
-            - postgres-data:/var/lib/postgresql/data
-        ports:
-            - 25432:5432
+  # Local development database.
+  database:
+    image: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - 25432:5432
 
-    # Django webserver.
-    web:
-        command: make web-local
-        image: clerk:latest
-        build:
-            context: .
-            dockerfile: Dockerfile
-        ports:
-            - 8000:8000
-        volumes:
-          - ./app:/app
-          - node_modules:/app/frontend/node_modules
-          - build:/app/frontend/build
-        links:
-            - database
-        environment:
-            PGDATABASE: postgres
-            PGUSER: postgres
-            PGPASSWORD: password
-            PGHOST: database
-            PGPORT: 5432
-            DJANGO_SETTINGS_MODULE: clerk.settings.dev
+  # Django webserver.
+  web:
+    command: make web-local
+    image: clerk:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app:/app
+    links:
+      - database
+    environment:
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: database
+      PGPORT: 5432
+      DJANGO_SETTINGS_MODULE: clerk.settings.dev
 
-    # Webpack build for frontend assets.
-    webpack:
-        command: make webpack
-        image: clerk:latest
-        volumes:
-            - ./app:/app
-            - node_modules:/app/frontend/node_modules
-            - build:/app/frontend/build
+  # For testing.
+  test:
+    image: clerk:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
 
 volumes:
-    postgres-data:
-    node_modules:
-    build:
+  postgres-data:

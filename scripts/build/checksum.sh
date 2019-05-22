@@ -10,8 +10,6 @@ PROJECT_FILES_MD5=$(find . \
     -not -path "./.git/*" \
     -not -path "./scripts/*" \
     -not -path "./.circleci/*" \
-    -not -path "./app/frontend/build/*" \
-    -not -path "./app/frontend/node_modules/*" \
     -not -name "*.pyc" \
     -not -name ".gitignore" \
     -not -name "README.md" \
