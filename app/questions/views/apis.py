@@ -1,5 +1,5 @@
-from rest_framework import viewsets
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import viewsets
 
 from questions.models import Submission
 
