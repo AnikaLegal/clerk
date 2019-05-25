@@ -97,16 +97,9 @@ workflows:
   build_test_deploy:
     jobs:
       - build
-      - lint:
-          requires:
-            - build
-      - hold:
-          type: approval
-          requires:
-            - lint
       - push:
           requires:
-            - hold
+            - build
       - deploy:
           requires:
             - push
