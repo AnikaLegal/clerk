@@ -6,6 +6,7 @@
 
 # Python
 *.pyc
+env/
 
 # NodeJS / Webpack
 node_modules/
@@ -16,6 +17,7 @@ webpack-stats.json
 # Docker stuff
 .docker_temp*
 image.tar
+.env
 
 # CircleCI stuff
 .checksum

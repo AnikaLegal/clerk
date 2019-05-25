@@ -29,6 +29,10 @@ services:
       PGHOST: database
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.dev
+      # Read from .env
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
 
   # For testing.
   test:

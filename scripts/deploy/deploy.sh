@@ -3,7 +3,7 @@
 # Deploy clerk the host server
 # Run this from the project root
 #
-HOST='13.239.27.102'
+HOST='13.211.109.142'
 PROJECT="clerk"
 
 ssh root@$HOST /bin/bash << EOF

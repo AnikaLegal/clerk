@@ -20,7 +20,7 @@
 - name: Write envar {{ item.key }}
   lineinfile:
     path: /etc/environment
-    regexp: '^{{ item.key }}'
+    regexp: "^{{ item.key }}"
     line: '{{ item.key }}="{{ item.value }}"'
   loop:
     - key: DJANGO_SECRET_KEY
@@ -29,3 +29,17 @@
       value: "{{ PGUSER }}"
     - key: PGPASSWORD
       value: "{{ PGPASSWORD }}"
+    - key: SENDGRID_API_KEY
+      value: "{{ SENDGRID_API_KEY }}"
+    - key: AWS_ACCESS_KEY_ID
+      value: "{{ AWS_ACCESS_KEY_ID }}"
+    - key: AWS_SECRET_ACCESS_KEY
+      value: "{{ AWS_SECRET_ACCESS_KEY }}"
+    - key: RAVEN_DSN
+      value: "{{ RAVEN_DSN }}"
+    - key: PAPERTRAIL_HOSTNAME
+      value: "{{ PAPERTRAIL_HOSTNAME }}"
+    - key: PAPERTRAIL_PORT
+      value: "{{ PAPERTRAIL_PORT }}"
+    - key: PAPERTRAIL_URL
+      value: "{{ PAPERTRAIL_URL }}"
