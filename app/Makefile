@@ -12,14 +12,16 @@ web-local:
 web-prod:
 	echo "Starting clerk app as `whoami`" && \
 	echo "Starting remote syslog" && \
+	mkdir -p /var/log/gunicorn && \
+	touch /var/log/gunicorn/access.log && \
+	touch /var/log/gunicorn/error.log && \
 	remote_syslog \
 	--hostname "${PAPERTRAIL_HOSTNAME}" \
 	--dest-port "${PAPERTRAIL_PORT}" \
 	--dest-host "${PAPERTRAIL_URL}" \
 	--pid-file /var/run/remote_syslog.pid \
-	mkdir -p /var/log/gunicorn && \
-	touch /var/log/gunicorn/access.log && \
-	touch /var/log/gunicorn/error.log && \
+	/var/log/gunicorn/access.log \
+	/var/log/gunicorn/error.log && \
 	echo "Running migrations" && \
 	./manage.py migrate && \
 	echo "Starting gunicorn" && \

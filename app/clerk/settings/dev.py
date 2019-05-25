@@ -4,6 +4,9 @@ from . import *
 DEBUG = True
 SECRET_KEY = 'its-a-secret-key!'
 
+MATT_EMAIL = 'matt@anikalegal.com'
+SUBMISSION_EMAILS = [MATT_EMAIL]
+
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
