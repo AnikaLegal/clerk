@@ -5,8 +5,6 @@ from rest_framework import routers
 
 from questions.views import apis
 
-router = routers.DefaultRouter()
-urlpatterns = [
-    path('admin/', admin.site.urls, name='admin'),
-    path('api/', include(router.urls)),
-]
+router = routers.SimpleRouter()
+router.register("submission", apis.SubmissionViewSet)
+urlpatterns = [path("admin/", admin.site.urls, name="admin"), path("api/", include(router.urls))]

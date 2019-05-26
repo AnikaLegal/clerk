@@ -113,3 +113,12 @@ AWS_REGION_NAME = "ap-southeast-2"
 AWS_S3_FILE_OVERWRITE = False  # Files with the same name will not each other
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+# Disable CSRF
+# FIXME: Remove this once users can log in and fetch a token - or if you figure out a smarter way to do this.
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.BasicAuthentication",
+        "clerk.auth.CsrfExemptSessionAuthentication",
+    )
+}
