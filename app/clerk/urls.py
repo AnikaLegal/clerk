@@ -7,4 +7,5 @@ from questions.views import apis
 
 router = routers.SimpleRouter()
 router.register("submission", apis.SubmissionViewSet)
+router.register("images", apis.ImageUploadViewSet)
 urlpatterns = [path("admin/", admin.site.urls, name="admin"), path("api/", include(router.urls))]

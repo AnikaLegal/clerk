@@ -15,6 +15,7 @@ class Email:
         self.recipients = recipients
         self.html_content = None
         self.text_content = None
+        self.files = []
 
     def with_text_body(self, text):
         """
@@ -28,6 +29,13 @@ class Email:
         Add text body to the email via a template - required.
         """
         self.text_content = render_to_string(template_name, template_context)
+        return self
+
+    def with_files(self, files):
+        """
+        Attach files to the email.
+        """
+        self.files = files
         return self
 
     def with_html_template(self, template_name, template_context):
@@ -50,6 +58,10 @@ class Email:
             from_email=self.from_email,
             to=self.recipients,
         )
+
+        for f in self.files:
+            email.attach_file(f)
+
         if self.html_content:
             email.attach_alternative(self.html_content, "text/html")
 

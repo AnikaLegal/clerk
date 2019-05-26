@@ -19,7 +19,9 @@ django-extensions
 ipython
 
 # File storage
+boto3
 django-storages
+Pillow
 
 # Linting
 isort

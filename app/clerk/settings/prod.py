@@ -22,7 +22,6 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 AWS_STORAGE_BUCKET_NAME = "anika-clerk"
 
 LOGGING = {
@@ -38,11 +37,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
+        "django.db.backends": {"level": "ERROR", "handlers": ["console"], "propagate": False},
         "raven": {"level": "DEBUG", "handlers": ["console"], "propagate": False},
         "sentry.errors": {"level": "DEBUG", "handlers": ["console"], "propagate": False},
     },
