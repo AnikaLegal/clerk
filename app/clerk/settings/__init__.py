@@ -6,6 +6,7 @@ import os
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+DEFAULT_FROM_EMAIL = "noreply@anikalegal.com"
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -26,7 +27,7 @@ INSTALLED_APPS = [
     # Error logging
     "raven.contrib.django.raven_compat",
     # Internal apps
-    "questions",
+    "questions.apps.QuestionsConfig",
 ]
 
 MIDDLEWARE = [
