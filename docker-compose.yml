@@ -42,6 +42,14 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./app:/app
+    links:
+      - database
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: database
+      PGPORT: 5432
+      DJANGO_SETTINGS_MODULE: clerk.settings.test
 
 volumes:
   postgres-data:

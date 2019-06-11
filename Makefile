@@ -32,3 +32,7 @@ lint:
 # Auto-format frontend and backend code
 format:
 	docker-compose run test make format
+
+# Run PyTest
+test:
+	docker-compose run test make test

@@ -9,6 +9,9 @@
 *.pyc
 env/
 
+# Tests
+test_media/
+
 # NodeJS / Webpack
 node_modules/
 npm-debug.log.*

@@ -14,3 +14,4 @@ class Submission(TimestampedModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     data = JSONField(encoder=DjangoJSONEncoder)
+    complete = models.BooleanField(default=False)

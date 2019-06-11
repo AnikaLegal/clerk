@@ -58,3 +58,7 @@ format:
 		-l 90 \
 		--skip migrations --skip /app/frontend \
 		--apply
+
+# Run PyTest
+test:
+	pytest -s -vv --reuse-db

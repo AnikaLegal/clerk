@@ -27,3 +27,11 @@ Pillow
 isort
 black
 flake8
+
+# Testing
+faker
+pytest-django
+pytest-factoryboy
+pytest-sugar
+responses
+freezegun
