@@ -12,4 +12,5 @@ logger = logging.getLogger(__name__)
 @receiver(post_save, sender=Submission)
 def save_submission(sender, instance, **kwargs):
     submission = instance
-    send_submission_email(submission)
+    if submission.complete:
+        send_submission_email(submission)
