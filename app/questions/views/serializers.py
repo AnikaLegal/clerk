@@ -6,7 +6,7 @@ from questions.models import Submission, ImageUpload
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = ("id", "data", "complete")
+        fields = ("id", "complete", "questions", "answers")
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):

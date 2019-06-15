@@ -12,11 +12,13 @@ def test_submission_create(client):
     User can create a submission
     """
     url = reverse("submission-list")
-    resp = client.post(url, data={"data": {}}, content_type="application/json")
+    data = {"questions": {"foo": {"a": 1}}, "answers": []}
+    resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 201
     sub = Submission.objects.last()
-    assert resp.json() == {"id": str(sub.id), "data": {}, "complete": False}
-    assert sub.data == {}
+    assert resp.data == {"id": str(sub.id), "complete": False, **data}
+    assert sub.answers == []
+    assert sub.questions == {"foo": {"a": 1}}
     assert sub.complete == False
 
 
@@ -25,11 +27,16 @@ def test_submission_get(client):
     """
     User can retrieve a submission
     """
-    sub = SubmissionFactory(data={"FOO": [1, 2, 3]})
+    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
     url = reverse("submission-detail", args=[sub.id])
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.json() == {"id": str(sub.id), "data": {"FOO": [1, 2, 3]}, "complete": False}
+    assert resp.data == {
+        "id": str(sub.id),
+        "answers": [{"FOO": [1, 2, 3]}],
+        "questions": {},
+        "complete": False,
+    }
 
 
 @pytest.mark.django_db
@@ -37,15 +44,24 @@ def test_submission_update(client):
     """
     User can update a submission
     """
-    sub = SubmissionFactory(data={"FOO": [1, 2, 3]})
+    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
     url = reverse("submission-detail", args=[sub.id])
-    resp = client.patch(
-        url, data={"data": {"BAR": "no"}, "complete": True}, content_type="application/json"
-    )
+    update = {
+        "answers": [{"BAR": "no"}],
+        "questions": {"foo": {"a": 1}},
+        "complete": True,
+    }
+    resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 200
-    assert resp.json() == {"id": str(sub.id), "data": {"BAR": "no"}, "complete": True}
+    assert resp.data == {
+        "id": str(sub.id),
+        "answers": [{"BAR": "no"}],
+        "questions": {"foo": {"a": 1}},
+        "complete": True,
+    }
     sub.refresh_from_db()
-    assert sub.data == {"BAR": "no"}
+    assert sub.questions == {"foo": {"a": 1}}
+    assert sub.answers == [{"BAR": "no"}]
     assert sub.complete == True
 
 
@@ -54,9 +70,10 @@ def test_submission_update_fails_when_complete(client):
     """
     User cannot update a complete submission
     """
-    sub = SubmissionFactory(data={"FOO": [1, 2, 3]}, complete=True)
+    sub = SubmissionFactory(answers=[{"FOO": [1, 2, 3]}], questions={}, complete=True)
+    update = {"answers": [{"BAR": "no"}]}
     url = reverse("submission-detail", args=[sub.id])
-    resp = client.patch(url, data={"data": {"BAR": "no"}}, content_type="application/json")
+    resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 400
 
 
@@ -65,7 +82,7 @@ def test_submission_security(client):
     """
     User cannot list or delete submissions
     """
-    sub = SubmissionFactory(data={"FOO": [1, 2, 3]})
+    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
     list_url = reverse("submission-list")
     detail_url = reverse("submission-detail", args=[sub.id])
 
@@ -87,7 +104,7 @@ def test_image_upload_create(client):
     assert ImageUpload.objects.count() == 0
     f = get_dummy_file("image.png")
     resp = client.post(list_url, {"image": f})
-    assert resp.json()["id"]
+    assert resp.data["id"]
     assert ImageUpload.objects.count() == 1
 
 
