@@ -1,5 +1,7 @@
 from . import *
 
+SUBMISSION_EMAILS = ["test@example.com"]
+
 DEBUG = False
 SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["*"]
@@ -14,7 +16,11 @@ LOGGING = {
     "loggers": {
         "reader": {"handlers": ["console"], "level": "INFO", "propagate": True},
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {"level": "INFO", "handlers": ["console"], "propagate": False},
+        "django.db.backends": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 

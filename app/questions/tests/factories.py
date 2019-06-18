@@ -24,7 +24,8 @@ class SubmissionFactory(TimestampedModelFactory):
         model = Submission
 
     id = factory.LazyAttribute(lambda x: uuid4())
-    data = {}
+    questions = {}
+    answers = {}
 
 
 @factory.django.mute_signals(post_save)
