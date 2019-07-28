@@ -1,6 +1,6 @@
+import hashlib
 import os
 import uuid
-import hashlib
 
 from django.db import models
 

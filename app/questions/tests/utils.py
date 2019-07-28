@@ -16,4 +16,3 @@ def drf_isoformat(datetime):
 def get_dummy_file(name):
     f = io.BytesIO(TINY_PNG)
     return InMemoryUploadedFile(f, None, name, "image/png", len(TINY_PNG), None)
-

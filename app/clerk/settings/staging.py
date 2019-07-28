@@ -6,9 +6,9 @@ from . import *
 
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-ALLOWED_HOSTS = ["clerk.anikalegal.com", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["test-clerk.anikalegal.com", "127.0.0.1", "localhost"]
 
-EMAIL_PREFIX = None
+EMAIL_PREFIX = 'TEST'
 WEBMASTER_EMAIL = "webmaster@anikalegal.com"
 SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 
@@ -26,7 +26,7 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-AWS_STORAGE_BUCKET_NAME = "anika-clerk"
+AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
 LOGGING = {
     "version": 1,
@@ -46,5 +46,5 @@ LOGGING = {
 sentry_sdk.init(
     dsn=os.environ.get("RAVEN_DSN"),
     integrations=[DjangoIntegration()],
-    environment="prod",
+    environment="test",
 )

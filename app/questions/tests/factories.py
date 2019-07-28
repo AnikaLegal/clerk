@@ -4,7 +4,8 @@ import factory
 from django.db.models.signals import post_save
 from django.utils import timezone
 
-from questions.models import Submission, ImageUpload
+from questions.models import ImageUpload, Submission
+
 from .utils import get_dummy_file
 
 

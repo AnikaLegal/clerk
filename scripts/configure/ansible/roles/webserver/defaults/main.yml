@@ -1,6 +1,9 @@
 ---
 # Webserver default variables
 http_endpoints:
-    - name: Clerk
-      server_name: clerk.anikalegal.com
-      port: 8000
+  - name: Clerk
+    server_name: clerk.anikalegal.com
+    port: 8000
+  - name: Clerk Test
+    server_name: test-clerk.anikalegal.com
+    port: 8001

@@ -3,6 +3,7 @@ from . import *
 SUBMISSION_EMAILS = ["test@example.com"]
 
 DEBUG = False
+EMAIL_PREFIX = 'TEST'
 SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["*"]
 DATABASES["default"]["name"] = "test"
@@ -23,4 +24,3 @@ LOGGING = {
         },
     },
 }
-

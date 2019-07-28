@@ -28,7 +28,7 @@ web-prod:
 	gunicorn clerk.wsgi:application \
 	--name clerk \
 	--workers 2 \
-	--bind 0.0.0.0:8000 \
+	--bind 0.0.0.0:${GUNICORN_PORT} \
 	--capture-output \
 	--log-level info \
 	--error-logfile /var/log/gunicorn/error.log \

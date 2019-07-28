@@ -37,8 +37,6 @@
       value: "{{ AWS_SECRET_ACCESS_KEY }}"
     - key: RAVEN_DSN
       value: "{{ RAVEN_DSN }}"
-    - key: PAPERTRAIL_HOSTNAME
-      value: "{{ PAPERTRAIL_HOSTNAME }}"
     - key: PAPERTRAIL_PORT
       value: "{{ PAPERTRAIL_PORT }}"
     - key: PAPERTRAIL_URL

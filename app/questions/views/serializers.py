@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from questions.models import Submission, ImageUpload
+from questions.models import ImageUpload, Submission
 
 
 class SubmissionSerializer(serializers.ModelSerializer):

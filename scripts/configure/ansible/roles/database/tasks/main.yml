@@ -17,7 +17,6 @@
 # groupdel postgres
 #
 
-
 # Postgres
 - name: Install PostgreSQL
   apt: name={{ item }} state=present
@@ -49,6 +48,9 @@
     loop_var: db
   with_items:
     - name: clerk
+      owner: "{{ PGUSER }}"
+      password: "{{ PGPASSWORD }}"
+    - name: clerk-test
       owner: "{{ PGUSER }}"
       password: "{{ PGPASSWORD }}"
 

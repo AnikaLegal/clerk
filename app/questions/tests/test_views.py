@@ -1,8 +1,9 @@
 import pytest
 from django.urls import reverse
 
-from questions.tests.factories import SubmissionFactory, ImageUploadFactory
-from questions.models import Submission, ImageUpload
+from questions.models import ImageUpload, Submission
+from questions.tests.factories import ImageUploadFactory, SubmissionFactory
+
 from .utils import get_dummy_file
 
 

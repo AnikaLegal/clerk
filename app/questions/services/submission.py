@@ -13,8 +13,8 @@ def send_submission_email(submission):
     Send a submission alert email with data included.
     """
     subject = f"Client intake submission {str(submission.id)}"
-    if settings.DEBUG:
-        subject = "[TEST] " + subject
+    if settings.EMAIL_PREFIX:
+        subject = f"[{settings.EMAIL_PREFIX}] {subject}"
 
     body = subject + "\n\n"
     answers = submission.answers

@@ -1,9 +1,9 @@
-from rest_framework import viewsets, mixins, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from questions.models import Submission, ImageUpload
+from questions.models import ImageUpload, Submission
 
-from .serializers import SubmissionSerializer, ImageUploadSerializer
+from .serializers import ImageUploadSerializer, SubmissionSerializer
 
 
 class SubmissionViewSet(

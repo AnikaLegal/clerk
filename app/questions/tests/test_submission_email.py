@@ -2,8 +2,8 @@ from unittest import mock
 
 import pytest
 
-from questions.tests.factories import SubmissionFactory, ImageUploadFactory
 from questions.services.submission import send_submission_email
+from questions.tests.factories import ImageUploadFactory, SubmissionFactory
 
 
 @mock.patch("questions.services.submission.EmailMultiAlternatives")
@@ -103,4 +103,3 @@ QUESTIONS = [
         ],
     },
 ]
-

@@ -4,8 +4,8 @@
 {% for endpoint in http_endpoints %}
 # {{ endpoint.name }}
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 80;
+    listen [::]:80;
     server_name {{ endpoint.server_name }};
     location / {
         proxy_pass http://127.0.0.1:{{ endpoint.port }};
@@ -17,3 +17,10 @@ server {
     }
 }
 {% endfor %}
+
+# 404 random requests
+server {
+    listen 80 default_server;
+    server_name _;
+    return 404;
+}

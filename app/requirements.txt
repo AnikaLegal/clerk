@@ -2,10 +2,10 @@
 requests
 django
 
-# Infrastructure)
+# Infrastructure
 psycopg2-binary
 gunicorn
-raven
+sentry-sdk
 
 # API
 djangorestframework

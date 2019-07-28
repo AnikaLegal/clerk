@@ -4,7 +4,18 @@
 # Run this from the project root
 #
 HOST='13.211.109.142'
-PROJECT="clerk"
+
+case $CIRCLE_BRANCH in
+    "develop")
+        export COMPOSE_SUFFIX="staging"
+        export PROJECT="clerk_test"
+        ;;
+    "master")
+        export COMPOSE_SUFFIX="prod"
+        export PROJECT="clerk"
+        ;;
+esac
+
 
 ssh root@$HOST /bin/bash << EOF
     set -e
@@ -13,7 +24,7 @@ ssh root@$HOST /bin/bash << EOF
 EOF
 
 echo "Copying $PROJECT compose file"
-scp docker-compose.prod.yml root@${HOST}:/srv/$PROJECT
+scp docker-compose.${COMPOSE_SUFFIX}.yml root@${HOST}:/srv/$PROJECT
 
 ssh root@$HOST /bin/bash << EOF
     set -e
@@ -27,6 +38,6 @@ ssh root@$HOST /bin/bash << EOF
         head -n1)
 
     docker stack deploy \
-        --compose-file /srv/${PROJECT}/docker-compose.prod.yml \
+        --compose-file /srv/${PROJECT}/docker-compose.${COMPOSE_SUFFIX}.yml \
         $PROJECT
 EOF
