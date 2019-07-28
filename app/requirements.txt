@@ -35,3 +35,6 @@ pytest-factoryboy
 pytest-sugar
 responses
 freezegun
+
+# Admin
+pygments  # Pretty print JSON in admin
