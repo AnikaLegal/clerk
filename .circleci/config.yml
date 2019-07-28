@@ -97,10 +97,10 @@ workflows:
   build_test_deploy:
     jobs:
       - build:
-        branches:
-          only:
-            - master
-            - develop
+          branches:
+            only:
+              - master
+              - develop
       - push:
           requires:
             - build
