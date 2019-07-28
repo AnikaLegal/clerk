@@ -36,48 +36,6 @@ jobs:
             - image.tar
           key: clerk-image-v1-{{ checksum ".checksum" }}
 
-  lint:
-    working_directory: ~/repo
-    machine: true
-    steps:
-      # Clone code from GitHub
-      - checkout
-
-      # Generate the project checksum
-      - run: ./scripts/build/checksum.sh
-
-      # Pull docker image from cache (~20s)
-      - restore_cache:
-          keys:
-            - clerk-image-v1-{{ checksum ".checksum" }}
-
-      # Load our docker image from the .tar file (~30s)
-      - run: docker load -i image.tar
-
-      # Run code linting (<1s)
-      - run: docker run anikalaw/clerk make lint
-
-  test:
-    working_directory: ~/repo
-    machine: true
-    steps:
-      # Clone code from GitHub
-      - checkout
-
-      # Generate the project checksum
-      - run: ./scripts/build/checksum.sh
-
-      # Pull docker image from cache (~20s)
-      - restore_cache:
-          keys:
-            - clerk-image-v1-{{ checksum ".checksum" }}
-
-      # Load our docker image from the .tar file (~30s)
-      - run: docker load -i image.tar
-
-      # Run code linting (<1s)
-      - run: docker run anikalaw/clerk make test
-
   push:
     working_directory: ~/repo
     machine: true
@@ -114,7 +72,7 @@ jobs:
 
 workflows:
   version: 2
-  build_test_deploy:
+  build_deploy:
     jobs:
       - build:
           filters:
@@ -122,17 +80,9 @@ workflows:
               only:
                 - master
                 - develop
-      - lint:
-          requires:
-            - build
-      - test:
-          requires:
-            - build
       - push:
           requires:
             - build
-            - lint
-            - test
       - deploy:
           requires:
             - push
