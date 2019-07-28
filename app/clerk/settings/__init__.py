@@ -24,8 +24,6 @@ INSTALLED_APPS = [
     # APIs
     "rest_framework",
     "corsheaders",
-    # Error logging
-    "raven.contrib.django.raven_compat",
     # Internal apps
     "questions.apps.QuestionsConfig",
 ]
