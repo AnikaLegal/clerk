@@ -35,7 +35,7 @@ def send_submission_email(submission):
     # See tests
     images = []
     for answer in answers:
-        answer, name = answer["answer"], answer["name"]
+        answer, name = answer.get("answer", ''), answer.get("name", '')
         field = fields[name]
         if field["type"] == "FILE":
             ids = [image["id"] for image in answer]

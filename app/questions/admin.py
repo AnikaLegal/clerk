@@ -12,13 +12,9 @@ from questions.models import ImageUpload, Submission
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    readonly_fields = ("questions_json", "answers_json")
+    readonly_fields = ("answers_json",)
     exclude = ("questions", "answers")
     list_display = ("id", "created_at", "modified_at", "complete")
-
-    def questions_json(self, instance):
-        """Function to display pretty version of our data"""
-        return dict_to_json_html(instance.questions)
 
     def answers_json(self, instance):
         return dict_to_json_html(instance.answers)
