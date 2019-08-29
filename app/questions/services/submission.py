@@ -3,15 +3,16 @@ import logging
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
-from questions.models import ImageUpload
+from questions.models import ImageUpload, Submission
 
 logger = logging.getLogger(__name__)
 
 
-def send_submission_email(submission):
+def send_submission_email(submission_pk):
     """
     Send a submission alert email with data included.
     """
+    submission = Submission.objects.get(submission_pk)
     subject = f"Client intake submission {str(submission.id)}"
     if settings.EMAIL_PREFIX:
         subject = f"[{settings.EMAIL_PREFIX}] {subject}"
@@ -35,13 +36,12 @@ def send_submission_email(submission):
     # See tests
     images = []
     for answer in answers:
-        answer, name = answer.get("answer", ''), answer.get("name", '')
+        answer, name = answer.get("answer", ""), answer.get("name", "")
         field = fields[name]
         if field["type"] == "FILE":
             ids = [image["id"] for image in answer]
             images += [
-                image_upload.image
-                for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
+                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
             ]
         else:
             body += name + " " + field.get("prompt", "") + "\n\n"

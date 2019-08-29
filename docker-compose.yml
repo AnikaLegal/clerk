@@ -21,6 +21,27 @@ services:
     volumes:
       - ./app:/app
     links:
+      - worker
+      - database
+    environment:
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: database
+      PGPORT: 5432
+      DJANGO_SETTINGS_MODULE: clerk.settings.dev
+      # Read from .env
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+
+  # Django-q worker.
+  worker:
+    command: make worker-local
+    image: clerk:latest
+    volumes:
+      - ./app:/app
+    links:
       - database
     environment:
       PGDATABASE: postgres

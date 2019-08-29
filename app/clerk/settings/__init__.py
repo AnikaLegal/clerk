@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     # APIs
     "rest_framework",
     "corsheaders",
+    # Async tasks
+    "django_q",
     # Internal apps
     "questions.apps.QuestionsConfig",
 ]
@@ -75,9 +77,7 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -123,4 +123,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
         "clerk.auth.CsrfExemptSessionAuthentication",
     )
+}
+
+Q_CLUSTER = {
+    "name": "clerk",
+    "timeout": 60,  # seconds,
+    "retry": 60,  # seconds,
+    "save_limit": 250,  # number of tasks saved to broker
+    "orm": "default",  # Use Django's ORM + database for broker
 }

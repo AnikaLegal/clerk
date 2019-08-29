@@ -25,3 +25,25 @@ services:
       PAPERTRAIL_HOSTNAME: ClerkTest
       PAPERTRAIL_PORT: $PAPERTRAIL_PORT
       PAPERTRAIL_URL: $PAPERTRAIL_URL
+
+  worker:
+    command: make worker-prod
+    image: anikalaw/clerk:latest
+    volumes:
+      - /var/run/postgresql:/app/postgres.sock
+    environment:
+      DJANGO_SETTINGS_MODULE: clerk.settings.staging
+      PGHOST: /app/postgres.sock
+      PGPORT: 5432
+      PGDATABASE: clerk-test
+      PGUSER: $PGUSER
+      PGPASSWORD: $PGPASSWORD
+      # Pass through
+      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+      SENDGRID_API_KEY: $SENDGRID_API_KEY
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      RAVEN_DSN: $RAVEN_DSN
+      PAPERTRAIL_HOSTNAME: ClerkTest
+      PAPERTRAIL_PORT: $PAPERTRAIL_PORT
+      PAPERTRAIL_URL: $PAPERTRAIL_URL

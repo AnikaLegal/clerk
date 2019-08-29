@@ -5,6 +5,12 @@
 # Allows us to run several commands in one bash shelll
 .ONESHELL:
 
+worker-local:
+	./manage.py qcluster
+
+worker-prod:
+	./manage.py qcluster
+
 web-local:
 	./manage.py runserver 0.0.0.0:8000
 

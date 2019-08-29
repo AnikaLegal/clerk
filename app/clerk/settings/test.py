@@ -3,7 +3,7 @@ from . import *
 SUBMISSION_EMAILS = ["test@example.com"]
 
 DEBUG = False
-EMAIL_PREFIX = 'TEST'
+EMAIL_PREFIX = "TEST"
 SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["*"]
 DATABASES["default"]["name"] = "test"
@@ -17,10 +17,10 @@ LOGGING = {
     "loggers": {
         "reader": {"handlers": ["console"], "level": "INFO", "propagate": True},
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {
-            "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False,
-        },
+        "django.db.backends": {"level": "INFO", "handlers": ["console"], "propagate": False},
     },
 }
+
+# Django-q cluster should run synchronously
+Q_CLUSTER = {"sync": True}
+

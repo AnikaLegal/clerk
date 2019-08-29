@@ -38,18 +38,14 @@ BING What is bing?
     mock_email = mock.MagicMock()
     mock_email_cls.return_value = mock_email
 
-    send_submission_email(sub)
+    send_submission_email(sub.pk)
 
     image_upload_1.image.seek(0)
     image_upload_2.image.seek(0)
     mock_email.attach.assert_has_calls(
         [
-            mock.call(
-                image_upload_1.image.name.split("/")[-1], image_upload_1.image.read()
-            ),
-            mock.call(
-                image_upload_2.image.name.split("/")[-1], image_upload_2.image.read()
-            ),
+            mock.call(image_upload_1.image.name.split("/")[-1], image_upload_1.image.read()),
+            mock.call(image_upload_2.image.name.split("/")[-1], image_upload_2.image.read()),
         ]
     )
     mock_email.send.assert_called_once_with(fail_silently=False)
@@ -93,11 +89,7 @@ QUESTIONS = [
                 "prompt": "Form 1",
                 "fields": [
                     # Image upload field
-                    {
-                        "name": "FILES",
-                        "type": "FILE",
-                        "prompt": "Show us a picture of your dog?",
-                    }
+                    {"name": "FILES", "type": "FILE", "prompt": "Show us a picture of your dog?"}
                 ],
             }
         ],
