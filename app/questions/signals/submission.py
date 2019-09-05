@@ -6,6 +6,7 @@ from django_q.tasks import async_task
 
 from questions.models import Submission
 from questions.services.submission import send_submission_email
+from questions.services.slack import send_submission_slack
 
 logger = logging.getLogger(__name__)
 
@@ -15,3 +16,4 @@ def save_submission(sender, instance, **kwargs):
     submission = instance
     if submission.complete:
         async_task(send_submission_email, str(submission.pk))
+        async_task(send_submission_slack, str(submission.pk))

@@ -132,3 +132,15 @@ Q_CLUSTER = {
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }
+
+# Adds a public slackbot notification to #general
+PUBLIC_SUBMIT_SLACK_WEBHOOK_URL = (
+    "https://hooks.slack.com/services/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"
+)
+# Add a private slackbot notification to @mattdsegal
+PRIVATE_SUBMIT_SLACK_WEBHOOK_URL = (
+    "https://hooks.slack.com/services/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"
+)
+# The URL the actually gets used
+SUBMIT_SLACK_WEBHOOK_URL = None
+

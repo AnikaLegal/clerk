@@ -8,7 +8,7 @@ DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = ["test-clerk.anikalegal.com", "127.0.0.1", "localhost"]
 
-EMAIL_PREFIX = 'TEST'
+EMAIL_PREFIX = "TEST"
 WEBMASTER_EMAIL = "webmaster@anikalegal.com"
 SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 
@@ -35,16 +35,12 @@ LOGGING = {
     "handlers": {"console": {"level": "INFO", "class": "logging.StreamHandler"}},
     "loggers": {
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
+        "django.db.backends": {"level": "ERROR", "handlers": ["console"], "propagate": False},
     },
 }
 
 sentry_sdk.init(
-    dsn=os.environ.get("RAVEN_DSN"),
-    integrations=[DjangoIntegration()],
-    environment="test",
+    dsn=os.environ.get("RAVEN_DSN"), integrations=[DjangoIntegration()], environment="test"
 )
+
+SUBMIT_SLACK_WEBHOOK_URL = PRIVATE_SUBMIT_SLACK_WEBHOOK_URL
