@@ -19,6 +19,9 @@ whitenoise
 django-extensions
 ipython
 
+# Development
+watchdog
+
 # File storage
 boto3
 django-storages

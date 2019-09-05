@@ -12,7 +12,7 @@ def send_submission_email(submission_pk):
     """
     Send a submission alert email with data included.
     """
-    submission = Submission.objects.get(submission_pk)
+    submission = Submission.objects.get(pk=submission_pk)
     subject = f"Client intake submission {str(submission.id)}"
     if settings.EMAIL_PREFIX:
         subject = f"[{settings.EMAIL_PREFIX}] {subject}"

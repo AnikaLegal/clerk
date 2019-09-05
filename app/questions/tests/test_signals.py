@@ -8,13 +8,16 @@ from questions.tests.factories import SubmissionFactory
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 @mock.patch("questions.signals.submission.send_submission_email", autospec=True)
-def test_email_sent_when_complete(mock_send):
+@mock.patch("questions.signals.submission.async_task", autospec=True)
+def test_email_sent_when_complete(mock_async, mock_send):
     submission = SubmissionFactory()
     assert not submission.complete
     mock_send.assert_not_called()
+    mock_async.assert_not_called()
     submission.complete = True
     submission.save()
-    mock_send.assert_called_with(submission)
+    mock_async.assert_called_with(mock_send, str(submission.pk))
+    mock_send.assert_not_called()
 
 
 @pytest.mark.django_db

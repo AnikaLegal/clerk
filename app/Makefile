@@ -6,6 +6,12 @@
 .ONESHELL:
 
 worker-local:
+	watchmedo \
+	auto-restart \
+	--directory /app/ \
+	--recursive \
+	--pattern '*.py' \
+	-- \
 	./manage.py qcluster
 
 worker-prod:
