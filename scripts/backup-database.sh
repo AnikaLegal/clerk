@@ -5,7 +5,7 @@
 #   su - postgres
 #	psql
 #
-HOST=13.211.109.142
+HOST=3.106.55.74
 S3_BUCKET=s3://anika-database-backups
 DATABASE_NAME=clerk
 TIME=$(date "+%s")

@@ -3,7 +3,7 @@
 # Deploy clerk the host server
 # Run this from the project root
 #
-HOST='13.211.109.142'
+HOST='3.106.55.74'
 
 case $CIRCLE_BRANCH in
     "develop")
