@@ -15,7 +15,7 @@ services:
     image: clerk:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     ports:
       - 8000:8000
     volumes:
@@ -60,7 +60,7 @@ services:
     image: clerk:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     volumes:
       - ./app:/app
     links:

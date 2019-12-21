@@ -10,13 +10,8 @@
 env/
 
 # Tests
+*pytest_cache*
 test_media/
-
-# NodeJS / Webpack
-node_modules/
-npm-debug.log.*
-frontend/build/
-webpack-stats.json
 
 # Docker stuff
 .docker_temp*

@@ -2,12 +2,6 @@
 # CircleCI Build Script
 # Install the CLI from https://circleci.com/docs/2.0/local-cli/
 # So you can run `circleci config validate`
-#
-# ALSO NICE TOOD:
-#   - scheduled build of base image
-#   - run ansible / CF to spin up environment
-#   - schedule DB backups
-#
 version: 2
 jobs:
   build:
@@ -35,21 +29,6 @@ jobs:
           paths:
             - image.tar
           key: clerk-image-v1-{{ checksum ".checksum" }}
-
-  push:
-    working_directory: ~/repo
-    machine: true
-    steps:
-      # Clone code from GitHub
-      - checkout
-
-      # Generate the project checksum
-      - run: ./scripts/build/checksum.sh
-
-      # Pull docker image from cache (~20s)
-      - restore_cache:
-          keys:
-            - clerk-image-v1-{{ checksum ".checksum" }}
 
       # Load our docker image from the .tar file (~30s)
       - run: docker load -i image.tar
@@ -80,9 +59,6 @@ workflows:
               only:
                 - master
                 - develop
-      - push:
-          requires:
-            - build
       - deploy:
           requires:
-            - push
+            - build

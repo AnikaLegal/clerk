@@ -6,72 +6,23 @@
 .ONESHELL:
 
 worker-local:
-	watchmedo \
-	auto-restart \
-	--directory /app/ \
-	--recursive \
-	--pattern '*.py' \
-	-- \
-	./manage.py qcluster
+	./scripts/worker/local.sh
 
 worker-prod:
-	./manage.py qcluster
+	./scripts/worker/prod.sh
 
 web-local:
-	./manage.py runserver 0.0.0.0:8000
+	./scripts/web/local.sh
 
-# Run Django website using gunicorn production
 web-prod:
-	echo "Starting clerk app as `whoami`" && \
-	echo "Starting remote syslog" && \
-	mkdir -p /var/log/gunicorn && \
-	touch /var/log/gunicorn/access.log && \
-	touch /var/log/gunicorn/error.log && \
-	remote_syslog \
-	--hostname "${PAPERTRAIL_HOSTNAME}" \
-	--dest-port "${PAPERTRAIL_PORT}" \
-	--dest-host "${PAPERTRAIL_URL}" \
-	--pid-file /var/run/remote_syslog.pid \
-	/var/log/gunicorn/access.log \
-	/var/log/gunicorn/error.log && \
-	echo "Running migrations" && \
-	./manage.py migrate && \
-	echo "Starting gunicorn" && \
-	gunicorn clerk.wsgi:application \
-	--name clerk \
-	--workers 2 \
-	--bind 0.0.0.0:${GUNICORN_PORT} \
-	--capture-output \
-	--log-level info \
-	--error-logfile /var/log/gunicorn/error.log \
-	--access-logfile /var/log/gunicorn/access.log
+	./scripts/web/prod.sh
 
-# Lint Python code
 lint:
-	flake8 \
-		--max-line-length=90 \
-		--exclude='*migrations*,/app/frontend' \
-		.
-	isort \
-		-l 90 \
-		--diff \
-		--check-only \
-		--skip migrations --skip /app/frontend
+	./scripts/tasks/lint.sh
 
-
-# Auto-format Python code
 format:
-	black \
-		--line-length 90 \
-		--exclude "frontend/|migrations/" \
-		--skip-string-normalization \
-		.
-	isort \
-		-l 90 \
-		--skip migrations --skip /app/frontend \
-		--apply
+	./scripts/tasks/format.sh
 
-# Run PyTest
 test:
-	export DJANGO_SETTINGS_MODULE=clerk.settings.test
-	pytest -s -vv --reuse-db
+	./scripts/tasks/test.sh
+

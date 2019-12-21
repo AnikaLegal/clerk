@@ -24,7 +24,7 @@ ssh root@$HOST /bin/bash << EOF
 EOF
 
 echo "Copying $PROJECT compose file"
-scp docker-compose.${COMPOSE_SUFFIX}.yml root@${HOST}:/srv/$PROJECT
+scp docker/docker-compose.${COMPOSE_SUFFIX}.yml root@${HOST}:/srv/$PROJECT
 
 ssh root@$HOST /bin/bash << EOF
     set -e

@@ -7,32 +7,32 @@
 #
 # Run Django website for local development
 web:
-	docker-compose up web
+	docker-compose -f docker/docker-compose.local.yml up web
 
 # Run Django with debugging enabled
 debug:
-	docker-compose run --rm --service-ports web
+	docker-compose -f docker/docker-compose.local.yml run --rm --service-ports web
 
 # Get a bash shell in the docker container
 bash:
-	docker-compose run --rm web bash
+	docker-compose -f docker/docker-compose.local.yml run --rm web bash
 
 # Get a Django shell_plus shell in the docker container
 shell:
-	docker-compose run --rm web ./manage.py shell_plus
+	docker-compose -f docker/docker-compose.local.yml run --rm web ./manage.py shell_plus
 
 # Get a Postgres shell in the docker container
 psql:
-	docker-compose run --rm web psql
+	docker-compose -f docker/docker-compose.local.yml run --rm web psql
 
 # Lint Python code
 lint:
-	docker-compose run --rm test make lint
+	docker-compose -f docker/docker-compose.local.yml run --rm test make lint
 
 # Auto-format frontend and backend code
 format:
-	docker-compose run --rm test make format
+	docker-compose -f docker/docker-compose.local.yml run --rm test make format
 
 # Run PyTest
 test:
-	docker-compose run --rm test make test
+	docker-compose -f docker/docker-compose.local.yml run --rm test make test

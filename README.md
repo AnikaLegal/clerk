@@ -1,19 +1,10 @@
-# Clerk
+# Clerk [![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
 
 This site is used by new Anika clients who want to submit their legal problem. Clients may submit the facts of their case using a structured form interface. Their case file is then entered into our case managment system.
 
 This is a speculative project built out for Random Hacks of Kindness (Melbourne, Summer 2018).
 
 > Depending on the job, office clerks might answer phones, filing, data processing, faxing, envelope stuffing and mailing, message delivery, running errands, sorting incoming mail and much more. ([source](https://www.snagajob.com/job-descriptions/office-clerk/))
-
-[![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
-
-# TODO
-
-- add database backup script
-- add file backup script
-- add S3 file storage backend
-- deploy to Anika AWS (document EC2 + S3 sizes + billing)
 
 # Development
 
