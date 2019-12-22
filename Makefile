@@ -5,6 +5,10 @@
 # If you find yourself running the same docker-compose command over and over,
 # then consider adding it here.
 #
+# Build local Docker envrionment
+build:
+	docker-compose -f docker/docker-compose.local.yml build
+
 # Run Django website for local development
 web:
 	docker-compose -f docker/docker-compose.local.yml up web
