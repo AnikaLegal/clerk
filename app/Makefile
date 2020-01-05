@@ -2,9 +2,6 @@
 # This Makefile contains commands which are run inside the Docker containers,
 # I do not recommend invoking these directly - see Makefile at project root instead.
 #
-# Allows us to run several commands in one bash shelll
-.ONESHELL:
-
 worker-local:
 	./scripts/worker/local.sh
 
@@ -25,4 +22,3 @@ format:
 
 test:
 	./scripts/tasks/test.sh
-

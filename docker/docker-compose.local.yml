@@ -13,13 +13,10 @@ services:
   web:
     command: make web-local
     image: clerk:latest
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
     ports:
       - 8000:8000
     volumes:
-      - ./app:/app
+      - ../app:/app
     links:
       - worker
       - database
@@ -40,7 +37,7 @@ services:
     command: make worker-local
     image: clerk:latest
     volumes:
-      - ./app:/app
+      - ../app:/app
     links:
       - database
     environment:
@@ -60,9 +57,9 @@ services:
     image: clerk:latest
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     volumes:
-      - ./app:/app
+      - ../app:/app
     links:
       - database
     environment:
