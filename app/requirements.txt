@@ -1,6 +1,7 @@
 # Backend
 requests
 django
+pdfkit # Generate PDFs for email
 
 # Infrastructure
 psycopg2-binary
