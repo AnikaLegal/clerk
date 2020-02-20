@@ -1,16 +1,22 @@
 # Use Clerk base image
 FROM anikalaw/clerkbase:latest
 
-# Install PDF kit binary
-# https://github.com/JazzCore/python-pdfkit/blob/master/travis/before-script.sh
-ENV WKHTML2PDF_VERSION 0.12.4
-RUN apt-get -qq update
-RUN apt-get install -qq openssl build-essential xorg libssl-dev
-RUN wget "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTML2PDF_VERSION}/wkhtmltox-${WKHTML2PDF_VERSION}_linux-generic-amd64.tar.xz"
-RUN tar -xJf "wkhtmltox-${WKHTML2PDF_VERSION}_linux-generic-amd64.tar.xz"
-RUN chown root:root wkhtmltox/bin/wkhtmltopdf
-RUN cp -r wkhtmltox/* /usr/
 
+# Install Weasyprint dependencies
+# https://weasyprint.readthedocs.io/en/stable/install.html#linux
+RUN apt-get -qq update
+RUN apt-get -qq install \
+  build-essential \
+  python3-wheel \
+  python3-cffi \
+  libcairo2 \
+  libpango-1.0-0 \
+  libpangocairo-1.0-0 \
+  libgdk-pixbuf2.0-0 \
+  libffi-dev \
+  shared-mime-info
+
+#
 # Install Python packages
 COPY app/requirements.txt .
 RUN \

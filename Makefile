@@ -40,3 +40,7 @@ format:
 # Run PyTest
 test:
 	docker-compose -f docker/docker-compose.local.yml run --rm test make test
+
+# View worker logs
+logs:
+	docker-compose -f docker/docker-compose.local.yml logs --tail 100 -f worker 

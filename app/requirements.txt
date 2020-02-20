@@ -1,7 +1,7 @@
 # Backend
 requests
 django
-pdfkit # Generate PDFs for email
+WeasyPrint # Generate PDFs for email
 
 # Infrastructure
 psycopg2-binary
@@ -21,7 +21,7 @@ django-extensions
 ipython
 
 # Development
-watchdog
+watchdog[watchmedo]
 
 # File storage
 boto3
