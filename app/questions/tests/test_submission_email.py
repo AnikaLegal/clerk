@@ -24,30 +24,11 @@ def test_submission_email(mock_email_cls):
             ],
         },
     ]
-    body = """Client intake submission 5cebdf3f-d1fc-4e47-86e6-00046a41057c
-FOO What is foo?
-'yes'
-BAR What is bar?
-['red', 'green']
-BAZ What is baz?
-'yes'
-BING What is bing?
-'yes'
-"""
     sub = SubmissionFactory(complete=False, questions=QUESTIONS, answers=answers)
     mock_email = mock.MagicMock()
     mock_email_cls.return_value = mock_email
 
     send_submission_email(sub.pk)
-
-    image_upload_1.image.seek(0)
-    image_upload_2.image.seek(0)
-    mock_email.attach.assert_has_calls(
-        [
-            mock.call(image_upload_1.image.name.split("/")[-1], image_upload_1.image.read()),
-            mock.call(image_upload_2.image.name.split("/")[-1], image_upload_2.image.read()),
-        ]
-    )
     mock_email.send.assert_called_once_with(fail_silently=False)
 
 
