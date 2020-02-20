@@ -63,6 +63,7 @@ services:
     links:
       - database
     environment:
+      PGDATABASE: postgres
       PGUSER: postgres
       PGPASSWORD: password
       PGHOST: database

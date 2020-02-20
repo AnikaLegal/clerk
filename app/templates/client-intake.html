@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .answer {
+        margin: 32px;
+      }
+      .answer h2 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+      }
+      .answer .key {
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Anika Legal Client Intake Submission</h1>
+    <hr />
+    <p>
+      This is a client's submission ({{submission.pk}}), first created at
+      {{submission.created_at|date:"l jS F Y "}}.
+    </p>
+    {% if images %}
+    <p>
+      The client attached the following images to their submission:
+    </p>
+    <ul>
+      {% for image in images%}
+      <li><a href="{{image.url}}">{{image.name}}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <p>
+      The client answered the following questions:
+    </p>
+
+    {% for answer in answers %}
+    <div class="answer">
+      <h2>{{answer.prompt}} <span class="key">({{answer.name}})</span></h2>
+      {% for a in answer.answers %}
+      <p>{{a}}</p>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </body>
+</html>

@@ -1,7 +1,9 @@
 import logging
 
+import weasyprint
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 from questions.models import ImageUpload, Submission
 
@@ -18,34 +20,10 @@ def send_submission_email(submission_pk):
         subject = f"[{settings.EMAIL_PREFIX}] {subject}"
 
     body = subject + "\n\n"
-    answers = submission.answers
-    questions = submission.questions
-    if not answers or not questions:
+    if not submission.answers or not submission.questions:
         logger.error("Submission[%s] has insufficient data", submission.id)
 
-    # Get questions from sections
-    fields = {}
-    for section in questions:
-        for form in section["forms"]:
-            for field in form["fields"]:
-                fs = field.get("fields", [field])
-                for f in fs:
-                    fields[f["name"]] = f
-
-    # Assume answer is a list of dicts with a pretty specific structure.
-    # See tests
-    images = []
-    for answer in answers:
-        answer, name = answer.get("answer", ""), answer.get("name", "")
-        field = fields[name]
-        if field["type"] == "FILE":
-            ids = [image["id"] for image in answer]
-            images += [
-                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
-            ]
-        else:
-            body += name + " " + field.get("prompt", "") + "\n\n"
-            body += repr(answer) + "\n\n"
+    body = subject + "\nSee attached PDF for client submission details."
 
     logger.info("Sending email for Submission[%s]", submission.id)
     email = EmailMultiAlternatives(
@@ -54,8 +32,46 @@ def send_submission_email(submission_pk):
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=settings.SUBMISSION_EMAILS,
     )
-
-    for image in images:
-        email.attach(image.name.split("/")[-1], image.read())
-
+    pdf_str = create_pdf(submission)
+    pdf_filename = f"client-intake-{submission_pk}.pdf"
+    email.attach(pdf_filename, pdf_str)
     email.send(fail_silently=False)
+
+
+def create_pdf(submission):
+    """
+    Returns a PDF file string.
+    """
+    # Get questions from sections
+    fields = {}
+    for section in submission.questions:
+        for form in section["forms"]:
+            for field in form["fields"]:
+                fs = field.get("fields", [field])
+                for f in fs:
+                    fields[f["name"]] = f
+
+    # Pull out image and answers
+    images = []
+    answers = []
+    for answer in submission.answers:
+        answer, name = answer.get("answer", ""), answer.get("name", "")
+        field = fields[name]
+        if field["type"] == "FILE":
+            ids = [image["id"] for image in answer]
+            images += [
+                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
+            ]
+        else:
+            answers.append(
+                {
+                    "name": name.lower().replace("_", " ").capitalize(),
+                    "prompt": field.get("prompt", ""),
+                    "answers": answer if type(answer) is list else [answer],
+                }
+            )
+
+    context = {"submission": submission, "answers": answers, "images": images}
+    pdf_html_str = render_to_string("client-intake.html", context=context)
+    pdf_bytes = weasyprint.HTML(string=pdf_html_str).write_pdf()
+    return pdf_bytes
