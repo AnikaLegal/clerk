@@ -21,7 +21,10 @@ def test_email_sent_when_complete(mock_async, mock_send, mock_slack):
     submission.save()
 
     mock_async.assert_has_calls(
-        [mock.call(mock_send, str(submission.pk)), mock.call(mock_slack, str(submission.pk))]
+        [
+            mock.call(mock_send, str(submission.pk)),
+            mock.call(mock_slack, str(submission.pk)),
+        ]
     )
     mock_send.assert_not_called()
     mock_slack.assert_not_called()

@@ -5,8 +5,8 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from questions.models import Submission
-from questions.services.submission import send_submission_email
 from questions.services.slack import send_submission_slack
+from questions.services.submission import send_submission_email
 
 logger = logging.getLogger(__name__)
 

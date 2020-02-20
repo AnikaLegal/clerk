@@ -70,7 +70,11 @@ QUESTIONS = [
                 "prompt": "Form 1",
                 "fields": [
                     # Image upload field
-                    {"name": "FILES", "type": "FILE", "prompt": "Show us a picture of your dog?"}
+                    {
+                        "name": "FILES",
+                        "type": "FILE",
+                        "prompt": "Show us a picture of your dog?",
+                    }
                 ],
             }
         ],

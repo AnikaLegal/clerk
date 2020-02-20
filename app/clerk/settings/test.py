@@ -17,7 +17,11 @@ LOGGING = {
     "loggers": {
         "reader": {"handlers": ["console"], "level": "INFO", "propagate": True},
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {"level": "INFO", "handlers": ["console"], "propagate": False},
+        "django.db.backends": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 

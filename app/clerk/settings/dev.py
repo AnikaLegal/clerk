@@ -10,7 +10,9 @@ SUBMISSION_EMAILS = [MATT_EMAIL]
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_REGEX_WHITELIST = (r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",)
+CORS_ORIGIN_REGEX_WHITELIST = (
+    r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",
+)
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
 LOGGING = {
@@ -21,7 +23,11 @@ LOGGING = {
     "loggers": {
         "reader": {"handlers": ["console"], "level": "INFO", "propagate": True},
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {"level": "INFO", "handlers": ["console"], "propagate": False},
+        "django.db.backends": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 

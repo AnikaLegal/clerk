@@ -60,7 +60,8 @@ def create_pdf(submission):
         if field["type"] == "FILE":
             ids = [image["id"] for image in answer]
             images += [
-                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
+                image_upload.image
+                for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
             ]
         else:
             answers.append(

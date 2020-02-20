@@ -8,7 +8,6 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
 
-
 from questions.models import ImageUpload, Submission
 from questions.services.slack import send_submission_slack
 from questions.services.submission import send_submission_email

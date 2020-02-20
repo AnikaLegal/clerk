@@ -17,7 +17,9 @@ def send_submission_slack(submission_pk):
         logging.info("Notifying slack of Submission<%s>", submission_pk)
         requests.post(url, json={"text": text}, headers=HEADERS)
     else:
-        logging.info("Not notifying slack of Submission<%s>, no URL provided", submission_pk)
+        logging.info(
+            "Not notifying slack of Submission<%s>, no URL provided", submission_pk
+        )
 
 
 def get_text(submission_pk):

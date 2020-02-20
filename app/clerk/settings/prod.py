@@ -35,12 +35,18 @@ LOGGING = {
     "handlers": {"console": {"level": "INFO", "class": "logging.StreamHandler"}},
     "loggers": {
         "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {"level": "ERROR", "handlers": ["console"], "propagate": False},
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 
 sentry_sdk.init(
-    dsn=os.environ.get("RAVEN_DSN"), integrations=[DjangoIntegration()], environment="prod"
+    dsn=os.environ.get("RAVEN_DSN"),
+    integrations=[DjangoIntegration()],
+    environment="prod",
 )
 
 SUBMIT_SLACK_WEBHOOK_URL = PUBLIC_SUBMIT_SLACK_WEBHOOK_URL

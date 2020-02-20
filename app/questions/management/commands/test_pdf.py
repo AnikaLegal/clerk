@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from questions.services.submission import create_pdf
 from questions.models import Submission
+from questions.services.submission import create_pdf
 
 
 class Command(BaseCommand):
@@ -17,4 +17,3 @@ class Command(BaseCommand):
         fname = f"test-{submission_pk}.pdf"
         with open(fname, "wb") as f:
             f.write(pdf_bytes)
-
