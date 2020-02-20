@@ -137,13 +137,11 @@ Q_CLUSTER = {
 }
 
 # Adds a public slackbot notification to #general
-PUBLIC_SUBMIT_SLACK_WEBHOOK_URL = (
-    "https://hooks.slack.com/services/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"
-)
+PUBLIC_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get('PUBLIC_SUBMIT_SLACK_WEBHOOK_URL')
+
 # Add a private slackbot notification to @mattdsegal
-PRIVATE_SUBMIT_SLACK_WEBHOOK_URL = (
-    "https://hooks.slack.com/services/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"
-)
+PRIVATE_SUBMIT_SLACK_WEBHOOK_URL os.environ.get('PRIVATE_SUBMIT_SLACK_WEBHOOK_URL')
+
 # The URL the actually gets used
 SUBMIT_SLACK_WEBHOOK_URL = None
 
