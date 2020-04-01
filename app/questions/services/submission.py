@@ -15,7 +15,7 @@ def send_submission_email(submission_pk):
     Send a submission alert email with data included.
     """
     submission = Submission.objects.get(pk=submission_pk)
-    subject = f"Client intake submission {str(submission.id)}"
+    subject = f"Client intake submission {submission.topic} {str(submission.id)}"
     if settings.EMAIL_PREFIX:
         subject = f"[{settings.EMAIL_PREFIX}] {subject}"
 
@@ -60,8 +60,7 @@ def create_pdf(submission):
         if field["type"] == "FILE":
             ids = [image["id"] for image in answer]
             images += [
-                image_upload.image
-                for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
+                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
             ]
         else:
             answers.append(
