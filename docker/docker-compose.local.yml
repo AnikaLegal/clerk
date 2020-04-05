@@ -3,7 +3,10 @@ version: "3"
 services:
   # Local development database.
   database:
+    container_name: database
     image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
@@ -11,6 +14,7 @@ services:
 
   # Django webserver.
   web:
+    container_name: web
     command: make web-local
     image: clerk:latest
     ports:
@@ -34,8 +38,12 @@ services:
 
   # Django-q worker.
   worker:
+    container_name: worker
     command: make worker-local
     image: clerk:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     volumes:
       - ../app:/app
     links:
@@ -56,10 +64,8 @@ services:
 
   # For testing.
   test:
+    container_name: test
     image: clerk:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     volumes:
       - ../app:/app
     links:
