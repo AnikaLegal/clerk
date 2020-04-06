@@ -28,25 +28,9 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["console"]},
-    "handlers": {"console": {"level": "INFO", "class": "logging.StreamHandler"}},
-    "loggers": {
-        "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
-    },
-}
 
 sentry_sdk.init(
-    dsn=os.environ.get("RAVEN_DSN"),
-    integrations=[DjangoIntegration()],
-    environment="test",
+    dsn=os.environ.get("RAVEN_DSN"), integrations=[DjangoIntegration()], environment="test"
 )
 
 SUBMIT_SLACK_WEBHOOK_URL = PRIVATE_SUBMIT_SLACK_WEBHOOK_URL

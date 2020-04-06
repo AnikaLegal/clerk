@@ -144,3 +144,26 @@ PRIVATE_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("PRIVATE_SUBMIT_SLACK_WEBHOOK_
 
 # The URL the actually gets used
 SUBMIT_SLACK_WEBHOOK_URL = None
+
+# Everyone gets the same logging config
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {"level": "INFO", "handlers": ["console", "file"]},
+    "handlers": {
+        "console": {"level": "INFO", "class": "logging.StreamHandler"},
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/django.log",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["console", "file"], "level": "INFO", "propagate": True},
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+    },
+}

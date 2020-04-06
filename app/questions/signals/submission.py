@@ -15,5 +15,6 @@ logger = logging.getLogger(__name__)
 def save_submission(sender, instance, **kwargs):
     submission = instance
     if submission.complete:
+        logger.info("Dispatching commpletion tasks for Submission<%s]>", submission.id)
         async_task(send_submission_email, str(submission.pk))
         async_task(send_submission_slack, str(submission.pk))

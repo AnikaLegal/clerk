@@ -8,6 +8,7 @@ services:
       - 8001:8001
     volumes:
       - /var/run/postgresql:/app/postgres.sock
+      - /var/log/clerk/test/web:/var/log
     environment:
       DJANGO_SETTINGS_MODULE: clerk.settings.staging
       GUNICORN_PORT: 8001
@@ -31,6 +32,7 @@ services:
     image: anikalaw/clerk:latest
     volumes:
       - /var/run/postgresql:/app/postgres.sock
+      - /var/log/clerk/test/worker:/var/log
     environment:
       DJANGO_SETTINGS_MODULE: clerk.settings.staging
       PGHOST: /app/postgres.sock

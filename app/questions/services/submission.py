@@ -25,7 +25,7 @@ def send_submission_email(submission_pk):
 
     body = subject + "\nSee attached PDF for client submission details."
 
-    logger.info("Sending email for Submission[%s]", submission.id)
+    logger.info("Sending email for Submission<%s]>", submission.id)
     email = EmailMultiAlternatives(
         subject=subject,
         body=body,
