@@ -18,7 +18,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     readonly_fields = ("answers_json",)
     exclude = ("questions", "answers")
-    list_display = ("id", "topic", "created_at", "modified_at", "complete")
+    list_display = ("id", "topic", "created_at", "modified_at", "num_answers", "complete")
+    list_filter = ("topic", "complete")
 
     actions = ["notify"]
 

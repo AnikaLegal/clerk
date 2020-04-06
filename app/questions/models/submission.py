@@ -19,3 +19,15 @@ class Submission(TimestampedModel):
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES, default="REPAIRS")
     questions = JSONField(encoder=DjangoJSONEncoder)
     answers = JSONField(encoder=DjangoJSONEncoder)
+    num_answers = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        """
+        Populate num_answers.with any avalable answers
+        """
+        try:
+            self.num_answers = len(self.answers)
+        except TypeError:
+            pass  # No length possible
+
+        super().save(*args, **kwargs)
