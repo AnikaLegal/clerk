@@ -37,7 +37,8 @@ flake8
 faker
 pytest-django
 pytest-factoryboy
-pytest-sugar
+# https://github.com/Teemu/pytest-sugar/issues/187
+# pytest-sugar
 responses
 freezegun
 

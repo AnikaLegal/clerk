@@ -13,7 +13,7 @@ def test_submission_create(client):
     User can create a submission
     """
     url = reverse("submission-list")
-    data = {"questions": {"foo": {"a": 1}}, "answers": []}
+    data = {"questions": {"foo": {"a": 1}}, "answers": [], "topic": "REPAIRS"}
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 201
     sub = Submission.objects.last()
@@ -28,12 +28,13 @@ def test_submission_get(client):
     """
     User can retrieve a submission
     """
-    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
+    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
     url = reverse("submission-detail", args=[sub.id])
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.data == {
         "id": str(sub.id),
+        "topic": "REPAIRS",
         "answers": [{"FOO": [1, 2, 3]}],
         "questions": {},
         "complete": False,
@@ -45,18 +46,15 @@ def test_submission_update(client):
     """
     User can update a submission
     """
-    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
+    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
     url = reverse("submission-detail", args=[sub.id])
-    update = {
-        "answers": [{"BAR": "no"}],
-        "questions": {"foo": {"a": 1}},
-        "complete": True,
-    }
+    update = {"answers": [{"BAR": "no"}], "questions": {"foo": {"a": 1}}, "complete": True}
     resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 200
     assert resp.data == {
         "id": str(sub.id),
         "answers": [{"BAR": "no"}],
+        "topic": "REPAIRS",
         "questions": {"foo": {"a": 1}},
         "complete": True,
     }
