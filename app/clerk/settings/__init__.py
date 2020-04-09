@@ -136,11 +136,11 @@ Q_CLUSTER = {
     "orm": "default",  # Use Django's ORM + database for broker
 }
 
-# Adds a public slackbot notification to #general
-PUBLIC_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("PUBLIC_SUBMIT_SLACK_WEBHOOK_URL")
+# Slack notification webhooks
+GENERAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("GENERAL_SUBMIT_SLACK_WEBHOOK_URL")
+MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL")
+ALERTS_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("ALERTS_SUBMIT_SLACK_WEBHOOK_URL")
 
-# Add a private slackbot notification to @mattdsegal
-PRIVATE_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("PRIVATE_SUBMIT_SLACK_WEBHOOK_URL")
 
 # The URL the actually gets used
 SUBMIT_SLACK_WEBHOOK_URL = None

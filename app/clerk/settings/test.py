@@ -20,3 +20,6 @@ Q_CLUSTER = {
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }
+
+SUBMIT_SLACK_WEBHOOK_URL = "https://www.example.com"  # Not a real Slack webhook
+
