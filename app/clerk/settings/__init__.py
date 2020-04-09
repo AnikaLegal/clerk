@@ -130,8 +130,9 @@ REST_FRAMEWORK = {
 
 Q_CLUSTER = {
     "name": "clerk",
-    "timeout": 60,  # seconds,
-    "retry": 60,  # seconds,
+    "timeout": 60,  # one minute.
+    # NB: Django-Q retries *forever*, tasks need to be manually deleted to stop this
+    "retry": 3600,  # an hour, must be longer than timeout
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }
