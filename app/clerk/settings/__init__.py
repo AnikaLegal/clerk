@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Async tasks
     "django_q",
     # Internal apps
+    "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
 ]
 
