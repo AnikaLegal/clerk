@@ -36,6 +36,8 @@ def send_submission_email(submission_pk):
     pdf_filename = f"client-intake-{submission_pk}.pdf"
     email.attach(pdf_filename, pdf_str)
     email.send(fail_silently=False)
+    # Mark request as sent
+    Submission.objects.filter(pk=submission.pk).update(is_data_sent=True)
 
 
 def create_pdf(submission):

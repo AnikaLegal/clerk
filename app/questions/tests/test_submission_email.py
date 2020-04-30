@@ -4,6 +4,7 @@ import pytest
 
 from questions.services.submission import send_submission_email
 from questions.tests.factories import ImageUploadFactory, SubmissionFactory
+from questions.models import Submission
 
 
 @mock.patch("questions.services.submission.EmailMultiAlternatives")
@@ -28,8 +29,11 @@ def test_submission_email(mock_email_cls):
     mock_email = mock.MagicMock()
     mock_email_cls.return_value = mock_email
 
+    assert not sub.is_data_sent
     send_submission_email(sub.pk)
     mock_email.send.assert_called_once_with(fail_silently=False)
+    sub = Submission.objects.get(pk=sub.id)
+    assert sub.is_data_sent
 
 
 QUESTIONS = [
@@ -70,11 +74,7 @@ QUESTIONS = [
                 "prompt": "Form 1",
                 "fields": [
                     # Image upload field
-                    {
-                        "name": "FILES",
-                        "type": "FILE",
-                        "prompt": "Show us a picture of your dog?",
-                    }
+                    {"name": "FILES", "type": "FILE", "prompt": "Show us a picture of your dog?"}
                 ],
             }
         ],

@@ -15,11 +15,15 @@ class Submission(TimestampedModel):
     TOPIC_CHOICES = (("REPAIRS", "REPAIRS"), ("COVID", "COVID"))
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    complete = models.BooleanField(default=False)
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES, default="REPAIRS")
     questions = JSONField(encoder=DjangoJSONEncoder)
     answers = JSONField(encoder=DjangoJSONEncoder)
     num_answers = models.IntegerField(default=0)
+    complete = models.BooleanField(default=False)
+    # Tracks whether a Slack alert has been successfully sent.
+    is_alert_sent = models.BooleanField(default=False)
+    # Tracks whether the case data has been successfully sent.
+    is_data_sent = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """

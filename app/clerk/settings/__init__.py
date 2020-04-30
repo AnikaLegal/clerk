@@ -138,14 +138,6 @@ Q_CLUSTER = {
     "orm": "default",  # Use Django's ORM + database for broker
 }
 
-# Slack notification webhooks
-GENERAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("GENERAL_SUBMIT_SLACK_WEBHOOK_URL")
-MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL")
-ALERTS_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("ALERTS_SUBMIT_SLACK_WEBHOOK_URL")
-
-
-# The URL the actually gets used
-SUBMIT_SLACK_WEBHOOK_URL = None
 
 # Everyone gets the same logging config
 LOGGING = {
@@ -169,3 +161,23 @@ LOGGING = {
         },
     },
 }
+
+
+class SlackUser:
+    NOEL = "U9PMDQ665"
+    ALEX = "UMMPBKKNH"
+    MATT = "UE0BMQDM2"
+    SAM = "UQCPNTHLN"
+
+
+SLACK_USER = SlackUser
+
+
+# Slack notification webhooks
+GENERAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("GENERAL_SUBMIT_SLACK_WEBHOOK_URL")
+MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL")
+ALERTS_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("ALERTS_SUBMIT_SLACK_WEBHOOK_URL")
+
+
+# The URL the actually gets used
+SUBMIT_SLACK_WEBHOOK_URL = None
