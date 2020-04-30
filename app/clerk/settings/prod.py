@@ -23,6 +23,9 @@ CORS_ORIGIN_REGEX_WHITELIST = (
     r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",
 )
 
+# Turn off browsable DRF API in prod.
+REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",)
+
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
