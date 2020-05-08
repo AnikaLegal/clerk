@@ -116,7 +116,7 @@ AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = "public-read"
 AWS_REGION_NAME = "ap-southeast-2"
-AWS_S3_FILE_OVERWRITE = False  # Files with the same name will not each other
+AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each other
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
