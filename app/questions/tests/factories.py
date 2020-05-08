@@ -4,7 +4,7 @@ import factory
 from django.db.models.signals import post_save
 from django.utils import timezone
 
-from questions.models import ImageUpload, Submission
+from questions.models import FileUpload, ImageUpload, Submission
 
 from .utils import get_dummy_file
 
@@ -45,3 +45,21 @@ class ImageUploadFactory(TimestampedModelFactory):
             file = get_dummy_file(file_name)
 
         self.image.save(file_name, file)
+
+
+@factory.django.mute_signals(post_save)
+class FileUploadFactory(TimestampedModelFactory):
+    class Meta:
+        model = FileUpload
+
+    id = factory.LazyAttribute(lambda x: uuid4())
+
+    @factory.post_generation
+    def file(self, create, extracted, **kwargs):
+        if extracted:
+            file_name, file = extracted
+        else:
+            file_name = "doc.pdf"
+            file = get_dummy_file(file_name)
+
+        self.file.save(file_name, file)

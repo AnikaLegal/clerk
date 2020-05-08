@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from questions.models import ImageUpload, Submission
+from questions.models import FileUpload, ImageUpload, Submission
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -9,8 +9,18 @@ class SubmissionSerializer(serializers.ModelSerializer):
         fields = ("id", "topic", "complete", "questions", "answers")
 
 
+class FileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileUpload
+        ready_only_fields = ("id",)
+        fields = ("id", "file")
+
+
 class ImageUploadSerializer(serializers.ModelSerializer):
+
+    file = serializers.ImageField(source="image")
+
     class Meta:
         model = ImageUpload
         ready_only_fields = ("id",)
-        fields = ("id", "image")
+        fields = ("id", "file")

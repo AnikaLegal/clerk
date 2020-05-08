@@ -1,8 +1,8 @@
 import pytest
 from django.urls import reverse
 
-from questions.models import ImageUpload, Submission
-from questions.tests.factories import ImageUploadFactory, SubmissionFactory
+from questions.models import FileUpload, ImageUpload, Submission
+from questions.tests.factories import FileUploadFactory, ImageUploadFactory, SubmissionFactory
 
 from .utils import get_dummy_file
 
@@ -102,9 +102,48 @@ def test_image_upload_create(client):
     list_url = reverse("images-list")
     assert ImageUpload.objects.count() == 0
     f = get_dummy_file("image.png")
-    resp = client.post(list_url, {"image": f})
+    resp = client.post(list_url, {"file": f})
     assert resp.data["id"]
     assert ImageUpload.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_file_upload_create(client):
+    """
+    User can upload a file to create an image upload
+    """
+    list_url = reverse("files-list")
+    assert FileUpload.objects.count() == 0
+    f = get_dummy_file("doc.pdf")
+    resp = client.post(list_url, {"file": f})
+    assert resp.data["id"]
+    assert FileUpload.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_file_upload_security(client):
+    """
+    User cannot list, get, or delete file uploads
+    """
+    file_upload = FileUploadFactory()
+    list_url = reverse("files-list")
+    detail_url = f"{list_url}{file_upload.id}/"
+
+    # User cannot get an file
+    resp = client.get(detail_url)
+    assert resp.status_code == 404
+
+    # User cannot update an file
+    resp = client.patch(detail_url)
+    assert resp.status_code == 404
+
+    # User cannot delete a file
+    resp = client.delete(detail_url)
+    assert resp.status_code == 404
+
+    # User cannot list files
+    resp = client.get(list_url)
+    assert resp.status_code == 405
 
 
 @pytest.mark.django_db
