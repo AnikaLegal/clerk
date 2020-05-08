@@ -32,7 +32,16 @@
       This is a client's submission ({{submission.pk}}), first created at
       {{submission.created_at|date:"l jS F Y "}}.
     </p>
-    {% if images %}
+    {% if docs %}
+    <p>
+      The client attached the following documents to their submission:
+    </p>
+    <ul>
+      {% for doc in docs%}
+      <li><a href="{{doc.url}}">{{doc.name}}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% if images %}
     <p>
       The client attached the following images to their submission:
     </p>

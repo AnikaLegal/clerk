@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-from questions.models import ImageUpload, Submission
+from questions.models import FileUpload, ImageUpload, Submission
 
 logger = logging.getLogger(__name__)
 
@@ -55,15 +55,30 @@ def create_pdf(submission):
 
     # Pull out image and answers
     images = []
+    docs = []
     answers = []
     for answer in submission.answers:
         answer, name = answer.get("answer", ""), answer.get("name", "")
         field = fields[name]
         if field["type"] == "FILE":
-            ids = [image["id"] for image in answer]
-            images += [
-                image_upload.image for image_upload in ImageUpload.objects.filter(pk__in=ids).all()
-            ]
+            image_ids = []
+            doc_ids = []
+            for file in answer:
+                if "image" in file:
+                    image_ids.append(file["id"])
+                elif "file" in file:
+                    doc_ids.append(file["id"])
+
+            if image_ids:
+                images += [
+                    image_upload.image
+                    for image_upload in ImageUpload.objects.filter(pk__in=image_ids).all()
+                ]
+            if doc_ids:
+                docs += [
+                    file_upload.file
+                    for file_upload in FileUpload.objects.filter(pk__in=doc_ids).all()
+                ]
         else:
             answers.append(
                 {
@@ -73,7 +88,7 @@ def create_pdf(submission):
                 }
             )
 
-    context = {"submission": submission, "answers": answers, "images": images}
+    context = {"submission": submission, "answers": answers, "images": images, "docs": docs}
     pdf_html_str = render_to_string("client-intake.html", context=context)
     pdf_bytes = weasyprint.HTML(string=pdf_html_str).write_pdf()
     return pdf_bytes

@@ -1,9 +1,9 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
-from questions.models import ImageUpload, Submission
+from questions.models import FileUpload, ImageUpload, Submission
 
-from .serializers import ImageUploadSerializer, SubmissionSerializer
+from .serializers import FileUploadSerializer, ImageUploadSerializer, SubmissionSerializer
 
 
 class SubmissionViewSet(
@@ -28,3 +28,9 @@ class ImageUploadViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
     http_method_names = ("post",)
     serializer_class = ImageUploadSerializer
     queryset = ImageUpload.objects.all()
+
+
+class FileUploadViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    http_method_names = ("post",)
+    serializer_class = FileUploadSerializer
+    queryset = FileUpload.objects.all()
