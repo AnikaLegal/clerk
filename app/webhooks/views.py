@@ -19,7 +19,7 @@ def webflow_form_view(request):
     curl \
         --header "Content-Type: application/json" \
         --request POST  \
-        --data '{"data": {"name": "Matt", "email": "matt@foo.com", "phone": "11111"}}' \
+        --data '{"data": {"Name": "Matt", "Email": "matt@foo.com", "Phone Number": "11111"}}' \
         http://localhost:8000/api/webhooks/webflow-form/
 
     But don't because it'd be a shitty thing to do.

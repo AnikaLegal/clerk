@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Async tasks
     "django_q",
     # Internal apps
+    "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
 ]
@@ -163,21 +164,10 @@ LOGGING = {
 }
 
 
-class SlackUser:
-    NOEL = "U9PMDQ665"
-    ALEX = "UMMPBKKNH"
-    MATT = "UE0BMQDM2"
-    SAM = "UQCPNTHLN"
+# Slack message types
+class SlackMessage:
+    CLIENT_INTAKE = "client-intake"
+    LANDING_FORM = "landing-form"
 
 
-SLACK_USER = SlackUser
-
-
-# Slack notification webhooks
-GENERAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("GENERAL_SUBMIT_SLACK_WEBHOOK_URL")
-MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("MATTSEGAL_SUBMIT_SLACK_WEBHOOK_URL")
-ALERTS_SUBMIT_SLACK_WEBHOOK_URL = os.environ.get("ALERTS_SUBMIT_SLACK_WEBHOOK_URL")
-
-
-# The URL the actually gets used
-SUBMIT_SLACK_WEBHOOK_URL = None
+SLACK_MESSAGE = SlackMessage

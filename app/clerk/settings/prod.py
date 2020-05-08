@@ -35,5 +35,3 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk"
 sentry_sdk.init(
     dsn=os.environ.get("RAVEN_DSN"), integrations=[DjangoIntegration()], environment="prod"
 )
-
-SUBMIT_SLACK_WEBHOOK_URL = ALERTS_SUBMIT_SLACK_WEBHOOK_URL
