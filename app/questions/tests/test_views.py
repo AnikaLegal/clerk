@@ -102,7 +102,7 @@ def test_image_upload_create(client):
     list_url = reverse("images-list")
     assert ImageUpload.objects.count() == 0
     f = get_dummy_file("image.png")
-    resp = client.post(list_url, {"file": f})
+    resp = client.post(list_url, {"image": f})
     assert resp.data["id"]
     assert ImageUpload.objects.count() == 1
 

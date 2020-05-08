@@ -17,10 +17,7 @@ class FileUploadSerializer(serializers.ModelSerializer):
 
 
 class ImageUploadSerializer(serializers.ModelSerializer):
-
-    file = serializers.ImageField(source="image")
-
     class Meta:
         model = ImageUpload
         ready_only_fields = ("id",)
-        fields = ("id", "file")
+        fields = ("id", "image")
