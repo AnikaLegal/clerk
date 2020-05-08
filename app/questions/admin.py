@@ -8,7 +8,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
 
-from questions.models import ImageUpload, Submission
+from questions.models import FileUpload, ImageUpload, Submission
 from questions.services.slack import send_submission_slack
 from questions.services.submission import send_submission_email
 
@@ -40,6 +40,12 @@ class SubmissionAdmin(admin.ModelAdmin):
 class ImageUploadAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     list_display = ("id", "created_at", "modified_at", "image")
+
+
+@admin.register(FileUpload)
+class FileUploadAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = ("id", "created_at", "modified_at", "file")
 
 
 def dict_to_json_html(data):
