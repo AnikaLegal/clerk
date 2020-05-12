@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Async tasks
     "django_q",
     # Internal apps
+    "actionstep.apps.ActionstepConfig",
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
@@ -173,3 +174,24 @@ class SlackMessage:
 
 
 SLACK_MESSAGE = SlackMessage
+
+ACTIONSTEP_CLIENT_ID = os.environ["ACTIONSTEP_CLIENT_ID"]
+ACTIONSTEP_CLIENT_SECRET = os.environ["ACTIONSTEP_CLIENT_SECRET"]
+ACTIONSTEP_SCOPES = [
+    "filenotes",
+    "users",
+    "actions",
+    "actioncreate",
+    "participants",
+    "actionparticipants",
+    "participanttypes",
+    "files",
+    "actiondocuments",
+    "actionfolders",
+    "actiontypes",
+]
+# Override me!
+ACTIONSTEP_REDIRECT_URI = None
+ACTIONSTEP_OAUTH_URI = None
+ACTIONSTEP_TOKEN_URI = None
+ACTIONSTEP_SETUP_OWNERS = None

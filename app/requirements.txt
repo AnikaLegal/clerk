@@ -19,6 +19,9 @@ whitenoise
 # Reporting
 streamlit
 
+# Web scraping
+beautifulsoup4
+
 # Admin
 django-extensions
 ipython

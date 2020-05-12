@@ -29,4 +29,6 @@ ADD app /app
 # Collect static files
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
 ARG DJANGO_SECRET_KEY=not-a-secret
+ARG ACTIONSTEP_CLIENT_ID=not-the-id
+ARG ACTIONSTEP_CLIENT_SECRET=not-the-secret
 RUN mkdir -p /static/ && ./manage.py collectstatic --noinput

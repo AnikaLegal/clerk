@@ -23,7 +23,7 @@ bash:
 
 # Get a Django shell_plus shell in the docker container
 shell:
-	docker-compose -f docker/docker-compose.local.yml run --rm web ./manage.py shell_plus
+	docker-compose -f docker/docker-compose.local.yml run --rm web make shell
 
 # Get a Postgres shell in the docker container
 psql:
