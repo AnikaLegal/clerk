@@ -22,3 +22,6 @@ format:
 
 test:
 	./scripts/tasks/test.sh
+
+shell:
+	./scripts/tasks/shell.sh

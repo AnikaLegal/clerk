@@ -36,6 +36,16 @@ services:
       SENDGRID_API_KEY: $SENDGRID_API_KEY
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_CLIENT_ID
+      ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_CLIENT_SECRET
+
+  # Reflect outbound requests
+  http_reflect:
+    container_name: http_reflect
+    command: /app/scripts/tasks/reflect.py
+    image: clerk:latest
+    volumes:
+      - ../app:/app
 
   # Reporting server.
   streamlit:
@@ -78,6 +88,8 @@ services:
       SENDGRID_API_KEY: $SENDGRID_API_KEY
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_CLIENT_ID
+      ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_CLIENT_SECRET
 
   # For testing.
   test:
@@ -94,6 +106,7 @@ services:
       PGHOST: database
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.test
-
+      ACTIONSTEP_CLIENT_ID: ""
+      ACTIONSTEP_CLIENT_SECRET: ""
 volumes:
   postgres-data:
