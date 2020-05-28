@@ -43,3 +43,20 @@ services:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
       RAVEN_DSN: $RAVEN_DSN
+
+  # Reporting server.
+  streamlit:
+    command: streamlit hello --browser.serverAddress localhost
+    image: anikalaw/clerk:latest
+    volumes:
+      - /var/run/postgresql:/app/postgres.sock
+    ports:
+      - 8500:8500
+    environment:
+      DJANGO_SETTINGS_MODULE: clerk.settings.prod
+      PGHOST: /app/postgres.sock
+      PGPORT: 5432
+      PGDATABASE: clerk
+      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+      PGUSER: $PGUSER
+      PGPASSWORD: $PGPASSWORD
