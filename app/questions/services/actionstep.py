@@ -1,7 +1,9 @@
 import logging
+from urllib.parse import urljoin
 
 from django.conf import settings
 
+from slack.services import send_slack_message
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
@@ -20,10 +22,20 @@ def send_submission_actionstep(submission_pk: str):
     """
     Send a submission to Actionstep.
     FIXME: add tests
+    FIXME: Make it harder to sync the same data twice.
     """
     submission = Submission.objects.get(pk=submission_pk)
+    if not settings.ACTIONSTEP_INTEGRATION_ENABLED:
+        logger.info(
+            "Not sending Submission<%s]> to Actionstep - integration disabled",
+            submission.id,
+        )
+        return
+
     if submission.topic != "REPAIRS":
-        logger.info("Not sending Submission<%s]> to Actionstep - not repairs", submission.id)
+        logger.info(
+            "Not sending Submission<%s]> to Actionstep - not repairs", submission.id
+        )
         return
 
     logger.info("Sending Submission<%s]> to Actionstep", submission.id)
@@ -31,7 +43,9 @@ def send_submission_actionstep(submission_pk: str):
 
     owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
     owner_data = api.participants.get_by_email(owner_email)
-    logger.info("Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"])
+    logger.info(
+        "Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"]
+    )
 
     # FIXME: This is pretty bad in that we depend on an schemaless JSON object that is set by the frontend.
     answers = {a["name"]: a["answer"] for a in submission.answers}
@@ -81,5 +95,21 @@ def send_submission_actionstep(submission_pk: str):
         logger.info("Attaching doc %s to Actionstep action %s", name, action_id)
         api.files.attach(name, doc.actionstep_id, action_id, doc.folder)
 
-    logger.info("Marking Actionstep integration complete for Submission<%s>", submission.id)
+    logger.info(
+        "Marking Actionstep integration complete for Submission<%s>", submission.id
+    )
     Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
+
+    # Try send a Slack message
+    logging.info(
+        "Notifying Slack of Actionstep integration for Submission<%s>", submission_pk
+    )
+    action_url = urljoin(
+        settings.ACTIONSTEP_WEB_URI,
+        f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
+    )
+    text = (
+        f"Submission {submission.topic}: {submission.pk} has been uploaded to Actionstep with file reference {fileref_name}.\n"
+        f"You can find the action at {action_url}"
+    )
+    send_slack_message(settings.SLACK_MESSAGE.ACTIONSTEP_CREATE, text)

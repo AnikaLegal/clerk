@@ -33,10 +33,14 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk"
 
 
 sentry_sdk.init(
-    dsn=os.environ.get("RAVEN_DSN"), integrations=[DjangoIntegration()], environment="prod"
+    dsn=os.environ.get("RAVEN_DSN"),
+    integrations=[DjangoIntegration()],
+    environment="prod",
 )
 
+
 ACTIONSTEP_REDIRECT_URI = "https://clerk.anikalegal.com/actionstep/end/"
+ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
 ACTIONSTEP_SETUP_OWNERS = {

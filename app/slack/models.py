@@ -35,7 +35,7 @@ class SlackMessage(models.Model):
 
     slug = models.SlugField(max_length=127, unique=True)
     channel = models.ForeignKey(SlackChannel, on_delete=models.PROTECT)
-    users = models.ManyToManyField(SlackUser)
+    users = models.ManyToManyField(SlackUser, blank=True)
 
     def __str__(self):
         return f"{self.pk}, {self.slug}"

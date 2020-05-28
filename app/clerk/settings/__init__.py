@@ -169,6 +169,7 @@ LOGGING = {
 
 # Slack message types
 class SlackMessage:
+    ACTIONSTEP_CREATE = "actionstep-create"
     CLIENT_INTAKE = "client-intake"
     LANDING_FORM = "landing-form"
 
@@ -191,7 +192,9 @@ ACTIONSTEP_SCOPES = [
     "actiontypes",
 ]
 # Override me!
+ACTIONSTEP_INTEGRATION_ENABLED = False
 ACTIONSTEP_REDIRECT_URI = None
 ACTIONSTEP_OAUTH_URI = None
 ACTIONSTEP_TOKEN_URI = None
 ACTIONSTEP_SETUP_OWNERS = None
+ACTIONSTEP_WEB_URI = None
