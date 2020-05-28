@@ -16,6 +16,9 @@ django-cors-headers
 # Static files
 whitenoise
 
+# Reporting
+streamlit
+
 # Admin
 django-extensions
 ipython

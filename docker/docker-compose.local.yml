@@ -22,6 +22,7 @@ services:
     volumes:
       - ../app:/app
     links:
+      - streamlit
       - worker
       - database
     environment:
@@ -35,6 +36,24 @@ services:
       SENDGRID_API_KEY: $SENDGRID_API_KEY
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+
+  # Reporting server.
+  streamlit:
+    container_name: streamlit
+    command: streamlit hello --browser.serverAddress localhost
+    image: clerk:latest
+    ports:
+      - 8501:8501
+    volumes:
+      - ../app:/app
+    links:
+      - database
+    environment:
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: database
+      PGPORT: 5432
 
   # Django-q worker.
   worker:
