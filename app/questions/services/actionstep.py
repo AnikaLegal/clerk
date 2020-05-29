@@ -15,7 +15,7 @@ from .pdf import create_pdf
 logger = logging.getLogger(__name__)
 
 PREFIX_LOOKUP = {"REPAIRS": "R", "COVID": "C"}
-ACTION_TYPE_LOOKUP = {"REPAIRS": ActionType.REPAIRS, "COVID": ActionType.GENERAL}
+ACTION_TYPE_LOOKUP = {"REPAIRS": ActionType.REPAIRS, "COVID": ActionType.COVID}
 
 
 def send_submission_actionstep(submission_pk: str):
@@ -25,19 +25,6 @@ def send_submission_actionstep(submission_pk: str):
     FIXME: Make it harder to sync the same data twice.
     """
     submission = Submission.objects.get(pk=submission_pk)
-    if not settings.ACTIONSTEP_INTEGRATION_ENABLED:
-        logger.info(
-            "Not sending Submission<%s]> to Actionstep - integration disabled",
-            submission.id,
-        )
-        return
-
-    if submission.topic != "REPAIRS":
-        logger.info(
-            "Not sending Submission<%s]> to Actionstep - not repairs", submission.id
-        )
-        return
-
     logger.info("Sending Submission<%s]> to Actionstep", submission.id)
     api = ActionstepAPI()
 

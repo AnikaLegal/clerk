@@ -15,7 +15,6 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 )
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
-ACTIONSTEP_INTEGRATION_ENABLED = True
 ACTIONSTEP_REDIRECT_URI = "http://localhost:8000/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstepstaging.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstepstaging.com"

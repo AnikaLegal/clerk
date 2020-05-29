@@ -35,7 +35,6 @@ sentry_sdk.init(
     environment="test",
 )
 
-ACTIONSTEP_INTEGRATION_ENABLED = True
 ACTIONSTEP_REDIRECT_URI = "https://test-clerk.anikalegal.com/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstepstaging.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstepstaging.com"
