@@ -1,7 +1,13 @@
 from unittest import mock
 
 import pytest
-from django.db.models.signals import m2m_changed, post_delete, post_save, pre_delete, pre_save
+from django.db.models.signals import (
+    m2m_changed,
+    post_delete,
+    post_save,
+    pre_delete,
+    pre_save,
+)
 
 
 @pytest.fixture(autouse=True)  # Automatically use in tests.

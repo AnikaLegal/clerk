@@ -58,13 +58,17 @@ class ParticipantEndpoint(BaseEndpoint):
         resp_data = super().create(data)
         return resp_data[self.resource]
 
-    def set_action_participant(self, action_id: int, client_id: int, participant_name: str):
+    def set_action_participant(
+        self, action_id: int, client_id: int, participant_name: str
+    ):
         """
         Set a user as a type of participant on an action.
         """
         participant_type = self.participant_types.get_for_name(participant_name)
         participant_type_id = participant_type["id"]
-        resp_data = self.action_participants.create(action_id, client_id, participant_type_id)
+        resp_data = self.action_participants.create(
+            action_id, client_id, participant_type_id
+        )
         return resp_data
 
 

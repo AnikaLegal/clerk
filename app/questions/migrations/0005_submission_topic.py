@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questions', '0004_auto_20190615_0250'),
+        ("questions", "0004_auto_20190615_0250"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='submission',
-            name='topic',
-            field=models.CharField(choices=[('REPAIRS', 'REPAIRS'), ('COVID', 'COVID')], default='REPAIRS', max_length=32),
+            model_name="submission",
+            name="topic",
+            field=models.CharField(
+                choices=[("REPAIRS", "REPAIRS"), ("COVID", "COVID")],
+                default="REPAIRS",
+                max_length=32,
+            ),
         ),
     ]

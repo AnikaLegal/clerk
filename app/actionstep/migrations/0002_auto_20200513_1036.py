@@ -7,18 +7,18 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('actionstep', '0001_initial'),
+        ("actionstep", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='accesstoken',
-            name='created_at',
+            model_name="accesstoken",
+            name="created_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AddField(
-            model_name='accesstoken',
-            name='expires_at',
+            model_name="accesstoken",
+            name="expires_at",
             field=models.DateTimeField(default=None),
             preserve_default=False,
         ),

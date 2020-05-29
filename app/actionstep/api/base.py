@@ -11,7 +11,8 @@ class BaseEndpoint:
     """
     Base class for Actionstep endpoints.
 
-    TODO: Pagination support.
+    FIXME: Pagination support.
+    FIXME: Handle expired token race condition
     """
 
     resource = None

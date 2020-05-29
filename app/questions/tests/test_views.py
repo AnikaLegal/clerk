@@ -2,7 +2,11 @@ import pytest
 from django.urls import reverse
 
 from questions.models import FileUpload, ImageUpload, Submission
-from questions.tests.factories import FileUploadFactory, ImageUploadFactory, SubmissionFactory
+from questions.tests.factories import (
+    FileUploadFactory,
+    ImageUploadFactory,
+    SubmissionFactory,
+)
 
 from .utils import get_dummy_file
 
@@ -48,7 +52,11 @@ def test_submission_update(client):
     """
     sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
     url = reverse("submission-detail", args=[sub.id])
-    update = {"answers": [{"BAR": "no"}], "questions": {"foo": {"a": 1}}, "complete": True}
+    update = {
+        "answers": [{"BAR": "no"}],
+        "questions": {"foo": {"a": 1}},
+        "complete": True,
+    }
     resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 200
     assert resp.data == {

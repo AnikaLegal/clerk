@@ -7,19 +7,26 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='AccessToken',
+            name="AccessToken",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('expires_in', models.IntegerField()),
-                ('api_endpoint', models.URLField()),
-                ('orgkey', models.CharField(max_length=256)),
-                ('token', models.CharField(max_length=1024)),
-                ('refresh_token', models.CharField(max_length=1024)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("expires_in", models.IntegerField()),
+                ("api_endpoint", models.URLField()),
+                ("orgkey", models.CharField(max_length=256)),
+                ("token", models.CharField(max_length=1024)),
+                ("refresh_token", models.CharField(max_length=1024)),
             ],
         ),
     ]

@@ -36,7 +36,9 @@ def create_pdf(submission):
             if image_ids:
                 images += [
                     image_upload.image
-                    for image_upload in ImageUpload.objects.filter(pk__in=image_ids).all()
+                    for image_upload in ImageUpload.objects.filter(
+                        pk__in=image_ids
+                    ).all()
                 ]
             if doc_ids:
                 docs += [
@@ -52,7 +54,12 @@ def create_pdf(submission):
                 }
             )
 
-    context = {"submission": submission, "answers": answers, "images": images, "docs": docs}
+    context = {
+        "submission": submission,
+        "answers": answers,
+        "images": images,
+        "docs": docs,
+    }
     pdf_html_str = render_to_string("client-intake.html", context=context)
     pdf_bytes = weasyprint.HTML(string=pdf_html_str).write_pdf()
     return pdf_bytes

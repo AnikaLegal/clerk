@@ -8,33 +8,62 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='SlackChannel',
+            name="SlackChannel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=127)),
-                ('webhook_url', models.URLField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=127)),
+                ("webhook_url", models.URLField()),
             ],
         ),
         migrations.CreateModel(
-            name='SlackUser',
+            name="SlackUser",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=127)),
-                ('slack_id', models.CharField(max_length=127)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=127)),
+                ("slack_id", models.CharField(max_length=127)),
             ],
         ),
         migrations.CreateModel(
-            name='SlackMessage',
+            name="SlackMessage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.SlugField(max_length=127, unique=True)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='slack.SlackChannel')),
-                ('users', models.ManyToManyField(to='slack.SlackUser')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("slug", models.SlugField(max_length=127, unique=True)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="slack.SlackChannel",
+                    ),
+                ),
+                ("users", models.ManyToManyField(to="slack.SlackUser")),
             ],
         ),
     ]

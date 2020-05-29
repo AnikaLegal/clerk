@@ -23,5 +23,7 @@ def save_submission(sender, instance, **kwargs):
             logger.info("Dispatching data task for Submission<%s]>", submission.id)
             async_task(send_submission_email, str(submission.pk))
         if not submission.is_case_sent:
-            logger.info("Dispatching Actionstep task for Submission<%s]>", submission.id)
+            logger.info(
+                "Dispatching Actionstep task for Submission<%s]>", submission.id
+            )
             async_task(send_submission_actionstep, str(submission.pk))

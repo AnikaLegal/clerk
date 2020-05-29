@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questions', '0002_imageupload'),
+        ("questions", "0002_imageupload"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='submission',
-            name='complete',
+            model_name="submission",
+            name="complete",
             field=models.BooleanField(default=False),
         ),
     ]

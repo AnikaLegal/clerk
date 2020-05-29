@@ -26,7 +26,11 @@ def webflow_form_view(request):
     """
     try:
         data = request.data["data"]
-        model_kwargs = {"name": data["Name"], "email": data["Email"], "phone": data["Phone Number"]}
+        model_kwargs = {
+            "name": data["Name"],
+            "email": data["Email"],
+            "phone": data["Phone Number"],
+        }
     except KeyError:
         raise ValidationError("Invalid request format.")
 

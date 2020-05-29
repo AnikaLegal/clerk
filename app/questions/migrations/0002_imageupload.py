@@ -9,20 +9,34 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questions', '0001_initial'),
+        ("questions", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ImageUpload',
+            name="ImageUpload",
             fields=[
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modified_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('image', models.ImageField(upload_to=questions.models.image_upload.get_s3_key)),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "modified_at",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        upload_to=questions.models.image_upload.get_s3_key
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False,},
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('actionstep', '0005_actiondocument_actionstep_id'),
+        ("actionstep", "0005_actiondocument_actionstep_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='actiondocument',
-            name='actionstep_id',
-            field=models.CharField(blank=True, default='', max_length=64),
+            model_name="actiondocument",
+            name="actionstep_id",
+            field=models.CharField(blank=True, default="", max_length=64),
         ),
     ]

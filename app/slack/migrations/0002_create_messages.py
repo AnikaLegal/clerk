@@ -7,7 +7,9 @@ def create_messages(apps, schema_editor):
     """
     SlackChannel = apps.get_model("slack", "SlackChannel")
     SlackMessage = apps.get_model("slack", "SlackMessage")
-    channel = SlackChannel.objects.create(name="Example", webhook_url="https://example.com")
+    channel = SlackChannel.objects.create(
+        name="Example", webhook_url="https://example.com"
+    )
     SlackMessage.objects.create(slug="client-intake", channel=channel)
     SlackMessage.objects.create(slug="landing-form", channel=channel)
 

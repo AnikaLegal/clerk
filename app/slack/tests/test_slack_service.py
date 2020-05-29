@@ -15,7 +15,9 @@ def test_send_submission_slack(slug):
     https://github.com/getsentry/responses
     """
     # Set up API response.
-    responses.add(method=responses.POST, url="https://example.com", status=200, json={})  # Not used
+    responses.add(
+        method=responses.POST, url="https://example.com", status=200, json={}
+    )  # Not used
     # Prepare database
     channel = SlackChannel.objects.last()
     assert channel.webhook_url == "https://example.com"

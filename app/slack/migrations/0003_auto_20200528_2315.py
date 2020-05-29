@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('slack', '0002_create_messages'),
+        ("slack", "0002_create_messages"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='slackmessage',
-            name='users',
-            field=models.ManyToManyField(blank=True, to='slack.SlackUser'),
+            model_name="slackmessage",
+            name="users",
+            field=models.ManyToManyField(blank=True, to="slack.SlackUser"),
         ),
     ]

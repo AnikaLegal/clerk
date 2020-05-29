@@ -8,22 +8,50 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('actionstep', '0003_accesstoken_is_active'),
+        ("actionstep", "0003_accesstoken_is_active"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ActionDocument',
+            name="ActionDocument",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modified_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('document', models.FileField(upload_to=actionstep.models.document.get_s3_key)),
-                ('folder', models.CharField(choices=[('Client', 'Client'), ('Precedents', 'Precedents'), ('Resources', 'Resources')], max_length=32)),
-                ('topic', models.CharField(choices=[('REPAIRS', 'REPAIRS'), ('COVID', 'COVID')], max_length=32)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "modified_at",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    "document",
+                    models.FileField(upload_to=actionstep.models.document.get_s3_key),
+                ),
+                (
+                    "folder",
+                    models.CharField(
+                        choices=[
+                            ("Client", "Client"),
+                            ("Precedents", "Precedents"),
+                            ("Resources", "Resources"),
+                        ],
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "topic",
+                    models.CharField(
+                        choices=[("REPAIRS", "REPAIRS"), ("COVID", "COVID")],
+                        max_length=32,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False,},
         ),
     ]

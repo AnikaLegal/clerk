@@ -10,7 +10,6 @@ FILE_CHUNK_BYTES = 5242880
 logger = logging.getLogger(__file__)
 
 
-
 class FileEndpoint(BaseEndpoint):
     """
     Endpoint for attaching files to Actions.
@@ -74,7 +73,8 @@ class FileUploadEndpoint(BaseEndpoint):
     def create(self, filename: str, file_bytes: bytes):
         chunk_size = FILE_CHUNK_BYTES
         byte_chunks = [
-            file_bytes[i : i + chunk_size] for i in range(0, len(file_bytes), chunk_size)
+            file_bytes[i : i + chunk_size]
+            for i in range(0, len(file_bytes), chunk_size)
         ]
         part_count = len(byte_chunks)
         file_id = None
@@ -84,12 +84,9 @@ class FileUploadEndpoint(BaseEndpoint):
         logger.info("Uploading %s to Actionstep", filename)
         for idx, chunk_bytes in enumerate(byte_chunks):
             url = urljoin(self.url + "/", file_id) if file_id else self.url
-            # url = "http://http_reflect:8001"
             params = {"part_count": part_count, "part_number": idx + 1}
-            # params = {}
             files = {"file": (filename, chunk_bytes)}
             resp = requests.post(url, files=files, params=params, headers=headers)
-            # break
             resp_data = self._handle_json_response(url, resp)
             file_data = resp_data["files"]
             file_id = file_data["id"]

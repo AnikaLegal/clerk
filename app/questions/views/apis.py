@@ -3,7 +3,11 @@ from rest_framework.response import Response
 
 from questions.models import FileUpload, ImageUpload, Submission
 
-from .serializers import FileUploadSerializer, ImageUploadSerializer, SubmissionSerializer
+from .serializers import (
+    FileUploadSerializer,
+    ImageUploadSerializer,
+    SubmissionSerializer,
+)
 
 
 class SubmissionViewSet(

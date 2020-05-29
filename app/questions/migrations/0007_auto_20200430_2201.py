@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questions', '0006_submission_num_answers'),
+        ("questions", "0006_submission_num_answers"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='submission',
-            name='is_alert_sent',
+            model_name="submission",
+            name="is_alert_sent",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='submission',
-            name='is_data_sent',
+            model_name="submission",
+            name="is_data_sent",
             field=models.BooleanField(default=False),
         ),
     ]

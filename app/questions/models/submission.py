@@ -17,7 +17,10 @@ class Submission(TimestampedModel):
     A form submission
     """
 
-    TOPIC_CHOICES = ((CaseTopic.REPAIRS, CaseTopic.REPAIRS), (CaseTopic.COVID, CaseTopic.COVID))
+    TOPIC_CHOICES = (
+        (CaseTopic.REPAIRS, CaseTopic.REPAIRS),
+        (CaseTopic.COVID, CaseTopic.COVID),
+    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES, default="REPAIRS")
