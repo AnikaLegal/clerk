@@ -23,3 +23,5 @@ ACTIONSTEP_SETUP_OWNERS = {
     "REPAIRS": "matt@anikalegal.com",
     "COVID": "matt@anikalegal.com",
 }
+
+ADMIN_PREFIX = "local"

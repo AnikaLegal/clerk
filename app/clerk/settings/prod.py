@@ -47,3 +47,5 @@ ACTIONSTEP_SETUP_OWNERS = {
     "REPAIRS": "samuel.kilpatrick@anikalegal.com",
     "COVID": "alex@anikalegal.com",
 }
+
+ADMIN_PREFIX = "prod"

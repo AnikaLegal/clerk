@@ -1,5 +1,3 @@
-from django.contrib import admin
-
 from clerk.models import User
 
 

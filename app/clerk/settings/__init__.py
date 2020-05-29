@@ -10,8 +10,9 @@ DEFAULT_FROM_EMAIL = "noreply@anikalegal.com"
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    # Custom admin
+    "admin.apps.ClerkAdminConfig",
     # Django
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -197,3 +198,5 @@ ACTIONSTEP_OAUTH_URI = None
 ACTIONSTEP_TOKEN_URI = None
 ACTIONSTEP_SETUP_OWNERS = None
 ACTIONSTEP_WEB_URI = None
+
+ADMIN_PREFIX = None
