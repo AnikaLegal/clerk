@@ -10,11 +10,12 @@ def create_messages(apps, schema_editor):
     channel, _ = SlackChannel.objects.get_or_create(
         name="Example", webhook_url="https://example.com"
     )
-    SlackMessage.objects.get_or_create(slug="actionstep-create", channel=channel)
+    SlackMessage.objects.get_or_create(
+        slug="actionstep-create", defaults={"channel": channel}
+    )
 
 
 class Migration(migrations.Migration):
 
     dependencies = [("slack", "0003_auto_20200528_2315")]
-
     operations = [migrations.RunPython(create_messages)]
