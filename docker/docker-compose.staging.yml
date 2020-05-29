@@ -50,13 +50,15 @@ services:
 
   # Reporting server.
   streamlit:
-    command: streamlit hello --browser.serverAddress localhost
+    command: make reports-prod
     image: anikalaw/clerk:latest
     volumes:
       - /var/run/postgresql:/app/postgres.sock
     ports:
       - 8501:8501
     environment:
+      STREAMLIT_BROWSER_SERVER_PORT: 8501
+      STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
       DJANGO_SETTINGS_MODULE: clerk.settings.staging
       PGHOST: /app/postgres.sock
       PGPORT: 5432
@@ -64,3 +66,9 @@ services:
       DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
       PGUSER: $PGUSER
       PGPASSWORD: $PGPASSWORD
+      SENDGRID_API_KEY: null
+      AWS_ACCESS_KEY_ID: null
+      AWS_SECRET_ACCESS_KEY: null
+      ACTIONSTEP_CLIENT_ID: null
+      ACTIONSTEP_CLIENT_SECRET: null
+      RAVEN_DSN: $RAVEN_DSN

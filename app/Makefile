@@ -2,6 +2,12 @@
 # This Makefile contains commands which are run inside the Docker containers,
 # I do not recommend invoking these directly - see Makefile at project root instead.
 #
+reports-local:
+	./scripts/reports/local.sh
+
+reports-prod:
+	./scripts/reports/prod.sh
+
 worker-local:
 	./scripts/worker/local.sh
 
