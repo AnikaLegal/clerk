@@ -13,6 +13,10 @@ build:
 web:
 	docker-compose -f docker/docker-compose.local.yml up web
 
+# Run Django reporting server for local development
+streamlit:
+	docker-compose -f docker/docker-compose.local.yml up streamlit
+
 # Run Django with debugging enabled
 debug:
 	docker-compose -f docker/docker-compose.local.yml run --rm --service-ports web

@@ -67,11 +67,8 @@ services:
       PGPASSWORD: password
       PGHOST: database
       PGPORT: 5432
-      SENDGRID_API_KEY: null
-      AWS_ACCESS_KEY_ID: null
-      AWS_SECRET_ACCESS_KEY: null
-      ACTIONSTEP_CLIENT_ID: null
-      ACTIONSTEP_CLIENT_SECRET: null
+      ACTIONSTEP_CLIENT_ID: ""
+      ACTIONSTEP_CLIENT_SECRET: ""
 
   # Django-q worker.
   worker:
