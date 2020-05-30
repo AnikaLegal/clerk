@@ -54,10 +54,15 @@ def run_streamlit():
     data_df = get_submission_df(["topic", "created_at", "num_answers", "complete"])
     data_df = topic_choice(data_df, key)
     data_df = filter_by_start_date(data_df, key)
+    bin_size = st.slider("Bin size", 1, 10, 1)
     chart = (
         alt.Chart(data_df)
         .mark_bar()
-        .encode(alt.X("num_answers:Q", bin=True), y="count()", color="topic")
+        .encode(
+            x=alt.X("num_answers:Q", bin=alt.Bin(step=bin_size)),
+            y="count()",
+            color="topic",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
 
