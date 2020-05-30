@@ -47,3 +47,25 @@ services:
       RAVEN_DSN: $RAVEN_DSN
       ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_PROD_CLIENT_ID
       ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_PROD_CLIENT_SECRET
+
+  # Reporting server.
+  streamlit:
+    command: make reports-prod
+    image: anikalaw/clerk:latest
+    volumes:
+      - /var/run/postgresql:/app/postgres.sock
+    ports:
+      - 8500:8500
+    environment:
+      STREAMLIT_BROWSER_SERVER_PORT: 8500
+      STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
+      DJANGO_SETTINGS_MODULE: clerk.settings.prod
+      PGHOST: /app/postgres.sock
+      PGPORT: 5432
+      PGDATABASE: clerk
+      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
+      PGUSER: $PGUSER
+      PGPASSWORD: $PGPASSWORD
+      ACTIONSTEP_CLIENT_ID: ""
+      ACTIONSTEP_CLIENT_SECRET: ""
+      RAVEN_DSN: $RAVEN_DSN
