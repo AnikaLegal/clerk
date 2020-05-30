@@ -49,5 +49,3 @@ ACTIONSTEP_SETUP_OWNERS = {
 }
 
 ADMIN_PREFIX = "prod"
-
-STREAMLIT_BASE_URL = "http://3.106.55.74/streamlit-prod/"

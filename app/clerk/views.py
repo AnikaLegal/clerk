@@ -11,5 +11,5 @@ def reports_view(request, path):
     See https://wellfire.co/learn/nginx-django-x-accel-redirects/
     """
     response = HttpResponse()
-    response["X-Accel-Redirect"] = urljoin(settings.STREAMLIT_BASE_URL, path)
+    response["X-Accel-Redirect"] = f"/streamlit/{path}"
     return response
