@@ -6,7 +6,12 @@ from . import *
 
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-ALLOWED_HOSTS = ["clerk.anikalegal.com", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = [
+    "clerk.anikalegal.com",
+    "127.0.0.1",
+    "localhost",
+    "reports.anikalegal.com",
+]
 
 EMAIL_PREFIX = None
 WEBMASTER_EMAIL = "webmaster@anikalegal.com"

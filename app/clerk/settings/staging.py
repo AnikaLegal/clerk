@@ -8,10 +8,9 @@ DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "test-clerk.anikalegal.com",
+    "test-reports.anikalegal.com",
     "127.0.0.1",
     "localhost",
-    "reports.anikalegal.com",
-    "3.106.55.74",
 ]
 
 EMAIL_PREFIX = "TEST"
