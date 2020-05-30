@@ -55,9 +55,8 @@ services:
     volumes:
       - /var/run/postgresql:/app/postgres.sock
     ports:
-      - 8500:8500
+      - 8500:8501
     environment:
-      STREAMLIT_BROWSER_SERVER_PORT: 8500
       STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
       DJANGO_SETTINGS_MODULE: clerk.settings.prod
       PGHOST: /app/postgres.sock

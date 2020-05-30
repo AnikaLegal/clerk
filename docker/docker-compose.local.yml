@@ -59,7 +59,6 @@ services:
     links:
       - database
     environment:
-      STREAMLIT_BROWSER_SERVER_PORT: 8501
       STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
       DJANGO_SETTINGS_MODULE: clerk.settings.dev
       PGDATABASE: postgres
