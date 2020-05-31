@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 
 SCHEDULES = [
     {
@@ -15,6 +15,9 @@ class ActionstepConfig(AppConfig):
     name = "actionstep"
 
     def ready(self):
+        """
+        Setup new schedules. This might be a stupid way to do this.
+        """
         import actionstep.signals
 
         from django_q.models import Schedule
@@ -25,5 +28,5 @@ class ActionstepConfig(AppConfig):
                     **schedule_data
                 ).delete()
                 Schedule.objects.get_or_create(**schedule_data)
-            except OperationalError:
+            except (OperationalError, ProgrammingError):
                 pass  # No database available, eg. Docker build.

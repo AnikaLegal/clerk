@@ -8,7 +8,7 @@ from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
 from questions.models import Submission
-
+from utils.sentry import WithSentryCapture
 
 from .pdf import create_pdf
 
@@ -18,7 +18,7 @@ PREFIX_LOOKUP = {"REPAIRS": "R", "COVID": "C"}
 ACTION_TYPE_LOOKUP = {"REPAIRS": ActionType.REPAIRS, "COVID": ActionType.COVID}
 
 
-def send_submission_actionstep(submission_pk: str):
+def _send_submission_actionstep(submission_pk: str):
     """
     Send a submission to Actionstep.
     FIXME: add tests
@@ -28,12 +28,14 @@ def send_submission_actionstep(submission_pk: str):
     logger.info("Sending Submission<%s]> to Actionstep", submission.id)
     api = ActionstepAPI()
 
+    # Fetch new action owner.
     owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
     owner_data = api.participants.get_by_email(owner_email)
     logger.info(
         "Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"]
     )
 
+    # Pull client data out of the Submission answers JSON.
     # FIXME: This is pretty bad in that we depend on an schemaless JSON object that is set by the frontend.
     answers = {a["name"]: a["answer"] for a in submission.answers}
     client_name = answers["CLIENT_NAME"]
@@ -42,28 +44,48 @@ def send_submission_actionstep(submission_pk: str):
     client_firstname = client_name.split(" ")[0]
     client_lastname = client_name.split(" ")[-1]
 
-    # Assume client doesn't already exist in the system (gulp!)
-    logger.info("Creating participant %s, %s", client_name, client_email)
-    participant_data = api.participants.create(
+    # Ensure participant is in the system.
+    logger.info("Try to create participant %s, %s.", client_name, client_email)
+    participant_data, created = api.participants.get_or_create(
         client_firstname, client_lastname, client_email, client_phone
     )
-    prefix = PREFIX_LOOKUP[submission.topic]
-    fileref_name = api.actions.get_next_ref(prefix)
-    logger.info("Creating new matter %s for %s", fileref_name, client_name)
-    action_type_name = ACTION_TYPE_LOOKUP[submission.topic]
-    action_type_data = api.actions.action_types.get_for_name(action_type_name)
-    action_type_id = action_type_data["id"]
-    action_data = api.actions.create(
-        action_type_id=action_type_id,
-        action_name=client_name,
-        file_reference=fileref_name,
-        participant_id=owner_data["id"],
-    )
+    if created:
+        logger.info("Created participant %s, %s.", client_name, client_email)
+    else:
+        logger.info("Participant %s, %s already exists.", client_name, client_email)
 
-    action_id = action_data["id"]
-    client_id = participant_data["id"]
-    api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
+    # Check if this submission already has an action
+    submission_filenotes = api.filenotes.get_by_text_match(submission.pk)
+    if submission_filenotes:
+        # An matter has already been created for this submission
+        action_id = max([int(fn["links"]["action"]) for fn in submission_filenotes])
+        logger.info("Found existing matter %s for %s", action_id, submission.pk)
+        action_data = api.actions.get(action_id)
+        fileref_name = action_data["reference"]
+        logger.info("Existing matter has fileref %s", fileref_name)
 
+    else:
+        # We need to create a new matter
+        file_ref_prefix = PREFIX_LOOKUP[submission.topic]
+        fileref_name = api.actions.get_next_ref(file_ref_prefix)
+        logger.info("Creating new matter %s for %s", fileref_name, client_name)
+        action_type_name = ACTION_TYPE_LOOKUP[submission.topic]
+        action_type_data = api.actions.action_types.get_for_name(action_type_name)
+        action_type_id = action_type_data["id"]
+        action_data = api.actions.create(
+            submission_id=submission.pk,
+            action_type_id=action_type_id,
+            action_name=client_name,
+            file_reference=fileref_name,
+            participant_id=owner_data["id"],
+        )
+        action_id = action_data["id"]
+        client_id = participant_data["id"]
+        api.participants.set_action_participant(
+            action_id, client_id, Participant.CLIENT
+        )
+
+    # Upload files. Note that multiple uploads will create copies.
     logger.info("Generating PDF for Submission<%s>", submission.id)
     pdf_bytes = create_pdf(submission)
     pdf_filename = f"client-intake-{submission_pk}.pdf"
@@ -100,3 +122,6 @@ def send_submission_actionstep(submission_pk: str):
         f"You can find the action at {action_url}"
     )
     send_slack_message(settings.SLACK_MESSAGE.ACTIONSTEP_CREATE, text)
+
+
+send_submission_actionstep = WithSentryCapture(_send_submission_actionstep)

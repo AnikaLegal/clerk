@@ -71,10 +71,11 @@ class BaseEndpoint:
         return json
 
     def _try_json_decode(self, resp):
-        try:
-            return resp.json()
-        except JSONDecodeError:
+        if resp.status_code == 204:
+            # No content
             return None
+        else:
+            return resp.json()
 
     def _ensure_list(self, data):
         """

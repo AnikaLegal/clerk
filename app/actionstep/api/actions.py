@@ -93,6 +93,7 @@ class ActionCreateEndpoint(BaseEndpoint):
 
     def create(
         self,
+        submission_id: str,
         action_type_id: int,
         action_name: str,
         file_reference: str,
@@ -105,7 +106,7 @@ class ActionCreateEndpoint(BaseEndpoint):
             "actioncreate": {
                 "actionName": action_name,
                 "fileReference": file_reference,
-                "fileNote": "Created automatically by Anika Clerk",
+                "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
                 "links": {
                     "actionType": str(action_type_id),
                     "assignedToParticipant": str(participant_id),

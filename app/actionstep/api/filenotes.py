@@ -16,6 +16,12 @@ class FilenoteEndpoint(BaseEndpoint):
         params = {"id": filenote_id}
         return super().get(params)
 
+    def get_by_text_match(self, text: str):
+        params = {"text_ilike": f"*{text}*"}
+        data = super().get(params)
+        if data:
+            return data[self.resource]
+
     def list(self):
         resp_data = super().get()
         data = resp_data[self.resource]

@@ -24,12 +24,25 @@ class ParticipantEndpoint(BaseEndpoint):
         self.action_participants = ActionParticipantEndpoint(*args, **kwargs)
         super().__init__(*args, **kwargs)
 
+    def get_or_create(self, first: str, last: str, email: str, phone: str):
+        """
+        Get participant based on email, or create a new one.
+        """
+        created = False
+        client = self.get_by_email(email)
+        if not client:
+            created = True
+            client = self.create(first, last, email, phone)
+
+        return client, created
+
     def get_by_email(self, email: str):
         """
         Look up a participant by email
         """
         data = super().get({"email": email})
-        return data[self.resource]
+        if data:
+            return data[self.resource]
 
     def get(self, id: int):
         """
