@@ -39,19 +39,22 @@ services:
       ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_CLIENT_ID
       ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_CLIENT_SECRET
 
-  # Reflect outbound requests
-  http_reflect:
-    container_name: http_reflect
-    command: /app/scripts/tasks/reflect.py
-    image: clerk:latest
-    volumes:
-      - ../app:/app
+  # # Reflect outbound requests
+  # http_reflect:
+  #   container_name: http_reflect
+  #   command: /app/scripts/tasks/reflect.py
+  #   image: clerk:latest
+  #   volumes:
+  #     - ../app:/app
 
   # Reporting server.
   streamlit:
     container_name: streamlit
     command: make reports-local
     image: clerk:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - 8501:8501
     volumes:
@@ -74,9 +77,6 @@ services:
     container_name: worker
     command: make worker-local
     image: clerk:latest
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
     volumes:
       - ../app:/app
     links:
