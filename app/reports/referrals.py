@@ -14,8 +14,10 @@ from django.conf import settings
 
 
 from questions.models import Submission
+from .utils import filter_by_start_date, filter_by_end_date, df_download_link
 
-START_DATE = timezone.make_aware(datetime(year=2020, month=1, day=1))
+
+MIN_START_DATE = timezone.make_aware(datetime(year=2020, month=1, day=1))
 
 
 def run_referrals():
@@ -30,9 +32,10 @@ def run_referrals():
     df_download_link(data_df, "Download referrals CSV", "referrals")
 
     st.subheader("Referral channels")
-    topic = st.selectbox(
-        "Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral"
-    )
+    topic = st.selectbox("Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral")
+    data_df = filter_by_start_date(data_df, "created_at", "referral")
+    data_df = filter_by_end_date(data_df, "created_at", "referral")
+
     if topic == "Repairs":
         data_df = data_df[data_df["topic"] == "REPAIRS"]
     elif topic == "COVID":
@@ -77,7 +80,7 @@ def get_referral_df():
         "CLIENT_REFERRAL_OTHER",
     ]
     data = list(
-        Submission.objects.filter(complete=True, created_at__gte=START_DATE)
+        Submission.objects.filter(complete=True, created_at__gte=MIN_START_DATE)
         .order_by("created_at")
         .values(*["topic", "created_at", "answers", "complete"])
     )
@@ -89,12 +92,3 @@ def get_referral_df():
 
     return pd.DataFrame(data, columns=["topic", "created_at", "complete", *questions])
 
-
-def df_download_link(df: pd.DataFrame, text: str, filename: str):
-    """
-    Generates a link allowing the data in a given panda dataframe to be downloaded
-    """
-    csv_bytes = df.to_csv(index=False).encode()
-    b64_str = base64.b64encode(csv_bytes).decode()
-    html_str = f'<a download="{filename}.csv" href="data:file/csv;name={filename}.csv;base64,{b64_str}">{text}</a>'
-    st.markdown(html_str, unsafe_allow_html=True)

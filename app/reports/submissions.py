@@ -1,7 +1,6 @@
 """
 Entrypoint for Streamlit server
 """
-import base64
 from datetime import datetime
 
 import django
@@ -14,6 +13,8 @@ from django.conf import settings
 
 
 from questions.models import Submission
+
+from .utils import filter_by_start_date, datetime_to_day, datetime_to_month, df_download_link
 
 
 def run_submissions():
@@ -35,9 +36,7 @@ def run_submissions():
 
     # Get all submissions grouped by month
     st.subheader("All intake attempts")
-    st.text(
-        "An attempt is a user visiting the intake form and filling in zero or more questions"
-    )
+    st.text("An attempt is a user visiting the intake form and filling in zero or more questions")
     key = "all-submissions"
     data_df = get_submission_df(["topic", "created_at", "num_answers", "complete"])
     data_df = filter_by_num_answers(data_df, key)
@@ -53,24 +52,18 @@ def run_submissions():
     data_df = get_submission_df(["topic", "created_at", "num_answers", "complete"])
     data_df = topic_choice(data_df, key)
     data_df = filter_by_completed(data_df, key)
-    data_df = filter_by_start_date(data_df, key)
+    data_df = filter_by_start_date(data_df, "created_at", key)
     bin_size = st.slider("Bin size", 1, 10, 1)
     chart = (
         alt.Chart(data_df)
         .mark_bar()
-        .encode(
-            x=alt.X("num_answers:Q", bin=alt.Bin(step=bin_size)),
-            y="count()",
-            color="topic",
-        )
+        .encode(x=alt.X("num_answers:Q", bin=alt.Bin(step=bin_size)), y="count()", color="topic",)
     )
     st.altair_chart(chart, use_container_width=True)
 
 
 def topic_choice(data_df: pd.DataFrame, key: str):
-    topic = st.selectbox(
-        "Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-{key}"
-    )
+    topic = st.selectbox("Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-{key}")
     if topic == "Repairs":
         return data_df[data_df["topic"] == "REPAIRS"]
     elif topic == "COVID":
@@ -89,9 +82,7 @@ def topic_bar_chart(data_df: pd.DataFrame, column: str):
 
 
 def date_rollup_choice(data_df: pd.DataFrame, key: str):
-    rollup_choice = st.selectbox(
-        "Reporting period", ["Month", "Day"], key=f"-date-rollup-{key}"
-    )
+    rollup_choice = st.selectbox("Reporting period", ["Month", "Day"], key=f"-date-rollup-{key}")
     rollup_func = datetime_to_month if rollup_choice == "Month" else datetime_to_day
     data_df["date_rollup"] = data_df["created_at"].apply(rollup_func)
     return data_df
@@ -99,9 +90,7 @@ def date_rollup_choice(data_df: pd.DataFrame, key: str):
 
 def filter_by_completed(data_df: pd.DataFrame, key: str):
     status = st.selectbox(
-        "Completion status",
-        ["Any", "Complete", "Incomplete"],
-        key=f"is-completed-{key}",
+        "Completion status", ["Any", "Complete", "Incomplete"], key=f"is-completed-{key}",
     )
     if status == "Complete":
         return data_df[data_df["complete"] == 1]
@@ -121,36 +110,7 @@ def filter_by_num_answers(data_df: pd.DataFrame, key: str):
     return data_df[data_df["num_answers"] >= min_qs]
 
 
-def filter_by_start_date(data_df: pd.DataFrame, key: str):
-    start_date = st.date_input(
-        "Start date",
-        value=data_df.created_at.min(),
-        min_value=data_df.created_at.min(),
-        max_value=data_df.created_at.max(),
-        key=f"start-date-{key}",
-    )
-    start_date = timezone.make_aware(datetime_to_day(start_date))
-    return data_df[data_df["created_at"] >= start_date]
-
-
 def get_submission_df(fields):
     data = Submission.objects.order_by("created_at").values_list(*fields)
     return pd.DataFrame(data, columns=fields)
 
-
-def datetime_to_month(dt):
-    return datetime(year=dt.year, month=dt.month, day=1)
-
-
-def datetime_to_day(dt):
-    return datetime(year=dt.year, month=dt.month, day=dt.day)
-
-
-def df_download_link(df: pd.DataFrame, text: str, filename: str):
-    """
-    Generates a link allowing the data in a given panda dataframe to be downloaded
-    """
-    csv_bytes = df.to_csv(index=False).encode()
-    b64_str = base64.b64encode(csv_bytes).decode()
-    html_str = f'<a download="{filename}.csv" href="data:file/csv;name={filename}.csv;base64,{b64_str}">{text}</a>'
-    st.markdown(html_str, unsafe_allow_html=True)
