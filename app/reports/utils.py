@@ -8,6 +8,33 @@ import pandas as pd
 import streamlit as st
 from django.utils import timezone
 
+from questions.models import Submission
+
+DEFAULT_FIELDS = ["topic", "created_at", "answers", "complete"]
+
+
+def plot_histogram(df, fieldname):
+    defects = []
+    for ds in df[fieldname]:
+        if type(ds) is str:
+            defects.append(ds)
+        else:
+            defects += ds
+
+    plot_df = pd.Series(defects, name=fieldname).value_counts()
+    st.bar_chart(plot_df)
+
+
+def get_submission_df(fields=DEFAULT_FIELDS):
+    data = Submission.objects.order_by("created_at").values(*fields)
+    for datum in data:
+        for a in datum["answers"]:
+            datum[a["name"]] = a.get("answer")
+
+        del datum["answers"]
+
+    return pd.DataFrame(data)
+
 
 def df_download_link(df: pd.DataFrame, text: str, filename: str):
     """

@@ -4,7 +4,6 @@ Entrypoint for Streamlit server
 import base64
 from datetime import datetime
 
-import django
 import numpy as np
 import streamlit as st
 import pandas as pd
@@ -26,9 +25,8 @@ def run_referrals():
     # Display download link for external analysis
     data_df = get_referral_df()
     num_cases = len(data_df)
-    st.text(
-        f"Referral info for all completed cases from Jan 1 2020 onwards. Found {num_cases} completed cases"
-    )
+    st.text("Referral info for all completed cases from Jan 1 2020 onwards.")
+    st.text(f"Found {num_cases} submitted cases from that date onwards.")
     df_download_link(data_df, "Download referrals CSV", "referrals")
 
     st.subheader("Referral channels")

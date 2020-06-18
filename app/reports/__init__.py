@@ -8,6 +8,8 @@ django.setup()
 
 from .submissions import run_submissions
 from .referrals import run_referrals
+from .problems import run_problems
+from .demographics import run_demographics
 
 
 def run_streamlit():
@@ -20,4 +22,6 @@ def run_streamlit():
 PAGES = {
     "Submissions": run_submissions,
     "Referrals": run_referrals,
+    "Client Issues": run_problems,
+    "Demographics": run_demographics,
 }
