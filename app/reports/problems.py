@@ -8,7 +8,7 @@ from .utils import (
     filter_by_start_date,
     filter_by_end_date,
     get_submission_df,
-    plot_histogram,
+    plot_category_counts,
     df_download_link,
 )
 
@@ -25,10 +25,10 @@ def run_problems():
     st.subheader("Repairs client issues")
     num_repairs_cases = len(repairs_df)
     st.text(f"Found {num_repairs_cases} submitted repairs cases")
-    plot_histogram(repairs_df, "DEFECT_TYPE")
+    plot_category_counts(repairs_df, "DEFECT_TYPE")
 
     st.subheader("COVID client issues")
     num_covid_cases = len(covid_df)
     st.text(f"Found {num_covid_cases} submitted repairs cases")
-    plot_histogram(covid_df, "ISSUE_TYPE")
+    plot_category_counts(covid_df, "ISSUE_TYPE")
 

@@ -13,16 +13,26 @@ from questions.models import Submission
 DEFAULT_FIELDS = ["topic", "created_at", "answers", "complete"]
 
 
-def plot_histogram(df, fieldname):
+def plot_category_counts(df, fieldname):
     defects = []
     for ds in df[fieldname]:
         if type(ds) is str:
             defects.append(ds)
-        else:
+        elif type(ds) is list:
             defects += ds
 
     plot_df = pd.Series(defects, name=fieldname).value_counts()
     st.bar_chart(plot_df)
+
+
+def filter_by_topic_choice(data_df: pd.DataFrame, key: str):
+    topic = st.selectbox("Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-{key}")
+    if topic == "Repairs":
+        return data_df[data_df["topic"] == "REPAIRS"]
+    elif topic == "COVID":
+        return data_df[data_df["topic"] == "COVID"]
+    else:
+        return data_df
 
 
 def get_submission_df(fields=DEFAULT_FIELDS):
@@ -76,3 +86,15 @@ def datetime_to_month(dt):
 
 def datetime_to_day(dt):
     return datetime(year=dt.year, month=dt.month, day=dt.day)
+
+
+def filter_by_completed(data_df: pd.DataFrame, key: str):
+    status = st.selectbox(
+        "Completion status", ["Any", "Complete", "Incomplete"], key=f"is-completed-{key}",
+    )
+    if status == "Complete":
+        return data_df[data_df["complete"] == 1]
+    elif status == "Incomplete":
+        return data_df[data_df["complete"] == 0]
+    else:
+        return data_df
