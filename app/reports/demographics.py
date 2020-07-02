@@ -22,6 +22,7 @@ def run_demographics():
     df = get_submission_df()
     df = df[df["complete"] == 1]
     df = filter_by_topic_choice(df, key="demo")
+    df = filter_by_start_date(df, "created_at", key="demo")
 
     st.subheader("Client ages")
     df["client_age"] = df["CLIENT_DOB"].apply(dob_str_to_age)
@@ -85,8 +86,11 @@ def dob_str_to_age(s: str):
         # Mon Feb 08 1993
         dt = datetime.strptime(s, "%a %b %M %Y")
     except ValueError:
-        # 1995-6-6
-        dt = datetime.strptime(s, "%Y-%d-%M")
+        try:
+            # 1995-6-6
+            dt = datetime.strptime(s, "%Y-%d-%M")
+        except ValueError:
+            return
 
     delta = datetime.now() - dt
     return int(delta.days // 365.25)
