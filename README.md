@@ -19,7 +19,13 @@ You first want to build the Docker environment that we'll be using:
 make build
 ```
 
-Then you want to get a bash shell into the web container and run a Django database migration:
+Now you can set up your database with this reset script:
+
+```bash
+./scripts/db/reset.sh
+```
+
+To do this manually, you can to get a bash shell into the web container and run a Django database migration:
 
 ```bash
 # Get a bash shell in the container
@@ -32,7 +38,7 @@ make bash
 ./manage.py createsuperuser
 ```
 
-Then you can exit the container shell and bring up the webserver:
+Finallly you can exit the container shell and bring up the webserver:
 
 ```bash
 make web
