@@ -3,31 +3,31 @@
 # I do not recommend invoking these directly - see Makefile at project root instead.
 #
 reports-local:
-	./scripts/reports/local.sh
+	bash ./scripts/reports/local.sh
 
 reports-prod:
-	./scripts/reports/prod.sh
+	bash ./scripts/reports/prod.sh
 
 worker-local:
-	./scripts/worker/local.sh
+	bash ./scripts/worker/local.sh
 
 worker-prod:
-	./scripts/worker/prod.sh
+	bash ./scripts/worker/prod.sh
 
 web-local:
-	./scripts/web/local.sh
+	bash ./scripts/web/local.sh
 
 web-prod:
-	./scripts/web/prod.sh
+	bash ./scripts/web/prod.sh
 
 lint:
-	./scripts/tasks/lint.sh
+	bash ./scripts/tasks/lint.sh
 
 format:
-	./scripts/tasks/format.sh
+	bash ./scripts/tasks/format.sh
 
 test:
-	./scripts/tasks/test.sh
+	bash ./scripts/tasks/test.sh
 
 shell:
-	./scripts/tasks/shell.sh
+	bash ./scripts/tasks/shell.sh
