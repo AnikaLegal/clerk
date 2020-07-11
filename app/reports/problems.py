@@ -27,8 +27,13 @@ def run_problems():
     st.text(f"Found {num_repairs_cases} submitted repairs cases")
     plot_category_counts(repairs_df, "DEFECT_TYPE")
 
+    download_df = repairs_df[["DEFECT_TYPE", "DEFECT_DESCRIPTION"]].copy()
+    df_download_link(download_df, "Download repairs issue type CSV", "repairs-issue-types")
+
     st.subheader("COVID client issues")
     num_covid_cases = len(covid_df)
     st.text(f"Found {num_covid_cases} submitted repairs cases")
     plot_category_counts(covid_df, "ISSUE_TYPE")
 
+    download_df = covid_df[["ISSUE_TYPE", "ISSUE_DESCRIPTION"]].copy()
+    df_download_link(download_df, "Download COVID issue type CSV", "covid-issue-types")
