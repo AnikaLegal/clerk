@@ -26,6 +26,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "modified_at",
         "num_answers",
         "complete",
+        "is_case_sent"
     )
     list_filter = ("topic", "complete")
 
