@@ -25,3 +25,5 @@ image.tar
 # Ansible
 *.secret.*
 *.retry
+
+.DS_Store
