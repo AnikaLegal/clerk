@@ -5,7 +5,7 @@ from rest_framework import routers
 
 from actionstep.views import start_oauth_view, end_oauth_view
 from questions.views import apis
-from webhooks.views import webflow_form_view
+from webhooks.views import webflow_form_view, jotform_form_view
 from .views import reports_view
 
 
@@ -19,5 +19,6 @@ urlpatterns = [
     path("actionstep/start/", start_oauth_view, name="actionstep-start"),
     path("actionstep/end/", end_oauth_view, name="actionstep-end"),
     path("api/webhooks/webflow-form/", webflow_form_view, name="webflow-form"),
+    path("api/webhooks/jotform-form/", jotform_form_view, name="jotform-form"),
     path("api/", include(router.urls)),
 ]
