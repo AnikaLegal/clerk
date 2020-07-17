@@ -1,4 +1,7 @@
-# Clerk [![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
+# Clerk
+
+Deployment: [![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
+Tests: ![Project Tests](https://github.com/AnikaLegal/clerk/workflows/Project%20Tests/badge.svg?branch=develop)
 
 This site is used by new Anika clients who want to submit their legal problem. Clients may submit the facts of their case using a structured form interface. Their case file is then entered into our case managment system.
 
