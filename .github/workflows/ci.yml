@@ -12,8 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-
     steps:
       - uses: actions/checkout@v2
       - name: Build Docker image
