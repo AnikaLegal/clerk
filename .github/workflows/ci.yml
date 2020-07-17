@@ -1,0 +1,22 @@
+name: Project Tests
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker build -t clerk:latest -f docker/Dockerfile .
+      - name: Run tests
+        run: docker-compose -f docker/docker-compose.local.yml run --rm -e DJANGO_SETTINGS_MODULE=clerk.settings.test test  pytest -s -vv
