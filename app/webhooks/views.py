@@ -1,10 +1,11 @@
 import logging
+import json
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from .models import WebflowContact
+from .models import WebflowContact, JotformSubmission
 
 logger = logging.getLogger(__file__)
 
@@ -36,3 +37,21 @@ def webflow_form_view(request):
 
     WebflowContact.objects.create(**model_kwargs)
     return Response({"message": "We got the form. :)"}, status=201)
+
+
+@api_view(["POST"])
+def jotform_form_view(request):
+    """
+    Save Jotform data from a POST request
+    """
+    try:
+        data = request.data["rawRequest"]
+        model_kwargs = {
+            "form_name" : request.data["formTitle"],
+            "answers" : json.loads(data)
+        }
+    except KeyError:
+        raise ValidationError("Invalid request format.")
+
+    JotformSubmission.objects.create(**model_kwargs)
+    return Response({"message": "Received Jotform submission."}, status=201)
