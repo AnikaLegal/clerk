@@ -20,7 +20,22 @@ def send_submission_slack(submission_pk: str):
 def get_text(submission: Submission):
     pk = submission.pk
     url = f"https://clerk.anikalegal.com/admin/questions/submission/{pk}/change/"
+
+    answers = {a["name"]: a["answer"] for a in submission.answers if "name" in a}
+    if "CLIENT_REFERRAL" in answers:
+        ref_type = answers["CLIENT_REFERRAL"]
+        ref_name = ""
+        ref_name = answers.get("CLIENT_REFERRAL_CHARITY", ref_name)
+        ref_name = answers.get("CLIENT_REFERRAL_LEGAL_CENTRE", ref_name)
+        ref_name = answers.get("CLIENT_REFERRAL_OTHER", ref_name)
+        ref_str = f"*Referral type*: {ref_type}"
+        if ref_name:
+            ref_str += " / " + ref_name
+    else:
+        ref_str = f"*Referral type*: no info available."
+
+    topic = submission.topic.lower()
     return (
-        f"A client has just submitted their {submission.topic} questionnaire answers for review.\n"
+        f"A client has just submitted their *{topic}* questionnaire answers for review.\n"
         f"Their submission id is <{url}|{pk}>.\n"
-    )
+    ) + ref_str
