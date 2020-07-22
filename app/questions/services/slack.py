@@ -18,8 +18,9 @@ def send_submission_slack(submission_pk: str):
 
 
 def get_text(submission: Submission):
+    pk = submission.pk
+    url = f"https://clerk.anikalegal.com/admin/questions/submission/{pk}/change/"
     return (
         f"A client has just submitted their {submission.topic} questionnaire answers for review.\n"
-        f"Their submission id is {submission.pk}.\n"
-        "Check your email at webmaster@anikalegal.com"
+        f"Their submission id is <{url}|{pk}>.\n"
     )

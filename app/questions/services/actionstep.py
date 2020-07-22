@@ -31,9 +31,7 @@ def _send_submission_actionstep(submission_pk: str):
     # Fetch new action owner.
     owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
     owner_data = api.participants.get_by_email(owner_email)
-    logger.info(
-        "Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"]
-    )
+    logger.info("Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"])
 
     # Pull client data out of the Submission answers JSON.
     # FIXME: This is pretty bad in that we depend on an schemaless JSON object that is set by the frontend.
@@ -87,9 +85,7 @@ def _send_submission_actionstep(submission_pk: str):
         )
         action_id = action_data["id"]
         client_id = participant_data["id"]
-        api.participants.set_action_participant(
-            action_id, client_id, Participant.CLIENT
-        )
+        api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
 
     # Upload files. Note that multiple uploads will create copies.
     logger.info("Generating PDF for Submission<%s>", submission.id)
@@ -110,23 +106,18 @@ def _send_submission_actionstep(submission_pk: str):
         logger.info("Attaching doc %s to Actionstep action %s", name, action_id)
         api.files.attach(name, doc.actionstep_id, action_id, doc.folder)
 
-    logger.info(
-        "Marking Actionstep integration complete for Submission<%s>", submission.id
-    )
+    logger.info("Marking Actionstep integration complete for Submission<%s>", submission.id)
     Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
 
     # Try send a Slack message
-    logging.info(
-        "Notifying Slack of Actionstep integration for Submission<%s>", submission_pk
-    )
+    logging.info("Notifying Slack of Actionstep integration for Submission<%s>", submission_pk)
+
     action_url = urljoin(
-        settings.ACTIONSTEP_WEB_URI,
-        f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
+        settings.ACTIONSTEP_WEB_URI, f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
     )
-    text = (
-        f"Submission {submission.topic}: {submission.pk} has been uploaded to Actionstep with file reference {fileref_name}.\n"
-        f"You can find the action at {action_url}"
-    )
+
+    topic_title = submission.topic.title()
+    text = f"{topic_title} submission has been uploaded to Actionstep as <{action_url}|{fileref_name}> ({submission.pk})"
     send_slack_message(settings.SLACK_MESSAGE.ACTIONSTEP_CREATE, text)
 
 
