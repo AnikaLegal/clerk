@@ -12,6 +12,7 @@ django-q
 # API
 djangorestframework
 django-cors-headers
+mailchimp3
 
 # Static files
 whitenoise

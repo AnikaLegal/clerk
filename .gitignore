@@ -1,6 +1,7 @@
 # General
 *.log
 *.pdf
+.DS_Store
 
 # IDE
 .idea/
