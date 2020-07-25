@@ -40,48 +40,31 @@ class ParticipantEndpoint(BaseEndpoint):
         """
         Look up a participant by email
         """
-        data = super().get({"email": email})
-        if data:
-            return data[self.resource]
+        return super().get({"email": email})
 
     def get(self, id: int):
         """
         Look up a participant by id
         """
-        data = super().get({"id": id})
-        return data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+        return super().get({"id": id})
 
     def create(self, first: str, last: str, email: str, phone: str):
         data = {
-            self.resource: [
-                {
-                    "isCompany": "F",
-                    "firstName": first,
-                    "lastName": last,
-                    "phone2Number": phone,
-                    "email": email,
-                }
-            ]
+            "isCompany": "F",
+            "firstName": first,
+            "lastName": last,
+            "phone2Number": phone,
+            "email": email,
         }
-        resp_data = super().create(data)
-        return resp_data[self.resource]
+        return super().create(data)
 
-    def set_action_participant(
-        self, action_id: int, client_id: int, participant_name: str
-    ):
+    def set_action_participant(self, action_id: int, client_id: int, participant_name: str):
         """
         Set a user as a type of participant on an action.
         """
         participant_type = self.participant_types.get_for_name(participant_name)
         participant_type_id = participant_type["id"]
-        resp_data = self.action_participants.create(
-            action_id, client_id, participant_type_id
-        )
+        resp_data = self.action_participants.create(action_id, client_id, participant_type_id)
         return resp_data
 
 
@@ -103,17 +86,10 @@ class ParticipantTypeEndpoint(BaseEndpoint):
     resource = "participanttypes"
 
     def get_for_name(self, name: str):
-        resp_data = super().get({"name": name})
-        return resp_data[self.resource]
+        return super().get({"name": name})
 
     def get(self, id: int):
-        resp_data = super().get({"id": id})
-        return resp_data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+        return super().get({"id": id})
 
 
 class ActionParticipantEndpoint(BaseEndpoint):
@@ -133,23 +109,17 @@ class ActionParticipantEndpoint(BaseEndpoint):
 
     def create(self, action_id: str, participant_id: int, participant_type_id: int):
         data = {
-            self.resource: [
-                {
-                    "links": {
-                        "action": action_id,
-                        "participant": participant_id,
-                        "participantType": participant_type_id,
-                    }
-                }
-            ]
+            "links": {
+                "action": action_id,
+                "participant": participant_id,
+                "participantType": participant_type_id,
+            }
         }
-        resp_data = super().create(data)
-        return resp_data[self.resource]
+        return super().create(data)
 
     def list_for_action(self, action_id: int):
-        resp_data = super().get(params={"action": action_id})
-        data = resp_data[self.resource]
-        return [self.parse_participant_type(act_p) for act_p in self._ensure_list(data)]
+        data = super().get({"action": action_id})
+        return [self.parse_participant_type(act_p) for act_p in data]
 
     def parse_participant_type(self, act_p: dict):
         p_type_id = act_p["id"].split("-")[2]

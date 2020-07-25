@@ -8,32 +8,17 @@ class FilenoteEndpoint(BaseEndpoint):
 
     resource = "filenotes"
 
-    def get_for_action(self, action_id: str):
-        params = {"action": action_id}
-        return super().get(params)
-
     def get(self, filenote_id: str):
-        params = {"id": filenote_id}
-        return super().get(params)
+        return super().get({"id": filenote_id})
 
-    def get_by_text_match(self, text: str):
-        params = {"text_ilike": f"*{text}*"}
-        data = super().get(params)
-        if data:
-            return data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+    def list_by_text_match(self, text: str):
+        return super().list({"text_ilike": f"*{text}*"})
 
     def create(self, action_id: str, text: str):
-        data = {self.resource: [{"text": text, "links": {"action": action_id}}]}
-        return super().create(data)
+        return super().create({"text": text, "links": {"action": action_id}})
 
     def update(self, filenote_id: str, text: str):
-        data = {self.resource: [{"text": text}]}
-        return super().update(filenote_id, data)
+        return super().update(filenote_id, {"text": text})
 
     def delete(self, filenote_id: str):
         return super().delete(filenote_id)

@@ -32,9 +32,7 @@ class ActionEndpoint(BaseEndpoint):
             try:
                 ref_num = int(action["reference"].replace(prefix, ""))
             except Exception:
-                logger.exception(
-                    "Error parsing matter reference %s", action["reference"]
-                )
+                logger.exception("Error parsing matter reference %s", action["reference"])
                 ref_num = 0
 
             if ref_num > max_ref_num:
@@ -44,18 +42,7 @@ class ActionEndpoint(BaseEndpoint):
         return prefix + str(next_ref).rjust(4, "0")
 
     def get(self, action_id: str):
-        params = {"id": action_id}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
-
-    def list(self, params=None):
-        resp_data = super().get(params)
-        data = resp_data[self.resource] if resp_data else None
-        return self._ensure_list(data)
-
-    def update(self, action_id: str, data: dict):
-        data = {self.resource: [data]}
-        return super().update(filenote_id, data)
+        return super().get({"id": action_id})
 
     def create(self, *args, **kwargs):
         """
@@ -73,14 +60,7 @@ class ActionTypesEndpoint(BaseEndpoint):
     resource = "actiontypes"
 
     def get_for_name(self, name: str):
-        params = {"name": name}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+        return super().get({"name": name})
 
 
 class ActionCreateEndpoint(BaseEndpoint):
@@ -103,15 +83,12 @@ class ActionCreateEndpoint(BaseEndpoint):
         Create an action - this is a separate API.
         """
         data = {
-            "actioncreate": {
-                "actionName": action_name,
-                "fileReference": file_reference,
-                "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
-                "links": {
-                    "actionType": str(action_type_id),
-                    "assignedToParticipant": str(participant_id),
-                },
-            }
+            "actionName": action_name,
+            "fileReference": file_reference,
+            "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
+            "links": {
+                "actionType": str(action_type_id),
+                "assignedToParticipant": str(participant_id),
+            },
         }
-        resp_data = super().create(data)
-        return resp_data[self.resource]
+        return super().create(data)

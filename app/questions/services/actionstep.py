@@ -54,12 +54,8 @@ def _send_submission_actionstep(submission_pk: str):
 
     # Check if this submission already has an action
     action_id = None
-    submission_filenotes = api.filenotes.get_by_text_match(submission.pk)
-    # This can be a list or a dict >.<
-    if type(submission_filenotes) is list:
-        action_id = max([int(fn["links"]["action"]) for fn in submission_filenotes])
-    elif type(submission_filenotes) is dict:
-        action_id = int(submission_filenotes["links"]["action"])
+    submission_filenotes = api.filenotes.list_by_text_match(submission.pk)
+    action_id = max([int(fn["links"]["action"]) for fn in submission_filenotes])
 
     if action_id:
         # An matter has already been created for this submission
