@@ -22,7 +22,7 @@ def _send_submission_actionstep(submission_pk: str):
     """
     Send a submission to Actionstep.
     FIXME: add tests
-    FIXME: Make it harder to sync the same data twice.
+    FIXME: Make it harder to sync the same documents twice.
     """
     submission = Submission.objects.get(pk=submission_pk)
     logger.info("Sending Submission<%s]> to Actionstep", submission.id)

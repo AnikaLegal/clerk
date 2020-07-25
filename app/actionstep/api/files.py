@@ -42,9 +42,7 @@ class FileEndpoint(BaseEndpoint):
             folder_data = self.folders.get(foldername, action_id)
             links["folder"] = folder_data["id"]
 
-        data = {self.resource: [{"name": filename, "file": file_id, "links": links}]}
-        resp_data = super().create(data)
-        return resp_data[self.resource]
+        return super().create({"name": filename, "file": file_id, "links": links})
 
 
 class FolderEndpoint(BaseEndpoint):
@@ -56,9 +54,7 @@ class FolderEndpoint(BaseEndpoint):
     resource = "actionfolders"
 
     def get(self, foldername: str, action_id: str):
-        params = {"name": foldername, "action": action_id}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
+        return super().get({"name": foldername, "action": action_id})
 
 
 class FileUploadEndpoint(BaseEndpoint):
@@ -73,8 +69,7 @@ class FileUploadEndpoint(BaseEndpoint):
     def create(self, filename: str, file_bytes: bytes):
         chunk_size = FILE_CHUNK_BYTES
         byte_chunks = [
-            file_bytes[i : i + chunk_size]
-            for i in range(0, len(file_bytes), chunk_size)
+            file_bytes[i : i + chunk_size] for i in range(0, len(file_bytes), chunk_size)
         ]
         part_count = len(byte_chunks)
         file_id = None
