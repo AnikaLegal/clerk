@@ -200,5 +200,5 @@ ACTIONSTEP_SETUP_OWNERS = None
 ACTIONSTEP_WEB_URI = None
 ADMIN_PREFIX = None
 
-# MailChimp automated emails
+# Reminder emails via MailChimp
 MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]

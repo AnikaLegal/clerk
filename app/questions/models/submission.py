@@ -34,6 +34,8 @@ class Submission(TimestampedModel):
     is_data_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
     is_case_sent = models.BooleanField(default=False)
+    # Tracks whether MailChimp reminder email has been successfully sent.
+    is_reminder_sent = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """
