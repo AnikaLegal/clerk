@@ -31,9 +31,11 @@ class BaseEndpoint:
         Returns a dict or None.
         """
         objs = self.list(params)
-        if objs is None:
+        if not objs:
+            # Empty list.
             return None
         else:
+            # Non-empty list.
             assert len(objs) == 1, f"Wrong number of objs for get: {objs}"
             return objs[0]
 
