@@ -5,23 +5,17 @@ from django.utils import timezone
 
 from questions.models import Submission
 
-# Submission object answers field example
-# [{'name': 'CLIENT_NAME', 'answer': 'Michael Jordan'},
-# {'name': 'CLIENT_RENTAL_ADDRESS', 'answer': 'Bulls Street'},
-# {'name': 'CLIENT_DOB', 'answer': '17-02-1963'},
-# {'name': 'CLIENT_EMAIL', 'answer': 'michael@jordan.com'},
-# {'name': 'CLIENT_PHONE', 'answer': '4458 3838'}]
 
 def remind_incomplete():
     """master function finding clients and sending reminder emails to them"""
 
     # find COVID clients and send reminder
     covid_emails = find_clients(topic='COVID')
-    send_email(emails=covid_emails, list_id=, workflow_id=, email_id=)
+    send_email(emails=covid_emails, list_id='', workflow_id='', email_id='')
 
     # find REPAIRS clients and send reminder
     repairs_emails = find_clients(topic='REPAIRS')
-    send_email(emails=repairs_emails, list_id=, workflow_id=, email_id=)
+    send_email(emails=repairs_emails, list_id='', workflow_id='', email_id='')
 
 
 def find_clients(topic):
@@ -32,7 +26,7 @@ def find_clients(topic):
     two_weeks_ago = timezone.now() - timezone.timedelta(days=14)
 
     # find submissions according to conditions specified
-    submissions = Submission.objects.filter(complete=False, is_reminder_sent=False, topic=topic
+    submissions = Submission.objects.filter(complete=False, is_reminder_sent=False, topic=topic,
                             created_at__gt=two_weeks_ago, created_at__lt=two_days_ago)
     
     # check for and collect emails inside of the submissions
@@ -41,6 +35,8 @@ def find_clients(topic):
     for submission in submissions:
         for answer in submission.answers:
             if answer["name"] == 'CLIENT_EMAIL' and answer["answer"]:
+                submission.is_reminder_sent = True
+                submission.save()
                 emails.append(answer["answer"])
     
     return emails
