@@ -10,12 +10,12 @@ def remind_incomplete():
     """master function finding clients and sending reminder emails to them"""
 
     # find COVID clients and send reminder
-    covid_emails = find_clients(topic='COVID')
-    send_email(emails=covid_emails, list_id='', workflow_id='', email_id='')
+    covid_clients = find_clients(topic='COVID')
+    send_email(clients=covid_clients, list_id='', workflow_id='', email_id='')
 
     # find REPAIRS clients and send reminder
-    repairs_emails = find_clients(topic='REPAIRS')
-    send_email(emails=repairs_emails, list_id='', workflow_id='', email_id='')
+    repairs_clients = find_clients(topic='REPAIRS')
+    send_email(clients=repairs_clients, list_id='', workflow_id='', email_id='')
 
 
 def find_clients(topic):
@@ -29,29 +29,31 @@ def find_clients(topic):
     submissions = Submission.objects.filter(complete=False, is_reminder_sent=False, topic=topic,
                             created_at__gt=two_weeks_ago, created_at__lt=two_days_ago)
     
-    # check for and collect emails inside of the submissions
-    emails = []
+    # generate list of clients with emails inside of submissions
+    clients = []
 
     for submission in submissions:
         for answer in submission.answers:
             if answer["name"] == 'CLIENT_EMAIL' and answer["answer"]:
-                submission.is_reminder_sent = True
-                submission.save()
-                emails.append(answer["answer"])
+                client = (submission, answer["answer"])
+                clients.append(client)
     
-    return emails
+    return clients
 
             
-def send_email(emails, list_id, workflow_id, email_id):
+def send_email(clients, list_id, workflow_id, email_id):
     """send reminder email via MailChimp API"""
     
-    client = MailChimp(settings.MAILCHIMP_API_KEY)
+    mailchimp = MailChimp(settings.MAILCHIMP_API_KEY)
 
-    for email in emails:
+    for submission, email in clients:
+        # mark as sent reminder
+        submission.is_reminder_sent = True
+        submission.save()
         # add formatting
         person = {'email_address': email, 'status': 'subscribed'}
         # add person to list
-        client.lists.members.create(list_id=list_id, data=person)
+        mailchimp.lists.members.create(list_id=list_id, data=person)
         # send person email
-        client.automations.emails.queues.create(workflow_id=workflow_id,
+        mailchimp.automations.emails.queues.create(workflow_id=workflow_id,
                             email_id=email_id, data=person)

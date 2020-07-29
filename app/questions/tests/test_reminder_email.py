@@ -2,9 +2,11 @@ from django.utils import timezone
 
 from unittest import mock
 import pytest
+import factory
 
-from questions.services.mailchimp import find_clients
+from questions.services.mailchimp import remind_incomplete, find_clients, send_email
 from questions.tests.factories import SubmissionFactory
+from questions.models import Submission
 
 
 # sample answers for testing
@@ -24,17 +26,17 @@ three_weeks_ago = timezone.now() - timezone.timedelta(days=21)
 three_days_ago = timezone.now() - timezone.timedelta(days=3)
 one_day_ago = timezone.now() - timezone.timedelta(days=1)
 
-# test find clients without emails
+
 @pytest.mark.django_db
-def test_no_emails():
+def test_find_clients_no_emails():
     sub1 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="COVID",
     created_at=three_days_ago, answers=answers_no_email)
     results = find_clients("COVID")
     assert results == []
 
-# test find clients with email
+
 @pytest.mark.django_db
-def test_with_emails():
+def test_find_clients_with_emails():
     sub1 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="REPAIRS",
     created_at=three_days_ago, answers=answers_no_email)
     sub2 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="REPAIRS",
@@ -42,9 +44,9 @@ def test_with_emails():
     results = find_clients("REPAIRS")
     assert len(results) == 1
 
-# test find clients with irrelevant dates
+
 @pytest.mark.django_db
-def test_irrelevant_dates():
+def test_find_clients_irrelevant_dates():
     sub1 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="COVID",
     created_at=three_weeks_ago, answers=answers_with_email)
     sub2 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="COVID",
@@ -52,12 +54,22 @@ def test_irrelevant_dates():
     results = find_clients("COVID")
     assert results == []
 
-# test find clients with relevant dates
+
 @pytest.mark.django_db
-def test_relevant_dates():
+def test_find_clients_relevant_dates():
     sub1 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="REPAIRS",
-    created_at=three_days_ago, answers=answers_with_email)
+    created_at=three_weeks_ago, answers=answers_with_email)
     sub2 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="REPAIRS",
     created_at=three_days_ago, answers=answers_with_email)
     results = find_clients("REPAIRS")
-    assert len(results) == 2
+    assert len(results) == 1
+
+
+@mock.patch("questions.services.mailchimp.MailChimp")
+@pytest.mark.django_db
+def test_remind_incomplete_with_email(mock_API):
+    sub1 = SubmissionFactory(complete=False, is_reminder_sent=False, topic="COVID",
+    created_at=three_days_ago, answers=answers_with_email)
+    remind_incomplete()
+    sub1 = Submission.objects.get(pk=sub1.id)
+    assert sub1.is_reminder_sent == True
