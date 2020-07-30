@@ -14,6 +14,31 @@ class FileEndpoint(BaseEndpoint):
     """
     Endpoint for attaching files to Actions.
     https://actionstep.atlassian.net/wiki/spaces/API/pages/18251961/Action+Documents
+    Example file schema:
+    {
+        'id': 2531,
+        'name': 'test',
+        'modifiedTimestamp': '2020-07-30T16:47:48+12:00',
+        'status': 'uploaded',
+        'keywords': None,
+        'summary': None,
+        'checkedOutTimestamp': None,
+        'fileType': None,
+        'checkedOutTo': None,
+        'checkedOutEtaTimestamp': None,
+        'fileSize': 17,
+        'extension': '.txt',
+        'sharepointUrl': 'https://www.example.com/test.txt',
+        'fileName': '65_20200730164748_test.txt',
+        'isDeleted': 'F',
+        'file': 'DL::Actions::65::2531',
+        'links': {
+            'action': '65',
+            'checkedOutBy': None,
+            'folder': None,
+            'createdBy': '11'
+        }
+    }
     """
 
     resource = "actiondocuments"
@@ -26,6 +51,7 @@ class FileEndpoint(BaseEndpoint):
     def upload(self, filename: str, file_bytes: bytes):
         """
         Upload a file to Actionstep.
+        Returns file id and upload status:
         {
             "id": "qwsqswqsqw",
             "status" : "Uploaded",
@@ -36,6 +62,7 @@ class FileEndpoint(BaseEndpoint):
     def attach(self, filename: str, file_id: str, action_id: str, foldername=None):
         """
         Attach a file to an Action
+        Returns a file (see schema above).
         """
         links = {"action": action_id}
         if foldername:
@@ -49,11 +76,20 @@ class FolderEndpoint(BaseEndpoint):
     """
     Endpoint for Action folders.
     https://actionstep.atlassian.net/wiki/spaces/API/pages/21135480/Action+Folders
+    Folder schema: 
+    {
+        'id': 287, 
+        'name': 'Client', 
+        'links': {'action': '65', 'parentFolder': None}
+    }
     """
 
     resource = "actionfolders"
 
     def get(self, foldername: str, action_id: str):
+        """
+        Returns a folder (see schema above)
+        """
         return super().get({"name": foldername, "action": action_id})
 
 
@@ -67,6 +103,14 @@ class FileUploadEndpoint(BaseEndpoint):
     resource = "files"
 
     def create(self, filename: str, file_bytes: bytes):
+        """
+        Creates a file upload.
+        Returns file id and upload status:
+        {
+            'id': 'qwsqswqsqw',
+            'status': 'Uploaded'
+        }
+        """
         chunk_size = FILE_CHUNK_BYTES
         byte_chunks = [
             file_bytes[i : i + chunk_size] for i in range(0, len(file_bytes), chunk_size)

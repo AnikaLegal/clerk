@@ -27,6 +27,7 @@ class ParticipantEndpoint(BaseEndpoint):
     def get_or_create(self, first: str, last: str, email: str, phone: str):
         """
         Get participant based on email, or create a new one.
+        Returns a participant (see schema above).
         """
         created = False
         client = self.get_by_email(email)
@@ -38,17 +39,23 @@ class ParticipantEndpoint(BaseEndpoint):
 
     def get_by_email(self, email: str):
         """
-        Look up a participant by email
+        Look up a participant by email.
+        Returns a participant (see schema above) or None.
         """
         return super().get({"email": email})
 
     def get(self, id: int):
         """
-        Look up a participant by id
+        Look up a participant by id.
+        Returns a participant (see schema above) or None.
         """
         return super().get({"id": id})
 
     def create(self, first: str, last: str, email: str, phone: str):
+        """
+        Create a new participant.
+        Returns a participant (see schema above).
+        """
         data = {
             "isCompany": "F",
             "firstName": first,
@@ -61,6 +68,7 @@ class ParticipantEndpoint(BaseEndpoint):
     def set_action_participant(self, action_id: int, client_id: int, participant_name: str):
         """
         Set a user as a type of participant on an action.
+        Returns an "Action participant" (see ActionParticipantEndpoint schema)
         """
         participant_type = self.participant_types.get_for_name(participant_name)
         participant_type_id = participant_type["id"]
@@ -86,9 +94,17 @@ class ParticipantTypeEndpoint(BaseEndpoint):
     resource = "participanttypes"
 
     def get_for_name(self, name: str):
+        """
+        Gets a participant type by name.
+        Returns a participant type (see schema above) or None
+        """
         return super().get({"name": name})
 
     def get(self, id: int):
+        """
+        Gets a participant type by id.
+        Returns a participant type (see schema above) or None
+        """
         return super().get({"id": id})
 
 
@@ -108,6 +124,10 @@ class ActionParticipantEndpoint(BaseEndpoint):
     resource = "actionparticipants"
 
     def create(self, action_id: str, participant_id: int, participant_type_id: int):
+        """
+        Creates an action participant.
+        Returns an action participant (see schema above)
+        """
         data = {
             "links": {
                 "action": action_id,
@@ -118,6 +138,11 @@ class ActionParticipantEndpoint(BaseEndpoint):
         return super().create(data)
 
     def list_for_action(self, action_id: int):
+        """
+        Lists all action participants present on an action.
+        Returns list of action participants (see schema above)
+        """
+
         data = super().get({"action": action_id})
         return [self.parse_participant_type(act_p) for act_p in data]
 

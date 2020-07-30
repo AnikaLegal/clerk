@@ -12,6 +12,28 @@ class ActionEndpoint(BaseEndpoint):
     """
     Endpoint for Actionstep actions.
     https://actionstep.atlassian.net/wiki/spaces/API/pages/12025956/Actions
+    Example action schema:
+    {
+        'id': 65,
+        'name': 'Fakey McFakeFake',
+        'reference': 'R0123',
+        'priority': 0,
+        'status': 'Closed',
+        'statusTimestamp': '2020-07-09T19:34:10+12:00',
+        'isBillableOverride': None,
+        'createdTimestamp': '2020-07-02',
+        'modifiedTimestamp': '2020-07-11T07:30:51+12:00',
+        'isDeleted': 'F',
+        'deletedBy': None,
+        'deletedTimestamp': None,
+        'isFavorite': 'F',
+        'overrideBillingStatus': None,
+        'lastAccessTimestamp': '2020-07-30T16:41:33+12:00',
+        'links': {'assignedTo': '11',
+        'actionType': '28',
+        'primaryParticipants': ['159'],
+        'relatedActions': None}
+    }
     """
 
     resource = "actions"
@@ -23,8 +45,8 @@ class ActionEndpoint(BaseEndpoint):
 
     def get_next_ref(self, prefix: str):
         """
-        Returns next file reference.
-        Eg. prefix of "R" would get "R0001"
+        Returns next file reference string.
+        Eg. prefix of "R" would return "R0001"
         """
         actions = self.list({"reference_ilike": f"{prefix}*"})
         max_ref_num = 0
@@ -42,11 +64,16 @@ class ActionEndpoint(BaseEndpoint):
         return prefix + str(next_ref).rjust(4, "0")
 
     def get(self, action_id: str):
+        """
+        Gets an action.
+        Returns action (see schema above) or None.
+        """
         return super().get({"id": action_id})
 
     def create(self, *args, **kwargs):
         """
-        Create an action - this is a separate API.
+        Create an action.
+        Returns action (see schema above).
         """
         return self.action_create.create(*args, **kwargs)
 
