@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.conf import settings
 
 from unittest import mock
 import pytest
@@ -60,7 +61,7 @@ def test_find_clients_with_emails():
         answers=answers_with_email,
     )
     results = find_clients("REPAIRS")
-    assert len(results) == 1
+    assert results == [(sub2, "michael@jordan.com")]
 
 
 @pytest.mark.django_db
@@ -100,7 +101,7 @@ def test_find_clients_relevant_dates():
         answers=answers_with_email,
     )
     results = find_clients("REPAIRS")
-    assert len(results) == 1
+    assert results == [(sub2, "michael@jordan.com")]
 
 
 @mock.patch("questions.services.mailchimp.MailChimp")
@@ -114,5 +115,23 @@ def test_remind_incomplete_sent(mock_API):
         answers=answers_with_email,
     )
     remind_incomplete()
-    sub1 = Submission.objects.get(pk=sub1.id)
+    sub1.refresh_from_db()
     assert sub1.is_reminder_sent == True
+
+
+@mock.patch("questions.services.mailchimp.MailChimp")
+@pytest.mark.django_db
+def test_remind_incomplete_api(mock_API):
+    mock_mailchimp = mock.Mock()
+    mock_API.return_value = mock_mailchimp
+    sub1 = SubmissionFactory(
+        complete=False,
+        is_reminder_sent=False,
+        topic="REPAIRS",
+        created_at=three_days_ago,
+        answers=answers_with_email,
+    )
+    remind_incomplete()
+    mock_API.assert_called_with(settings.MAILCHIMP_API_KEY)
+    mock_mailchimp.lists.members.create.assert_called_once()
+    mock_mailchimp.automations.emails.queues.create.assert_called_once()
