@@ -20,7 +20,7 @@ def webflow_form_view(request):
     curl \
         --header "Content-Type: application/json" \
         --request POST  \
-        --data '{"data": {"Name": "Matt", "Email": "matt@foo.com", "Phone Number": "11111"}}' \
+        --data '{"data": {"Name": "Matt", "Email": "matt@foo.com", "Phone Number": "11111", "Referral": "Foobar"}}' \
         http://localhost:8000/api/webhooks/webflow-form/
 
     But don't because it'd be a shitty thing to do.
@@ -31,6 +31,7 @@ def webflow_form_view(request):
             "name": data["Name"],
             "email": data["Email"],
             "phone": data["Phone Number"],
+            "referral": data["Referral"],
         }
     except KeyError:
         raise ValidationError("Invalid request format.")
@@ -46,10 +47,7 @@ def jotform_form_view(request):
     """
     try:
         data = request.data["rawRequest"]
-        model_kwargs = {
-            "form_name" : request.data["formTitle"],
-            "answers" : json.loads(data)
-        }
+        model_kwargs = {"form_name": request.data["formTitle"], "answers": json.loads(data)}
     except KeyError:
         raise ValidationError("Invalid request format.")
 
