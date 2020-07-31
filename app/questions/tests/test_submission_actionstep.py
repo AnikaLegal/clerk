@@ -96,23 +96,33 @@ def test_submission_actionstep(mock_api):
             'createdBy': '11'
         }
     }
+    file_upload_status = {
+        "id": "testid",
+        "status": "Uploaded"
+    }
     mock_api.return_value.participants.get_by_email.return_value = participant
     mock_api.return_value.participants.get_or_create.return_value = [participant, True]
     
+    # For testing both if a submission has an action or not
     mock_api.return_value.filenotes.list_by_text_match.side_effect = [[filenote], []]
 
     mock_api.return_value.actions.get_next_ref.return_value = action["reference"]
     mock_api.return_value.actions.get.return_value = action
     mock_api.return_value.actions.create.return_value = action
+    mock_api.return_value.files.upload.return_value = file_upload_status
 
-    # Test if submission has action
+    # Test when submission has action
     _send_submission_actionstep(sub.pk)
     res_sub = Submission.objects.get(pk=sub.id)
     assert mock_api.return_value.actions.create.call_count == 0
+    assert mock_api.return_value.files.upload.call_count == 1
     assert res_sub.is_case_sent
 
-    # Test for if submission has no action
+    mock_api.reset_mock()
+
+    # Test when submission has no action
     _send_submission_actionstep(sub.pk)
     res_sub = Submission.objects.get(pk=sub.id)
     assert mock_api.return_value.actions.create.call_count == 1
+    assert mock_api.return_value.files.upload.call_count == 1
     assert res_sub.is_case_sent
