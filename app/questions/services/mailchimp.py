@@ -11,11 +11,21 @@ def remind_incomplete():
 
     # Find COVID clients and send reminder
     covid_clients = find_clients(topic="COVID")
-    send_email(clients=covid_clients, list_id="", workflow_id="", email_id="")
+    send_email(
+        clients=covid_clients,
+        list_id=settings.MAILCHIMP_COVID_LIST_ID,
+        workflow_id=settings.MAILCHIMP_COVID_WORKFLOW_ID,
+        email_id=settings.MAILCHIMP_COVID_EMAIL_ID,
+    )
 
     # Find REPAIRS clients and send reminder
     repairs_clients = find_clients(topic="REPAIRS")
-    send_email(clients=repairs_clients, list_id="", workflow_id="", email_id="")
+    send_email(
+        clients=repairs_clients,
+        list_id=settings.MAILCHIMP_REPAIRS_LIST_ID,
+        workflow_id=settings.MAILCHIMP_REPAIRS_WORKFLOW_ID,
+        email_id=settings.MAILCHIMP_REPAIRS_EMAIL_ID,
+    )
 
 
 def find_clients(topic):

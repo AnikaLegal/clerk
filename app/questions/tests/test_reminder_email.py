@@ -131,7 +131,14 @@ def test_remind_incomplete_api(mock_API):
         created_at=three_days_ago,
         answers=answers_with_email,
     )
+    person = {"email_address": "michael@jordan.com", "status": "subscribed"}
     remind_incomplete()
     mock_API.assert_called_with(settings.MAILCHIMP_API_KEY)
-    mock_mailchimp.lists.members.create.assert_called_once()
-    mock_mailchimp.automations.emails.queues.create.assert_called_once()
+    mock_mailchimp.lists.members.create.assert_called_with(
+        list_id=settings.MAILCHIMP_REPAIRS_LIST_ID, data=person
+    )
+    mock_mailchimp.automations.emails.queues.create.assert_called_with(
+        workflow_id=settings.MAILCHIMP_REPAIRS_WORKFLOW_ID,
+        email_id=settings.MAILCHIMP_REPAIRS_EMAIL_ID,
+        data=person,
+    )
