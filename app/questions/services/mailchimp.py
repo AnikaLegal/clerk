@@ -63,7 +63,11 @@ def send_email(clients, list_id, workflow_id, email_id):
 
     for submission, email in clients:
         # Add formatting
-        person = {"email_address": email, "status": "subscribed"}
+        person = {
+            "email_address": email,
+            "status": "subscribed",
+            "merge_fields": {"SUB_ID": submission.id},
+        }
         # Add person to list
         mailchimp.lists.members.create(list_id=list_id, data=person)
         # Send person email
