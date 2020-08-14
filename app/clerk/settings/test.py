@@ -25,3 +25,13 @@ Q_CLUSTER = {
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }
+
+
+# Reminder emails via MailChimp
+MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
+MAILCHIMP_COVID_LIST_ID = ""
+MAILCHIMP_COVID_WORKFLOW_ID = ""
+MAILCHIMP_COVID_EMAIL_ID = ""
+MAILCHIMP_REPAIRS_LIST_ID = ""
+MAILCHIMP_REPAIRS_WORKFLOW_ID = ""
+MAILCHIMP_REPAIRS_EMAIL_ID = ""
