@@ -1,4 +1,5 @@
 from mailchimp3 import MailChimp
+from mailchimp3.mailchimpclient import MailChimpError
 
 from django.conf import settings
 from django.utils import timezone
@@ -66,14 +67,19 @@ def send_email(clients, list_id, workflow_id, email_id):
         person = {
             "email_address": email,
             "status": "subscribed",
-            "merge_fields": {"SUB_ID": submission.id},
+            "merge_fields": {"SUB_ID": str(submission.id)},
         }
-        # Add person to list
-        mailchimp.lists.members.create(list_id=list_id, data=person)
-        # Send person email
-        mailchimp.automations.emails.queues.create(
-            workflow_id=workflow_id, email_id=email_id, data=person
-        )
+
+        try:
+            # Add person to list and send them email
+            mailchimp.lists.members.create(list_id=list_id, data=person)
+            mailchimp.automations.emails.queues.create(
+                workflow_id=workflow_id, email_id=email_id, data=person
+            )
+        except MailChimpError:
+            # Skip if their email is already on list
+            continue
+
         # Mark as sent
         submission.is_reminder_sent = True
         submission.save()
