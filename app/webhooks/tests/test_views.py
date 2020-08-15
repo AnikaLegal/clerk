@@ -19,6 +19,7 @@ def test_webflow_form_create(client):
             "Name": "sorry alex I need to do this quite a few times",
             "Email": "matt99@anikalegal.com",
             "Phone Number": "1111111",
+            "Referral": "Google Maps",
             "Field 4": "true",
         },
     }
@@ -29,6 +30,7 @@ def test_webflow_form_create(client):
     assert contact.name == "sorry alex I need to do this quite a few times"
     assert contact.email == "matt99@anikalegal.com"
     assert contact.phone == "1111111"
+    assert contact.referral == "Google Maps"
 
 
 @pytest.mark.django_db
@@ -51,9 +53,9 @@ def test_jotforms_form_create(client):
     """
     url = reverse("jotform-form")
     data = {
-        "rawRequest" : "{\"test\" : \"value\", \"another\" : \"one\"}",
-        "pretty" : "test:value, another:one",
-        "formTitle" : "TestForm"
+        "rawRequest": '{"test" : "value", "another" : "one"}',
+        "pretty": "test:value, another:one",
+        "formTitle": "TestForm",
     }
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 201
@@ -68,9 +70,7 @@ def test_jotforms_form_create_fail(client):
     JotForm survey submission test failure
     """
     url = reverse("jotform-form")
-    data = {
-        "this" : "ain't it chief"
-    }
+    data = {"this": "ain't it chief"}
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 400
     assert resp.json() == ["Invalid request format."]

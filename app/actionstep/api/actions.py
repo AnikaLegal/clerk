@@ -12,6 +12,28 @@ class ActionEndpoint(BaseEndpoint):
     """
     Endpoint for Actionstep actions.
     https://actionstep.atlassian.net/wiki/spaces/API/pages/12025956/Actions
+    Example action schema:
+    {
+        'id': 65,
+        'name': 'Fakey McFakeFake',
+        'reference': 'R0123',
+        'priority': 0,
+        'status': 'Closed',
+        'statusTimestamp': '2020-07-09T19:34:10+12:00',
+        'isBillableOverride': None,
+        'createdTimestamp': '2020-07-02',
+        'modifiedTimestamp': '2020-07-11T07:30:51+12:00',
+        'isDeleted': 'F',
+        'deletedBy': None,
+        'deletedTimestamp': None,
+        'isFavorite': 'F',
+        'overrideBillingStatus': None,
+        'lastAccessTimestamp': '2020-07-30T16:41:33+12:00',
+        'links': {'assignedTo': '11',
+        'actionType': '28',
+        'primaryParticipants': ['159'],
+        'relatedActions': None}
+    }
     """
 
     resource = "actions"
@@ -23,8 +45,8 @@ class ActionEndpoint(BaseEndpoint):
 
     def get_next_ref(self, prefix: str):
         """
-        Returns next file reference.
-        Eg. prefix of "R" would get "R0001"
+        Returns next file reference string.
+        Eg. prefix of "R" would return "R0001"
         """
         actions = self.list({"reference_ilike": f"{prefix}*"})
         max_ref_num = 0
@@ -32,9 +54,7 @@ class ActionEndpoint(BaseEndpoint):
             try:
                 ref_num = int(action["reference"].replace(prefix, ""))
             except Exception:
-                logger.exception(
-                    "Error parsing matter reference %s", action["reference"]
-                )
+                logger.exception("Error parsing matter reference %s", action["reference"])
                 ref_num = 0
 
             if ref_num > max_ref_num:
@@ -44,22 +64,16 @@ class ActionEndpoint(BaseEndpoint):
         return prefix + str(next_ref).rjust(4, "0")
 
     def get(self, action_id: str):
-        params = {"id": action_id}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
-
-    def list(self, params=None):
-        resp_data = super().get(params)
-        data = resp_data[self.resource] if resp_data else None
-        return self._ensure_list(data)
-
-    def update(self, action_id: str, data: dict):
-        data = {self.resource: [data]}
-        return super().update(filenote_id, data)
+        """
+        Gets an action.
+        Returns action (see schema above) or None.
+        """
+        return super().get({"id": action_id})
 
     def create(self, *args, **kwargs):
         """
-        Create an action - this is a separate API.
+        Create an action.
+        Returns action (see schema above).
         """
         return self.action_create.create(*args, **kwargs)
 
@@ -73,14 +87,7 @@ class ActionTypesEndpoint(BaseEndpoint):
     resource = "actiontypes"
 
     def get_for_name(self, name: str):
-        params = {"name": name}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+        return super().get({"name": name})
 
 
 class ActionCreateEndpoint(BaseEndpoint):
@@ -103,15 +110,12 @@ class ActionCreateEndpoint(BaseEndpoint):
         Create an action - this is a separate API.
         """
         data = {
-            "actioncreate": {
-                "actionName": action_name,
-                "fileReference": file_reference,
-                "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
-                "links": {
-                    "actionType": str(action_type_id),
-                    "assignedToParticipant": str(participant_id),
-                },
-            }
+            "actionName": action_name,
+            "fileReference": file_reference,
+            "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
+            "links": {
+                "actionType": str(action_type_id),
+                "assignedToParticipant": str(participant_id),
+            },
         }
-        resp_data = super().create(data)
-        return resp_data[self.resource]
+        return super().create(data)

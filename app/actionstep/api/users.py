@@ -4,16 +4,19 @@ from .base import BaseEndpoint
 class UserEndpoint(BaseEndpoint):
     """
     Endpoint for Actionstep users.
+    Example user schema:
+    {
+        'id': 11,
+        'isCurrent': 'F',
+        'emailAddress': 'foo.bar@anikalegal.com',
+        'isActive': 'T',
+        'hasAuthority': 'F',
+        'links': {'participant': '26'}
+    }
     """
 
     resource = "users"
 
     def get(self, user_id: str):
-        params = {"id": user_id}
-        resp_data = super().get(params)
-        return resp_data[self.resource]
-
-    def list(self):
-        resp_data = super().get()
-        data = resp_data[self.resource]
-        return self._ensure_list(data)
+        """Returns a user (see schema above) or None."""
+        return super().get({"id": user_id})

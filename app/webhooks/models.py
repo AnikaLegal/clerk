@@ -15,6 +15,7 @@ class WebflowContact(TimestampedModel):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
+    referral = models.CharField(max_length=255, default="", blank=True)
 
     # Tracks whether a Slack alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)

@@ -22,7 +22,7 @@ def _send_submission_actionstep(submission_pk: str):
     """
     Send a submission to Actionstep.
     FIXME: add tests
-    FIXME: Make it harder to sync the same data twice.
+    FIXME: Make it harder to sync the same documents twice.
     """
     submission = Submission.objects.get(pk=submission_pk)
     logger.info("Sending Submission<%s]> to Actionstep", submission.id)
@@ -54,12 +54,11 @@ def _send_submission_actionstep(submission_pk: str):
 
     # Check if this submission already has an action
     action_id = None
-    submission_filenotes = api.filenotes.get_by_text_match(submission.pk)
-    # This can be a list or a dict >.<
-    if type(submission_filenotes) is list:
+    submission_filenotes = api.filenotes.list_by_text_match(submission.pk)
+    if submission_filenotes:
         action_id = max([int(fn["links"]["action"]) for fn in submission_filenotes])
-    elif type(submission_filenotes) is dict:
-        action_id = int(submission_filenotes["links"]["action"])
+    else:
+        action_id = None
 
     if action_id:
         # An matter has already been created for this submission

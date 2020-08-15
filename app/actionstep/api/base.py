@@ -11,7 +11,6 @@ class BaseEndpoint:
     """
     Base class for Actionstep endpoints.
 
-    FIXME: Pagination support.
     FIXME: Handle expired token race condition
     """
 
@@ -26,39 +25,78 @@ class BaseEndpoint:
             "Authorization": f"Bearer {access_token}",
         }
 
-    def get(self, params=None):
+    def get(self, params=None) -> dict:
+        """
+        Gets a resource, filtered by params.
+        Returns a dict or None.
+        """
+        objs = self.list(params)
+        if not objs:
+            # Empty list.
+            return None
+        else:
+            # Non-empty list.
+            assert len(objs) == 1, f"Wrong number of objs for get: {objs}"
+            return objs[0]
+
+    def list(self, params=None) -> list:
         """
         Get a resource, filtered by params.
-        Return value may be None if object has been deleted.
+        Returns a list of results.
         """
-        url = self.url
+        return self._list(self.url, params)
+
+    def _list(self, url, params=None) -> list:
         resp = requests.get(url, params=params, headers=self.headers)
-        return self._handle_json_response(url, resp)
+        response_data = self._handle_json_response(url, resp)
+        if not response_data:
+            # Nothing found.
+            return []
+
+        data = response_data[self.resource]
+        results = []
+        results += data if type(data) is list else [data]
+        try:
+            paging = response_data["meta"]["paging"][self.resource]
+        except (TypeError, KeyError):
+            paging = None
+
+        if paging and paging["nextPage"]:
+            results += self._list(paging["nextPage"])
+
+        return results
 
     def create(self, data: dict):
         """
         Create a resource with provided data.
+        Returns the created object.
         """
         url = self.url
-        resp = requests.post(url, json=data, headers=self.headers)
-        return self._handle_json_response(url, resp)
+        request_data = {self.resource: [data]}
+        resp = requests.post(url, json=request_data, headers=self.headers)
+        response_data = self._handle_json_response(url, resp)
+        return response_data[self.resource]
 
     def update(self, resource_id: str, data: dict):
         """
         Update data in an existing resource.
+        Returns the created object.
         """
         url = urljoin(self.url, str(resource_id))
+        request_data = {self.resource: [data]}
         resp = requests.put(url, json=data, headers=self.headers)
-        return self._handle_json_response(url, resp)
+        response_data = self._handle_json_response(url, resp)
+        return response_data[self.resource]
 
     def delete(self, resource_id: str):
         """
         Delete an existing resource,
         May result in a soft-delete.
+        Returns None
         """
         url = urljoin(self.url, str(resource_id))
         resp = requests.delete(url, headers=self.headers)
-        return self._handle_json_response(url, resp)
+        self._handle_json_response(url, resp)
 
     def _handle_json_response(self, url, resp):
         json = self._try_json_decode(resp)
@@ -77,14 +115,3 @@ class BaseEndpoint:
         else:
             return resp.json()
 
-    def _ensure_list(self, data):
-        """
-        Actionstep sometimes returns a list or dict depending on the data.
-        Returns a list if it's not already a list.
-        """
-        if type(data) is list:
-            return data
-        elif data:
-            return [data]
-        else:
-            return []

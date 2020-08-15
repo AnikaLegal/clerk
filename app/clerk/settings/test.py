@@ -10,6 +10,11 @@ DATABASES["default"]["name"] = "test"
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "test_media")
 
+ACTIONSTEP_SETUP_OWNERS = {
+    "COVID": "keithleonardo@anikalegal.com",
+    "REPAIRS": "keithleonardo@anikalegal.com"
+}
+
 
 # Django-q cluster should run synchronously
 Q_CLUSTER = {
