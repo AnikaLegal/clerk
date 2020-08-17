@@ -5,6 +5,9 @@ from django.conf import settings
 from django.utils import timezone
 
 from questions.models import Submission
+import logging
+
+logger = logging.getLogger(__file__)
 
 
 def remind_incomplete():
@@ -64,10 +67,11 @@ def send_email(clients, list_id, workflow_id, email_id):
 
     for submission, email in clients:
         # Add formatting
+        submission_id = str(submission.id)
         person = {
             "email_address": email,
             "status": "subscribed",
-            "merge_fields": {"SUB_ID": str(submission.id)},
+            "merge_fields": {"SUB_ID": submission_id},
         }
 
         try:
@@ -78,6 +82,10 @@ def send_email(clients, list_id, workflow_id, email_id):
             )
         except MailChimpError:
             # Skip if their email is already on list
+            logger.exception(
+                "Failed to send reminder email to incomplete submission %s",
+                submission_id,
+            )
             continue
 
         # Mark as sent
