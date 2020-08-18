@@ -134,7 +134,7 @@ def test_remind_incomplete_api(mock_API):
     person = {
         "email_address": "michael@jordan.com",
         "status": "subscribed",
-        "merge_fields": {"SUB_ID": sub1.id},
+        "merge_fields": {"SUB_ID": str(sub1.id)},
     }
     remind_incomplete()
     mock_API.assert_called_with(settings.MAILCHIMP_API_KEY)

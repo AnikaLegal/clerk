@@ -1,9 +1,13 @@
 from mailchimp3 import MailChimp
+from mailchimp3.mailchimpclient import MailChimpError
 
 from django.conf import settings
 from django.utils import timezone
 
 from questions.models import Submission
+import logging
+
+logger = logging.getLogger(__file__)
 
 
 def remind_incomplete():
@@ -63,17 +67,27 @@ def send_email(clients, list_id, workflow_id, email_id):
 
     for submission, email in clients:
         # Add formatting
+        submission_id = str(submission.id)
         person = {
             "email_address": email,
             "status": "subscribed",
-            "merge_fields": {"SUB_ID": submission.id},
+            "merge_fields": {"SUB_ID": submission_id},
         }
-        # Add person to list
-        mailchimp.lists.members.create(list_id=list_id, data=person)
-        # Send person email
-        mailchimp.automations.emails.queues.create(
-            workflow_id=workflow_id, email_id=email_id, data=person
-        )
+
+        try:
+            # Add person to list and send them email
+            mailchimp.lists.members.create(list_id=list_id, data=person)
+            mailchimp.automations.emails.queues.create(
+                workflow_id=workflow_id, email_id=email_id, data=person
+            )
+        except MailChimpError:
+            # Skip if their email is already on list
+            logger.exception(
+                "Failed to send reminder email to incomplete submission %s",
+                submission_id,
+            )
+            continue
+
         # Mark as sent
         submission.is_reminder_sent = True
         submission.save()
