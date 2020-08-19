@@ -105,6 +105,7 @@ class ActionCreateEndpoint(BaseEndpoint):
         action_name: str,
         file_reference: str,
         participant_id: str,
+        timestamp: str = ""
     ):
         """
         Create an action - this is a separate API.
@@ -113,9 +114,12 @@ class ActionCreateEndpoint(BaseEndpoint):
             "actionName": action_name,
             "fileReference": file_reference,
             "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
+            "timestamp": timestamp,
             "links": {
                 "actionType": str(action_type_id),
                 "assignedToParticipant": str(participant_id),
             },
         }
+        if timestamp:
+            data["timestamp"] = timestamp
         return super().create(data)
