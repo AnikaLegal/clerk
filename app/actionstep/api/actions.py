@@ -114,7 +114,6 @@ class ActionCreateEndpoint(BaseEndpoint):
             "actionName": action_name,
             "fileReference": file_reference,
             "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
-            "timestamp": timestamp,
             "links": {
                 "actionType": str(action_type_id),
                 "assignedToParticipant": str(participant_id),
