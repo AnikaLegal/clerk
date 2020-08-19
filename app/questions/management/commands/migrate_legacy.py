@@ -21,8 +21,7 @@ class Command(BaseCommand):
     timestamp = "2000-11-21T15:01:36+13:00"
 
     def get_submission(self, firstname, lastname, case_topic):
-        # TODO: Make "is_case_sent" False
-        all_submissions = Submission.objects.filter(complete=True, is_case_sent=True)
+        all_submissions = Submission.objects.filter(complete=True, is_case_sent=False)
         client_data = {}
         for s in all_submissions:
             if s.topic != case_topic:
@@ -54,28 +53,36 @@ class Command(BaseCommand):
         submission, client_data = self.get_submission(
             firstname, lastname, case_type
         )
-
-        # Test if the participant exists in Actionstep
-        participant_data, created = api.participants.get_or_create(
-            firstname, lastname, client_data['CLIENT_EMAIL'], client_data['CLIENT_PHONE']
-        )
-        if created:
-            print(f"Created participant {client_data['CLIENT_NAME']}.")
+        if not submission:
+            print(f"Can't find submission for {firstname} {lastname}!")
+            print(f"Creating new client...")
+            participant_data = api.participants.create(firstname, lastname, "", "")
         else:
-            print(f"{client_data['CLIENT_NAME']} already exists.")
+            # Test if the participant exists in Actionstep
+            participant_data, created = api.participants.get_or_create(
+                firstname, lastname, client_data['CLIENT_EMAIL'], client_data['CLIENT_PHONE']
+            )
+            if created:
+                print(f"Created participant {client_data['CLIENT_NAME']}.")
+            else:
+                print(f"{client_data['CLIENT_NAME']} already exists.")
 
         # Procedures from _send_submission_actionstep() function
-        owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
+        owner_email = settings.ACTIONSTEP_SETUP_OWNERS[case_type]
         owner_data = api.participants.get_by_email(owner_email)
         
         # Create a new matter for the participant
-        action_type_name = ACTION_TYPE_LOOKUP[submission.topic]
+        submission_id = "LEGACYCASE"
+        if submission:
+            submission_id = submission.pk
+
+        action_type_name = ACTION_TYPE_LOOKUP[case_type]
         action_type_data = api.actions.action_types.get_for_name(action_type_name)
         action_type_id = action_type_data["id"]
         action_data = api.actions.create(
-            submission_id=submission.pk,
+            submission_id=submission_id,
             action_type_id=action_type_id,
-            action_name=client_data["CLIENT_NAME"],
+            action_name=f"{firstname} {lastname}",
             file_reference=fileref_name,
             participant_id=owner_data["id"],
             timestamp=self.timestamp
@@ -102,7 +109,10 @@ class Command(BaseCommand):
         for f in all_files:
             file_data = api.files.upload(f["name"], f["bytes"])
             api.files.attach(f["name"], file_data["id"], action_id, f["target_folder"])
-        Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
+        
+        # Update existing submission
+        if submission:
+            Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
 
         
     def handle(self, *args, **options):
