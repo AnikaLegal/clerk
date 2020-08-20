@@ -12,7 +12,7 @@ ACTION_TYPE_LOOKUP = {"REPAIRS": ActionType.REPAIRS, "COVID": ActionType.COVID}
 
 
 class Command(BaseCommand):
-    help = 'Map documents to users in Actionstep database'
+    help = "Map documents to users in Actionstep database"
 
     # Change this to the directory of the files
     base_dir = "./questions/management/commands/legacy_data"
@@ -28,15 +28,14 @@ class Command(BaseCommand):
                 continue
 
             for field in s.answers:
-                field_match = (field['name'] == "CLIENT_NAME")
-                answer_match = (field["answer"] == f"{firstname} {lastname}")
+                field_match = field["name"] == "CLIENT_NAME"
+                answer_match = field["answer"] == f"{firstname} {lastname}"
 
                 if field_match and answer_match:
                     for d in s.answers:
-                        client_data[d['name']] = d['answer']
+                        client_data[d["name"]] = d["answer"]
                     return s, client_data
         return None, client_data
-
 
     def upload(self, case_type, item):
         api = ActionstepAPI()
@@ -48,19 +47,22 @@ class Command(BaseCommand):
         print(f"Uploading data from {item}...")
         tokens = item.split()
         fileref_name, (firstname, lastname) = tokens[0], tokens[2:4]
-    
+
         # Retrieve matching client data from clerk submissions
-        submission, client_data = self.get_submission(
-            firstname, lastname, case_type
-        )
+        submission, client_data = self.get_submission(firstname, lastname, case_type)
         if not submission:
             print(f"Can't find submission for {firstname} {lastname}!")
             print(f"Creating new client...")
             participant_data = api.participants.create(firstname, lastname, "", "")
         else:
+            # Check that we haven't already synced this submission.
+            if submission.is_case_sent:
+                print(f"Submission {submission.pk} has already been synced to Actionstep.")
+                return
+
             # Test if the participant exists in Actionstep
             participant_data, created = api.participants.get_or_create(
-                firstname, lastname, client_data['CLIENT_EMAIL'], client_data['CLIENT_PHONE']
+                firstname, lastname, client_data["CLIENT_EMAIL"], client_data["CLIENT_PHONE"]
             )
             if created:
                 print(f"Created participant {client_data['CLIENT_NAME']}.")
@@ -70,7 +72,7 @@ class Command(BaseCommand):
         # Procedures from _send_submission_actionstep() function
         owner_email = settings.ACTIONSTEP_SETUP_OWNERS[case_type]
         owner_data = api.participants.get_by_email(owner_email)
-        
+
         # Create a new matter for the participant
         submission_id = "LEGACYCASE"
         if submission:
@@ -85,7 +87,7 @@ class Command(BaseCommand):
             action_name=f"{firstname} {lastname}",
             file_reference=fileref_name,
             participant_id=owner_data["id"],
-            timestamp=self.timestamp
+            timestamp=self.timestamp,
         )
         action_id = action_data["id"]
         client_id = participant_data["id"]
@@ -96,25 +98,22 @@ class Command(BaseCommand):
         for root, folders, files in os.walk(path):
             for filename in files:
                 subpath = os.path.join(root, filename)
-                with open(subpath, 'rb') as file:
+                with open(subpath, "rb") as file:
                     # TODO: Test if API creates folders on Actionstep
-                    # to preserve file hierarchy    
-                    all_files.append({
-                        "name" : filename,
-                        "bytes" : file.read(),
-                        "target_folder" : "Client"
-                    })
+                    # to preserve file hierarchy
+                    all_files.append(
+                        {"name": filename, "bytes": file.read(), "target_folder": "Client"}
+                    )
 
         # Upload and attach files to the matter
         for f in all_files:
             file_data = api.files.upload(f["name"], f["bytes"])
             api.files.attach(f["name"], file_data["id"], action_id, f["target_folder"])
-        
+
         # Update existing submission
         if submission:
             Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
 
-        
     def handle(self, *args, **options):
         for case_type in os.listdir(self.base_dir):
             # case_type should match a CaseTopic
