@@ -1,3 +1,6 @@
+from mailchimp3.mailchimpclient import MailChimpError
+from mailchimp3.helpers import check_email
+
 from django.utils import timezone
 from django.conf import settings
 
@@ -6,7 +9,6 @@ import pytest
 
 from questions.services.mailchimp import remind_incomplete, find_clients
 from questions.tests.factories import SubmissionFactory
-from questions.models import Submission
 
 
 # Sample answers for testing
@@ -23,6 +25,14 @@ answers_no_email = [
     {"name": "CLIENT_RENTAL_ADDRESS", "answer": "Manchester United"},
     {"name": "CLIENT_DOB", "answer": "1974-11-16"},
     {"name": "CLIENT_PHONE", "answer": "4567 4756"},
+]
+
+answers_invalid_email = [
+    {"name": "CLIENT_NAME", "answer": "Orenthal James Simpson"},
+    {"name": "CLIENT_RENTAL_ADDRESS", "answer": "Buffalo Bills"},
+    {"name": "CLIENT_DOB", "answer": "1947-07-09"},
+    {"name": "CLIENT_EMAIL", "answer": "it_wasn't_me"},
+    {"name": "CLIENT_PHONE", "answer": "4768 4858"},
 ]
 
 # Sample dates for testing
@@ -106,21 +116,6 @@ def test_find_clients_relevant_dates():
 
 @mock.patch("questions.services.mailchimp.MailChimp")
 @pytest.mark.django_db
-def test_remind_incomplete_sent(mock_API):
-    sub1 = SubmissionFactory(
-        complete=False,
-        is_reminder_sent=False,
-        topic="COVID",
-        created_at=three_days_ago,
-        answers=answers_with_email,
-    )
-    remind_incomplete()
-    sub1.refresh_from_db()
-    assert sub1.is_reminder_sent == True
-
-
-@mock.patch("questions.services.mailchimp.MailChimp")
-@pytest.mark.django_db
 def test_remind_incomplete_api(mock_API):
     mock_mailchimp = mock.Mock()
     mock_API.return_value = mock_mailchimp
@@ -146,3 +141,70 @@ def test_remind_incomplete_api(mock_API):
         email_id=settings.MAILCHIMP_REPAIRS_EMAIL_ID,
         data=person,
     )
+
+
+@mock.patch("questions.services.mailchimp.MailChimp")
+@pytest.mark.django_db
+def test_remind_incomplete_same_email(mock_API):
+    mock_mailchimp = mock.Mock()
+    mock_API.return_value = mock_mailchimp
+    emails = []
+
+    def check(list_id, data):
+        if data["email_address"] in emails:
+            raise MailChimpError
+        else:
+            emails.append(data["email_address"])
+
+    mock_mailchimp.lists.members.create.side_effect = check
+    sub1 = SubmissionFactory(
+        complete=False,
+        is_reminder_sent=False,
+        topic="REPAIRS",
+        created_at=three_days_ago,
+        answers=answers_with_email,
+    )
+    sub2 = SubmissionFactory(
+        complete=False,
+        is_reminder_sent=False,
+        topic="REPAIRS",
+        created_at=three_days_ago,
+        answers=answers_with_email,
+    )
+    remind_incomplete()
+    sub1.refresh_from_db()
+    sub2.refresh_from_db()
+    assert sub1.is_reminder_sent == True
+    assert sub2.is_reminder_sent == False
+
+
+@mock.patch("questions.services.mailchimp.MailChimp")
+@pytest.mark.django_db
+def test_remind_incomplete_invalid_email(mock_API):
+    mock_mailchimp = mock.Mock()
+    mock_API.return_value = mock_mailchimp
+
+    def check(list_id, data):
+        check_email(data["email_address"])
+
+    mock_mailchimp.lists.members.create.side_effect = check
+    sub1 = SubmissionFactory(
+        complete=False,
+        is_reminder_sent=False,
+        topic="COVID",
+        created_at=three_days_ago,
+        answers=answers_invalid_email,
+    )
+    sub2 = SubmissionFactory(
+        complete=False,
+        is_reminder_sent=False,
+        topic="REPAIRS",
+        created_at=three_days_ago,
+        answers=answers_with_email,
+    )
+    remind_incomplete()
+    sub1.refresh_from_db()
+    sub2.refresh_from_db()
+    assert sub1.is_reminder_sent == False
+    assert sub2.is_reminder_sent == True
+
