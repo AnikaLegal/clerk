@@ -72,6 +72,7 @@ services:
       PGPORT: 5432
       ACTIONSTEP_CLIENT_ID: ""
       ACTIONSTEP_CLIENT_SECRET: ""
+      MAILCHIMP_API_KEY: ""
 
   # Django-q worker.
   worker:

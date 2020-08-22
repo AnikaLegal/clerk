@@ -1,7 +1,7 @@
 # Clerk
 
-- Deployment: [![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk)
-- Tests: ![Project Tests](https://github.com/AnikaLegal/clerk/workflows/Project%20Tests/badge.svg?branch=develop)
+[![CircleCI](https://circleci.com/gh/AnikaLegal/clerk.svg?style=svg)](https://circleci.com/gh/AnikaLegal/clerk) for deployments
+![Project Tests](https://github.com/AnikaLegal/clerk/workflows/Project%20Tests/badge.svg?branch=develop) for testing
 
 This site is used by new Anika clients who want to submit their legal problem. Clients may submit the facts of their case using a structured form interface. Their case file is then entered into our case managment system.
 
@@ -16,7 +16,19 @@ You will need:
 
 ## Getting Started
 
-You first want to build the Docker environment that we'll be using:
+First, add a file called `.env` to the repository root with the following contents:
+
+```text
+SENDGRID_API_KEY=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+ACTIONSTEP_CLIENT_ID=
+ACTIONSTEP_CLIENT_SECRET=
+```
+
+The values of these secrets will be provided to you if you need them.
+
+Next, you want to build the Docker environment that we'll be using:
 
 ```bash
 make build
@@ -75,6 +87,8 @@ When making a change or bugfix, you should:
 - merge the `develop` into `master` and push to GitHub to release your change to prod
 
 ## Infrastructure
+
+![infra](docs/infra.png)
 
 There are two containers that run the application. A Django web server and a [Django Q](https://django-q.readthedocs.io/en/latest/) worker server. Both connect to a common database.
 
