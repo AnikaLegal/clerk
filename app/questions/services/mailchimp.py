@@ -80,10 +80,16 @@ def send_email(clients, list_id, workflow_id, email_id):
             mailchimp.automations.emails.queues.create(
                 workflow_id=workflow_id, email_id=email_id, data=person
             )
+        except ValueError:
+            logger.info(
+                "'%s' is invalid email address for incomplete submission %s",
+                email,
+                submission_id,
+            )
+            continue
         except MailChimpError:
-            # Skip if their email is already on list
             logger.exception(
-                "Failed to send reminder email to incomplete submission %s",
+                "Email address is already on list for incomplete submission %s",
                 submission_id,
             )
             continue
