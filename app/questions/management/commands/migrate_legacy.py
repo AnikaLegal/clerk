@@ -15,10 +15,10 @@ class Command(BaseCommand):
     help = "Map documents to users in Actionstep database"
 
     # Change this to the directory of the files
-    base_dir = "./questions/management/commands/legacy_data"
+    base_dir = "/app/legacy_data"
 
     # Change this to be right before first entry on Actionstep
-    timestamp = "2000-11-21T15:01:36+13:00"
+    timestamp = "2020-04-14T15:00:00+00:00"
 
     def get_submission(self, firstname, lastname, case_topic):
         all_submissions = Submission.objects.filter(complete=True, is_case_sent=False)
