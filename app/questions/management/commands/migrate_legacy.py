@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
             for field in s.answers:
                 field_match = field["name"] == "CLIENT_NAME"
-                answer_match = field["answer"] == f"{firstname} {lastname}"
+                answer_match = field.get("answer") == f"{firstname} {lastname}"
 
                 if field_match and answer_match:
                     for d in s.answers:
