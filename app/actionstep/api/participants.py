@@ -37,6 +37,13 @@ class ParticipantEndpoint(BaseEndpoint):
 
         return client, created
 
+    def get_by_name(self, first: str, last: str):
+        """
+        Look up a participant by name.
+        Returns a participant (see schema above) or None.
+        """
+        return super().get({"firstName": first, "lastName": last})
+
     def get_by_email(self, email: str):
         """
         Look up a participant by email.
@@ -143,7 +150,7 @@ class ActionParticipantEndpoint(BaseEndpoint):
         Returns list of action participants (see schema above)
         """
 
-        data = super().get({"action": action_id})
+        data = super().list({"action": action_id})
         return [self.parse_participant_type(act_p) for act_p in data]
 
     def parse_participant_type(self, act_p: dict):

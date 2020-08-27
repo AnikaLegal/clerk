@@ -70,6 +70,13 @@ class ActionEndpoint(BaseEndpoint):
         """
         return super().get({"id": action_id})
 
+    def get_by_ref(self, ref: str):
+        """
+        Gets an action by file reference, eg. 'R0001'.
+        Returns action (see schema above) or None.
+        """
+        return super().get({"reference": ref})
+
     def create(self, *args, **kwargs):
         """
         Create an action.
@@ -105,7 +112,7 @@ class ActionCreateEndpoint(BaseEndpoint):
         action_name: str,
         file_reference: str,
         participant_id: str,
-        timestamp: str = ""
+        timestamp: str = "",
     ):
         """
         Create an action - this is a separate API.

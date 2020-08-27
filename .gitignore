@@ -26,3 +26,5 @@ image.tar
 # Ansible
 *.secret.*
 *.retry
+
+legacy_data/
