@@ -1,0 +1,1 @@
+This is where the JS + CSS assets from the frontend go.
