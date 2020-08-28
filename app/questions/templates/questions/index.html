@@ -1,0 +1,12 @@
+{% load render_bundle from webpack_loader %}
+
+<html>
+  <head>
+    {% render_bundle 'main' 'css' %}
+  </head>
+  <body>
+    <div id="app">
+    </div>
+    {% render_bundle 'main' 'js' %}
+  </body>
+</head>

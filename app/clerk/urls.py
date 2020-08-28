@@ -8,6 +8,8 @@ from questions.views import apis
 from webhooks.views import webflow_form_view, jotform_form_view
 from .views import reports_view
 
+from django.views.generic import TemplateView
+
 
 router = routers.SimpleRouter()
 router.register("submission", apis.SubmissionViewSet, basename="submission")
@@ -15,6 +17,7 @@ router.register("images", apis.ImageUploadViewSet, basename="images")
 router.register("files", apis.FileUploadViewSet, basename="files")
 urlpatterns = [
     re_path("^reports/(?P<path>.*)$", reports_view, name="reports"),
+    path("", TemplateView.as_view(template_name="questions/index.html")),
     path("admin/", admin.site.urls, name="admin"),
     path("actionstep/start/", start_oauth_view, name="actionstep-start"),
     path("actionstep/end/", end_oauth_view, name="actionstep-end"),

@@ -16,6 +16,7 @@ mailchimp3
 
 # Static files
 whitenoise
+django-webpack-loader
 
 # Reporting
 streamlit

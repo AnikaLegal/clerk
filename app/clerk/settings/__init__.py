@@ -17,21 +17,23 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    # Static files
+    # Static files.
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    # Dev tools
+    # Dev tools.
     "django_extensions",
-    # APIs
+    # APIs.
     "rest_framework",
     "corsheaders",
-    # Async tasks
+    # Async tasks.
     "django_q",
-    # Internal apps
+    # Internal apps.
     "actionstep.apps.ActionstepConfig",
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
+    # Frontend asset loader.
+    "webpack_loader",
 ]
 
 MIDDLEWARE = [
@@ -84,9 +86,7 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -199,3 +199,15 @@ ACTIONSTEP_TOKEN_URI = None
 ACTIONSTEP_SETUP_OWNERS = None
 ACTIONSTEP_WEB_URI = None
 ADMIN_PREFIX = None
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "CACHE": True,
+        "BUNDLE_DIR_NAME": "build/",
+        "STATS_FILE": "/app/webpack-stats.json",
+        "POLL_INTERVAL": 0.1,
+        "TIMEOUT": None,
+        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
+        "LOADER_CLASS": "webpack_loader.loader.WebpackLoader",
+    }
+}

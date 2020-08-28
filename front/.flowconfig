@@ -1,0 +1,16 @@
+[ignore]
+
+[include]
+src
+
+[libs]
+src/globals.js
+
+[lints]
+
+[options]
+module.name_mapper='^comps' ->'<PROJECT_ROOT>/src/comps'
+module.name_mapper='^design' ->'<PROJECT_ROOT>/src/design'
+module.name_mapper='^utils' ->'<PROJECT_ROOT>/src/utils'
+
+[strict]

@@ -27,4 +27,11 @@ image.tar
 *.secret.*
 *.retry
 
-legacy_data/
+# frontend
+dist/
+node_modules/
+build/
+webpack-stats.json
+
+# Storybook build assets
+story/
