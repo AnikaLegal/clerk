@@ -2,7 +2,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { theme } from './theme'
+import { theme } from '../theme'
 
 export const BigButton = styled.button`
   height: 48px;
@@ -14,9 +14,9 @@ export const BigButton = styled.button`
 
   /* Default is secondary button */
   padding: 6px 38px 10px 38px;
-  color: ${theme.color.tealLight};
+  color: ${theme.color.teal.secondary};
   background-color: ${theme.color.white};
-  border: 2px solid ${theme.color.tealLight};
+  border: 2px solid ${theme.color.teal.secondary};
   box-sizing: border-box;
   &:hover {
     box-shadow: ${theme.shadow};
@@ -25,11 +25,11 @@ export const BigButton = styled.button`
     primary: `
       color: ${theme.color.white};
       border: none;
-      background-color: ${theme.color.teal};
+      background-color: ${theme.color.teal.primary};
       padding: 8px 40px;
       &:active {
         outline: none;
-        box-shadow: 0 0 0 1px ${theme.color.teal};
+        box-shadow: 0 0 0 1px ${theme.color.teal.primary};
         border: solid 1px ${theme.color.white};
         padding: 7px 39px;
 
@@ -60,23 +60,23 @@ const _Button = styled.button`
   border-radius: 20px;
   border: none;
   /* Default is secondary button */
-  background-color: ${theme.color.tealLight};
+  background-color: ${theme.color.teal.secondary};
 
   ${theme.switch({
     primary: `
-      background-color: ${theme.color.teal};
+      background-color: ${theme.color.teal.primary};
       `,
   })}
 
   &:hover {
-    background-color: ${theme.color.teal};
+    background-color: ${theme.color.teal.primary};
   }
   &:focus {
     outline: none;
   }
   &:active {
     outline: none;
-    box-shadow: 0 0 0 1px ${theme.color.teal};
+    box-shadow: 0 0 0 1px ${theme.color.teal.primary};
     border: solid 1px ${theme.color.white};
   }
   &:disabled {
@@ -102,7 +102,7 @@ const _Button = styled.button`
 `
 
 const _IconWrapper = styled.span`
-  margin-left: 10px;
+  margin-left: 8px;
 `
 
 export const Button = ({ children, Icon, ...props }: any) => (

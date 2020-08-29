@@ -12,8 +12,8 @@ type Props = {
 const ErrorEl = styled.div`
   display: flex;
   align-items: center;
-  color: ${theme.color.textError};
-  background-color: ${theme.color.error};
+  color: ${theme.color.error.primary};
+  background-color: ${theme.color.error.secondary};
   padding: 3px 10px;
   font-size: ${theme.text.subtitle};
   & + & {

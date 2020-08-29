@@ -9,7 +9,7 @@ const Header = styled.h2`
   font-weight: normal;
   font-size: ${theme.text.title};
   line-height: 32px;
-  color: ${theme.color.text};
+  color: ${theme.color.grey.dark};
   margin: 0 0 20px 0;
 `
 
@@ -18,7 +18,7 @@ const Body = styled.p`
   font-weight: normal;
   font-size: ${theme.text.subtitle};
   line-height: 28px;
-  color: ${theme.color.textLight};
+  color: ${theme.color.grey.mid};
   margin: 0 0 20px 0;
 `
 

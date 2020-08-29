@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const base = require('../webpack/webpack.base.js')
 const babel = require('../webpack/babel.js')
 
@@ -16,5 +17,12 @@ module.exports = async ({ config, mode }) => {
   ]
   config.resolve = base.resolve
   config.plugins = config.plugins.concat(base.plugins)
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      SENTRY_JS_DSN: JSON.stringify(''),
+      SENTRY_RELEASE: JSON.stringify(''),
+      GA_ID: JSON.stringify(''),
+    })
+  )
   return config
 }

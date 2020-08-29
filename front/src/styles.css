@@ -39,14 +39,11 @@ html,
 body {
   height: 100%;
   font-family: 'DM Sans', sans-serif;
-  background-color: rgba(var(--grey), 0.15);
+  background-color: white;
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
   padding: 0;
-  @media (max-width: 700px) {
-    font-size: 12px;
-  }
 }
 
 button {

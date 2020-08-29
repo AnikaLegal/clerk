@@ -68,7 +68,7 @@ const Close = ({ ...props }: any) => (
     />
   </svg>
 )
-const Tick = ({ ...props }: any) => (
+const Tick = ({ color, ...props }: any) => (
   <svg
     width="18"
     height="13"
@@ -79,10 +79,10 @@ const Tick = ({ ...props }: any) => (
   >
     <path
       d="M2 7L6.5 11.5L16 2"
-      stroke="#fff"
-      stroke-width="2.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      stroke={color || '#fff'}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )
