@@ -1,0 +1,1 @@
+from .tenancy import Tenancy

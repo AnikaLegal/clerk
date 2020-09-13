@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
+    "core.apps.CoreConfig",
+    "tenancy.apps.TenancyConfig",
 ]
 
 MIDDLEWARE = [
