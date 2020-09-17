@@ -1,5 +1,5 @@
 from .client import Client
 from .person import Person
-from .submission import Submission
+from .submission import Submission, CaseTopic
 from .timestamped import TimestampedModel
 from .upload import FileUpload

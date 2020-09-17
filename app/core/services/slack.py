@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from slack.services import send_slack_message
-from questions.models import Submission
+from core.models import Submission
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,7 @@ def send_submission_slack(submission_pk: str):
 def get_text(submission: Submission):
     pk = submission.pk
     url = f"https://clerk.anikalegal.com/admin/questions/submission/{pk}/change/"
-
-    answers = {a["name"]: a["answer"] for a in submission.answers if "name" in a}
+    answers = submission.answers
     if "CLIENT_REFERRAL" in answers:
         ref_type = answers["CLIENT_REFERRAL"]
         ref_name = ""

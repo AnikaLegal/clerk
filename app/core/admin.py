@@ -1,16 +1,10 @@
-import json
-
 from django_q.tasks import async_task
 from django.contrib import admin
 from django.contrib.messages import constants as messages
-from django.utils.safestring import mark_safe
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import JsonLexer
 
-from questions.services.slack import send_submission_slack
-from questions.services.submission import send_submission_email
-from questions.services.actionstep import send_submission_actionstep
+from core.services.slack import send_submission_slack
+from actionstep.services.actionstep import send_submission_actionstep
+from utils.admin import admin_link, dict_to_json_html
 
 from .models import FileUpload, Submission, Client, Person
 
@@ -18,7 +12,12 @@ from .models import FileUpload, Submission, Client, Person
 @admin.register(FileUpload)
 class FileUploadAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    list_display = ("id", "created_at", "modified_at", "file")
+    list_display = ("id", "created_at", "submission_link", "file")
+    list_select_related = ("submission",)
+
+    @admin_link("submission", "Submission")
+    def submission_link(self, submission):
+        return submission.id
 
 
 @admin.register(Person)
@@ -46,11 +45,11 @@ class ClientAdmin(admin.ModelAdmin):
 class SubmissionAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     readonly_fields = ("answers_json",)
+    exclude = ("answers",)
     list_display = (
         "id",
         "topic",
         "created_at",
-        "modified_at",
         "complete",
         "is_alert_sent",
         "is_data_sent",
@@ -61,7 +60,6 @@ class SubmissionAdmin(admin.ModelAdmin):
         "topic",
         "complete",
         "is_alert_sent",
-        "is_data_sent",
         "is_case_sent",
         "is_reminder_sent",
     )
@@ -78,7 +76,6 @@ class SubmissionAdmin(admin.ModelAdmin):
 
     def notify(self, request, queryset):
         for submission in queryset:
-            async_task(send_submission_email, str(submission.pk))
             async_task(send_submission_slack, str(submission.pk))
 
         self.message_user(request, "Notifications sent.", level=messages.INFO)
@@ -88,10 +85,3 @@ class SubmissionAdmin(admin.ModelAdmin):
     def answers_json(self, instance):
         return dict_to_json_html(instance.answers)
 
-
-def dict_to_json_html(data):
-    json_str = json.dumps(data, sort_keys=True, indent=2)
-    formatter = HtmlFormatter(style="colorful")
-    highlighted = highlight(json_str, JsonLexer(), formatter)
-    style = "<style>" + formatter.get_style_defs() + "</style><br>"
-    return mark_safe(style + highlighted)

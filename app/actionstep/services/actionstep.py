@@ -7,15 +7,26 @@ from slack.services import send_slack_message
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
-from questions.models import Submission
+from core.models import Submission
+from core.models.submission import CaseTopic
 from utils.sentry import WithSentryCapture
 
 from .pdf import create_pdf
 
+
 logger = logging.getLogger(__name__)
 
-PREFIX_LOOKUP = {"REPAIRS": "R", "COVID": "C"}
-ACTION_TYPE_LOOKUP = {"REPAIRS": ActionType.REPAIRS, "COVID": ActionType.COVID}
+PREFIX_LOOKUP = {
+    CaseTopic.REPAIRS: "R",
+    CaseTopic.RENT_REDUCTION: "C",
+    CaseTopic.OTHER: "O",
+}
+# TODO: Add Other case topic in actionstep
+ACTION_TYPE_LOOKUP = {
+    CaseTopic.REPAIRS: ActionType.REPAIRS,
+    CaseTopic.RENT_REDUCTION: ActionType.COVID,
+    CaseTopic.OTHER: None,
+}
 
 
 def _send_submission_actionstep(submission_pk: str):
@@ -31,26 +42,26 @@ def _send_submission_actionstep(submission_pk: str):
     # Fetch new action owner.
     owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
     owner_data = api.participants.get_by_email(owner_email)
-    logger.info("Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"])
+    logger.info(
+        "Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"]
+    )
 
-    # Pull client data out of the Submission answers JSON.
-    # FIXME: This is pretty bad in that we depend on an schemaless JSON object that is set by the frontend.
-    answers = {a["name"]: a["answer"] for a in submission.answers}
-    client_name = answers["CLIENT_NAME"]
-    client_phone = answers["CLIENT_PHONE"]
-    client_email = answers["CLIENT_EMAIL"]
-    client_firstname = client_name.split(" ")[0]
-    client_lastname = client_name.split(" ")[-1]
+    answers = submission.answers
+    client = submission.client
 
     # Ensure participant is in the system.
-    logger.info("Try to create participant %s, %s.", client_name, client_email)
+    logger.info(
+        "Try to create participant %s, %s.", client.get_full_name(), client.email
+    )
     participant_data, created = api.participants.get_or_create(
-        client_firstname, client_lastname, client_email, client_phone
+        client.first_name, client.last_name, client.email, client.phone_number
     )
     if created:
-        logger.info("Created participant %s, %s.", client_name, client_email)
+        logger.info("Created participant %s, %s.", client.get_full_name(), client.email)
     else:
-        logger.info("Participant %s, %s already exists.", client_name, client_email)
+        logger.info(
+            "Participant %s, %s already exists.", client.get_full_name(), client.email
+        )
 
     # Check if this submission already has an action
     action_id = None
@@ -71,20 +82,24 @@ def _send_submission_actionstep(submission_pk: str):
         # We need to create a new matter
         file_ref_prefix = PREFIX_LOOKUP[submission.topic]
         fileref_name = api.actions.get_next_ref(file_ref_prefix)
-        logger.info("Creating new matter %s for %s", fileref_name, client_name)
+        logger.info(
+            "Creating new matter %s for %s", fileref_name, client.get_full_name()
+        )
         action_type_name = ACTION_TYPE_LOOKUP[submission.topic]
         action_type_data = api.actions.action_types.get_for_name(action_type_name)
         action_type_id = action_type_data["id"]
         action_data = api.actions.create(
             submission_id=submission.pk,
             action_type_id=action_type_id,
-            action_name=client_name,
+            action_name=client.get_full_name(),
             file_reference=fileref_name,
             participant_id=owner_data["id"],
         )
         action_id = action_data["id"]
         client_id = participant_data["id"]
-        api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
+        api.participants.set_action_participant(
+            action_id, client_id, Participant.CLIENT
+        )
 
     # Upload files. Note that multiple uploads will create copies.
     logger.info("Generating PDF for Submission<%s>", submission.id)
@@ -105,14 +120,19 @@ def _send_submission_actionstep(submission_pk: str):
         logger.info("Attaching doc %s to Actionstep action %s", name, action_id)
         api.files.attach(name, doc.actionstep_id, action_id, doc.folder)
 
-    logger.info("Marking Actionstep integration complete for Submission<%s>", submission.id)
+    logger.info(
+        "Marking Actionstep integration complete for Submission<%s>", submission.id
+    )
     Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
 
     # Try send a Slack message
-    logging.info("Notifying Slack of Actionstep integration for Submission<%s>", submission_pk)
+    logging.info(
+        "Notifying Slack of Actionstep integration for Submission<%s>", submission_pk
+    )
 
     action_url = urljoin(
-        settings.ACTIONSTEP_WEB_URI, f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
+        settings.ACTIONSTEP_WEB_URI,
+        f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
     )
 
     topic_title = submission.topic.title()
@@ -121,3 +141,25 @@ def _send_submission_actionstep(submission_pk: str):
 
 
 send_submission_actionstep = WithSentryCapture(_send_submission_actionstep)
+
+
+def _upload_action_document(doc_pk: str):
+    """
+    Send a submission to Actionstep.
+    """
+    doc = ActionDocument.objects.get(pk=doc_pk)
+    if doc.actionstep_id:
+        logger.error("ActionDocument<%s]> already has an Actionstep ID", doc_pk)
+        return
+
+    logger.info("Uploading ActionDocument<%s]> to Actionstep", doc_pk)
+    api = ActionstepAPI()
+    doc_bytes = doc.document.file.read()
+    doc_filename = doc.get_filename()
+    file_data = api.files.upload(doc_filename, doc_bytes)
+    doc.actionstep_id = file_data["id"]
+    doc.save()
+    logger.info("Sucessfully uploaded ActionDocument<%s]> to Actionstep", doc_pk)
+
+
+upload_action_document = WithSentryCapture(_upload_action_document)

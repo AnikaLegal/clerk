@@ -34,3 +34,12 @@ class Client(TimestampedModel):
         max_length=32, choices=CALL_TIME_CHOICES, blank=True, null=True
     )
     is_eligible = models.BooleanField(null=True, blank=True)
+    # Tracks whether MailChimp reminder email has been successfully sent.
+    is_reminder_sent = models.BooleanField(default=False)
+
+    def get_full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def __str__(self) -> str:
+        name = self.get_full_name()
+        return f"{name} ({self.id})"

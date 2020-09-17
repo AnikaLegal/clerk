@@ -9,9 +9,6 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
 
 from questions.models import FileUpload, ImageUpload, Submission
-from questions.services.slack import send_submission_slack
-from questions.services.submission import send_submission_email
-from questions.services.actionstep import send_submission_actionstep
 
 
 @admin.register(Submission)
@@ -26,28 +23,14 @@ class SubmissionAdmin(admin.ModelAdmin):
         "modified_at",
         "num_answers",
         "complete",
-        "is_case_sent"
+        "is_case_sent",
+        "is_reminder_sent",
     )
-    list_filter = ("topic", "complete")
-
-    actions = ["notify", "integrate"]
-
-    def integrate(self, request, queryset):
-        for submission in queryset:
-            async_task(send_submission_actionstep, str(submission.pk))
-
-        self.message_user(request, "Integrations sent.", level=messages.INFO)
-
-    integrate.short_description = "Integrate with external systems"
-
-    def notify(self, request, queryset):
-        for submission in queryset:
-            async_task(send_submission_email, str(submission.pk))
-            async_task(send_submission_slack, str(submission.pk))
-
-        self.message_user(request, "Notifications sent.", level=messages.INFO)
-
-    notify.short_description = "Send notifications"
+    list_filter = (
+        "topic",
+        "complete",
+        "is_reminder_sent",
+    )
 
     def answers_json(self, instance):
         return dict_to_json_html(instance.answers)

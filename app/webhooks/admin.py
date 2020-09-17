@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import WebflowContact, JotformSubmission
-from questions.admin import dict_to_json_html
+from utils.admin import dict_to_json_html
 
 
 @admin.register(WebflowContact)

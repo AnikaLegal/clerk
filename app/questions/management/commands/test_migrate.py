@@ -28,69 +28,166 @@ class Command(BaseCommand):
         Tenancy.objects.all().delete()
 
         for old_sub in SubmissionOld.objects.all():
-            client = get_client(old_sub, Client)
+            client, created = get_client(old_sub, Client)
             if not client:
                 continue
 
-            # Agent
-            # "LANDLORD_HAS_AGENT",
-            # "AGENT_ADDRESS",
-            # "AGENT_COMPANY",
-            # "AGENT_EMAIL",
-            # "AGENT_NAME",
-            # "AGENT_PHONE",
+            if not old_sub.complete:
+                continue
 
-            # Landlord
-            # "LANDLORD_ADDRESS",
-            # "LANDLORD_EMAIL",
-            # "LANDLORD_NAME",
-            # "LANDLORD_PHONE",
+            tenancy = get_tenancy(old_sub, client, Tenancy, Person)
+            if not tenancy:
+                continue
 
-            # Tenancy
-            # "CLIENT_IS_TENANT",
-            # "CLIENT_RENTAL_ADDRESS",
-            # "TENANCY_START_DATE",
+            sub, created = Submission.objects.get_or_create(
+                id=old_sub.id,
+                defaults={
+                    "created_at": old_sub.created_at,
+                    "topic": update_topic(old_sub.topic),
+                    "answers": {
+                        a["name"]: a.get("answer")
+                        for a in old_sub.answers
+                        if "name" in a
+                    },
+                    "client": client,
+                    "complete": old_sub.complete,
+                    "is_alert_sent": old_sub.is_alert_sent,
+                    "is_case_sent": old_sub.is_case_sent,
+                },
+            )
 
-            # Submission
+            if old_sub.is_reminder_sent:
+                client.is_reminder_sent = True
+                client.save()
+
+            for item in sub.answers:
+                answer = item.get("answer")
+                is_img = answer and (type(answer) is list) and ("image" in answer[0])
+                is_file = answer and (type(answer) is list) and ("file" in answer[0])
+                if not (is_img or is_file):
+                    continue
+
+                for upload in answer:
+                    if is_img:
+                        try:
+                            upload = ImageUploadOld.objects.get(id=upload["id"])
+                            name = upload.image.name
+                        except ImageUploadOld.DoesNotExist:
+                            continue
+
+                    else:
+                        try:
+                            upload = FileUploadOld.objects.get(id=upload["id"])
+                            name = upload.file.name
+                        except FileUploadOld.DoesNotExist:
+                            continue
+
+                    FileUpload.objects.get_or_create(
+                        id=upload.id, defaults={"file": name, "submission": sub}
+                    )
+
+
+def get_tenancy(old_sub, client, Tenancy, Person):
+    # Tenancy
+    is_tenant = make_bool(get_answer(old_sub.answers, "CLIENT_IS_TENANT"))
+    address = get_answer(old_sub.answers, "CLIENT_RENTAL_ADDRESS")
+    start_date = get_answer(old_sub.answers, "TENANCY_START_DATE")
+    if not address:
+        return None, False
+
+    start_date = parse_dob(start_date)
+
+    # Agent
+    landlord_has_agent = make_bool(get_answer(old_sub.answers, "LANDLORD_HAS_AGENT"))
+    agent_email = get_answer(old_sub.answers, "AGENT_EMAIL")
+    agent_name = get_answer(old_sub.answers, "AGENT_NAME")
+    agent_company = get_answer(old_sub.answers, "AGENT_COMPANY") or ""
+    agent_address = get_answer(old_sub.answers, "AGENT_ADDRESS") or ""
+    agent_phone = parse_phone(get_answer(old_sub.answers, "AGENT_PHONE") or "")
+    if agent_email and "http://" in agent_email:
+        agent_email = None
+
+    # Landlord
+    landlord_email = get_answer(old_sub.answers, "LANDLORD_EMAIL")
+    landlord_name = get_answer(old_sub.answers, "LANDLORD_NAME")
+    landlord_address = get_answer(old_sub.answers, "LANDLORD_ADDRESS") or ""
+    landlord_phone = parse_phone(get_answer(old_sub.answers, "LANDLORD_PHONE") or "")
+
+    is_agent_data = all([agent_email, agent_name])
+    is_landlord_data = all([landlord_email, landlord_name])
+
+    if agent_email and ":" in agent_email:
+        agent_email = agent_email.split(":")[1].strip()
+
+    agent = None
+    if is_agent_data and not agent_name in JUNK_PERSON_NAMES:
+        agent = Person.objects.create(
+            full_name=agent_name.title(),
+            address=agent_address,
+            email=agent_email,
+            company=agent_company,
+            phone_number=agent_phone,
+            created_at=old_sub.created_at,
+        )
+
+    landlord = None
+    if is_landlord_data and not landlord_name in JUNK_PERSON_NAMES:
+        landlord = Person.objects.create(
+            full_name=landlord_name.title(),
+            address=landlord_address,
+            email=landlord_email,
+            phone_number=landlord_phone,
+            created_at=old_sub.created_at,
+        )
+
+    return Tenancy.objects.get_or_create(
+        address=address,
+        client=client,
+        defaults={
+            "is_on_lease": is_tenant,
+            "started": start_date,
+            "created_at": old_sub.created_at,
+            "landlord": landlord,
+            "agent": agent,
+        },
+    )
 
 
 def get_client(old_sub, Client):
     name = get_answer(old_sub.answers, "CLIENT_NAME")
     if name in JUNK_NAMES or not name:
-        return
+        return None, False
 
     name_parts = name.strip().split(" ")
     first_name = name_parts[0].title()
     last_name = " ".join(name_parts[1:]).title()
-    # print(first_name, "|", last_name)
 
     email = get_answer(old_sub.answers, "CLIENT_EMAIL") or ""
     email = email.lower()
     if email in JUNK_EMAILS or not email:
-        return
+        return None, False
 
     date_of_birth = get_answer(old_sub.answers, "CLIENT_DOB")
     date_of_birth = parse_dob(date_of_birth)
 
     phone_number = get_answer(old_sub.answers, "CLIENT_PHONE")
     phone_number = parse_phone(phone_number)
-    if phone_number:
-        pass
-        # print(phone_number)
 
     call_time = get_answer(old_sub.answers, "CLIENT_CALL_TIME") or []
     call_time = parse_call_time(call_time)
     is_eligible = True
 
-    return Client.objects.create(
-        first_name=first_name,
-        last_name=last_name,
+    return Client.objects.get_or_create(
         email=email,
-        date_of_birth=date_of_birth,
-        phone_number=phone_number,
-        call_time=call_time,
-        is_eligible=is_eligible,
-        created_at=old_sub.created_at,
+        defaults={
+            "first_name": first_name,
+            "last_name": last_name,
+            "date_of_birth": date_of_birth,
+            "phone_number": phone_number,
+            "call_time": call_time,
+            "is_eligible": is_eligible,
+            "created_at": old_sub.created_at,
+        },
     )
 
 
@@ -140,7 +237,20 @@ def parse_dob(s: str):
     return dt.replace(hour=0, minute=0)
 
 
+def make_bool(s):
+    if s == "yes":
+        return True
+    elif s == "no":
+        return False
+    else:
+        return None
+
+
 JUNK_EMAILS = [
+    "kate.robinson@anikalegal.com",
+    "tori@anikalegal.com",
+    "cvfewadfefdssdf",
+    "zzz",
     "2217912855@qq.com",
     "2227164141@qq.com",
     "adfwae@gmail.com",
@@ -220,5 +330,35 @@ JUNK_NAMES = [
 JUNK_DATES = [
     "190-1-11",
     "198-3-22",
+    "20109-3-15",
 ]
 
+
+JUNK_PERSON_NAMES = [
+    "-",
+    ".",
+    "A",
+    "Don't know",
+    "Don't know. Daya something or other",
+    "Don’t know ",
+    "dont know",
+    "n/a",
+    "N/A",
+    "na",
+    "No idea",
+    "Not mentioned",
+    "Not sure",
+    "not sure, he is a new owner",
+    "TBC",
+    "Unknown",
+    "Unknown ",
+    "unsure",
+    "Unsure",
+]
+
+
+def update_topic(s):
+    if s == "COVID":
+        return "RENT_REDUCTION"
+    else:
+        return s

@@ -31,9 +31,5 @@ class Submission(TimestampedModel):
     complete = models.BooleanField(default=False)
     # Tracks whether a Slack alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)
-    # Tracks whether the case data has been successfully sent via email.
-    is_data_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
     is_case_sent = models.BooleanField(default=False)
-    # Tracks whether MailChimp reminder email has been successfully sent.
-    is_reminder_sent = models.BooleanField(default=False)

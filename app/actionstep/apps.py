@@ -17,6 +17,7 @@ class ActionstepConfig(AppConfig):
     def ready(self):
         """
         Setup new schedules. This might be a stupid way to do this.
+        FIXME: This is stupid, stop doing this.
         """
         import actionstep.signals
 

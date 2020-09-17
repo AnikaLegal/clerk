@@ -20,9 +20,6 @@
         font-weight: 600;
         color: #333;
       }
-      .answer .key {
-        color: #666;
-      }
     </style>
   </head>
   <body>
@@ -32,22 +29,13 @@
       This is a client's submission ({{submission.pk}}), first created at
       {{submission.created_at|date:"l jS F Y "}}.
     </p>
-    {% if docs %}
+    {% if uploads %}
     <p>
-      The client attached the following documents to their submission:
+      The client attached the following uploads to their submission:
     </p>
     <ul>
-      {% for doc in docs%}
-      <li><a href="{{doc.url}}">{{doc.name}}</a></li>
-      {% endfor %}
-    </ul>
-    {% endif %} {% if images %}
-    <p>
-      The client attached the following images to their submission:
-    </p>
-    <ul>
-      {% for image in images%}
-      <li><a href="{{image.url}}">{{image.name}}</a></li>
+      {% for upload in uploads%}
+      <li><a href="{{upload.url}}">{{upload.name}}</a></li>
       {% endfor %}
     </ul>
     {% endif %}
@@ -58,7 +46,7 @@
 
     {% for answer in answers %}
     <div class="answer">
-      <h2>{{answer.prompt}} <span class="key">({{answer.name}})</span></h2>
+      <h2>{{ answer.name }})</h2>
       {% for a in answer.answers %}
       <p>{{a}}</p>
       {% endfor %}

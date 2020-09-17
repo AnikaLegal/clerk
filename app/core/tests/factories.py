@@ -30,29 +30,12 @@ class SubmissionFactory(TimestampedModelFactory):
 
 
 @factory.django.mute_signals(post_save)
-class ImageUploadFactory(TimestampedModelFactory):
-    class Meta:
-        model = ImageUpload
-
-    id = factory.LazyAttribute(lambda x: uuid4())
-
-    @factory.post_generation
-    def image(self, create, extracted, **kwargs):
-        if extracted:
-            file_name, file = extracted
-        else:
-            file_name = "image.png"
-            file = get_dummy_file(file_name)
-
-        self.image.save(file_name, file)
-
-
-@factory.django.mute_signals(post_save)
 class FileUploadFactory(TimestampedModelFactory):
     class Meta:
         model = FileUpload
 
     id = factory.LazyAttribute(lambda x: uuid4())
+    submission = factory.SubFactory(SubmissionFactory)
 
     @factory.post_generation
     def file(self, create, extracted, **kwargs):

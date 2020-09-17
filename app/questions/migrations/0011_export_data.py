@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("questions", "0010_submission_is_reminder_sent"),
-        ("core", "0002_submission_client"),
+        ("core", "0001_initial"),
         ("tenancy", "0001_initial"),
     ]
 

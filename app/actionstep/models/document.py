@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-from questions.models.timestamped import TimestampedModel
-from questions.models.submission import Submission
+from core.models import TimestampedModel, Submission
 from actionstep.constants import ActionFolder
 
 

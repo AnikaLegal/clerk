@@ -5,7 +5,7 @@ from django_q.tasks import async_task
 
 from .models import AccessToken, ActionDocument
 from .auth import refresh_tokens
-from .services import upload_action_document
+from .services.actionstep import upload_action_document
 
 
 @admin.register(ActionDocument)
