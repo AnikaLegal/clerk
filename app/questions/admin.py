@@ -1,13 +1,6 @@
-import json
-
 from django.contrib import admin
-from django.contrib.messages import constants as messages
-from django.utils.safestring import mark_safe
-from django_q.tasks import async_task
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import JsonLexer
 
+from utils.admin import dict_to_json_html
 from questions.models import FileUpload, ImageUpload, Submission
 
 
@@ -46,11 +39,3 @@ class ImageUploadAdmin(admin.ModelAdmin):
 class FileUploadAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     list_display = ("id", "created_at", "modified_at", "file")
-
-
-def dict_to_json_html(data):
-    json_str = json.dumps(data, sort_keys=True, indent=2)
-    formatter = HtmlFormatter(style="colorful")
-    highlighted = highlight(json_str, JsonLexer(), formatter)
-    style = "<style>" + formatter.get_style_defs() + "</style><br>"
-    return mark_safe(style + highlighted)

@@ -13,13 +13,11 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=Submission)
 def save_submission(sender, instance, **kwargs):
-    submission = instance
-    if submission.complete:
-        if not submission.is_alert_sent:
-            logger.info("Dispatching alert task for Submission<%s]>", submission.id)
-            async_task(send_submission_slack, str(submission.pk))
-        if not submission.is_case_sent:
-            logger.info(
-                "Dispatching Actionstep task for Submission<%s]>", submission.id
-            )
-            async_task(send_submission_actionstep, str(submission.pk))
+    sub = instance
+    if sub.complete:
+        if not sub.is_alert_sent:
+            logger.info("Dispatching alert task for Submission<%s]>", sub.id)
+            async_task(send_submission_slack, str(sub.pk))
+        if not sub.is_case_sent:
+            logger.info("Dispatching Actionstep task for Submission<%s]>", sub.id)
+            async_task(send_submission_actionstep, str(sub.pk))

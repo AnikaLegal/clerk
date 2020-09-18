@@ -6,7 +6,7 @@ from core.services.slack import send_submission_slack
 from actionstep.services.actionstep import send_submission_actionstep
 from utils.admin import admin_link, dict_to_json_html
 
-from .models import FileUpload, Submission, Client, Person
+from .models import FileUpload, Submission, Client, Person, Tenancy
 
 
 @admin.register(FileUpload)
@@ -37,6 +37,7 @@ class ClientAdmin(admin.ModelAdmin):
         "phone_number",
         "is_eligible",
         "created_at",
+        "is_reminder_sent",
     )
     list_filter = ("is_eligible",)
 
@@ -52,16 +53,13 @@ class SubmissionAdmin(admin.ModelAdmin):
         "created_at",
         "complete",
         "is_alert_sent",
-        "is_data_sent",
         "is_case_sent",
-        "is_reminder_sent",
     )
     list_filter = (
         "topic",
         "complete",
         "is_alert_sent",
         "is_case_sent",
-        "is_reminder_sent",
     )
 
     actions = ["notify", "integrate"]
@@ -85,3 +83,32 @@ class SubmissionAdmin(admin.ModelAdmin):
     def answers_json(self, instance):
         return dict_to_json_html(instance.answers)
 
+
+@admin.register(Tenancy)
+class TenancyAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "address",
+        "client_link",
+        "landlord_link",
+        "agent_link",
+        "created_at",
+    )
+    list_select_related = (
+        "client",
+        "landlord",
+        "agent",
+    )
+
+    @admin_link("client", "Client")
+    def client_link(self, client):
+        return client.get_full_name()
+
+    @admin_link("landlord", "Landlord")
+    def landlord_link(self, landlord):
+        return landlord.full_name
+
+    @admin_link("agent", "Agent")
+    def agent_link(self, agent):
+        return agent.full_name

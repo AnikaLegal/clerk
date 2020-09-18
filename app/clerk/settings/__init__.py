@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
     "core.apps.CoreConfig",
-    "tenancy.apps.TenancyConfig",
 ]
 
 MIDDLEWARE = [

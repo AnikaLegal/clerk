@@ -19,7 +19,7 @@ class Command(BaseCommand):
         Client = apps.get_model("core", "Client")
         Person = apps.get_model("core", "Person")
         FileUpload = apps.get_model("core", "FileUpload")
-        Tenancy = apps.get_model("tenancy", "Tenancy")
+        Tenancy = apps.get_model("core", "Tenancy")
 
         Submission.objects.all().delete()
         Client.objects.all().delete()

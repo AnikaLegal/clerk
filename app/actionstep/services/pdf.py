@@ -1,8 +1,7 @@
 import weasyprint
 from django.template.loader import render_to_string
 
-from core.models import FileUpload, Submission
-from tenancy.models import Tenancy
+from core.models import FileUpload, Submission, Tenancy
 
 
 def create_pdf(submission: Submission):

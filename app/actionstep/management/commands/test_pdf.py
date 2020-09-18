@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from questions.models import Submission
-from questions.services.submission import create_pdf
+from core.models import Submission
+from actionstep.services.pdf import create_pdf
 
 
 class Command(BaseCommand):
