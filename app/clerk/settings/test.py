@@ -11,8 +11,9 @@ DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "test_media")
 
 ACTIONSTEP_SETUP_OWNERS = {
-    "COVID": "keithleonardo@anikalegal.com",
     "REPAIRS": "keithleonardo@anikalegal.com",
+    "RENT_REDUCTION": "keithleonardo@anikalegal.com",
+    "OTHER": "keithleonardo@anikalegal.com",
 }
 
 

@@ -21,7 +21,8 @@ ACTIONSTEP_OAUTH_URI = "https://go.actionstepstaging.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstepstaging.com"
 ACTIONSTEP_SETUP_OWNERS = {
     "REPAIRS": "matt@anikalegal.com",
-    "COVID": "matt@anikalegal.com",
+    "RENT_REDUCTION": "matt@anikalegal.com",
+    "OTHER": "matt@anikalegal.com",
 }
 
 ADMIN_PREFIX = "local"

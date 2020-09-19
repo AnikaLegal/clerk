@@ -8,12 +8,12 @@ from actionstep.api.base import BaseEndpoint
 TEST_URL = "https://example.com/rest/test/"
 
 
-class TestEndpoint(BaseEndpoint):
+class _TestEndpoint(BaseEndpoint):
     resource = "test"
 
 
 def _get_endpoint():
-    return TestEndpoint(base_url="https://example.com", access_token="access")
+    return _TestEndpoint(base_url="https://example.com", access_token="access")
 
 
 def _add_response(method, data, status, suffix=""):

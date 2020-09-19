@@ -20,7 +20,7 @@ def run_problems():
     df = df[df["complete"] == 1]
     df = filter_by_start_date(df, "created_at", "referral")
     repairs_df = df[df["topic"] == "REPAIRS"]
-    covid_df = df[df["topic"] == "COVID"]
+    rr_df = df[df["topic"] == "RENT_REDUCTION"]
 
     st.subheader("Repairs client issues")
     num_repairs_cases = len(repairs_df)
@@ -28,12 +28,14 @@ def run_problems():
     plot_category_counts(repairs_df, "DEFECT_TYPE")
 
     download_df = repairs_df[["DEFECT_TYPE", "DEFECT_DESCRIPTION"]].copy()
-    df_download_link(download_df, "Download repairs issue type CSV", "repairs-issue-types")
+    df_download_link(
+        download_df, "Download repairs issue type CSV", "repairs-issue-types"
+    )
 
-    st.subheader("COVID client issues")
-    num_covid_cases = len(covid_df)
-    st.text(f"Found {num_covid_cases} submitted repairs cases")
-    plot_category_counts(covid_df, "ISSUE_TYPE")
+    st.subheader("Rent reduction client issues")
+    num_covid_cases = len(rr_df)
+    st.text(f"Found {num_covid_cases} submitted rent reduction cases")
+    plot_category_counts(rr_df, "ISSUE_TYPE")
 
-    download_df = covid_df[["ISSUE_TYPE", "ISSUE_DESCRIPTION"]].copy()
+    download_df = rr_df[["ISSUE_TYPE", "ISSUE_DESCRIPTION"]].copy()
     df_download_link(download_df, "Download COVID issue type CSV", "covid-issue-types")

@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.conf import settings
 
 
-from questions.models import Submission
+from core.models import Submission
 from .utils import filter_by_start_date, filter_by_end_date, df_download_link
 
 
@@ -30,7 +30,9 @@ def run_referrals():
     df_download_link(data_df, "Download referrals CSV", "referrals")
 
     st.subheader("Referral channels")
-    topic = st.selectbox("Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral")
+    topic = st.selectbox(
+        "Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral"
+    )
     data_df = filter_by_start_date(data_df, "created_at", "referral")
     data_df = filter_by_end_date(data_df, "created_at", "referral")
 
@@ -83,7 +85,7 @@ def get_referral_df():
         .values(*["topic", "created_at", "answers", "complete"])
     )
     for datum in data:
-        answers = {a["name"]: a.get("answer") for a in datum["answers"]}
+        answers = datum["answers"]
         del datum["answers"]
         for question in questions:
             datum[question] = answers.get(question)
