@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+from core.factories import get_dummy_file
+
 
 @pytest.mark.skip
 @pytest.mark.django_db

@@ -29,7 +29,7 @@ class Client(TimestampedModel):
     last_name = models.CharField(max_length=150)
     email = models.EmailField(max_length=150)
     date_of_birth = models.DateTimeField(null=True, blank=True)
-    phone_number = models.CharField(max_length=16, blank=True, default="")
+    phone_number = models.CharField(max_length=32, blank=True, default="")
     call_time = models.CharField(
         max_length=32, choices=CALL_TIME_CHOICES, blank=True, null=True
     )

@@ -1,9 +1,7 @@
 import uuid
 
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-
 from .timestamped import TimestampedModel
 
 
@@ -24,8 +22,8 @@ class Submission(TimestampedModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES, default="REPAIRS")
-    questions = JSONField(encoder=DjangoJSONEncoder)
-    answers = JSONField(encoder=DjangoJSONEncoder)
+    questions = models.JSONField(encoder=DjangoJSONEncoder)
+    answers = models.JSONField(encoder=DjangoJSONEncoder)
     num_answers = models.IntegerField(default=0)
     complete = models.BooleanField(default=False)
     # Tracks whether a Slack alert has been successfully sent.

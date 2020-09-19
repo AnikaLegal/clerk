@@ -7,6 +7,7 @@ from django_q.tasks import async_task
 from core.models import Submission
 from core.services.slack import send_submission_slack
 from core.services.actionstep import send_submission_actionstep
+from actionstep.services.actionstep import send_submission_actionstep
 
 logger = logging.getLogger(__name__)
 

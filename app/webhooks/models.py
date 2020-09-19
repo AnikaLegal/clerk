@@ -1,6 +1,5 @@
 import uuid
 
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
@@ -31,4 +30,4 @@ class JotformSubmission(TimestampedModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     form_name = models.CharField(max_length=128)
-    answers = JSONField(encoder=DjangoJSONEncoder)
+    answers = models.JSONField(encoder=DjangoJSONEncoder)

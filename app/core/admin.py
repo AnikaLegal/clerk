@@ -49,11 +49,12 @@ class SubmissionAdmin(admin.ModelAdmin):
     exclude = ("answers",)
     list_display = (
         "id",
-        "topic",
-        "created_at",
+        "topic_pretty",
+        "client_link",
         "complete",
         "is_alert_sent",
         "is_case_sent",
+        "created_at",
     )
     list_filter = (
         "topic",
@@ -61,6 +62,17 @@ class SubmissionAdmin(admin.ModelAdmin):
         "is_alert_sent",
         "is_case_sent",
     )
+
+    list_select_related = ("client",)
+
+    def topic_pretty(self, sub):
+        return sub.topic.replace("_", " ").title()
+
+    topic_pretty.short_description = "topic"
+
+    @admin_link("client", "Client")
+    def client_link(self, client):
+        return client.get_full_name()
 
     actions = ["notify", "integrate"]
 

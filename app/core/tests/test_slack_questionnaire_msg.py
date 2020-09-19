@@ -2,10 +2,10 @@ from unittest import mock
 
 import pytest
 
-from questions.services import slack
-from questions.services.slack import send_submission_slack
-from questions.tests.factories import SubmissionFactory
-from questions.models import Submission
+from core.services import slack
+from core.services.slack import send_submission_slack
+from core.factories import SubmissionFactory
+from core.models import Submission
 
 
 @pytest.mark.django_db

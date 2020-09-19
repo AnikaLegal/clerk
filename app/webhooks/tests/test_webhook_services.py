@@ -5,7 +5,7 @@ from django.conf import settings
 
 from webhooks.services import slack
 from webhooks.services.slack import send_webflow_contact_slack
-from webhooks.tests.factories import WebflowContactFactory
+from webhooks.factories import WebflowContactFactory
 from webhooks.models import WebflowContact
 
 

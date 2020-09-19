@@ -7,8 +7,8 @@ from django.conf import settings
 from unittest import mock
 import pytest
 
-from questions.services.mailchimp import remind_incomplete, find_clients
-from questions.tests.factories import SubmissionFactory
+from core.factories import SubmissionFactory
+from core.services.mailchimp import remind_incomplete, find_clients
 
 
 # Sample answers for testing

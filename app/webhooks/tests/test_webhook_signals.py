@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from webhooks.tests.factories import WebflowContactFactory
+from webhooks.factories import WebflowContactFactory
 from webhooks.services.slack import send_webflow_contact_slack
 
 

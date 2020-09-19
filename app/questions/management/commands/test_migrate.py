@@ -5,11 +5,15 @@ from django.core.management.base import BaseCommand
 from django.apps import apps
 from django.utils import timezone
 
+from utils.signals import disable_signals
+
 
 class Command(BaseCommand):
     help = "Test migration"
 
     def handle(self, *args, **kwargs):
+        disable_signals()
+
         # Old models
         SubmissionOld = apps.get_model("questions", "Submission")
         FileUploadOld = apps.get_model("questions", "FileUpload")
@@ -60,7 +64,7 @@ class Command(BaseCommand):
                 client.is_reminder_sent = True
                 client.save()
 
-            for item in sub.answers:
+            for item in old_sub.answers:
                 answer = item.get("answer")
                 is_img = answer and (type(answer) is list) and ("image" in answer[0])
                 is_file = answer and (type(answer) is list) and ("file" in answer[0])

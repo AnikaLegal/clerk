@@ -10,7 +10,7 @@ def create_pdf(submission: Submission):
     """
     client = submission.client
     uploads = FileUpload.objects.filter(submission=submission)
-    tenancy = Tenancy.objects.get(client=client).select_related("landlord", "agent")
+    tenancy = Tenancy.objects.select_related("landlord", "agent").get(client=client)
 
     client_info = [
         {"name": "Client name", "answers": [client.get_full_name()]},
@@ -35,10 +35,10 @@ def create_pdf(submission: Submission):
 
     people = []
     people_info = []
-    if client.agent:
-        people.append(["Agent", client.agent])
-    if client.landlord:
-        people.append(["Landlord", client.landlord])
+    if tenancy.agent:
+        people.append(["Agent", tenancy.agent])
+    if tenancy.landlord:
+        people.append(["Landlord", tenancy.landlord])
 
     for title, person in people:
         if person.full_name:
