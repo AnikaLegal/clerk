@@ -42,7 +42,7 @@ def test_slack_not_dispatched_when_already_sent(mock_async):
     submission.save()
     # Ensure only email task was dispatched
     mock_async.assert_has_calls(
-        [[mock.call(send_submission_actionstep, str(submission.pk))],]
+        [mock.call(send_submission_actionstep, str(submission.pk))]
     )
 
 
@@ -60,9 +60,7 @@ def test_actionstep_not_dispatched_when_already_sent(mock_async):
     submission.complete = True
     submission.save()
     # Ensure only email task was dispatched
-    mock_async.assert_has_calls(
-        [[mock.call(send_submission_slack, str(submission.pk))],]
-    )
+    mock_async.assert_has_calls([mock.call(send_submission_slack, str(submission.pk))])
 
 
 @pytest.mark.django_db

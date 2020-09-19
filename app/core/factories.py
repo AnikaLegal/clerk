@@ -79,6 +79,7 @@ class SubmissionFactory(TimestampedModelFactory):
 
     id = factory.LazyAttribute(lambda x: uuid4())
     topic = "REPAIRS"
+    answers = {}
     client = factory.SubFactory(ClientFactory)
 
 

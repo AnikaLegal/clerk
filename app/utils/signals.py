@@ -27,7 +27,7 @@ def restore_signals():
     """
     When the test tears down, restore the signals.
     """
-    keys = list(RESTORE.keys())
-    for k in keys:
-        signal.receivers = RESTORE[k]
-        del RESTORE[k]
+    signals = list(RESTORE.keys())
+    for signal in signals:
+        signal.receivers = RESTORE[signal]
+        del RESTORE[signal]
