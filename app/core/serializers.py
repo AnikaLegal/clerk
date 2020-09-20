@@ -41,9 +41,9 @@ class TenancySerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = ("id", "topic", "complete", "answers", "client", "file_uploads")
+        fields = ("id", "topic", "complete", "answers", "client", "fileupload_set")
 
-    file_uploads = FileUploadSerializer(many=True, read_only=True)
+    fileupload_set = FileUploadSerializer(many=True, read_only=True)
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -58,9 +58,9 @@ class ClientSerializer(serializers.ModelSerializer):
             "phone_number",
             "call_time",
             "is_eligible",
-            "submissions",
-            "tenancy",
+            "submission_set",
+            "tenancy_set",
         )
 
-    tenancy = TenancySerializer(read_only=True)
-    submissions = SubmissionSerializer(many=True, read_only=True)
+    tenancy_set = TenancySerializer(many=True, read_only=True)
+    submission_set = SubmissionSerializer(many=True, read_only=True)

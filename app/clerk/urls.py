@@ -6,13 +6,15 @@ from rest_framework import routers
 from actionstep.views import start_oauth_view, end_oauth_view
 from webhooks.views import webflow_form_view, jotform_form_view
 from reports.views import reports_view
-
+from core import views as core_views
 
 router = routers.SimpleRouter()
-# from questions.views import apis
-# router.register("submission", apis.SubmissionViewSet, basename="submission")
-# router.register("images", apis.ImageUploadViewSet, basename="images")
-# router.register("files", apis.FileUploadViewSet, basename="files")
+router.register("client", core_views.ClientViewSet, basename="client")
+router.register("person", core_views.PersonViewSet, basename="person")
+router.register("upload", core_views.UploadViewSet, basename="upload")
+router.register("tenancy", core_views.TenancyViewSet, basename="tenancy")
+router.register("submission", core_views.SubmissionViewSet, basename="submission")
+
 urlpatterns = [
     re_path("^reports/(?P<path>.*)$", reports_view, name="reports"),
     path("admin/", admin.site.urls, name="admin"),
