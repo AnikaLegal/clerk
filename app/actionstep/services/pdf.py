@@ -1,15 +1,15 @@
 import weasyprint
 from django.template.loader import render_to_string
 
-from core.models import FileUpload, Submission, Tenancy
+from core.models import FileUpload, Issue, Tenancy
 
 
-def create_pdf(submission: Submission):
+def create_pdf(issue: Issue):
     """
     Returns a PDF file string.
     """
-    client = submission.client
-    uploads = FileUpload.objects.filter(submission=submission)
+    client = issue.client
+    uploads = FileUpload.objects.filter(issue=issue)
     tenancy = Tenancy.objects.select_related("landlord", "agent").get(client=client)
 
     client_info = [
@@ -59,7 +59,7 @@ def create_pdf(submission: Submission):
             )
 
     sub_info = []
-    for name, answer in submission.answers.items():
+    for name, answer in issue.answers.items():
         sub_info.append(
             {
                 "name": name.lower().replace("_", " ").capitalize(),
@@ -74,7 +74,7 @@ def create_pdf(submission: Submission):
         *sub_info,
     ]
     context = {
-        "submission": submission,
+        "issue": issue,
         "answers": answers,
         "uploads": uploads,
     }

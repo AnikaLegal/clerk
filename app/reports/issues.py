@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.conf import settings
 
 
-from core.models import Submission, Client
+from core.models import Issue, Client
 
 from .utils import (
     filter_by_start_date,
@@ -24,18 +24,18 @@ from .utils import (
 )
 
 
-def run_submissions():
-    st.header("Submissions")
+def run_issues():
+    st.header("Issues")
 
     # Display download link for external analysis
-    data_df = get_submission_df(["topic", "created_at", "complete"])
-    df_download_link(data_df, "Download submission CSV", "submissions")
+    data_df = get_issue_df(["topic", "created_at", "is_submitted"])
+    df_download_link(data_df, "Download issue CSV", "issues")
 
-    st.subheader("Completed Submissions")
-    st.text("All intake form submissions that have been fully filled out and submitted")
-    key = "submissions-completed"
-    data_df = get_submission_df(["topic", "created_at", "complete"])
-    data_df = data_df[data_df["complete"] == 1]
+    st.subheader("Submitted Issues")
+    st.text("All intake form issues that have been fully filled out and submitted")
+    key = "issues-completed"
+    data_df = get_issue_df(["topic", "created_at", "is_submitted"])
+    data_df = data_df[data_df["is_submitted"] == 1]
     data_df = filter_by_topic_choice(data_df, key)
     data_df["date_rollup"] = data_df["created_at"].apply(datetime_to_month)
     topic_bar_chart(data_df, "date_rollup")
@@ -45,8 +45,8 @@ def run_submissions():
     attempt_df = get_client_df(["created_at"])
     attempt_df["date_rollup"] = attempt_df["created_at"].apply(datetime_to_month)
     attempts = attempt_df["date_rollup"].value_counts()
-    success_df = get_submission_df(["created_at", "complete"])
-    success_df = success_df[success_df["complete"] == 1]
+    success_df = get_issue_df(["created_at", "is_submitted"])
+    success_df = success_df[success_df["is_submitted"] == 1]
     success_df["date_rollup"] = success_df["created_at"].apply(datetime_to_month)
     successes = success_df["date_rollup"].value_counts()
     st.bar_chart(successes / attempts)
@@ -66,6 +66,6 @@ def get_client_df(fields):
     return pd.DataFrame(data, columns=fields)
 
 
-def get_submission_df(fields):
-    data = Submission.objects.order_by("created_at").values_list(*fields)
+def get_issue_df(fields):
+    data = Issue.objects.order_by("created_at").values_list(*fields)
     return pd.DataFrame(data, columns=fields)

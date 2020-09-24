@@ -2,15 +2,15 @@ from unittest import mock
 
 import pytest
 
-from core.factories import SubmissionFactory, ClientFactory, TenancyFactory
-from core.models.submission import Submission
-from actionstep.services.actionstep import _send_submission_actionstep
+from core.factories import IssueFactory, ClientFactory, TenancyFactory
+from core.models.issue import Issue
+from actionstep.services.actionstep import _send_issue_actionstep
 
 
 @mock.patch("actionstep.services.actionstep.ActionstepAPI")
 @pytest.mark.django_db
-def test_submission_actionstep(mock_api):
-    # Create the mock Submission
+def test_issue_actionstep(mock_api):
+    # Create the mock Issue
     client = ClientFactory(
         first_name="Keith",
         last_name="Leonardo",
@@ -19,9 +19,9 @@ def test_submission_actionstep(mock_api):
     )
     tenancy = TenancyFactory(client=client)
     answers = {"FAVOURITE_ANIMAL": "Cow", "BEST_TRICK": "I can do a backflip."}
-    sub = SubmissionFactory(complete=False, answers=answers, client=client)
+    sub = IssueFactory(is_submitted=False, answers=answers, client=client)
 
-    # Set mock return values for all API calls made in _send_submission_actionstep()
+    # Set mock return values for all API calls made in _send_issue_actionstep()
     participant = {
         "id": 11,
         "displayName": "Leonardo, Keith",
@@ -92,7 +92,7 @@ def test_submission_actionstep(mock_api):
     mock_api.return_value.participants.get_by_email.return_value = participant
     mock_api.return_value.participants.get_or_create.return_value = [participant, True]
 
-    # For testing both if a submission has an action or not
+    # For testing both if a issue has an action or not
     mock_api.return_value.filenotes.list_by_text_match.side_effect = [[filenote], []]
 
     mock_api.return_value.actions.get_next_ref.return_value = action["reference"]
@@ -100,18 +100,18 @@ def test_submission_actionstep(mock_api):
     mock_api.return_value.actions.create.return_value = action
     mock_api.return_value.files.upload.return_value = file_upload_status
 
-    # Test when submission has action
-    _send_submission_actionstep(sub.pk)
-    res_sub = Submission.objects.get(pk=sub.id)
+    # Test when issue has action
+    _send_issue_actionstep(sub.pk)
+    res_sub = Issue.objects.get(pk=sub.id)
     assert mock_api.return_value.actions.create.call_count == 0
     assert mock_api.return_value.files.upload.call_count == 1
     assert res_sub.is_case_sent
 
     mock_api.reset_mock()
 
-    # Test when submission has no action
-    _send_submission_actionstep(sub.pk)
-    res_sub = Submission.objects.get(pk=sub.id)
+    # Test when issue has no action
+    _send_issue_actionstep(sub.pk)
+    res_sub = Issue.objects.get(pk=sub.id)
     assert mock_api.return_value.actions.create.call_count == 1
     assert mock_api.return_value.files.upload.call_count == 1
     assert res_sub.is_case_sent

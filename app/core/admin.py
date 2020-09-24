@@ -2,22 +2,22 @@ from django_q.tasks import async_task
 from django.contrib import admin
 from django.contrib.messages import constants as messages
 
-from core.services.slack import send_submission_slack
-from actionstep.services.actionstep import send_submission_actionstep
+from core.services.slack import send_issue_slack
+from actionstep.services.actionstep import send_issue_actionstep
 from utils.admin import admin_link, dict_to_json_html
 
-from .models import FileUpload, Submission, Client, Person, Tenancy
+from .models import FileUpload, Issue, Client, Person, Tenancy
 
 
 @admin.register(FileUpload)
 class FileUploadAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    list_display = ("id", "created_at", "submission_link", "file")
-    list_select_related = ("submission",)
+    list_display = ("id", "created_at", "issue_link", "file")
+    list_select_related = ("issue",)
 
-    @admin_link("submission", "Submission")
-    def submission_link(self, submission):
-        return submission.id
+    @admin_link("issue", "Issue")
+    def issue_link(self, issue):
+        return issue.id
 
 
 @admin.register(Person)
@@ -42,8 +42,8 @@ class ClientAdmin(admin.ModelAdmin):
     list_filter = ("is_eligible",)
 
 
-@admin.register(Submission)
-class SubmissionAdmin(admin.ModelAdmin):
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     readonly_fields = ("answers_json",)
     exclude = ("answers",)
@@ -51,14 +51,16 @@ class SubmissionAdmin(admin.ModelAdmin):
         "id",
         "topic_pretty",
         "client_link",
-        "complete",
+        "is_answered",
+        "is_submitted",
         "is_alert_sent",
         "is_case_sent",
         "created_at",
     )
     list_filter = (
         "topic",
-        "complete",
+        "is_answered",
+        "is_submitted",
         "is_alert_sent",
         "is_case_sent",
     )
@@ -77,16 +79,16 @@ class SubmissionAdmin(admin.ModelAdmin):
     actions = ["notify", "integrate"]
 
     def integrate(self, request, queryset):
-        for submission in queryset:
-            async_task(send_submission_actionstep, str(submission.pk))
+        for issue in queryset:
+            async_task(send_issue_actionstep, str(issue.pk))
 
         self.message_user(request, "Integrations sent.", level=messages.INFO)
 
     integrate.short_description = "Integrate with external systems"
 
     def notify(self, request, queryset):
-        for submission in queryset:
-            async_task(send_submission_slack, str(submission.pk))
+        for issue in queryset:
+            async_task(send_issue_slack, str(issue.pk))
 
         self.message_user(request, "Notifications sent.", level=messages.INFO)
 

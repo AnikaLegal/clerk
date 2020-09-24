@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Client, Person, Submission, Tenancy, FileUpload
+from core.models import Client, Person, Issue, Tenancy, FileUpload
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -19,13 +19,14 @@ class PersonSerializer(serializers.ModelSerializer):
 class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
-        fields = ("id", "file", "submission")
+        fields = ("id", "file", "issue")
 
 
 class TenancySerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenancy
         fields = (
+            "id",
             "client",
             "address",
             "started",
@@ -34,14 +35,22 @@ class TenancySerializer(serializers.ModelSerializer):
             "agent",
         )
 
-    landlord = PersonSerializer()
-    agent = PersonSerializer()
+    landlord = PersonSerializer(read_only=True)
+    agent = PersonSerializer(read_only=True)
 
 
-class SubmissionSerializer(serializers.ModelSerializer):
+class IssueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Submission
-        fields = ("id", "topic", "complete", "answers", "client", "fileupload_set")
+        model = Issue
+        fields = (
+            "id",
+            "topic",
+            "is_answered",
+            "is_submitted",
+            "answers",
+            "client",
+            "fileupload_set",
+        )
 
     fileupload_set = FileUploadSerializer(many=True, read_only=True)
 
@@ -58,9 +67,9 @@ class ClientSerializer(serializers.ModelSerializer):
             "phone_number",
             "call_time",
             "is_eligible",
-            "submission_set",
+            "issue_set",
             "tenancy_set",
         )
 
     tenancy_set = TenancySerializer(many=True, read_only=True)
-    submission_set = SubmissionSerializer(many=True, read_only=True)
+    issue_set = IssueSerializer(many=True, read_only=True)

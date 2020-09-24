@@ -6,29 +6,29 @@ from core.factories import get_dummy_file
 
 @pytest.mark.skip
 @pytest.mark.django_db
-def test_submission_create(client):
+def test_issue_create(client):
     """
-    User can create a submission
+    User can create a issue
     """
-    url = reverse("submission-list")
+    url = reverse("issue-list")
     data = {"questions": {"foo": {"a": 1}}, "answers": [], "topic": "REPAIRS"}
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 201
-    sub = Submission.objects.last()
-    assert resp.data == {"id": str(sub.id), "complete": False, **data}
+    sub = Issue.objects.last()
+    assert resp.data == {"id": str(sub.id), "is_submitted": False, **data}
     assert sub.answers == []
     assert sub.questions == {"foo": {"a": 1}}
-    assert sub.complete == False
+    assert sub.is_submitted == False
 
 
 @pytest.mark.skip
 @pytest.mark.django_db
-def test_submission_get(client):
+def test_issue_get(client):
     """
-    User can retrieve a submission
+    User can retrieve a issue
     """
-    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
-    url = reverse("submission-detail", args=[sub.id])
+    sub = IssueFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
+    url = reverse("issue-detail", args=[sub.id])
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.data == {
@@ -36,22 +36,22 @@ def test_submission_get(client):
         "topic": "REPAIRS",
         "answers": [{"FOO": [1, 2, 3]}],
         "questions": {},
-        "complete": False,
+        "is_submitted": False,
     }
 
 
 @pytest.mark.skip
 @pytest.mark.django_db
-def test_submission_update(client):
+def test_issue_update(client):
     """
-    User can update a submission
+    User can update a issue
     """
-    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
-    url = reverse("submission-detail", args=[sub.id])
+    sub = IssueFactory(questions={}, answers=[{"FOO": [1, 2, 3]}], topic="REPAIRS")
+    url = reverse("issue-detail", args=[sub.id])
     update = {
         "answers": [{"BAR": "no"}],
         "questions": {"foo": {"a": 1}},
-        "complete": True,
+        "is_submitted": True,
     }
     resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 200
@@ -60,42 +60,42 @@ def test_submission_update(client):
         "answers": [{"BAR": "no"}],
         "topic": "REPAIRS",
         "questions": {"foo": {"a": 1}},
-        "complete": True,
+        "is_submitted": True,
     }
     sub.refresh_from_db()
     assert sub.questions == {"foo": {"a": 1}}
     assert sub.answers == [{"BAR": "no"}]
-    assert sub.complete == True
+    assert sub.is_submitted == True
 
 
 @pytest.mark.skip
 @pytest.mark.django_db
-def test_submission_update_fails_when_complete(client):
+def test_issue_update_fails_when_is_submitted(client):
     """
-    User cannot update a complete submission
+    User cannot update a is_submitted issue
     """
-    sub = SubmissionFactory(answers=[{"FOO": [1, 2, 3]}], questions={}, complete=True)
+    sub = IssueFactory(answers=[{"FOO": [1, 2, 3]}], questions={}, is_submitted=True)
     update = {"answers": [{"BAR": "no"}]}
-    url = reverse("submission-detail", args=[sub.id])
+    url = reverse("issue-detail", args=[sub.id])
     resp = client.patch(url, data=update, content_type="application/json")
     assert resp.status_code == 400
 
 
 @pytest.mark.skip
 @pytest.mark.django_db
-def test_submission_security(client):
+def test_issue_security(client):
     """
-    User cannot list or delete submissions
+    User cannot list or delete issues
     """
-    sub = SubmissionFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
-    list_url = reverse("submission-list")
-    detail_url = reverse("submission-detail", args=[sub.id])
+    sub = IssueFactory(questions={}, answers=[{"FOO": [1, 2, 3]}])
+    list_url = reverse("issue-list")
+    detail_url = reverse("issue-detail", args=[sub.id])
 
-    # User cannot delete a submission
+    # User cannot delete a issue
     resp = client.delete(detail_url)
     assert resp.status_code == 405
 
-    # User cannot list submissions
+    # User cannot list issues
     resp = client.get(list_url)
     assert resp.status_code == 405
 

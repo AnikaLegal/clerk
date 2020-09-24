@@ -13,7 +13,7 @@ router.register("client", core_views.ClientViewSet, basename="client")
 router.register("person", core_views.PersonViewSet, basename="person")
 router.register("upload", core_views.UploadViewSet, basename="upload")
 router.register("tenancy", core_views.TenancyViewSet, basename="tenancy")
-router.register("submission", core_views.SubmissionViewSet, basename="submission")
+router.register("issue", core_views.IssueViewSet, basename="issue")
 
 urlpatterns = [
     re_path("^reports/(?P<path>.*)$", reports_view, name="reports"),

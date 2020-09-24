@@ -5,7 +5,7 @@ import uuid
 from django.db import models
 
 from .timestamped import TimestampedModel
-from .submission import Submission
+from .issue import Issue
 
 
 def get_s3_key(file_upload, filename):
@@ -26,11 +26,11 @@ def get_s3_key(file_upload, filename):
 
 class FileUpload(TimestampedModel):
     """
-    An image or document uploaded by a user as a part of a submission.
+    An image or document uploaded by a user as a part of a issue.
     """
 
     UPLOAD_KEY = "file-uploads"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file = models.FileField(upload_to=get_s3_key)
-    submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)

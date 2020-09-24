@@ -9,9 +9,9 @@ from slack.models import SlackUser, SlackChannel, SlackMessage
 @responses.activate
 @pytest.mark.django_db
 @pytest.mark.parametrize("slug", ["client-intake", "landing-form"])
-def test_send_submission_slack(slug):
+def test_send_issue_slack(slug):
     """
-    Ensure send_submission_slack call Slack without anything exploding
+    Ensure send_issue_slack call Slack without anything exploding
     https://github.com/getsentry/responses
     """
     # Set up API response.

@@ -7,7 +7,7 @@ from django.conf import settings
 from unittest import mock
 import pytest
 
-from core.factories import SubmissionFactory, ClientFactory
+from core.factories import IssueFactory, ClientFactory
 from core.services.mailchimp import remind_incomplete, find_clients
 from core.models import CaseTopic
 
@@ -45,9 +45,9 @@ ONE_DAY_AGO = timezone.now() - timezone.timedelta(days=1)
 @pytest.mark.django_db
 def test_find_clients__with_success():
     client = ClientFactory(is_reminder_sent=False)
-    sub = SubmissionFactory(
+    sub = IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
@@ -58,17 +58,17 @@ def test_find_clients__with_success():
 
 
 @pytest.mark.django_db
-def test_find_clients__with_multiple_submissions():
+def test_find_clients__with_multiple_issues():
     client = ClientFactory(is_reminder_sent=False)
-    SubmissionFactory(
+    IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.RENT_REDUCTION,
         created_at=THREE_DAYS_AGO,
     )
-    latest_sub = SubmissionFactory(
+    latest_sub = IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.RENT_REDUCTION,
         created_at=THREE_DAYS_AGO,
     )
@@ -79,26 +79,26 @@ def test_find_clients__with_multiple_submissions():
 
 
 @pytest.mark.django_db
-def test_find_clients__with_no_submissions():
+def test_find_clients__with_no_issues():
     client = ClientFactory(is_reminder_sent=False)
     clients = find_clients(CaseTopic.REPAIRS)
     assert clients == []
 
 
 @pytest.mark.django_db
-def test_find_clients__with_submission_complete():
+def test_find_clients__with_issue_complete():
     client = ClientFactory(is_reminder_sent=False)
     # Complete - should result in no results
-    SubmissionFactory(
+    IssueFactory(
         client=client,
-        complete=True,
+        is_submitted=True,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
     # Incomplete
-    SubmissionFactory(
+    IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
@@ -109,9 +109,9 @@ def test_find_clients__with_submission_complete():
 @pytest.mark.django_db
 def test_find_clients__with_reminder_already_sent():
     client = ClientFactory(is_reminder_sent=True)
-    sub = SubmissionFactory(
+    sub = IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
@@ -120,21 +120,24 @@ def test_find_clients__with_reminder_already_sent():
 
 
 @pytest.mark.django_db
-def test_find_clients__with_submission_too_early():
+def test_find_clients__with_issue_too_early():
     client = ClientFactory(is_reminder_sent=False)
-    sub = SubmissionFactory(
-        client=client, complete=False, topic=CaseTopic.REPAIRS, created_at=ONE_DAY_AGO,
+    sub = IssueFactory(
+        client=client,
+        is_submitted=False,
+        topic=CaseTopic.REPAIRS,
+        created_at=ONE_DAY_AGO,
     )
     clients = find_clients(CaseTopic.REPAIRS)
     assert clients == []
 
 
 @pytest.mark.django_db
-def test_find_clients__with_submission_too_late():
+def test_find_clients__with_issue_too_late():
     client = ClientFactory(is_reminder_sent=False)
-    sub = SubmissionFactory(
+    sub = IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_WEEKS_AGO,
     )
@@ -147,9 +150,9 @@ def test_find_clients__with_submission_too_late():
 def test_remind_incomplete__sends_email(mock_api):
     # Setup a client who should be sent an email.
     client = ClientFactory(is_reminder_sent=False)
-    sub = SubmissionFactory(
+    sub = IssueFactory(
         client=client,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
@@ -181,16 +184,16 @@ def test_remind_incomplete__sends_email(mock_api):
 def test_remind_incomplete_same_email(mock_api):
     # Setup a duplicate client who should be sent an email.
     client_a = ClientFactory(email="foo@bar.com", is_reminder_sent=False)
-    sub_a = SubmissionFactory(
+    sub_a = IssueFactory(
         client=client_a,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
     client_b = ClientFactory(email="foo@bar.com", is_reminder_sent=False)
-    sub_b = SubmissionFactory(
+    sub_b = IssueFactory(
         client=client_b,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
@@ -222,16 +225,16 @@ def test_remind_incomplete_same_email(mock_api):
 def test_remind_incomplete_invalid_email(mock_api):
     # Setup two clients, one with an invalid who should be sent email.
     client_a = ClientFactory(email="@bar.com", is_reminder_sent=False)
-    sub_a = SubmissionFactory(
+    sub_a = IssueFactory(
         client=client_a,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )
     client_b = ClientFactory(email="foo@bar.com", is_reminder_sent=False)
-    sub_b = SubmissionFactory(
+    sub_b = IssueFactory(
         client=client_b,
-        complete=False,
+        is_submitted=False,
         topic=CaseTopic.REPAIRS,
         created_at=THREE_DAYS_AGO,
     )

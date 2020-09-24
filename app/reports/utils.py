@@ -8,9 +8,9 @@ import pandas as pd
 import streamlit as st
 from django.utils import timezone
 
-from core.models import Submission
+from core.models import Issue
 
-DEFAULT_FIELDS = ["topic", "created_at", "answers", "complete"]
+DEFAULT_FIELDS = ["topic", "created_at", "answers", "is_submitted"]
 
 
 def plot_category_counts(df, fieldname):
@@ -37,8 +37,8 @@ def filter_by_topic_choice(data_df: pd.DataFrame, key: str):
         return data_df
 
 
-def get_submission_df(fields=DEFAULT_FIELDS):
-    data = Submission.objects.order_by("created_at").values(*fields)
+def get_issue_df(fields=DEFAULT_FIELDS):
+    data = Issue.objects.order_by("created_at").values(*fields)
     for datum in data:
         for k, v in datum["answers"].items():
             datum[k] = v
@@ -97,8 +97,8 @@ def filter_by_completed(data_df: pd.DataFrame, key: str):
         key=f"is-completed-{key}",
     )
     if status == "Complete":
-        return data_df[data_df["complete"] == 1]
+        return data_df[data_df["is_submitted"] == 1]
     elif status == "Incomplete":
-        return data_df[data_df["complete"] == 0]
+        return data_df[data_df["is_submitted"] == 0]
     else:
         return data_df

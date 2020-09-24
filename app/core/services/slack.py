@@ -3,24 +3,24 @@ import logging
 from django.conf import settings
 
 from slack.services import send_slack_message
-from core.models import Submission
+from core.models import Issue
 
 logger = logging.getLogger(__name__)
 
 
-def send_submission_slack(submission_pk: str):
-    submission = Submission.objects.get(pk=submission_pk)
-    text = get_text(submission)
-    logging.info("Notifying Slack of Submission<%s>", submission_pk)
+def send_issue_slack(issue_pk: str):
+    issue = Issue.objects.get(pk=issue_pk)
+    text = get_text(issue)
+    logging.info("Notifying Slack of Issue<%s>", issue_pk)
     send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, text)
     # Mark request as sent
-    Submission.objects.filter(pk=submission.pk).update(is_alert_sent=True)
+    Issue.objects.filter(pk=issue.pk).update(is_alert_sent=True)
 
 
-def get_text(submission: Submission):
-    pk = submission.pk
-    url = f"https://clerk.anikalegal.com/admin/questions/submission/{pk}/change/"
-    answers = submission.answers
+def get_text(issue: Issue):
+    pk = issue.pk
+    url = f"https://clerk.anikalegal.com/admin/core/issue/{pk}/change/"
+    answers = issue.answers
     if "CLIENT_REFERRAL" in answers:
         ref_type = answers["CLIENT_REFERRAL"]
         ref_name = ""
@@ -33,8 +33,8 @@ def get_text(submission: Submission):
     else:
         ref_str = f"*Referral type*: no info available."
 
-    topic = submission.topic.lower()
+    topic = issue.topic.lower()
     return (
         f"A client has just submitted their *{topic}* questionnaire answers for review.\n"
-        f"Their submission id is <{url}|{pk}>.\n"
+        f"Their issue id is <{url}|{pk}>.\n"
     ) + ref_str

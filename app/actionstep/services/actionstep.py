@@ -7,8 +7,8 @@ from slack.services import send_slack_message
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
-from core.models import Submission
-from core.models.submission import CaseTopic
+from core.models import Issue
+from core.models.issue import CaseTopic
 from utils.sentry import WithSentryCapture
 
 from .pdf import create_pdf
@@ -29,25 +29,23 @@ ACTION_TYPE_LOOKUP = {
 }
 
 
-def _send_submission_actionstep(submission_pk: str):
+def _send_issue_actionstep(issue_pk: str):
     """
-    Send a submission to Actionstep.
+    Send a issue to Actionstep.
     FIXME: add tests
     FIXME: Make it harder to sync the same documents twice.
     """
-    submission = Submission.objects.get(pk=submission_pk)
-    logger.info("Sending Submission<%s]> to Actionstep", submission.id)
+    issue = Issue.objects.get(pk=issue_pk)
+    logger.info("Sending Issue<%s]> to Actionstep", issue.id)
     api = ActionstepAPI()
 
     # Fetch new action owner.
-    owner_email = settings.ACTIONSTEP_SETUP_OWNERS[submission.topic]
+    owner_email = settings.ACTIONSTEP_SETUP_OWNERS[issue.topic]
     owner_data = api.participants.get_by_email(owner_email)
-    logger.info(
-        "Assigning Submission<%s]> to owner %s", submission_pk, owner_data["email"]
-    )
+    logger.info("Assigning Issue<%s]> to owner %s", issue_pk, owner_data["email"])
 
-    answers = submission.answers
-    client = submission.client
+    answers = issue.answers
+    client = issue.client
 
     # Ensure participant is in the system.
     logger.info(
@@ -63,33 +61,33 @@ def _send_submission_actionstep(submission_pk: str):
             "Participant %s, %s already exists.", client.get_full_name(), client.email
         )
 
-    # Check if this submission already has an action
+    # Check if this issue already has an action
     action_id = None
-    submission_filenotes = api.filenotes.list_by_text_match(submission.pk)
-    if submission_filenotes:
-        action_id = max([int(fn["links"]["action"]) for fn in submission_filenotes])
+    issue_filenotes = api.filenotes.list_by_text_match(issue.pk)
+    if issue_filenotes:
+        action_id = max([int(fn["links"]["action"]) for fn in issue_filenotes])
     else:
         action_id = None
 
     if action_id:
-        # An matter has already been created for this submission
-        logger.info("Found existing matter %s for %s", action_id, submission.pk)
+        # An matter has already been created for this issue
+        logger.info("Found existing matter %s for %s", action_id, issue.pk)
         action_data = api.actions.get(action_id)
         fileref_name = action_data["reference"]
         logger.info("Existing matter has fileref %s", fileref_name)
 
     else:
         # We need to create a new matter
-        file_ref_prefix = PREFIX_LOOKUP[submission.topic]
+        file_ref_prefix = PREFIX_LOOKUP[issue.topic]
         fileref_name = api.actions.get_next_ref(file_ref_prefix)
         logger.info(
             "Creating new matter %s for %s", fileref_name, client.get_full_name()
         )
-        action_type_name = ACTION_TYPE_LOOKUP[submission.topic]
+        action_type_name = ACTION_TYPE_LOOKUP[issue.topic]
         action_type_data = api.actions.action_types.get_for_name(action_type_name)
         action_type_id = action_type_data["id"]
         action_data = api.actions.create(
-            submission_id=submission.pk,
+            issue_id=issue.pk,
             action_type_id=action_type_id,
             action_name=client.get_full_name(),
             file_reference=fileref_name,
@@ -102,50 +100,46 @@ def _send_submission_actionstep(submission_pk: str):
         )
 
     # Upload files. Note that multiple uploads will create copies.
-    logger.info("Generating PDF for Submission<%s>", submission.id)
-    pdf_bytes = create_pdf(submission)
-    pdf_filename = f"client-intake-{submission_pk}.pdf"
+    logger.info("Generating PDF for Issue<%s>", issue.id)
+    pdf_bytes = create_pdf(issue)
+    pdf_filename = f"client-intake-{issue_pk}.pdf"
 
-    logger.info("Uploading PDF for Submission<%s>", submission.id)
+    logger.info("Uploading PDF for Issue<%s>", issue.id)
     file_data = api.files.upload(pdf_filename, pdf_bytes)
     file_id = file_data["id"]
     folder_name = "Client"
-    logger.info("Attaching PDF for Submission<%s>", submission.id)
+    logger.info("Attaching PDF for Issue<%s>", issue.id)
     api.files.attach(pdf_filename, file_id, action_id, folder_name)
 
     logger.info("Setting up training materials for Actionstep action %s", action_id)
-    topic_docs = ActionDocument.objects.filter(topic=submission.topic)
+    topic_docs = ActionDocument.objects.filter(topic=issue.topic)
     for doc in topic_docs:
         name = doc.get_filename()
         logger.info("Attaching doc %s to Actionstep action %s", name, action_id)
         api.files.attach(name, doc.actionstep_id, action_id, doc.folder)
 
-    logger.info(
-        "Marking Actionstep integration complete for Submission<%s>", submission.id
-    )
-    Submission.objects.filter(pk=submission.pk).update(is_case_sent=True)
+    logger.info("Marking Actionstep integration complete for Issue<%s>", issue.id)
+    Issue.objects.filter(pk=issue.pk).update(is_case_sent=True)
 
     # Try send a Slack message
-    logging.info(
-        "Notifying Slack of Actionstep integration for Submission<%s>", submission_pk
-    )
+    logging.info("Notifying Slack of Actionstep integration for Issue<%s>", issue_pk)
 
     action_url = urljoin(
         settings.ACTIONSTEP_WEB_URI,
         f"/mym/asfw/workflow/action/overview/action_id/{action_id}",
     )
 
-    topic_title = submission.topic.title()
-    text = f"{topic_title} submission has been uploaded to Actionstep as <{action_url}|{fileref_name}> ({submission.pk})"
+    topic_title = issue.topic.title()
+    text = f"{topic_title} issue has been uploaded to Actionstep as <{action_url}|{fileref_name}> ({issue.pk})"
     send_slack_message(settings.SLACK_MESSAGE.ACTIONSTEP_CREATE, text)
 
 
-send_submission_actionstep = WithSentryCapture(_send_submission_actionstep)
+send_issue_actionstep = WithSentryCapture(_send_issue_actionstep)
 
 
 def _upload_action_document(doc_pk: str):
     """
-    Send a submission to Actionstep.
+    Send a issue to Actionstep.
     """
     doc = ActionDocument.objects.get(pk=doc_pk)
     if doc.actionstep_id:

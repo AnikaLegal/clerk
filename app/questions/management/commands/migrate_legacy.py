@@ -86,19 +86,24 @@ class Command(BaseCommand):
         else:
             # Check that we haven't already synced this submission.
             if submission.is_case_sent:
-                print(f"Submission {submission.pk} has already been synced to Actionstep.")
+                print(
+                    f"Submission {submission.pk} has already been synced to Actionstep."
+                )
                 return
 
             # Test if the participant exists in Actionstep
             participant_data, created = api.participants.get_or_create(
-                firstname, lastname, client_data["CLIENT_EMAIL"], client_data["CLIENT_PHONE"]
+                firstname,
+                lastname,
+                client_data["CLIENT_EMAIL"],
+                client_data["CLIENT_PHONE"],
             )
             if created:
                 print(f"Created participant {client_data['CLIENT_NAME']}.")
             else:
                 print(f"{client_data['CLIENT_NAME']} already exists.")
 
-        # Procedures from _send_submission_actionstep() function
+        # Procedures from _send_issue_actionstep() function
         owner_email = settings.ACTIONSTEP_SETUP_OWNERS[case_type]
         owner_data = api.participants.get_by_email(owner_email)
 
@@ -125,7 +130,9 @@ class Command(BaseCommand):
         action_id = action_data["id"]
         client_id = participant_data["id"]
 
-        existing_participants = api.participants.action_participants.list_for_action(action_id)
+        existing_participants = api.participants.action_participants.list_for_action(
+            action_id
+        )
         is_participant_present = False
         for existing_participant in existing_participants:
             if str(client_id) == str(existing_participant["links"]["participant"]):
@@ -133,7 +140,9 @@ class Command(BaseCommand):
                 break
 
         if not is_participant_present:
-            api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
+            api.participants.set_action_participant(
+                action_id, client_id, Participant.CLIENT
+            )
 
         FILENAMES_TO_IGNORE = [
             "Student Manual.docx",
@@ -153,7 +162,11 @@ class Command(BaseCommand):
 
                 subpath = os.path.join(root, filename)
                 with open(subpath, "rb") as file:
-                    file_data = {"name": filename, "bytes": file.read(), "target_folder": "Client"}
+                    file_data = {
+                        "name": filename,
+                        "bytes": file.read(),
+                        "target_folder": "Client",
+                    }
                     all_files_data.append(file_data)
 
         # Upload and attach files to the matter
@@ -175,7 +188,9 @@ class Command(BaseCommand):
             for field in s.answers:
                 field_match = field["name"] == "CLIENT_NAME"
                 if field_match:
-                    answer_match = field.get("answer").lower() == f"{firstname} {lastname}".lower()
+                    answer_match = (
+                        field.get("answer").lower() == f"{firstname} {lastname}".lower()
+                    )
                     if answer_match:
                         for d in s.answers:
                             client_data[d["name"]] = d.get("answer")

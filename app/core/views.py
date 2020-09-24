@@ -1,13 +1,13 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
 
-from core.models import Client, Person, FileUpload, Tenancy, Submission
+from core.models import Client, Person, FileUpload, Tenancy, Issue
 from core.serializers import (
     ClientSerializer,
     PersonSerializer,
     FileUploadSerializer,
     TenancySerializer,
-    SubmissionSerializer,
+    IssueSerializer,
 )
 
 
@@ -15,7 +15,7 @@ class ClientViewSet(
     GenericViewSet, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
 ):
     prefetch = (
-        "submission_set__fileupload_set",
+        "issue_set__fileupload_set",
         "tenancy_set__agent",
         "tenancy_set__landlord",
     )
@@ -38,6 +38,6 @@ class TenancyViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin):
     serializer_class = TenancySerializer
 
 
-class SubmissionViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin):
-    queryset = Submission.objects.all()
-    serializer_class = SubmissionSerializer
+class IssueViewSet(GenericViewSet, CreateModelMixin, UpdateModelMixin):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer

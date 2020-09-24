@@ -11,7 +11,7 @@ from core.models import (
     Client,
     Tenancy,
     FileUpload,
-    Submission,
+    Issue,
     Person,
     TimestampedModel,
 )
@@ -73,9 +73,9 @@ class TenancyFactory(TimestampedModelFactory):
 
 
 @factory.django.mute_signals(post_save)
-class SubmissionFactory(TimestampedModelFactory):
+class IssueFactory(TimestampedModelFactory):
     class Meta:
-        model = Submission
+        model = Issue
 
     id = factory.LazyAttribute(lambda x: uuid4())
     topic = "REPAIRS"
@@ -89,7 +89,7 @@ class FileUploadFactory(TimestampedModelFactory):
         model = FileUpload
 
     id = factory.LazyAttribute(lambda x: uuid4())
-    submission = factory.SubFactory(SubmissionFactory)
+    issue = factory.SubFactory(IssueFactory)
 
     @factory.post_generation
     def file(self, create, extracted, **kwargs):

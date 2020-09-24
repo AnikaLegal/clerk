@@ -25,7 +25,7 @@ class Command(BaseCommand):
         FileUpload = apps.get_model("core", "FileUpload")
         Tenancy = apps.get_model("core", "Tenancy")
 
-        Submission.objects.all().delete()
+        Issue.objects.all().delete()
         Client.objects.all().delete()
         Person.objects.all().delete()
         FileUpload.objects.all().delete()
@@ -43,7 +43,7 @@ class Command(BaseCommand):
             if not tenancy:
                 continue
 
-            sub, created = Submission.objects.get_or_create(
+            sub, created = Issue.objects.get_or_create(
                 id=old_sub.id,
                 defaults={
                     "created_at": old_sub.created_at,
@@ -54,7 +54,8 @@ class Command(BaseCommand):
                         if "name" in a
                     },
                     "client": client,
-                    "complete": old_sub.complete,
+                    "is_answered": old_sub.complete,
+                    "is_submitted": old_sub.complete,
                     "is_alert_sent": old_sub.is_alert_sent,
                     "is_case_sent": old_sub.is_case_sent,
                 },
@@ -87,7 +88,7 @@ class Command(BaseCommand):
                             continue
 
                     FileUpload.objects.get_or_create(
-                        id=upload.id, defaults={"file": name, "submission": sub}
+                        id=upload.id, defaults={"file": name, "issue": sub}
                     )
 
 

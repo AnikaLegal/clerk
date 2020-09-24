@@ -9,7 +9,7 @@ import pandas as pd
 from .utils import (
     filter_by_start_date,
     filter_by_end_date,
-    get_submission_df,
+    get_issue_df,
     plot_category_counts,
     df_download_link,
     filter_by_topic_choice,
@@ -19,8 +19,8 @@ from .utils import (
 def run_demographics():
     st.header("Client Demographics")
     st.text("A breakdown of who our clients are.")
-    df = get_submission_df()
-    df = df[df["complete"] == 1]
+    df = get_issue_df()
+    df = df[df["is_submitted"] == 1]
     df = filter_by_topic_choice(df, key="demo")
     df = filter_by_start_date(df, "created_at", key="demo")
 
@@ -60,7 +60,9 @@ def run_demographics():
     plot_category_counts(df, "Answers")
 
 
-def plot_histogram(df, value_col, label_name, buckets, min_val=float("-inf"), max_val=float("inf")):
+def plot_histogram(
+    df, value_col, label_name, buckets, min_val=float("-inf"), max_val=float("inf")
+):
     df[label_name] = "Unknown"
     for bucket_name in buckets:
         bucket_parts = bucket_name.replace("+", "").split("-")

@@ -23,15 +23,15 @@
     </style>
   </head>
   <body>
-    <h1>Anika Legal Client Intake Submission - {{submission.topic}}</h1>
+    <h1>Anika Legal Client Intake Submission - {{issue.topic}}</h1>
     <hr />
     <p>
-      This is a client's submission ({{submission.pk}}), first created at
-      {{submission.created_at|date:"l jS F Y "}}.
+      This is a client's issue ({{issue.pk}}), first created at
+      {{issue.created_at|date:"l jS F Y "}}.
     </p>
     {% if uploads %}
     <p>
-      The client attached the following uploads to their submission:
+      The client attached the following uploads to their issue:
     </p>
     <ul>
       {% for upload in uploads%}

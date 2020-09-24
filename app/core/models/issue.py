@@ -13,9 +13,9 @@ class CaseTopic:
     OTHER = "OTHER"
 
 
-class Submission(TimestampedModel):
+class Issue(TimestampedModel):
     """
-    A submission by a client describing a specific issue.
+    A client's specific issue.
     """
 
     TOPIC_CHOICES = (
@@ -28,7 +28,10 @@ class Submission(TimestampedModel):
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
     answers = models.JSONField(encoder=DjangoJSONEncoder)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    complete = models.BooleanField(default=False)
+    # Tracks whether the client has finished answering all questions.
+    is_answered = models.BooleanField(default=False)
+    # Tracks whether the client has submitted their issue to Anika for help.
+    is_submitted = models.BooleanField(default=False)
     # Tracks whether a Slack alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
