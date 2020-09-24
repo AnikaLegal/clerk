@@ -19,7 +19,7 @@ class Command(BaseCommand):
         FileUploadOld = apps.get_model("questions", "FileUpload")
         ImageUploadOld = apps.get_model("questions", "ImageUpload")
         # New models
-        Submission = apps.get_model("core", "Submission")
+        Issue = apps.get_model("core", "Issue")
         Client = apps.get_model("core", "Client")
         Person = apps.get_model("core", "Person")
         FileUpload = apps.get_model("core", "FileUpload")
