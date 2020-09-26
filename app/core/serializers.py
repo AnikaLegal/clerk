@@ -32,11 +32,32 @@ class TenancySerializer(serializers.ModelSerializer):
             "started",
             "is_on_lease",
             "landlord",
+            "landlord_id",
             "agent",
+            "agent_id",
         )
 
     landlord = PersonSerializer(read_only=True)
+    landlord_id = serializers.IntegerField(write_only=True, required=False)
+
     agent = PersonSerializer(read_only=True)
+    agent_id = serializers.IntegerField(write_only=True, required=False)
+
+    def update(self, instance, validated_data):
+        """
+        Add agent or landlord to tenancy if requested.
+        """
+        tenancy = super().update(instance, validated_data)
+        agent_id = validated_data.get("agent_id")
+        landlord_id = validated_data.get("landlord_id")
+        if agent_id:
+            tenancy.agent_id = agent_id
+            tenancy.save()
+        if landlord_id:
+            tenancy.landlord_id = landlord_id
+            tenancy.save()
+
+        return tenancy
 
 
 class IssueSerializer(serializers.ModelSerializer):
