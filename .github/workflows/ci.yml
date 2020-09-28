@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set tag name
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+          if [ "${{ github.ref }}" == "refs/heads/develop" || "${{ github.base_ref }}" == "refs/heads/develop" ]; then
               echo "::set-env name=TAG::staging"
           else
               echo "::set-env name=TAG::prod"
