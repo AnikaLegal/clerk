@@ -101,7 +101,7 @@ services:
   # For testing.
   test:
     container_name: test
-    image: clerk:latest
+    image: anikalaw/clerk:${TAG}
     volumes:
       - ../app:/app
     links:

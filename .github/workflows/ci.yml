@@ -1,15 +1,36 @@
-name: CI
+name: Continuous Integration
 on:
   push:
     branches:
-      - hub
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
 
 jobs:
-  test:
+  build-test-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build Docker image
-        run: docker build -t clerk:latest -f docker/Dockerfile .
-      - name: Run tests
+      - name: Set tag name
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+              echo "::set-env name=TAG::staging"
+          else
+              echo "::set-env name=TAG::prod"
+          fi
+      - name: Build container image
+        run: docker build -t anikalaw/clerk:${TAG} -f docker/Dockerfile .
+      - name: Run unit tests
         run: docker-compose -f docker/docker-compose.local.yml run --rm test  pytest -s -vv
+      - name: Login to DockerHub
+        if: ${{ success() }}
+        uses: docker/login-action@v1
+        with:
+          username: anikalaw
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push container image
+        if: ${{ success() }}
+        run: docker push anikalaw/clerk:${TAG}
