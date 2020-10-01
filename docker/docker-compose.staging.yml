@@ -3,7 +3,7 @@ version: "3"
 services:
   web:
     command: make web-prod
-    image: anikalaw/clerk:latest
+    image: anikalaw/clerk:staging
     ports:
       - 8001:8001
     volumes:
@@ -29,7 +29,7 @@ services:
 
   worker:
     command: make worker-prod
-    image: anikalaw/clerk:latest
+    image: anikalaw/clerk:staging
     volumes:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/test/worker:/var/log
@@ -53,7 +53,7 @@ services:
   # Reporting server.
   streamlit:
     command: make reports-prod
-    image: anikalaw/clerk:latest
+    image: anikalaw/clerk:staging
     volumes:
       - /var/run/postgresql:/app/postgres.sock
     ports:

@@ -16,7 +16,7 @@ services:
   web:
     container_name: web
     command: make web-local
-    image: clerk:latest
+    image: clerk:local
     ports:
       - 8000:8000
     volumes:
@@ -52,7 +52,7 @@ services:
   streamlit:
     container_name: streamlit
     command: make reports-local
-    image: clerk:latest
+    image: clerk:local
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -78,7 +78,7 @@ services:
   worker:
     container_name: worker
     command: make worker-local
-    image: clerk:latest
+    image: clerk:local
     volumes:
       - ../app:/app
     links:
@@ -101,7 +101,7 @@ services:
   # For testing.
   test:
     container_name: test
-    image: anikalaw/clerk:${TAG}
+    image: clerk:local
     volumes:
       - ../app:/app
     links:
