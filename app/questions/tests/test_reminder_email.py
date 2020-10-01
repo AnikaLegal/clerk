@@ -206,5 +206,5 @@ def test_remind_incomplete_invalid_email(mock_API):
     sub1.refresh_from_db()
     sub2.refresh_from_db()
     assert sub1.is_reminder_sent == False
-    assert sub2.is_reminder_sent == True
+    assert sub2.is_reminder_sent == False
 
