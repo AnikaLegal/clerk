@@ -10,9 +10,12 @@ jobs:
               if [ "${{ github.ref }}" = "refs/heads/master" ]; then
                   echo "::set-env name=COMPOSE_SUFFIX::prod"
                   echo "::set-env name=PROJECT::clerk"
-              else
+              elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
                   echo "::set-env name=COMPOSE_SUFFIX::staging"
                   echo "::set-env name=PROJECT::clerk_test"
+              else
+                  echo "Please specify either master (prod) or develop (staging) branch"
+                  exit 1
               fi
             - name: Run deploy script
               run: ./scripts/deploy/deploy.sh
