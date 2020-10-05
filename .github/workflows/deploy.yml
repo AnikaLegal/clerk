@@ -1,0 +1,19 @@
+name: Deploy Application
+on: [workflow_dispatch]
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set variables
+              run: |
+              if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+                  echo "::set-env name=COMPOSE_SUFFIX::prod"
+                  echo "::set-env name=PROJECT::clerk"
+              else
+                  echo "::set-env name=COMPOSE_SUFFIX::staging"
+                  echo "::set-env name=PROJECT::clerk_test"
+              fi
+            - name: Run deploy script
+              run: ./scripts/deploy/deploy.sh
+              shell: bash
