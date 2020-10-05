@@ -7,11 +7,10 @@ jobs:
             - uses: actions/checkout@v2
             - name: Set variables
               run: |
-              if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
-                  echo "Set variables for staging"
+              if [ "${{ github.ref }}" == "refs/heads/develop"]; then
+                echo "we are on develop branch"
               else
-                  echo "Please select develop (staging) or master (prod) branch"
-                  exit 1
+                echo "we are on another branch"
               fi
             - name: Run deploy script
               run: ./scripts/deploy/deploy.sh
