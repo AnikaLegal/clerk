@@ -8,6 +8,7 @@ jobs:
             - name: Set variables
               run: |
               if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+                  echo "Set variables for staging"
               else
                   echo "Please select develop (staging) or master (prod) branch"
                   exit 1
