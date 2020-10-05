@@ -7,12 +7,14 @@ jobs:
             - uses: actions/checkout@v2
             - name: Set variables
               run: |
-              if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-                  echo "::set-env name=COMPOSE_SUFFIX::prod"
-              elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+              if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
                   echo "::set-env name=COMPOSE_SUFFIX::staging"
+                  echo "::set-env name=PROJECT::clerk_test"
+              elif [ "${{ github.ref }}" = "refs/heads/master" ]; then
+                  echo "::set-env name=COMPOSE_SUFFIX::prod"
+                  echo "::set-env name=PROJECT::clerk"
               else
-                  echo "Please specify either master (prod) or develop (staging) branch"
+                  echo "Please select develop (staging) or master (prod) branch"
                   exit 1
               fi
             - name: Run deploy script
