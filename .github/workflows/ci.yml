@@ -17,9 +17,9 @@ jobs:
       - name: Set tag name
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/develop" || "${{ github.base_ref }}" == "develop" ]]; then
-              echo "::set-env name=TAG::staging"
+              echo "TAG=staging" >> $GITHUB_ENV
           else
-              echo "::set-env name=TAG::prod"
+              echo "TAG=prod" >> $GITHUB_ENV
           fi
       - name: Build container image
         run: docker build -t anikalaw/clerk:${TAG} -f docker/Dockerfile .
