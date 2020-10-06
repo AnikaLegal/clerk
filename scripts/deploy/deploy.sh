@@ -5,18 +5,6 @@
 #
 HOST='3.106.55.74'
 
-case $CIRCLE_BRANCH in
-    "develop")
-        export COMPOSE_SUFFIX="staging"
-        export PROJECT="clerk_test"
-        ;;
-    "master")
-        export COMPOSE_SUFFIX="prod"
-        export PROJECT="clerk"
-        ;;
-esac
-
-
 ssh root@$HOST /bin/bash << EOF
     set -e
     echo "Setting up deployment files for $PROJECT"
