@@ -7,7 +7,7 @@
 #
 # Build local Docker envrionment
 build:
-	docker build . --tag clerk:latest -f docker/Dockerfile
+	docker build . --tag clerk:local -f docker/Dockerfile
 
 # Run Django website for local development
 web:

@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  # Test database.
+  database:
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - 25432:5432
+
+  # Test container.
+  test:
+    image: anikalaw/clerk:${TAG}
+    links:
+      - database
+    environment:
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: password
+      PGHOST: database
+      PGPORT: 5432
+      DJANGO_SETTINGS_MODULE: clerk.settings.test
+      ACTIONSTEP_CLIENT_ID: ""
+      ACTIONSTEP_CLIENT_SECRET: ""
+      MAILCHIMP_API_KEY: ""
