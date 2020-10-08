@@ -10,9 +10,8 @@ SUBMISSION_EMAILS = [MATT_EMAIL]
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_REGEX_WHITELIST = (
-    r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",
-)
+CORS_ALLOW_ALL_ORIGINS = True
+
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
 ACTIONSTEP_REDIRECT_URI = "http://localhost:8000/actionstep/end/"
