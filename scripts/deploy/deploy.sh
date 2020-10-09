@@ -29,6 +29,7 @@ echo -e "\n>>> Deploying $PROJECT to clerk at $HOST with suffix $COMPOSE_SUFFIX.
 # Set up SSH key
 echo -e "\n>>> Setting up private key."
 echo -e "$CLERK_PRIVATE_SSH_KEY" > deploy.key
+chmod 600 deploy.key
 
 echo -e "\n>>> SSHing into clerk at $HOST."
 ssh -v -i deploy.key root@$HOST /bin/bash << EOF
