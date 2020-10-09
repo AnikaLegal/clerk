@@ -21,3 +21,5 @@ jobs:
       - name: Run deploy script
         run: ./scripts/deploy/deploy.sh
         shell: bash
+        env:
+          CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}

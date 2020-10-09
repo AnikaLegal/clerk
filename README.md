@@ -2,8 +2,6 @@
 
 ![Test](https://github.com/AnikaLegal/clerk/workflows/Test/badge.svg?branch=develop)
 
-![Deploy](https://github.com/AnikaLegal/clerk/workflows/Deploy/badge.svg?branch=develop)
-
 This site is used by new Anika clients who want to submit their legal problem. Clients may submit the facts of their case using a structured form interface. Their case file is then entered into our case managment system.
 
 > Depending on the job, office clerks might answer phones, filing, data processing, faxing, envelope stuffing and mailing, message delivery, running errands, sorting incoming mail and much more. ([source](https://www.snagajob.com/job-descriptions/office-clerk/))
@@ -70,12 +68,7 @@ make shell
 
 ## Deployment
 
-Build and deployment scripts live in `scripts` A deployment involves:
-
-- building the Docker container and pushing it to Docker Hub
-- SSHing into the target server and updating the Docker Swarm config
-
-Deployment is run automatically by [CircleCI](https://circleci.com/dashboard). It is trigger when new commits are pushed to GitHub on `develop` or `master`. There are two environments to deploy to, test and prod:
+Deployment is done via a GitHub workflow [here](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy.) A deployment involves SSHing into the target server and updating the Docker Swarm config. Deployment must be manually triggered from GitHub. There are two environments to deploy to, test and prod:
 
 - [test backend](https://test-clerk.anikalegal.com/admin), which is deployed to by `develop`, used by the [test frontend](https://test-repairs.anikalegal.com)
 - [prod backend](https://clerk.anikalegal.com/admin), which is deployed to by `master`, used by the [prod frontend](https://repairs.anikalegal.com)
@@ -83,9 +76,9 @@ Deployment is run automatically by [CircleCI](https://circleci.com/dashboard). I
 When making a change or bugfix, you should:
 
 - create a feature branch from `develop` called `feature/my-branch-name` and test it locally
-- merge the branch into `develop` and push to GitHub to trigger a release to the test environment
+- merge the branch into `develop` and trigger a release to the test environment
 - check your changes in the test environment
-- merge the `develop` into `master` and push to GitHub to release your change to prod
+- merge the `develop` into `master` trigger a release of your change to prod
 
 ## Infrastructure
 
