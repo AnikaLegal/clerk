@@ -31,6 +31,12 @@ echo -e "\n>>> Setting up private key."
 echo -e "$CLERK_PRIVATE_SSH_KEY" > deploy.key
 chmod 600 deploy.key
 
+echo -e "\n>>> Debugging private key."
+
+head -1 deploy.key 
+tail -1 deploy.key 
+
+
 echo -e "\n>>> SSHing into clerk at $HOST."
 ssh -v -i deploy.key root@$HOST /bin/bash << EOF
     set -e
