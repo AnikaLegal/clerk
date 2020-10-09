@@ -31,7 +31,7 @@ echo -e "\n>>> Setting up private key."
 echo -e "$CLERK_PRIVATE_SSH_KEY" > deploy.key
 
 echo -e "\n>>> SSHing into clerk at $HOST."
-ssh -i deploy.key root@$HOST /bin/bash << EOF
+ssh -v -i deploy.key root@$HOST /bin/bash << EOF
     set -e
     echo -e "\n>>> Setting up deployment files for $PROJECT"
     mkdir -p /srv/${PROJECT}/
@@ -41,7 +41,7 @@ echo -e "\n>>> Copying $PROJECT compose file to clerk at $HOST"
 scp docker/docker-compose.${COMPOSE_SUFFIX}.yml root@${HOST}:/srv/$PROJECT
 
 echo -e "\n>>> SSHing into clerk at $HOST."
-ssh -i deploy.key root@$HOST /bin/bash << EOF
+ssh -v -i deploy.key root@$HOST /bin/bash << EOF
     set -e
     echo -e "\n>>> Deploying $PROJECT to Docker Swarm cluster"
     docker stack deploy \
