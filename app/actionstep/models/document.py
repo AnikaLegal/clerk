@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-from questions.models.timestamped import TimestampedModel
-from questions.models.submission import Submission
+from core.models import TimestampedModel, Issue
 from actionstep.constants import ActionFolder
 
 
@@ -23,7 +22,7 @@ class ActionDocument(TimestampedModel):
     )
     document = models.FileField(upload_to=get_s3_key)
     folder = models.CharField(max_length=32, choices=FOLDER_CHOICES)
-    topic = models.CharField(max_length=32, choices=Submission.TOPIC_CHOICES)
+    topic = models.CharField(max_length=32, choices=Issue.TOPIC_CHOICES)
     actionstep_id = models.CharField(max_length=64, default="", blank=True)
 
     def get_filename(self):

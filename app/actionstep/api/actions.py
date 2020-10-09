@@ -54,7 +54,9 @@ class ActionEndpoint(BaseEndpoint):
             try:
                 ref_num = int(action["reference"].replace(prefix, ""))
             except Exception:
-                logger.exception("Error parsing matter reference %s", action["reference"])
+                logger.exception(
+                    "Error parsing matter reference %s", action["reference"]
+                )
                 ref_num = 0
 
             if ref_num > max_ref_num:
@@ -107,7 +109,7 @@ class ActionCreateEndpoint(BaseEndpoint):
 
     def create(
         self,
-        submission_id: str,
+        issue_id: str,
         action_type_id: int,
         action_name: str,
         file_reference: str,
@@ -120,7 +122,7 @@ class ActionCreateEndpoint(BaseEndpoint):
         data = {
             "actionName": action_name,
             "fileReference": file_reference,
-            "fileNote": f"Created automatically by Anika Clerk for submission {submission_id}",
+            "fileNote": f"Created automatically by Anika Clerk for issue {issue_id}",
             "links": {
                 "actionType": str(action_type_id),
                 "assignedToParticipant": str(participant_id),

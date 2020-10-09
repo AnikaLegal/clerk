@@ -2,7 +2,7 @@ version: "3"
 
 services:
   web:
-    command: make web-prod
+    command: bash /app/scripts/web/prod.sh
     image: anikalaw/clerk:prod
     ports:
       - 8000:8000
@@ -28,7 +28,7 @@ services:
       MAILCHIMP_API_KEY: $MAILCHIMP_PROD_API_KEY
 
   worker:
-    command: make worker-prod
+    command: bash /app/scripts/worker/prod.sh
     image: anikalaw/clerk:prod
     volumes:
       - /var/run/postgresql:/app/postgres.sock
@@ -52,7 +52,7 @@ services:
 
   # Reporting server.
   streamlit:
-    command: make reports-prod
+    command: bash /app/scripts/reports/prod.sh
     image: anikalaw/clerk:prod
     volumes:
       - /var/run/postgresql:/app/postgres.sock

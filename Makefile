@@ -27,7 +27,7 @@ bash:
 
 # Get a Django shell_plus shell in the docker container
 shell:
-	docker-compose -f docker/docker-compose.local.yml run --rm web make shell
+	docker-compose -f docker/docker-compose.local.yml run --rm web /app/scripts/tasks/shell.sh
 
 # Get a Postgres shell in the docker container
 psql:
@@ -35,16 +35,17 @@ psql:
 
 # Lint Python code
 lint:
-	docker-compose -f docker/docker-compose.local.yml run --rm test make lint
+	docker-compose -f docker/docker-compose.local.yml run --rm test /app/scripts/tasks/lint.sh
 
 # Auto-format frontend and backend code
 format:
-	docker-compose -f docker/docker-compose.local.yml run --rm test make format
+	docker-compose -f docker/docker-compose.local.yml run --rm test /app/scripts/tasks/format.sh
 
 # Run PyTest
 test:
-	docker-compose -f docker/docker-compose.local.yml run --rm test make test
+	docker-compose -f docker/docker-compose.local.yml run --rm test /app/scripts/tasks/test.sh
 
 # View worker logs
 logs:
 	docker-compose -f docker/docker-compose.local.yml logs --tail 100 -f worker 
+

@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.conf import settings
 
 
-from questions.models import Submission
+from core.models import Issue
 from .utils import filter_by_start_date, filter_by_end_date, df_download_link
 
 
@@ -30,7 +30,9 @@ def run_referrals():
     df_download_link(data_df, "Download referrals CSV", "referrals")
 
     st.subheader("Referral channels")
-    topic = st.selectbox("Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral")
+    topic = st.selectbox(
+        "Case type", ["All", "Repairs", "COVID"], key=f"topic-choice-referral"
+    )
     data_df = filter_by_start_date(data_df, "created_at", "referral")
     data_df = filter_by_end_date(data_df, "created_at", "referral")
 
@@ -70,7 +72,7 @@ def topic_bar_chart(data_df: pd.DataFrame, column: str):
 
 
 def get_referral_df():
-    query_fields = ["topic", "created_at", "answers", "complete"]
+    query_fields = ["topic", "created_at", "answers", "is_submitted"]
     questions = [
         "CLIENT_REFERRAL",
         "CLIENT_REFERRAL_LEGAL_CENTRE",
@@ -78,15 +80,17 @@ def get_referral_df():
         "CLIENT_REFERRAL_OTHER",
     ]
     data = list(
-        Submission.objects.filter(complete=True, created_at__gte=MIN_START_DATE)
+        Issue.objects.filter(is_submitted=True, created_at__gte=MIN_START_DATE)
         .order_by("created_at")
-        .values(*["topic", "created_at", "answers", "complete"])
+        .values(*["topic", "created_at", "answers", "is_submitted"])
     )
     for datum in data:
-        answers = {a["name"]: a.get("answer") for a in datum["answers"]}
+        answers = datum["answers"]
         del datum["answers"]
         for question in questions:
             datum[question] = answers.get(question)
 
-    return pd.DataFrame(data, columns=["topic", "created_at", "complete", *questions])
+    return pd.DataFrame(
+        data, columns=["topic", "created_at", "is_submitted", *questions]
+    )
 

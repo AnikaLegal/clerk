@@ -15,7 +15,7 @@ services:
   # Django webserver.
   web:
     container_name: web
-    command: make web-local
+    command: bash /app/scripts/web/local.sh
     image: clerk:local
     ports:
       - 8000:8000
@@ -40,18 +40,10 @@ services:
       ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_CLIENT_SECRET
       MAILCHIMP_API_KEY: $MAILCHIMP_API_KEY
 
-  # # Reflect outbound requests
-  # http_reflect:
-  #   container_name: http_reflect
-  #   command: /app/scripts/tasks/reflect.py
-  #   image: clerk:latest
-  #   volumes:
-  #     - ../app:/app
-
   # Reporting server.
   streamlit:
     container_name: streamlit
-    command: make reports-local
+    command: bash /app/scripts/reports/local.sh
     image: clerk:local
     build:
       context: ..
@@ -77,7 +69,7 @@ services:
   # Django-q worker.
   worker:
     container_name: worker
-    command: make worker-local
+    command: bash /app/scripts/worker/local.sh
     image: clerk:local
     volumes:
       - ../app:/app

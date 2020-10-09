@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from actionstep.models import ActionDocument
-from actionstep.services import upload_action_document
+from actionstep.services.actionstep import upload_action_document
 
 logger = logging.getLogger(__name__)
 

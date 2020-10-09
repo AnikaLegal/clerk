@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 black \
     --line-length 90 \
     --exclude "frontend/|migrations/" \

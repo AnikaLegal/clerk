@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
+    "core.apps.CoreConfig",
 ]
 
 MIDDLEWARE = [
@@ -134,11 +135,12 @@ REST_FRAMEWORK = {
     )
 }
 
+ONE_HUNDRED_YEARS = 100 * 365 * 24 * 60 * 60  # seconds
 Q_CLUSTER = {
     "name": "clerk",
-    "timeout": 60,  # one minute.
+    "timeout": 60,  # seconds, tasks will be killed if they run for longer than this.
     # NB: Django-Q retries *forever*, tasks need to be manually deleted to stop this
-    "retry": 3600,  # an hour, must be longer than timeout
+    "retry": ONE_HUNDRED_YEARS,  # seconds, effectively never retry (this is a yucky hack.)
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }

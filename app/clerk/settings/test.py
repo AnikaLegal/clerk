@@ -11,8 +11,9 @@ DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "test_media")
 
 ACTIONSTEP_SETUP_OWNERS = {
-    "COVID": "keithleonardo@anikalegal.com",
-    "REPAIRS": "keithleonardo@anikalegal.com"
+    "REPAIRS": "keithleonardo@anikalegal.com",
+    "RENT_REDUCTION": "keithleonardo@anikalegal.com",
+    "OTHER": "keithleonardo@anikalegal.com",
 }
 
 
@@ -20,8 +21,8 @@ ACTIONSTEP_SETUP_OWNERS = {
 Q_CLUSTER = {
     "name": "clerk",
     "sync": True,  # tasks run in sync
-    "timeout": 60,  # seconds,
-    "retry": 60,  # seconds,
+    "timeout": 60,  # seconds, tasks will be killed if they run for longer than this.
+    "retry": 120,  # seconds, time until retry
     "save_limit": 250,  # number of tasks saved to broker
     "orm": "default",  # Use Django's ORM + database for broker
 }
@@ -35,3 +36,4 @@ MAILCHIMP_COVID_EMAIL_ID = ""
 MAILCHIMP_REPAIRS_LIST_ID = ""
 MAILCHIMP_REPAIRS_WORKFLOW_ID = ""
 MAILCHIMP_REPAIRS_EMAIL_ID = ""
+
