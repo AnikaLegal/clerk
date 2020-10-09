@@ -31,7 +31,7 @@ jobs:
         run: docker-compose -f docker/docker-compose.ci.yml run --rm test  pytest -vv
       # If the tests passed and we're on master/develop, then login to DockerHub
       - name: Login to DockerHub
-        if: ${{ success() }} && (${{ github.ref }} == "refs/heads/develop" || ${{ github.ref }} == "refs/heads/master")
+        if: success() && (github.ref == "refs/heads/develop" || github.ref == "refs/heads/master")
         uses: docker/login-action@v1
         with:
           username: anikalaw
@@ -39,5 +39,5 @@ jobs:
       # If the tests passed and we're on master/develop, then push the image to DockerHub
       # This image will be used for the next deployment.
       - name: Push container image
-        if: ${{ success() }} && (${{ github.ref }} == "refs/heads/develop" || ${{ github.ref }} == "refs/heads/master")
+        if: success() && (github.ref == "refs/heads/develop" || github.ref == "refs/heads/master")
         run: docker push anikalaw/clerk:${TAG}
