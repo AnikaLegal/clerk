@@ -10,15 +10,17 @@ jobs:
       # Set envars for deployment.
       - name: Set env vars
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-              echo -e "\n>>> Using production envars."
-              echo "COMPOSE_SUFFIX=prod" >> $GITHUB_ENV
-              echo "PROJECT=clerk" >> $GITHUB_ENV
+          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "COMPOSE_SUFFIX=staging" >> $GITHUB_ENV
+            echo "PROJECT=clerk_test" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "COMPOSE_SUFFIX=prod" >> $GITHUB_ENV
+            echo "PROJECT=clerk" >> $GITHUB_ENV
           else
-              echo -e "\n>>> Using staging envars."
-              echo "COMPOSE_SUFFIX=staging" >> $GITHUB_ENV
-              echo "PROJECT=clerk_test" >> $GITHUB_ENV
+            echo "Please specify either the develop branch for staging or master branch for prod"
+            exit 1
           fi
+      # Update Docker Swarm on clerk server to deploy new container.
       - name: Run deploy script
         run: ./scripts/deploy/deploy.sh
         shell: bash
