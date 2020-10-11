@@ -35,11 +35,13 @@ class ClientAdmin(admin.ModelAdmin):
         "last_name",
         "email",
         "phone_number",
+        "referrer_type",
+        "referrer",
         "is_eligible",
         "created_at",
         "is_reminder_sent",
     )
-    list_filter = ("is_eligible",)
+    list_filter = ("is_eligible", "referrer_type")
 
 
 @admin.register(Issue)

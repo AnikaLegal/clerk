@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Client, Person, Issue, Tenancy, FileUpload
+from .models import Client, Person, Issue, Tenancy, FileUpload
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -88,6 +88,8 @@ class ClientSerializer(serializers.ModelSerializer):
             "phone_number",
             "call_time",
             "is_eligible",
+            "referrer_type",
+            "referrer",
             "issue_set",
             "tenancy_set",
         )

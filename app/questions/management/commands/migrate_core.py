@@ -7,9 +7,11 @@ from django.utils import timezone
 
 from utils.signals import disable_signals
 
+from core.models.client import ReferrerType
+
 
 class Command(BaseCommand):
-    help = "Test migration"
+    help = "Data migration from questions app to core app"
 
     def handle(self, *args, **kwargs):
         disable_signals()
@@ -32,7 +34,7 @@ class Command(BaseCommand):
         Tenancy.objects.all().delete()
 
         for old_sub in SubmissionOld.objects.all():
-            client, created = get_client(old_sub, Client)
+            client, _ = get_client(old_sub, Client)
             if not client:
                 continue
 
@@ -182,6 +184,21 @@ def get_client(old_sub, Client):
     call_time = parse_call_time(call_time)
     is_eligible = True
 
+    referrer_type_orig = get_answer(old_sub.answers, "CLIENT_REFERRAL")
+    referrer_charity = get_answer(old_sub.answers, "CLIENT_REFERRAL_CHARITY")
+    referrer_legal_center = get_answer(old_sub.answers, "CLIENT_REFERRAL_LEGAL_CENTRE")
+    referrer_other = get_answer(old_sub.answers, "CLIENT_REFERRAL_OTHER")
+    referrer = get_referrer([referrer_charity, referrer_legal_center, referrer_other])
+
+    if referrer_type_orig:
+        try:
+            referrer_type = REF_TYPE_MAP[referrer_type_orig]
+        except KeyError:
+            print(referrer_type_orig)
+            referrer_type = ""
+    else:
+        referrer_type = ""
+
     return Client.objects.get_or_create(
         email=email,
         defaults={
@@ -189,9 +206,11 @@ def get_client(old_sub, Client):
             "last_name": last_name,
             "date_of_birth": date_of_birth,
             "phone_number": phone_number,
-            "call_time": call_time,
+            "call_time": call_time or "",
             "is_eligible": is_eligible,
             "created_at": old_sub.created_at,
+            "referrer_type": referrer_type,
+            "referrer": referrer,
         },
     )
 
@@ -249,6 +268,66 @@ def make_bool(s):
         return False
     else:
         return None
+
+
+def get_referrer(strs):
+    for s in strs:
+        if not s:
+            continue
+
+        for k, v in REF_MAP.items():
+            if k in s.lower():
+                return v
+    return ""
+
+
+REF_MAP = {
+    "asrc": "Asylum Seeker Resource Centre",
+    "asylum seeker": "Asylum Seeker Resource Centre",
+    "cav": "Consumer Affairs Victoria",
+    "consumers affairs": "Consumer Affairs Victoria",
+    "consumer affairs": "Consumer Affairs Victoria",
+    "eastern": "Eastern Community Legal Centre",
+    "tanant victoria": "Tenants Victoria",
+    "tenancy union": "Tenants Victoria",
+    "tenancy union": "Tenants Victoria",
+    "tenant victoria": "Tenants Victoria",
+    "tenants association": "Tenants Victoria",
+    "tenants union": "Tenants Victoria",
+    "tenants victoria": "Tenants Victoria",
+    "tenantsvic": "Tenants Victoria",
+    "tenats vic": "Tenants Victoria",
+    "victenancy": "Tenants Victoria",
+    "reddit": "Reddit",
+    "linkedin": "LinkedIn",
+    "j2si": "Journey to Social Inclusion",
+    "vcat": "VCAT",
+    "vincent care": "Vincent Care",
+    "wayss": "WAYSS",
+    "west justice": "West Justice",
+    "legal aid": "Victoria Legal Aid",
+    "legalaid": "Victoria Legal Aid",
+    "vla": "Victoria Legal Aid",
+    "launch": "Launch Housing",
+    "housing justice": "Housing Victoria",
+    "housing tenancy of victoria": "Housing Victoria",
+    "housing victoria website": "Housing Victoria",
+    "tenancy plus": "Housing Victoria",
+    "justice connect": "Justice Connect",
+}
+
+
+REF_TYPE_MAP = {
+    "Google": ReferrerType.SEARCH,
+    "Social media": ReferrerType.SOCIAL_MEDIA,
+    "Online ad": ReferrerType.ONLINE_AD,
+    "Word of mouth": ReferrerType.WORD_OF_MOUTH,
+    "Charity": ReferrerType.CHARITY,
+    "Legal centre": ReferrerType.LEGAL_CENTRE,
+    "Other": "",
+    "Referred by Tenants Union VIC": ReferrerType.LEGAL_CENTRE,
+    "Facebook": ReferrerType.SOCIAL_MEDIA,
+}
 
 
 JUNK_EMAILS = [
