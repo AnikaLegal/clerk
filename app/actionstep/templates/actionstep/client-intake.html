@@ -35,7 +35,7 @@
     </p>
     <ul>
       {% for upload in uploads%}
-      <li><a href="{{upload.url}}">{{upload.name}}</a></li>
+      <li><a href="{{upload.file.url}}">{{upload.file.name}}</a></li>
       {% endfor %}
     </ul>
     {% endif %}
@@ -48,7 +48,11 @@
     <div class="answer">
       <h2>{{ answer.name }}</h2>
       {% for a in answer.answers %}
-      <p>{{a}}</p>
+      {% if a.file %}
+        <img src="{{ a.file }}" />
+      {% else %}
+        <p>{{a}}</p>
+      {% endif %}
       {% endfor %}
     </div>
     {% endfor %}
