@@ -6,4 +6,4 @@ watchmedo \
     --recursive \
     --pattern '*.py' \
     -- \
-    ./manage.py shell_plus
+    python3.8 ./manage.py shell_plus

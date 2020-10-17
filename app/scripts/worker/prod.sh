@@ -8,4 +8,4 @@ touch /var/log/django.log
 
 
 echo "Starting qcluster"
-./manage.py qcluster
+python3.8 ./manage.py qcluster

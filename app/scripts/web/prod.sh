@@ -12,7 +12,7 @@ touch /var/log/gunicorn/error.log
 touch /var/log/django.log
 
 echo "Running migrations"
-./manage.py migrate
+python3.8 ./manage.py migrate
 
 echo "Starting gunicorn"
 gunicorn clerk.wsgi:application \

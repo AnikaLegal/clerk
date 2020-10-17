@@ -22,6 +22,8 @@ streamlit
 
 # Web scraping
 beautifulsoup4
+# playwright - installed in base Dockerfile.
+pytest-playwright
 
 # Admin
 django-extensions

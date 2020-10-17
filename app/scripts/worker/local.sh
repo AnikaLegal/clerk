@@ -6,4 +6,4 @@ watchmedo \
     --recursive \
     --pattern '*.py' \
     -- \
-    ./manage.py qcluster
+    python3.8 ./manage.py qcluster
