@@ -1,0 +1,13 @@
+name: Integration Tests
+on:
+  - workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out GitHub reportiory
+      - uses: actions/checkout@v2
+      # Run clerk integration unitests
+      - name: Run integration tests
+        run: TAG=staging docker-compose -f docker/docker-compose.ci.yml run --rm python3 /app/play.py
