@@ -10,4 +10,4 @@ jobs:
       - uses: actions/checkout@v2
       # Run clerk integration unitests
       - name: Run integration tests
-        run: TAG=staging docker-compose -f docker/docker-compose.ci.yml run --rm python3 /app/play.py
+        run: TAG=staging docker-compose -f docker/docker-compose.ci.yml run --rm test python3 /app/play.py
