@@ -194,7 +194,6 @@ def get_client(old_sub, Client):
         try:
             referrer_type = REF_TYPE_MAP[referrer_type_orig]
         except KeyError:
-            print(referrer_type_orig)
             referrer_type = ""
     else:
         referrer_type = ""
@@ -318,6 +317,9 @@ REF_MAP = {
 
 
 REF_TYPE_MAP = {
+    "reddit": ReferrerType.SOCIAL_MEDIA,
+    "Reddit": ReferrerType.SOCIAL_MEDIA,
+    "Instagram": ReferrerType.SOCIAL_MEDIA,
     "Google": ReferrerType.SEARCH,
     "Social media": ReferrerType.SOCIAL_MEDIA,
     "Online ad": ReferrerType.ONLINE_AD,
@@ -412,6 +414,7 @@ JUNK_NAMES = [
 ]
 
 JUNK_DATES = [
+    "111-11-11",
     "190-1-11",
     "198-3-22",
     "20109-3-15",
