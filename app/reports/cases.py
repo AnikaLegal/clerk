@@ -5,9 +5,6 @@ import json
 from core.models import Client, Issue
 from .utils import datetime_to_month
 
-MONTHS = [
-    "Jan", "Feb", "Mar", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-]
 
 def fetch_data():
     joined = {
