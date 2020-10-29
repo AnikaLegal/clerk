@@ -19,6 +19,7 @@ First, add a file called `.env` to the repository root with the following conten
 
 ```text
 SENDGRID_API_KEY=
+MAILCHIMP_API_KEY=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ACTIONSTEP_CLIENT_ID=
