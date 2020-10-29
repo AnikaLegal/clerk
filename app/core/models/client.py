@@ -19,6 +19,7 @@ class ReferrerType:
     SOCIAL_MEDIA = "SOCIAL_MEDIA"
     WORD_OF_MOUTH = "WORD_OF_MOUTH"
     ONLINE_AD = "ONLINE_AD"
+    HOUSING_SERVICE = "HOUSING_SERVICE"
 
 
 class Client(TimestampedModel):
@@ -40,6 +41,7 @@ class Client(TimestampedModel):
         (ReferrerType.SOCIAL_MEDIA, ReferrerType.SOCIAL_MEDIA),
         (ReferrerType.WORD_OF_MOUTH, ReferrerType.WORD_OF_MOUTH),
         (ReferrerType.ONLINE_AD, ReferrerType.ONLINE_AD),
+        (ReferrerType.HOUSING_SERVICE, ReferrerType.HOUSING_SERVICE),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
