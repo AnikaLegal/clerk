@@ -1,4 +1,10 @@
 #!/bin/bash
 set -e
 cd /app/
-streamlit run dash.py
+watchmedo \
+    auto-restart \
+    --directory /app/ \
+    --recursive \
+    --pattern '*.py' \
+    -- \
+    streamlit run dash.py
