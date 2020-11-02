@@ -12,6 +12,7 @@ from reports.problems import run_problems
 from reports.demographics import run_demographics
 from reports.cases import run_cases
 
+
 def run_streamlit():
     st.sidebar.header("Anika Reports")
     page = st.sidebar.selectbox("Select a report", list(PAGES.keys()))
@@ -20,8 +21,8 @@ def run_streamlit():
 
 
 PAGES = {
-    "Cases by Referral": run_cases,
     "Submissions": run_issues,
+    "Cases by Referral": run_cases,
     "Referrals": run_referrals,
     "Client Issues": run_problems,
     "Demographics": run_demographics,
