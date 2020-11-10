@@ -13,6 +13,7 @@ django-q
 djangorestframework
 django-cors-headers
 mailchimp3
+twilio
 
 # Static files
 whitenoise
