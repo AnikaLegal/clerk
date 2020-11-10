@@ -1,14 +1,13 @@
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-
 from twilio.twiml.voice_response import VoiceResponse, Gather
+from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
+from .models import Call
 
 
-@require_http_methods(["POST"])
-@csrf_exempt
+@require_http_methods(["GET"])
 def answer_view(request):
     """Respond to phone call from user"""
     response = VoiceResponse()
@@ -19,7 +18,7 @@ def answer_view(request):
         "Thank you for calling Anika Legal. \
         For information about repairing your rental property, please press 1. \
         For information about negotiating a rent reduction, please press 2. \
-        For all other enquiries, please press 3.",
+        If you have specific enquiry and want us to call you back, please press 3.",
         voice="alice",
         language="en-AU",
     )
@@ -34,8 +33,7 @@ def answer_view(request):
     return TwimlResponse(response)
 
 
-@require_http_methods(["POST"])
-@csrf_exempt
+@require_http_methods(["GET"])
 def collect_view(request):
     """Retrieve information from user's call"""
     response = VoiceResponse()
@@ -51,11 +49,14 @@ def collect_view(request):
 
     # Generate message depending on user choice.
     if choice == "1":
-        message = "Thank you for enquiring about repairing your rental property, please fill in the form at this link: https://test-intake.anikalegal.com/"
+        message = "Thank you for enquiring about repairing your rental property, \
+            please fill in the form at this link: https://test-intake.anikalegal.com/"
     elif choice == "2":
-        message = "Thank you for enquiring about reducing your rent, please fill in the form at this link: https://test-intake.anikalegal.com/"
+        message = "Thank you for enquiring about reducing your rent, \
+            please fill in the form at this link: https://test-intake.anikalegal.com/"
     elif choice == "3":
-        message = "Thank you for contacting us about your specific enquiry, one of our staff will call back in the next few days."
+        message = "Thank you for contacting us about your specific enquiry, \
+            one of our staff will call back in the next few days."
     else:
         response.say(
             "Sorry we haven't received a valid choice, please try again.",
@@ -71,6 +72,17 @@ def collect_view(request):
         "An SMS relating to your enquiry has been sent.",
         voice="alice",
         language="en-AU",
+    )
+    return TwimlResponse(response)
+
+
+@require_http_methods(["GET"])
+def message_view(request):
+    """Respond to SMS from user"""
+    response = MessagingResponse()
+    response.message(
+        "Thank you for sending us an SMS. \
+            Please call us on this number or direct written enquiries to contact@anikalegal.com"
     )
     return TwimlResponse(response)
 
