@@ -8,6 +8,6 @@ class Call(TimestampedModel):
     """
 
     phone_number = models.CharField(max_length=32)
-    topic = models.CharField(max_length=1)
+    topic = models.CharField(max_length=1, blank=True)
     requires_callback = models.BooleanField(default=False)
     number_callbacks = models.IntegerField(default=0)

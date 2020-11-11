@@ -12,19 +12,24 @@ def answer_view(request):
     """Respond to phone call from user"""
     response = VoiceResponse()
 
+    # Create an entry for this new call.
+    number = request.GET.get("From")
+    call = Call(phone_number=number)
+    call.save()
+
     # Play message and record user's choice.
-    gather = Gather(action="/caller/collect", numDigits=1)
+    gather = Gather(action="/caller/collect/", numDigits=1, method="GET")
     gather.say(
         "Thank you for calling Anika Legal. \
-        For information about repairing your rental property, please press 1. \
-        For information about negotiating a rent reduction, please press 2. \
-        If you have specific enquiry and want us to call you back, please press 3.",
+            For information about repairing your rental property, please press 1. \
+            For information about negotiating a rent reduction, please press 2. \
+            If you have a different enquiry and want us to call you back, please press 3.",
         voice="alice",
         language="en-AU",
     )
     response.append(gather)
 
-    # End the call if user doesn't respond.
+    # End the call if user doesn't give us anything.
     response.say(
         "Sorry we haven't received a response, goodbye.",
         voice="alice",
@@ -35,12 +40,12 @@ def answer_view(request):
 
 @require_http_methods(["GET"])
 def collect_view(request):
-    """Retrieve information from user's call"""
+    """Handle phone call where user makes a choice"""
     response = VoiceResponse()
 
-    # Retrieve caller's number and choice.
-    number = request.POST.get("From")
-    choice = request.POST.get("Digits")
+    # Retrieve user's number and choice.
+    number = request.GET.get("From")
+    choice = request.GET.get("Digits")
 
     # Authenticate to send SMS.
     account_sid = settings.TWILIO_ACCOUNT_SID
@@ -49,30 +54,33 @@ def collect_view(request):
 
     # Generate message depending on user choice.
     if choice == "1":
-        message = "Thank you for enquiring about repairing your rental property, \
-            please fill in the form at this link: https://test-intake.anikalegal.com/"
+        message = "Thank you for enquiring about repairing your rental property, please fill in the form at this link: https://test-intake.anikalegal.com/"
     elif choice == "2":
-        message = "Thank you for enquiring about reducing your rent, \
-            please fill in the form at this link: https://test-intake.anikalegal.com/"
+        message = "Thank you for enquiring about reducing your rent, please fill in the form at this link: https://test-intake.anikalegal.com/"
     elif choice == "3":
-        message = "Thank you for contacting us about your specific enquiry, \
-            one of our staff will call back in the next few days."
+        message = "Thank you for contacting us about your specific enquiry, one of our staff will call back in the next few days."
     else:
         response.say(
-            "Sorry we haven't received a valid choice, please try again.",
+            "Sorry we haven't received a valid choice, goodbye.",
             voice="alice",
             language="en-AU",
         )
-        response.redirect("/caller/answer", method="POST")
         return TwimlResponse(response)
 
-    # for choices 1 - 3.
+    # Send an SMS for valid choices.
     client.messages.create(to=number, from_="+61488839562", body=message)
     response.say(
         "An SMS relating to your enquiry has been sent.",
         voice="alice",
         language="en-AU",
     )
+
+    # Retrieve and update corresponding entry for valid choices.
+    call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
+    call.topic = choice
+    call.requires_callback = True if choice == "3" else False
+    call.save()
+
     return TwimlResponse(response)
 
 
@@ -81,8 +89,7 @@ def message_view(request):
     """Respond to SMS from user"""
     response = MessagingResponse()
     response.message(
-        "Thank you for sending us an SMS. \
-            Please call us on this number or direct written enquiries to contact@anikalegal.com"
+        "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
     )
     return TwimlResponse(response)
 

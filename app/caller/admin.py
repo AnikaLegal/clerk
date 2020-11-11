@@ -4,6 +4,7 @@ from .models import Call
 
 class CallAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "phone_number",
         "topic",
         "created_at",
