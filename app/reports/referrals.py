@@ -72,7 +72,6 @@ def topic_bar_chart(data_df: pd.DataFrame, column: str):
 
 
 def get_referral_df():
-    query_fields = ["topic", "created_at", "answers", "is_submitted"]
     questions = [
         "CLIENT_REFERRAL",
         "CLIENT_REFERRAL_LEGAL_CENTRE",
@@ -93,4 +92,3 @@ def get_referral_df():
     return pd.DataFrame(
         data, columns=["topic", "created_at", "is_submitted", *questions]
     )
-

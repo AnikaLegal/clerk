@@ -25,6 +25,7 @@ run_docker ./manage.py createsuperuser \
 
 echo -e "\nSetting superuser 'admin' password to 12345"
 SHELL_CMD="\
+Group.objects.get_or_create(name='Impact');\
 u=User.objects.get(username='admin');\
 u.set_password('12345');\
 u.save();\

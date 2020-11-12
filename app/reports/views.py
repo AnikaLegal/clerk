@@ -1,8 +1,19 @@
 import pandas as pd
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from core.models import Issue
+
+
+def group_required(*group_names):
+    """Requires user membership in at least one of the groups passed in."""
+
+    def in_groups(u):
+        return u.is_authenticated and (
+            u.groups.filter(name__in=group_names).exists() | u.is_superuser
+        )
+
+    return user_passes_test(in_groups, login_url="403")
 
 
 @login_required(login_url="/admin/login/")
@@ -19,6 +30,7 @@ def reports_view(request, path):
 IMPACT_CSV_FIELDS = {
     # Client info
     "ISSUE_ID": lambda issue: issue.id,
+    "ISSUE_CREATED": lambda issue: issue.created_at.date(),
     "CLIENT_FIRST_NAME": lambda issue: issue.client.first_name,
     "CLIENT_LAST_NAME": lambda issue: issue.client.last_name,
     "CLIENT_EMAIL": lambda issue: issue.client.email,
@@ -52,8 +64,8 @@ IMPACT_CSV_FIELDS = {
 }
 
 
-# TODO add group permission
 @login_required(login_url="/admin/login/")
+@group_required("Impact")
 def impact_view(request):
     """"""
     issues = (
