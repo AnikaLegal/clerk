@@ -93,6 +93,7 @@ def _send_issue_actionstep(issue_pk: str):
             file_reference=fileref_name,
             participant_id=owner_data["id"],
         )
+        Issue.objects.filter(pk=issue_pk).update(fileref=fileref_name)
         action_id = action_data["id"]
         client_id = participant_data["id"]
         api.participants.set_action_participant(
