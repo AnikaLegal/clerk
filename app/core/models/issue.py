@@ -13,13 +13,19 @@ class CaseTopic:
     OTHER = "OTHER"
 
 
-class CaseStatus:
-    OPEN = "OPEN"  # Previous 'Ongoing' - we are working on the case.
-    NO_CONTACT = "NO_CONTACT"  # Have not yet engaged the client, cannot contact the,
-    UNRESPONSIVE = "UNRESPONSIVE"  # Previously 'Stopped'. We engaged the client but the client is unresponsive.
-    POST_CASE = "POST_CASE"  # We have serviced the client but we have some extra stuff like post case interview to do.
-    CLOSED = "CLOSED"  # We provided a service and there is no more work to do.
-    REFERRED = "REFERRED"  # Referred to another org
+class CaseStage:
+    ENGAGED = "ENGAGED"
+    ADVICE = "ADVICE"
+    POST_CASE = "POST_CASE"
+
+
+class CaseOutcome:
+    UNRESPONSIVE = "UNRESPONSIVE"
+    OUT_OF_SCOPE = "OUT_OF_SCOPE"
+    SUCCESS = "SUCCESS"
+    UNSUCCESSFUL = "UNSUCCESSFUL"
+    REFERRED = "REFERRED"
+    ESCALATION = "ESCALATION"
 
 
 class Issue(TimestampedModel):
@@ -27,13 +33,19 @@ class Issue(TimestampedModel):
     A client's specific issue.
     """
 
-    STATUS_CHOICES = (
-        (CaseStatus.OPEN, CaseStatus.OPEN),
-        (CaseStatus.NO_CONTACT, CaseStatus.NO_CONTACT),
-        (CaseStatus.UNRESPONSIVE, CaseStatus.UNRESPONSIVE),
-        (CaseStatus.POST_CASE, CaseStatus.POST_CASE),
-        (CaseStatus.CLOSED, CaseStatus.CLOSED),
-        (CaseStatus.REFERRED, CaseStatus.REFERRED),
+    STAGE_CHOICES = (
+        (CaseStage.ENGAGED, CaseStage.ENGAGED),
+        (CaseStage.ADVICE, CaseStage.ADVICE),
+        (CaseStage.POST_CASE, CaseStage.POST_CASE),
+    )
+
+    OUTCOME_CHOICES = (
+        (CaseOutcome.UNRESPONSIVE, CaseOutcome.UNRESPONSIVE),
+        (CaseOutcome.OUT_OF_SCOPE, CaseOutcome.OUT_OF_SCOPE),
+        (CaseOutcome.SUCCESS, CaseOutcome.SUCCESS),
+        (CaseOutcome.UNSUCCESSFUL, CaseOutcome.UNSUCCESSFUL),
+        (CaseOutcome.REFERRED, CaseOutcome.REFERRED),
+        (CaseOutcome.ESCALATION, CaseOutcome.ESCALATION),
     )
 
     TOPIC_CHOICES = (
@@ -46,11 +58,10 @@ class Issue(TimestampedModel):
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
     # Where the case is at now.
-    status = models.CharField(
-        max_length=32, default=CaseStatus.OPEN, choices=STATUS_CHOICES
-    )
-    # An explanation of the status
-    status_note = models.CharField(max_length=256, default="")
+    stage = models.CharField(max_length=32, null=True, blank=True, choices=STAGE_CHOICES)
+    # An explanation of the outcome
+    outcome = models.CharField(max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES)
+    outcome_notes = models.CharField(max_length=256, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)
     # File reference number from ActionStep
@@ -59,6 +70,8 @@ class Issue(TimestampedModel):
     answers = models.JSONField(encoder=DjangoJSONEncoder)
     # The person we are trying to help.
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    # Tracks whether the case has been closed by paralegals.
+    is_open = models.BooleanField(default=True)
     # Tracks whether the client has finished answering all questions.
     is_answered = models.BooleanField(default=False)
     # Tracks whether the client has submitted their issue to Anika for help.
