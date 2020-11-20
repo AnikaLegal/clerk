@@ -6,6 +6,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 from .models import Call
 
+# Insert the Twilio number purchased
 BOUGHT = "+61488839562"
 
 
