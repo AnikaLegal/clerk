@@ -1,18 +1,14 @@
 from rest_framework import serializers
 
-from .models import Client, Person, Issue, Tenancy, FileUpload
+from .models import Submission, FileUpload
 
 
-class PersonSerializer(serializers.ModelSerializer):
+class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Person
+        model = Submission
         fields = (
             "id",
-            "full_name",
-            "email",
-            "company",
-            "address",
-            "phone_number",
+            "answers",
         )
 
 
@@ -20,79 +16,3 @@ class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
         fields = ("id", "file", "issue")
-
-
-class TenancySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tenancy
-        fields = (
-            "id",
-            "client",
-            "address",
-            "started",
-            "is_on_lease",
-            "landlord",
-            "landlord_id",
-            "agent",
-            "agent_id",
-        )
-
-    landlord = PersonSerializer(read_only=True)
-    landlord_id = serializers.IntegerField(write_only=True, required=False)
-
-    agent = PersonSerializer(read_only=True)
-    agent_id = serializers.IntegerField(write_only=True, required=False)
-
-    def update(self, instance, validated_data):
-        """
-        Add agent or landlord to tenancy if requested.
-        """
-        tenancy = super().update(instance, validated_data)
-        agent_id = validated_data.get("agent_id")
-        landlord_id = validated_data.get("landlord_id")
-        if agent_id:
-            tenancy.agent_id = agent_id
-            tenancy.save()
-        if landlord_id:
-            tenancy.landlord_id = landlord_id
-            tenancy.save()
-
-        return tenancy
-
-
-class IssueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Issue
-        fields = (
-            "id",
-            "topic",
-            "is_answered",
-            "is_submitted",
-            "answers",
-            "client",
-            "fileupload_set",
-        )
-
-    fileupload_set = FileUploadSerializer(many=True, read_only=True)
-
-
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "email",
-            "date_of_birth",
-            "phone_number",
-            "call_time",
-            "is_eligible",
-            "referrer_type",
-            "referrer",
-            "issue_set",
-            "tenancy_set",
-        )
-
-    tenancy_set = TenancySerializer(many=True, read_only=True)
-    issue_set = IssueSerializer(many=True, read_only=True)

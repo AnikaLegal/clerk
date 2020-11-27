@@ -54,8 +54,6 @@ class Client(TimestampedModel):
         max_length=32, choices=CALL_TIME_CHOICES, blank=True, default=""
     )
     is_eligible = models.BooleanField(null=True, blank=True)
-    # Tracks whether MailChimp reminder email has been successfully sent.
-    is_reminder_sent = models.BooleanField(default=False)
 
     # How did the client find us?
     referrer_type = models.CharField(

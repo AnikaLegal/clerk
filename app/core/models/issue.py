@@ -58,9 +58,13 @@ class Issue(TimestampedModel):
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
     # Where the case is at now.
-    stage = models.CharField(max_length=32, null=True, blank=True, choices=STAGE_CHOICES)
+    stage = models.CharField(
+        max_length=32, null=True, blank=True, choices=STAGE_CHOICES
+    )
     # An explanation of the outcome
-    outcome = models.CharField(max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES)
+    outcome = models.CharField(
+        max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES
+    )
     outcome_notes = models.CharField(max_length=256, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)
@@ -72,10 +76,6 @@ class Issue(TimestampedModel):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
-    # Tracks whether the client has finished answering all questions.
-    is_answered = models.BooleanField(default=False)
-    # Tracks whether the client has submitted their issue to Anika for help.
-    is_submitted = models.BooleanField(default=False)
     # Tracks whether a Slack alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.

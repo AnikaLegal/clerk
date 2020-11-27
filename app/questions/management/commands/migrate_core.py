@@ -26,6 +26,7 @@ class Command(BaseCommand):
         Person = apps.get_model("core", "Person")
         FileUpload = apps.get_model("core", "FileUpload")
         Tenancy = apps.get_model("core", "Tenancy")
+        Submission = apps.get_model("core", "Submission")
 
         Issue.objects.all().delete()
         Client.objects.all().delete()
@@ -34,6 +35,22 @@ class Command(BaseCommand):
         Tenancy.objects.all().delete()
 
         for old_sub in SubmissionOld.objects.all():
+            answers = {
+                a["name"]: a.get("answer") for a in old_sub.answers if "name" in a
+            }
+
+            if answers:
+                Submission.objects.update_or_create(
+                    id=old_sub.id,
+                    defaults={
+                        "answers": answers,
+                        "is_complete": old_sub.complete,
+                        "is_processed": old_sub.is_case_sent,
+                        "created_at": old_sub.created_at,
+                        "modified_at": old_sub.modified_at,
+                    },
+                )
+
             client, _ = get_client(old_sub, Client)
             if not client:
                 continue
@@ -50,14 +67,8 @@ class Command(BaseCommand):
                 defaults={
                     "created_at": old_sub.created_at,
                     "topic": update_topic(old_sub.topic),
-                    "answers": {
-                        a["name"]: a.get("answer")
-                        for a in old_sub.answers
-                        if "name" in a
-                    },
+                    "answers": answers,
                     "client": client,
-                    "is_answered": old_sub.complete,
-                    "is_submitted": old_sub.complete,
                     "is_alert_sent": old_sub.is_alert_sent,
                     "is_case_sent": old_sub.is_case_sent,
                 },

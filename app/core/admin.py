@@ -6,7 +6,20 @@ from core.services.slack import send_issue_slack
 from actionstep.services.actionstep import send_issue_actionstep
 from utils.admin import admin_link, dict_to_json_html
 
-from .models import FileUpload, Issue, Client, Person, Tenancy
+from .models import FileUpload, Issue, Client, Person, Tenancy, Submission
+
+
+@admin.register(Submission)
+class SubmissionAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "created_at",
+        "modified_at",
+        "is_complete",
+        "is_processed",
+        "is_reminder_sent",
+    )
 
 
 @admin.register(FileUpload)
@@ -17,7 +30,7 @@ class FileUploadAdmin(admin.ModelAdmin):
 
     @admin_link("issue", "Issue")
     def issue_link(self, issue):
-        return issue.id
+        return issue.id if issue else None
 
 
 @admin.register(Person)
@@ -39,7 +52,6 @@ class ClientAdmin(admin.ModelAdmin):
         "referrer",
         "is_eligible",
         "created_at",
-        "is_reminder_sent",
     )
     list_filter = ("is_eligible", "referrer_type")
 
@@ -53,16 +65,12 @@ class IssueAdmin(admin.ModelAdmin):
         "id",
         "topic_pretty",
         "client_link",
-        "is_answered",
-        "is_submitted",
         "is_alert_sent",
         "is_case_sent",
         "created_at",
     )
     list_filter = (
         "topic",
-        "is_answered",
-        "is_submitted",
         "is_alert_sent",
         "is_case_sent",
     )

@@ -9,11 +9,8 @@ from reports.views import reports_view, impact_view
 from core import views as core_views
 
 router = routers.SimpleRouter()
-router.register("client", core_views.ClientViewSet, basename="client")
-router.register("person", core_views.PersonViewSet, basename="person")
 router.register("upload", core_views.UploadViewSet, basename="upload")
-router.register("tenancy", core_views.TenancyViewSet, basename="tenancy")
-router.register("issue", core_views.IssueViewSet, basename="issue")
+router.register("submission", core_views.SubmissionViewSet, basename="upload")
 
 urlpatterns = [
     path("reports/impact.csv", impact_view, name="impact-csv"),
