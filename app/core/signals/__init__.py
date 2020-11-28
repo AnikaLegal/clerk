@@ -1,1 +1,1 @@
-from .issue import *
+from . import issue, submission

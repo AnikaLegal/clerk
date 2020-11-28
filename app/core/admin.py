@@ -69,11 +69,7 @@ class IssueAdmin(admin.ModelAdmin):
         "is_case_sent",
         "created_at",
     )
-    list_filter = (
-        "topic",
-        "is_alert_sent",
-        "is_case_sent",
-    )
+    list_filter = ("topic", "is_alert_sent", "is_case_sent")
 
     list_select_related = ("client",)
 
@@ -114,16 +110,14 @@ class TenancyAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "address",
+        "postcode",
+        "suburb",
         "client_link",
         "landlord_link",
         "agent_link",
         "created_at",
     )
-    list_select_related = (
-        "client",
-        "landlord",
-        "agent",
-    )
+    list_select_related = ("client", "landlord", "agent")
 
     @admin_link("client", "Client")
     def client_link(self, client):

@@ -1,3 +1,4 @@
+import json
 import re
 
 from datetime import datetime
@@ -8,6 +9,12 @@ from django.utils import timezone
 from utils.signals import disable_signals
 
 from core.models.client import ReferrerType
+
+with open("/app/data/postcode_to_suburb.json") as f:
+    POSTCODE_TO_SUBURB = json.load(f)
+
+with open("/app/data/suburb_to_postcode.json") as f:
+    SUBURB_TO_POSTCODE = json.load(f)
 
 
 class Command(BaseCommand):
@@ -35,9 +42,7 @@ class Command(BaseCommand):
         Tenancy.objects.all().delete()
 
         for old_sub in SubmissionOld.objects.all():
-            answers = {
-                a["name"]: a.get("answer") for a in old_sub.answers if "name" in a
-            }
+            answers = {a["name"]: a.get("answer") for a in old_sub.answers if "name" in a}
 
             if answers:
                 Submission.objects.update_or_create(
@@ -113,6 +118,34 @@ def get_tenancy(old_sub, client, Tenancy, Person):
     if not address:
         return None, False
 
+    # Try figure out postcode
+    postcode = None
+    suburb = None
+
+    cleaned_address = (
+        address.replace("VIC", "")
+        .replace("Vic", "")
+        .replace("vic", "")
+        .replace("Victoria", "")
+        .replace(",", " ")
+        .strip()
+    )
+
+    for p in POSTCODE_TO_SUBURB:
+        if p in address:
+            postcode = p
+            suburbs = POSTCODE_TO_SUBURB[p]
+            if len(suburbs) == 1:
+                suburb = suburbs[0]
+
+    if not postcode:
+        for s in SUBURB_TO_POSTCODE:
+            if s in address:
+                suburb = s
+                postcodes = SUBURB_TO_POSTCODE[s]
+                if len(postcodes) == 1:
+                    postcode = postcodes[0]
+
     start_date = parse_dob(start_date)
 
     # Agent
@@ -167,6 +200,8 @@ def get_tenancy(old_sub, client, Tenancy, Person):
             "created_at": old_sub.created_at,
             "landlord": landlord,
             "agent": agent,
+            "postcode": postcode,
+            "suburb": suburb,
         },
     )
 

@@ -1,0 +1,77 @@
+import logging
+
+from core.models import Submission
+
+logger = logging.getLogger(__name__)
+
+
+def process_submission(sub_pk: str):
+    logger.info("Processing Submission[%s]", sub_pk)
+    sub = Submission.objects.get(pk=sub_pk)
+
+
+"""
+Client
+    FIRST_NAME
+    LAST_NAME
+    EMAIL
+    
+    # Break suburb up into postcode / address / suburb
+
+    DOB
+    GENDER
+    GENDER_DETAILS
+    IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER
+    CAN_SPEAK_NON_ENGLISH
+    PHONE
+    AVAILIBILITY
+    REFERRER_TYPE
+    LEGAL_CENTER_REFERRER
+    HOUSING_SERVICE_REFERRER
+    CHARITY_REFERRER
+    SOCIAL_REFERRER
+
+Tenancy
+    SUBURB
+    POSTCODE
+    ADDRESS
+    START_DATE
+    IS_ON_LEASE
+    (agent, landlord)
+
+Person (Agent / Landlord)
+    PROPERTY_MANAGER_IS_AGENT
+    AGENT_NAME
+    AGENT_ADDRESS
+    AGENT_EMAIL
+    AGENT_PHONE
+    LANDLORD_NAME
+    LANDLORD_ADDRESS
+    LANDLORD_EMAIL
+    LANDLORD_PHONE
+
+
+Issue / Upload
+    ISSUES
+    REPAIRS_REQUIRED
+    REPAIRS_ISSUE_DESCRIPTION
+    REPAIRS_ISSUE_START
+    REPAIRS_ISSUE_PHOTO
+    REPAIRS_OUTRO
+    RENT_REDUCTION_INTRO
+    RENT_REDUCTION_ISSUES
+    RENT_REDUCTION_ISSUE_DESCRIPTION
+    RENT_REDUCTION_ISSUE_START
+    RENT_REDUCTION_ISSUE_PHOTO
+    RENT_REDUCTION_IS_NOTICE_TO_VACATE
+    RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT
+    RENT_REDUCTION_OUTRO
+    OTHER_INTRO
+    OTHER_ISSUE_DESCRIPTION
+    OTHER_OUTRO
+
+
+
+
+
+"""
