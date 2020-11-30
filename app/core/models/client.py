@@ -50,8 +50,13 @@ class Client(TimestampedModel):
     email = models.EmailField(max_length=150)
     date_of_birth = models.DateTimeField(null=True, blank=True)
     phone_number = models.CharField(max_length=32, blank=True, default="")
-    call_time = models.CharField(max_length=32, choices=CALL_TIME_CHOICES, blank=True, default="")
-    is_eligible = models.BooleanField(null=True, blank=True)
+    call_time = models.CharField(
+        max_length=32, choices=CALL_TIME_CHOICES, blank=True, default=""
+    )
+    gender = models.CharField(max_length=64, null=True, blank=True)
+    gender_details = models.CharField(max_length=256, null=True, blank=True)
+    can_speak_non_english = models.BooleanField(default=False)
+    is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
 
     # How did the client find us?
     referrer_type = models.CharField(

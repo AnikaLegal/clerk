@@ -58,9 +58,13 @@ class Issue(TimestampedModel):
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
     # Where the case is at now.
-    stage = models.CharField(max_length=32, null=True, blank=True, choices=STAGE_CHOICES)
+    stage = models.CharField(
+        max_length=32, null=True, blank=True, choices=STAGE_CHOICES
+    )
     # An explanation of the outcome
-    outcome = models.CharField(max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES)
+    outcome = models.CharField(
+        max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES
+    )
     outcome_notes = models.CharField(max_length=256, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)

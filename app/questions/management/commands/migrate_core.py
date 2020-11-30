@@ -13,9 +13,6 @@ from core.models.client import ReferrerType
 with open("/app/data/postcode_to_suburb.json") as f:
     POSTCODE_TO_SUBURB = json.load(f)
 
-with open("/app/data/suburb_to_postcode.json") as f:
-    SUBURB_TO_POSTCODE = json.load(f)
-
 
 class Command(BaseCommand):
     help = "Data migration from questions app to core app"
@@ -42,7 +39,9 @@ class Command(BaseCommand):
         Tenancy.objects.all().delete()
 
         for old_sub in SubmissionOld.objects.all():
-            answers = {a["name"]: a.get("answer") for a in old_sub.answers if "name" in a}
+            answers = {
+                a["name"]: a.get("answer") for a in old_sub.answers if "name" in a
+            }
 
             if answers:
                 Submission.objects.update_or_create(
@@ -122,15 +121,6 @@ def get_tenancy(old_sub, client, Tenancy, Person):
     postcode = None
     suburb = None
 
-    cleaned_address = (
-        address.replace("VIC", "")
-        .replace("Vic", "")
-        .replace("vic", "")
-        .replace("Victoria", "")
-        .replace(",", " ")
-        .strip()
-    )
-
     for p in POSTCODE_TO_SUBURB:
         if p in address:
             postcode = p
@@ -138,21 +128,11 @@ def get_tenancy(old_sub, client, Tenancy, Person):
             if len(suburbs) == 1:
                 suburb = suburbs[0]
 
-    if not postcode:
-        for s in SUBURB_TO_POSTCODE:
-            if s in address:
-                suburb = s
-                postcodes = SUBURB_TO_POSTCODE[s]
-                if len(postcodes) == 1:
-                    postcode = postcodes[0]
-
     start_date = parse_dob(start_date)
 
     # Agent
-    landlord_has_agent = make_bool(get_answer(old_sub.answers, "LANDLORD_HAS_AGENT"))
     agent_email = get_answer(old_sub.answers, "AGENT_EMAIL")
     agent_name = get_answer(old_sub.answers, "AGENT_NAME")
-    agent_company = get_answer(old_sub.answers, "AGENT_COMPANY") or ""
     agent_address = get_answer(old_sub.answers, "AGENT_ADDRESS") or ""
     agent_phone = parse_phone(get_answer(old_sub.answers, "AGENT_PHONE") or "")
     if agent_email and "http://" in agent_email:
@@ -176,7 +156,6 @@ def get_tenancy(old_sub, client, Tenancy, Person):
             full_name=agent_name.title(),
             address=agent_address,
             email=agent_email,
-            company=agent_company,
             phone_number=agent_phone,
             created_at=old_sub.created_at,
         )
@@ -228,7 +207,6 @@ def get_client(old_sub, Client):
 
     call_time = get_answer(old_sub.answers, "CLIENT_CALL_TIME") or []
     call_time = parse_call_time(call_time)
-    is_eligible = True
 
     referrer_type_orig = get_answer(old_sub.answers, "CLIENT_REFERRAL")
     referrer_charity = get_answer(old_sub.answers, "CLIENT_REFERRAL_CHARITY")
@@ -252,7 +230,6 @@ def get_client(old_sub, Client):
             "date_of_birth": date_of_birth,
             "phone_number": phone_number,
             "call_time": call_time or "",
-            "is_eligible": is_eligible,
             "created_at": old_sub.created_at,
             "referrer_type": referrer_type,
             "referrer": referrer,

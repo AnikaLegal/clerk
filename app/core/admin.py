@@ -50,10 +50,9 @@ class ClientAdmin(admin.ModelAdmin):
         "phone_number",
         "referrer_type",
         "referrer",
-        "is_eligible",
         "created_at",
     )
-    list_filter = ("is_eligible", "referrer_type")
+    list_filter = ("referrer_type",)
 
 
 @admin.register(Issue)
