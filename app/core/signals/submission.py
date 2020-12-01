@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=Submission)
-def save_issue(sender, instance, **kwargs):
+def save_submission(sender, instance, **kwargs):
     sub = instance
     if sub.is_complete and not sub.is_processed:
         logger.info("Dispatching processing task for Submission<%s]>", sub.pk)

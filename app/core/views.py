@@ -33,19 +33,16 @@ class SubmissionViewSet(
     @action(detail=True, methods=["post"])
     def submit(self, request, *args, **kwargs):
         submission = self.get_object()
-        if submission.is_complete:
-            raise SubmittedException()
-
         submission.is_complete = True
         submission.save()
         return Response({}, status=200)
 
-    def get(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         submission = self.get_object()
         if submission.is_complete:
             raise SubmittedException()
 
-        return super().get(request, *args, **kwargs)
+        return super().retrieve(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         submission = self.get_object()

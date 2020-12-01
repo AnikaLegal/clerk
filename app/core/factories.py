@@ -52,7 +52,6 @@ class PersonFactory(TimestampedModelFactory):
 
     full_name = factory.Faker("name")
     email = factory.Faker("ascii_email")
-    company = factory.Faker("company")
     address = factory.Faker("address")
     phone_number = factory.Faker("phone_number")
 

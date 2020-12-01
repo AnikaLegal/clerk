@@ -74,7 +74,7 @@ def send_email(submissions, list_id, workflow_id, email_id):
         except ValueError:
             logger.info(
                 "'%s' is invalid email address for incomplete issue %s",
-                email.email,
+                email,
                 sub_id,
             )
             continue

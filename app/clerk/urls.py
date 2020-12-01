@@ -10,7 +10,7 @@ from core import views as core_views
 
 router = routers.SimpleRouter()
 router.register("upload", core_views.UploadViewSet, basename="upload")
-router.register("submission", core_views.SubmissionViewSet, basename="upload")
+router.register("submission", core_views.SubmissionViewSet, basename="submission")
 
 urlpatterns = [
     path("reports/impact.csv", impact_view, name="impact-csv"),

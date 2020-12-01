@@ -9,7 +9,7 @@ from core.models import Issue
 
 
 @pytest.mark.django_db
-def test_slack_issuemission_message(monkeypatch):
+def test_slack_issue_message(monkeypatch):
     """
     Ensure we call Slack without anything exploding
     """

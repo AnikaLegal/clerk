@@ -45,10 +45,6 @@ def create_pdf(issue: Issue):
             people_info.append({"name": f"{title} name", "answers": [person.full_name]})
         if person.email:
             people_info.append({"name": f"{title} email", "answers": [person.email]})
-        if person.company:
-            people_info.append(
-                {"name": f"{title} company", "answers": [person.company]}
-            )
         if person.address:
             people_info.append(
                 {"name": f"{title} address", "answers": [person.address]}

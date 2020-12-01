@@ -17,9 +17,9 @@ def test_issue_actionstep(mock_api):
         email="keith@anikalegal.com",
         phone_number="0412348793",
     )
-    tenancy = TenancyFactory(client=client)
+    TenancyFactory(client=client)
     answers = {"FAVOURITE_ANIMAL": "Cow", "BEST_TRICK": "I can do a backflip."}
-    sub = IssueFactory(is_submitted=False, answers=answers, client=client)
+    issue = IssueFactory(answers=answers, client=client)
 
     # Set mock return values for all API calls made in _send_issue_actionstep()
     participant = {
@@ -101,17 +101,17 @@ def test_issue_actionstep(mock_api):
     mock_api.return_value.files.upload.return_value = file_upload_status
 
     # Test when issue has action
-    _send_issue_actionstep(sub.pk)
-    res_sub = Issue.objects.get(pk=sub.id)
+    _send_issue_actionstep(issue.pk)
+    res_issue = Issue.objects.get(pk=issue.id)
     assert mock_api.return_value.actions.create.call_count == 0
     assert mock_api.return_value.files.upload.call_count == 1
-    assert res_sub.is_case_sent
+    assert res_issue.is_case_sent
 
     mock_api.reset_mock()
 
     # Test when issue has no action
-    _send_issue_actionstep(sub.pk)
-    res_sub = Issue.objects.get(pk=sub.id)
+    _send_issue_actionstep(issue.pk)
+    res_issue = Issue.objects.get(pk=issue.id)
     assert mock_api.return_value.actions.create.call_count == 1
     assert mock_api.return_value.files.upload.call_count == 1
-    assert res_sub.is_case_sent
+    assert res_issue.is_case_sent

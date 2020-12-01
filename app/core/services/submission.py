@@ -94,50 +94,48 @@ def process_submission(sub_pk: str):
         logger.exception("Could not process Tenancy for Submission[%s]")
         raise
 
+    ISSUE_ANSWERS = {
+        "REPAIRS": {
+            "non_photo": [
+                "REPAIRS_REQUIRED",
+                "REPAIRS_ISSUE_DESCRIPTION",
+                "REPAIRS_ISSUE_START",
+            ],
+            "photo": ["REPAIRS_ISSUE_PHOTO"],
+        },
+        "RENT_REDUCTION": {
+            "non_photo": [
+                "RENT_REDUCTION_ISSUES",
+                "RENT_REDUCTION_ISSUE_DESCRIPTION",
+                "RENT_REDUCTION_ISSUE_START",
+                "RENT_REDUCTION_IS_NOTICE_TO_VACATE",
+            ],
+            "photo": [
+                "RENT_REDUCTION_ISSUE_PHOTO",
+                "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
+            ],
+        },
+        "OTHER": {
+            "non_photo": ["OTHER_ISSUE_DESCRIPTION"],
+            "photo": [],
+        },
+    }
     for topic in answers["ISSUES"]:
         logger.info("Processing %s Issue for Submission[%s]", topic, sub_pk)
         try:
+            non_photo_answers = ISSUE_ANSWERS[topic]["non_photo"]
+            photo_answers = ISSUE_ANSWERS[topic]["photo"]
+            issue_answers = {k: answers[k] for k in non_photo_answers}
             issue_upload_ids = []
-            if topic == CaseTopic.REPAIRS:
-                issue_answers = {
-                    "REPAIRS_REQUIRED": answers["REPAIRS_REQUIRED"],
-                    "REPAIRS_ISSUE_DESCRIPTION": answers["REPAIRS_ISSUE_DESCRIPTION"],
-                    "REPAIRS_ISSUE_START": answers["REPAIRS_ISSUE_START"],
-                }
-                issue_upload_ids += [
-                    f["id"] for f in answers.get("REPAIRS_ISSUE_PHOTO", [])
-                ]
-            elif topic == CaseTopic.RENT_REDUCTION:
-                issue_answers = {
-                    "RENT_REDUCTION_ISSUES": answers["RENT_REDUCTION_ISSUES"],
-                    "RENT_REDUCTION_ISSUE_DESCRIPTION": answers[
-                        "RENT_REDUCTION_ISSUE_DESCRIPTION"
-                    ],
-                    "RENT_REDUCTION_ISSUE_START": answers["RENT_REDUCTION_ISSUE_START"],
-                    "RENT_REDUCTION_IS_NOTICE_TO_VACATE": answers[
-                        "RENT_REDUCTION_IS_NOTICE_TO_VACATE"
-                    ],
-                }
-                issue_upload_ids += [
-                    f["id"] for f in answers.get("RENT_REDUCTION_ISSUE_PHOTO", [])
-                ]
-                issue_upload_ids += [
-                    f["id"]
-                    for f in answers.get("RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT", [])
-                ]
-            elif topic == CaseTopic.OTHER:
-                issue_answers = {
-                    "OTHER_ISSUE_DESCRIPTION": answers["OTHER_ISSUE_DESCRIPTION"],
-                }
-            else:
-                raise ValueError(f"No issue type '{topic}'")
+            for k in photo_answers:
+                issue_upload_ids += [f["id"] for f in answers.get(k, [])]
 
             issue = Issue.objects.create(
                 topic=topic,
                 answers=issue_answers,
                 client=client,
             )
-            FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue)
+            FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
             logger.info(
                 "Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk
             )
