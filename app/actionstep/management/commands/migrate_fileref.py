@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         api = ActionstepAPI()
 
-        for issue in Issue.objects.filter(is_submitted=True).all():
+        for issue in Issue.objects.filter(is_case_sent=True).all():
             # Check if this issue already has an action
 
             logger.info("Checking fileref for Issue<%s>", issue.id)
