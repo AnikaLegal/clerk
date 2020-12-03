@@ -25,16 +25,18 @@ PREFIX_LOOKUP = {
 ACTION_TYPE_LOOKUP = {
     CaseTopic.REPAIRS: ActionType.REPAIRS,
     CaseTopic.RENT_REDUCTION: ActionType.COVID,
-    CaseTopic.OTHER: None,
+    CaseTopic.OTHER: ActionType.GENERAL,
 }
 
 
 def _send_issue_actionstep(issue_pk: str):
     """
     Send a issue to Actionstep.
-    FIXME: add tests
-    FIXME: Make it harder to sync the same documents twice.
     """
+    if not settings.ACTIONSTEP_WEB_URI:
+        logger.info("Skipping sending Issue<%s]> to Actionstep: not set up.", issue_pk)
+        return
+
     issue = Issue.objects.get(pk=issue_pk)
     logger.info("Sending Issue<%s]> to Actionstep", issue.id)
     api = ActionstepAPI()

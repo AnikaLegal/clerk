@@ -14,16 +14,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 
-ACTIONSTEP_REDIRECT_URI = "http://localhost:8000/actionstep/end/"
-ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstepstaging.com"
-ACTIONSTEP_OAUTH_URI = "https://go.actionstepstaging.com"
-ACTIONSTEP_TOKEN_URI = "https://api.actionstepstaging.com"
-ACTIONSTEP_SETUP_OWNERS = {
-    "REPAIRS": "matt@anikalegal.com",
-    "RENT_REDUCTION": "matt@anikalegal.com",
-    "OTHER": "matt@anikalegal.com",
-}
-
 ADMIN_PREFIX = "local"
 
 # Reminder emails via MailChimp
