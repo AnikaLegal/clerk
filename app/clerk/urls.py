@@ -5,12 +5,7 @@ from rest_framework import routers
 
 from actionstep.views import start_oauth_view, end_oauth_view
 from webhooks.views import webflow_form_view, jotform_form_view
-<<<<<<< HEAD
-from caller.views import answer_view, collect_view
-=======
-from reports.views import reports_view
 from caller.views import answer_view, collect_view, message_view
->>>>>>> Create Call model and migration
 from core import views as core_views
 
 router = routers.SimpleRouter()

@@ -24,6 +24,8 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ACTIONSTEP_CLIENT_ID=
 ACTIONSTEP_CLIENT_SECRET=
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
 ```
 
 The values of these secrets will be provided to you if you need them.
