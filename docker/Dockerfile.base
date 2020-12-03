@@ -46,25 +46,3 @@ RUN echo "Installing Weasyprint dependencies." && \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
     shared-mime-info
-
-# Install web test automation tools.
-# Installs Playwright and browser binaries for Chromium, Firefox and WebKit
-RUN echo "Installing Playwright" && \
-    pip install playwright && \
-    python3 -m playwright install
-
-RUN echo "Installing Playwright dependencies." && \
-    apt-get -qq install \
-        libnss3 \
-        libx11-xcb1 \
-        libnspr4 \
-        libatk1.0-0 \
-        libatk-bridge2.0-0 \
-        libcups2 \
-        libdbus-1-3 \
-        libdrm2 \
-        libxkbcommon0 \
-        libgtk-3-0 \
-        libgbm1 \
-        libasound2 \
-        libatspi2.0-0

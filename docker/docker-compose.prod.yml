@@ -49,25 +49,3 @@ services:
       ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_PROD_CLIENT_ID
       ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_PROD_CLIENT_SECRET
       MAILCHIMP_API_KEY: $MAILCHIMP_PROD_API_KEY
-
-  # Reporting server.
-  streamlit:
-    command: bash /app/scripts/reports/prod.sh
-    image: anikalaw/clerk:prod
-    volumes:
-      - /var/run/postgresql:/app/postgres.sock
-    ports:
-      - 8500:8501
-    environment:
-      STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
-      DJANGO_SETTINGS_MODULE: clerk.settings.prod
-      PGHOST: /app/postgres.sock
-      PGPORT: 5432
-      PGDATABASE: clerk
-      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
-      PGUSER: $PGUSER
-      PGPASSWORD: $PGPASSWORD
-      RAVEN_DSN: $RAVEN_DSN
-      ACTIONSTEP_CLIENT_ID: ""
-      ACTIONSTEP_CLIENT_SECRET: ""
-      MAILCHIMP_API_KEY: ""

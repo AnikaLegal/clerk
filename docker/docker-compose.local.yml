@@ -22,7 +22,6 @@ services:
     volumes:
       - ../app:/app
     links:
-      - streamlit
       - worker
       - database
     environment:
@@ -39,32 +38,6 @@ services:
       ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_CLIENT_ID
       ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_CLIENT_SECRET
       MAILCHIMP_API_KEY: $MAILCHIMP_API_KEY
-
-  # Reporting server.
-  streamlit:
-    container_name: streamlit
-    command: bash /app/scripts/reports/local.sh
-    image: clerk:local
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    ports:
-      - 8501:8501
-    volumes:
-      - ../app:/app
-    links:
-      - database
-    environment:
-      STREAMLIT_BROWSER_SERVER_ADDRESS: localhost
-      DJANGO_SETTINGS_MODULE: clerk.settings.dev
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: password
-      PGHOST: database
-      PGPORT: 5432
-      ACTIONSTEP_CLIENT_ID: ""
-      ACTIONSTEP_CLIENT_SECRET: ""
-      MAILCHIMP_API_KEY: ""
 
   # Django-q worker.
   worker:
@@ -108,5 +81,6 @@ services:
       ACTIONSTEP_CLIENT_ID: ""
       ACTIONSTEP_CLIENT_SECRET: ""
       MAILCHIMP_API_KEY: ""
+
 volumes:
   postgres-data:

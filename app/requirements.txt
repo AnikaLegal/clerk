@@ -17,9 +17,6 @@ mailchimp3
 # Static files
 whitenoise
 
-# Reporting
-streamlit
-
 # Web scraping
 beautifulsoup4
 
