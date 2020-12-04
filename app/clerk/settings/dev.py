@@ -17,10 +17,15 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
 ADMIN_PREFIX = "local"
 
 # Reminder emails via MailChimp
-MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
 MAILCHIMP_COVID_LIST_ID = "9749f1f08c"
 MAILCHIMP_COVID_WORKFLOW_ID = "fb4daa69fe"
 MAILCHIMP_COVID_EMAIL_ID = "e8ae8c5b35"
 MAILCHIMP_REPAIRS_LIST_ID = "aa24ab1b75"
 MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
+
+# Call Centre powered by Twilio
+TWILIO_PHONE_NUMBER = "+61480015687"
+TWILIO_AUDIO_BASE_URL = (
+    "https://anika-twilio-audio-test.s3-ap-southeast-2.amazonaws.com"
+)

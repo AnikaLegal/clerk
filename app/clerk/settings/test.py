@@ -31,7 +31,6 @@ Q_CLUSTER = {
 ACTIONSTEP_WEB_URI = "https://example.com"
 
 # Reminder emails via MailChimp
-MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
 MAILCHIMP_COVID_LIST_ID = ""
 MAILCHIMP_COVID_WORKFLOW_ID = ""
 MAILCHIMP_COVID_EMAIL_ID = ""

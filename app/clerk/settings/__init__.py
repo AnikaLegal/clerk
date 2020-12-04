@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "webhooks.apps.WebhooksConfig",
     "questions.apps.QuestionsConfig",
     "core.apps.CoreConfig",
+    "caller.apps.CallerConfig",
 ]
 
 MIDDLEWARE = [
@@ -201,3 +202,14 @@ ACTIONSTEP_TOKEN_URI = None
 ACTIONSTEP_SETUP_OWNERS = None
 ACTIONSTEP_WEB_URI = None
 ADMIN_PREFIX = None
+
+
+# Call Centre powered by Twilio
+TWILIO_ACCOUNT_SID = os.environ["TWILIO_ACCOUNT_SID"]
+TWILIO_AUTH_TOKEN = os.environ["TWILIO_AUTH_TOKEN"]
+TWILIO_PHONE_NUMBER = None  # Overwrite me
+TWILIO_AUDIO_BASE_URL = None  # Overwrite me
+
+
+# Reminder emails via MailChimp
+MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
