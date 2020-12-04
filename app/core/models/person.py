@@ -9,6 +9,6 @@ class Person(TimestampedModel):
     """
 
     full_name = models.CharField(max_length=256)
-    email = models.EmailField(max_length=150)
+    email = models.EmailField(max_length=150, blank=True, default="")
     address = models.CharField(max_length=256, blank=True, default="")
     phone_number = models.CharField(max_length=32, blank=True, default="")

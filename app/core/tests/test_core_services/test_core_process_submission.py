@@ -29,7 +29,7 @@ def test_process_submission():
     process_submission(sub.pk)
 
     assert Client.objects.count() == 1
-    assert Person.objects.count() == 1
+    assert Person.objects.count() == 2
     assert Tenancy.objects.count() == 1
     assert Issue.objects.count() == 3
     assert FileUpload.objects.count() == 3
@@ -49,24 +49,23 @@ def test_process_submission():
     assert client.referrer_type == "CHARITY"
     assert client.referrer == "Jewish Care"
 
-    # Check agent was created
-    landlord = Person.objects.last()
-    assert landlord.full_name == "Joe Blowzini"
-    assert landlord.email == "joe@joemail.co"
-    assert landlord.address == "123 Joe St"
-    assert landlord.phone_number == "0411111166"
-
     # Check tenancy was created
     tenancy = Tenancy.objects.last()
     assert tenancy.client == client
-    assert tenancy.landlord == landlord
-    assert tenancy.agent is None
-
     assert tenancy.address == "3/71 Rose St"
     assert tenancy.suburb == "Fitzroy"
     assert tenancy.postcode == "3000"
     # assert tenancy.started == "" # TODO
     assert tenancy.is_on_lease is True
+
+    # Check agent was created
+    assert tenancy.agent.full_name == "Joe Blowzini"
+    assert tenancy.agent.email == "joe@joemail.co"
+    assert tenancy.agent.address == "123 Joe St"
+    assert tenancy.agent.phone_number == "0411111166"
+
+    # Check landlord was created
+    assert tenancy.landlord.full_name == "Sally Wurtz"
 
     # Check issues were created
     repairs_issue = Issue.objects.filter(topic="REPAIRS").last()
@@ -128,16 +127,16 @@ ANSWERS = {
     "START_DATE": "1990-01-01",
     "IS_ON_LEASE": True,
     # Agent
-    "PROPERTY_MANAGER_IS_AGENT": False,
-    "AGENT_NAME": None,
-    "AGENT_EMAIL": None,
-    "AGENT_PHONE": None,
-    "AGENT_ADDRESS": None,
+    "PROPERTY_MANAGER_IS_AGENT": True,
+    "AGENT_NAME": "Joe Blowzini",
+    "AGENT_EMAIL": "joe@joemail.co",
+    "AGENT_PHONE": "0411111166",
+    "AGENT_ADDRESS": "123 Joe St",
     # Landlord
-    "LANDLORD_EMAIL": "joe@joemail.co",
-    "LANDLORD_PHONE": "0411111166",
-    "LANDLORD_NAME": "Joe Blowzini",
-    "LANDLORD_ADDRESS": "123 Joe St",
+    "LANDLORD_NAME": "Sally Wurtz",
+    "LANDLORD_EMAIL": None,
+    "LANDLORD_PHONE": None,
+    "LANDLORD_ADDRESS": None,
     # Issues
     "ISSUES": ["RENT_REDUCTION", "REPAIRS", "OTHER"],
     # Repairs

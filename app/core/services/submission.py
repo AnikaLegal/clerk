@@ -61,20 +61,20 @@ def process_submission(sub_pk: str):
     try:
         agent = None
         landlord = None
-        is_agent = answers["PROPERTY_MANAGER_IS_AGENT"]
-        if is_agent:
+        if answers["PROPERTY_MANAGER_IS_AGENT"]:
             agent = Person.objects.create(
                 full_name=answers["AGENT_NAME"].title(),
                 address=answers["AGENT_ADDRESS"],
                 email=answers["AGENT_EMAIL"],
                 phone_number=answers["AGENT_PHONE"],
             )
-        else:
+
+        if answers["LANDLORD_NAME"]:
             landlord = Person.objects.create(
                 full_name=answers["LANDLORD_NAME"].title(),
-                address=answers["LANDLORD_ADDRESS"],
-                email=answers["LANDLORD_EMAIL"],
-                phone_number=answers["LANDLORD_PHONE"],
+                address=answers.get("LANDLORD_ADDRESS") or "",
+                email=answers.get("LANDLORD_EMAIL") or "",
+                phone_number=answers.get("LANDLORD_PHONE") or "",
             )
 
         tenancy, _ = Tenancy.objects.get_or_create(
