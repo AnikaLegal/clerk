@@ -13,15 +13,15 @@ from core.models.issue import CaseTopic
 from .models import Call
 
 # Greet user, introduce Anika, explain options.
-CALL_INTRO_AUDIO = "call-intro.mp3"
+CALL_INTRO_AUDIO = "call-intro.wav"
 # Response when user selects repairs option.
-OPTION_REPAIRS_AUDIO = "option-repairs.mp3"
+OPTION_REPAIRS_AUDIO = "option-repairs.wav"
 # Response when user selects rent reduction option.
-OPTION_RENT_REDUCTION_AUDIO = "option-rent-reduction.mp3"
+OPTION_RENT_REDUCTION_AUDIO = "option-rent-reduction.wav"
 # Response when user selects callbacl option.
-OPTION_CALLBACK_AUDIO = "option-callback.mp3"
+OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
-CALL_TIMEOUT_AUDIO = "call-timeout.mp3"
+CALL_TIMEOUT_AUDIO = "call-timeout.wav"
 
 # The SMS message we send to people who send us SMS's.
 # We don't do inbound SMS communications so we ask them to send us an email instead.
