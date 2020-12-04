@@ -1,7 +1,13 @@
+from datetime import datetime
+
 import weasyprint
 from django.template.loader import render_to_string
 
 from core.models import FileUpload, Issue, Tenancy
+
+
+def _format_datetime(dt):
+    return datetime.strftime(dt, "%d %B %Y")
 
 
 def create_pdf(issue: Issue):
@@ -10,14 +16,16 @@ def create_pdf(issue: Issue):
     """
     client = issue.client
     uploads = FileUpload.objects.filter(issue=issue)
-    tenancy = Tenancy.objects.select_related("landlord", "agent").get(client=client)
+    tenancy = (
+        Tenancy.objects.select_related("landlord", "agent").filter(client=client).last()
+    )
 
     client_info = [
         {"name": "Client name", "answers": [client.get_full_name()]},
         {"name": "Client email", "answers": [client.email]},
         {
             "name": "Client DOB",
-            "answers": [client.date_of_birth.isoformat()]
+            "answers": [_format_datetime(client.date_of_birth)]
             if client.date_of_birth
             else [],
         },
@@ -28,7 +36,7 @@ def create_pdf(issue: Issue):
         {"name": "Tenancy address", "answers": [tenancy.address]},
         {
             "name": "Tenancy started",
-            "answers": [tenancy.started.isoformat()] if tenancy.started else [],
+            "answers": [_format_datetime(tenancy.started)] if tenancy.started else [],
         },
         {"name": "Client is on lease", "answers": [tenancy.is_on_lease]},
     ]
