@@ -63,3 +63,7 @@ MAILCHIMP_COVID_EMAIL_ID = "e8ae8c5b35"
 MAILCHIMP_REPAIRS_LIST_ID = "aa24ab1b75"
 MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
+
+# Call Centre powered by Twilio
+TWILIO_PHONE_NUMBER = "+61480016398"
+TWILIO_AUDIO_BASE_URL = "https://anika-twilio-audio.s3-ap-southeast-2.amazonaws.com"

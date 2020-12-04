@@ -1,13 +1,69 @@
+from urllib.parse import urljoin
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
+from django.urls import reverse
+
 from twilio.twiml.voice_response import VoiceResponse, Gather
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
+
+from core.models.issue import CaseTopic
 from .models import Call
 
-# Insert the Twilio number purchased
-BOUGHT = "+61488839562"
+# Greet user, introduce Anika, explain options.
+CALL_INTRO_AUDIO = "call-intro.mp3"
+# Response when user selects repairs option.
+OPTION_REPAIRS_AUDIO = "option-repairs.mp3"
+# Response when user selects rent reduction option.
+OPTION_RENT_REDUCTION_AUDIO = "option-rent-reduction.mp3"
+# Response when user selects callbacl option.
+OPTION_CALLBACK_AUDIO = "option-callback.mp3"
+# Response when user no option and the input times out.
+CALL_TIMEOUT_AUDIO = "call-timeout.mp3"
+
+# The SMS message we send to people who send us SMS's.
+# We don't do inbound SMS communications so we ask them to send us an email instead.
+INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
+
+# The SMS message we send to people who are enquiring about repairs.
+REPAIRS_SMS_MESSAGE = """
+Thank you for enquiring about Anika's rental repairs service.
+
+To get help, please fill in this form: https://intake.anikalegal.com
+
+For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+# The SMS message we send to people who are enquiring about rent reductions.
+RENT_REDUCTION_SMS_MESSAGE = """
+Thank you for enquiring about Anika's rent reduction service.
+
+To get help, please fill in this form: https://intake.anikalegal.com
+
+For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+# The SMS message we send to people who want a callback about another issue.
+CALLBACK_SMS_MESSAGE = """
+Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
+
+In the meantime, for more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+
+TOPIC_MAPPING = {
+    "1": CaseTopic.REPAIRS,
+    "2": CaseTopic.RENT_REDUCTION,
+    "3": CaseTopic.OTHER,
+}
 
 
 @require_http_methods(["GET"])
@@ -21,23 +77,14 @@ def answer_view(request):
     call.save()
 
     # Play message and record user's choice.
-    gather = Gather(action="/caller/collect/", numDigits=1, method="GET")
-    gather.say(
-        "Thank you for calling Anika Legal. \
-            For information about repairing your rental property, please press 1. \
-            For information about negotiating a rent reduction, please press 2. \
-            If you have a different enquiry and want us to call you back, please press 3.",
-        voice="alice",
-        language="en-AU",
+    gather = Gather(
+        action="/caller/collect/", numDigits=1, method="GET", timeout=10, enhanced=True
     )
+    gather.play(_get_audio_url(CALL_INTRO_AUDIO))
     response.append(gather)
 
     # End the call if user doesn't give us anything.
-    response.say(
-        "Sorry we haven't received a response, goodbye.",
-        voice="alice",
-        language="en-AU",
-    )
+    response.play(_get_audio_url(CALL_TIMEOUT_AUDIO))
     return TwimlResponse(response)
 
 
@@ -50,38 +97,33 @@ def collect_view(request):
     number = request.GET.get("From")
     choice = request.GET.get("Digits")
 
-    # Authenticate to send SMS.
-    account_sid = settings.TWILIO_ACCOUNT_SID
-    auth_token = settings.TWILIO_AUTH_TOKEN
-    client = Client(account_sid, auth_token)
-
     # Generate message depending on user choice.
     if choice == "1":
-        message = "Thank you for enquiring about repairing your rental property, please fill in the form at this link: https://test-intake.anikalegal.com/"
+        # Repairs option.
+        audio_url = _get_audio_url(OPTION_REPAIRS_AUDIO)
+        message_text = REPAIRS_SMS_MESSAGE
     elif choice == "2":
-        message = "Thank you for enquiring about reducing your rent, please fill in the form at this link: https://test-intake.anikalegal.com/"
+        # Rent reduction option.
+        audio_url = _get_audio_url(OPTION_RENT_REDUCTION_AUDIO)
+        message_text = RENT_REDUCTION_SMS_MESSAGE
     elif choice == "3":
-        message = "Thank you for contacting us about your specific enquiry, one of our staff will call back in the next few days."
+        audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
+        message_text = CALLBACK_SMS_MESSAGE
     else:
-        response.say(
-            "Sorry we haven't received a valid choice, goodbye.",
-            voice="alice",
-            language="en-AU",
-        )
+        response.redirect = response.redirect(reverse("caller-answer"), method="GET")
         return TwimlResponse(response)
 
     # Send an SMS for valid choices.
-    client.messages.create(to=number, from_=BOUGHT, body=message)
-    response.say(
-        "An SMS relating to your enquiry has been sent.",
-        voice="alice",
-        language="en-AU",
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    client.messages.create(
+        to=number, from_=settings.TWILIO_PHONE_NUMBER, body=message_text
     )
+    response.play(audio_url)
 
     # Retrieve and update corresponding entry for valid choices.
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
-    call.topic = choice
-    call.requires_callback = True if choice == "3" else False
+    call.topic = TOPIC_MAPPING[choice]
+    call.requires_callback = choice == "3"
     call.save()
 
     return TwimlResponse(response)
@@ -91,9 +133,7 @@ def collect_view(request):
 def message_view(request):
     """Respond to SMS from user"""
     response = MessagingResponse()
-    response.message(
-        "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
-    )
+    response.message(INBOUND_SMS_REPLY_MESSAGE)
     return TwimlResponse(response)
 
 
@@ -103,3 +143,7 @@ class TwimlResponse(HttpResponse):
     def __init__(self, twiml_obj, **kwargs):
         super_kwargs = {"status": 200, "content_type": "application/xml", **kwargs}
         return super().__init__(str(twiml_obj), **super_kwargs)
+
+
+def _get_audio_url(filename: str):
+    return urljoin(settings.TWILIO_AUDIO_BASE_URL, filename)
