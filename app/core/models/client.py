@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 from .timestamped import TimestampedModel
 
@@ -53,6 +54,26 @@ class Client(TimestampedModel):
     call_time = models.CharField(
         max_length=32, choices=CALL_TIME_CHOICES, blank=True, default=""
     )
+
+    # AVAILIBILITY
+    call_times = ArrayField(
+        models.CharField(max_length=32, choices=CALL_TIME_CHOICES),
+        default=list,
+        blank=True,
+    )
+    # WORK_OR_STUDY_CIRCUMSTANCES - string
+    employment_status = models.CharField(max_length=32, blank=True, default="")
+    # SPECIAL_CIRCUMSTANCES - list of strings
+    special_circumstances = ArrayField(
+        models.CharField(max_length=32), default=list, blank=True
+    )
+    # WEEKLY_INCOME - int
+    weekly_income = models.IntegerField(null=True, blank=True)
+    # WEEKLY_RENT - int
+    weekly_rent = models.IntegerField(null=True, blank=True)
+    # WELFARE_RELIANCE - string
+    welfare_reliance = models.CharField(max_length=32, blank=True, default="")
+
     gender = models.CharField(max_length=64, null=True, blank=True)
     gender_details = models.CharField(max_length=256, null=True, blank=True)
     can_speak_non_english = models.BooleanField(default=False)
