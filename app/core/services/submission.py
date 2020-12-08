@@ -128,7 +128,7 @@ def process_submission(sub_pk: str):
             issue_answers = {k: answers[k] for k in non_photo_answers}
             issue_upload_ids = []
             for k in photo_answers:
-                issue_upload_ids += [f["id"] for f in answers.get(k, [])]
+                issue_upload_ids += [f["id"] for f in (answers.get(k) or [])]
 
             issue = Issue.objects.create(
                 topic=topic,
