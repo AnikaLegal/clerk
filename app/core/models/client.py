@@ -45,45 +45,39 @@ class Client(TimestampedModel):
         (ReferrerType.HOUSING_SERVICE, ReferrerType.HOUSING_SERVICE),
     )
 
+    # Identifying info
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
+
+    # Contact details
     email = models.EmailField(max_length=150)
     date_of_birth = models.DateTimeField(null=True, blank=True)
     phone_number = models.CharField(max_length=32, blank=True, default="")
-    call_time = models.CharField(
-        max_length=32, choices=CALL_TIME_CHOICES, blank=True, default=""
-    )
-
-    # AVAILIBILITY
     call_times = ArrayField(
         models.CharField(max_length=32, choices=CALL_TIME_CHOICES),
         default=list,
         blank=True,
     )
-    # WORK_OR_STUDY_CIRCUMSTANCES - string
+
+    # Demographic info for impact analysis.
     employment_status = models.CharField(max_length=32, blank=True, default="")
-    # SPECIAL_CIRCUMSTANCES - list of strings
     special_circumstances = ArrayField(
         models.CharField(max_length=32), default=list, blank=True
     )
-    # WEEKLY_INCOME - int
     weekly_income = models.IntegerField(null=True, blank=True)
-    # WEEKLY_RENT - int
     weekly_rent = models.IntegerField(null=True, blank=True)
-    # WELFARE_RELIANCE - string
     welfare_reliance = models.CharField(max_length=32, blank=True, default="")
-
     gender = models.CharField(max_length=64, null=True, blank=True)
     gender_details = models.CharField(max_length=256, null=True, blank=True)
     can_speak_non_english = models.BooleanField(default=False)
     is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
 
-    # How did the client find us?
+    # Referrer info: how did the client find us?
     referrer_type = models.CharField(
         max_length=64, choices=REFERRER_TYPE_CHOICES, blank=True, default=""
     )
-    # Specifically, what referrer sent the client to us?
+    # Specific referrer name.
     referrer = models.CharField(max_length=64, blank=True, default="")
 
     def get_full_name(self) -> str:

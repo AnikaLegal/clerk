@@ -30,7 +30,11 @@ def create_pdf(issue: Issue):
             else [],
         },
         {"name": "Client phone", "answers": [client.phone_number]},
-        {"name": "Client call time", "answers": [client.call_time]},
+        {"name": "Client call times", "answers": [client.call_times]},
+        {
+            "name": "Client special circumstances",
+            "answers": [client.special_circumstances],
+        },
     ]
     tenancy_info = [
         {"name": "Tenancy address", "answers": [tenancy.address]},

@@ -3,6 +3,18 @@
 from django.db import migrations
 
 
+IS_ESL = "Not comfortable with English"
+IS_ABORIGINAL_OR_TS_ISLANDER = (
+    "Is from an Aboriginal or Torres Strait Islander background"
+)
+CIRCUMSTANCE_MAP = {
+    "Has mental illness or intellectual disability": "HEALTH_CONDITION",
+    "Physical disability": "HEALTH_CONDITION",
+    "Has a low income health care card": "CENTRELINK",
+    "Is a single parent": "SINGLE_PARENT",
+}
+
+
 def migrate_client_data(apps, schema_editor):
     """
     We can't import the Post model directly as it may be a newer
@@ -15,13 +27,38 @@ def migrate_client_data(apps, schema_editor):
             client.call_times = [client.call_time]
 
         weekly_income = None
+        special_circumstances = []
+        can_speak_non_english = False
+        is_aboriginal_or_torres_strait_islander = False
+
         for issue in client.issue_set.all():
             if "CLIENT_WEEKLY_EARNINGS" in issue.answers:
                 weekly_income = issue.answers["CLIENT_WEEKLY_EARNINGS"]
+                if weekly_income > 5000 or weekly_income < 100:
+                    weekly_income = None
 
             if "CLIENT_SPECIAL_CIRCUMSTANCES" in issue.answers:
-                pass
-                # CLIENT_SPECIAL_CIRCUMSTANCES
+                circs = issue.answers["CLIENT_SPECIAL_CIRCUMSTANCES"]
+                if type(circs) is str:
+                    circs = [circs]
+
+                for circ in circs:
+                    new_circ = CIRCUMSTANCE_MAP.get(circ)
+                    if new_circ and not new_circ in special_circumstances:
+                        special_circumstances.append(new_circ)
+
+                can_speak_non_english |= IS_ESL in circs
+                is_aboriginal_or_torres_strait_islander |= (
+                    IS_ABORIGINAL_OR_TS_ISLANDER in circs
+                )
+
+        if special_circumstances:
+            client.special_circumstances = special_circumstances
+
+        client.can_speak_non_english |= can_speak_non_english
+        client.is_aboriginal_or_torres_strait_islander |= (
+            is_aboriginal_or_torres_strait_islander
+        )
 
         if weekly_income is not None:
             client.weekly_income = weekly_income
