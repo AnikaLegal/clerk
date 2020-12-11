@@ -17,8 +17,11 @@ CIRCUMSTANCE_MAP = {
 
 def migrate_client_data(apps, schema_editor):
     """
-    We can't import the Post model directly as it may be a newer
-    version than this migration expects. We use the historical version.
+    Update client info:
+        - special_circumstances
+        - can_speak_non_english
+        - is_aboriginal_or_torres_strait_islander
+        - weekly_income
     """
     Client = apps.get_model("core", "Client")
     for client in Client.objects.all():
