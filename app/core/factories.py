@@ -42,7 +42,7 @@ class ClientFactory(TimestampedModelFactory):
         "date_time_between", tzinfo=timezone.utc, start_date="-50y", end_date="-18y"
     )
     phone_number = factory.Faker("phone_number")
-    call_time = "WEEK_DAY"
+    call_times = ["WEEK_DAY"]
 
 
 @factory.django.mute_signals(post_save)
