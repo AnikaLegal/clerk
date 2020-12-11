@@ -34,6 +34,14 @@ def process_submission(sub_pk: str):
         referrer = answers.get("HOUSING_SERVICE_REFERRER") or referrer
         referrer = answers.get("CHARITY_REFERRER") or referrer
         referrer = answers.get("SOCIAL_REFERRER") or referrer
+
+        call_times = []
+        call_times_answer = answers["AVAILIBILITY"]
+        if type(call_times_answer) is list:
+            call_times = call_times_answer
+        else:
+            call_times.append(call_times_answer)
+
         client, _ = Client.objects.get_or_create(
             email=answers["EMAIL"],
             defaults={
@@ -41,7 +49,6 @@ def process_submission(sub_pk: str):
                 "last_name": answers["LAST_NAME"],
                 "date_of_birth": parse_date_string(answers["DOB"]),
                 "phone_number": answers["PHONE"],
-                "call_time": answers["AVAILIBILITY"] or "",
                 "referrer_type": answers["REFERRER_TYPE"] or "",
                 "referrer": referrer or "",
                 "gender": answers["GENDER"],
@@ -50,6 +57,12 @@ def process_submission(sub_pk: str):
                 "is_aboriginal_or_torres_strait_islander": answers[
                     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
                 ],
+                "weekly_rent": answers.get("WEEKLY_RENT"),
+                "weekly_income": answers.get("WEEKLY_INCOME"),
+                "welfare_reliance": answers.get("WELFARE_RELIANCE") or "",
+                "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
+                "call_times": call_times,
+                "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
             },
         )
         logger.info("Processed Client[%s] for Submission[%s]", client.pk, sub_pk)
@@ -150,7 +163,7 @@ def process_submission(sub_pk: str):
 
 def parse_date_string(s: str):
     # 1995-6-6
-    dt = datetime.strptime(s, "%Y-%d-%M")
+    dt = datetime.strptime(s, "%Y-%m-%d")
     tz = timezone.get_current_timezone()
     dt = timezone.make_aware(dt, timezone=tz)
     return dt.replace(hour=0, minute=0)
