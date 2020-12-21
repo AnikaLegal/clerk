@@ -14,18 +14,22 @@ class CaseTopic:
 
 
 class CaseStage:
+    SUBMITTED = "SUBMITTED"
     ENGAGED = "ENGAGED"
     ADVICE = "ADVICE"
     POST_CASE = "POST_CASE"
 
 
 class CaseOutcome:
+    UNKNOWN = "UNKNOWN"
     UNRESPONSIVE = "UNRESPONSIVE"
     OUT_OF_SCOPE = "OUT_OF_SCOPE"
     SUCCESS = "SUCCESS"
     UNSUCCESSFUL = "UNSUCCESSFUL"
     REFERRED = "REFERRED"
     ESCALATION = "ESCALATION"
+    DROPPED_OUT = "DROPPED_OUT"
+    RESOLVED_EARLY = "RESOLVED_EARLY"
 
 
 class Issue(TimestampedModel):
@@ -34,6 +38,7 @@ class Issue(TimestampedModel):
     """
 
     STAGE_CHOICES = (
+        (CaseStage.SUBMITTED, CaseStage.SUBMITTED),
         (CaseStage.ENGAGED, CaseStage.ENGAGED),
         (CaseStage.ADVICE, CaseStage.ADVICE),
         (CaseStage.POST_CASE, CaseStage.POST_CASE),
@@ -46,6 +51,9 @@ class Issue(TimestampedModel):
         (CaseOutcome.UNSUCCESSFUL, CaseOutcome.UNSUCCESSFUL),
         (CaseOutcome.REFERRED, CaseOutcome.REFERRED),
         (CaseOutcome.ESCALATION, CaseOutcome.ESCALATION),
+        (CaseOutcome.DROPPED_OUT, CaseOutcome.DROPPED_OUT),
+        (CaseOutcome.RESOLVED_EARLY, CaseOutcome.RESOLVED_EARLY),
+        (CaseOutcome.UNKNOWN, CaseOutcome.UNKNOWN),
     )
 
     TOPIC_CHOICES = (
@@ -65,11 +73,11 @@ class Issue(TimestampedModel):
     outcome = models.CharField(
         max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES
     )
-    outcome_notes = models.CharField(max_length=256, default="")
+    outcome_notes = models.CharField(max_length=256, blank=True, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)
     # File reference number from ActionStep
-    fileref = models.CharField(max_length=8, default="")
+    fileref = models.CharField(max_length=8, default="", blank=True)
     # Questionnaire answers
     answers = models.JSONField(encoder=DjangoJSONEncoder)
     # The person we are trying to help.
