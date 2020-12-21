@@ -7,7 +7,16 @@ from utils.admin import dict_to_json_html
 @admin.register(WebflowContact)
 class WebflowContactAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    list_display = ("id", "name", "referral", "email", "phone", "created_at")
+    list_display = (
+        "id",
+        "name",
+        "referral",
+        "email",
+        "phone",
+        "created_at",
+        "requires_callback",
+        "number_callbacks",
+    )
     list_filter = ("referral",)
 
 
