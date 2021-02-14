@@ -16,6 +16,7 @@ class WebflowContactAdmin(admin.ModelAdmin):
         "created_at",
         "requires_callback",
         "number_callbacks",
+        "comments",
     )
     list_filter = ("referral",)
 

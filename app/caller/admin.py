@@ -10,6 +10,7 @@ class CallAdmin(admin.ModelAdmin):
         "created_at",
         "requires_callback",
         "number_callbacks",
+        "comments",
     )
 
 
