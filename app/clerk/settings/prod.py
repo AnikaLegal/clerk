@@ -48,11 +48,7 @@ ACTIONSTEP_REDIRECT_URI = "https://clerk.anikalegal.com/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
-ACTIONSTEP_SETUP_OWNERS = {
-    "REPAIRS": "coordinators@anikalegal.com",
-    "RENT_REDUCTION": "coordinators@anikalegal.com",
-    "OTHER": "coordinators@anikalegal.com",
-}
+ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
 
 ADMIN_PREFIX = "prod"
 
