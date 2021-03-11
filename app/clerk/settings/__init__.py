@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "actionstep.apps.ActionstepConfig",
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
-    "questions.apps.QuestionsConfig",
+    "case.apps.CaseConfig",
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
 ]
