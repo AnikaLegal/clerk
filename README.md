@@ -6,6 +6,19 @@ This site is used by new Anika clients who want to submit their legal problem. C
 
 > Depending on the job, office clerks might answer phones, filing, data processing, faxing, envelope stuffing and mailing, message delivery, running errands, sorting incoming mail and much more. ([source](https://www.snagajob.com/job-descriptions/office-clerk/))
 
+## Structure
+
+This Django project has several apps:
+
+- actionstep: Actionstep integration
+- admin: Customization of Admin interface
+- caller: Call centre
+- case: Case management system website
+- clerk: Project settings
+- core: Core domain models and functionality
+- slack: Slack integration
+- webhooks: Webhooks from 3rd party services
+
 ## Prerequisites for Local Development
 
 You will need:
@@ -111,6 +124,13 @@ This app has unit tests. They are not run in CI, but if you are making changes, 
 
 ```
 make test
+```
+
+To run specific tests
+
+```
+docker-compose -f docker/docker-compose.local.yml run --rm test bash
+pytest case/tests/test_urls.py -vv
 ```
 
 The Python code is formatted with Black. To check the code with the linter run:

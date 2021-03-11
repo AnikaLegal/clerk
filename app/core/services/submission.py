@@ -2,12 +2,9 @@ from datetime import datetime
 import logging
 
 from django.db import transaction
-from django.db.models.expressions import Case
 from django.utils import timezone
 
 from core.models import Submission, Issue, Client, Person, FileUpload, Tenancy
-from core.models.issue import CaseTopic
-from questions.management.commands.migrate_core import CALL_TIMES
 
 logger = logging.getLogger(__name__)
 
