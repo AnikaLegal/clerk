@@ -1,8 +1,9 @@
 from datetime import datetime
 
 import pytest
-from core.models.upload import FileUpload
+from django.utils import timezone
 
+from core.models.upload import FileUpload
 from core.factories import FileUploadFactory
 from core.services.submission import process_submission
 from core.models import Submission, Client, Person, Tenancy, Issue, FileUpload
@@ -16,69 +17,69 @@ Test case #1
 - partner helps with rent
 """
 REPAIRS_ANSWERS = {
-    "answers": {
-        "ISSUES": "REPAIRS",
-        "FIRST_NAME": "Matthew",
-        "LAST_NAME": "Segal",
-        "EMAIL": "mattdsegal@gmail.com",
-        "PHONE": "0431417373",
-        "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
-        "REPAIRS_REQUIRED": ["Water", "Roof"],
-        "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
-        "REPAIRS_ISSUE_START": "2020-01-01",
-        "REPAIRS_ISSUE_PHOTO": [
-            {
-                "id": "f280feb7-54ed-459f-8057-4603fe7d9996",
-                "file": "https://example.com/fde477cab5ba1555caa5983f84f37852.png",
-                "issue": None,
-            }
-        ],
-        "RENTAL_CIRCUMSTANCES": "SOLO",
-        "IS_ON_LEASE": "YES",
-        "START_DATE": "2019-01-01",
-        "SUBURB": "Fiztroy",
-        "POSTCODE": 3065,
-        "ADDRESS": "123 Fake St",
-        "PROPERTY_MANAGER_IS_AGENT": False,
-        "LANDLORD_NAME": "John Smith",
-        "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
-        "LANDLORD_EMAIL": "john.smith@landlord.com",
-        "LANDLORD_PHONE": "0411111122",
-        "DOB": "1990-08-15",
-        "GENDER": "male",
-        "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
-        "CAN_SPEAK_NON_ENGLISH": True,
-        "FIRST_LANGUAGE": "Chinese",
-        "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME"],
-        "IS_MULTI_INCOME_HOUSEHOLD": True,
-        "WEEKLY_INCOME": 1000,
-        "WEEKLY_RENT": 668,
-        "NUMBER_OF_DEPENDENTS": 0,
-        "SPECIAL_CIRCUMSTANCES": ["CENTRELINK", "PUBLIC_HOUSING"],
-        "LEGAL_ACCESS_DIFFICULTIES": ["SUBSTANCE_ABUSE", "DISABILITY"],
-        "REFERRER_TYPE": "LEGAL_CENTRE",
-        "LEGAL_CENTER_REFERRER": "Justice Connect",
-    }
+    "ADDRESS": "123 Fake St",
+    "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
+    "CAN_SPEAK_NON_ENGLISH": True,
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Chinese",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "male",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
+    "IS_MULTI_INCOME_HOUSEHOLD": True,
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "REPAIRS",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0411111122",
+    "LAST_NAME": "Segal",
+    "LEGAL_ACCESS_DIFFICULTIES": ["SUBSTANCE_ABUSE", "DISABILITY"],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PROPERTY_MANAGER_IS_AGENT": False,
+    "REFERRER_TYPE": "LEGAL_CENTRE",
+    "SPECIAL_CIRCUMSTANCES": ["CENTRELINK", "PUBLIC_HOUSING"],
+    "START_DATE": "2019-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_INCOME": 1000,
+    "WEEKLY_RENT": 668,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME"],
+    "REPAIRS_REQUIRED": ["Water", "Roof"],
+    "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
+    "REPAIRS_ISSUE_START": "2020-01-01",
+    "REPAIRS_ISSUE_PHOTO": [
+        {
+            "id": "e249c2c2-15ed-4609-865f-c2109f06f6f8",
+            "file": "https://example.com/e249c2c2-15ed-4609-865f-c2109f06f6f8.png",
+            "issue": None,
+        }
+    ],
+    "RENTAL_CIRCUMSTANCES": "PARTNER",
 }
 REPAIRS_CLIENT = {
-    "id": "",
-    "first_name": "",
-    "last_name": "",
-    "email": "",
-    "date_of_birth": "",
-    "phone_number": "",
-    "call_times": "",
-    "employment_status": "",
-    "special_circumstances": "",
-    "weekly_income": "",
-    "weekly_rent": "",
-    "welfare_reliance": "",
-    "gender": "",
-    "gender_details": "",
-    "can_speak_non_english": "",
-    "is_aboriginal_or_torres_strait_islander": "",
-    "referrer_type": "",
-    "referrer": "",
+    "first_name": "Matthew",
+    "last_name": "Segal",
+    "gender": "male",
+    "email": "mattdsegal@gmail.com",
+    "date_of_birth": "1990-08-15",
+    "phone_number": "0431417373",
+    "call_times": ["WEEK_DAY", "WEEK_EVENING"],
+    "employment_status": ["STUDENT", "WORKING_PART_TIME"],
+    "special_circumstances": ["CENTRELINK", "PUBLIC_HOUSING"],
+    "weekly_income": 1000,
+    "weekly_rent": 668,
+    "rental_circumstances": "PARTNER",
+    "legal_access_difficulties": ["SUBSTANCE_ABUSE", "DISABILITY"],
+    "is_multi_income_household": True,
+    "number_of_dependents": 0,
+    "primary_language_non_english": True,
+    "primary_language": "Chinese",
+    "is_aboriginal_or_torres_strait_islander": False,
+    "referrer_type": "LEGAL_CENTRE",
+    "referrer": "Justice Connect",
 }
 REPAIRS_LANDLORD = {
     "full_name": "John Smith",
@@ -88,7 +89,7 @@ REPAIRS_LANDLORD = {
 }
 REPAIRS_AGENT = None
 REPAIRS_TENANCY = {
-    "client": "Matthew Segal",
+    "client": "Matthew",
     "address": "123 Fake St",
     "suburb": "Fitzroy",
     "postcode": "3065",
@@ -98,7 +99,7 @@ REPAIRS_TENANCY = {
     "agent": None,
 }
 REPAIRS_ISSUE = {
-    "client": "Matthew Segal",
+    "client": "Matthew",
     "topic": "REPAIRS",
     "stage": None,
     "outcome": None,
@@ -108,15 +109,9 @@ REPAIRS_ISSUE = {
         "REPAIRS_REQUIRED": ["Water", "Roof"],
         "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
         "REPAIRS_ISSUE_START": "2020-01-01",
-        "REPAIRS_ISSUE_PHOTO": [
-            {
-                "id": "f280feb7-54ed-459f-8057-4603fe7d9996",
-                "file": "https://example.com/fde477cab5ba1555caa5983f84f37852.png",
-                "issue": None,
-            }
-        ],
     },
 }
+REPAIRS_UPLOADS = ["e249c2c2-15ed-4609-865f-c2109f06f6f8"]
 
 """
 Test case #2
@@ -126,29 +121,131 @@ Test case #2
 - Partner doesn't help with rent (is dependent)
 """
 EVICTIONS_ANSWERS = {
+    "ADDRESS": "123 Fake St",
+    "AGENT_ADDRESS": "321 Fake St",
+    "AGENT_EMAIL": "sarah.smith@agent.com",
+    "AGENT_NAME": "Sarah Smith",
+    "AGENT_PHONE": "0411111188",
+    "AVAILIBILITY": ["WEEK_DAY", "SUNDAY"],
+    "CAN_SPEAK_NON_ENGLISH": False,
+    "DOB": "1990-02-01",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "genderqueer",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": True,
+    "IS_MULTI_INCOME_HOUSEHOLD": False,
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "EVICTION",
+    "LANDLORD_NAME": "John Smith",
+    "LAST_NAME": "Segal",
+    "NUMBER_OF_DEPENDENTS": 1,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PROPERTY_MANAGER_IS_AGENT": True,
+    "REFERRER_TYPE": "WORD_OF_MOUTH",
+    "RENTAL_CIRCUMSTANCES": "PARTNER",
+    "START_DATE": "1999-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_INCOME": 2000,
+    "WEEKLY_RENT": 1100,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["WORKING_FULL_TIME"],
+    "EVICTIONS_IS_UNPAID_RENT": True,
+    "EVICTIONS_IS_ALREADY_REMOVED": False,
+    "EVICTIONS_HAS_NOTICE": True,
+    "EVICTIONS_DOCUMENTS_PROVIDED": [
+        "Notice to Vacate",
+        "Application for a Possession Order",
+    ],
+    "EVICTIONS_DOCUMENTS_UPLOAD": [
+        {
+            "id": "55bf8c07-5240-4253-9880-58c24f6afd8f",
+            "file": "https://example.com/55bf8c07-5240-4253-9880-58c24f6afd8f.pdf",
+        },
+        {
+            "id": "ab365dc1-5aae-4c5e-8528-a5fe08f57d35",
+            "file": "https://example.com/ab365dc1-5aae-4c5e-8528-a5fe08f57d35.pdf",
+        },
+    ],
+    "EVICTIONS_NOTICE_SEND_DATE": "1990-02-01",
+    "EVICTIONS_NOTICE_VACATE_DATE": "2022-01-01",
+    "EVICTIONS_DOC_DELIVERY_METHOD_NOTICE_TO_VACATE": "By registered post",
+    "EVICTIONS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE": "2000-12-31",
+    "EVICTIONS_DOC_DELIVERY_METHOD_POSSESION_ORDER": "Another delivery method",
+    "EVICTIONS_DOC_DELIVERY_TIME_POSSESION_ORDER": "2020-03-01",
+    "EVICTIONS_IS_VCAT_DATE": True,
+    "EVICTIONS_VCAT_DATE": "2022-02-01",
+    "EVICTIONS_RENT_UNPAID": 11000,
+    "EVICTIONS_RENT_CYCLE": "FORTNIGHTLY",
+    "EVICTIONS_IS_ON_PAYMENT_PLAN": False,
+    "EVICTIONS_CAN_AFFORD_PAYMENT_PLAN": "YES",
+    "EVICTIONS_PAYMENT_AMOUNT": 200,
+    "EVICTIONS_PAYMENT_FAIL_REASON": [
+        "Unable to work",
+        "Another tenant moving out",
+    ],
+    "EVICTIONS_PAYMENT_FAIL_DESCRIPTION": "Got fired and friend moving in with parents",
+    "EVICTIONS_PAYMENT_FAIL_CHANGE": "Got a new job",
+    "EVICTIONS_MISC": "Landlord harasses me with phone calls",
+}
+
+EVICTIONS_CLIENT = {
+    "first_name": "Matthew",
+    "last_name": "Segal",
+    "gender": "genderqueer",
+    "email": "mattdsegal@gmail.com",
+    "date_of_birth": "1990-02-01",
+    "phone_number": "0431417373",
+    "call_times": ["WEEK_DAY", "SUNDAY"],
+    "employment_status": ["WORKING_FULL_TIME"],
+    "special_circumstances": [],
+    "weekly_income": 2000,
+    "weekly_rent": 1100,
+    "rental_circumstances": "PARTNER",
+    "legal_access_difficulties": [],
+    "is_multi_income_household": False,
+    "number_of_dependents": 1,
+    "primary_language_non_english": False,
+    "primary_language": "",
+    "is_aboriginal_or_torres_strait_islander": True,
+    "referrer_type": "WORD_OF_MOUTH",
+    "referrer": "",
+}
+EVICTIONS_LANDLORD = {
+    "full_name": "John Smith",
+    "email": "",
+    "address": "",
+    "phone_number": "",
+}
+EVICTIONS_AGENT = {
+    "full_name": "Sarah Smith",
+    "email": "sarah.smith@agent.com",
+    "address": "321 Fake St",
+    "phone_number": "0411111188",
+}
+EVICTIONS_TENANCY = {
+    "client": "Matthew",
+    "address": "123 Fake St",
+    "suburb": "Fitzroy",
+    "postcode": "3065",
+    "started": "1999-01-01",
+    "is_on_lease": "YES",
+    "landlord": "John Smith",
+    "agent": "Sarah Smith",
+}
+EVICTIONS_ISSUE = {
+    "client": "Matthew",
+    "topic": "EVICTION",
+    "stage": None,
+    "outcome": None,
+    "outcome_notes": "",
+    "provided_legal_services": False,
     "answers": {
-        "ISSUES": "EVICTION",
-        "FIRST_NAME": "Matthew",
-        "LAST_NAME": "Segal",
-        "EMAIL": "mattdsegal@gmail.com",
-        "PHONE": "0431417373",
-        "AVAILIBILITY": ["WEEK_DAY", "SUNDAY"],
         "EVICTIONS_IS_UNPAID_RENT": True,
         "EVICTIONS_IS_ALREADY_REMOVED": False,
         "EVICTIONS_HAS_NOTICE": True,
         "EVICTIONS_DOCUMENTS_PROVIDED": [
             "Notice to Vacate",
             "Application for a Possession Order",
-        ],
-        "EVICTIONS_DOCUMENTS_UPLOAD": [
-            {
-                "id": "ac51e45c-12c2-44e2-acca-bb698d81754f",
-                "file": "https://example.com/fbc8205bca9eed4d41d1bdecf9a44fed.pdf",
-            },
-            {
-                "id": "ab365dc1-5aae-4c5e-8528-a5fe08f57d35",
-                "file": "https://example.com/d18921c58774870ef2508e1524990228.pdf",
-            },
         ],
         "EVICTIONS_NOTICE_SEND_DATE": "1990-02-01",
         "EVICTIONS_NOTICE_VACATE_DATE": "2022-01-01",
@@ -170,35 +267,13 @@ EVICTIONS_ANSWERS = {
         "EVICTIONS_PAYMENT_FAIL_DESCRIPTION": "Got fired and friend moving in with parents",
         "EVICTIONS_PAYMENT_FAIL_CHANGE": "Got a new job",
         "EVICTIONS_MISC": "Landlord harasses me with phone calls",
-        "RENTAL_CIRCUMSTANCES": "PARTNER",
-        "IS_ON_LEASE": "YES",
-        "START_DATE": "1999-01-01",
-        "SUBURB": "Fitzroy",
-        "POSTCODE": 3065,
-        "ADDRESS": "123 Fake St",
-        "PROPERTY_MANAGER_IS_AGENT": True,
-        "AGENT_NAME": "Sarah Smith",
-        "AGENT_ADDRESS": "321 Fake St",
-        "AGENT_EMAIL": "sarah.smith@agent.com",
-        "AGENT_PHONE": "0411111188",
-        "LANDLORD_NAME": "John Smith",
-        "DOB": "1990-02-01",
-        "GENDER": "genderqueer",
-        "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": True,
-        "CAN_SPEAK_NON_ENGLISH": False,
-        "WORK_OR_STUDY_CIRCUMSTANCES": ["WORKING_FULL_TIME"],
-        "IS_MULTI_INCOME_HOUSEHOLD": False,
-        "WEEKLY_INCOME": 2000,
-        "WEEKLY_RENT": 11000,
-        "NUMBER_OF_DEPENDENTS": 1,
-        "REFERRER_TYPE": "WORD_OF_MOUTH",
-    }
+    },
 }
-EVICTIONS_CLIENT = None
-EVICTIONS_LANDLORD = None
-EVICTIONS_AGENT = None
-EVICTIONS_TENANCY = None
-EVICTIONS_ISSUE = None
+EVICTIONS_UPLOADS = [
+    "55bf8c07-5240-4253-9880-58c24f6afd8f",
+    "ab365dc1-5aae-4c5e-8528-a5fe08f57d35",
+]
+
 
 """
 Test case #3
@@ -208,60 +283,111 @@ Test case #3
 - Partner doesn't help with rent (no dependents)
 """
 RENT_REDUCTION_ANSWERS = {
+    "ADDRESS": "123 Fake St",
+    "AVAILIBILITY": ["SUNDAY"],
+    "CAN_SPEAK_NON_ENGLISH": True,
+    "CHARITY_REFERRER": "Jewish Care",
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Russian",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "omitted",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
+    "IS_MULTI_INCOME_HOUSEHOLD": False,
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "RENT_REDUCTION",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0422211133",
+    "LAST_NAME": "Segal",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PROPERTY_MANAGER_IS_AGENT": False,
+    "REFERRER_TYPE": "CHARITY",
+    "RENTAL_CIRCUMSTANCES": "SOLO",
+    "SPECIAL_CIRCUMSTANCES": ["REFUGEE"],
+    "START_DATE": "1990-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_INCOME": 1337,
+    "WEEKLY_RENT": 1336,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["LOOKING_FOR_WORK", "STUDENT"],
+    "RENT_REDUCTION_ISSUES": ["Another tenant moved out"],
+    "RENT_REDUCTION_ISSUE_DESCRIPTION": "Another tenant moved out coz they lost their job and I cannot afford the rent",
+    "RENT_REDUCTION_ISSUE_START": "2020-08-02",
+    "RENT_REDUCTION_ISSUE_PHOTO": [
+        {
+            "id": "380aeaa4-c767-4a9b-90ad-b4d5b4e16859",
+            "file": "https://example.com/380aeaa4-c767-4a9b-90ad-b4d5b4e16859.pdf",
+        }
+    ],
+    "RENT_REDUCTION_IS_NOTICE_TO_VACATE": True,
+    "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT": [
+        {
+            "id": "1f5f6874-9af3-4996-ab8c-022e3877f50f",
+            "file": "https://example.com/1f5f6874-9af3-4996-ab8c-022e3877f50f.pdf",
+        }
+    ],
+}
+
+RENT_REDUCTION_CLIENT = {
+    "first_name": "Matthew",
+    "last_name": "Segal",
+    "gender": "omitted",
+    "email": "mattdsegal@gmail.com",
+    "date_of_birth": "1990-08-15",
+    "phone_number": "0431417373",
+    "call_times": ["SUNDAY"],
+    "employment_status": ["LOOKING_FOR_WORK", "STUDENT"],
+    "special_circumstances": ["REFUGEE"],
+    "weekly_income": 1337,
+    "weekly_rent": 1336,
+    "rental_circumstances": "SOLO",
+    "legal_access_difficulties": [],
+    "is_multi_income_household": False,
+    "number_of_dependents": 0,
+    "primary_language_non_english": True,
+    "primary_language": "Russian",
+    "is_aboriginal_or_torres_strait_islander": False,
+    "referrer_type": "CHARITY",
+    "referrer": "Jewish Care",
+}
+RENT_REDUCTION_LANDLORD = {
+    "full_name": "John Smith",
+    "email": "john.smith@landlord.com",
+    "address": "321 Fake St, Fitzroy 3065",
+    "phone_number": "0422211133",
+}
+RENT_REDUCTION_AGENT = None
+RENT_REDUCTION_TENANCY = {
+    "client": "Matthew",
+    "address": "123 Fake St",
+    "suburb": "Fitzroy",
+    "postcode": "3065",
+    "started": "1990-01-01",
+    "is_on_lease": "YES",
+    "landlord": "John Smith",
+    "agent": None,
+}
+RENT_REDUCTION_ISSUE = {
+    "client": "Matthew",
+    "topic": "RENT_REDUCTION",
+    "stage": None,
+    "outcome": None,
+    "outcome_notes": "",
+    "provided_legal_services": False,
     "answers": {
-        "ISSUES": "RENT_REDUCTION",
-        "FIRST_NAME": "Matthew",
-        "LAST_NAME": "Segal",
-        "EMAIL": "mattdsegal@gmail.com",
-        "PHONE": "0431417373",
-        "AVAILIBILITY": ["SUNDAY"],
         "RENT_REDUCTION_ISSUES": ["Another tenant moved out"],
         "RENT_REDUCTION_ISSUE_DESCRIPTION": "Another tenant moved out coz they lost their job and I cannot afford the rent",
         "RENT_REDUCTION_ISSUE_START": "2020-08-02",
-        "RENT_REDUCTION_ISSUE_PHOTO": [
-            {
-                "id": "380aeaa4-c767-4a9b-90ad-b4d5b4e16859",
-                "file": "https://example.com/d18921c58774870ef2508e1524990228.pdf",
-            }
-        ],
         "RENT_REDUCTION_IS_NOTICE_TO_VACATE": True,
-        "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT": [
-            {
-                "id": "1f5f6874-9af3-4996-ab8c-022e3877f50f",
-                "file": "https://example.com/d18921c58774870ef2508e1524990228.pdf",
-            }
-        ],
-        "RENTAL_CIRCUMSTANCES": "PARTNER",
-        "IS_ON_LEASE": "YES",
-        "START_DATE": "1990-01-01",
-        "SUBURB": "Fitzroy",
-        "POSTCODE": 3065,
-        "ADDRESS": "123 Fake St",
-        "PROPERTY_MANAGER_IS_AGENT": False,
-        "LANDLORD_NAME": "John Smith",
-        "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
-        "LANDLORD_EMAIL": "john.smith@landlord.com",
-        "LANDLORD_PHONE": "0422211133",
-        "DOB": "1990-08-15",
-        "GENDER": "omitted",
-        "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
-        "CAN_SPEAK_NON_ENGLISH": True,
-        "FIRST_LANGUAGE": "Russian",
-        "WORK_OR_STUDY_CIRCUMSTANCES": ["LOOKING_FOR_WORK", "STUDENT"],
-        "IS_MULTI_INCOME_HOUSEHOLD": False,
-        "WEEKLY_INCOME": 1337,
-        "WEEKLY_RENT": 1336,
-        "NUMBER_OF_DEPENDENTS": 0,
-        "SPECIAL_CIRCUMSTANCES": ["REFUGEE"],
-        "REFERRER_TYPE": "CHARITY",
-        "CHARITY_REFERRER": "Jewish Care",
-    }
+    },
 }
-RENT_REDUCTION_CLIENT = None
-RENT_REDUCTION_LANDLORD = None
-RENT_REDUCTION_AGENT = None
-RENT_REDUCTION_TENANCY = None
-RENT_REDUCTION_ISSUE = None
+RENT_REDUCTION_UPLOADS = [
+    "380aeaa4-c767-4a9b-90ad-b4d5b4e16859",
+    "1f5f6874-9af3-4996-ab8c-022e3877f50f",
+]
 
 PROCESS_TESTS = (
     # answers, expected_client, expected_landlord, expected_agent, expected_tenancy, expected_issue
@@ -272,6 +398,7 @@ PROCESS_TESTS = (
         REPAIRS_AGENT,
         REPAIRS_TENANCY,
         REPAIRS_ISSUE,
+        REPAIRS_UPLOADS,
     ),
     (
         EVICTIONS_ANSWERS,
@@ -280,6 +407,7 @@ PROCESS_TESTS = (
         EVICTIONS_AGENT,
         EVICTIONS_TENANCY,
         EVICTIONS_ISSUE,
+        EVICTIONS_UPLOADS,
     ),
     (
         RENT_REDUCTION_ANSWERS,
@@ -288,13 +416,24 @@ PROCESS_TESTS = (
         RENT_REDUCTION_AGENT,
         RENT_REDUCTION_TENANCY,
         RENT_REDUCTION_ISSUE,
+        RENT_REDUCTION_UPLOADS,
     ),
 )
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "answers, expected_client, expected_landlord, expected_agent, expected_tenancy, expected_issue",
+    ",".join(
+        [
+            "answers",
+            "expected_client",
+            "expected_landlord",
+            "expected_agent",
+            "expected_tenancy",
+            "expected_issue",
+            "expected_uploads",
+        ]
+    ),
     PROCESS_TESTS,
 )
 def test_process_submission(
@@ -304,19 +443,20 @@ def test_process_submission(
     expected_agent,
     expected_tenancy,
     expected_issue,
+    expected_uploads,
 ):
     """
     Ensure that intake form submissions can be processed,
     """
     # Create some file uploads that we can associate with the issue.
-    upload_1 = FileUploadFactory(id="e249c2c2-15ed-4609-865f-c2109f06f6f8", issue=None)
-    upload_2 = FileUploadFactory(id="55bf8c07-5240-4253-9880-58c24f6afd8f", issue=None)
-    upload_3 = FileUploadFactory(id="b5871cd9-79ea-4c04-843d-a013c5e0a647", issue=None)
+    for upload_id in expected_uploads:
+        FileUploadFactory(id=upload_id, issue=None)
+
     assert Client.objects.count() == 0
     assert Person.objects.count() == 0
     assert Tenancy.objects.count() == 0
     assert Issue.objects.count() == 0
-    assert FileUpload.objects.count() == 3
+    assert FileUpload.objects.count() == len(expected_uploads)
 
     sub = Submission.objects.create(answers=answers)
     process_submission(sub.pk)
@@ -331,51 +471,53 @@ def test_process_submission(
     assert Client.objects.count() == 1
     assert Tenancy.objects.count() == 1
     assert Issue.objects.count() == 1
-    assert FileUpload.objects.count() == 3
+    assert FileUpload.objects.count() == len(expected_uploads)
 
-    # # Check client was created
-    # client = Client.objects.last()
-    # assert client.first_name ==
-    # assert client.last_name ==
-    # assert client.email ==
-    # assert _format_datetime(client.date_of_birth) ==
-    # assert client.phone_number ==
-    # assert client.call_times ==
-    # assert client.gender ==
-    # assert client.can_speak_non_english ==
-    # assert client.first_langage ==
-    # assert client.is_aboriginal_or_torres_strait_islander ==
-    # assert client.referrer_type ==
-    # assert client.referrer ==
+    # Check client was created with correct data
+    client = Client.objects.last()
+    for k, v in expected_client.items():
+        if k == "date_of_birth":
+            assert _format_datetime(getattr(client, k)) == v, k
+        else:
+            assert getattr(client, k) == v, k
 
-    # assert client.employment_status == "WORKING_FULL_TIME"
-    # assert client.welfare_reliance == "SOMEWHAT_RELIANT"
-    # assert client.special_circumstances == ["SINGLE_PARENT"]
-    # assert client.weekly_income == 700
-    # assert client.weekly_rent == 710
+    tenancy = Tenancy.objects.last()
+    for k, v in expected_tenancy.items():
+        if k == "started":
+            assert _format_datetime(getattr(tenancy, k)) == v, k
+        elif k in ["landlord", "agent"] and v:
+            getattr(tenancy, k).full_name == v, k
+        elif k == "client":
+            getattr(tenancy, k).first_name == v, k
+        else:
+            assert getattr(tenancy, k) == v, k
 
-    # # Check tenancy was created
-    # tenancy = Tenancy.objects.last()
-    # assert tenancy.client == client
-    # assert tenancy.address == "99 Cool St"
-    # assert tenancy.suburb == "Fitzroy"
-    # assert tenancy.postcode == "3000"
-    # assert _format_datetime(tenancy.started) == "1990-01-01"
-    # assert tenancy.is_on_lease is True
+    if expected_agent:
+        agent = Person.objects.get(email=expected_agent["email"])
+        for k, v in expected_agent.items():
+            assert getattr(agent, k) == v, k
+    else:
+        assert tenancy.agent is None
 
-    # # Check agent was not created
-    # assert tenancy.agent is None
+    if expected_landlord:
+        landlord = Person.objects.get(email=expected_landlord["email"])
+        for k, v in expected_landlord.items():
+            assert getattr(landlord, k) == v, k
+    else:
+        assert tenancy.landlord is None
 
-    # # Check landlord was created
-    # assert tenancy.landlord.full_name == "John Smith"
-    # assert tenancy.landlord.email == "john@smith.com"
-    # assert tenancy.landlord.address == "123 Fake St"
-    # assert tenancy.landlord.phone_number == "0411111122"
+    issue = Issue.objects.last()
+    for k, v in expected_issue.items():
+        if k == "client":
+            getattr(issue, k).first_name == v, k
+    else:
+        assert getattr(issue, k) == v, k
 
-    # # Check issues were created
-    # other_issue = Issue.objects.filter(topic="OTHER").last()
-    # assert other_issue.client == client
-    # assert other_issue.is_open
-    # assert other_issue.answers == {
-    #     "OTHER_ISSUE_DESCRIPTION": "Lots of mould",
-    # }
+    for upload in FileUpload.objects.all():
+        assert str(upload.id) in expected_uploads
+        assert upload.issue == issue
+
+
+def _format_datetime(dt):
+    dt = timezone.make_naive(dt)
+    return datetime.strftime(dt, "%Y-%m-%d")

@@ -7,9 +7,10 @@ from core.models.issue import Issue
 from actionstep.services.actionstep import _send_issue_actionstep
 
 
-@mock.patch("actionstep.services.actionstep.ActionstepAPI")
 @pytest.mark.django_db
-def test_issue_actionstep(mock_api):
+@mock.patch("actionstep.services.actionstep.send_slack_message")
+@mock.patch("actionstep.services.actionstep.ActionstepAPI")
+def test_issue_actionstep(mock_api, mock_send_slack_message):
     # Create the mock Issue
     client = ClientFactory(
         first_name="Keith",

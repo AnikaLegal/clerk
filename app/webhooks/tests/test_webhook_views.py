@@ -1,3 +1,4 @@
+from unittest import mock
 import pytest
 from django.urls import reverse
 
@@ -5,7 +6,8 @@ from webhooks.models import WebflowContact, JotformSubmission
 
 
 @pytest.mark.django_db
-def test_webflow_form_create(client):
+@mock.patch("webhooks.services.slack.send_slack_message")
+def test_webflow_form_create(mock_slack, client):
     """
     Webflow webhooks create a contact entry
     """

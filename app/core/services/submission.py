@@ -52,17 +52,21 @@ def process_submission(sub_pk: str):
                 "referrer_type": answers["REFERRER_TYPE"] or "",
                 "referrer": referrer or "",
                 "gender": answers["GENDER"],
-                "gender_details": answers.get("GENDER_DETAILS"),
-                "can_speak_non_english": answers["CAN_SPEAK_NON_ENGLISH"],
+                "primary_language_non_english": answers["CAN_SPEAK_NON_ENGLISH"],
                 "is_aboriginal_or_torres_strait_islander": answers[
                     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
                 ],
                 "weekly_rent": answers.get("WEEKLY_RENT"),
                 "weekly_income": answers.get("WEEKLY_INCOME"),
-                "welfare_reliance": answers.get("WELFARE_RELIANCE") or "",
                 "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
                 "call_times": call_times,
                 "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
+                "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
+                "legal_access_difficulties": answers.get("LEGAL_ACCESS_DIFFICULTIES")
+                or [],
+                "is_multi_income_household": answers["IS_MULTI_INCOME_HOUSEHOLD"],
+                "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
+                "primary_language": answers.get("FIRST_LANGUAGE", ""),
             },
         )
         logger.info("Processed Client[%s] for Submission[%s]", client.pk, sub_pk)
@@ -107,56 +111,41 @@ def process_submission(sub_pk: str):
         logger.exception("Could not process Tenancy for Submission[%s]")
         raise
 
-    ISSUE_ANSWERS = {
-        "REPAIRS": {
-            "non_photo": [
-                "REPAIRS_REQUIRED",
-                "REPAIRS_ISSUE_DESCRIPTION",
-                "REPAIRS_ISSUE_START",
-            ],
-            "photo": ["REPAIRS_ISSUE_PHOTO"],
-        },
-        "RENT_REDUCTION": {
-            "non_photo": [
-                "RENT_REDUCTION_ISSUES",
-                "RENT_REDUCTION_ISSUE_DESCRIPTION",
-                "RENT_REDUCTION_ISSUE_START",
-                "RENT_REDUCTION_IS_NOTICE_TO_VACATE",
-            ],
-            "photo": [
-                "RENT_REDUCTION_ISSUE_PHOTO",
-                "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
-            ],
-        },
-        "OTHER": {
-            "non_photo": ["OTHER_ISSUE_DESCRIPTION"],
-            "photo": [],
-        },
+    UPLOAD_ANSWERS = {
+        "REPAIRS": [
+            "REPAIRS_ISSUE_PHOTO",
+        ],
+        "RENT_REDUCTION": [
+            "RENT_REDUCTION_ISSUE_PHOTO",
+            "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
+        ],
+        "EVICTION": ["EVICTIONS_DOCUMENTS_UPLOAD"],
     }
-    for topic in answers["ISSUES"]:
-        logger.info("Processing %s Issue for Submission[%s]", topic, sub_pk)
-        try:
-            non_photo_answers = ISSUE_ANSWERS[topic]["non_photo"]
-            photo_answers = ISSUE_ANSWERS[topic]["photo"]
-            issue_answers = {k: answers[k] for k in non_photo_answers}
-            issue_upload_ids = []
-            for k in photo_answers:
-                issue_upload_ids += [f["id"] for f in (answers.get(k) or [])]
+    topic = answers["ISSUES"]
+    logger.info("Processing %s Issue for Submission[%s]", topic, sub_pk)
+    try:
+        upload_answers = UPLOAD_ANSWERS[topic]
+        issue_answers = {
+            k: v
+            for k, v in answers.items()
+            if k.startswith(topic) and k not in upload_answers
+        }
+        issue_upload_ids = []
+        for k in upload_answers:
+            issue_upload_ids += [f["id"] for f in (answers.get(k) or [])]
 
-            issue = Issue.objects.create(
-                topic=topic,
-                answers=issue_answers,
-                client=client,
-            )
-            FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
-            logger.info(
-                "Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk
-            )
-        except Exception:
-            logger.exception(
-                "Could not process %s Issue for Submission[%s]", topic, sub_pk
-            )
-            raise
+        issue = Issue.objects.create(
+            topic=topic,
+            answers=issue_answers,
+            client=client,
+        )
+        FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
+        logger.info(
+            "Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk
+        )
+    except Exception:
+        logger.exception("Could not process %s Issue for Submission[%s]", topic, sub_pk)
+        raise
 
     Submission.objects.filter(pk=sub.pk).update(is_processed=True)
 
