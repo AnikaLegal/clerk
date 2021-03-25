@@ -42,6 +42,13 @@ def process_submission(sub_pk: str):
         else:
             call_times.append(call_times_answer)
 
+        if answers["IS_MULTI_INCOME_HOUSEHOLD"]:
+            weekly_rent = answers["WEEKLY_RENT_MULTI"]
+            weekly_income = answers["WEEKLY_INCOME_MULTI"]
+        else:
+            weekly_rent = answers["WEEKLY_RENT"]
+            weekly_income = answers["WEEKLY_INCOME"]
+
         client, _ = Client.objects.get_or_create(
             email=answers["EMAIL"],
             defaults={
@@ -56,8 +63,8 @@ def process_submission(sub_pk: str):
                 "is_aboriginal_or_torres_strait_islander": answers[
                     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
                 ],
-                "weekly_rent": answers.get("WEEKLY_RENT"),
-                "weekly_income": answers.get("WEEKLY_INCOME"),
+                "weekly_rent": weekly_rent,
+                "weekly_income": weekly_income,
                 "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
                 "call_times": call_times,
                 "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],

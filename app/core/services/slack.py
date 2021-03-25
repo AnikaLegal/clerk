@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_issue_slack(issue_pk: str):
-    issue = Issue.objects.get(pk=issue_pk)
+    issue = Issue.objects.select_related("client").get(pk=issue_pk)
     text = get_text(issue)
     logging.info("Notifying Slack of Issue<%s>", issue_pk)
     send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, text)
@@ -20,16 +20,14 @@ def send_issue_slack(issue_pk: str):
 def get_text(issue: Issue):
     pk = issue.pk
     url = f"https://clerk.anikalegal.com/admin/core/issue/{pk}/change/"
-    answers = issue.answers
-    if "CLIENT_REFERRAL" in answers:
-        ref_type = answers["CLIENT_REFERRAL"]
-        ref_name = ""
-        ref_name = answers.get("CLIENT_REFERRAL_CHARITY", ref_name)
-        ref_name = answers.get("CLIENT_REFERRAL_LEGAL_CENTRE", ref_name)
-        ref_name = answers.get("CLIENT_REFERRAL_OTHER", ref_name)
-        ref_str = f"*Referral type*: {ref_type}"
-        if ref_name:
-            ref_str += " / " + ref_name
+
+    referrer_type = issue.client.referrer_type.title().replace("_", " ")
+    referrer = issue.client.referrer
+
+    if referrer_type:
+        ref_str = f"*Referral type*: {referrer_type}"
+        if referrer:
+            ref_str += f" / {referrer}"
     else:
         ref_str = f"*Referral type*: no info available."
 
