@@ -16,6 +16,8 @@ from .models import Call
 CALL_INTRO_AUDIO = "call-intro.wav"
 # Response when user selects repairs option.
 OPTION_REPAIRS_AUDIO = "option-repairs.wav"
+# Response when user selects evictions option.
+OPTION_EVICTIONS_AUDIO = "option-evictions.wav"
 # Response when user selects rent reduction option.
 OPTION_RENT_REDUCTION_AUDIO = "option-rent-reduction.wav"
 # Response when user selects callbacl option.
@@ -30,6 +32,17 @@ INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on 
 # The SMS message we send to people who are enquiring about repairs.
 REPAIRS_SMS_MESSAGE = """
 Thank you for enquiring about Anika's rental repairs service.
+
+To get help, please fill in this form: https://intake.anikalegal.com
+
+For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+# The SMS message we send to people who are enquiring about evictions.
+EVICTIONS_SMS_MESSAGE = """
+Thank you for enquiring about Anika's evictions service.
 
 To get help, please fill in this form: https://intake.anikalegal.com
 
@@ -61,8 +74,9 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 
 TOPIC_MAPPING = {
     "1": CaseTopic.REPAIRS,
-    "2": CaseTopic.RENT_REDUCTION,
-    "3": CaseTopic.OTHER,
+    "2": CaseTopic.EVICTION,
+    "3": CaseTopic.RENT_REDUCTION,
+    "4": CaseTopic.OTHER,
 }
 
 
@@ -103,10 +117,14 @@ def collect_view(request):
         audio_url = _get_audio_url(OPTION_REPAIRS_AUDIO)
         message_text = REPAIRS_SMS_MESSAGE
     elif choice == "2":
+        # Evictions option.
+        audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
+        message_text = EVICTIONS_SMS_MESSAGE
+    elif choice == "3":
         # Rent reduction option.
         audio_url = _get_audio_url(OPTION_RENT_REDUCTION_AUDIO)
         message_text = RENT_REDUCTION_SMS_MESSAGE
-    elif choice == "3":
+    elif choice == "4":
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = CALLBACK_SMS_MESSAGE
     else:
@@ -115,6 +133,7 @@ def collect_view(request):
 
     # Send an SMS for valid choices.
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    # TODO: Validate whether this number is a mobile number.
     client.messages.create(
         to=number, from_=settings.TWILIO_PHONE_NUMBER, body=message_text
     )

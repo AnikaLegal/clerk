@@ -20,12 +20,14 @@ PREFIX_LOOKUP = {
     CaseTopic.REPAIRS: "R",
     CaseTopic.RENT_REDUCTION: "C",
     CaseTopic.OTHER: "O",
+    CaseTopic.EVICTION: "E",
 }
-# TODO: Add Other case topic in actionstep
+
 ACTION_TYPE_LOOKUP = {
     CaseTopic.REPAIRS: ActionType.REPAIRS,
     CaseTopic.RENT_REDUCTION: ActionType.COVID,
     CaseTopic.OTHER: ActionType.GENERAL,
+    CaseTopic.EVICTION: ActionType.EVICTION,
 }
 
 
@@ -42,7 +44,7 @@ def _send_issue_actionstep(issue_pk: str):
     api = ActionstepAPI()
 
     # Fetch new action owner.
-    owner_email = settings.ACTIONSTEP_SETUP_OWNERS[issue.topic]
+    owner_email = settings.ACTIONSTEP_SETUP_OWNER
     owner_data = api.participants.get_by_email(owner_email)
     logger.info("Assigning Issue<%s]> to owner %s", issue_pk, owner_data["email"])
 

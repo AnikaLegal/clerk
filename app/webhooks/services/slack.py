@@ -1,6 +1,5 @@
 import logging
 
-import requests
 from django.conf import settings
 
 from slack.services import send_slack_message

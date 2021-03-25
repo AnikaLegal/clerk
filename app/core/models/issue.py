@@ -10,6 +10,7 @@ from .client import Client
 class CaseTopic:
     REPAIRS = "REPAIRS"
     RENT_REDUCTION = "RENT_REDUCTION"
+    EVICTION = "EVICTION"
     OTHER = "OTHER"
 
 
@@ -59,6 +60,7 @@ class Issue(TimestampedModel):
     TOPIC_CHOICES = (
         (CaseTopic.REPAIRS, CaseTopic.REPAIRS),
         (CaseTopic.RENT_REDUCTION, CaseTopic.RENT_REDUCTION),
+        (CaseTopic.EVICTION, CaseTopic.EVICTION),
         (CaseTopic.OTHER, CaseTopic.OTHER),
     )
 

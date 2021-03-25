@@ -61,17 +61,25 @@ class Client(TimestampedModel):
     )
 
     # Demographic info for impact analysis.
-    employment_status = models.CharField(max_length=32, blank=True, default="")
+    employment_status = ArrayField(
+        models.CharField(max_length=32), default=list, blank=True
+    )
+
     special_circumstances = ArrayField(
         models.CharField(max_length=32), default=list, blank=True
     )
     weekly_income = models.IntegerField(null=True, blank=True)
     weekly_rent = models.IntegerField(null=True, blank=True)
-    welfare_reliance = models.CharField(max_length=32, blank=True, default="")
     gender = models.CharField(max_length=64, null=True, blank=True)
-    gender_details = models.CharField(max_length=256, null=True, blank=True)
-    can_speak_non_english = models.BooleanField(default=False)
+    primary_language_non_english = models.BooleanField(default=False)
+    primary_language = models.CharField(max_length=32, blank=True, default="")
     is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
+    rental_circumstances = models.CharField(max_length=32, blank=True, default="")
+    is_multi_income_household = models.BooleanField(null=True)
+    number_of_dependents = models.IntegerField(null=True)
+    legal_access_difficulties = ArrayField(
+        models.CharField(max_length=32), default=list, blank=True
+    )
 
     # Referrer info: how did the client find us?
     referrer_type = models.CharField(

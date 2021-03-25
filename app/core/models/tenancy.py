@@ -15,7 +15,7 @@ class Tenancy(TimestampedModel):
     suburb = models.CharField(max_length=128, null=True, blank=True)
     postcode = models.CharField(max_length=6, null=True, blank=True)
     started = models.DateTimeField(null=True, blank=True)
-    is_on_lease = models.BooleanField(null=True, blank=True)
+    is_on_lease = models.CharField(max_length=32, blank=True, null=True)
     landlord = models.ForeignKey(
         Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
