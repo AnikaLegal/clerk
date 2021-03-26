@@ -18,8 +18,6 @@ CALL_INTRO_AUDIO = "call-intro.wav"
 OPTION_REPAIRS_AUDIO = "option-repairs.wav"
 # Response when user selects evictions option.
 OPTION_EVICTIONS_AUDIO = "option-evictions.wav"
-# Response when user selects rent reduction option.
-OPTION_RENT_REDUCTION_AUDIO = "option-rent-reduction.wav"
 # Response when user selects callbacl option.
 OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
@@ -51,17 +49,6 @@ For more info on Anika's services, please visit https://www.anikalegal.com/faq/f
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
 
-# The SMS message we send to people who are enquiring about rent reductions.
-RENT_REDUCTION_SMS_MESSAGE = """
-Thank you for enquiring about Anika's rent reduction service.
-
-To get help, please fill in this form: https://intake.anikalegal.com
-
-For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
 # The SMS message we send to people who want a callback about another issue.
 CALLBACK_SMS_MESSAGE = """
 Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
@@ -75,8 +62,7 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 TOPIC_MAPPING = {
     "1": CaseTopic.REPAIRS,
     "2": CaseTopic.EVICTION,
-    "3": CaseTopic.RENT_REDUCTION,
-    "4": CaseTopic.OTHER,
+    "3": CaseTopic.OTHER,
 }
 
 
@@ -121,10 +107,6 @@ def collect_view(request):
         audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
         message_text = EVICTIONS_SMS_MESSAGE
     elif choice == "3":
-        # Rent reduction option.
-        audio_url = _get_audio_url(OPTION_RENT_REDUCTION_AUDIO)
-        message_text = RENT_REDUCTION_SMS_MESSAGE
-    elif choice == "4":
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = CALLBACK_SMS_MESSAGE
     else:
@@ -142,7 +124,7 @@ def collect_view(request):
     # Retrieve and update corresponding entry for valid choices.
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
     call.topic = TOPIC_MAPPING[choice]
-    call.requires_callback = choice == "4"
+    call.requires_callback = choice == "3"
     call.save()
 
     return TwimlResponse(response)
