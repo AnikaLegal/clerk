@@ -142,7 +142,7 @@ def collect_view(request):
     # Retrieve and update corresponding entry for valid choices.
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
     call.topic = TOPIC_MAPPING[choice]
-    call.requires_callback = choice == "3"
+    call.requires_callback = choice == "4"
     call.save()
 
     return TwimlResponse(response)
