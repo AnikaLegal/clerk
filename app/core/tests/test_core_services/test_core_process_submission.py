@@ -128,6 +128,7 @@ EVICTIONS_ANSWERS = {
     "AGENT_PHONE": "0411111188",
     "AVAILIBILITY": ["WEEK_DAY", "SUNDAY"],
     "CAN_SPEAK_NON_ENGLISH": False,
+    "FIRST_LANGUAGE": None,
     "DOB": "1990-02-01",
     "EMAIL": "mattdsegal@gmail.com",
     "FIRST_NAME": "Matthew",

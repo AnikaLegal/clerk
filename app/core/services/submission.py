@@ -73,7 +73,7 @@ def process_submission(sub_pk: str):
                 or [],
                 "is_multi_income_household": answers["IS_MULTI_INCOME_HOUSEHOLD"],
                 "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
-                "primary_language": answers.get("FIRST_LANGUAGE", ""),
+                "primary_language": answers.get("FIRST_LANGUAGE") or "",
             },
         )
         logger.info("Processed Client[%s] for Submission[%s]", client.pk, sub_pk)
