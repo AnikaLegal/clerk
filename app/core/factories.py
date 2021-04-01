@@ -6,6 +6,7 @@ import factory
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from core.models import (
     Client,
@@ -13,11 +14,28 @@ from core.models import (
     FileUpload,
     Issue,
     Person,
-    TimestampedModel,
 )
 
 
 TINY_PNG = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\tpHYs\x00\x00\x0e\xc4\x00\x00\x0e\xc4\x01\x95+\x0e\x1b\x00\x00\x00\x19tEXtSoftware\x00gnome-screenshot\xef\x03\xbf>\x00\x00\x00\rIDAT\x08\x99c```\xf8\x0f\x00\x01\x04\x01\x00}\xb2\xc8\xdf\x00\x00\x00\x00IEND\xaeB`\x82"
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    email = factory.Faker("email")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    date_joined = factory.Faker(
+        "date_time_between", tzinfo=timezone.utc, start_date="-2y", end_date="-1y"
+    )
+    is_staff = False
+    is_active = True
+
+    @factory.lazy_attribute
+    def username(self):
+        return self.email
 
 
 class TimestampedModelFactory(factory.django.DjangoModelFactory):

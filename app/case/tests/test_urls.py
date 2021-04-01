@@ -6,6 +6,7 @@ import pytest
 URLS_TO_TEST = [
     # url, status code expected, redirect url expected
     ("/", 200, None),
+    ("/login/", 200, None),
     ("/robots.txt", 200, None),
 ]
 

@@ -1,8 +1,18 @@
-{% extends "case/_base.html" %}
-{% block title %}Example{% endblock %}
-
+{% extends "case/_base.html" %} 
+{% block title %}Example{% endblock %} 
 {% block content %}
-<div class="ui container">
-    <a href="{% url "social:begin" "google-oauth2" %}">Log in with Google</a>
+<div class="ui container center aligned">
+    <h1 class="ui header">
+        Welcome to Clerk
+        <div class="sub header">
+            You can log in with your Anika email
+        </div>
+    </h1>
+    <a href="{% url 'social:begin' 'google-oauth2' %}">
+        <button class="ui google plus button">
+            <i class="google icon"></i>
+            Log in
+        </button>
+    </a>
 </div>
 {% endblock %}
