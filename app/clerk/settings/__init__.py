@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     # APIs
     "rest_framework",
     "corsheaders",
+    # Social auth
+    "social_django",
     # Async tasks
     "django_q",
     # Internal apps
@@ -46,6 +48,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "clerk.urls"
@@ -55,13 +58,12 @@ WSGI_APPLICATION = "clerk.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            # /app/templates/
-            os.path.abspath(os.path.join(BASE_DIR, "..", "templates"))
-        ],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
@@ -84,7 +86,37 @@ DATABASES = {
     }
 }
 
-# Password validation
+# Authentication
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "example"
+AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+]
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("GOOGLE_OAUTH2_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+]
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.com"]
+
+# See https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    # Associates the current social details with another user account with a similar email address.
+    "social_core.pipeline.social_auth.associate_by_email",
+    "social_core.pipeline.user.create_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
