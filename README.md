@@ -39,6 +39,8 @@ ACTIONSTEP_CLIENT_ID=
 ACTIONSTEP_CLIENT_SECRET=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
+GOOGLE_OAUTH2_KEY=
+GOOGLE_OAUTH2_SECRET=
 ```
 
 The values of these secrets will be provided to you if you need them.

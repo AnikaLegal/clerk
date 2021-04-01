@@ -9,6 +9,9 @@ gunicorn
 sentry-sdk
 django-q
 
+# Authentication
+social-auth-app-django
+
 # API
 djangorestframework
 django-cors-headers

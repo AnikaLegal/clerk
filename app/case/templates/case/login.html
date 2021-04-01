@@ -1,0 +1,8 @@
+{% extends "case/_base.html" %}
+{% block title %}Example{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <a href="{% url "social:begin" "google-oauth2" %}">Log in with Google</a>
+</div>
+{% endblock %}
