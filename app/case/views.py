@@ -1,5 +1,9 @@
 from django.views.generic.base import TemplateView
 from django.contrib.auth.views import LoginView as BaseLoginView
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+from django.conf import settings
 
 
 class RobotsView(TemplateView):
@@ -18,3 +22,8 @@ class ExampleView(TemplateView):
 class LoginView(BaseLoginView):
     template_name = "case/login.html"
     redirect_authenticated_user = True
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(settings.LOGIN_URL)
