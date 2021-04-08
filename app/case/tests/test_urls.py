@@ -30,5 +30,7 @@ def test_url_status_codes(client, url, status_code, redirect_url):
         assert len(response_redirect.redirect_chain) == 1, msg
         # Ensure lands on expected URL
         actual_redirect_url = response_redirect.redirect_chain[0][0]
-        msg = f"Wrong redirect for {url} expected {redirect_url}, got {actual_redirect_url}"
+        msg = (
+            f"Wrong redirect for {url} expected {redirect_url}, got {actual_redirect_url}"
+        )
         assert actual_redirect_url == redirect_url, msg

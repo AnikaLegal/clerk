@@ -1,6 +1,7 @@
 from django.db import models
-from core.models.timestamped import TimestampedModel
+
 from core.models.issue import Issue
+from core.models.timestamped import TimestampedModel
 
 
 class Call(TimestampedModel):

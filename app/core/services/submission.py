@@ -1,10 +1,10 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from django.db import transaction
 from django.utils import timezone
 
-from core.models import Submission, Issue, Client, Person, FileUpload, Tenancy
+from core.models import Client, FileUpload, Issue, Person, Submission, Tenancy
 
 logger = logging.getLogger(__name__)
 
@@ -144,9 +144,7 @@ def process_submission(sub_pk: str):
             client=client,
         )
         FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
-        logger.info(
-            "Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk
-        )
+        logger.info("Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk)
     except Exception:
         logger.exception("Could not process %s Issue for Submission[%s]", topic, sub_pk)
         raise

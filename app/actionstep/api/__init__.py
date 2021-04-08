@@ -2,19 +2,19 @@
 from actionstep.api import ActionstepAPI 
 api = ActionstepAPI() 
 """
-from .filenotes import FilenoteEndpoint
-from .users import UserEndpoint
-from .actions import ActionEndpoint
-from .participants import ParticipantEndpoint
-from .files import FileEndpoint
-
 from actionstep.models import AccessToken
+
+from .actions import ActionEndpoint
+from .filenotes import FilenoteEndpoint
+from .files import FileEndpoint
+from .participants import ParticipantEndpoint
+from .users import UserEndpoint
 
 
 class ActionstepAPI:
     """
     Object providing acccess to all Actionstep API endpoints.
-    
+
     """
 
     def __init__(self):

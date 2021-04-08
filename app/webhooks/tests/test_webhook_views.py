@@ -1,8 +1,9 @@
 from unittest import mock
+
 import pytest
 from django.urls import reverse
 
-from webhooks.models import WebflowContact, JotformSubmission
+from webhooks.models import JotformSubmission, WebflowContact
 
 
 @pytest.mark.django_db

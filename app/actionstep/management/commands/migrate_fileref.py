@@ -2,9 +2,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from core.models import Issue
 from actionstep.api import ActionstepAPI, participants
-
+from core.models import Issue
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 import os
+
 from sentry_sdk import capture_exception
 
 SENTRY_DSN = os.environ.get("RAVEN_DSN")
@@ -6,9 +7,9 @@ SENTRY_DSN = os.environ.get("RAVEN_DSN")
 
 class WithSentryCapture:
     """
-    Wrapper for Django-Q tasks so that Sentry logging doesn't choke on 
+    Wrapper for Django-Q tasks so that Sentry logging doesn't choke on
     Django-Q internals in the stack trace,
-    
+
     Written as a class so it is pickleable, as per
     http://gael-varoquaux.info/programming/decoration-in-python-done-right-decorating-and-pickling.html
     """

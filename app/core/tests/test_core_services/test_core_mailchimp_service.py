@@ -1,16 +1,14 @@
-from mailchimp3.mailchimpclient import MailChimpError
-from mailchimp3.helpers import check_email
-
-from django.utils import timezone
-from django.conf import settings
-
 from unittest import mock
+
 import pytest
+from django.conf import settings
+from django.utils import timezone
+from mailchimp3.helpers import check_email
+from mailchimp3.mailchimpclient import MailChimpError
 
-from core.factories import IssueFactory, ClientFactory
-from core.services.mailchimp import remind_incomplete, find_submissions
+from core.factories import ClientFactory, IssueFactory
 from core.models import CaseTopic, Submission
-
+from core.services.mailchimp import find_submissions, remind_incomplete
 
 # Sample dates for testing
 THREE_WEEKS_AGO = timezone.now() - timezone.timedelta(days=21)

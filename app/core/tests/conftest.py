@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from utils.signals import restore_signals, disable_signals
+from utils.signals import disable_signals, restore_signals
 
 
 @pytest.fixture(autouse=True)  # Automatically use in tests.

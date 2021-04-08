@@ -5,7 +5,7 @@ from django.utils import timezone
 from mailchimp3 import MailChimp
 from mailchimp3.mailchimpclient import MailChimpError
 
-from core.models import Client, Submission, CaseTopic
+from core.models import CaseTopic, Client, Submission
 
 logger = logging.getLogger(__file__)
 

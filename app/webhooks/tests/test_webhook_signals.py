@@ -16,9 +16,7 @@ def test_slack_sent_on_save(mock_async):
     # Save the contact to trigger signal.
     contact.save()
     # Ensure tasks were dispatched
-    mock_async.assert_has_calls(
-        [mock.call(send_webflow_contact_slack, str(contact.pk))]
-    )
+    mock_async.assert_has_calls([mock.call(send_webflow_contact_slack, str(contact.pk))])
 
 
 @pytest.mark.django_db

@@ -4,7 +4,6 @@ import responses
 
 from actionstep.api.base import BaseEndpoint
 
-
 TEST_URL = "https://example.com/rest/test/"
 
 

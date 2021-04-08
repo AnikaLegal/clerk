@@ -1,6 +1,6 @@
 import logging
-from urllib.parse import urljoin
 from json.decoder import JSONDecodeError
+from urllib.parse import urljoin
 
 import requests
 
@@ -114,4 +114,3 @@ class BaseEndpoint:
             return None
         else:
             return resp.json()
-

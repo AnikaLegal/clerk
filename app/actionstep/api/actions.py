@@ -54,9 +54,7 @@ class ActionEndpoint(BaseEndpoint):
             try:
                 ref_num = int(action["reference"].replace(prefix, ""))
             except Exception:
-                logger.exception(
-                    "Error parsing matter reference %s", action["reference"]
-                )
+                logger.exception("Error parsing matter reference %s", action["reference"])
                 ref_num = 0
 
             if ref_num > max_ref_num:

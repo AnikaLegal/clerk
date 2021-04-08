@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
-from core.models import TimestampedModel, Issue
 from actionstep.constants import ActionFolder
+from core.models import Issue, TimestampedModel
 
 
 def get_s3_key(file_upload, filename):

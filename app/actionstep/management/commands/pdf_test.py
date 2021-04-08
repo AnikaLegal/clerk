@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from core.models import Issue
 from actionstep.services.pdf import create_pdf
+from core.models import Issue
 
 
 class Command(BaseCommand):

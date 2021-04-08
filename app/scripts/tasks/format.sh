@@ -8,4 +8,5 @@ black \
 isort \
     -l 90 \
     --skip migrations --skip /app/frontend \
-    --apply
+    --apply \
+    .

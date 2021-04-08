@@ -2,9 +2,9 @@ from unittest import mock
 
 import pytest
 
-from core.factories import IssueFactory, ClientFactory, TenancyFactory
-from core.models.issue import Issue
 from actionstep.services.actionstep import _send_issue_actionstep
+from core.factories import ClientFactory, IssueFactory, TenancyFactory
+from core.models.issue import Issue
 
 
 @pytest.mark.django_db

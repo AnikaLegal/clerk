@@ -1,12 +1,12 @@
-from django_q.tasks import async_task
 from django.contrib import admin
 from django.contrib.messages import constants as messages
+from django_q.tasks import async_task
 
-from core.services.slack import send_issue_slack
 from actionstep.services.actionstep import send_issue_actionstep
+from core.services.slack import send_issue_slack
 from utils.admin import admin_link, dict_to_json_html
 
-from .models import FileUpload, Issue, Client, Person, Tenancy, Submission
+from .models import Client, FileUpload, Issue, Person, Submission, Tenancy
 
 
 @admin.register(Submission)

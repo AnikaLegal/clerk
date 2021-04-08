@@ -3,10 +3,10 @@ from unittest import mock
 import pytest
 from django.conf import settings
 
-from webhooks.services import slack
-from webhooks.services.slack import send_webflow_contact_slack
 from webhooks.factories import WebflowContactFactory
 from webhooks.models import WebflowContact
+from webhooks.services import slack
+from webhooks.services.slack import send_webflow_contact_slack
 
 
 @pytest.mark.django_db

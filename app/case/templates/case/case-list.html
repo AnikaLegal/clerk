@@ -1,0 +1,84 @@
+{% extends "case/_base.html" %}
+{% block title %}Cases{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <h1>Cases</h1>
+    {% comment %} 
+    TODO:
+    - filter by case type
+    - filter by referrer
+    - show open cases only
+    {% endcomment %}
+
+
+    <div class="ui pagination menu">
+        {% if issue_page.has_previous %}
+            <a href="?page={{ issue_page.previous_page_number }}" class="item">
+                <i class="chevron left icon"></i>
+            </a>
+        {% else %}
+            <a class="item disabled">
+                <i class="chevron left icon"></i>
+            </a>        
+        {% endif %}
+        <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
+        {% if issue_page.has_next %}
+            <a href="?page={{ issue_page.next_page_number }}" class="item">
+                <i class="chevron right icon"></i>
+            </a>
+        {% else %}
+            <a class="item disabled">
+                <i class="chevron right icon"></i>
+            </a>        
+        {% endif %}
+    </div>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>File Ref</th>
+                <th>Topic</th>
+                <th>Client</th>
+                <th>Created At</th>
+                <th>Referrer</th>
+                <th>Case Open</th>
+                <th>Legal Advice</th>
+                <th>Stage</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for issue in issue_page %}
+            <tr>
+                <td>
+                    <a href="{% url 'case-detail' issue.pk %}">
+                        {{ issue.fileref }}
+                    </a>
+                </td>
+                <td>{{ issue.topic|title }}</td>
+                <td>{{ issue.client.get_full_name|title }}</td>
+                <td>{{ issue.created_at|date:"jS M 'y" }}</td>
+                <td>{{ issue.client.referrer|default:"-" }}</td>
+                <td class="center aligned">
+                    {% if issue.is_open %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+                <td class="center aligned">
+                    {% if issue.provided_legal_services %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+                
+                <td>{{issue.stage|default:"-" }}</td>
+                <td>{{issue.outcome|default:"-" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

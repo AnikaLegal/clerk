@@ -2,8 +2,8 @@ import logging
 
 from django.conf import settings
 
-from slack.services import send_slack_message
 from core.models import Issue
+from slack.services import send_slack_message
 
 logger = logging.getLogger(__name__)
 
