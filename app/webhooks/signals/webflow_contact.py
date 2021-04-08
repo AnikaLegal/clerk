@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from webhooks.models import WebflowContact
-
 from webhooks.services.slack import send_webflow_contact_slack
 
 logger = logging.getLogger(__name__)

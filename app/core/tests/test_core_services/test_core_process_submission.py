@@ -3,11 +3,10 @@ from datetime import datetime
 import pytest
 from django.utils import timezone
 
-from core.models.upload import FileUpload
 from core.factories import FileUploadFactory
+from core.models import Client, FileUpload, Issue, Person, Submission, Tenancy
+from core.models.upload import FileUpload
 from core.services.submission import process_submission
-from core.models import Submission, Client, Person, Tenancy, Issue, FileUpload
-
 
 """
 Test case #1

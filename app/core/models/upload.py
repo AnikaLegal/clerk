@@ -1,11 +1,11 @@
-import os
 import hashlib
+import os
 import uuid
 
 from django.db import models
 
-from .timestamped import TimestampedModel
 from .issue import Issue
+from .timestamped import TimestampedModel
 
 
 def get_s3_key(file_upload, filename):

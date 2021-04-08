@@ -1,12 +1,8 @@
 import pytest
 from django.urls import reverse
 
-from core.models import Submission, FileUpload
-from core.factories import (
-    get_dummy_file,
-    IssueFactory,
-    FileUploadFactory,
-)
+from core.factories import FileUploadFactory, IssueFactory, get_dummy_file
+from core.models import FileUpload, Submission
 
 
 @pytest.mark.django_db

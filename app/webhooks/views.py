@@ -1,11 +1,11 @@
-import logging
 import json
+import logging
 
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 
-from .models import WebflowContact, JotformSubmission
+from .models import JotformSubmission, WebflowContact
 
 logger = logging.getLogger(__file__)
 
@@ -47,7 +47,10 @@ def jotform_form_view(request):
     """
     try:
         data = request.data["rawRequest"]
-        model_kwargs = {"form_name": request.data["formTitle"], "answers": json.loads(data)}
+        model_kwargs = {
+            "form_name": request.data["formTitle"],
+            "answers": json.loads(data),
+        }
     except KeyError:
         raise ValidationError("Invalid request format.")
 

@@ -1,10 +1,10 @@
 import uuid
 
-from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 
-from .timestamped import TimestampedModel
 from .client import Client
+from .timestamped import TimestampedModel
 
 
 class CaseTopic:

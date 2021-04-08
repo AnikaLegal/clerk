@@ -1,7 +1,8 @@
 import uuid
 
-from django.db import models
+from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
 
 from .timestamped import TimestampedModel
 
@@ -96,6 +97,9 @@ class Client(TimestampedModel):
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
+
+    def get_age(self) -> int:
+        return int((timezone.now() - self.date_of_birth).days / 365.25)
 
     def __str__(self) -> str:
         name = self.get_full_name()

@@ -1,7 +1,7 @@
 import uuid
 
-from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 
 from core.models.timestamped import TimestampedModel
 

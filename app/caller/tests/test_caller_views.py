@@ -1,6 +1,6 @@
 from unittest import mock
-import pytest
 
+import pytest
 from django.urls import reverse
 
 from caller.models import Call
@@ -60,9 +60,7 @@ def test_collect_view(mock_VR, mock_G, mock_C, client):
     choice = "3"
 
     client.get(reverse("caller-answer"), {"From": from_number})
-    resp = client.get(
-        reverse("caller-collect"), {"From": from_number, "Digits": choice}
-    )
+    resp = client.get(reverse("caller-collect"), {"From": from_number, "Digits": choice})
 
     mock_client.messages.create.assert_called_once()
     call = Call.objects.last()

@@ -2,14 +2,14 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.views.decorators.http import require_http_methods
 from django.urls import reverse
-
-from twilio.twiml.voice_response import VoiceResponse, Gather
-from twilio.twiml.messaging_response import MessagingResponse
+from django.views.decorators.http import require_http_methods
 from twilio.rest import Client
+from twilio.twiml.messaging_response import MessagingResponse
+from twilio.twiml.voice_response import Gather, VoiceResponse
 
 from core.models.issue import CaseTopic
+
 from .models import Call
 
 # Greet user, introduce Anika, explain options.

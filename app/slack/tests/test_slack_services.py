@@ -1,9 +1,10 @@
 import json
+
 import pytest
 import responses
 
+from slack.models import SlackChannel, SlackMessage, SlackUser
 from slack.services import send_slack_message
-from slack.models import SlackUser, SlackChannel, SlackMessage
 
 
 @responses.activate

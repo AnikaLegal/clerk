@@ -76,10 +76,10 @@ class FolderEndpoint(BaseEndpoint):
     """
     Endpoint for Action folders.
     https://actionstep.atlassian.net/wiki/spaces/API/pages/21135480/Action+Folders
-    Folder schema: 
+    Folder schema:
     {
-        'id': 287, 
-        'name': 'Client', 
+        'id': 287,
+        'name': 'Client',
         'links': {'action': '65', 'parentFolder': None}
     }
     """

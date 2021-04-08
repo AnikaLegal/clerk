@@ -3,16 +3,15 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 
-from slack.services import send_slack_message
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
 from core.models import Issue
 from core.models.issue import CaseTopic
+from slack.services import send_slack_message
 from utils.sentry import WithSentryCapture
 
 from .pdf import create_pdf
-
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +51,7 @@ def _send_issue_actionstep(issue_pk: str):
     client = issue.client
 
     # Ensure participant is in the system.
-    logger.info(
-        "Try to create participant %s, %s.", client.get_full_name(), client.email
-    )
+    logger.info("Try to create participant %s, %s.", client.get_full_name(), client.email)
     participant_data, created = api.participants.get_or_create(
         client.first_name, client.last_name, client.email, client.phone_number
     )
@@ -84,9 +81,7 @@ def _send_issue_actionstep(issue_pk: str):
         # We need to create a new matter
         file_ref_prefix = PREFIX_LOOKUP[issue.topic]
         fileref_name = api.actions.get_next_ref(file_ref_prefix)
-        logger.info(
-            "Creating new matter %s for %s", fileref_name, client.get_full_name()
-        )
+        logger.info("Creating new matter %s for %s", fileref_name, client.get_full_name())
         action_type_name = ACTION_TYPE_LOOKUP[issue.topic]
         action_type_data = api.actions.action_types.get_for_name(action_type_name)
         action_type_id = action_type_data["id"]
@@ -100,9 +95,7 @@ def _send_issue_actionstep(issue_pk: str):
         Issue.objects.filter(pk=issue_pk).update(fileref=fileref_name)
         action_id = action_data["id"]
         client_id = participant_data["id"]
-        api.participants.set_action_participant(
-            action_id, client_id, Participant.CLIENT
-        )
+        api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
 
     # Upload files. Note that multiple uploads will create copies.
     logger.info("Generating PDF for Issue<%s>", issue.id)

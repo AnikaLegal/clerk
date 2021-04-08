@@ -1,8 +1,8 @@
 from django.db import models
 
-from .timestamped import TimestampedModel
 from .client import Client
 from .person import Person
+from .timestamped import TimestampedModel
 
 
 class Tenancy(TimestampedModel):

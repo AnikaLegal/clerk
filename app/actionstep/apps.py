@@ -19,9 +19,9 @@ class ActionstepConfig(AppConfig):
         Setup new schedules. This might be a stupid way to do this.
         FIXME: This is stupid, stop doing this.
         """
-        import actionstep.signals
-
         from django_q.models import Schedule
+
+        import actionstep.signals
 
         for schedule_data in SCHEDULES:
             try:
