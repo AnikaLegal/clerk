@@ -1,0 +1,32 @@
+{% comment %} 
+Renders a Semantic UI dropdown.
+Requires JavaScript init.
+<script>
+    $('.selection.dropdown').dropdown()
+</script>
+
+Args:
+    field: Django form field (eg form.foo)
+
+{% endcomment %}
+<div class="field {% if field.errors %}error{% endif %}" id="field-{{ field.name }}">
+    <label>{{ field.label }}</label>
+    <div class="ui selection dropdown" tabindex="0">
+        {% if field.value %}
+            <input type="hidden" name="{{ field.name }}" value="{{ field.value }}" class="noselection">
+        {% else %}
+            <input type="hidden" name="{{ field.name }}" value="" class="noselection">
+        {% endif %}
+        <i class="dropdown icon"></i>
+        <div class="default text">Select an option</div>
+        <div class="menu transition hidden" tabindex="-1">
+            {% for value, display in field.field.choices %}
+                {% if value %}
+                    <div class="item" data-value="{{ value }}">{{ display }}</div>
+                {% else %}
+                    <div class="item" data-value="">-</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
