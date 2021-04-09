@@ -26,4 +26,13 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BASE_URL = "https://anika-twilio-audio-test.s3-ap-southeast-2.amazonaws.com"
+TWILIO_AUDIO_BASE_URL = (
+    "https://anika-twilio-audio-test.s3-ap-southeast-2.amazonaws.com"
+)
+
+
+ACTIONSTEP_REDIRECT_URI = "http://localhost:8000/actionstep/end/"
+ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
+ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
+ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
+ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"

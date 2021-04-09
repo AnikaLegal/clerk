@@ -26,7 +26,7 @@ def root_view(request):
 @login_required
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
-    issue_qs = Issue.objects.select_related("client")
+    issue_qs = Issue.objects.select_related("client", "paralegal")
     issues = form.search(issue_qs).order_by("-created_at").all()
     page, next_qs, prev_qs = _get_page(request, issues, per_page=10)
     context = {
@@ -71,8 +71,10 @@ def _get_case_detail_context(request, pk):
     # FIXME: Assume only only tenancy but that's not how the models work.
     tenancy = issue.client.tenancy_set.first()
 
-    # FIXME: hardcoded
-    actionstep_url = _get_actionstep_url(719)
+    if issue.actionstep_id:
+        actionstep_url = _get_actionstep_url(issue.actionstep_id)
+    else:
+        actionstep_url = None
 
     return {
         "issue": issue,

@@ -2,6 +2,7 @@ import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.contrib.auth.models import User
 
 from .client import Client
 from .timestamped import TimestampedModel
@@ -84,9 +85,16 @@ class Issue(TimestampedModel):
     answers = models.JSONField(encoder=DjangoJSONEncoder)
     # The person we are trying to help.
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    # The paralegal who is working on the case
+    paralegal = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL
+    )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
     # Tracks whether a Slack alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
     is_case_sent = models.BooleanField(default=False)
+
+    # Actionstep ID
+    actionstep_id = models.IntegerField(blank=True, null=True)
