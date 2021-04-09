@@ -39,29 +39,29 @@ class Issue(TimestampedModel):
     """
 
     STAGE_CHOICES = (
-        (CaseStage.SUBMITTED, CaseStage.SUBMITTED),
-        (CaseStage.ENGAGED, CaseStage.ENGAGED),
-        (CaseStage.ADVICE, CaseStage.ADVICE),
-        (CaseStage.POST_CASE, CaseStage.POST_CASE),
+        (CaseStage.SUBMITTED, "Submitted"),
+        (CaseStage.ENGAGED, "Engaged"),
+        (CaseStage.ADVICE, "Advice"),
+        (CaseStage.POST_CASE, "Post-case"),
     )
 
     OUTCOME_CHOICES = (
-        (CaseOutcome.UNRESPONSIVE, CaseOutcome.UNRESPONSIVE),
-        (CaseOutcome.OUT_OF_SCOPE, CaseOutcome.OUT_OF_SCOPE),
-        (CaseOutcome.SUCCESS, CaseOutcome.SUCCESS),
-        (CaseOutcome.UNSUCCESSFUL, CaseOutcome.UNSUCCESSFUL),
-        (CaseOutcome.REFERRED, CaseOutcome.REFERRED),
-        (CaseOutcome.ESCALATION, CaseOutcome.ESCALATION),
-        (CaseOutcome.DROPPED_OUT, CaseOutcome.DROPPED_OUT),
-        (CaseOutcome.RESOLVED_EARLY, CaseOutcome.RESOLVED_EARLY),
-        (CaseOutcome.UNKNOWN, CaseOutcome.UNKNOWN),
+        (CaseOutcome.UNRESPONSIVE, "Unresponsive"),
+        (CaseOutcome.OUT_OF_SCOPE, "Out of scope"),
+        (CaseOutcome.SUCCESS, "Success"),
+        (CaseOutcome.UNSUCCESSFUL, "Unsuccessful"),
+        (CaseOutcome.REFERRED, "Referred"),
+        (CaseOutcome.ESCALATION, "Escalation"),
+        (CaseOutcome.DROPPED_OUT, "Dropped out"),
+        (CaseOutcome.RESOLVED_EARLY, "Resolved early"),
+        (CaseOutcome.UNKNOWN, "Unknown"),
     )
 
     TOPIC_CHOICES = (
-        (CaseTopic.REPAIRS, CaseTopic.REPAIRS),
-        (CaseTopic.RENT_REDUCTION, CaseTopic.RENT_REDUCTION),
-        (CaseTopic.EVICTION, CaseTopic.EVICTION),
-        (CaseTopic.OTHER, CaseTopic.OTHER),
+        (CaseTopic.REPAIRS, "Repairs"),
+        (CaseTopic.RENT_REDUCTION, "Rent reduction"),
+        (CaseTopic.EVICTION, "Eviction"),
+        (CaseTopic.OTHER, "Other"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

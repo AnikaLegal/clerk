@@ -1,35 +1,12 @@
 {% extends "case/_base.html" %}
 {% block title %}Case {{ issue.fileref }}{% endblock %}
 
-{% block scripts%}
-<script>
-    // Initialize JavaScript enabled Semantic UI elements.
-    $('.selection.dropdown').dropdown()
-    $('.menu .item').tab()
-</script>
-{% endblock %}
+
 
 
 {% block content %}
 <div class="ui container">
-    <h1 class="ui header">
-        {{ issue.topic|title }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
-        <div class="sub header">
-            Created {{ issue.created_at|date:"jS M 'y" }}, updated {{ issue.modified_at|date:"jS M 'y" }}
-            (<a href="{{actionstep_url}}">view in Actionstep</a>)
-        </div>
-    </h1>
-    <div class="ui top attached tabular menu">
-        <a class="item active" data-tab="details">            
-            <i class="clipboard list icon"></i>
-            Details
-        </a>
-        <a class="item" data-tab="progress">
-            <i class="chart line icon"></i>
-            Progress
-        </a>
-    </div>
-    {# Details Tab #}
+    {% include 'case/_case_detail_header.html' with active="detail" %}
     <div class="ui bottom attached tab segment active" data-tab="details">
         <div class="ui two column grid">
 
@@ -196,77 +173,6 @@
             </h2>
         {% endcomment %}
     </div>
-    {# Progress Tab #}
-    <div class="ui bottom attached tab segment" data-tab="progress">
-        <form class="ui form">
-            <div class="two fields">
-                <div class="field">
-                    <label>Stage</label>
-                    <div class="ui selection dropdown" tabindex="0">
-                        <input type="hidden" name="stage" class="noselection">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select a stage</div>
-                        <div class="menu transition hidden" tabindex="-1">
-                            {# TODO: Add information and populate from view #}
-                            <div class="item" data-value="SUBMITTED">Submitted</div>
-                            <div class="item" data-value="ENGAGED">Engaged</div>
-                            <div class="item" data-value="ADVICE">Advice</div>
-                            <div class="item" data-value="POST_CASE">Post case</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Outcome</label>
-                    <div class="ui selection dropdown" tabindex="0">
-                        <input type="hidden" name="outcome" class="noselection">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select an outcome</div>
-                        <div class="menu transition hidden" tabindex="-1">
-                            {# TODO: Add information and populate from view #}
-                            <div class="item" data-value="">-</div>
-                            <div class="item" data-value="UNKNOWN">Unknown</div>
-                            <div class="item" data-value="UNRESPONSIVE">Unresponsive</div>
-                            <div class="item" data-value="OUT_OF_SCOPE">Out of scope</div>
-                            <div class="item" data-value="SUCCESS">Success</div>
-                            <div class="item" data-value="UNSUCCESSFUL">Unsuccessful</div>
-                            <div class="item" data-value="REFERRED">Referred</div>
-                            <div class="item" data-value="ESCALATION">Escalation</div>
-                            <div class="item" data-value="DROPPED_OUT">Dropped out</div>
-                            <div class="item" data-value="RESOLVED_EARLY">Resolved early</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="two fields">
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input id="case-open" {% if issue.is_open %}checked{% endif %}  type="checkbox" class="hidden">
-                        <label for="case-open">Case Open</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input id="legal-services" {% if issue.provided_legal_services %}checked{% endif %}  type="checkbox" class="hidden">
-                        <label for="legal-services">Legal Services Provided</label>
-                    </div>
-                </div>
-            </div>
-            <div class="field">
-                <label>Outcome Notes</label>
-                <textarea></textarea>
-            </div>
-            <button class="ui button" type="submit">Update</button>
-        </form>
-    </div>
-    
-    {% comment %} TODO: Make editable
-    - case open
-    - legal advice
-    - latest stage
-    - outcome
-    - outcome notes
-    {% endcomment %}
-
 </div>
 {% endblock %}
 

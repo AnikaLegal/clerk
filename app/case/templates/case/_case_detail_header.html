@@ -1,0 +1,17 @@
+<h1 class="ui header">
+    {{ issue.topic|title }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
+    <div class="sub header">
+        Created {{ issue.created_at|date:"jS M 'y" }}, updated {{ issue.modified_at|date:"jS M 'y" }}
+        (<a href="{{actionstep_url}}">view in Actionstep</a>)
+    </div>
+</h1>
+<div class="ui top attached tabular menu">
+    <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}" data-tab="details">            
+        <i class="clipboard list icon"></i>
+        Details
+    </a>
+    <a href="{% url 'case-detail-progress' issue.pk %}" class="item {% if active == 'progress' %}active{% endif %}" data-tab="progress">
+        <i class="chart line icon"></i>
+        Progress
+    </a>
+</div>

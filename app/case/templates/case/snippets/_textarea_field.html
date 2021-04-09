@@ -1,0 +1,15 @@
+{% comment %} 
+Renders a Semantic UI textarea.
+
+Args:
+    field: Django form field (eg form.foo)
+
+{% endcomment %}
+<div class="field {% if field.errors %}error{% endif %}">
+    <label>{{ field.label }}</label>
+    {% if field.value %}
+        <textarea name="{{ field.name }}">{{ field.value }}</textarea>
+    {% else %}
+        <textarea name="{{ field.name }}"></textarea>
+    {% endif %}
+</div>

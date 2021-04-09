@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -5,8 +7,10 @@ from django.contrib.auth.views import LoginView as BaseLoginView
 from django.shortcuts import redirect, render
 from django.core.paginator import Paginator
 from django.http import Http404
+from django.contrib import messages
 
 from core.models import Issue
+from .forms import IssueProgressForm, IssueSearchForm
 
 
 def robots_view(request):
@@ -18,19 +22,47 @@ def root_view(request):
     return redirect("case-list")
 
 
+# FIXME: Permissions
 @login_required
 def case_list_view(request):
-    issues = Issue.objects.select_related("client").order_by("-created_at").all()
-    page_size = 10
-    page_number = request.GET.get("page", 1) or 1
-    issue_paginator = Paginator(issues, page_size)
-    issue_page = issue_paginator.get_page(page_number)
-    context = {"issue_page": issue_page}
-    return render(request, "case/case-list.html", context)
+    form = IssueSearchForm(request.GET)
+    issue_qs = Issue.objects.select_related("client")
+    issues = form.search(issue_qs).order_by("-created_at").all()
+    page, next_qs, prev_qs = _get_page(request, issues, per_page=10)
+    context = {
+        "issue_page": page,
+        "form": form,
+        "next_qs": next_qs,
+        "prev_qs": prev_qs,
+    }
+    return render(request, "case/case_list.html", context)
 
 
+# FIXME: Permissions
 @login_required
-def case_details_view(request, pk):
+def case_detail_view(request, pk):
+    context = _get_case_detail_context(request, pk)
+    return render(request, "case/case_detail.html", context)
+
+
+# FIXME: Permissions
+@login_required
+def case_detail_progress_view(request, pk):
+    context = _get_case_detail_context(request, pk)
+    # FIXME: Permissions
+    if request.method == "POST":
+        form = IssueProgressForm(request.POST, instance=context["issue"])
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Update successful")
+    else:
+        form = IssueProgressForm(instance=context["issue"])
+
+    context = {**context, "form": form}
+    return render(request, "case/case_detail_progress.html", context)
+
+
+def _get_case_detail_context(request, pk):
     try:
         issue = Issue.objects.select_related("client").get(pk=pk)
     except Issue.DoesNotExist:
@@ -42,12 +74,23 @@ def case_details_view(request, pk):
     # FIXME: hardcoded
     actionstep_url = _get_actionstep_url(719)
 
-    context = {
+    return {
         "issue": issue,
         "tenancy": tenancy,
         "actionstep_url": actionstep_url,
     }
-    return render(request, "case/case-details.html", context)
+
+
+def _get_page(request, items, per_page):
+    page_number = request.GET.get("page", 1) or 1
+    paginator = Paginator(items, per_page=per_page)
+    page = paginator.get_page(page_number)
+    next_page_num = page.next_page_number() if page.has_next() else paginator.num_pages
+    prev_page_num = page.previous_page_number() if page.has_previous() else 1
+    get_query = {k: v for k, v in request.GET.items()}
+    next_qs = "?" + urlencode({**get_query, "page": next_page_num})
+    prev_qs = "?" + urlencode({**get_query, "page": prev_page_num})
+    return page, next_qs, prev_qs
 
 
 class LoginView(BaseLoginView):

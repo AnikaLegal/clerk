@@ -1,0 +1,13 @@
+{% comment %} 
+Renders a Semantic UI chechbox.
+
+Args:
+    field: Django form field (eg form.foo)
+
+{% endcomment %}
+<div class="field {% if field.errors %}error{% endif %}" id="field-{{ field.name }}">
+    <div class="ui checkbox">
+        <input name="{{ field.name }}" id="{{ field.name }}" {% if field.value %}checked{% endif %}  type="checkbox" class="hidden">
+        <label for="{{ field.name }}">{{ field.label }}</label>
+    </div>
+</div>
