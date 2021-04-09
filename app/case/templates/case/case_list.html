@@ -68,8 +68,6 @@
             {% include 'case/snippets/_dropdown_field.html' with field=form.topic %}
             {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
             {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
-
-
             <div class="field" id="field-{{ form.is_open.name }}">
                 <label>{{ form.is_open.label }}</label>
                 <div class="ui selection dropdown" tabindex="0">
@@ -82,12 +80,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
             <button class="ui button" type="submit">Search</button>
         </div>
     </form>
@@ -119,6 +111,7 @@
                 <th>File Ref</th>
                 <th>Topic</th>
                 <th>Client</th>
+                <th>Paralegal</th>
                 <th>Created At</th>
                 <th>Referrer</th>
                 <th>Case Open</th>
@@ -137,6 +130,7 @@
                 </td>
                 <td>{{ issue.topic|title }}</td>
                 <td>{{ issue.client.get_full_name|title }}</td>
+                <td>{{ issue.paralegal.get_full_name|title|default:'-' }}</td>
                 <td>{{ issue.created_at|date:"jS M 'y" }}</td>
                 <td>{{ issue.client.referrer|default:"-" }}</td>
                 <td class="center aligned">

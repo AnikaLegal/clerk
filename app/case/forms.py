@@ -17,7 +17,7 @@ class IssueSearchForm(forms.ModelForm):
 
     def search(self, issue_qs):
         for k, v in self.data.items():
-            if k not in k in self.fields:
+            if k not in self.fields:
                 continue
 
             if type(self.fields[k]) is BooleanField:
