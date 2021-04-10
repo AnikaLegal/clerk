@@ -168,7 +168,7 @@ def _sync_paralegals():
     issues = Issue.objects.filter(
         paralegal__isnull=True, actionstep_id__isnull=False
     ).all()
-    for issue in issues:
+    for idx, issue in enumerate(issues):
         logging.info("Checking Issue<%s> for paralegal.", issue.pk)
         api = ActionstepAPI()
         action = api.actions.get(issue.actionstep_id)

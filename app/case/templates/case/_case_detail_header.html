@@ -1,13 +1,22 @@
 <h1 class="ui header">
-    {{ issue.topic|title }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
+    {{ issue.get_topic_display }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
     <div class="sub header">
         Created {{ issue.created_at|date:"jS M 'y" }}, updated {{ issue.modified_at|date:"jS M 'y" }}
+        <br/>
+
+        {% if issue.paralegal %}
+            Assigned to 
+            <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+                {{ issue.paralegal.get_full_name|title }}
+            </a>               
+        {% else %}
+            Not assigned
+        {% endif %}
         {% if actionstep_url %}
             (<a href="{{actionstep_url}}">view in Actionstep</a>)
         {% else %}
             (Actionstep link not available)
         {% endif %}
-
     </div>
 </h1>
 <div class="ui top attached tabular menu">

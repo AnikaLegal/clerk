@@ -1,7 +1,9 @@
 from urllib.parse import urlencode
 
+from django.db.models import Max, Count, Q
 from django.conf import settings
 from django.contrib.auth import logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.shortcuts import redirect, render
@@ -11,6 +13,8 @@ from django.contrib import messages
 
 from core.models import Issue
 from .forms import IssueProgressForm, IssueSearchForm
+
+PARALEGAL_CAPACITY = 4.0
 
 
 def robots_view(request):
@@ -24,11 +28,74 @@ def root_view(request):
 
 # FIXME: Permissions
 @login_required
+def paralegal_detail_view(request, pk):
+    try:
+        paralegal = (
+            User.objects.filter(issue__isnull=False)
+            .prefetch_related("issue_set")
+            .distinct()
+            .annotate(
+                latest_issue_created_at=Max("issue__created_at"),
+                total_cases=Count("issue"),
+                open_cases=Count("issue", Q(issue__is_open=True)),
+                open_repairs=Count(
+                    "issue", Q(issue__is_open=True, issue__topic="REPAIRS")
+                ),
+                open_rent_reduction=Count(
+                    "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
+                ),
+                open_eviction=Count(
+                    "issue", Q(issue__is_open=True, issue__topic="EVICTION")
+                ),
+            )
+            .get(pk=pk)
+        )
+    except User.DoesNotExist:
+        raise Http404()
+
+    context = {
+        "paralegal": paralegal,
+    }
+    return render(request, "case/paralegal_detail.html", context)
+
+
+# FIXME: Permissions
+@login_required
+def paralegal_list_view(request):
+    paralegals = (
+        User.objects.filter(issue__isnull=False)
+        .prefetch_related("issue_set")
+        .distinct()
+        .annotate(
+            latest_issue_created_at=Max("issue__created_at"),
+            total_cases=Count("issue"),
+            open_cases=Count("issue", Q(issue__is_open=True)),
+            open_repairs=Count("issue", Q(issue__is_open=True, issue__topic="REPAIRS")),
+            open_rent_reduction=Count(
+                "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
+            ),
+            open_eviction=Count(
+                "issue", Q(issue__is_open=True, issue__topic="EVICTION")
+            ),
+        )
+        .order_by("-latest_issue_created_at")
+    )
+    for p in paralegals:
+        p.capacity = 100 * p.open_cases / PARALEGAL_CAPACITY
+
+    context = {
+        "paralegals": paralegals,
+    }
+    return render(request, "case/paralegal_list.html", context)
+
+
+# FIXME: Permissions
+@login_required
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
     issue_qs = Issue.objects.select_related("client", "paralegal")
     issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = _get_page(request, issues, per_page=10)
+    page, next_qs, prev_qs = _get_page(request, issues, per_page=14)
     context = {
         "issue_page": page,
         "form": form,
