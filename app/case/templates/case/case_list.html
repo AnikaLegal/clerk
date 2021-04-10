@@ -65,37 +65,37 @@
 {% block content %}
 <div class="ui container">
     <h1>Cases</h1>
-    <div class="ui basic clearing segment">
-        <div class="ui pagination menu">
-            {% if issue_page.has_previous %}
-                <a href="{{ prev_qs }}" class="item">
-                    <i class="chevron left icon"></i>
-                </a>
-            {% else %}
-                <a class="item disabled">
-                    <i class="chevron left icon"></i>
-                </a>        
-            {% endif %}
-            <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
-            {% if issue_page.has_next %}
-                <a href="{{ next_qs }}" class="item">
-                    <i class="chevron right icon"></i>
-                </a>
-            {% else %}
-                <a class="item disabled">
-                    <i class="chevron right icon"></i>
-                </a>        
-            {% endif %}
+    <div class="ui grid">
+        <div class="eight wide column">
+            <div class="ui pagination menu">
+                {% if issue_page.has_previous %}
+                    <a href="{{ prev_qs }}" class="item">
+                        <i class="chevron left icon"></i>
+                    </a>
+                {% else %}
+                    <a class="item disabled">
+                        <i class="chevron left icon"></i>
+                    </a>        
+                {% endif %}
+                <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
+                {% if issue_page.has_next %}
+                    <a href="{{ next_qs }}" class="item">
+                        <i class="chevron right icon"></i>
+                    </a>
+                {% else %}
+                    <a class="item disabled">
+                        <i class="chevron right icon"></i>
+                    </a>        
+                {% endif %}
+            </div>
         </div>
-
-        <button id="filter-open" class="ui labeled icon right floated button">
-            <i class="filter icon"></i>
-            Filtered Search
-        </button>
+        <div class="eight wide column">
+            <button id="filter-open" class="ui labeled icon right floated button">
+                <i class="filter icon"></i>
+                Filtered Search
+            </button>
+        </div>
     </div>
-
-
-
 
     <div class="ui card fluid" id="filter-card" style="display: none;">
         <div class="content">
