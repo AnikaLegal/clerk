@@ -65,8 +65,8 @@
 {% block content %}
 <div class="ui container">
     <h1>Cases</h1>
-    <div class="ui grid">
-        <div class="eight wide column">
+    <div class="ui grid middle aligned">
+        <div class="six wide column">
             <div class="ui pagination menu">
                 {% if issue_page.has_previous %}
                     <a href="{{ prev_qs }}" class="item">
@@ -89,7 +89,10 @@
                 {% endif %}
             </div>
         </div>
-        <div class="eight wide column">
+        <div class="four wide column center aligned">
+            Showing {{ issue_page.object_list.count }} of {{ issue_page.paginator.count }} cases
+        </div>
+        <div class="six wide column">
             <button id="filter-open" class="ui labeled icon right floated button">
                 <i class="filter icon"></i>
                 Filtered Search
@@ -138,17 +141,6 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
     <table class="ui celled table">
         <thead>
             <tr>
@@ -174,13 +166,14 @@
                 <td>{{ issue.get_topic_display }}</td>
                 <td>{{ issue.client.get_full_name|title }}</td>
                 <td>
+                    {% if issue.paralegal %}
                 
-
                     <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
-                        {{ issue.paralegal.get_full_name|title|default:'-' }}
+                        {{ issue.paralegal.get_full_name|title }}
                     </a>               
-
-
+                    {% else %}
+                        -
+                    {% endif %}
                 </td>
                 <td>{{ issue.created_at|date:"d/m/y" }}</td>
                 <td class="center aligned">
