@@ -1,8 +1,8 @@
 import uuid
 
-from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils import timezone
 
 from .timestamped import TimestampedModel
 

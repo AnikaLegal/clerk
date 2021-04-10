@@ -1,7 +1,18 @@
 from django import forms
 from django.forms.fields import BooleanField
 
+from accounts.models import User
 from core.models import Issue
+
+
+class ParalegalDetailsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "is_intern",
+        ]
 
 
 class IssueSearchForm(forms.ModelForm):
