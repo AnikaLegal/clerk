@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     # Async tasks
     "django_q",
     # Internal apps
+    "accounts.apps.AccountsConfig",
     "actionstep.apps.ActionstepConfig",
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
@@ -87,6 +88,7 @@ DATABASES = {
 }
 
 # Authentication
+AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "root"

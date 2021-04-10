@@ -1,18 +1,19 @@
 from urllib.parse import urlencode
 
-from django.db.models import Max, Count, Q
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView
-from django.shortcuts import redirect, render
 from django.core.paginator import Paginator
+from django.db.models import Count, Max, Q
 from django.http import Http404
-from django.contrib import messages
+from django.shortcuts import redirect, render
 
+from accounts.models import User
 from core.models import Issue
-from .forms import IssueProgressForm, IssueSearchForm
+
+from .forms import IssueProgressForm, IssueSearchForm, ParalegalDetailsForm
 
 PARALEGAL_CAPACITY = 4.0
 
@@ -53,9 +54,16 @@ def paralegal_detail_view(request, pk):
     except User.DoesNotExist:
         raise Http404()
 
-    context = {
-        "paralegal": paralegal,
-    }
+    # FIXME: Permissions
+    if request.method == "POST":
+        form = ParalegalDetailsForm(request.POST, instance=paralegal)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Update successful")
+    else:
+        form = ParalegalDetailsForm(instance=paralegal)
+
+    context = {"paralegal": paralegal, "form": form}
     return render(request, "case/paralegal_detail.html", context)
 
 
@@ -74,9 +82,7 @@ def paralegal_list_view(request):
             open_rent_reduction=Count(
                 "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
             ),
-            open_eviction=Count(
-                "issue", Q(issue__is_open=True, issue__topic="EVICTION")
-            ),
+            open_eviction=Count("issue", Q(issue__is_open=True, issue__topic="EVICTION")),
         )
         .order_by("-latest_issue_created_at")
     )

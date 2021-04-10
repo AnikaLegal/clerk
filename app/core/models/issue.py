@@ -2,7 +2,8 @@ import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.contrib.auth.models import User
+
+from accounts.models import User
 
 from .client import Client
 from .timestamped import TimestampedModel
@@ -69,9 +70,7 @@ class Issue(TimestampedModel):
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
     # Where the case is at now.
-    stage = models.CharField(
-        max_length=32, null=True, blank=True, choices=STAGE_CHOICES
-    )
+    stage = models.CharField(max_length=32, null=True, blank=True, choices=STAGE_CHOICES)
     # An explanation of the outcome
     outcome = models.CharField(
         max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES
@@ -86,9 +85,7 @@ class Issue(TimestampedModel):
     # The person we are trying to help.
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     # The paralegal who is working on the case
-    paralegal = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL
-    )
+    paralegal = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
     # Tracks whether a Slack alert has been successfully sent.

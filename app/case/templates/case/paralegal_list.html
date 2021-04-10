@@ -18,13 +18,12 @@
         <tbody>
         {% for paralegal in paralegals %}
             <tr>
-                <td>
+                <td {% if paralegal.is_intern %}class="blue"{% endif %}>
                     <a href="{% url 'paralegal-detail' paralegal.pk %}">
-                        {{ paralegal.get_full_name|title }}
+                        {{ paralegal.get_full_name|title }} {% if paralegal.is_intern %}(intern){% endif %}
                     </a>               
-                </td>
+                </td>                
                 <td class="center aligned">{{ paralegal.latest_issue_created_at|date:"d/m/y" }}</td>
-
                 {% if paralegal.capacity == 0 %}
                     <td class="center aligned">{{paralegal.capacity|floatformat:'0' }}</td>
                 {% elif paralegal.capacity < 50 %}
