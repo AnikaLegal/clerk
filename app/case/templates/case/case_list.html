@@ -30,7 +30,7 @@
     onUpdateFilters()
     $('.selection.dropdown').dropdown()
     $('#filter-select').dropdown({
-        placeholder: "Select a search filter",
+        placeholder: "Select some search filters",
         values: values,
         onAdd: (v) => {
             filterState.items.push(v)
@@ -53,6 +53,11 @@
         })
         window.location.href = "?" + (new URLSearchParams(values)).toString()
     })
+
+    $('#filter-open').click(() => {
+        $('#filter-card').show()
+    })
+
 </script>
 {% endblock %}
 
@@ -60,51 +65,90 @@
 {% block content %}
 <div class="ui container">
     <h1>Cases</h1>
-    <form class="ui form" id="filter-form">
-        <div class="field">
-            <select multiple="" class="ui fluid dropdown" id="filter-select"></select>
+    <div class="ui basic clearing segment">
+        <div class="ui pagination menu">
+            {% if issue_page.has_previous %}
+                <a href="{{ prev_qs }}" class="item">
+                    <i class="chevron left icon"></i>
+                </a>
+            {% else %}
+                <a class="item disabled">
+                    <i class="chevron left icon"></i>
+                </a>        
+            {% endif %}
+            <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
+            {% if issue_page.has_next %}
+                <a href="{{ next_qs }}" class="item">
+                    <i class="chevron right icon"></i>
+                </a>
+            {% else %}
+                <a class="item disabled">
+                    <i class="chevron right icon"></i>
+                </a>        
+            {% endif %}
         </div>
-        <div class="inline fields">
-            {% include 'case/snippets/_dropdown_field.html' with field=form.topic %}
-            {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
-            {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
-            <div class="field" id="field-{{ form.is_open.name }}">
-                <label>{{ form.is_open.label }}</label>
-                <div class="ui selection dropdown" tabindex="0">
-                    <input type="hidden" name="{{ form.is_open.name }}" value="{{ form.is_open.value }}" class="noselection">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">Select an option</div>
-                    <div class="menu transition hidden" tabindex="-1">
-                        <div class="item" data-value="True">Open</div>
-                        <div class="item" data-value="False">Closed</div>
-                    </div>
-                </div>
-            </div>
-            <button class="ui button" type="submit">Search</button>
-        </div>
-    </form>
 
-    <div class="ui pagination menu">
-        {% if issue_page.has_previous %}
-            <a href="{{ prev_qs }}" class="item">
-                <i class="chevron left icon"></i>
-            </a>
-        {% else %}
-            <a class="item disabled">
-                <i class="chevron left icon"></i>
-            </a>        
-        {% endif %}
-        <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
-        {% if issue_page.has_next %}
-            <a href="{{ next_qs }}" class="item">
-                <i class="chevron right icon"></i>
-            </a>
-        {% else %}
-            <a class="item disabled">
-                <i class="chevron right icon"></i>
-            </a>        
-        {% endif %}
+        <button id="filter-open" class="ui labeled icon right floated button">
+            <i class="filter icon"></i>
+            Filtered Search
+        </button>
     </div>
+
+
+
+
+    <div class="ui card fluid" id="filter-card" style="display: none;">
+        <div class="content">
+            <div class="header">Filtered Search</div>
+            <div class="meta">
+                <span>Use these filters to find the cases you want.</span>
+            </div>
+            <div class="description">
+                <form class="ui form" id="filter-form">
+                    <div class="field info">
+                        <select multiple="" class="ui dropdown" id="filter-select"></select>
+                    </div>
+                    <div class="equal width fields">
+                        {% include 'case/snippets/_dropdown_field.html' with field=form.topic %}
+                        {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
+                    </div>
+                    <div class="equal width fields">
+                        {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
+                        <div class="field" id="field-{{ form.is_open.name }}">
+                            <label>{{ form.is_open.label }}</label>
+                            <div class="ui selection dropdown" tabindex="0">
+                                <input type="hidden" name="{{ form.is_open.name }}" value="{{ form.is_open.value }}" class="noselection">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select an option</div>
+                                <div class="menu transition hidden" tabindex="-1">
+                                    <div class="item" data-value="True">Open</div>
+                                    <div class="item" data-value="False">Closed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="extra content">
+            <button class="ui button" type="submit" form="filter-form">Search</button>
+            <a href="{% url 'case-list' %}">
+                <button class="ui button" id="filter-clear">Clear</button>
+            </a>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
     <table class="ui celled table">
         <thead>
             <tr>
@@ -112,10 +156,9 @@
                 <th>Topic</th>
                 <th>Client</th>
                 <th>Paralegal</th>
-                <th>Created At</th>
-                <th>Referrer</th>
-                <th>Case Open</th>
-                <th>Legal Advice</th>
+                <th>Created</th>
+                <th>Open</th>
+                <th>Advice</th>
                 <th>Stage</th>
                 <th>Outcome</th>
             </tr>
@@ -128,11 +171,18 @@
                         {{ issue.fileref }}
                     </a>
                 </td>
-                <td>{{ issue.topic|title }}</td>
+                <td>{{ issue.get_topic_display }}</td>
                 <td>{{ issue.client.get_full_name|title }}</td>
-                <td>{{ issue.paralegal.get_full_name|title|default:'-' }}</td>
-                <td>{{ issue.created_at|date:"jS M 'y" }}</td>
-                <td>{{ issue.client.referrer|default:"-" }}</td>
+                <td>
+                
+
+                    <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+                        {{ issue.paralegal.get_full_name|title|default:'-' }}
+                    </a>               
+
+
+                </td>
+                <td>{{ issue.created_at|date:"d/m/y" }}</td>
                 <td class="center aligned">
                     {% if issue.is_open %}
                         <i class="green checkmark icon"></i>
@@ -148,8 +198,8 @@
                     {% endif %}
                 </td>
                 
-                <td>{{issue.stage|default:"-" }}</td>
-                <td>{{issue.outcome|default:"-" }}</td>
+                <td>{{issue.get_stage_display|default:"-" }}</td>
+                <td>{{issue.get_outcome_display|default:"-" }}</td>
             </tr>
         {% endfor %}
         </tbody>

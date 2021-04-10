@@ -8,6 +8,9 @@ urlpatterns = [
     path("oauth/", include("social_django.urls", namespace="social")),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
+    # Paralegals
+    path("paralegals/", views.paralegal_list_view, name="paralegal-list"),
+    path("paralegals/<int:pk>/", views.paralegal_detail_view, name="paralegal-detail"),
     # Cases
     path("cases/", views.case_list_view, name="case-list"),
     path("cases/<uuid:pk>/", views.case_detail_view, name="case-detail"),

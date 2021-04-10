@@ -18,7 +18,7 @@
                         <div class="meta">
                             <span>Created {{ issue.client.created_at|date:"jS M 'y" }}, updated {{ issue.client.modified_at|date:"jS M 'y" }}</span>
                         </div>
-                        <table class="ui definition table">
+                        <table class="ui definition table small">
                             <tbody>
                                 <tr>
                                     <td>Email</td>
@@ -51,7 +51,7 @@
                             <span>Created {{ tenancy.created_at|date:"jS M 'y" }}, updated {{ tenancy.modified_at|date:"jS M 'y" }}</span>
                         </div>
 
-                        <table class="ui definition table">
+                        <table class="ui definition table small">
                             <tbody>
                                 <tr>
                                     <td>Street Address</td>
@@ -85,7 +85,7 @@
                                 <span>Created {{ tenancy.landlord.created_at|date:"jS M 'y" }}, updated {{ tenancy.landlord.modified_at|date:"jS M 'y" }}</span>
                             </div>
 
-                            <table class="ui definition table">
+                            <table class="ui definition table small">
                                 <tbody>
                                     <tr>
                                         <td>Name</td>
@@ -121,7 +121,7 @@
                                 <span>Created {{ tenancy.agent.created_at|date:"jS M 'y" }}, updated {{ tenancy.agent.modified_at|date:"jS M 'y" }}</span>
                             </div>
 
-                            <table class="ui definition table">
+                            <table class="ui definition table small">
                                 <tbody>
                                     <tr>
                                         <td>Name</td>
@@ -152,7 +152,7 @@
                 <div class="meta">
                     <span>This will be more nicely formatted later on.</span>
                 </div>
-                <table class="ui definition table">
+                <table class="ui definition table small">
                     <tbody>
                         {% for k, v in issue.answers.items %}
                         <tr>
