@@ -21,6 +21,9 @@ class ReferrerType:
     WORD_OF_MOUTH = "WORD_OF_MOUTH"
     ONLINE_AD = "ONLINE_AD"
     HOUSING_SERVICE = "HOUSING_SERVICE"
+    RADIO = "RADIO"
+    BILLBOARD = "BILLBOARD"
+    POSTER = "POSTER"
 
 
 class Client(TimestampedModel):
@@ -29,20 +32,23 @@ class Client(TimestampedModel):
     """
 
     CALL_TIME_CHOICES = (
-        (CallTime.WEEK_DAY, CallTime.WEEK_DAY),
-        (CallTime.WEEK_EVENING, CallTime.WEEK_EVENING),
-        (CallTime.SATURDAY, CallTime.SATURDAY),
-        (CallTime.SUNDAY, CallTime.SUNDAY),
+        (CallTime.WEEK_DAY, "Week day"),
+        (CallTime.WEEK_EVENING, "Week evening"),
+        (CallTime.SATURDAY, "Saturday"),
+        (CallTime.SUNDAY, "Sunday"),
     )
 
     REFERRER_TYPE_CHOICES = (
-        (ReferrerType.LEGAL_CENTRE, ReferrerType.LEGAL_CENTRE),
-        (ReferrerType.CHARITY, ReferrerType.CHARITY),
-        (ReferrerType.SEARCH, ReferrerType.SEARCH),
-        (ReferrerType.SOCIAL_MEDIA, ReferrerType.SOCIAL_MEDIA),
-        (ReferrerType.WORD_OF_MOUTH, ReferrerType.WORD_OF_MOUTH),
-        (ReferrerType.ONLINE_AD, ReferrerType.ONLINE_AD),
-        (ReferrerType.HOUSING_SERVICE, ReferrerType.HOUSING_SERVICE),
+        (ReferrerType.LEGAL_CENTRE, "Legal centre"),
+        (ReferrerType.CHARITY, "Charity"),
+        (ReferrerType.SEARCH, "Search"),
+        (ReferrerType.SOCIAL_MEDIA, "Social media"),
+        (ReferrerType.WORD_OF_MOUTH, "Word of mouth"),
+        (ReferrerType.ONLINE_AD, "Online ad"),
+        (ReferrerType.HOUSING_SERVICE, "Housing service"),
+        (ReferrerType.RADIO, "Radio"),
+        (ReferrerType.BILLBOARD, "Billboard"),
+        (ReferrerType.POSTER, "Poster"),
     )
 
     # Identifying info
