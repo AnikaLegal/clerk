@@ -5,6 +5,26 @@
 <script>
     // Initialize JavaScript enabled Semantic UI elements.
     $('.selection.dropdown').dropdown()
+    $('.menu .item').tab()
+    $('.ui.calendar').calendar({
+        type: 'date',
+        formatter: {
+        date: (date) => {
+            if (!date) return '';
+            var day = date.getDate() + '';
+            if (day.length < 2) {
+                day = '0' + day;
+            }
+            var month = (date.getMonth() + 1) + '';
+            if (month.length < 2) {
+                month = '0' + month;
+            }
+            var year = date.getFullYear();
+            return month + '/' + day + '/' + year;
+        }
+    }
+
+    })
 </script>
 {% endblock %}
 
@@ -13,22 +33,40 @@
 <div class="ui container">
     {% include 'case/_case_detail_header.html' with active="progress" %}
     <div class="ui bottom attached tab segment active" data-tab="progress">
-        <form class="ui form  {% if form.errors %}error{% else %}success{% endif %}" method="post">
-            {% csrf_token %}
-            <h4 class="ui header">Case Progress Updates</h4>
-            <div class="inline fields">
-                {% include 'case/snippets/_checkbox_field.html' with field=form.is_open %}
-                {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
+        <div class="ui top attached tabular menu">
+            <a class="item active" data-tab="first">Update case status</a>
+            <a class="item" data-tab="second">Add paralegal note</a>
+            <a class="item" data-tab="third">Add case review</a>
+        </div>
+        <div class="ui bottom attached tab segment active" data-tab="first">
+            {% include 'case/htmx/_case_progress_form.html' with form=progress_form %}
+        </div>
+        <div class="ui bottom attached tab segment" data-tab="second">
+            {% include 'case/htmx/_case_paralegal_note_form.html' with form=paralegal_notes_form %}
+        </div>
+        <div class="ui bottom attached tab segment" data-tab="third">
+            {% include 'case/htmx/_case_review_note_form.html' with form=case_review_form %}
+        </div>
+    </div>
+    <div class="ui feed">
+        {% for note in notes %}
+            <div class="event">
+                <div class="label">
+                    <img src="https://ui-avatars.com/api/?name={{ note.creator.first_name }}+{{ note.creator.last_name }}" />
+                </div>
+                <div class="content">
+                    <div class="summary">
+                        <a class="user">
+                        {{ note.creator.get_full_name }}
+                        </a>
+                        wrote
+                    </div>
+                    <div class="extra text">
+                        {{ note.text }}
+                    </div>
+                </div>
             </div>
-            <div class="two fields">
-                {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
-                {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
-            </div>
-            {% include 'case/snippets/_textarea_field.html' with field=form.outcome_notes %}
-            {% include 'case/snippets/_form_errors.html' %}
-            {% include 'case/snippets/_form_success.html' %}
-            <button class="ui button" type="submit">Update</button>
-        </form>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,25 @@
+{% comment %} 
+Renders a the IssueProgressForm
+Args:
+    form: IssueProgressForm
+    issue: Issue
+
+{% endcomment %}
+<form 
+    class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
+    hx-post="{% url 'case-detail-progress-form' issue.pk %}"
+    hx-target="this"
+>
+    <div class="inline fields">
+        {% include 'case/snippets/_checkbox_field.html' with field=form.is_open %}
+        {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
+    </div>
+    <div class="two fields">
+        {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
+        {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
+    </div>
+    {% include 'case/snippets/_textarea_field.html' with field=form.outcome_notes %}
+    {% include 'case/snippets/_form_errors.html' %}
+    {% include 'case/snippets/_form_success.html' %}
+    <button class="ui positive button" type="submit">Update</button>
+</form>
