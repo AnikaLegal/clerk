@@ -1,0 +1,18 @@
+{% comment %} 
+Renders a the ParalegalNoteForm
+Args:
+    form: ParalegalNoteForm
+    issue: Issue
+
+{% endcomment %}
+<form 
+    class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
+    hx-post="{% url 'case-detail-review-form' issue.pk %}"
+    hx-target="this"
+>
+    {% include 'case/snippets/_textarea_field.html' with field=form.text %}
+    {% include 'case/snippets/_calendar_field.html' with field=form.event %}
+    {% include 'case/snippets/_form_errors.html' %}
+    {% include 'case/snippets/_form_success.html' %}
+    <button class="ui positive button" type="submit">Create note</button>
+</form>

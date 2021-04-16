@@ -1,0 +1,20 @@
+{% comment %} 
+Renders a Semantic UI calendar.
+
+Args:
+    field: Django form field (eg form.foo)
+
+{% endcomment %}
+<div class="field {% if field.errors %}error{% endif %}" id="field-{{ field.name }}">
+    <label for="{{ field.name }}">{{ field.label }}</label>
+    <div class="ui calendar">
+        <div class="ui input left icon">
+            <i class="calendar icon"></i>
+            {% if field.value %}
+                <input autocomplete="off" type="text" placeholder="Pick up a date" name="{{ field.name }}" value="{{ field.value }}">
+            {% else %}
+                <input autocomplete="off" type="text" placeholder="Pick up a date" name="{{ field.name }}" value="">
+            {% endif %}
+        </div>        
+    </div>
+</div>

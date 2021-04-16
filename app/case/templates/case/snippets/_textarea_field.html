@@ -8,8 +8,8 @@ Args:
 <div class="field {% if field.errors %}error{% endif %}">
     <label>{{ field.label }}</label>
     {% if field.value %}
-        <textarea name="{{ field.name }}">{{ field.value }}</textarea>
+        <textarea rows="3" name="{{ field.name }}">{{ field.value }}</textarea>
     {% else %}
-        <textarea name="{{ field.name }}"></textarea>
+        <textarea rows="3" name="{{ field.name }}"></textarea>
     {% endif %}
 </div>

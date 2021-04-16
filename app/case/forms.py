@@ -2,7 +2,35 @@ from django import forms
 from django.forms.fields import BooleanField
 
 from accounts.models import User
-from core.models import Issue
+from core.models import Issue, IssueNote
+
+
+class ParalegalNoteForm(forms.ModelForm):
+    class Meta:
+        model = IssueNote
+        fields = [
+            "issue",
+            "creator",
+            "note_type",
+            "text",
+        ]
+
+    text = forms.CharField(label="Paralegal note", min_length=1, max_length=2048)
+
+
+class ReviewNoteForm(forms.ModelForm):
+    class Meta:
+        model = IssueNote
+        fields = [
+            "issue",
+            "creator",
+            "note_type",
+            "text",
+            "event",
+        ]
+
+    text = forms.CharField(label="Review note", min_length=1, max_length=2048)
+    event = forms.DateField(label="Next review date", required=True)
 
 
 class ParalegalDetailsForm(forms.ModelForm):
