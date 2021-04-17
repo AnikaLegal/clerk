@@ -20,11 +20,11 @@
     </div>
 </h1>
 <div class="ui top attached tabular menu">
-    <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}" data-tab="details">            
+    <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
         <i class="clipboard list icon"></i>
         Details
     </a>
-    <a href="{% url 'case-detail-progress' issue.pk %}" class="item {% if active == 'progress' %}active{% endif %}" data-tab="progress">
+    <a href="{% url 'case-detail-progress' issue.pk %}" class="item {% if active == 'progress' %}active{% endif %}">
         <i class="chart line icon"></i>
         Progress
     </a>

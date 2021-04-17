@@ -1,0 +1,43 @@
+{% comment %} 
+Renders the feed for notes for a case
+Args:
+    notes: List[IssueNote]
+
+{% endcomment %}
+<div id="case-feed" class="ui large feed" hx-swap-oob="true">
+    {% if not notes %}
+        <p>No notes yet.</p>
+    {% endif %}
+    {% for note in notes %}
+        <div class="event" style="margin-top: 2rem">
+            <div class="label">
+                {% if note.note_type == 'PARALEGAL' %}
+                    <i class="graduation cap icon"></i>
+                {% elif note.note_type == 'REVIEW'  %}
+                    <i class="search icon"></i>
+                {% endif %}
+            </div>
+            <div class="content">
+                <div class="summary">
+                    {{ note.creator.get_full_name }}
+                    {% if note.note_type == 'PARALEGAL' %}
+                        wrote a paralegal note
+                    {% elif note.note_type == 'REVIEW'  %}
+                        performed a case reivew
+                    {% endif %}
+                    <div class="date">
+                        {{note.created_at|date:"jS M y, ga"}}
+                        {% if note.note_type == 'REVIEW' %}
+                            &nbsp;(next review {{note.event|date:"jS M y"}})
+                        {% endif %}
+
+
+                    </div>
+                </div>
+                <div class="extra text">
+                    <p>{{ note.text }}</p>                           
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -11,9 +11,9 @@ Args:
         <div class="ui input left icon">
             <i class="calendar icon"></i>
             {% if field.value %}
-                <input autocomplete="off" type="text" placeholder="Pick up a date" name="{{ field.name }}" value="{{ field.value }}">
+                <input autocomplete="off" type="text" placeholder="Enter a date (MM/DD/YYYY)" name="{{ field.name }}" value="{{ field.value }}">
             {% else %}
-                <input autocomplete="off" type="text" placeholder="Pick up a date" name="{{ field.name }}" value="">
+                <input autocomplete="off" type="text" placeholder="Enter a date (MM/DD/YYYY)" name="{{ field.name }}" value="">
             {% endif %}
         </div>        
     </div>
