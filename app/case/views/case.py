@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDict
+from django.views.decorators.http import require_http_methods
 
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
@@ -20,6 +21,7 @@ from case.forms import (
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["GET"])
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
     issue_qs = Issue.objects.select_related("client", "paralegal")
@@ -36,6 +38,7 @@ def case_list_view(request):
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["GET"])
 def case_detail_view(request, pk):
     context = _get_case_detail_context(request, pk)
     return render(request, "case/case_detail.html", context)
@@ -43,14 +46,10 @@ def case_detail_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["GET"])
 def case_detail_progress_view(request, pk):
     context = _get_case_detail_context(request, pk)
-    notes = (
-        IssueNote.objects.filter(issue=pk)
-        .select_related("creator")
-        .order_by("-created_at")
-        .all()
-    )
+    notes = _get_issue_notes(pk)
     context = {
         **context,
         "notes": notes,
@@ -63,68 +62,74 @@ def case_detail_progress_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["POST"])
 def case_detail_review_note_form_view(request, pk):
     context = _get_case_detail_context(request, pk)
-    # FIXME: Permissions
-    if request.method == "POST":
-        form_data = _add_form_data(
-            request.POST,
-            {
-                "issue": context["issue"],
-                "creator": request.user,
-                "note_type": NoteType.REVIEW,
-            },
-        )
+    default_data = {
+        "issue": context["issue"],
+        "creator": request.user,
+        "note_type": NoteType.REVIEW,
+    }
+    form_data = _add_form_data(request.POST, default_data)
+    form = ReviewNoteForm(form_data)
+    notes = None
+    if form.is_valid():
+        form.save()
+        notes = _get_issue_notes(pk)
+        messages.success(request, "Note created")
 
-        form = ReviewNoteForm(form_data)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Note created")
-
-    context = {**context, "form": form}
+    context = {**context, "form": form, "htmx_notes": notes}
     return render(request, "case/htmx/_case_review_note_form.html", context)
 
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["POST"])
 def case_detail_paralegal_note_form_view(request, pk):
     context = _get_case_detail_context(request, pk)
-    # FIXME: Permissions
-    if request.method == "POST":
-        form_data = _add_form_data(
-            request.POST,
-            {
-                "issue": context["issue"],
-                "creator": request.user,
-                "note_type": NoteType.PARALEGAL,
-            },
-        )
-        form = ParalegalNoteForm(form_data)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Note created")
+    default_data = {
+        "issue": context["issue"],
+        "creator": request.user,
+        "note_type": NoteType.PARALEGAL,
+    }
+    form_data = _add_form_data(request.POST, default_data)
+    form = ParalegalNoteForm(form_data)
+    notes = None
+    if form.is_valid():
+        form.save()
+        notes = _get_issue_notes(pk)
+        messages.success(request, "Note created")
 
-    context = {**context, "form": form}
+    context = {**context, "form": form, "htmx_notes": notes}
     return render(request, "case/htmx/_case_paralegal_note_form.html", context)
 
 
 # FIXME: Permissions
 @login_required
+@require_http_methods(["POST"])
 def case_detail_progress_form_view(request, pk):
     context = _get_case_detail_context(request, pk)
-    # FIXME: Permissions
-    if request.method == "POST":
-        form = IssueProgressForm(request.POST, instance=context["issue"])
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Update successful")
+    form = IssueProgressForm(request.POST, instance=context["issue"])
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Update successful")
 
     context = {**context, "form": form}
     return render(request, "case/htmx/_case_progress_form.html", context)
 
 
+def _get_issue_notes(pk):
+    return (
+        IssueNote.objects.filter(issue=pk)
+        .select_related("creator")
+        .order_by("-created_at")
+        .all()
+    )
+
+
 def _get_case_detail_context(request, pk):
     try:
+        # FIXME: Who has access to this?
         issue = Issue.objects.select_related("client").get(pk=pk)
     except Issue.DoesNotExist:
         raise Http404()

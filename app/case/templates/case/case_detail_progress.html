@@ -5,7 +5,7 @@
 <script>
     // Initialize JavaScript enabled Semantic UI elements.
     $('.selection.dropdown').dropdown()
-    $('.menu .item').tab()
+    $('#form-tab-menu.menu .item').tab()
     $('.ui.calendar').calendar({
         type: 'date',
         formatter: {
@@ -23,7 +23,6 @@
             return month + '/' + day + '/' + year;
         }
     }
-
     })
 </script>
 {% endblock %}
@@ -33,7 +32,7 @@
 <div class="ui container">
     {% include 'case/_case_detail_header.html' with active="progress" %}
     <div class="ui bottom attached tab segment active" data-tab="progress">
-        <div class="ui top attached tabular menu">
+        <div id="form-tab-menu" class="ui top attached tabular menu">
             <a class="item active" data-tab="first">Update case status</a>
             <a class="item" data-tab="second">Add paralegal note</a>
             <a class="item" data-tab="third">Add case review</a>
@@ -48,26 +47,11 @@
             {% include 'case/htmx/_case_review_note_form.html' with form=case_review_form %}
         </div>
     </div>
-    <div class="ui feed">
-        {% for note in notes %}
-            <div class="event">
-                <div class="label">
-                    <img src="https://ui-avatars.com/api/?name={{ note.creator.first_name }}+{{ note.creator.last_name }}" />
-                </div>
-                <div class="content">
-                    <div class="summary">
-                        <a class="user">
-                        {{ note.creator.get_full_name }}
-                        </a>
-                        wrote
-                    </div>
-                    <div class="extra text">
-                        {{ note.text }}
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+    <div class="ui segment">
+        <h1 class="ui header">Case notes</h1>
+        {% include 'case/htmx/_case_feed.html' %}
     </div>
 </div>
 {% endblock %}
 
+{% comment %} <img src="https://ui-avatars.com/api/?name={{ note.creator.first_name }}+{{ note.creator.last_name }}" /> {% endcomment %}

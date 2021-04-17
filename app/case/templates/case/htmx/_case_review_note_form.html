@@ -3,6 +3,7 @@ Renders a the ParalegalNoteForm
 Args:
     form: ParalegalNoteForm
     issue: Issue
+    htmx_notes: List[IssueNote] - only render in reponse to POST
 
 {% endcomment %}
 <form 
@@ -16,3 +17,6 @@ Args:
     {% include 'case/snippets/_form_success.html' %}
     <button class="ui positive button" type="submit">Create note</button>
 </form>
+{% if htmx_notes %}
+    {% include 'case/htmx/_case_feed.html' with notes=htmx_notes %}
+{% endif %}
