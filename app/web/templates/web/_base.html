@@ -1,0 +1,18 @@
+{% load static %}
+<html lang="en">
+<head>
+    <title>
+        {% block title %}{% endblock %} | Anika Legal
+    </title>
+    <!-- Meta tags -->
+    <meta charset="utf-8">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'brand/logo-icon-color.png' %}">
+    <!-- Styling -->
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/global.css' %}">
+</head>
+<body>
+    {% block content %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>
