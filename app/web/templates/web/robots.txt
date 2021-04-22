@@ -1,0 +1,11 @@
+# Tells crawlers to ignore these paths and subpaths
+# https://developers.google.com/search/docs/advanced/robots/create-robots-txt
+# N.B: Doesn't actually stop anyone from trying, just a courtesy thing.
+User-agent: *
+Disallow: /oauth/
+Disallow: /admin/
+Disallow: /actionstep/
+Disallow: /caller/
+Disallow: /api/
+Disallow: /case/
+Disallow: /accounts/

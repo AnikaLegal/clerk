@@ -3,10 +3,6 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    # Auth
-    path("oauth/", include("social_django.urls", namespace="social")),
-    path("login/", views.auth.login_view, name="login"),
-    path("logout/", views.auth.logout_view, name="logout"),
     # Paralegals
     path("paralegals/", views.paralegal.paralegal_list_view, name="paralegal-list"),
     path(
@@ -37,7 +33,5 @@ urlpatterns = [
         views.case.case_detail_review_note_form_view,
         name="case-detail-review-form",
     ),
-    # Root views
-    path("robots.txt", views.root.robots_view),
-    path("", views.root.root_view, name="root"),
+    path("", views.case.root_view, name="case-root"),
 ]
