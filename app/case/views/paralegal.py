@@ -5,9 +5,7 @@ from django.http import Http404
 from django.shortcuts import render
 
 from accounts.models import User
-from case.forms import (
-    ParalegalDetailsForm,
-)
+from case.forms import ParalegalDetailsForm
 
 PARALEGAL_CAPACITY = 4.0
 
@@ -67,9 +65,7 @@ def paralegal_list_view(request):
             open_rent_reduction=Count(
                 "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
             ),
-            open_eviction=Count(
-                "issue", Q(issue__is_open=True, issue__topic="EVICTION")
-            ),
+            open_eviction=Count("issue", Q(issue__is_open=True, issue__topic="EVICTION")),
         )
         .order_by("-latest_issue_created_at")
     )

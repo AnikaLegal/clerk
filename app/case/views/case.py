@@ -8,15 +8,10 @@ from django.shortcuts import render
 from django.utils.datastructures import MultiValueDict
 from django.views.decorators.http import require_http_methods
 
+from case.forms import (IssueProgressForm, IssueSearchForm, ParalegalNoteForm,
+                        ReviewNoteForm)
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
-
-from case.forms import (
-    IssueProgressForm,
-    IssueSearchForm,
-    ParalegalNoteForm,
-    ReviewNoteForm,
-)
 
 
 # FIXME: Permissions
