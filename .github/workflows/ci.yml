@@ -4,12 +4,10 @@ on:
     branches:
       - develop
       - master
-      - cms
   pull_request:
     branches:
       - develop
       - master
-      - cms
 
 jobs:
   test:
