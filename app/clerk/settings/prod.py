@@ -63,3 +63,5 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480016398"
 TWILIO_AUDIO_BASE_URL = "https://anika-twilio-audio.s3-ap-southeast-2.amazonaws.com"
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
