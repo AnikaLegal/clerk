@@ -1,5 +1,127 @@
 {% extends "web/_base.html" %} 
+{% load static %}
 {% block title %}Landing{% endblock %} 
 {% block content %}
-<h1>This is the landing page</h1>
+
+
+
+<div id="landing-hero">
+    <div class="container wide">
+        <h1> Get free, ongoing legal<br/> assistance in 2 working days</h1>
+        <p>
+            Anika is a <strong>free</strong> online legal service that helps Victorian renters
+            take control of their living situation. Get <strong>reliable</strong> legal advice that’s specific
+            to your circumstances within 2 working days.
+        </p>
+        <p>
+            Getting evicted <strong>because you’re behind on rent?</strong> 
+            Need something <strong>repaired in your rental?</strong> You’ve got options. 
+        </p>
+
+        <button>Get started</button>
+    </div>
+
+</div>
+<div id="landing-brag">
+    <h2>We’ve helped over <span class="brag-number">300 renters</span> stay in safe,<br/>secure homes</h2>
+    <div class="divider" style="margin-bottom: 0"></div>
+</div>
+<div class="segment gold round-large top-right bottom-left">
+    <div class="container">
+        <h2>How it works</h2>
+        <div class="divider"></div>
+        <div class="card-grid four">
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="https://images.unsplash.com/photo-1616605939678-843a97a2056f?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=254&ixlib=rb-1.2.1&q=80&w=344">
+                <div class="header">Questionnaire</div>
+                <div class="content">It takes less than 10 minutes</div>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="https://images.unsplash.com/photo-1617044605982-cde3f9a9f7a6?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=254&ixlib=rb-1.2.1&q=80&w=344">
+                <div class="header">We’ll call you</div>
+                <div class="content">One of our friendly team will call you within two working days to discuss your situation</div>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="https://images.unsplash.com/photo-1616808722043-7be356618474?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=254&ixlib=rb-1.2.1&q=80&w=344">
+                <div class="header">Legal advice</div>
+                <div class="content">You’ll get an email outlining your rights and options</div>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="https://images.unsplash.com/photo-1616387219375-22b23c2bca5b?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=254&ixlib=rb-1.2.1&q=80&w=344">
+                <div class="header">Resolution</div>
+                <div class="content">We’ll work with you to reach a resolution that best fits you and your needs</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container wide">
+    <div class="story center">
+        <div class="blue-ball">
+            <img class="round top-left bottom-left bottom-right" src="{% static 'web/img/mum.jpg' %}">
+        </div>
+        <div class="content">
+            <h2>Louise’s story</h2>
+            <p>For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
+            <p>“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
+            <button style="margin-top: 60px">Read more</button>
+        </div>
+    </div>
+</div>
+<div class="segment gold round-large top-right bottom-left">
+    <div class="container">
+        <h2>Why use Anika?</h2>
+        <div class="divider"></div>
+        <div class="card-grid six">
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">100% free</div>
+                <div class="content">We’re a charity so we’ll never charge you a cent.</div>
+            </div>
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">Personalised assistance</div>
+                <div class="content">Get legal advice specific to your circumstances.</div>
+            </div>
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">Fast</div>
+                <div class="content">We’ll get back to you in 2 working days.</div>
+            </div>
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">Law you can understand</div>
+                <div class="content">No long documents & confusing legal jargon. Just what you need to know, in plain English, explained by a (real) human being.</div>
+            </div>
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">Tenancy Experts</div>
+                <div class="content">Our Principal Lawyer has practiced tenancy law for over 20 years.</div>
+            </div>
+            <div class="card">
+                <img src="{% static 'web/img/star.svg' %}">
+                <div class="header">Online assistance</div>
+                <div class="content">All assistance is online or over the phone, so you can take control of your living situation from the comfort of your couch.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container">
+        <h2>Our partners</h2>
+        <div class="divider"></div>
+    </div>
+</div>
+<div class="segment gold round-large top-right">
+    <div class="container">
+        <h2>What our clients say</h2>
+        <div class="divider"></div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container">
+        <h2>Contact us</h2>
+        <div class="divider"></div>
+    </div>
+</div>
+{% include 'web/snippets/_footer_cta.html' %}
 {% endblock %}

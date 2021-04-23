@@ -7,12 +7,32 @@
     <!-- Meta tags -->
     <meta charset="utf-8">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'brand/logo-icon-color.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}">
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap" rel="stylesheet">   
     <!-- Styling -->
-    <link rel="stylesheet" type="text/css" href="{% static 'styles/global.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web/styles/global.css' %}">
 </head>
 <body>
+    <header>
+        <a href="{% url 'landing' %}">
+            <img src="{% static 'web/brand/logo-color.svg' %}">
+        </a>
+        <nav>
+            <a href="#">Services</a>
+            <a href="{% url 'resources' %}">Resouces</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'impact' %}">Impact</a>
+            <a href="{% url 'landing' %}#contact-us">Contact</a>
+        </nav>
+    </header>
     {% block content %}{% endblock %}
+    <footer>
+    </footer>
     {% block scripts %}{% endblock %}
 </body>
 </html>
