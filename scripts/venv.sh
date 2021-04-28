@@ -5,7 +5,7 @@ then
     # Create virutal environment, install python packages.
     virtualenv -p python3 env
     . env/bin/activate
-    pip3 install -r app/requirements.txt
+    pip3 install -r ../app/requirements.txt # added the ../
 else
-    . env/bin/activate
+    . env/bin/activate #doesnt work, probably happens in the scripts process, which closes. 
 fi
