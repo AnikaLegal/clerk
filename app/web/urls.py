@@ -32,5 +32,6 @@ urlpatterns = repeated_paths + [
     # TODO: Blog and blog articles (by slug)
     # path("/blog/", ???, name="blog"),
     path("robots.txt", views.robots_view),
-    path("", template("web/landing.html"), name="landing"),
+    path("landing/contact/", views.landing_contact_form_view, name="landing-contact"),
+    path("", views.landing_view, name="landing"),
 ]
