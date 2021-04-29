@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap" rel="stylesheet">   
     <!-- Styling -->
     <link rel="stylesheet" type="text/css" href="{% static 'web/styles/global.css' %}">
 </head>
@@ -74,6 +73,12 @@
             </div>
         </div>
     </footer>
+    <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
+    <script>
+      document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      })
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
