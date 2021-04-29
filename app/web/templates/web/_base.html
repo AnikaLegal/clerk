@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
     <!-- Styling -->
     <link rel="stylesheet" type="text/css" href="{% static 'web/styles/global.css' %}">
 </head>
@@ -31,11 +32,15 @@
     </header>
     {% block content %}{% endblock %}
     <footer>
-        <div id=footer-container>
-            <div class=footer-list>
-                <h3><img id='footer-logo' src="{% static 'web/brand/logo-footer.svg' %}"/></h3>
+        <div class=inner>
+            <div class=column>
+                <h3>
+                    <img src="{% static 'web/brand/logo-footer.svg' %}"/>
+                </h3>
                 <p>
-                    Lorem ipsum dolor amet, consectetur adipiscing elit. Eget nisl nunc quam ac sed turpes volutpat. Cursus sed massa non nisi, placerat.
+                    Lorem ipsum dolor amet, consectetur adipiscing elit. 
+                    Eget nisl nunc quam ac sed turpes volutpat. 
+                    Cursus sed massa non nisi, placerat.
                 </p>
                 <div id='social-media'>
                    <a href=#1><img src="{% static 'web/img/instagram.svg' %}"/></a><span></span>
@@ -44,32 +49,35 @@
                    <a href=#4><img src="{% static 'web/img/youtube.svg' %}"/></a><span></span>
                 </div>
             </div>
-            <div class='footer-list links'>
+            <div class='column'>
                 <h3>Quick Links</h3>
-            <div class=line-break-lists>
-                <a href=#>Portfolio</a>
-                <a href=#>Blogs</a>
-                <a href=#>About</a>
-                <a href=#>Press</a>
-                </div>
-                    <div>
-                        <a href=#>Careers</a>&nbsp;&nbsp;<span id='careersText'>We're hiring</span><!---placement of &nbsp; matters here-->
-                </div>
+                <p><a href=#>Portfolio</a></p>
+                <p><a href=#>Blogs</a></p>
+                <p><a href=#>About</a></p>
+                <p><a href=#>Press</a></p>
+                <p>
+                    <a href=#>Careers</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
+                </p>
             </div>
-            <div class='footer-list links'>
+            <div class='column'>
                 <h3>Services</h3>
-                <div class=line-break-lists>
-                    <a href=#>Rent reduction</a>
-                    <a href=#>Rental repairs</a>
-                </div>
+                <p><a href=#>Rent reduction</a></p>
+                <p><a href=#>Rental repairs</a></p>
             </div>
-            <div class='footer-list links'>
+            <div class='column'>
                 <h3>Reach Us</h3>
-                <span id='contact-details'>
-                    <img src="{% static 'web/img/email.svg' %}"/> contact@anika.com
-                    <img src="{% static 'web/img/phone.svg' %}"/> 0451 618 383
-                    <img src="{% static 'web/img/location.svg' %}"/> Offices in Melbourne CBD, Glen Eira, Port Phillip and Moreland
-                </span>
+                <p class="icon">
+                    <img src="{% static 'web/img/email.svg' %}"/>
+                    contact@anika.com
+                </p>
+                <p class="icon">
+                    <img src="{% static 'web/img/phone.svg' %}"/>
+                    0451 618 383
+                </p>
+                <p class="icon">
+                    <img src="{% static 'web/img/location.svg' %}"/>
+                    Offices in Melbourne CBD, Glen Eira, Port Phillip and Moreland
+                </p>
             </div>
         </div>
     </footer>

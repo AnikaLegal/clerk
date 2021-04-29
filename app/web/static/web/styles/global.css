@@ -1,6 +1,4 @@
 /* GLOBAL */
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
 :root {
   --blue: #438fef;
   --blue-dark: #00377b;
@@ -252,78 +250,60 @@ header nav a:visited {
 /* PAGE FOOTER */
 footer {
   background-color: var(--blue-dark);
-  height: 471px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  line-height: 24px;
-  color:white;
-  padding-left: 164px;
-  padding-right: 164px;
+  padding: 100px 0 150px 0;
 }
-#footer-container {
-  place-self: center;
+footer .inner {
+  max-width: 1080px;
+  width: calc(100vw - 330px);
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, 25%);  
-  position: relative;
-  top: 74;
+  grid-template-columns: repeat(4, 25%);
+  grid-gap: 45px;
 }
-footer h3{
-  font-size:20px;
-  font-weight:500;
-  line-height:30px;
-}
-footer p{
-  margin-right:24px;
-  margin-bottom:24px;
-}
-footer a{
-  color:white;
-  text-decoration: none;
-  margin-bottom:12;
-  display: inline-block;
-}
-#careersText{
-  color:#2EC5CE;
+footer h3 {
+  color: var(--white);
   font-size: 20px;
-  font-family: 'Nanum Pen Script', cursive;
+  line-height: 30px;
+  font-weight: 600;
+  margin-bottom: 24px;
 }
-#footer-logo{
-  position: relative;
-  top: -2px;
+footer p {
+  font-size: 14px;
+  color: var(--grey-2);
+  line-height: 24px;
+  margin-bottom: 12px;
 }
-.footer-list {
+footer a {
+  color: var(--grey-2);
+  text-decoration: none;
+}
+footer a:visited {
+  color: var(--grey-2);
+}
+
+footer .career-text {
+  color: #2ec5ce;
+  font-size: 20px;
+  font-family: "Nanum Pen Script", cursive;
+}
+footer .column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  flex: none;
 }
-.line-break-lists {
-  white-space: pre-line;
-  line-height: 24px;
-  -webkit-margin-before: -24px;
-}
-.links {
-  margin-left:6px;
-  margin-right:12px;
-}
-#social-media{
-  width:146;
+#social-media {
+  width: 146;
   display: grid;
-  grid-template-columns: repeat(4, 24px 16px);  
+  grid-template-columns: repeat(4, 24px 16px);
+}
+footer p.icon {
+  padding-left: 35px;
   position: relative;
-  left:-1
 }
-#contact-details{
-  display: grid;
-  grid-template-columns: auto auto;
-  row-gap: 20px;
-  column-gap: 8px;
-}
-#contact-details img{
-  display: block;
+footer p.icon img {
   height: 25px;
-  width: auto;
-  position:relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* Optional footer call to action section */
