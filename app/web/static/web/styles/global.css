@@ -48,6 +48,7 @@ Screen sizes to consider (https://screensiz.es/):
   --container-padding: 135px;
   --container-wide-padding: 100px;
   --header-font-size: 50px;
+  --header-line-height: 58px;
   --header-mini-font-size: 25px;
   --body-font-size: 20px;
   --body-line-height: 34px;
@@ -58,6 +59,7 @@ Screen sizes to consider (https://screensiz.es/):
 @media (max-width: 1300px) {
   :root {
     --header-font-size: 26px;
+    --header-line-height: 32px;
     --header-mini-font-size: 18px;
     --body-font-size: 16px;
     --body-line-height: 25px;
@@ -91,6 +93,10 @@ body {
 body {
   /* For the header */
   padding-top: 123px;
+}
+
+a {
+  text-decoration: none;
 }
 
 /* Page header */

@@ -8,15 +8,11 @@ Includes:
 */
 
 /* Headers */
-h1 {
-  font-family: var(--font-serif);
-  font-size: 48px;
-  margin: 0;
-}
-
+h1,
 h2 {
   font-family: var(--font-serif);
   font-size: var(--header-font-size);
+  line-height: var(--header-line-height);
   margin: 0 0 1rem 0;
 }
 

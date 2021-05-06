@@ -18,8 +18,7 @@ Landing page only styles.
   }
 }
 
-#landing-hero {
-  z-index: -1;
+.landing-hero {
   position: relative;
   box-sizing: border-box;
   background-color: var(--hero-loading-color);
@@ -32,7 +31,7 @@ Landing page only styles.
   padding-bottom: var(--hero-padding-bottom);
   min-height: calc(100vh + var(--hero-curve-height));
 }
-#landing-hero:before {
+.landing-hero.large:before {
   content: "";
   background: white;
   position: absolute;
@@ -43,24 +42,53 @@ Landing page only styles.
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
 
-#landing-hero p {
+.landing-hero.large p {
   color: var(--dark-3);
   max-width: 473px;
   letter-spacing: 0.05em;
   line-height: 38px;
 }
-#landing-brag {
-  height: 400px;
-  margin-top: calc(-1 * var(--hero-curve-height));
-  z-index: 1;
+.landing-brag.small,
+.landing-brag.large .inner {
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   flex-direction: column;
 }
-#landing-brag .brag-number {
+
+.landing-brag.large {
+  height: 400px;
+  margin-top: calc(-1 * var(--hero-curve-height));
+  position: relative;
+}
+.landing-brag.large .inner {
+  position: absolute;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+.landing-brag .brag-number {
   color: var(--blue);
+}
+.landing-brag.small {
+  padding: 50px 0;
+}
+.landing-hero.small,
+.landing-brag.small {
+  display: none;
+}
+
+@media (max-width: 1300px) {
+  .landing-hero.large,
+  .landing-brag.large {
+    display: none;
+  }
+  .landing-hero.small,
+  .landing-brag.small {
+    display: block;
+  }
 }
 
 #landing-partners {

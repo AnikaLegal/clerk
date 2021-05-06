@@ -7,28 +7,23 @@
 <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/landing.css' %}">
 {% endblock %}
 
-
-<div id="landing-hero">
+<div class="landing-hero small">
     <div class="container wide">
-        <h1> Get free, ongoing legal<br/> assistance in 2 working days</h1>
-        <p>
-            Anika is a <strong>free</strong> online legal service that helps Victorian renters
-            take control of their living situation. Get <strong>reliable</strong> legal advice that’s specific
-            to your circumstances within 2 working days.
-        </p>
-        <p>
-            Getting evicted <strong>because you’re behind on rent?</strong> 
-            Need something <strong>repaired in your rental?</strong>
-            <br>We can help. 
-        </p>
-
-        <button>Get started today</button>
+        {% include 'web/snippets/_landing_hero_text.html' %}
+        <div class="landing-brag small">
+            {% include 'web/snippets/_landing_brag_text.html' %}
+        </div>
     </div>
-
 </div>
-<div id="landing-brag">
-    <h2>We’ve helped over <span class="brag-number">300 renters</span> stay in safe,<br/>secure homes</h2>
-    <div class="divider" style="margin-bottom: 0"></div>
+<div class="landing-hero large">
+    <div class="container wide">
+        {% include 'web/snippets/_landing_hero_text.html' %}
+    </div>
+</div>
+<div class="landing-brag large">
+    <div class="inner">
+        {% include 'web/snippets/_landing_brag_text.html' %}
+    </div>
 </div>
 <div class="segment gold round-large top-right bottom-left">
     <div class="container">
