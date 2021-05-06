@@ -1,0 +1,330 @@
+/*
+Generic components that can be used in each page.
+Includes:
+  - Header text
+  - Paragraph text
+  - Buttons n stuff
+  - More complicated repeated components (eg. grids of cards)
+*/
+
+/* Headers */
+h1 {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  margin: 0;
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: var(--header-font-size);
+  margin: 0 0 1rem 0;
+}
+
+@media (max-width: 1300px) {
+  h2 {
+    margin: 0 0 0.5rem 0;
+  }
+}
+
+/* Paragraph / normal sized text */
+p {
+  margin: 0 0 1rem 0;
+  font-size: var(--body-font-size);
+  line-height: var(--body-line-height);
+  letter-spacing: 0.05em;
+  color: var(--dark-4);
+}
+p.light {
+  color: var(--dark-6);
+}
+p.compact {
+  margin: 0;
+}
+p.header {
+  font-weight: bold;
+  font-size: var(--header-mini-font-size);
+  color: var(--dark-1);
+}
+
+/* Horizontal divider */
+.divider {
+  width: 134px;
+  height: 0px;
+  border-top: 1px solid #000000;
+  margin: 0 auto 75px auto;
+}
+@media (max-width: 1300px) {
+  .divider {
+    width: 76px;
+    margin: 0 auto 35px auto;
+  }
+}
+
+/* Buttons */
+button {
+  color: var(--white);
+  background: var(--blue);
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 60px;
+  font-size: var(--body-font-size);
+  font-family: var(--font-sans-alt-2) !important;
+  border: none;
+  border-radius: 29px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0px 4px 4px rgba(67, 143, 239, 0.18);
+}
+@media (max-width: 600px) {
+  button {
+    margin: 0 auto;
+    width: 270px;
+    max-width: 100%;
+    padding: 14px 30px;
+  }
+}
+
+/*
+White or gold segment of page
+Has vertical padding only
+*/
+.segment {
+  padding: 75px 0 125px 0;
+  text-align: center;
+}
+.segment.gold {
+  background-color: var(--gold-light);
+}
+@media (max-width: 1300px) {
+  .segment {
+    padding: 42px 0 75px 0;
+  }
+}
+
+/* 
+Horizontal container
+Has horizontal padding only
+*/
+.container {
+  max-width: 1240px;
+  width: calc(100vw - 2 * var(--container-padding));
+  margin: 0 auto;
+}
+.container.wide {
+  width: calc(100vw - 2 * var(--container-wide-padding));
+}
+
+/* 
+Border radius on things
+Eg. "round-large top-right bottom-left"
+*/
+.round-small.top-right {
+  border-top-right-radius: calc(60px * var(--radius-multiplier));
+}
+.round-small.top-left {
+  border-top-left-radius: calc(60px * var(--radius-multiplier));
+}
+.round-small.bottom-right {
+  border-bottom-right-radius: calc(60px * var(--radius-multiplier));
+}
+.round-small.bottom-left {
+  border-bottom-left-radius: calc(60px * var(--radius-multiplier));
+}
+
+.round.top-right {
+  border-top-right-radius: calc(120px * var(--radius-multiplier));
+}
+.round.top-left {
+  border-top-left-radius: calc(120px * var(--radius-multiplier));
+}
+.round.bottom-right {
+  border-bottom-right-radius: calc(120px * var(--radius-multiplier));
+}
+.round.bottom-left {
+  border-bottom-left-radius: calc(120px * var(--radius-multiplier));
+}
+
+.round-large.top-right {
+  border-top-right-radius: calc(240px * var(--radius-multiplier));
+}
+.round-large.top-left {
+  border-top-left-radius: calc(240px * var(--radius-multiplier));
+}
+.round-large.bottom-right {
+  border-bottom-right-radius: calc(240px * var(--radius-multiplier));
+}
+.round-large.bottom-left {
+  border-bottom-left-radius: calc(240px * var(--radius-multiplier));
+}
+
+/* Little blue ball that goes ontop of images */
+.blue-ball {
+  position: relative;
+}
+.blue-ball:before {
+  content: "";
+  position: absolute;
+  top: -41px;
+  left: 23%;
+  width: 82px;
+  height: 82px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+@media (max-width: 1300px) {
+  .blue-ball:before {
+    width: 41px;
+    height: 41px;
+    top: -20.5px;
+  }
+}
+
+/*
+Grid of cards
+Used for grids of images or icons.
+Each image/icon can have some descriptive test below it.
+*/
+.card-grid {
+  display: grid;
+  justify-items: center;
+  margin: 0 auto;
+  grid-row-gap: 60px;
+  grid-column-gap: 120px;
+}
+.card-grid.four {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  max-width: 860px;
+}
+.card-grid.six {
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.card {
+  max-width: 344px;
+}
+.card img {
+  max-width: 100%;
+}
+.card .header {
+  margin-top: 30px;
+  margin-bottom: 13px;
+}
+
+@media (max-width: 1300px) {
+  .card-grid.four,
+  .card-grid.six {
+    grid-template-columns: repeat(auto-fit, minmax(0, 343px));
+    grid-template-rows: 1fr;
+    grid-row-gap: 30px;
+  }
+  .card .header {
+    margin-top: 15px;
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 600px) {
+  .card-grid.four,
+  .card-grid.six {
+    grid-template-columns: repeat(auto-fit, minmax(0, 343px));
+    grid-template-rows: 1fr;
+  }
+  .card img {
+    width: calc(100vw - 2 * var(--container-padding));
+    max-height: 130px;
+    object-fit: cover;
+  }
+  .card img.icon {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+  }
+}
+
+/* 
+Story sections
+A story has a big image on one side, and some content on the other.
+*/
+.story.center {
+  padding-top: 175px;
+  padding-bottom: 150px;
+  display: flex;
+}
+.story.center img {
+  width: 677px;
+  margin-right: 75px;
+}
+.story.center .content {
+  padding-top: 32px;
+}
+@media (max-width: 1300px) {
+  .story.center {
+    flex-direction: column;
+    padding-top: 42px;
+    padding-bottom: 45px;
+  }
+  .story.center img {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+/* Message to a user */
+.message {
+  padding: 20px;
+  border-radius: 14px;
+  line-height: 100%;
+  margin-top: 20px;
+  color: var(--gold);
+  font-weight: bold;
+  background: var(--gold-light);
+  border: 2px solid var(--gold);
+}
+
+/* Checkbox form input */
+.checkbox {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  user-select: none;
+  line-height: var(--body-line-height);
+  font-size: var(--body-font-size);
+  letter-spacing: 0.05em;
+  color: var(--dark-4);
+}
+.checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.checkmark {
+  position: absolute;
+  margin-top: 5px;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  border: 1.5px solid var(--dark-6);
+}
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+.checkbox .checkmark:after {
+  left: 6px;
+  top: -13px;
+  width: 8px;
+  height: 22px;
+  border: solid var(--blue);
+  border-width: 0 7px 7px 0;
+  transform: rotate(45deg);
+}

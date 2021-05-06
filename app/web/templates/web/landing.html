@@ -3,6 +3,9 @@
 {% block title %}Landing{% endblock %} 
 {% block content %}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/landing.css' %}">
+{% endblock %}
 
 
 <div id="landing-hero">
@@ -64,7 +67,7 @@
             <h2>Louise’s story</h2>
             <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
             <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
-            <button style="margin-top: 60px">Read more</button>
+            <button>Read more</button>
         </div>
     </div>
 </div>
@@ -74,32 +77,32 @@
         <div class="divider"></div>
         <div class="card-grid six">
             <div class="card">
-                <img src="{% static 'web/img/reasons/star.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/star.svg' %}">
                 <p class="header">100% free</p>
                 <p class="compact">We’re a non-profit so we’ll never charge you a cent.</p>
             </div>
             <div class="card">
-                <img src="{% static 'web/img/reasons/valet.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/valet.svg' %}">
                 <p class="header">Personal support</p>
-                <p class="compact">You’ll have a paralegal dedicated to your case, giving you ongoing legal support specific to your circumstances, every step of the way.</p>
+                <p class="compact">You’ll have a paralegal dedicated to your case, giving you ongoing legal support specific to your circumstances, every step<br>of the way.</p>
             </div>
             <div class="card">
-                <img src="{% static 'web/img/reasons/fast.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/fast.svg' %}">
                 <p class="header">Fast</p>
                 <p class="compact">We’ll get back to you within 2 working days.</p>
             </div>
             <div class="card">
-                <img src="{% static 'web/img/reasons/law.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/law.svg' %}">
                 <p class="header">Law you can understand</p>
                 <p class="compact">No long documents & confusing legal jargon. Just what you need to know, in plain English, explained by a (real) human being.</p>
             </div>
             <div class="card">
-                <img src="{% static 'web/img/reasons/house.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/house.svg' %}">
                 <p class="header">Tenancy experts</p>
-                <p class="compact">Our Principal Lawyer has practiced tenancy law for over 20 years.</p>
+                <p class="compact">Our Principal Lawyer has practiced tenancy law for<br>over 20 years.</p>
             </div>
             <div class="card">
-                <img src="{% static 'web/img/reasons/dial.svg' %}">
+                <img class="icon" src="{% static 'web/img/reasons/dial.svg' %}">
                 <p class="header">Online assistance</p>
                 <p class="compact">All assistance is online or over the phone, so you can take control of your living situation from the comfort of your couch.</p>
             </div>
@@ -205,7 +208,7 @@
             })           
         </script>
 </div>
-<div id="contact-us" class="segment" style="padding-bottom: 0">
+<div id="contact-us" class="segment" style="padding: 0">
     <div class="container">
         <div id="contact">
             <div class="text">
