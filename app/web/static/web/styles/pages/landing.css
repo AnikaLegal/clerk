@@ -2,13 +2,14 @@
 Landing page only styles.
 */
 :root {
-  --hero-curve-height: 280px;
   --hero-loading-color: #ededf2;
 
   /* Desktop size responsive vars */
+  --hero-curve-height: 280px;
   --hero-padding-top: 98px;
   --hero-padding-bottom: 400px;
-  --hero-image-height: 68.75vw;
+  --brag-height: 400px;
+  --hero-small-image-height: 600px;
 }
 
 /* Shorter laptop screen size responsive vars */
@@ -16,17 +17,38 @@ Landing page only styles.
   :root {
     --hero-padding-top: 40px;
     --hero-padding-bottom: 350px;
-    --hero-image-height: 86.75vw;
   }
 }
 
 /* Tablet/phone screen size responsive vars */
+@media (max-width: 1600px) {
+  :root {
+    --hero-curve-height: 100px;
+    --hero-padding-top: 40px;
+    --hero-padding-bottom: 350px;
+  }
+}
+
 @media (max-width: 1300px) {
   :root {
-    --hero-curve-height: 45px;
+    --brag-height: 200px;
+    --hero-curve-height: 50px;
+    --hero-padding-top: 40px;
+    --hero-padding-bottom: 10px;
+  }
+}
+
+/* Tablet/phone screen size responsive vars */
+@media (max-width: 1100px) {
+  :root {
+    --hero-curve-height: 46px;
     --hero-padding-top: 0;
     --hero-padding-bottom: 0;
-    --hero-image-height: 68.75vw;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --hero-small-image-height: 275px;
   }
 }
 
@@ -59,7 +81,7 @@ Landing page only styles.
   filter: blur(10px);
   z-index: -1;
   width: 100vw;
-  clip: rect(0px, 100vw, 275px, 0px);
+  clip: rect(0px, 100vw, var(--hero-small-image-height), 0px);
   position: absolute;
   object-fit: cover;
   top: 0;
@@ -68,7 +90,7 @@ Landing page only styles.
   overflow: hidden;
 }
 .landing-hero.small .img {
-  height: 275px;
+  height: var(--hero-small-image-height);
   background-image: var(--url-landing-hero-phone-img);
   background-position: 50% 100%;
   background-repeat: no-repeat;
@@ -78,18 +100,18 @@ Landing page only styles.
 }
 
 .landing-hero.large {
-  min-height: calc(100vh + var(--hero-curve-height));
+  height: calc(100vh + var(--hero-curve-height));
+  max-height: calc(68.75vw);
   overflow: hidden;
-  max-height: 68.75vw;
 }
 .landing-hero.large:before {
   content: "";
   background: white;
   position: absolute;
-  bottom: -2px;
+  bottom: -3px;
   left: 0;
   width: 100%;
-  height: var(--hero-curve-height);
+  height: calc(var(--hero-curve-height) + 2px);
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
 .landing-hero.small .container {
@@ -99,10 +121,10 @@ Landing page only styles.
   content: "";
   background: white;
   position: absolute;
-  top: calc(275px - var(--hero-curve-height));
+  top: calc(var(--hero-small-image-height) - var(--hero-curve-height));
   left: 0;
   width: 100vw;
-  height: var(--hero-curve-height);
+  height: calc(var(--hero-curve-height) + 1px);
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
 
@@ -122,7 +144,7 @@ Landing page only styles.
 }
 
 .landing-brag.large {
-  height: 400px;
+  height: var(--brag-height);
   margin-top: calc(-1 * var(--hero-curve-height));
   position: relative;
 }
@@ -144,7 +166,7 @@ Landing page only styles.
   display: none;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1100px) {
   .landing-hero.large,
   .landing-brag.large {
     display: none;
