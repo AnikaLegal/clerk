@@ -352,7 +352,7 @@ Landing page only styles.
 
 @media (max-width: 1300px) {
   #contact {
-    flex-wrap: wrap;
+    flex-direction: column;
     padding-top: 30px;
   }
   #contact .text {
@@ -361,16 +361,21 @@ Landing page only styles.
     margin-bottom: 20px;
   }
   #contact form {
-    width: calc(100% + 2 * var(--container-padding));
-    margin-left: calc(-1 * var(--container-padding));
-    margin-right: calc(-1 * var(--container-padding));
-    margin-bottom: -63px;
-    padding: 50px 38px 48px 38px;
-    z-index: 1;
+    align-self: center;
   }
   #contact form input,
   #contact form select,
   #contact form .checkbox {
     margin-bottom: 44px;
+  }
+}
+@media (max-width: 800px) {
+  #contact form {
+    width: calc(100vw);
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    margin-bottom: -63px;
+    padding: 50px 38px 48px 38px;
+    z-index: 1;
   }
 }

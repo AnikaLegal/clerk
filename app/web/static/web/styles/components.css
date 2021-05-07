@@ -185,18 +185,17 @@ Each image/icon can have some descriptive test below it.
 .card-grid {
   display: grid;
   justify-items: center;
+  justify-content: center;
   margin: 0 auto;
   grid-row-gap: 60px;
   grid-column-gap: 120px;
 }
 .card-grid.four {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, 342px);
   max-width: 860px;
 }
 .card-grid.six {
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, 300px);
 }
 .card {
   max-width: 344px;
@@ -212,8 +211,6 @@ Each image/icon can have some descriptive test below it.
 @media (max-width: 1300px) {
   .card-grid.four,
   .card-grid.six {
-    grid-template-columns: repeat(auto-fit, minmax(0, 343px));
-    grid-template-rows: 1fr;
     grid-row-gap: 30px;
   }
   .card .header {
@@ -222,11 +219,6 @@ Each image/icon can have some descriptive test below it.
   }
 }
 @media (max-width: 600px) {
-  .card-grid.four,
-  .card-grid.six {
-    grid-template-columns: repeat(auto-fit, minmax(0, 343px));
-    grid-template-rows: 1fr;
-  }
   .card img {
     width: calc(100vw - 2 * var(--container-padding));
     max-height: 130px;
