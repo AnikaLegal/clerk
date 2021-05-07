@@ -201,11 +201,7 @@ header nav.small .dropdown {
   margin-bottom: 4px;
 }
 
-/* header nav.small .dropdown:hover {
-} */
-header nav.small .dropdown:hover > .options,
-header nav.small .dropdown:focus-within > .options,
-header nav.small .dropdown .options:hover {
+header nav.small .dropdown.active > .options {
   display: flex;
   flex-direction: column;
   padding: 0 12px 0 18px;

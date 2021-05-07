@@ -50,6 +50,24 @@
                 }
             }
             hambugerEl.addEventListener("click", toggleMenu)
+
+            // Mobile menu dropdown toggle
+            const dropdownTitleEls = document.querySelectorAll("nav.small .menu .dropdown .title")
+            const toggleDropdown = (e) => {
+                const dropdownEl = e.target.offsetParent
+                const isActiveAlready = dropdownEl.classList.contains('active')
+                for (let titleEl of dropdownTitleEls) {
+                    const el = titleEl.offsetParent
+                    if (el === dropdownEl && !isActiveAlready) {
+                        el.classList.add('active')
+                    } else {
+                        el.classList.remove('active')
+                    }
+                }
+            }
+            for (let el of dropdownTitleEls) {
+                el.addEventListener("click", toggleDropdown)
+            }
         </script>
     </header>
     {% block content %}{% endblock %}
