@@ -8,6 +8,8 @@
 {% endblock %}
 
 <div class="landing-hero small">
+    {% include 'web/snippets/_landing_hero_preview.svg' %}
+    <div class="img"></div>
     <div class="container wide">
         {% include 'web/snippets/_landing_hero_text.html' %}
         <div class="landing-brag small">
@@ -16,6 +18,21 @@
     </div>
 </div>
 <div class="landing-hero large">
+    {% include 'web/snippets/_landing_hero_preview.svg' %}
+    <img
+        src="{% static 'web/img/landing-hero-1920.jpg' %}"
+        alt="Girl at home on laptop, wearing headphones."
+        srcset="
+            {% static 'web/img/landing-hero-2560.jpg' %} 2560w,
+            {% static 'web/img/landing-hero-1920.jpg' %} 1920w,
+            {% static 'web/img/landing-hero-1080.jpg' %} 1080w
+        "
+        sizes="
+            (min-width: 1080w) 1080px,
+            (min-width: 1920w) 1920px,
+            2560px
+        "
+     >
     <div class="container wide">
         {% include 'web/snippets/_landing_hero_text.html' %}
     </div>

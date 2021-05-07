@@ -8,6 +8,7 @@ Landing page only styles.
   /* Desktop size responsive vars */
   --hero-padding-top: 98px;
   --hero-padding-bottom: 400px;
+  --hero-image-height: 68.75vw;
 }
 
 /* Shorter laptop screen size responsive vars */
@@ -15,21 +16,71 @@ Landing page only styles.
   :root {
     --hero-padding-top: 40px;
     --hero-padding-bottom: 350px;
+    --hero-image-height: 86.75vw;
+  }
+}
+
+/* Tablet/phone screen size responsive vars */
+@media (max-width: 1300px) {
+  :root {
+    --hero-curve-height: 45px;
+    --hero-padding-top: 0;
+    --hero-padding-bottom: 0;
+    --hero-image-height: 68.75vw;
   }
 }
 
 .landing-hero {
   position: relative;
-  box-sizing: border-box;
-  background-color: var(--hero-loading-color);
-  background-image: var(--url-landing-hero-img);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 0 25%;
-  margin-top: calc(-1 * var(--header-height-total));
   padding-top: calc(var(--header-height-total) + var(--hero-padding-top));
   padding-bottom: var(--hero-padding-bottom);
+  margin-top: calc(-1 * var(--header-height-total));
+  box-sizing: border-box;
+}
+.landing-hero svg {
+  background-color: var(--hero-loading-color);
+}
+.landing-hero.large svg {
+  filter: blur(50px);
+}
+
+.landing-hero.large svg,
+.landing-hero.large img {
+  z-index: -1;
+  width: 100vw;
+  position: absolute;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.landing-hero.small svg {
+  filter: blur(10px);
+  z-index: -1;
+  width: 100vw;
+  clip: rect(0px, 100vw, 275px, 0px);
+  position: absolute;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+.landing-hero.small .img {
+  height: 275px;
+  background-image: var(--url-landing-hero-phone-img);
+  background-position: 50% 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  z-index: -1;
+}
+
+.landing-hero.large {
   min-height: calc(100vh + var(--hero-curve-height));
+  overflow: hidden;
+  max-height: 68.75vw;
 }
 .landing-hero.large:before {
   content: "";
@@ -38,6 +89,19 @@ Landing page only styles.
   bottom: -2px;
   left: 0;
   width: 100%;
+  height: var(--hero-curve-height);
+  border-radius: 0 25% 0 0/ 0 100% 0 0;
+}
+.landing-hero.small .container {
+  margin-top: -20px;
+}
+.landing-hero.small .img::after {
+  content: "";
+  background: white;
+  position: absolute;
+  top: calc(275px - var(--hero-curve-height));
+  left: 0;
+  width: 100vw;
   height: var(--hero-curve-height);
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
@@ -73,7 +137,7 @@ Landing page only styles.
   color: var(--blue);
 }
 .landing-brag.small {
-  padding: 50px 0;
+  padding: 20px 0 50px 0;
 }
 .landing-hero.small,
 .landing-brag.small {
@@ -88,6 +152,10 @@ Landing page only styles.
   .landing-hero.small,
   .landing-brag.small {
     display: block;
+  }
+  #landing-cta,
+  .desktop-break {
+    display: none;
   }
 }
 
@@ -282,10 +350,5 @@ Landing page only styles.
   #contact form select,
   #contact form .checkbox {
     margin-bottom: 44px;
-  }
-
-  /* FIXME: ADD BACK */
-  header {
-    display: none;
   }
 }
