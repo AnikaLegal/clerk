@@ -71,9 +71,9 @@
     </div>
 </div>
 <div class="container wide">
-    <div class="story center">
+    <div class="story right">
         <div class="blue-ball">
-            <img class="round top-left bottom-left bottom-right" src="{% static 'web/img/mum.jpg' %}">
+            <img class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/mum.jpg' %}">
         </div>
         <div class="content">
             <h2>Louise’s story</h2>
@@ -233,5 +233,5 @@
         </div>
     </div>
 </div>
-{% include 'web/snippets/_footer_cta.html' %}
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
 {% endblock %}

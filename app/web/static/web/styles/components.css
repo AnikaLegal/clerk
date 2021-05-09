@@ -141,6 +141,18 @@ Eg. "round-large top-right bottom-left"
 .round.bottom-left {
   border-bottom-left-radius: calc(120px * var(--radius-multiplier));
 }
+.round.not-responsive.top-right {
+  border-top-right-radius: calc(120px);
+}
+.round.not-responsive.top-left {
+  border-top-left-radius: calc(120px);
+}
+.round.not-responsive.bottom-right {
+  border-bottom-right-radius: calc(120px);
+}
+.round.not-responsive.bottom-left {
+  border-bottom-left-radius: calc(120px);
+}
 
 .round-large.top-right {
   border-top-right-radius: calc(240px * var(--radius-multiplier));
@@ -194,6 +206,28 @@ Each image/icon can have some descriptive test below it.
   grid-template-columns: repeat(auto-fit, 342px);
   max-width: 860px;
 }
+.card-grid.five {
+  grid-template-columns: repeat(6, 150px);
+  grid-column-gap: 80px;
+}
+
+.card-grid.five .card:nth-child(1),
+.card-grid.five .card:nth-child(2),
+.card-grid.five .card:nth-child(3) {
+  grid-column: span 2;
+}
+
+.card-grid.five .card:nth-child(4) {
+  grid-column: span 3;
+  justify-self: end;
+  padding-right: 20px;
+}
+.card-grid.five .card:nth-child(5) {
+  grid-column: span 3;
+  justify-self: flex-start;
+  padding-left: 20px;
+}
+
 .card-grid.six {
   grid-template-columns: repeat(auto-fit, 300px);
 }
@@ -210,9 +244,17 @@ Each image/icon can have some descriptive test below it.
 
 @media (max-width: 1300px) {
   .card-grid.four,
+  .card-grid.five,
   .card-grid.six {
+    grid-template-columns: repeat(auto-fit, 300px);
     grid-row-gap: 30px;
+    grid-column-gap: 120px;
   }
+  .card-grid.five .card {
+    grid-column: span 1 !important;
+    padding: 0 !important;
+  }
+
   .card .header {
     margin-top: 15px;
     margin-bottom: 8px;
@@ -235,27 +277,124 @@ Each image/icon can have some descriptive test below it.
 Story sections
 A story has a big image on one side, and some content on the other.
 */
-.story.center {
-  padding-top: 175px;
-  padding-bottom: 150px;
+.story {
   display: flex;
+  text-align: left;
 }
-.story.center img {
-  width: 677px;
+.story img {
+  width: 594px;
+  object-fit: cover;
+}
+.story.right img {
   margin-right: 75px;
 }
-.story.center .content {
+.story.left img {
+  margin-left: 75px;
+}
+.story .content {
   padding-top: 32px;
 }
 @media (max-width: 1300px) {
-  .story.center {
+  .story {
     flex-direction: column;
-    padding-top: 42px;
-    padding-bottom: 45px;
+    align-items: center;
   }
-  .story.center img {
+  .story.left {
+    flex-direction: column-reverse;
+  }
+  .story.right img,
+  .story.left img {
     width: 100%;
     margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+/*
+A panel is a big yellow section of the page
+with a image on one side and text on the other.
+Very similar to a story.
+Assumed to be in a wide container.
+*/
+.panel-container {
+  width: 100%;
+  height: 635px;
+  position: relative;
+  margin-top: 30px;
+  margin-bottom: 85px;
+}
+.panel-container + .panel-container {
+  margin-top: 85px;
+}
+.panel {
+  position: absolute;
+  display: flex;
+  align-items: stretch;
+  background: var(--gold-light);
+  text-align: left;
+  height: 100%;
+  width: calc(100vw - var(--container-wide-padding));
+  max-width: 1520px;
+}
+.panel.left {
+  right: 0;
+}
+.panel.right {
+  left: 0;
+}
+.panel h2 {
+  font-size: 38px;
+  color: var(--dark-0);
+}
+.panel ul {
+  padding-left: 25px;
+}
+.panel p,
+.panel li {
+  color: var(--dark-0);
+}
+.panel img {
+  object-fit: cover;
+  flex-grow: 1;
+}
+.panel .content {
+  align-self: center;
+  box-sizing: border-box;
+  max-width: 631px;
+  padding: 100px 100px 100px 100px;
+}
+@media (max-width: 1300px) {
+  .panel-container {
+    width: 100vw;
+    height: unset;
+    margin-top: 0;
+    margin-bottom: 35px;
+  }
+  .panel-container + .panel-container {
+    margin-top: 35px;
+  }
+
+  .panel h2 {
+    font-size: var(--header-font-size);
+  }
+  .panel.left,
+  .panel.right {
+    position: static;
+    height: unset;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+  }
+  .panel.left .content,
+  .panel.right .content {
+    padding: var(--container-wide-padding);
+  }
+  .panel.left {
+    flex-direction: column-reverse;
+  }
+  .panel.right img,
+  .panel.left img {
+    width: 100%;
   }
 }
 

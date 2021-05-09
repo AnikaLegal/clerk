@@ -10,7 +10,7 @@ def template(name):
 
 # Views where the path, name and template name are the same.
 repeated_names = [
-    "about",
+    "rental-help" "about",
     "team",
     "partners",
     "impact",
@@ -27,8 +27,10 @@ repeated_paths = [
 
 
 urlpatterns = repeated_paths + [
-    path("/services/rental-repairs/", template("web/repairs.html"), name="repairs"),
-    path("/services/evictions/", template("web/evictions.html"), name="evictions"),
+    path("services/rental-repairs/", template("web/repairs.html"), name="repairs"),
+    path(
+        "services/eviction-support/", template("web/evictions.html"), name="evictions"
+    ),
     # TODO: Blog and blog articles (by slug)
     # path("/blog/", ???, name="blog"),
     path("robots.txt", views.robots_view),

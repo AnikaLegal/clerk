@@ -1,17 +1,20 @@
 {% extends "web/_base.html" %} 
 {% load static %}
-{% block title %}Evictions{% endblock %} 
+{% block title %}Rental Repairs{% endblock %} 
 {% block content %}
 <div class="segment">
     <div class="container wide">
         <div class="story left">
             <div class="content">
-                <h1>Getting evicted? Know your rights before you panic!</h1>
+                <h1>Need something repaired by your agent?</h1>
                 <p>
-                    Landlords can now evict tenants who have fallen behind on their rent.
+                    So, you’re renting and there’s an issue in your home.
                 </p>
                 <p>
-                    Received a notice to vacate? There’s no time to waste. Get free, ongoing legal support within 2 working days.
+                    This time it’s a leaking tap, shower, or maybe the heater won’t turn on?  You’ve raised the issue with your agent and landlord, and you’re waiting… and waiting. In an ideal situation, they’ll fix it as soon as possible, but this isn’t always the case!
+                </p>
+                <p>
+                    Need something in your rental property fixed? We’re here to help.
                 </p>
                 <a href="https://intake.anikalegal.com/">
                     <button>Get started today</button>
@@ -35,7 +38,7 @@
                 <li>In your inbox within 2 working days of starting your case</li>
             </ul>
             <p>
-                Whether it’s negotiating a payment plan with your landlord on your behalf or buying you some time in your home to find a new place, we’ve got you covered. 
+                Whether it’s sending a letter to your landlord, talking to them on your behalf, or helping to prepare for VCAT, we’ll do everything we can to get your home repaired!
             </p>
         </div>
     </div>
@@ -45,7 +48,7 @@
         <div class="content">
             <h2>Am I eligible?</h2>
             <p>
-                You are eligible for this service if you’re a renter living in Victorian who is being evicted because you are behind on rent payments. Still not sure if you're eligible? Submit your case, and we’ll let you know.
+                You are eligible for this service if you’re a renter living in Victorian who cannot afford to pay for a private lawyer. Still not sure if you're eligible? Submit your case, and we’ll let you know.
             </p>
         </div>
         <img class="round not-responsive bottom-left" src="{% static 'web/img/mum.jpg' %}">
@@ -75,16 +78,16 @@
             </div>
             <div class="card">
                 <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">Negotiate a payment plan</p>
-                <p class="compact">We can help you negotiate a payment plan for unpaid rent with your landlord</p>
+                <p class="header">Ask your landlord to perform repairs</p>
+                <p class="compact">We’ll send a letter formally asking your landlord to repair your home. If they don’t respond we can give them a call too!</p>
             </div>
             <div class="card">
                 <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">Reach a resolution at VCAT</p>
-                <p class="compact"> We’ll help you prepare for your VCAT hearing, whether it’s to stop the eviction process, agree on a payment plan, or ask for one more month in your rental to look for your next accommodation</p>
+                <p class="header">Reach a resolution</p>
+                <p class="compact">Whether it’s following up your landlord on your behalf or helping you prepare your case for VCAT, we’ll work with you to reach a resolution that best fits you and your needs</p>
             </div>
         </div>
     </div>
 </div>
-{% include 'web/snippets/_footer_cta.html' with cta="Received a Notice to Vacate your home?" %}
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to get your home repaired?" %}
 {% endblock %}

@@ -100,10 +100,10 @@ Landing page only styles.
 }
 
 .landing-hero.large {
-  height: calc(100vh + var(--hero-curve-height));
-  max-height: calc(68.75vw);
+  height: calc(max(716px, 100vh) + var(--hero-curve-height));
   overflow: hidden;
 }
+
 .landing-hero.large:before {
   content: "";
   background: white;
@@ -178,6 +178,24 @@ Landing page only styles.
   #landing-cta,
   .desktop-break {
     display: none;
+  }
+}
+
+/* Louise's story */
+.story {
+  padding-top: 175px;
+  padding-bottom: 150px;
+}
+.story img {
+  width: 677px;
+}
+.story .content {
+  padding-top: 32px;
+}
+@media (max-width: 1300px) {
+  .story {
+    padding-top: 42px;
+    padding-bottom: 45px;
   }
 }
 
