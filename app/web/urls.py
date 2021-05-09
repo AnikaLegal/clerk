@@ -10,7 +10,8 @@ def template(name):
 
 # Views where the path, name and template name are the same.
 repeated_names = [
-    "rental-help" "about",
+    "rental-help",
+    "about",
     "team",
     "partners",
     "impact",

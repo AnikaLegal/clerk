@@ -56,6 +56,21 @@ p.header {
   }
 }
 
+/* Desktop/mobile only line breaks */
+.mobile-break {
+  display: none;
+}
+@media (max-width: 1300px) {
+  .desktop-break {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .mobile-break {
+    display: unset;
+  }
+}
+
 /* Buttons */
 button {
   color: var(--white);
@@ -231,13 +246,13 @@ Each image/icon can have some descriptive test below it.
 .card-grid.six {
   grid-template-columns: repeat(auto-fit, 300px);
 }
-.card {
+.card-grid .card {
   max-width: 344px;
 }
-.card img {
+.card-grid .card img {
   max-width: 100%;
 }
-.card .header {
+.card-grid .card .header {
   margin-top: 30px;
   margin-bottom: 13px;
 }
@@ -255,18 +270,18 @@ Each image/icon can have some descriptive test below it.
     padding: 0 !important;
   }
 
-  .card .header {
+  .card-grid .card .header {
     margin-top: 15px;
     margin-bottom: 8px;
   }
 }
 @media (max-width: 600px) {
-  .card img {
+  .card-grid .card img {
     width: calc(100vw - 2 * var(--container-padding));
     max-height: 130px;
     object-fit: cover;
   }
-  .card img.icon {
+  .card-grid .card img.icon {
     width: 50px;
     height: 50px;
     object-fit: cover;
@@ -291,9 +306,21 @@ A story has a big image on one side, and some content on the other.
 .story.left img {
   margin-left: 75px;
 }
-.story .content {
+.story.right .content,
+.story.left .content {
   padding-top: 32px;
 }
+.story.center .content {
+  padding: 63px 44px 0 44px;
+}
+.story.center {
+  flex-direction: column;
+  align-items: center;
+}
+.story.center img {
+  width: 100%;
+}
+
 @media (max-width: 1300px) {
   .story {
     flex-direction: column;
@@ -307,6 +334,9 @@ A story has a big image on one side, and some content on the other.
     width: 100%;
     margin-right: 0;
     margin-left: 0;
+  }
+  .story.center .content {
+    padding: 32px 0 0 0;
   }
 }
 
@@ -343,8 +373,12 @@ Assumed to be in a wide container.
   left: 0;
 }
 .panel h2 {
-  font-size: 38px;
+  font-size: 28px;
   color: var(--dark-0);
+  font-weight: 600;
+  font-family: var(--font-sans-alt-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 .panel ul {
   padding-left: 25px;
@@ -375,7 +409,7 @@ Assumed to be in a wide container.
   }
 
   .panel h2 {
-    font-size: var(--header-font-size);
+    font-size: 18px;
   }
   .panel.left,
   .panel.right {
@@ -395,6 +429,30 @@ Assumed to be in a wide container.
   .panel.right img,
   .panel.left img {
     width: 100%;
+  }
+}
+
+/* Big text section */
+.brag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  padding: 200px 0;
+}
+.brag p {
+  color: var(--dark-0);
+}
+.brag .divider {
+  margin: 0;
+}
+.brag .callout {
+  color: var(--blue);
+}
+@media (max-width: 1300px) {
+  .brag {
+    padding: 62px 12px;
   }
 }
 
@@ -454,4 +512,57 @@ Assumed to be in a wide container.
   border: solid var(--blue);
   border-width: 0 7px 7px 0;
   transform: rotate(45deg);
+}
+
+/* Link list */
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+.link-list .card {
+  max-width: 380px;
+  width: 100%;
+  background: var(--white);
+  box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
+  border-radius: 22px;
+  padding: 88px 56px;
+  box-sizing: border-box;
+}
+.link-list .card img {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 25px;
+}
+.link-list .card button {
+  margin: 0 auto;
+}
+
+.link-list .card h2 {
+  font-size: 32px;
+  color: var(--dark-0);
+  font-weight: 600;
+  font-family: var(--font-sans-alt-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 70px;
+}
+
+@media (max-width: 1300px) {
+  .link-list {
+    grid-gap: 30px;
+  }
+  .link-list .card {
+    padding: 46px 42px 56px 42px;
+  }
+  .link-list .card h2 {
+    font-size: 25px;
+    margin-bottom: 50px;
+  }
+  .link-list .card img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
 }
