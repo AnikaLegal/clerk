@@ -10,12 +10,6 @@ def template(name):
 
 # Views where the path, name and template name are the same.
 repeated_names = [
-    "rental-help",
-    "about",
-    "team",
-    "partners",
-    "impact",
-    "resources",
     "terms-of-use",
     "eligibility-criteria",
     "privacy-policy",
@@ -28,6 +22,11 @@ repeated_paths = [
 
 
 urlpatterns = repeated_paths + [
+    path("about/", template("web/about.html"), name="about"),
+    path("about/team/", views.team_view, name="team"),
+    path("about/impact/", template("web/impact.html"), name="impact"),
+    path("about/partners/", template("web/partners.html"), name="partners"),
+    path("services/community/", template("web/community.html"), name="community"),
     path("services/rental-repairs/", template("web/repairs.html"), name="repairs"),
     path(
         "services/eviction-support/", template("web/evictions.html"), name="evictions"

@@ -1,0 +1,176 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% block title %}Refer Someone{% endblock %} 
+{% block content %}
+<div class="hero-gold">
+    <div class="external-radius outer">
+        <div class="external-radius inner"></div>
+    </div>
+    <div class="container wide">
+        <div class="story left">
+            <div class="content">
+                <h1>Refer someone to Anika</h1>
+                <p>
+                    Anika provides free legal advice and ongoing casework to vulnerable renters who are being evicted for rental arrears, or who need repairs performed in their rental. 
+                </p>
+                <p>
+                    You can refer someone to Anika Legal’s services by helping them fill out this 10 minute questionnaire, or sending an email to <strong>referrals@anikalegal.com</strong>.
+                </p>
+                <a href="https://intake.anikalegal.com/">
+                    <button>Refer someone</button>
+                </a>
+            </div>
+            <img class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container wide">
+        <h2 style="z-index: 1">
+            What type of cases can<br class="mobile-break"> we take?
+        </h2>
+        <div class="divider"></div>
+        <div class="link-list two">
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>Eviction for rental arrears</h2>
+                <p>
+                    We can help Victorian renters who have received a notice to vacate for rental arrears, and a possession order has not yet been granted.
+                </p>
+                <a href="#">
+                    <button>Learn more</button>
+                </a>
+            </div>
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/wrench.svg' %}">
+                <h2>Repairs</h2>
+                <p>
+                    We can renters who require urgent or non-urgent repairs in their rental.
+                </p>
+                <a href="#">
+                    <button>Learn more</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="segment gold round-large top-right bottom-left">
+    <div class="container">
+        <h2>What will we do?</h2>
+        <div class="divider"></div>
+        <div class="card-grid three">
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
+                <p class="header">1. Legal advice</p>
+                <p class="compact">We’ll provide legal advice outlining our client’s rights and options</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
+                <p class="header">2. Casework</p>
+                <p class="compact">We’ll communicate with their landlord on our client’s behalf, and apply for VCAT if necessary</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
+                <p class="header">3. VCAT preparation</p>
+                <p class="compact">We’ll work with our client to prepare them to self-represent at VCAT</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container wide">
+        <h2 style="z-index: 1">
+            How can I refer to Anika? 
+        </h2>
+        <div class="divider"></div>
+        <div class="link-list three">
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/questionnaire.svg' %}">
+                <h2>Intake questionnaire</h2>
+                <p>
+                    The best way to refer a client is to help them complete our 10-minute questionnaire.
+                </p>
+                <a href="https://intake.anikalegal.com">
+                    <button>Start</button>
+                </a>
+            </div>
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/email.svg' %}">
+                <h2>Email us</h2>
+                <p>
+                    If you already have written information about your client’s case you can email their contact details and circumstances to <strong>referrals@anikalegal.com</strong> 
+                </p>
+                <a href="mailto:referrals@anikalegal.com">
+                    <button>Email us</button>
+                </a>
+            </div>
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/phone.svg' %}">
+                <h2>Call us</h2>
+                <p>
+                    If you are unsure if Anika is appropriate for your client, leave us a message on 0480 016 398 and we will call you back immediately
+                </p>
+                <a href="tel:+61480016398">
+                    <button>Call us</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-container tall">
+    <div class="panel right round top-right">
+        <img class="round not-responsive bottom-right" src="{% static 'web/img/mum.jpg' %}">
+        <div class="content">
+            <h2>Who can we help?</h2>
+            <p>
+                We can help people who:
+            </p>
+            <ul>
+                <li>
+                    Rent a property in Victoria and are on the lease
+                </li> 
+                <li>
+                    Understand basic English (interpreters available)
+                </li>
+                <li>
+                    Have access to a smartphone or computer
+                </li>
+                <li>
+                    Does not require physical representation at VCAT
+                </li>
+            </ul>
+            <p>
+                99% of clients referred to Anika meet our eligibility criteria. We conduct an eligibility assessment after receiving the questionnaire submission, and on the rare occasion a client does not meet the criteria, we refer them to the most appropriate service. 
+            </p>
+            <a href="">
+                <button>See full eligibility criteria</button>
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel-container">
+    <div class="panel left round top-left">
+        <div class="content">
+            <h2>How can my organisation refer to Anika?</h2>
+            <p>
+                If your community organisation would like to discuss the best way to refer clients to Anika,
+                our Community Partnerships Team can provide your organisation with up to date referral resources or present at your team meeting.
+                Email us at <strong>partnerships@anikalegal.com</strong>
+            </p>
+            <a href="mailto:partnerships@anikalegal.com">
+                <button>Get in touch</button>
+            </a>
+        </div>
+        <img class="round not-responsive bottom-left" src="{% static 'web/img/mum.jpg' %}">
+    </div>
+</div>
+
+
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
+{% endblock %} 

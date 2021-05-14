@@ -196,6 +196,9 @@ Eg. "round-large top-right bottom-left"
   background: var(--blue);
   border-radius: 50%;
 }
+.blue-ball.right:before {
+  left: 66%;
+}
 @media (max-width: 1300px) {
   .blue-ball:before {
     width: 41px;
@@ -217,10 +220,22 @@ Each image/icon can have some descriptive test below it.
   grid-row-gap: 60px;
   grid-column-gap: 120px;
 }
+.card-grid.three {
+  grid-template-columns: repeat(auto-fit, 342px);
+  max-width: 1240px;
+  grid-column-gap: 90px;
+}
+
 .card-grid.four {
   grid-template-columns: repeat(auto-fit, 342px);
   max-width: 860px;
 }
+.card-grid.four.wide {
+  max-width: unset;
+  grid-column-gap: 90px;
+  grid-template-columns: repeat(auto-fit, 224px);
+}
+
 .card-grid.five {
   grid-template-columns: repeat(6, 150px);
   grid-column-gap: 80px;
@@ -244,16 +259,28 @@ Each image/icon can have some descriptive test below it.
 }
 
 .card-grid.six {
-  grid-template-columns: repeat(auto-fit, 300px);
+  grid-template-columns: repeat(auto-fit, 330px);
 }
 .card-grid .card {
   max-width: 344px;
 }
 .card-grid .card img {
   max-width: 100%;
+  margin-bottom: 30px;
+}
+.card-grid .card .metric {
+  font-family: var(--font-sans-alt-2);
+  color: var(--blue-dark);
+  margin-bottom: 27px;
+  font-size: 50px;
+  font-weight: 700;
+}
+.card-grid .card .metric-text {
+  color: var(--dark-0);
+  font-size: 22px;
+  font-weight: 600;
 }
 .card-grid .card .header {
-  margin-top: 30px;
   margin-bottom: 13px;
 }
 
@@ -274,6 +301,13 @@ Each image/icon can have some descriptive test below it.
     margin-top: 15px;
     margin-bottom: 8px;
   }
+  .card-grid .card .metric {
+    margin-bottom: 5px;
+    font-size: 35px;
+  }
+  .card-grid .card .metric-text {
+    font-size: var(--body-font-size);
+  }
 }
 @media (max-width: 600px) {
   .card-grid .card img {
@@ -285,6 +319,47 @@ Each image/icon can have some descriptive test below it.
     width: 50px;
     height: 50px;
     object-fit: cover;
+  }
+}
+
+/* Profile card  */
+.card-grid .card.profile {
+  text-align: left;
+  color: var(--dark-4);
+  background: var(--white);
+}
+.card-grid .card.profile.blue {
+  background: var(--blue-light);
+}
+.card-grid .card.profile .content {
+  padding: 5px 33px 33px 33px;
+}
+.card-grid .card.profile .content .name {
+  font-size: var(--header-mini-font-size);
+  text-transform: uppercase;
+  margin-bottom: 0;
+  font-weight: 700;
+}
+.card-grid .card.profile .content .title {
+  font-size: var(--body-font-size);
+  font-weight: 700;
+  margin-bottom: 22px;
+}
+.card-grid .card.profile .content ul {
+  padding-left: 18px;
+  margin: 0;
+}
+.card-grid .card.profile .content ul li + li {
+  margin-top: 10px;
+}
+@media (max-width: 1300px) {
+  .card-grid .card.profile .content {
+    padding: 5px 21px 33px 21px;
+  }
+}
+@media (max-width: 600px) {
+  .card-grid .card.profile img {
+    max-height: unset;
   }
 }
 
@@ -353,6 +428,9 @@ Assumed to be in a wide container.
   margin-top: 30px;
   margin-bottom: 85px;
 }
+.panel-container.tall {
+  height: 857px;
+}
 .panel-container + .panel-container {
   margin-top: 85px;
 }
@@ -364,7 +442,6 @@ Assumed to be in a wide container.
   text-align: left;
   height: 100%;
   width: calc(100vw - var(--container-wide-padding));
-  max-width: 1520px;
 }
 .panel.left {
   right: 0;
@@ -379,6 +456,7 @@ Assumed to be in a wide container.
   font-family: var(--font-sans-alt-2);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 1.3;
 }
 .panel ul {
   padding-left: 25px;
@@ -441,6 +519,12 @@ Assumed to be in a wide container.
   flex-direction: column;
   padding: 200px 0;
 }
+.brag.short {
+  padding: 120px 0;
+}
+.brag.gold {
+  background: var(--gold-light);
+}
 .brag p {
   color: var(--dark-0);
 }
@@ -451,7 +535,8 @@ Assumed to be in a wide container.
   color: var(--blue);
 }
 @media (max-width: 1300px) {
-  .brag {
+  .brag,
+  .brag.short {
     padding: 62px 12px;
   }
 }
@@ -519,24 +604,40 @@ Assumed to be in a wide container.
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 40px;
+  text-align: center;
+  gap: 52px;
 }
 .link-list .card {
-  max-width: 380px;
   width: 100%;
   background: var(--white);
   box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
   border-radius: 22px;
-  padding: 88px 56px;
+  padding: 88px 50px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.link-list .card.short {
+  padding: 55px;
+}
+.link-list.two .card {
+  max-width: 594px;
+}
+.link-list.three .card {
+  max-width: 378px;
 }
 .link-list .card img {
   width: 70px;
   height: 70px;
   margin-bottom: 25px;
 }
+
+.link-list .card a {
+  margin-top: auto;
+}
 .link-list .card button {
-  margin: 0 auto;
+  margin: auto auto 0 auto;
 }
 
 .link-list .card h2 {
@@ -546,7 +647,21 @@ Assumed to be in a wide container.
   font-family: var(--font-sans-alt-2);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+.link-list .card.short h2 {
+  font-size: var(--header-mini-font-size);
+  color: var(--dark-1);
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.link-list .card h2,
+.link-list .card .header {
   margin-bottom: 70px;
+}
+.link-list .card.short h2,
+.link-list .card.short .header {
+  margin-bottom: 10px;
 }
 
 @media (max-width: 1300px) {
@@ -558,11 +673,88 @@ Assumed to be in a wide container.
   }
   .link-list .card h2 {
     font-size: 25px;
+  }
+  .link-list .card h2,
+  .link-list .card .header {
     margin-bottom: 50px;
+  }
+  .link-list .card.short h2,
+  .link-list .card.short .header {
+    margin-bottom: 20px;
   }
   .link-list .card img {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
+  }
+}
+
+/*
+Grey block with an upwards curve that appears
+before the final footer.
+*/
+.pre-footer {
+  position: relative;
+  background: var(--grey);
+  padding-top: 180px;
+}
+.pre-footer:before {
+  content: "";
+  background: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  border-radius: 0 0 0 25%/ 0 0 0 100%;
+}
+
+/* Hero containers */
+.hero-gold {
+  position: relative;
+  background: var(--gold-light);
+  padding: 90px 0;
+}
+.hero-gold::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--header-height-total));
+  left: 0;
+  right: 0;
+  height: var(--header-height-total);
+  background: var(--gold-light);
+}
+@media (max-width: 1300px) {
+  .hero-gold {
+    padding: 45px 0;
+  }
+}
+
+/* A little gold bit sticking out  */
+.hero-gold .external-radius.outer {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  height: var(--hero-external-radius);
+  width: var(--hero-external-radius);
+  background: var(--gold-light);
+  bottom: calc(-1 * var(--hero-external-radius));
+  left: 0;
+}
+.hero-gold .external-radius.inner {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  height: var(--hero-external-radius);
+  width: var(--hero-external-radius);
+  background: var(--white);
+  top: 0;
+  left: 0;
+  border-top-left-radius: 100%;
+}
+@media (max-width: 1300px) {
+  .hero-gold .external-radius.outer,
+  .hero-gold .external-radius.inner {
+    width: calc(0.66 * var(--hero-external-radius));
   }
 }

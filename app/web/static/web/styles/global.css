@@ -16,7 +16,7 @@ Screen sizes to consider (https://screensiz.es/):
   --blue: #438fef;
   --blue-mid: #104485;
   --blue-dark: #00377b;
-  --blue-light: #9fc6ff;
+  --blue-light: #eff6ff;
   --gold: #ebb900;
   --gold-light: #fff9e8;
   --peach: #f37365;
@@ -54,11 +54,13 @@ Screen sizes to consider (https://screensiz.es/):
   --body-font-size: 20px;
   --body-line-height: 34px;
   --radius-multiplier: 1;
+  --hero-external-radius: 300px;
 }
 
 /* Responsive variables (tablet) */
 @media (max-width: 1300px) {
   :root {
+    --hero-external-radius: 124px;
     --header-font-size: 26px;
     --header-line-height: 32px;
     --header-mini-font-size: 18px;
@@ -177,6 +179,7 @@ header nav .dropdown {
 header nav .dropdown {
   position: relative;
   padding: 12px;
+  display: block;
 }
 header nav .dropdown .title {
   position: relative;
@@ -343,22 +346,9 @@ footer p.icon img {
 Optional call to action section thar sits just above the footer.
  */
 #footer-cta {
-  position: relative;
-  background: var(--grey);
-  padding-top: 180px;
   background-image: var(--url-footer-cta-img);
   background-repeat: no-repeat;
   background-position: calc(50% + 300px) 100%;
-}
-#footer-cta:before {
-  content: "";
-  background: white;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 180px;
-  border-radius: 0 0 0 25%/ 0 0 0 100%;
 }
 #footer-cta .content {
   padding: 80px 0;

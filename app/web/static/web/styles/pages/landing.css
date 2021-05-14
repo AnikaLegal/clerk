@@ -100,7 +100,10 @@ Landing page only styles.
 }
 
 .landing-hero.large {
-  height: calc(max(716px, 100vh) + var(--hero-curve-height));
+  height: calc(
+    max(716px, min(100vh, calc(68.7vw - var(--hero-curve-height)))) +
+      var(--hero-curve-height)
+  );
   overflow: hidden;
 }
 
