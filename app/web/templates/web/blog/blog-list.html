@@ -1,0 +1,24 @@
+{% extends "web/_base.html" %} 
+{% load wagtailcore_tags wagtailimages_tags %}
+{% block title %}Blog{% endblock %} 
+{% block content %}
+
+<div class="segment">
+    <h1>Blog</h1>
+    <div style="margin-bottom: 20px" class="divider"></div>
+    <input style="margin-bottom: 100px" placeholder="Search blog..."/>
+    <div class="container">
+        <div class="card-grid six">
+            {% for blog in blogs %}
+            <a href="{% pageurl blog %}">
+                <div class="card">
+                    {% image blog.specific.main_image width-400 class="round-small top-right bottom-left" %}
+                    <p class="compact">{{ blog.last_published_at|date:"D jS N 'y" }}</p>
+                    <p class="header">{{ blog.title }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

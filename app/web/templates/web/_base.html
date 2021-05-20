@@ -1,4 +1,5 @@
 {% load static %}
+{% load wagtailcore_tags %}
 <html lang="en">
 <head>
     <title>
@@ -97,7 +98,7 @@
             <div class='column'>
                 <h3>Quick Links</h3>
                 <p><a href="{% url 'about' %}">About</a></p>
-                <p><a href="{% url 'blog' %}">Blog</a></p>
+                <p><a href="{% slugurl 'anika-blog' %}">Blog</a></p>
                 {% comment %} <p><a href=#>News</a></p>
                 <p>
                     <a href=#>Jobs</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
