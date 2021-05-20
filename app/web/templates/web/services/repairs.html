@@ -1,0 +1,93 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% block title %}Rental Repairs{% endblock %} 
+{% block content %}
+<div class="segment">
+    <div class="container wide">
+        <div class="story left">
+            <div class="content">
+                <h1>Need something repaired by your agent?</h1>
+                <p>
+                    So, you’re renting and there’s an issue in your home.
+                </p>
+                <p>
+                    This time it’s a leaking tap, shower, or maybe the heater won’t turn on?  You’ve raised the issue with your agent and landlord, and you’re waiting… and waiting. In an ideal situation, they’ll fix it as soon as possible, but this isn’t always the case!
+                </p>
+                <p>
+                    Need something in your rental property fixed? We’re here to help.
+                </p>
+                <a href="https://intake.anikalegal.com/">
+                    <button>Get started today</button>
+                </a>
+            </div>
+            <img class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/repairs-hero.jpg' %}">
+        </div>
+    </div>
+</div>
+<div class="panel-container">
+    <div class="panel right round top-right">
+        <img class="round not-responsive bottom-right" src="{% static 'web/img/services/coffee.jpg' %}">
+        <div class="content">
+            <h2>What does it involve?</h2>
+            <p>
+            Start your case with us and you’ll receive free legal assistance and advice that is:
+            </p>
+            <ul>
+                <li>Specific to your circumstances</li> 
+                <li>Online and easy to understand</li>
+                <li>In your inbox within 2 working days of starting your case</li>
+            </ul>
+            <p>
+                Whether it’s sending a letter to your landlord, talking to them on your behalf, or helping to prepare for VCAT, we’ll do everything we can to get your home repaired!
+            </p>
+        </div>
+    </div>
+</div>
+<div class="panel-container">
+    <div class="panel left round top-left">
+        <div class="content">
+            <h2>Am I eligible?</h2>
+            <p>
+                You are eligible for this service if you’re a renter living in Victorian who cannot afford to pay for a private lawyer. Still not sure if you're eligible? Submit your case, and we’ll let you know.
+            </p>
+        </div>
+        <img style="object-position: 100% 50%;" class="round not-responsive bottom-left" src="{% static 'web/img/services/mum.jpg' %}">
+    </div>
+</div>
+<div class="segment" style="padding-bottom: 0;">
+    <div class="container wide">
+        <h2>Here’s the step-by-step breakdown</h2>
+        <div class="divider"></div>
+        <div class="card-grid five">
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}">
+                <p class="header">
+                    Complete our questionnaire
+                </p>
+                <p class="compact">It is <a href="https://intake.anikalegal.com/">fully online</a>  and takes less than 10 minutes</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}">
+                <p class="header">We’ll call you</p>
+                <p class="compact">One of our friendly team will call you within two working days to discuss your situation</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
+                <p class="header">Receive your personalised legal advice</p>
+                <p class="compact"> You’ll get an email outlining your rights and options</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/agreement.jpg' %}">
+                <p class="header">Ask your landlord to perform repairs</p>
+                <p class="compact">We’ll send a letter formally asking your landlord to repair your home. If they don’t respond we can give them a call too!</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}">
+                <p class="header">Reach a resolution</p>
+                <p class="compact">Whether it’s following up your landlord on your behalf or helping you prepare your case for VCAT, we’ll work with you to reach a resolution that best fits you and your needs</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to get your home repaired?" %}
+{% endblock %}

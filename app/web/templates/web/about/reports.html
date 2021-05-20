@@ -1,0 +1,71 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% block title %}Reports{% endblock %} 
+{% block content %}
+<div class="hero-gold">
+    <div class="external-radius outer">
+        <div class="external-radius inner"></div>
+    </div>
+    <div class="container wide">
+        <div class="story left">
+            <div class="content">
+                <h1>Reports</h1>
+                <p style="max-width: 530px">
+                    Anika Legal is an independent legal practice, tax-deductible charity & social enterprise.
+                    Our Annual, Financial and Impact Reports outline the work we do.
+                </p>
+                <a href="{% static 'web/docs/impact-report-2019-2020.pdf' %}">
+                    <button>Latest annual report</button>
+                </a>
+            </div>
+            <img 
+                class="round not-responsive top-left top-right bottom-left" 
+                src="{% static 'web/img/photos/mum.jpg' %}"
+            >
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container wide">
+        <h2 style="z-index: 1">
+            Our reports and resources
+        </h2>
+        <div class="divider"></div>
+        <div class="link-list two">
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>Annual Report<br class="mobile-break"> 2019-2020</h2>
+                <p>
+                    Lorem ipsum dolor amet, consectetur adipiscing elit. Eget nisl nunc quam ac sed turpes volutpat. Cursus sed massa non nisi, placerat.
+                </p>
+                <a href="{% static 'web/docs/impact-report-2019-2020.pdf' %}">
+                    <button>View</button>
+                </a>
+            </div>
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>Financial Report<br class="mobile-break"> 2019-2020</h2>
+                <p>
+                    Lorem ipsum dolor amet, consectetur adipiscing elit. Eget nisl nunc quam ac sed turpes volutpat. Cursus sed massa non nisi, placerat.
+                </p>
+                <a href="{% static 'web/docs/financial-report-2019-2020.pdf' %}">
+                    <button>View</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="segment gold round-large top-right ">
+    <div class="container wide">
+        <h2>
+            Our Theory of Change
+        </h2>
+        <div class="divider"></div>
+        {% include 'web/snippets/_theory_of_change.html' with id="toc-links" %}
+    </div>
+</div>
+
+{% endblock %}

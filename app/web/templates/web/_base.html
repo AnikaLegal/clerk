@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <title>
-        {% block title %}{% endblock %} | Anika Legal
+        {% block supertitle %}
+            {% block title %}{% endblock %} | Anika Legal
+        {% endblock %}
     </title>
     <!-- Meta tags -->
     <meta charset="utf-8">
@@ -75,34 +77,36 @@
         <div class=inner>
             <div class=column>
                 <h3>
-                    <img src="{% static 'web/brand/logo-footer.svg' %}"/>
+                    <img style="margin-right: 20px;" src="{% static 'web/brand/logo-footer.svg' %}"/>
+                    <a href="https://www.acnc.gov.au/charity/3acdc07aacf256d03811dc298a2d5aea">
+                        <img 
+                            src="{% static 'web/brand/acnc-charity.png' %}"
+                            style="height:33px"
+                        />
+                    </a>
                 </h3>
                 <p>
-                    Lorem ipsum dolor amet, consectetur adipiscing elit. 
-                    Eget nisl nunc quam ac sed turpes volutpat. 
-                    Cursus sed massa non nisi, placerat.
+                    Anika Legal is a <strong style="text-decoration: underline"><a href="https://www.acnc.gov.au/charity/3acdc07aacf256d03811dc298a2d5aea">registered</a></strong> charity with the 
+                    Australian Charities and Not-for-profits Commission.
                 </p>
                 <div id='social-media'>
-                   <a href=#1><img src="{% static 'web/img/instagram.svg' %}"/></a><span></span>
-                   <a href=#2><img src="{% static 'web/img/dribble.svg' %}"/></a><span></span>
-                   <a href=#3><img src="{% static 'web/img/twitter.svg' %}"/></a><span></span>
-                   <a href=#4><img src="{% static 'web/img/youtube.svg' %}"/></a><span></span>
+                   <a href="https://www.instagram.com/anikalegal/"><img src="{% static 'web/img/instagram.svg' %}"/></a><span></span>
+                   <a href="https://twitter.com/anikalegal"><img src="{% static 'web/img/twitter.svg' %}"/></a><span></span>
                 </div>
             </div>
             <div class='column'>
                 <h3>Quick Links</h3>
-                <p><a href=#>Portfolio</a></p>
-                <p><a href=#>Blogs</a></p>
-                <p><a href=#>About</a></p>
-                <p><a href=#>Press</a></p>
+                <p><a href="{% url 'about' %}">About</a></p>
+                <p><a href="{% url 'blog' %}">Blog</a></p>
+                {% comment %} <p><a href=#>News</a></p>
                 <p>
-                    <a href=#>Careers</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
-                </p>
+                    <a href=#>Jobs</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
+                </p> {% endcomment %}
             </div>
             <div class='column'>
                 <h3>Services</h3>
-                <p><a href=#>Rent reduction</a></p>
-                <p><a href=#>Rental repairs</a></p>
+                <p><a href="{% url 'evictions' %}">Eviction support</a></p>
+                <p><a href="{% url 'repairs' %}">Rental repairs</a></p>
             </div>
             <div class='column'>
                 <h3>Reach Us</h3>

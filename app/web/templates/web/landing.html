@@ -1,6 +1,6 @@
 {% extends "web/_base.html" %} 
 {% load static %}
-{% block title %}Landing{% endblock %} 
+{% block supertitle %}Anika Legal{% endblock %} 
 {% block content %}
 
 {% block styles %}
@@ -48,23 +48,23 @@
         <div class="divider"></div>
         <div class="card-grid four">
             <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">Questionnaire</p>
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}">
+                <p class="header">1. Questionnaire</p>
                 <p class="compact">It takes less than 10 minutes</p>
             </div>
             <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">We’ll call you</p>
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}">
+                <p class="header">2. We’ll call you</p>
                 <p class="compact">A paralegal assigned to your case will call you within two working days to discuss your situation</p>
             </div>
             <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">Legal advice</p>
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
+                <p class="header">3. Legal advice</p>
                 <p class="compact">You’ll get an email outlining your rights and options</p>
             </div>
             <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/mum.jpg' %}">
-                <p class="header">Resolution</p>
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}">
+                <p class="header">4. Resolution</p>
                 <p class="compact">We’ll work with you to reach a resolution that best fits you and your needs</p>
             </div>
         </div>
@@ -142,88 +142,40 @@
         <h2>What our clients say</h2>
         <div class="divider"></div>
         <div class="testamonial-list">
-            <div class="testamonial active">
-                <div class="quote">“</div>
-                <p class="light compact">
-                    My father began life in the profession which your uncle, Mr. Phillips, appears to do so much credit to - but he gave 
-                    up everything to be of use to the late Mr. Darcy and devoted all his time to the care of the Pemberley property. 
-                    When she was only fifteen, there was a man at my brother Gardiner's in town so much in love with her that my sister-in-law 
-                    was sure he would make her an offer before we came away. I have often observed how little young ladies are interested by 
-                    books of a serious stamp.
-                </p>
-            </div>
-            <div class="testamonial">
-                <div class="quote">“</div>
-                <p class="light compact">
-                    Anika was exactly the service I needed - I couldn’t have asked for anything better. 
-                    I was so used to everyone else that I’d dealt with letting me down - agents, landlords, even law firms. 
-                    Sam (the Anika law student) was just that one solid person I could completely count on when I needed him. 
-                    The empathy that everyone at Anika showed for our situation was amazing, and with Sam taking over, 
-                    everything just became so much easier for me. 
-                </p>
-            </div>
-            <div class="testamonial">
-                <div class="quote">“</div>
-                <p class="light compact">
-                    Oh! my dear brother that is exactly what I could most wish for. I like her appearance She looks sickly and cross. 
-                    No motive can excuse the unjust and ungenerous part you acted there. And so ended his affection There has been many a one, 
-                    I fancy, overcome in the same way. As a child I was taught what was right, but I was not taught to correct my temper. 
-                    Mr. Darcy asked him why he had not married your sister at once.
-                </p>
-            </div>
+            {% for t in testimonials %}
+                <div class="testamonial {% if forloop.first %}active{% endif %}">
+                    <div class="quote">“</div>
+                    <p class="light compact">{{ t.testimonial }}</p>
+                </div>
+            {% endfor %}
         </div>
         <div class="client-list">
-            <div class="client active">
-                <img src="{% static 'web/img/mum.jpg' %}">
-                <div class="details">
-                    <p class="compact header">Lord Huffington</p>
-                    <p class="compact">Eviction</p>
+            {% for t in testimonials %}
+                <div class="client {% if forloop.first %}active{% endif %}">
+                    <img src="{% static t.image %}">
+                    <div class="details">
+                        <p class="compact header">{{ t.name }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="client">
-                <img src="{% static 'web/img/mum.jpg' %}">
-                <div class="details">
-                    <p class="compact header">Louise</p>
-                    <p class="compact">Rental repair</p>
-                </div>
-            </div>
-            <div class="client">
-                <img src="{% static 'web/img/mum.jpg' %}">
-                <div class="details">
-                    <p class="compact header">Lady Grace</p>
-                    <p class="compact">Rental repair</p>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        </div>
-        <script>
-            // Make the carousel work
-            const UPDATE_MS = 20 * 1000
-            const clients = document.getElementsByClassName("client")
-            const testamonials = document.getElementsByClassName("testamonial")
-            let clientIdx = 0 // Start on client 0
-            const moveCarousel = () => {
-                console.log(clientIdx)
-                clients[clientIdx].classList.remove("active")
-                testamonials[clientIdx].classList.remove("active")
-                clientIdx = clientIdx + 1
-                if (clientIdx >= clients.length) clientIdx = 0
-                clients[clientIdx].classList.add("active")
-                testamonials[clientIdx].classList.add("active")
-            }
-            const intervalId = setInterval(moveCarousel, UPDATE_MS)
-            Array.prototype.slice.call(clients).map((client, idx) => {
-                client.addEventListener('click', () => {
-                    clearInterval(intervalId)
-                    clients[clientIdx].classList.remove("active")
-                    testamonials[clientIdx].classList.remove("active")
-                    clientIdx = idx
-                    clients[clientIdx].classList.add("active")
-                    testamonials[clientIdx].classList.add("active")
-                })
-            })           
-        </script>
+    </div>
 </div>
+<script>
+    // Make the carousel work
+    const clients = document.getElementsByClassName("client")
+    const testamonials = document.getElementsByClassName("testamonial")
+    let clientIdx = 0 // Start on client 0
+    Array.prototype.slice.call(clients).map((client, idx) => {
+        client.addEventListener('click', () => {
+            clients[clientIdx].classList.remove("active")
+            testamonials[clientIdx].classList.remove("active")
+            clientIdx = idx
+            clients[clientIdx].classList.add("active")
+            testamonials[clientIdx].classList.add("active")
+        })
+    })           
+</script>
 <div id="contact-us" class="segment" style="padding: 0">
     <div class="container">
         <div id="contact">
