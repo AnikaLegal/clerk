@@ -10,10 +10,8 @@ from .models import Blog
 
 # TODO:
 # images: put keys from essenger into docker .env
-# image model migration: 
+# image model migration:
 # view: put transformation stuff in template rendering, just pass on filtered objects. {{ value|truncatechars:7 }}
-
-
 
 
 @require_http_methods(["GET"])
@@ -197,22 +195,24 @@ TESTIMONIALS = [
         "image": "web/img/testimonials/mary.jpg",
     },
 ]
-#site might not update when more blogs added (kind of confirmed)
-#probably needs get method to load content with each request
-#currently all loads just once with the class
+# site might not update when more blogs added (kind of confirmed)
+# probably needs get method to load content with each request
+# currently all loads just once with the class
 class BlogListView(ListView):
     paginate_by = 9
     model = Blog
-    context_object_name = 'Blogs'
-    template_name = 'web/blog-list.html'
-    def get_query_set:
-        # for i in Blog.objects.filter(live='t'):
-        #     i.body= i.body[:55] + '...'
-        #     queryset.append(i)
-        # return queryset
+    context_object_name = "Blogs"
+    template_name = "web/blog-list.html"
+
+    # def get_query_set(self):
+    #     pass
+    # for i in Blog.objects.filter(live='t'):
+    #     i.body= i.body[:55] + '...'
+    #     queryset.append(i)
+    # return queryset
+
 
 class BlogDetailView(DetailView):
     model = Blog
-    template_name = 'web/blog.html'
-    context_object_name = 'Blog'
-
+    template_name = "web/blog.html"
+    context_object_name = "Blog"
