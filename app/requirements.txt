@@ -2,6 +2,7 @@
 requests
 django
 WeasyPrint # Generate PDFs for email
+wagtail
 
 # Infrastructure
 psycopg2-binary
