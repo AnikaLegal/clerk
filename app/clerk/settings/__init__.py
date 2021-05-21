@@ -121,8 +121,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.profile",
 ]
 
-# SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.com"]
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = ["matt@anikalegal.com"]
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.com"]
 
 # See https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
 SOCIAL_AUTH_PIPELINE = (
