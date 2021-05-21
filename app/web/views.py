@@ -4,12 +4,8 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 
+from .models import BlogListPage
 from .forms import ContactForm
-
-# TODO:
-# images: put keys from essenger into docker .env
-# image model migration:
-# view: put transformation stuff in template rendering, just pass on filtered objects. {{ value|truncatechars:7 }}
 
 
 @require_http_methods(["GET"])
@@ -24,6 +20,13 @@ def landing_view(request):
     return render(
         request, "web/landing.html", {"form": form, "testimonials": TESTIMONIALS}
     )
+
+
+@require_http_methods(["GET"])
+def blog_search_view(request):
+    blog_parent = BlogListPage.objects.get(slug="root")
+    context = blog_parent.get_context(request)
+    return render(request, "web/htmx/_blog_results.html", context)
 
 
 @require_http_methods(["POST"])

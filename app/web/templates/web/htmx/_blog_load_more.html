@@ -1,0 +1,12 @@
+<div id="load-more" hx-swap-oob="true">
+    {% if blogs.has_next %}
+    <button
+        hx-get="{% url 'blog-search' %}" 
+        hx-vals='{"page": "{{ blogs.next_page_number }}", "search": "{{ search }}"}'
+        hx-target="#blog-results" 
+        hx-swap="beforeend"
+    >
+        Load more
+    </button>
+    {% endif %}
+</div>

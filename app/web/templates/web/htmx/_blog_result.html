@@ -1,0 +1,7 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<a href="{% pageurl blog %}">
+    <div class="card">
+        {% image blog.specific.main_image width-400 class="round-small top-right bottom-left" %}
+        <p class="header" style="margin-top: 0; text-align: left;">{{ blog.title }}</p>
+    </div>
+</a>

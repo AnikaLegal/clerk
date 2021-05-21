@@ -1,0 +1,19 @@
+{% extends "wagtailadmin/login.html" %}
+
+{% block login_form %}
+    <h1>Welcome to the Anika Blog</h1>
+    <style>
+    #google {
+        background-color: #dd4b39;
+        border-color: #dd4b39;
+    }
+    #google:hover {
+        background-color: #e0321c;
+    }
+    </style>
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/cms/admin/">
+        <div id="google" class="button button-longrunning" onclick="">
+            Sign in with Google
+        </div>
+    </a>
+{% endblock %}

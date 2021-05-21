@@ -10,6 +10,7 @@ This site is used by new Anika clients who want to submit their legal problem. C
 
 This Django project has several apps:
 
+- accounts: User accounts
 - actionstep: Actionstep integration
 - admin: Customization of Admin interface
 - caller: Call centre
@@ -17,6 +18,7 @@ This Django project has several apps:
 - clerk: Project settings
 - core: Core domain models and functionality
 - slack: Slack integration
+- web: Public website and blog
 - webhooks: Webhooks from 3rd party services
 
 ## Prerequisites for Local Development

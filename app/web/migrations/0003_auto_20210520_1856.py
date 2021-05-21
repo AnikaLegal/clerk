@@ -3,11 +3,42 @@
 from django.db import migrations
 
 
+def setup_default_site(apps, schema_editor):
+    BlogListPage = apps.get_model("web", "BlogListPage")
+    Site = apps.get_model("wagtailcore", "Site")
+    Page = apps.get_model("wagtailcore", "Page")
+    Locale = apps.get_model("wagtailcore", "Locale")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    Site.objects.all().delete()
+    Page.objects.all().delete()
+    page_data = {
+        "title": "Anika Blog",
+        "content_type": ContentType.objects.get_for_model(BlogListPage),
+        "locale": Locale.objects.first(),
+        "slug": "root",
+        "path": "0001",
+        "depth": 1,
+        "numchild": 0,
+        "url_path": "/",
+    }
+    root_page = BlogListPage.objects.create(**page_data)
+
+    site_data = {
+        "hostname": "localhost",
+        "port": 80,
+        "site_name": "Anika Legal",
+        "root_page": root_page,
+        "is_default_site": True,
+    }
+    Site.objects.create(**site_data)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web', '0002_auto_20210520_1855'),
+        ("web", "0002_auto_20210520_1855"),
     ]
 
     operations = [
+        migrations.RunPython(setup_default_site),
     ]

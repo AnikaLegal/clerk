@@ -73,6 +73,7 @@ urlpatterns = [
     # Wagtail
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
+    path("blog/search/", views.blog_search_view, name="blog-search"),
     path("blog/", include(wagtail_urls), name="blog"),
     # Robots.txt
     path("robots.txt", views.robots_view),

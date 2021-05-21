@@ -35,6 +35,7 @@ Screen sizes to consider (https://screensiz.es/):
   --header-offset-top: 60px;
   --header-height-total: 123px;
   --container-max-width: 1240px;
+  --container-article-max-width: 950px;
   /* Fonts - too many? */
   --font-serif: "Abhaya Libre", serif;
   --font-sans: "Nunito Sans", sans-serif;

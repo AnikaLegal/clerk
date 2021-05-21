@@ -1,0 +1,5 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+{% for blog in blogs %}
+{% include 'web/htmx/_blog_result.html' with blog=blog %}
+{% endfor %}
+{% include 'web/htmx/_blog_load_more.html' with blogs=blogs %}

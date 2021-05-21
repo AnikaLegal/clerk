@@ -2,23 +2,51 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 {% block title %}Blog{% endblock %} 
 {% block content %}
-
-<div class="segment">
-    <h1>Blog</h1>
-    <div style="margin-bottom: 20px" class="divider"></div>
-    <input style="margin-bottom: 100px" placeholder="Search blog..."/>
+<style>
+#load-more {
+    padding-top: 80px;
+    display: flex;
+    justify-content: center;
+}
+input.search {
+    margin-bottom: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.33);
+    box-sizing: border-box;
+    border-radius: 49px;
+    font-size: var(--body-font-size);
+    line-height: var(--body-line-height);
+    letter-spacing: 0.05em;
+    color: var(--dark-6);
+    padding: 10px 34px;
+    width: 100%;
+    max-width: 460px;
+}
+@media (max-width: 1300px) {
+    input.search {
+        margin-bottom: 25px;
+    }
+}
+</style>
+<div class="segment" style="padding-bottom: 0">
     <div class="container">
-        <div class="card-grid six">
+        <h1>Blog</h1>
+        <div style="margin-bottom: 20px" class="divider"></div>
+        <input 
+            class="search"
+            name="search"
+            placeholder="Search blog..."
+            type="text" 
+            hx-get="{% url 'blog-search' %}" 
+            hx-trigger="keyup changed delay:500ms" 
+            hx-target="#blog-results"
+        />
+        <div class="card-grid six" id="blog-results">
             {% for blog in blogs %}
-            <a href="{% pageurl blog %}">
-                <div class="card">
-                    {% image blog.specific.main_image width-400 class="round-small top-right bottom-left" %}
-                    <p class="compact">{{ blog.last_published_at|date:"D jS N 'y" }}</p>
-                    <p class="header">{{ blog.title }}</p>
-                </div>
-            </a>
+            {% include 'web/htmx/_blog_result.html' with blog=blog %}
             {% endfor %}
         </div>
     </div>
+    {% include 'web/htmx/_blog_load_more.html' with blogs=blogs %}
 </div>
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
 {% endblock %}

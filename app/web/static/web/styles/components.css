@@ -123,6 +123,10 @@ Has horizontal padding only
   width: calc(100vw - 2 * var(--container-padding));
   margin: 0 auto;
 }
+.container.article {
+  max-width: var(--container-article-max-width);
+}
+
 .container.wide {
   width: calc(100vw - 2 * var(--container-wide-padding));
 }
@@ -833,5 +837,68 @@ before the final footer.
   .hero-gold .external-radius.outer,
   .hero-gold .external-radius.inner {
     width: calc(0.66 * var(--hero-external-radius));
+  }
+}
+
+/* Blog post articles */
+.article .block-image img {
+  max-width: 100% !important;
+  height: unset;
+  margin-bottom: 2rem;
+  border-top-left-radius: calc(120px * var(--radius-multiplier));
+  border-bottom-right-radius: calc(120px * var(--radius-multiplier));
+}
+.article .block-paragraph {
+  text-align: left;
+  margin-bottom: 2rem;
+  font-size: var(--body-font-size);
+  line-height: var(--body-line-height);
+  letter-spacing: 0.05em;
+}
+.article .block-paragraph p {
+  margin: 0 !important;
+}
+
+.article .block-heading {
+  text-align: left;
+  margin: 3rem 0 0.8rem 0;
+  font-family: var(--font-serif);
+  font-size: 40px;
+}
+.article .block-quote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+.article .block-quote blockquote {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  line-height: 46px;
+  font-size: 34px;
+}
+.article .block-quote:before {
+  content: "“";
+  font-family: var(--font-serif);
+  font-size: 96px;
+  color: var(--blue);
+  line-height: 46px;
+  padding-right: 12px;
+  vertical-align: bottom;
+  transform: translateY(24px);
+}
+
+@media (max-width: 1300px) {
+  .article .block-heading {
+    font-size: 26px;
+  }
+  .article .block-quote {
+    flex-direction: column;
+  }
+  .article .block-quote blockquote {
+    font-size: 26px;
+    line-height: 32px;
   }
 }

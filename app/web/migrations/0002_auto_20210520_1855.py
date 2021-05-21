@@ -11,40 +11,81 @@ import wagtail.images.blocks
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0062_comment_models_and_pagesubscription'),
-        ('wagtailimages', '0023_add_choose_permissions'),
-        ('wagtailforms', '0004_add_verbose_name_plural'),
-        ('wagtailredirects', '0006_redirect_increase_max_length'),
+        ("wagtailcore", "0062_comment_models_and_pagesubscription"),
+        ("wagtailimages", "0023_add_choose_permissions"),
+        ("wagtailforms", "0004_add_verbose_name_plural"),
+        ("wagtailredirects", "0006_redirect_increase_max_length"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('web', '0001_initial'),
+        ("web", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BlogListPage',
+            name="BlogListPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='BlogPage',
+            name="BlogPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('body', wagtail.core.fields.StreamField([('heading', wagtail.core.blocks.CharBlock(form_classname='full title')), ('paragraph', wagtail.core.blocks.RichTextBlock()), ('image', wagtail.images.blocks.ImageChooserBlock())])),
-                ('published_at', models.DateField(verbose_name='Published date')),
-                ('author', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('main_image', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='+', to='wagtailimages.image')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "body",
+                    wagtail.core.fields.StreamField(
+                        [
+                            (
+                                "heading",
+                                wagtail.core.blocks.CharBlock(
+                                    form_classname="full title"
+                                ),
+                            ),
+                            ("paragraph", wagtail.core.blocks.RichTextBlock()),
+                            ("image", wagtail.images.blocks.ImageChooserBlock()),
+                        ]
+                    ),
+                ),
+                (
+                    "main_image",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="wagtailimages.image",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.DeleteModel(
-            name='Blog',
+            name="Blog",
         ),
     ]
