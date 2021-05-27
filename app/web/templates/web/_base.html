@@ -10,6 +10,16 @@
     <!-- Meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% block social_meta %}
+        {% include 'web/snippets/_social_meta.html' with title="Anika Legal" description="Get free, ongoing legal support in 2 working days" %}
+    {% endblock %}
+    {% block social_meta_card %}
+        <meta property="og:image" content="{% static 'web/brand/social-card.png' %}" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:image" content="{% static 'web/brand/social-card.png' %}" />
+        <meta name="twitter:card" content="summary_large_image" />
+    {% endblock %}
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}">
     <!-- Google fonts -->
@@ -98,16 +108,23 @@
             <div class='column'>
                 <h3>Quick Links</h3>
                 <p><a href="{% url 'about' %}">About</a></p>
-                <p><a href="{% slugurl 'root' %}">Blog</a></p>
+                <p><a href="{% slugurl 'blog' %}">Blog</a></p>
                 {% comment %} <p><a href=#>News</a></p>
                 <p>
                     <a href=#>Jobs</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
                 </p> {% endcomment %}
+
+                <h3 style="margin-top: 27px">Legal</h3>
+                <p><a href="{% slugurl 'terms-of-use' %}">Terms of use</a></p>
+                <p><a href="{% slugurl 'eligibility-criteria' %}">Eligibility criteria</a></p>
             </div>
             <div class='column'>
                 <h3>Services</h3>
                 <p><a href="{% url 'evictions' %}">Eviction support</a></p>
                 <p><a href="{% url 'repairs' %}">Rental repairs</a></p>
+                <h3 style="margin-top: 27px">Privacy</h3>
+                <p><a href="{% slugurl 'privacy-policy' %}">Privacy policy</a></p>
+                <p><a href="{% slugurl 'collections-statement' %}">Collections statement</a></p>
             </div>
             <div class='column'>
                 <h3>Reach Us</h3>
@@ -117,7 +134,7 @@
                 </p>
                 <p class="icon">
                     <img src="{% static 'web/img/phone.svg' %}"/>
-                    0451 618 383
+                    0480 016 398
                 </p>
                 <p class="icon">
                     <img src="{% static 'web/img/location.svg' %}"/>

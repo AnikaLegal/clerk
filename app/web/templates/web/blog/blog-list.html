@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load wagtailcore_tags wagtailimages_tags %}
 {% block title %}Blog{% endblock %} 
+{% block social_meta %}
+    {% include 'web/snippets/_social_meta.html' with title="Anika Blog" description="Articles and resources provided by Anika Legal for Victorian renters." %}            
+{% endblock %}
 {% block content %}
 <style>
 #load-more {

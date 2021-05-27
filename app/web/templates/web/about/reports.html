@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Reports{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Reports" description="Anika Legal is an independent legal practice, tax-deductible charity & social enterprise. Our Annual, Financial and Impact Reports outline the work we do." %}            
+{% endblock %}
 {% block content %}
 <div class="hero-gold">
     <div class="external-radius outer">

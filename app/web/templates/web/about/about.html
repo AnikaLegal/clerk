@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
-{% block title %}About{% endblock %} 
+{% block title %}About{% endblock %}
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can’t access it through practical legal education and trusted partnerships" %}            
+{% endblock %}
 {% block content %}
 
 <div class="container">

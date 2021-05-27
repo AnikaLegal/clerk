@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Rental Repairs{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Rental Repairs" description="Need something in your rental property fixed? We’re here to help." %}            
+{% endblock %}
 {% block content %}
 <div class="segment">
     <div class="container wide">

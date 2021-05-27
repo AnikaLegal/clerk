@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Evictions Support{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Evictions Support" description="Getting evicted? Know your rights before you panic!" %}            
+{% endblock %}
 {% block content %}
 <div class="segment">
     <div class="container wide">

@@ -14,40 +14,6 @@ def template(name):
 
 urlpatterns = [
     path(
-        "terms-of-use/", template("web/legalese/terms-of-use.html"), name="terms-of-use"
-    ),
-    path(
-        "eligibility-criteria/",
-        template("web/legalese/eligibility-criteria.html"),
-        name="eligibility-criteria",
-    ),
-    path(
-        "privacy-policy/",
-        template("web/legalese/privacy-policy.html"),
-        name="privacy-policy",
-    ),
-    path(
-        "collections-statement/",
-        template("web/legalese/collections-statement.html"),
-        name="collections-statement",
-    ),
-    # path(
-    #     "partnerships/philanthropy",
-    #     template("web/philanthropy.html"),
-    #     name="philanthropy",
-    # ),
-    # path("partnerships/corporates", template("web/corporates.html"), name="corporates"),
-    # path(
-    #     "partnerships/universities",
-    #     template("web/universities.html"),
-    #     name="universities",
-    # ),
-    # path(
-    #     "partnerships/community",
-    #     template("web/partnerships/community.html"),
-    #     name="community",
-    # ),
-    path(
         "resources/community",
         template("web/resources/community.html"),
         name="refer",
@@ -73,8 +39,8 @@ urlpatterns = [
     # Wagtail
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
+    path("cms/", include(wagtail_urls)),
     path("blog/search/", views.blog_search_view, name="blog-search"),
-    path("blog/", include(wagtail_urls), name="blog"),
     # Robots.txt
     path("robots.txt", views.robots_view),
     # Landing page

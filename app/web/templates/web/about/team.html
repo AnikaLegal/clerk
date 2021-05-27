@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Our Team{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Our Team" description="Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice." %}            
+{% endblock %}
 {% block content %}
 <div class="hero-story tall">
     <div class="inner">

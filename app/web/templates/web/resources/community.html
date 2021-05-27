@@ -1,13 +1,14 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Refer Someone{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Refer Someone" description="Anika provides free legal advice and ongoing casework to vulnerable renters who are being evicted for rental arrears, or who need repairs performed in their rental." %}            
+{% endblock %}
 {% block content %}
 <div class="hero-gold">
     <div class="external-radius outer">
         <div class="external-radius inner"></div>
     </div>
-
-
     <div class="hero-story">
         <div class="inner">
             <div class="content">

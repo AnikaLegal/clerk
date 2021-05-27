@@ -44,6 +44,7 @@ Landing page only styles.
     --hero-curve-height: 46px;
     --hero-padding-top: 0;
     --hero-padding-bottom: 0;
+    --hero-small-image-height: 350px;
   }
 }
 @media (max-width: 600px) {
@@ -92,7 +93,7 @@ Landing page only styles.
 .landing-hero.small .img {
   height: var(--hero-small-image-height);
   background-image: var(--url-landing-hero-phone-img);
-  background-position: 50% 100%;
+  background-position: 50% 30%;
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
@@ -178,7 +179,6 @@ Landing page only styles.
   .landing-brag.small {
     display: block;
   }
-  #landing-cta,
   .desktop-break {
     display: none;
   }

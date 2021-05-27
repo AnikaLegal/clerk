@@ -1,0 +1,20 @@
+{% extends "web/_base.html" %} 
+{% load wagtailcore_tags %}
+{% block title %}{{ page.title }}{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="{{ page.title }}" description="" %}            
+{% endblock %}
+{% block content %}
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container">
+            <h1>{{ page.title }}</h1>
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container article">
+        {% include_block page.body %}
+    </div>
+</div>
+{% endblock %}

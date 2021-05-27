@@ -59,6 +59,7 @@ class Command(BaseCommand):
                 "title": title,
                 "slug": slugify(title),
                 "main_image_id": random.choice(images).id,
+                "search_description": fake.sentence(),
                 "owner_id": u.id,
                 "body": json.dumps(
                     [

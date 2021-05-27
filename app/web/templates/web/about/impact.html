@@ -1,6 +1,9 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% block title %}Impact{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Impact" description="Our vision is a world where everyone can access justice" %}            
+{% endblock %}
 {% block content %}
 <div class="container">
     <div class="brag">

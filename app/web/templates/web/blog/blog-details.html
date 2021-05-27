@@ -1,6 +1,18 @@
 {% extends "web/_base.html" %} 
 {% load wagtailcore_tags %}
-{% block title %}{{ page.title }}| Anika Legal{% endblock %} 
+{% load wagtailimages_tags %}
+{% block title %}{{ page.title }}{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title=page.title description=page.search_description %}            
+{% endblock %}
+{% block social_meta_card %}
+    {% image page.main_image fill-1200x630 as social_image %}
+    <meta property="og:image" content="{{ social_image.url }}" />
+    <meta property="og:image:width" content="{{ social_image.width }}" />
+    <meta property="og:image:height" content="{{ social_image.height }}" />
+    <meta name="twitter:image" content="{{ social_image.url }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+{% endblock %}
 {% block content %}
 <style>
 .meta {
@@ -10,17 +22,10 @@
     font-weight: bold;
     gap: 30px;
 }
-.hero-segment {
-  padding: 25px 0 85px 0;
-  text-align: center;
-}
 @media (max-width: 1300px) {
     .meta {
         flex-direction: column;
         gap: 4px;
-    }
-    .hero-segment {
-        padding: 0;
     }
 }
 </style>

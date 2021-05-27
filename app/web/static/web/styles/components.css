@@ -6,7 +6,6 @@ Includes:
   - Buttons n stuff
   - More complicated repeated components (eg. grids of cards)
 */
-
 /* Headers */
 h1,
 h2 {
@@ -840,6 +839,17 @@ before the final footer.
   }
 }
 
+/* A segment that can live inside hero-gold */
+.hero-segment {
+  padding: 25px 0 85px 0;
+  text-align: center;
+}
+@media (max-width: 1300px) {
+  .hero-segment {
+    padding: 0;
+  }
+}
+
 /* Blog post articles */
 .article .block-image img {
   max-width: 100% !important;
@@ -848,14 +858,16 @@ before the final footer.
   border-top-left-radius: calc(120px * var(--radius-multiplier));
   border-bottom-right-radius: calc(120px * var(--radius-multiplier));
 }
-.article .block-paragraph {
+.article .block-paragraph,
+.article .block-paragraph p {
+  color: var(--dark-0) i !important;
   text-align: left;
   margin-bottom: 2rem;
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
   letter-spacing: 0.05em;
 }
-.article .block-paragraph p {
+.article .block-paragraph p:last-child {
   margin: 0 !important;
 }
 
