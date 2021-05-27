@@ -7,11 +7,15 @@ from django.shortcuts import render
 from accounts.models import User
 from case.forms import ParalegalDetailsForm
 
+from django.contrib.auth.decorators import user_passes_test
+from .auth import is_superuser
+
 PARALEGAL_CAPACITY = 4.0
 
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 def paralegal_detail_view(request, pk):
     try:
         paralegal = (
@@ -52,6 +56,7 @@ def paralegal_detail_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 def paralegal_list_view(request):
     paralegals = (
         User.objects.filter(issue__isnull=False)
@@ -65,7 +70,9 @@ def paralegal_list_view(request):
             open_rent_reduction=Count(
                 "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
             ),
-            open_eviction=Count("issue", Q(issue__is_open=True, issue__topic="EVICTION")),
+            open_eviction=Count(
+                "issue", Q(issue__is_open=True, issue__topic="EVICTION")
+            ),
         )
         .order_by("-latest_issue_created_at")
     )

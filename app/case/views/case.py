@@ -17,6 +17,9 @@ from case.forms import (
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
 
+from django.contrib.auth.decorators import user_passes_test
+from .auth import is_superuser
+
 
 def root_view(request):
     return redirect("case-list")
@@ -24,6 +27,7 @@ def root_view(request):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["GET"])
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
@@ -41,6 +45,7 @@ def case_list_view(request):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["GET"])
 def case_detail_view(request, pk):
     context = _get_case_detail_context(request, pk)
@@ -49,6 +54,7 @@ def case_detail_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["GET"])
 def case_detail_progress_view(request, pk):
     context = _get_case_detail_context(request, pk)
@@ -65,6 +71,7 @@ def case_detail_progress_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["POST"])
 def case_detail_review_note_form_view(request, pk):
     context = _get_case_detail_context(request, pk)
@@ -87,6 +94,7 @@ def case_detail_review_note_form_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["POST"])
 def case_detail_paralegal_note_form_view(request, pk):
     context = _get_case_detail_context(request, pk)
@@ -109,6 +117,7 @@ def case_detail_paralegal_note_form_view(request, pk):
 
 # FIXME: Permissions
 @login_required
+@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["POST"])
 def case_detail_progress_form_view(request, pk):
     context = _get_case_detail_context(request, pk)

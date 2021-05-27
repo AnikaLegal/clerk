@@ -136,6 +136,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
+    # Ensure new users can access the Wagtail CMS
+    "accounts.social_auth.set_new_user_as_cms_editor",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -269,3 +271,6 @@ TWILIO_AUDIO_BASE_URL = None  # Overwrite me
 
 # Reminder emails via MailChimp
 MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
+
+# Google Analytics
+GOOGLE_ANALYTICS_ID = ""

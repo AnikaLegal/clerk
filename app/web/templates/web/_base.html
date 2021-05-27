@@ -1,4 +1,5 @@
 {% load static %}
+{% load analytics %}
 {% load wagtailcore_tags %}
 <html lang="en">
 <head>
@@ -143,6 +144,7 @@
             </div>
         </div>
     </footer>
+    {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
     <script>
       document.body.addEventListener('htmx:configRequest', (event) => {
