@@ -13,11 +13,6 @@ def template(name):
 
 
 urlpatterns = [
-    path(
-        "resources/community",
-        template("web/resources/community.html"),
-        name="refer",
-    ),
     # Jobs
     path("openings/", template("web/openings.html"), name="openings"),
     # About
@@ -35,6 +30,11 @@ urlpatterns = [
         "services/eviction-support/",
         template("web/services/evictions.html"),
         name="evictions",
+    ),
+    path(
+        "services/refer-someone/",
+        template("web/services/refer-someone.html"),
+        name="refer",
     ),
     # Wagtail
     path("cms/admin/", include(wagtailadmin_urls)),

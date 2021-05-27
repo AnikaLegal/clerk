@@ -67,10 +67,10 @@ ADVISORS = [
     {
         "image": "web/img/photos/advisors/brendan-lacota.jpeg",
         "name": "Brendan Lacota",
-        "title": "Head of Community Programs and Justice Connect",
+        "title": "Not-for-profit and for-purpose consultant",
         "brags": [
             "Brendan is an emerging leader in designing innovative ways to provide community legal services",
-            "Brendan is the 2020 President Elect of the Law Institute of Victoria and has been a member of the LIV Council since January 2017",
+            "Brendan was the Head of Community Programs at Justice Connect and the 2020 President Elect of the Law Institute of Victoria",
         ],
     },
     {
