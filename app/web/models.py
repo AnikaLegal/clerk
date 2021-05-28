@@ -4,7 +4,12 @@ from django.http import Http404
 from wagtail.core import blocks
 from wagtail.core.models import Page
 from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
+from wagtail.admin.edit_handlers import (
+    FieldPanel,
+    StreamFieldPanel,
+    MultiFieldPanel,
+    PrivacyModalPanel,
+)
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
 
@@ -90,9 +95,17 @@ class BlogPage(Page):
         blank=True,
         null=True,
     )
+
+    promote_panels = [FieldPanel("slug")]
+    settings_panels = [PrivacyModalPanel()]
     content_panels = Page.content_panels + [
-        FieldPanel("owner"),
-        ImageChooserPanel("main_image"),
-        FieldPanel("search_description"),
+        FieldPanel("owner", heading="Author"),
+        MultiFieldPanel(
+            [
+                ImageChooserPanel("main_image"),
+                FieldPanel("search_description"),
+            ],
+            "Search and social media",
+        ),
         StreamFieldPanel("body"),
     ]

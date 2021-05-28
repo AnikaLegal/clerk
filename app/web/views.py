@@ -24,7 +24,7 @@ def landing_view(request):
 
 @require_http_methods(["GET"])
 def blog_search_view(request):
-    blog_parent = BlogListPage.objects.get(slug="root")
+    blog_parent = BlogListPage.objects.get(slug="blog")
     context = blog_parent.get_context(request)
     return render(request, "web/htmx/_blog_results.html", context)
 

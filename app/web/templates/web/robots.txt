@@ -4,6 +4,7 @@
 User-agent: *
 Disallow: /oauth/
 Disallow: /admin/
+Disallow: /cms/admin/
 Disallow: /actionstep/
 Disallow: /caller/
 Disallow: /api/
