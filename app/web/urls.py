@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
+from .models import ResourceListPage, BlogListPage
 
 from . import views
 
@@ -39,7 +40,9 @@ urlpatterns = [
     # Wagtail
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
-    path("cms/", include(wagtail_urls)),
+    path("cms/pages/", include(wagtail_urls)),
+    ResourceListPage.as_path("resources"),
+    BlogListPage.as_path("blog"),
     path("blog/search/", views.blog_search_view, name="blog-search"),
     # Robots.txt
     path("robots.txt", views.robots_view),

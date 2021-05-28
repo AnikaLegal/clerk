@@ -1,6 +1,7 @@
 {% load static %}
 {% load analytics %}
 {% load wagtailcore_tags %}
+{% load wagtail_clerk %}
 <html lang="en">
 <head>
     <title>
@@ -118,23 +119,23 @@
             <div class='column'>
                 <h3>Quick Links</h3>
                 <p><a href="{% url 'about' %}">About</a></p>
-                <p><a href="{% slugurl 'blog' %}">Blog</a></p>
+                <p><a href="{% clerk_slugurl 'blog' %}">Blog</a></p>
                 {% comment %} <p><a href=#>News</a></p>
                 <p>
                     <a href=#>Jobs</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
                 </p> {% endcomment %}
 
                 <h3 style="margin-top: 27px">Legal</h3>
-                <p><a href="{% slugurl 'terms-of-use' %}">Terms of use</a></p>
-                <p><a href="{% slugurl 'eligibility-criteria' %}">Eligibility criteria</a></p>
+                <p><a href="{% clerk_slugurl 'terms-of-use' %}">Terms of use</a></p>
+                <p><a href="{% clerk_slugurl 'eligibility-criteria' %}">Eligibility criteria</a></p>
             </div>
             <div class='column'>
                 <h3>Services</h3>
                 <p><a href="{% url 'evictions' %}">Eviction support</a></p>
                 <p><a href="{% url 'repairs' %}">Rental repairs</a></p>
                 <h3 style="margin-top: 27px">Privacy</h3>
-                <p><a href="{% slugurl 'privacy-policy' %}">Privacy policy</a></p>
-                <p><a href="{% slugurl 'collections-statement' %}">Collections statement</a></p>
+                <p><a href="{% clerk_slugurl 'privacy-policy' %}">Privacy policy</a></p>
+                <p><a href="{% clerk_slugurl 'collections-statement' %}">Collections statement</a></p>
             </div>
             <div class='column'>
                 <h3>Reach Us</h3>

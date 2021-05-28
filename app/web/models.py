@@ -12,6 +12,8 @@ from wagtail.admin.edit_handlers import (
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.core.views import serve as wagtail_serve
+from django.urls import re_path
 
 
 class NotFoundMixin:
@@ -19,19 +21,49 @@ class NotFoundMixin:
         raise Http404("Page does not exist.")
 
 
+class MultiRootPageMixin:
+    public_path = None
+    private_path = None
+
+    def get_url_parts(self, *args, **kwargs):
+        site_id, root_url, page_path = super().get_url_parts(*args, **kwargs)
+        new_path = None
+        if page_path is not None:
+            new_path = page_path.replace(self.private_path, self.public_path)
+
+        return site_id, root_url, new_path
+
+    @classmethod
+    def as_path(cls, name: str):
+        def view(request, path):
+            new_path = cls.public_path + path
+            return wagtail_serve(request, new_path)
+
+        url_prefix = cls.public_path.lstrip("/")
+        url_re = fr"^{url_prefix}((?:[\w\-]+/)*)$"
+        return re_path(url_re, view, name=name)
+
+
+class ResourceRootMixin(MultiRootPageMixin):
+    public_path = "/resources/"
+    private_path = "/cms/pages/resources/"
+
+
+class BlogRootMixin(MultiRootPageMixin):
+    public_path = "/blog/"
+    private_path = "/cms/pages/blog/"
+
+
 class RootPage(NotFoundMixin, Page):
     subpage_types = ["web.BlogListPage", "web.ResourceListPage"]
 
 
-class ResourceListPage(NotFoundMixin, Page):
-    public_path = "/resources/"
-    private_path = "/cms/pages/resources/"
-
+class ResourceListPage(NotFoundMixin, ResourceRootMixin, Page):
     subpage_types = ["web.ResourcePage"]
     parent_page_types = ["web.RootPage"]
 
 
-class ResourcePage(Page):
+class ResourcePage(ResourceRootMixin, Page):
     template = "web/resources/resource-page.html"
     parent_page_types = ["web.ResourceListPage"]
     subpage_types = []
@@ -47,7 +79,7 @@ class ResourcePage(Page):
     ]
 
 
-class BlogListPage(Page):
+class BlogListPage(BlogRootMixin, Page):
     template = "web/blog/blog-list.html"
     subpage_types = ["web.BlogPage"]
     parent_page_types = ["web.RootPage"]
@@ -74,7 +106,9 @@ class BlogListPage(Page):
         return context
 
 
-class BlogPage(Page):
+class BlogPage(MultiRootPageMixin, Page):
+    public_path = "/blog/"
+    private_path = "/cms/pages/blog/"
 
     template = "web/blog/blog-details.html"
     parent_page_types = ["web.BlogListPage"]
