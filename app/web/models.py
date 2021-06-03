@@ -63,6 +63,18 @@ class ResourceListPage(NotFoundMixin, ResourceRootMixin, Page):
     parent_page_types = ["web.RootPage"]
 
 
+# See here for details
+# https://docs.wagtail.io/en/stable/advanced_topics/customisation/page_editing_interface.html#limiting-features-in-a-rich-text-field
+RICH_TEXT_FEATURES = [
+    "h2",
+    "bold",
+    "italic",  # bold / italic text
+    "ol",
+    "ul",  # ordered / unordered lists
+    "link",  # page, external and email links
+]
+
+
 class ResourcePage(ResourceRootMixin, Page):
     template = "web/resources/resource-page.html"
     parent_page_types = ["web.ResourceListPage"]
@@ -71,7 +83,10 @@ class ResourcePage(ResourceRootMixin, Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock()),
+            (
+                "paragraph",
+                blocks.RichTextBlock(features=RICH_TEXT_FEATURES),
+            ),
         ]
     )
     content_panels = Page.content_panels + [
@@ -117,7 +132,7 @@ class BlogPage(MultiRootPageMixin, Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock()),
+            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
             ("image", ImageChooserBlock()),
             ("quote", blocks.BlockQuoteBlock()),
         ]

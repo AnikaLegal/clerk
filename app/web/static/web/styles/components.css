@@ -871,9 +871,11 @@ before the final footer.
   margin: 0 !important;
 }
 
-.article .block-heading {
+.article .block-heading,
+.article .block-paragraph h2 {
   text-align: left;
   margin: 3rem 0 0.8rem 0;
+  line-height: 1.1;
   font-family: var(--font-serif);
   font-size: 40px;
 }
