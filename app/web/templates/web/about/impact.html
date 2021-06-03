@@ -1,5 +1,6 @@
 {% extends "web/_base.html" %} 
 {% load static %}
+{% load wagtail_clerk %}
 {% block title %}Impact{% endblock %} 
 {% block social_meta %}
 {% include 'web/snippets/_social_meta.html' with title="Impact" description="Our vision is a world where everyone can access justice" %}            
@@ -73,7 +74,7 @@
                     <br><br>
                     <strong><i>- Louise</i></strong>
                 </p>
-                <a href="{% url 'impact' %}">
+                <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
                     <button>Read more</button>
                 </a>
             </div>
@@ -84,7 +85,7 @@
                     <br><br>
                     <strong><i>- Erica</i></strong>
                 </p>
-                <a href="{% url 'impact' %}">
+                <a href="{% clerk_slugurl 'erica-rent-reduction' %}">
                     <button>Read more</button>
                 </a>
             </div>
@@ -129,7 +130,9 @@
                 <h2>Louise’s story</h2>
                 <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
                 <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
-                <button>Read more</button>
+                <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
+                    <button>Read more</button>
+                </a>
             </div>
         </div>
     </div>
@@ -141,7 +144,9 @@
                 <h2>Sam’s story</h2>
                 <p class="light">Sam joined Anika to get his first community law experience by helping a pregnant mother get her unsafe home repaired just a week before the birth of the her baby.</p>
                 <p class="light">“Seeing how our assistance empowered Louise during what she told me was one of the most stressful periods of her life, emphasised to me the unique and powerful social justice organisation Anika is poised to become”</p>
-                <button>Read more</button>
+                <a href="{% clerk_slugurl 'meet-sam-one-of-our-volunteer-paralegals' %}">
+                    <button>Read more</button>
+                </a>
             </div>
             <div class="blue-ball right">
                 <img

@@ -1,5 +1,6 @@
 {% extends "web/_base.html" %} 
 {% load static %}
+{% load wagtail_clerk %}
 {% block supertitle %}Anika Legal{% endblock %} 
 {% block content %}
 
@@ -93,7 +94,9 @@
             <h2>Louise’s story</h2>
             <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
             <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
-            <button>Read more</button>
+            <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
+                <button>Read more</button>
+            </a>
         </div>
     </div>
 </div>
