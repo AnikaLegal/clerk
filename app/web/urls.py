@@ -21,6 +21,7 @@ urlpatterns = [
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
     path("about/team/", views.team_view, name="team"),
     path("about/impact/", template("web/about/impact.html"), name="impact"),
+    path("about/join-our-team/", template("web/jobs/job-list.html"), name="jobs"),
     # Services
     path(
         "services/",
