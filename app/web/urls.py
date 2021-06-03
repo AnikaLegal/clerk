@@ -23,6 +23,11 @@ urlpatterns = [
     path("about/impact/", template("web/about/impact.html"), name="impact"),
     # Services
     path(
+        "services/",
+        template("web/services/services.html"),
+        name="services",
+    ),
+    path(
         "services/rental-repairs/",
         template("web/services/repairs.html"),
         name="repairs",
