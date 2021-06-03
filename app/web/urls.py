@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import include
 from django.views.generic import TemplateView
 from wagtail.admin import urls as wagtailadmin_urls
@@ -47,12 +47,13 @@ urlpatterns = [
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
     path("cms/pages/", include(wagtail_urls)),
+    path("blog/search/", views.blog_search_view, name="blog-search"),
     ResourceListPage.as_path("resources"),
     BlogListPage.as_path("blog"),
-    path("blog/search/", views.blog_search_view, name="blog-search"),
     # Robots.txt
     path("robots.txt", views.robots_view),
     # Landing page
     path("landing/contact/", views.landing_contact_form_view, name="landing-contact"),
-    path("", views.landing_view, name="landing"),
+    re_path(r"^$", views.landing_view, name="landing"),
+    re_path(r"^(?P<path>.*)$", views.not_found_view, name="not-found"),
 ]
