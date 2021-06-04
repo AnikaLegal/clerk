@@ -75,6 +75,10 @@ NON_WAGTAIL_REDIRECTS = [
 # src path, dest slug - all hard / 301
 WAGTAIL_REDIRECTS = [
     (
+        "/blog/how-you-can-get-your-landlord-to-repair-your-home-during-covid-19",
+        "get-your-landlord-to-repair-your-home-during-covid-19",
+    ),
+    (
         "/blog/6-top-things-you-need-to-know-about-your-tenancy-repair-rights-11",
         "6-things-you-need-to-know-about-your-tenancy-repair-rights",
     ),
