@@ -53,5 +53,4 @@ urlpatterns = [
     # Landing page
     path("landing/contact/", views.landing_contact_form_view, name="landing-contact"),
     re_path(r"^$", views.landing_view, name="landing"),
-    re_path(r"^(?P<path>.*)$", views.not_found_view, name="not-found"),
 ]

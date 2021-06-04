@@ -1,27 +1,11 @@
 import random
 
-from django.shortcuts import render, redirect
-from django.http import Http404
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 
-from .models import BlogListPage, WebRedirect
+from .models import BlogListPage
 from .forms import ContactForm
-
-
-def not_found_view(request, path):
-    """
-    Handle requests where we couldn't find a match.
-    Doesn't work for Wagtail managed URLs - they need to be handled within Wagtail.
-    """
-    path_no_slashes = path.strip("/")
-    web_redirect = WebRedirect.objects.filter(source_path=path_no_slashes).first()
-    if web_redirect:
-        return redirect(
-            web_redirect.destination_path, permanent=web_redirect.is_permanent
-        )
-    else:
-        raise Http404()
 
 
 @require_http_methods(["GET"])
