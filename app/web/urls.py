@@ -14,8 +14,6 @@ def template(name):
 
 
 urlpatterns = [
-    # Jobs
-    path("openings/", template("web/openings.html"), name="openings"),
     # About
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),

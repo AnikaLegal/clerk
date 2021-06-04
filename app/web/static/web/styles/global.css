@@ -41,7 +41,6 @@ Screen sizes to consider (https://screensiz.es/):
   --font-sans: "Nunito Sans", sans-serif;
   --font-sans-alt-1: "Nunito", sans-serif;
   --font-sans-alt-2: "DM Sans", sans-serif;
-  --font-handwritten: "Nanum Pen Script", cursive;
   /* Static content urls */
   --url-footer-cta-img: url("/static/web/img/footer-cta-phones.png");
   --url-chevron-down-svg: url("/static/web/img/chevron-down.svg");
@@ -319,11 +318,6 @@ footer a:visited {
   color: var(--grey-2);
 }
 
-footer .career-text {
-  color: #2ec5ce;
-  font-size: 20px;
-  font-family: var(--font-handwritten);
-}
 footer .column {
   display: flex;
   flex-direction: column;
