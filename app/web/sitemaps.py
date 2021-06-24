@@ -30,7 +30,7 @@ class BlogSitemap(sitemaps.Sitemap):
     changefreq = "daily"
 
     def items(self):
-        return [BlogListPage.objects.first(), *BlogPage.objects.all()]
+        return [*BlogListPage.objects.all(), *BlogPage.objects.all()]
 
     def location(self, item):
         return item.url
