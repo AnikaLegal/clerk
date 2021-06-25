@@ -34,21 +34,16 @@ Landing page only styles.
     --brag-height: 200px;
     --hero-curve-height: 50px;
     --hero-padding-top: 40px;
-    --hero-padding-bottom: 10px;
+    --hero-padding-bottom: 140px;
   }
 }
 
 /* Tablet/phone screen size responsive vars */
-@media (max-width: 1100px) {
+@media (max-width: 600px) {
   :root {
     --hero-curve-height: 46px;
     --hero-padding-top: 0;
     --hero-padding-bottom: 0;
-    --hero-small-image-height: 350px;
-  }
-}
-@media (max-width: 600px) {
-  :root {
     --hero-small-image-height: 275px;
   }
 }
@@ -119,7 +114,7 @@ Landing page only styles.
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
 .landing-hero.small .container {
-  margin-top: -20px;
+  margin-top: -15px;
 }
 .landing-hero.small .img::after {
   content: "";
@@ -135,8 +130,7 @@ Landing page only styles.
 .landing-hero.large p {
   color: var(--dark-3);
   max-width: 473px;
-  letter-spacing: 0.05em;
-  line-height: 38px;
+  line-height: 1.8;
 }
 .landing-brag.small,
 .landing-brag.large .inner {
@@ -158,19 +152,40 @@ Landing page only styles.
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
+  padding: 0 var(--container-padding);
+  box-sizing: border-box;
 }
 .landing-brag .brag-number {
   color: var(--blue);
 }
 .landing-brag.small {
-  padding: 20px 0 50px 0;
+  padding: 20px 0 70px 0;
+}
+.landing-brag.small button {
+  margin: 30px auto 70px auto;
 }
 .landing-hero.small,
 .landing-brag.small {
   display: none;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1300px) {
+  .landing-hero.large {
+    height: unset;
+  }
+  .landing-hero.large img {
+    filter: sepia(0.4) opacity(0.4) grayscale(0.3);
+    height: 100%;
+    width: 100%;
+    object-position: 50% -12%;
+    transform: scale(1.8);
+  }
+  .landing-hero.large svg {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
   .landing-hero.large,
   .landing-brag.large {
     display: none;
