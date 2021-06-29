@@ -120,7 +120,7 @@ class MultiRootPageMixin:
 
 class JobsRootMixin(MultiRootPageMixin):
     wagtail_slug = "jobs"
-    public_path = "/about/jobs/"
+    public_path = "/about/join-our-team/"
 
 
 class ResourceRootMixin(MultiRootPageMixin):

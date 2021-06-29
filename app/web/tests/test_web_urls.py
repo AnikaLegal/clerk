@@ -2,9 +2,19 @@
 Smoke tests for URLS
 """
 import pytest
+from datetime import date
 from django.urls import reverse
 
-from web.models import RootPage, ResourceListPage, ResourcePage, BlogListPage, BlogPage
+
+from web.models import (
+    RootPage,
+    ResourceListPage,
+    ResourcePage,
+    BlogListPage,
+    BlogPage,
+    JobListPage,
+    JobPage,
+)
 
 URLS_TO_TEST_BY_NAME = [
     # url, status code expected
@@ -12,7 +22,6 @@ URLS_TO_TEST_BY_NAME = [
     ("reports", 200),
     ("team", 200),
     ("impact", 200),
-    ("jobs", 200),
     ("services", 200),
     ("repairs", 200),
     ("evictions", 200),
@@ -32,6 +41,31 @@ def test_path_name_status_codes(client, name, status_code):
     response = client.get(url)
     msg = f"URL name {name} failed, expecting {status_code} got {response.status_code}"
     assert response.status_code == status_code, msg
+
+
+@pytest.mark.django_db
+def test_job_urls(client):
+    root_page = RootPage.objects.get()
+    job_list_page = JobListPage(title="Jobs", slug="jobs")
+    root_page.add_child(instance=job_list_page)
+    job_list_page.save_revision().publish()
+
+    # Job list page works
+    response = client.get("/about/join-our-team/")
+    assert response.status_code == 200
+
+    # Job page works
+    job_page = JobPage(
+        title="Job Post",
+        slug="job-post",
+        icon="web/img/icons/cash.svg",
+        closing_date=date(2020, 1, 1),
+    )
+    job_list_page.add_child(instance=job_page)
+    job_page.save_revision().publish()
+
+    response = client.get("/about/join-our-team/job-post/")
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db

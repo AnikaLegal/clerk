@@ -14,7 +14,6 @@ class StaticSitemap(sitemaps.Sitemap):
             "reports",
             "team",
             "impact",
-            "jobs",
             "services",
             "repairs",
             "evictions",
