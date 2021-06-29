@@ -1,0 +1,58 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% load wagtailcore_tags %}
+{% block title %}{{ page.title }}{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title=page.title description=page.search_description %}            
+{% endblock %}
+{% block content %}
+<style>
+.meta {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto !important;
+    font-weight: bold;
+    gap: 30px;
+}
+@media (max-width: 1300px) {
+    .meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+</style>
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container wide">
+            <img class="icon" style="margin-bottom: 0.5rem;" src="{% static page.icon %}">
+            <h1>{{ page.title }}</h1>
+            <p class="meta">
+                Application closes {{ page.closing_date|date:"jS F Y" }}.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="segment" style="padding-bottom: 0;">
+    <div class="container article">
+        <div class="block-paragraph">
+            <p>{{ page.search_description }}</p>
+        </div>
+        {% include_block page.body %}
+    </div>
+</div>
+
+<div class="segment gold round-large top-right">
+    <div class="container">
+        <h2>How to apply</h2>
+        <div class="divider"></div>
+        <p>
+            Send an email attaching your CV to <strong>people@anikalegal.com</strong> with the position you're applying for and your name in the subject title. Please also share a few sentences about why you want to apply for the role.
+        </p>
+        <p>
+            Our culture is of the highest priority to us, and we value the right people over technical skills.
+        </p>
+
+    </div>
+</div>
+{% endblock %}

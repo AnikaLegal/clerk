@@ -5,7 +5,7 @@ from django.contrib.sitemaps.views import sitemap
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from .models import ResourceListPage, BlogListPage
+from .models import ResourceListPage, BlogListPage, JobListPage
 from .sitemaps import SITEMAPS
 
 from . import views
@@ -21,7 +21,6 @@ urlpatterns = [
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
     path("about/team/", views.team_view, name="team"),
     path("about/impact/", template("web/about/impact.html"), name="impact"),
-    path("about/join-our-team/", template("web/jobs/job-list.html"), name="jobs"),
     # Services
     path(
         "services/",
@@ -50,6 +49,7 @@ urlpatterns = [
     path("blog/search/", views.blog_search_view, name="blog-search"),
     ResourceListPage.as_path("resources"),
     BlogListPage.as_path("blog"),
+    JobListPage.as_path("jobs"),
     # Robots.txt
     path("robots.txt", views.robots_view),
     path(

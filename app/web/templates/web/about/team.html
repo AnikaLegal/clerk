@@ -1,5 +1,6 @@
 {% extends "web/_base.html" %} 
 {% load static %}
+{% load wagtail_clerk %}
 {% block title %}Our Team{% endblock %} 
 {% block social_meta %}
 {% include 'web/snippets/_social_meta.html' with title="Our Team" description="Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice." %}            
@@ -87,7 +88,7 @@
                     Anika’s volunteers comprise 90% of our team. They assist with cases, build our partnerships, design our services, and do our marketing.
                 </p>
                 <p class="light">The dedication of our exceptional volunteers make Anika’s impact possible.</p>
-                <a href="{% url 'jobs' %}">
+                <a href="{% clerk_slugurl 'jobs' %}">
                     <button>
                         Join the team
                     </button>

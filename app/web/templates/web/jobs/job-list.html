@@ -1,16 +1,101 @@
 {% extends "web/_base.html" %} 
+{% load static %}
+{% load wagtailcore_tags %}
 {% block title %}Join our team{% endblock %} 
+{% include 'web/snippets/_social_meta.html' with title="Join Our Team" description="Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice." %}            
 {% block content %}
-<div class="segment">
+<div class="hero-story tall">
+    <div class="inner">
+        <div class="content">
+            <h1>Volunteer at Anika</h1>
+            <p style="max-width: 342px">
+                The hands-on work we do at Anika means real-world experience while providing the opportunity to escape from the structure of traditional companies.
+            </p>
+            <p class="compact" style="max-width: 342px">
+                With a strong mentorship culture across the organisation and through external partnerships, Anika is a place for people enthusiastic to learn, establish meaningful relationships, and make a difference.
+            </p>
+        </div>
+        <img 
+            class="round top-left bottom-left" 
+            src="{% static 'web/img/photos/jobs-hero.jpg' %}"
+            style="object-position: 50% 10%;"
+        >
+    </div>
+</div>
+<div class="segment gold round-large top-right bottom-left">
     <div class="container">
-        <h1>Join our team</h1>
+        <h2>Why join us?</h2>
         <div class="divider"></div>
-    <p>
-        We're currently working on posting our job listings here - watch this space.
-        <br class="desktop-break">
-        In the meantime, please send any volunteer or employment enquiries to <strong>people@anikalegal.com</strong>
-    </p>
+        <div class="card-grid six">
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/love-hand.svg' %}">
+                <p class="header">Meaningful work</p>
+                <p class="compact">
+                    Our work makes a difference and helps those who need it most. If you are excited by the prospect of building something from the ground up through hands-on, high impact work – we want to hear from you!
+                </p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/crowd.svg' %}">
+                <p class="header">Work in a driven, innovative team</p>
+                <p class="compact">
+                    Become a part of a vibrant culture, and a close-knit team passionate about making a difference in the world. Staying true to our innovative vision, we pride ourselves on doing things differently in the legal industry.
+                </p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/personal-growth.svg' %}">
+                <p class="header">Personal & professional development‍</p>
+                <p class="compact">
+                    As a rapidly growing organisation, we are constantly looking for people eager to upskill in areas they are passionate about. If you want to learn something, we want to know about it. We grow Anika’s impact by growing our volunteers.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container wide">
+        <h2>Openings</h2>
+        <div class="divider"></div>
+        <div class="link-list two">
+            {% for job in jobs %}
+            <div class="card">
+                <img class="icon" src="{% static job.icon %}">
+                <h2>{{ job.title }}</h2>
+                <p>{{ job.search_description }}</p>
+                <p>Application closes {{ job.closing_date|date:"jS F Y" }}.</p>
+                <a href="{% pageurl job.specific %}">
+                    <button>Read more</button>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
 </div>
+
+
+<div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/team-apply.jpg' %}">
+    <div class="content">
+        <h2>How do I apply?</h2>
+        <p>
+            Send an email attaching your CV to <strong>people@anikalegal.com</strong> with the position you're applying for and your name in the subject title. Please also share a few sentences about why you want to apply for the role.
+        </p>
+        <p>
+            Our culture is of the highest priority to us, and we value the right people over technical skills.
+        </p>
+    </div>
+</div>
+
+<div class="panel-container">
+    <div class="panel right round top-left bottom-left">
+        <div class="content">
+            <h2>How will I know if I'm successful?</h2>
+            <p>
+                We endeavour to get back to every applicant after the application closing deadline. Whether progressing to the next stage or in the instance that you are not successful, you will receive an email confirmation regardless.
+            </p>
+        </div>
+    <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/team-success.jpg' %}">
+</div>
+
 {% endblock %}

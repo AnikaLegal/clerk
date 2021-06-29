@@ -1,8 +1,11 @@
+import os
+from django.conf import settings
+
 from django.db import models
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import Http404
-from wagtail.core import blocks
-from wagtail.core.models import Page
+from django.http import Http404, HttpResponse
+from wagtail.core import blocks, hooks
+from wagtail.core.models import Page, Site
 from wagtail.core.fields import StreamField
 from wagtail.admin.edit_handlers import (
     FieldPanel,
@@ -12,8 +15,32 @@ from wagtail.admin.edit_handlers import (
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.core.views import serve as wagtail_serve
 from django.urls import re_path
+
+
+ICONS_DIR = os.path.join(
+    settings.BASE_DIR, "..", "web", "static", "web", "img", "icons"
+)
+ICONS = [os.path.join("web", "img", "icons", i) for i in os.listdir(ICONS_DIR)]
+ICON_CHOICES = (
+    (
+        i,
+        i.split("/")[-1].split(".")[0],
+    )
+    for i in ICONS
+)
+
+
+# See here for details
+# https://docs.wagtail.io/en/stable/advanced_topics/customisation/page_editing_interface.html#limiting-features-in-a-rich-text-field
+RICH_TEXT_FEATURES = [
+    "h2",
+    "bold",
+    "italic",  # bold / italic text
+    "ol",
+    "ul",  # ordered / unordered lists
+    "link",  # page, external and email links
+]
 
 
 class WebRedirect(models.Model):
@@ -45,56 +72,115 @@ class NotFoundMixin:
 
 class MultiRootPageMixin:
     public_path = None
-    private_path = None
+    wagtail_slug = None
+
+    def get_private_path(self):
+        return f"/cms/pages/{self.wagtail_slug}/"
 
     def get_url_parts(self, *args, **kwargs):
         site_id, root_url, page_path = super().get_url_parts(*args, **kwargs)
         new_path = None
         if page_path is not None:
-            new_path = page_path.replace(self.private_path, self.public_path)
+            new_path = page_path.replace(self.get_private_path(), self.public_path)
 
         return site_id, root_url, new_path
 
     @classmethod
     def as_path(cls, name: str):
-        def view(request, path):
-            new_path = cls.public_path + path
-            return wagtail_serve(request, new_path)
+        def wagtail_serve_view(request, path):
+            """
+            Override default Wagtail 'serve' view.
+            https://github.com/wagtail/wagtail/blob/main/wagtail/core/views.py#L12
+            """
+            site = Site.find_for_request(request)
+            if not site:
+                raise Http404
+
+            path_components = [component for component in path.split("/") if component]
+
+            # Begin hack: before this is Wagtail code.
+            path_components = [cls.wagtail_slug] + path_components
+            # End hack: after this is Wagtail code.
+
+            page, args, kwargs = site.root_page.localized.specific.route(
+                request, path_components
+            )
+
+            for fn in hooks.get_hooks("before_serve_page"):
+                result = fn(page, request, args, kwargs)
+                if isinstance(result, HttpResponse):
+                    return result
+
+            return page.serve(request, *args, **kwargs)
 
         url_prefix = cls.public_path.lstrip("/")
-        url_re = fr"^{url_prefix}((?:[\w\-]+/)*)$"
-        return re_path(url_re, view, name=name)
+        url_re = f"^{url_prefix}((?:[\w\-]+/)*)$"
+        return re_path(url_re, wagtail_serve_view, name=name)
+
+
+class JobsRootMixin(MultiRootPageMixin):
+    wagtail_slug = "jobs"
+    public_path = "/about/jobs/"
 
 
 class ResourceRootMixin(MultiRootPageMixin):
+    wagtail_slug = "resources"
     public_path = "/resources/"
-    private_path = "/cms/pages/resources/"
 
 
 class BlogRootMixin(MultiRootPageMixin):
+    wagtail_slug = "blog"
     public_path = "/blog/"
-    private_path = "/cms/pages/blog/"
 
 
 class RootPage(NotFoundMixin, Page):
-    subpage_types = ["web.BlogListPage", "web.ResourceListPage"]
+    subpage_types = ["web.BlogListPage", "web.ResourceListPage", "web.JobListPage"]
+
+
+class JobListPage(JobsRootMixin, Page):
+    template = "web/jobs/job-list.html"
+    subpage_types = ["web.JobPage"]
+    parent_page_types = ["web.RootPage"]
+
+    def get_context(self, request):
+        context = super().get_context(request)
+        jobs = (
+            self.get_children()
+            .live()
+            .specific()
+            .public()
+            .order_by("-first_published_at")
+        )
+        context["jobs"] = jobs
+        return context
+
+
+class JobPage(JobsRootMixin, Page):
+    template = "web/jobs/job-details.html"
+    parent_page_types = ["web.JobListPage"]
+    subpage_types = []
+    icon = models.CharField(max_length=64, choices=ICON_CHOICES)
+    closing_date = models.DateField()
+    body = StreamField(
+        [
+            ("heading", blocks.CharBlock(form_classname="full title")),
+            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
+            ("image", ImageChooserBlock()),
+        ]
+    )
+    promote_panels = [FieldPanel("slug")]
+    settings_panels = [PrivacyModalPanel()]
+    content_panels = Page.content_panels + [
+        FieldPanel("icon", heading="Icon"),
+        FieldPanel("closing_date", heading="Application closing date"),
+        FieldPanel("search_description", heading="Short description"),
+        StreamFieldPanel("body", heading="Long description"),
+    ]
 
 
 class ResourceListPage(NotFoundMixin, ResourceRootMixin, Page):
     subpage_types = ["web.ResourcePage"]
     parent_page_types = ["web.RootPage"]
-
-
-# See here for details
-# https://docs.wagtail.io/en/stable/advanced_topics/customisation/page_editing_interface.html#limiting-features-in-a-rich-text-field
-RICH_TEXT_FEATURES = [
-    "h2",
-    "bold",
-    "italic",  # bold / italic text
-    "ol",
-    "ul",  # ordered / unordered lists
-    "link",  # page, external and email links
-]
 
 
 class ResourcePage(ResourceRootMixin, Page):
@@ -105,10 +191,7 @@ class ResourcePage(ResourceRootMixin, Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            (
-                "paragraph",
-                blocks.RichTextBlock(features=RICH_TEXT_FEATURES),
-            ),
+            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
         ]
     )
     content_panels = Page.content_panels + [
@@ -143,10 +226,7 @@ class BlogListPage(BlogRootMixin, Page):
         return context
 
 
-class BlogPage(MultiRootPageMixin, Page):
-    public_path = "/blog/"
-    private_path = "/cms/pages/blog/"
-
+class BlogPage(BlogRootMixin, Page):
     template = "web/blog/blog-details.html"
     parent_page_types = ["web.BlogListPage"]
     subpage_types = []

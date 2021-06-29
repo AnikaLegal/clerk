@@ -112,10 +112,10 @@
                 <h3>Quick Links</h3>
                 <p><a href="{% url 'about' %}">About</a></p>
                 <p><a href="{% clerk_slugurl 'blog' %}">Blog</a></p>
-                {% comment %} <p><a href=#>News</a></p>
+                {% comment %} <p><a href=#>News</a></p> {% endcomment %}
                 <p>
-                    <a href=#>Jobs</a>&nbsp;&nbsp;<span class='career-text'>We're hiring</span>
-                </p> {% endcomment %}
+                    <a href="{% clerk_slugurl 'jobs' %}">Jobs (we're hiring!)</a>
+                </p>
                 <h3 style="margin-top: 27px">Legal</h3>
                 <p><a href="{% clerk_slugurl 'terms-of-use' %}">Terms of use</a></p>
                 <p><a href="{% clerk_slugurl 'eligibility-criteria' %}">Eligibility criteria</a></p>

@@ -21,7 +21,6 @@ def clerk_slugurl(context, slug):
 
     Based on: https://github.com/wagtail/wagtail/blob/main/wagtail/core/templatetags/wagtailcore_tags.py#L48
     """
-
     page = None
     try:
         site = Site.find_for_request(context["request"])
