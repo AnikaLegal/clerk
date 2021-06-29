@@ -36,11 +36,9 @@
                     <div class="content">
                         <p class="name">{{member.name}}</p>
                         <p class="title">{{member.title}}</p>
-                        <ul>
-                            {% for brag in member.brags %}
-                                <li>{{ brag }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% for brag in member.brags %}
+                            <p class="line-compact">{{ brag }}</p>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}
@@ -62,11 +60,9 @@
                     <div class="content">
                         <p class="name">{{member.name}}</p>
                         <p class="title">{{member.title}}</p>
-                        <ul>
-                            {% for brag in member.brags %}
-                                <li>{{ brag }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% for brag in member.brags %}
+                            <p class="line-compact">{{ brag }}</p>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}

@@ -35,6 +35,9 @@ p.light {
 p.compact {
   margin: 0;
 }
+.line-compact {
+  line-height: 1.3;
+}
 p.header {
   font-weight: bold;
   font-size: var(--header-mini-font-size);
@@ -355,15 +358,16 @@ Each image/icon can have some descriptive test below it.
 }
 .card-grid .card.profile .content .name {
   font-size: var(--header-mini-font-size);
-  text-transform: uppercase;
-  margin-bottom: -6px;
+  color: var(--dark-1);
+  margin-bottom: 0px;
   font-weight: 700;
 }
 .card-grid .card.profile .content .title {
-  font-size: var(--body-font-size);
+  font-size: calc(0.9 * var(--body-font-size));
   font-weight: 700;
   margin-bottom: 22px;
   color: var(--dark-6);
+  line-height: 1.2;
 }
 .card-grid .card.profile .content ul {
   padding-left: 18px;
@@ -725,27 +729,21 @@ Assumed to be in a wide container.
 }
 
 .link-list .card h2 {
-  font-size: 32px;
-  color: var(--dark-0);
   font-weight: 600;
   font-family: var(--font-sans-alt-2);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-.link-list .card.short h2 {
   font-size: var(--header-mini-font-size);
   color: var(--dark-1);
   line-height: 1.3;
-  text-transform: none;
 }
 
 .link-list .card h2,
 .link-list .card .header {
-  margin-bottom: 70px;
+  margin-bottom: 30px;
 }
-.link-list .card.short h2,
-.link-list .card.short .header {
-  margin-bottom: 10px;
+.link-list .card h2 + p,
+.link-list .card .header + p {
+  margin-top: -20px;
 }
 
 @media (max-width: 1300px) {
@@ -758,13 +756,14 @@ Assumed to be in a wide container.
   .link-list .card h2 {
     font-size: 25px;
   }
+
   .link-list .card h2,
   .link-list .card .header {
-    margin-bottom: 50px;
-  }
-  .link-list .card.short h2,
-  .link-list .card.short .header {
     margin-bottom: 20px;
+  }
+  .link-list .card h2 + p,
+  .link-list .card .header + p {
+    margin-top: -10px;
   }
   .link-list .card img {
     width: 50px;
