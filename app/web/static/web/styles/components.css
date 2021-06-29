@@ -35,6 +35,9 @@ p.light {
 p.compact {
   margin: 0;
 }
+.line-compact {
+  line-height: 1.3;
+}
 p.header {
   font-weight: bold;
   font-size: var(--header-mini-font-size);
@@ -107,7 +110,7 @@ Has vertical padding only
 .segment.gold {
   background-color: var(--gold-light);
 }
-@media (max-width: 1300px) {
+@media (max-width: 600px) {
   .segment {
     padding: 42px 0 75px 0;
   }
@@ -220,8 +223,8 @@ Each image/icon can have some descriptive test below it.
   justify-items: center;
   justify-content: center;
   margin: 0 auto;
-  grid-row-gap: 60px;
-  grid-column-gap: 120px;
+  grid-row-gap: 70px;
+  grid-column-gap: 140px;
 }
 .card-grid.three {
   grid-template-columns: repeat(auto-fit, 342px);
@@ -263,6 +266,7 @@ Each image/icon can have some descriptive test below it.
 
 .card-grid.six {
   grid-template-columns: repeat(auto-fit, 330px);
+  grid-column-gap: 80px;
 }
 .card-grid .card {
   max-width: 344px;
@@ -273,6 +277,7 @@ Each image/icon can have some descriptive test below it.
   width: 100%;
   max-height: 229.33px;
   object-fit: cover;
+  filter: saturate(0.8);
 }
 .card-grid .card img.icon {
   width: unset;
@@ -305,8 +310,8 @@ Each image/icon can have some descriptive test below it.
   .card-grid.five,
   .card-grid.six {
     grid-template-columns: repeat(auto-fit, 300px);
-    grid-row-gap: 30px;
-    grid-column-gap: 120px;
+    grid-row-gap: 50px;
+    grid-column-gap: 70px;
   }
   .card-grid.five .card {
     grid-column: span 1 !important;
@@ -353,15 +358,16 @@ Each image/icon can have some descriptive test below it.
 }
 .card-grid .card.profile .content .name {
   font-size: var(--header-mini-font-size);
-  text-transform: uppercase;
-  margin-bottom: -6px;
+  color: var(--dark-1);
+  margin-bottom: 0px;
   font-weight: 700;
 }
 .card-grid .card.profile .content .title {
-  font-size: var(--body-font-size);
+  font-size: calc(0.9 * var(--body-font-size));
   font-weight: 700;
   margin-bottom: 22px;
   color: var(--dark-6);
+  line-height: 1.2;
 }
 .card-grid .card.profile .content ul {
   padding-left: 18px;
@@ -469,7 +475,7 @@ Very similar to a story.
   align-self: center;
   min-width: 342px;
 }
-@media (max-width: 1300px) {
+@media (max-width: 600px) {
   .hero-story {
     width: 100vw;
     height: unset;
@@ -529,13 +535,10 @@ Assumed to be in a wide container.
   left: 0;
 }
 .panel h2 {
-  font-size: 28px;
+  font-size: 38px;
   color: var(--dark-0);
   font-weight: 600;
-  font-family: var(--font-sans-alt-2);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1.3;
+  line-height: 1;
 }
 .panel ul {
   padding-left: 25px;
@@ -555,18 +558,23 @@ Assumed to be in a wide container.
   padding: 100px 100px 100px 100px;
 }
 @media (max-width: 1300px) {
+  .panel .content {
+    padding: 50px 50px 50px 50px;
+  }
+}
+@media (max-width: 600px) {
   .panel-container {
     width: 100vw;
     height: unset;
     margin-top: 0;
-    margin-bottom: 35px;
+    margin-bottom: 0px;
   }
   .panel-container + .panel-container {
     margin-top: 35px;
   }
-
   .panel h2 {
-    font-size: 18px;
+    font-size: 28px;
+    line-height: 1.2;
   }
   .panel.left,
   .panel.right {
@@ -721,27 +729,21 @@ Assumed to be in a wide container.
 }
 
 .link-list .card h2 {
-  font-size: 32px;
-  color: var(--dark-0);
   font-weight: 600;
   font-family: var(--font-sans-alt-2);
-  text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-.link-list .card.short h2 {
   font-size: var(--header-mini-font-size);
   color: var(--dark-1);
   line-height: 1.3;
-  text-transform: none;
 }
 
 .link-list .card h2,
 .link-list .card .header {
-  margin-bottom: 70px;
+  margin-bottom: 30px;
 }
-.link-list .card.short h2,
-.link-list .card.short .header {
-  margin-bottom: 10px;
+.link-list .card h2 + p,
+.link-list .card .header + p {
+  margin-top: -20px;
 }
 
 @media (max-width: 1300px) {
@@ -754,13 +756,14 @@ Assumed to be in a wide container.
   .link-list .card h2 {
     font-size: 25px;
   }
+
   .link-list .card h2,
   .link-list .card .header {
-    margin-bottom: 50px;
-  }
-  .link-list .card.short h2,
-  .link-list .card.short .header {
     margin-bottom: 20px;
+  }
+  .link-list .card h2 + p,
+  .link-list .card .header + p {
+    margin-top: -10px;
   }
   .link-list .card img {
     width: 50px;

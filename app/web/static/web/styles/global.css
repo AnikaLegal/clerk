@@ -58,8 +58,19 @@ Screen sizes to consider (https://screensiz.es/):
   --hero-external-radius: 300px;
 }
 
-/* Responsive variables (tablet) */
+/* Responsive variables (tablet / half screen) */
 @media (max-width: 1300px) {
+  :root {
+    --header-font-size: 36px;
+    --header-line-height: 44px;
+    --header-mini-font-size: 20px;
+    --body-font-size: 18px;
+    --body-line-height: 28px;
+  }
+}
+
+/* Responsive variables (phone) */
+@media (max-width: 600px) {
   :root {
     --hero-external-radius: 124px;
     --header-font-size: 26px;
@@ -71,12 +82,6 @@ Screen sizes to consider (https://screensiz.es/):
     --header-height: 46px;
     --header-offset-top: 28px;
     --header-height-total: 74px;
-  }
-}
-
-/* Responsive variables (phone) */
-@media (max-width: 600px) {
-  :root {
     --container-padding: 24px;
     --container-wide-padding: 24px;
   }
