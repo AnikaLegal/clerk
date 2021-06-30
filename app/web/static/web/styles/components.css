@@ -219,57 +219,20 @@ Used for grids of images or icons.
 Each image/icon can have some descriptive test below it.
 */
 .card-grid {
-  display: grid;
-  justify-items: center;
-  justify-content: center;
   margin: 0 auto;
-  grid-row-gap: 70px;
-  grid-column-gap: 140px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 70px 140px;
 }
-.card-grid.three {
-  grid-template-columns: repeat(auto-fit, 342px);
-  max-width: var(--container-max-width);
-  grid-column-gap: 90px;
-}
-
-.card-grid.four {
-  grid-template-columns: repeat(auto-fit, 342px);
-  max-width: 860px;
-}
-.card-grid.four.wide {
-  max-width: unset;
-  grid-column-gap: 90px;
-  grid-template-columns: repeat(auto-fit, 224px);
-}
-
-.card-grid.five {
-  grid-template-columns: repeat(6, 150px);
-  grid-column-gap: 80px;
-}
-
-.card-grid.five .card:nth-child(1),
-.card-grid.five .card:nth-child(2),
-.card-grid.five .card:nth-child(3) {
-  grid-column: span 2;
-}
-
-.card-grid.five .card:nth-child(4) {
-  grid-column: span 3;
-  justify-self: end;
-  padding-right: 20px;
-}
-.card-grid.five .card:nth-child(5) {
-  grid-column: span 3;
-  justify-self: flex-start;
-  padding-left: 20px;
-}
-
-.card-grid.six {
-  grid-template-columns: repeat(auto-fit, 330px);
-  grid-column-gap: 80px;
+.card-grid.tight {
+  gap: 70px 100px;
 }
 .card-grid .card {
   max-width: 344px;
+}
+.card-grid .card.tight {
+  max-width: 280px;
 }
 .card-grid .card img {
   max-width: 100%;
@@ -302,25 +265,16 @@ Each image/icon can have some descriptive test below it.
   font-weight: 600;
 }
 .card-grid .card .header {
-  margin-bottom: 13px;
+  margin-bottom: 6px;
 }
 
 @media (max-width: 1300px) {
-  .card-grid.four,
-  .card-grid.five,
-  .card-grid.six {
-    grid-template-columns: repeat(auto-fit, 300px);
-    grid-row-gap: 50px;
-    grid-column-gap: 70px;
+  .card-grid {
+    gap: 50px 70px;
   }
-  .card-grid.five .card {
-    grid-column: span 1 !important;
-    padding: 0 !important;
-  }
-
   .card-grid .card .header {
-    margin-top: 15px;
-    margin-bottom: 8px;
+    margin-top: 6px;
+    margin-bottom: 6px;
   }
   .card-grid .card .metric {
     margin-bottom: 5px;
@@ -331,11 +285,14 @@ Each image/icon can have some descriptive test below it.
   }
 }
 @media (max-width: 600px) {
+  .card-grid .card {
+    max-width: 100%;
+  }
   .card-grid .card img {
     width: calc(100vw - 2 * var(--container-padding));
     max-height: 130px;
     object-fit: cover;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   .card-grid .card img.icon {
     width: 50px;
