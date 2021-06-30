@@ -301,6 +301,13 @@ Each image/icon can have some descriptive test below it.
   }
 }
 
+/* Blog card */
+.card-grid .card.blog img {
+  height: 273px;
+  margin-bottom: 24px;
+  box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
+}
+
 /* Profile card  */
 .card-grid .card.profile {
   text-align: left;

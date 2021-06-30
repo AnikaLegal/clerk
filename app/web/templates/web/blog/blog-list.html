@@ -31,7 +31,7 @@ input.search {
 }
 </style>
 <div class="segment" style="padding-bottom: 0">
-    <div class="container">
+    <div class="container wide">
         <h1>Blog</h1>
         <div style="margin-bottom: 20px" class="divider"></div>
         <input 
@@ -43,7 +43,7 @@ input.search {
             hx-trigger="keyup changed delay:500ms" 
             hx-target="#blog-results"
         />
-        <div class="card-grid six" id="blog-results">
+        <div class="card-grid tight" id="blog-results">
             {% for blog in blogs %}
             {% include 'web/htmx/_blog_result.html' with blog=blog %}
             {% endfor %}
