@@ -58,15 +58,17 @@
         <div class="divider"></div>
         <div class="link-list two">
             {% for job in jobs %}
-            <div class="card">
-                <img class="icon" src="{% static job.icon %}">
-                <h2>{{ job.title }}</h2>
-                <p>{{ job.search_description }}</p>
-                <p>Application closes {{ job.closing_date|date:"jS F Y" }}.</p>
-                <a href="{% pageurl job.specific %}">
-                    <button>Read more</button>
-                </a>
-            </div>
+                <div class="card">
+                    <img class="icon" src="{% static job.icon %}">
+                    <h2>{{ job.title }}</h2>
+                    <p>{{ job.search_description }}</p>
+                    <p>Application closes {{ job.closing_date|date:"jS F Y" }}.</p>
+                    <a href="{% pageurl job.specific %}">
+                        <button>Read more</button>
+                    </a>
+                </div>
+            {% empty %}
+                <p>There are no openings listed here at the moment.</p>
             {% endfor %}
         </div>
     </div>
