@@ -5,7 +5,7 @@ from django.contrib.sitemaps.views import sitemap
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from .models import ResourceListPage, BlogListPage, JobListPage
+from .models import ResourceListPage, BlogListPage, JobListPage, NewsListPage
 from .sitemaps import SITEMAPS
 
 from . import views
@@ -42,16 +42,19 @@ urlpatterns = [
         template("web/services/refer-someone.html"),
         name="refer",
     ),
-    # Wagtail
+    # Wagtail admin - excluded by robots.txt
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
     path("cms/pages/", include(wagtail_urls)),
-    path("blog/search/", views.blog_search_view, name="blog-search"),
+    # Wagtail entry points.
     ResourceListPage.as_path("resources"),
     BlogListPage.as_path("blog"),
     JobListPage.as_path("jobs"),
+    NewsListPage.as_path("news"),
+    path("blog/search/", views.blog_search_view, name="blog-search"),
     # Robots.txt
     path("robots.txt", views.robots_view),
+    # Sitemap
     path(
         "sitemap.xml",
         sitemap,

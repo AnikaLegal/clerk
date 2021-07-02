@@ -15,9 +15,10 @@ from django.db import transaction
 WagtailImage = get_image_model()
 
 from accounts.models import User
-from web.models import BlogListPage, BlogPage
+from web.models import BlogListPage, BlogPage, NewsListPage, NewsPage
 
-NUM_POSTS = 200
+NUM_BLOG_POSTS = 12
+NUM_NEWS_POSTS = 5
 NUM_IMAGES = 30
 
 
@@ -40,10 +41,8 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def _build_posts(self, images):
-        BlogPage.objects.all().delete()
-        u = User.objects.last()
+        u = User.objects.filter(first_name__isnull=False).last()
         fake = Factory.create("en_AU")
-        parent_page = BlogListPage.objects.last()
         get_img = lambda: {"type": "image", "value": random.choice(images).id}
         get_heading = lambda: {"type": "heading", "value": fake.sentence()}
         get_quote = lambda: {"type": "quote", "value": fake.sentence()}
@@ -52,8 +51,38 @@ class Command(BaseCommand):
             "value": fake.paragraph(nb_sentences=random.randint(7, 20)),
         }
 
-        for i in range(NUM_POSTS):
-            print("Creating post", i)
+        NewsPage.objects.all().delete()
+        parent_page = NewsListPage.objects.last()
+        for i in range(NUM_NEWS_POSTS):
+            print("Creating news post", i)
+            title = fake.sentence()
+            model_data = {
+                "title": title,
+                "slug": slugify(title),
+                "search_description": fake.sentence(),
+                "owner_id": u.id,
+                "body": json.dumps(
+                    [
+                        get_para(),
+                        get_img(),
+                        get_para(),
+                        get_heading(),
+                        get_para(),
+                        get_quote(),
+                        get_para(),
+                        get_img(),
+                        get_para(),
+                    ]
+                ),
+            }
+            article = NewsPage(**model_data)
+            parent_page.add_child(instance=article)
+            article.save_revision().publish()
+
+        BlogPage.objects.all().delete()
+        parent_page = BlogListPage.objects.last()
+        for i in range(NUM_BLOG_POSTS):
+            print("Creating blog post", i)
             title = fake.sentence()
             model_data = {
                 "title": title,

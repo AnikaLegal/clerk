@@ -1,0 +1,42 @@
+{% extends "web/_base.html" %} 
+{% load wagtailcore_tags %}
+{% block title %}{{ page.title }}{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title=page.title description=page.search_description %}            
+{% endblock %}
+{% block content %}
+<style>
+.meta {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto !important;
+    font-weight: bold;
+    gap: 30px;
+}
+@media (max-width: 1300px) {
+    .meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+</style>
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container wide">
+            <h1>{{ page.title }}</h1>
+            <p class="compact meta">
+                <span>By {{ page.owner.get_full_name }}</span>
+                <span class="desktop-break">|</span>
+                <span>{{ page.last_published_at|date:"D jS N 'y" }}</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="segment" style="padding-bottom: 0;margin-bottom: -40px;">
+    <div class="container article">
+        {% include_block page.body %}
+    </div>
+</div>
+{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "web/_base.html" %} 
+{% load wagtailcore_tags wagtailimages_tags %}
+{% block title %}Newsroom{% endblock %} 
+{% load static %}
+{% block social_meta %}
+    {% include 'web/snippets/_social_meta.html' with title="Anika Newsroom" description="Anika Legal's latest media releases, organisational updates, and media features." %}            
+{% endblock %}
+{% block content %}
+<style>
+h3 {
+  font-family: var(--font-sans-alt-2);
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 28px;
+  line-height: 30px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  margin-top: 0;
+}
+.segment + .segment {
+    padding-top: 0;
+}
+.link-list {
+    justify-content: left;
+}
+.link-list .card img.external {
+    width: unset;
+    height: 72px;
+}
+</style>
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container wide">
+            <h1>Newsroom</h1>
+            <div class="divider" style="margin-bottom: 30px"></div>
+
+            <p>
+                Here you’ll find our latest media releases, organisational<br class="desktop-break"> updates, and media features.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container wide">
+        <h3>Media Releases & Organisation Updates</h3>
+        <div class="link-list two">
+            {% for article in articles %}
+                <div class="card">
+                    <img style="height: 72px;width: 172px;" src="{% static 'web/brand/logo-color.svg' %}">
+                    <h2>{{ article.title }}</h2>
+                    <p>
+                        Published on {{ article.last_published_at|date:"jS N Y" }}.
+                    </p>
+                    <a href="{{ article.url }}">
+                        <button class="inverted">Read more</button>
+                    </a>
+                </div>
+            {% empty %}
+                <p>Watch this space</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container wide">
+        <h3>Anika in the News</h3>
+        <div class="link-list two">
+            {% for article in external_articles %}
+                <div class="card">
+                    {% image article.brand_image height-72 class="external" %}
+                    <h2>{{ article.title}}</h2>
+                    <p>
+                        Published on {{ article.published_date|date:"jS N Y" }}.
+                    </p>
+                    <a href="{{ article.url }}">
+                        <button class="inverted">Read more</button>
+                    </a>
+                </div>
+            {% empty %}
+                <p>Watch this space</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

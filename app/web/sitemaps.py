@@ -1,7 +1,15 @@
 from django.contrib import sitemaps
 from django.urls import reverse
 
-from .models import ResourcePage, BlogListPage, BlogPage, JobListPage, JobPage
+from .models import (
+    ResourcePage,
+    BlogListPage,
+    BlogPage,
+    JobListPage,
+    JobPage,
+    NewsListPage,
+    NewsPage,
+)
 
 
 class StaticSitemap(sitemaps.Sitemap):
@@ -24,37 +32,42 @@ class StaticSitemap(sitemaps.Sitemap):
         return reverse(item)
 
 
-class JobSitemap(sitemaps.Sitemap):
+class WagtailSitemap(sitemaps.Sitemap):
     priority = 0.5
     changefreq = "daily"
+    list_page = None
+    details_page = None
 
     def items(self):
-        return [*JobListPage.objects.all(), *JobPage.objects.all()]
+        items = []
+        if self.list_page:
+            items += list(self.list_page.objects.all())
+        if self.details_page:
+            items += list(self.details_page.objects.all())
+
+        return items
 
     def location(self, item):
         return item.url
 
 
-class BlogSitemap(sitemaps.Sitemap):
-    priority = 0.5
-    changefreq = "daily"
-
-    def items(self):
-        return [*BlogListPage.objects.all(), *BlogPage.objects.all()]
-
-    def location(self, item):
-        return item.url
+class JobSitemap(WagtailSitemap):
+    list_page = JobListPage
+    details_page = JobPage
 
 
-class ResourceSitemap(sitemaps.Sitemap):
-    priority = 0.5
-    changefreq = "daily"
+class BlogSitemap(WagtailSitemap):
+    list_page = BlogListPage
+    details_page = BlogPage
 
-    def items(self):
-        return ResourcePage.objects.all()
 
-    def location(self, item):
-        return item.url
+class ResourceSitemap(WagtailSitemap):
+    details_page = ResourcePage
+
+
+class NewsSitemap(WagtailSitemap):
+    list_page = NewsListPage
+    details_page = NewsPage
 
 
 SITEMAPS = {
@@ -62,4 +75,5 @@ SITEMAPS = {
     "blog": BlogSitemap,
     "resources": ResourceSitemap,
     "jobs": JobSitemap,
+    "news": NewsSitemap,
 }

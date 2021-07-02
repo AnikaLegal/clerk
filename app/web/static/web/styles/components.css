@@ -98,6 +98,11 @@ button {
     padding: 14px 30px;
   }
 }
+button.inverted {
+  color: var(--blue);
+  background: var(--white);
+  border: 1px solid var(--blue);
+}
 
 /*
 White or gold segment of page
@@ -811,6 +816,9 @@ before the final footer.
   margin-bottom: 2rem;
   border-top-left-radius: calc(120px * var(--radius-multiplier));
   border-bottom-right-radius: calc(120px * var(--radius-multiplier));
+  max-height: 550px;
+  object-fit: cover;
+  box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
 }
 .article .block-paragraph,
 .article .block-paragraph p {

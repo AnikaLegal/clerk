@@ -1,5 +1,6 @@
 """
 Smoke tests for URLS
+TODO: Test News URLs
 """
 import pytest
 from datetime import date
