@@ -727,6 +727,11 @@ Assumed to be in a wide container.
     margin-bottom: 10px;
   }
 }
+@media (max-width: 1300px) {
+  .link-list .card h2 {
+    font-size: var(--header-mini-font-size);
+  }
+}
 
 /*
 Grey block with an upwards curve that appears

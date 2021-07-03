@@ -16,7 +16,7 @@ from .mixins import MultiRootPageMixin, RICH_TEXT_FEATURES
 
 class NewsRootMixin(MultiRootPageMixin):
     wagtail_slug = "news"
-    public_path = "/about/news/"
+    public_path = "/news/"
 
 
 class NewsListPage(NewsRootMixin, Page):
