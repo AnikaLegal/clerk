@@ -41,10 +41,10 @@ def landing_contact_form_view(request):
 
 @require_http_methods(["GET"])
 def team_view(request):
-    members = [TEAM_MEMBERS[0]] + shuffle(TEAM_MEMBERS[1:])
-    advisors = shuffle(ADVISORS)
     return render(
-        request, "web/about/team.html", {"members": members, "advisors": advisors}
+        request,
+        "web/about/team.html",
+        {"members": TEAM_MEMBERS, "advisors": ADVISORS, "board": BOARD},
     )
 
 
@@ -52,6 +52,48 @@ def shuffle(l):
     l2 = l.copy()
     random.shuffle(l2)
     return l2
+
+
+BOARD = [
+    {
+        "image": "web/img/photos/board/dennis.jpeg",
+        "name": "Denis Nelthorpe",
+        "title": "Board Member",
+        "brags": [
+            "Denis has worked in the community legal centre sector for over 40 years including as the CEO of West Justice, Consumer Credit Legal Service, Footscray and Wyndham CLCs, and is the Chair of St Kilda Legal Service."
+        ],
+    },
+    {
+        "image": "web/img/photos/board/marcia.jpeg",
+        "name": "Marcia Pinskier",
+        "title": "Board Member",
+        "brags": [
+            "Marcia (FAICD) is an expert on good governance in the not-for-profit sector. She is a Fellow of the Australian Institute of Company Directors and has chaired numerous not-for-profit boards. She has experience in leadership roles including as a Victorian Multicultural Commissioner, liaison to the Victoria Police Multicultural Advisory Unit and a member of the Victorian Mental Health Reform Council."
+        ],
+    },
+    {
+        "image": "web/img/photos/team/tessa.jpeg",
+        "name": "Tessa Ramanlal",
+        "title": "Board Member & Co-founder",
+        "brags": [
+            "Tessa previously volunteered as co-founder and Head of User at Anika. Tessa has practiced as a Corporate lawyer / Innovation lawyer at Herbert Smith Freehills and is an Enterprise Partnerships Associate at DoorDash."
+        ],
+    },
+    {
+        "image": "web/img/photos/team/michael.jpeg",
+        "name": "Michael Choong",
+        "title": "Board Member",
+        "brags": [
+            "Michael previously volunteered as the Head of Strategy at Anika. He is now a Strategy Manager at Seek."
+        ],
+    },
+    {
+        "image": "web/img/photos/team/noel.jpeg",
+        "name": "Noel Lim",
+        "title": "Board Member & CEO",
+        "brags": ["Noel is the full-time CEO and co-founder of Anika Legal."],
+    },
+]
 
 
 ADVISORS = [
@@ -92,25 +134,7 @@ TEAM_MEMBERS = [
         "title": "Chief Executive Officer",
         "brags": [
             "Noel drives the direction of our organisation and ensures that each portfolio is successfully managed",
-            "Noel has a background in education technology and social impact organisations",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/kate.jpeg",
-        "name": "Kate Robinson",
-        "title": "Head of User",
-        "brags": [
-            "Kate leads our User Portfolio, which ensures that Anika’s marketing and services are user-focused",
-            "Kate is also a Digital producer at Conversion Digital and has extensive marketing and project management experience",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/dan.jpeg",
-        "name": "Dan Poole",
-        "title": "Head of Finance",
-        "brags": [
-            "Dan leads our Finance and Philanthropy portfolios, ensuring Anika has the money it needs to maximise our impact",
-            "Dan is also a pro-bono lawyer at Hall & Wilcox and Co-founder of Society Melbourne",
+            "Noel is the full-time CEO and co-founder of Anika Legal",
         ],
     },
     {
@@ -123,12 +147,47 @@ TEAM_MEMBERS = [
         ],
     },
     {
+        "image": "web/img/photos/team/lucy.jpeg",
+        "name": "Lucy Majstorovic",
+        "title": "Head of Partnerships & Philanthropy",
+        "brags": [
+            "Lucy is our full-time Head of Partnerships & Philanthropy, working with our trusted partners to maximise Anika’s impact.",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/dan.jpeg",
+        "name": "Dan Poole",
+        "title": "Head of Finance",
+        "brags": [
+            "Dan leads our Finance portfolio, ensuring Anika’s finances are well managed",
+            "Dan is also a pro-bono lawyer at Hall & Wilcox and Co-founder of Society Melbourne ",
+        ],
+    },
+    {
         "image": "web/img/photos/team/gwylim.jpeg",
         "name": "Gwilym Temple",
         "title": "Head of Operations",
         "brags": [
             "Gwilym leads our Operations portfolio, which keeps the engine of our legal practice running",
             "Gwilym has experience in workforce management, analysis and process optimisation at Uber",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/kate.jpeg",
+        "name": "Kate Robinson",
+        "title": "Head of User",
+        "brags": [
+            "Kate leads our User Portfolio, which ensures that Anika’s marketing and services are user-focused",
+            "Kate is also a Digital producer at Conversion Digital and has extensive marketing and project management experience",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/edward.jpeg",
+        "name": "Edward Sinclair",
+        "title": "Head of Strategy",
+        "brags": [
+            "Edward leads our Strategy portfolio, which keeps us focused on success",
+            "Edward is a Management Consultant at McKinsey & Company. Before this he worked as a solicitor at Herbert Smith Freehills.",
         ],
     },
     {
@@ -141,12 +200,12 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/michael.jpeg",
-        "name": "Michael Choong",
-        "title": "Head of Strategy",
+        "image": "web/img/photos/team/matt.jpeg",
+        "name": "Matthew Segal",
+        "title": "Head of Technology",
         "brags": [
-            "Michael leads our Strategy portfolio, which keeps us focused on success",
-            "Michael is a Strategy Manager at SEEK",
+            "Matt leads our Technology portfolio and is responsible for our technical infrastructure",
+            "Matt is a full-stack software developer with experience in eCommerce, fintech and online media",
         ],
     },
     {
@@ -156,15 +215,6 @@ TEAM_MEMBERS = [
         "brags": [
             "George leads our People & Culture portfolio, which supports Anika’s functions to build aligned, effective and engaged teams",
             "George is a Senior Analyst (Strategy) at Coles Group",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/matt.jpeg",
-        "name": "Matthew Segal",
-        "title": "Head of Technology",
-        "brags": [
-            "Matt leads our Technology portfolio and is responsible for our technical infrastructure",
-            "Matt is a full-stack software developer with experience in eCommerce, fintech and online media",
         ],
     },
 ]

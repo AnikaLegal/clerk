@@ -29,8 +29,35 @@
     </div>
 </div>
 <div class="segment">
+    <div class="container wide">
+        <h2>Anika Legal’s Board</h2>
+        <div class="divider"></div>
+        <div class="card-grid tight">
+            {% for member in board %}
+                <div class="card profile blue round-small bottom-right bottom-left top-right">
+                    <img 
+                        class="round-small top-right bottom-left headshot grey"
+                        src="{% static member.image %}"
+                    >
+                    <div class="content">
+                        <p class="name">{{member.name}}</p>
+                        <p class="title">{{member.title}}</p>
+                        {% for brag in member.brags %}
+                            <p class="line-compact">{{ brag }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<div class="segment">
     <div class="container">
-        <div class="card-grid six">
+        <h2>Our Team</h2>
+        <div class="divider"></div>
+        <div class="card-grid tight">
             {% for member in members %}
                 <div class="card profile blue round-small bottom-right bottom-left top-right">
                     <img class="round-small top-right bottom-left headshot" src="{% static member.image %}">
@@ -47,11 +74,10 @@
     </div>
 </div>
 <div class="segment gold round-large top-right bottom-left">
-
     <div class="container wide">
         <h2>Our Advisory Panel</h2>
         <div class="divider"></div>
-        <div class="card-grid six">
+        <div class="card-grid tight">
             {% for member in advisors %}
                 <div class="card profile round-small bottom-right bottom-left top-right">
                     <img 
