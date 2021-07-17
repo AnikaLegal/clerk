@@ -46,12 +46,12 @@ urlpatterns = [
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
     path("cms/pages/", include(wagtail_urls)),
+    path("blog/search/", views.blog_search_view, name="blog-search"),
     # Wagtail entry points.
     ResourceListPage.as_path("resources"),
     BlogListPage.as_path("blog"),
     JobListPage.as_path("jobs"),
     NewsListPage.as_path("news"),
-    path("blog/search/", views.blog_search_view, name="blog-search"),
     # Robots.txt
     path("robots.txt", views.robots_view),
     # Sitemap
