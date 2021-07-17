@@ -4,6 +4,7 @@ from django.urls import path
 from rest_framework import routers
 
 from web import urls as web_urls
+from emails import urls as email_urls
 from actionstep.views import end_oauth_view, start_oauth_view
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
@@ -31,5 +32,6 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("case/", include("case.urls")),
     path("accounts/", include("accounts.urls")),
+    path("email/", include(email_urls)),
     path("", include(web_urls)),
 ]

@@ -21,6 +21,7 @@ services:
       PGHOST: database
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.test
+      SENDGRID_API_KEY: ""
       ACTIONSTEP_CLIENT_ID: ""
       ACTIONSTEP_CLIENT_SECRET: ""
       MAILCHIMP_API_KEY: ""
