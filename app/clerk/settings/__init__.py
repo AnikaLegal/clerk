@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "case.apps.CaseConfig",
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
+    "emails.apps.EmailsConfig",
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",

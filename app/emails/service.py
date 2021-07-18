@@ -2,7 +2,9 @@ import logging
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.utils.datastructures import MultiValueDict
 
+from .models import Email, EmailAttachment
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +33,14 @@ def send_email(
         to=[to_addr],
     )
     email.send(fail_silently=False)
+
+
+def process_inbound_email(data: MultiValueDict, files: MultiValueDict):
+    """
+    Parse an inbound email from SendGrid and save as an Email.
+    """
+    import pdb
+
+    pdb.set_trace()
+    # Email
+    # data, files
