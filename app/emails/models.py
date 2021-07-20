@@ -1,5 +1,7 @@
 from django.db import models
-from django.utils.text import slugify
+from django.utils import timezone
+
+from utils.uploads import get_s3_key
 
 
 class EmailState:
@@ -27,11 +29,10 @@ class Email(models.Model):
     state = models.CharField(max_length=32, choices=STATE_CHOICES)
     text = models.TextField()
     html = models.TextField(default="")
+    created_at = models.DateTimeField(default=timezone.now)
 
-
-def get_s3_key(email, filename):
-    fn = slugify(filename)
-    return f"{email.UPLOAD_KEY}/{fn}"
+    def __str__(self):
+        return f"{self.pk}: {self.subject}"
 
 
 # FIXME: Configure so S3 bucket cannot be publicly read from
@@ -40,4 +41,5 @@ class EmailAttachment(models.Model):
 
     email = models.ForeignKey(Email, on_delete=models.SET_NULL, null=True, blank=True)
     file = models.FileField(upload_to=get_s3_key)
-    mimetype = models.CharField(max_length=128)
+    content_type = models.CharField(max_length=128)
+    created_at = models.DateTimeField(default=timezone.now)
