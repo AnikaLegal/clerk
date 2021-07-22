@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "case.apps.CaseConfig",
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
+    "emails.apps.EmailsConfig",
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -272,7 +273,17 @@ TWILIO_PHONE_NUMBER = None  # Overwrite me
 TWILIO_AUDIO_BASE_URL = None  # Overwrite me
 
 
-# Reminder emails via MailChimp
+# Transactional emails via SendGrid
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_DOMAIN = "em7221.test-mail.anikalegal.com"
+
+
+# Marketing emails via MailChimp
 MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
 
 # Analytics

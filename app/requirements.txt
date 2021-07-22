@@ -16,6 +16,8 @@ social-auth-app-django
 # API
 djangorestframework
 django-cors-headers
+
+# Emails and comms
 mailchimp3
 twilio
 
