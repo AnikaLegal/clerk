@@ -1,0 +1,60 @@
+<table class="ui celled table">
+    <thead>
+        <tr>
+            <th>File Ref</th>
+            <th>Topic</th>
+            <th>Client</th>
+            <th>Paralegal</th>
+            <th>Created</th>
+            <th>Open</th>
+            <th>Advice</th>
+            <th>Stage</th>
+            <th>Outcome</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for issue in issues %}
+        <tr>
+            <td>
+                <a href="{% url 'case-detail' issue.pk %}">
+                    {{ issue.fileref }}
+                </a>
+            </td>
+            <td>{{ issue.get_topic_display }}</td>
+            <td>
+                <a href="{% url 'client-detail' issue.client.pk %}">
+                    {{ issue.client.get_full_name|title }}
+                </a>                    
+            </td>
+            <td>
+                {% if issue.paralegal %}
+            
+                <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+                    {{ issue.paralegal.get_full_name|title }}
+                </a>               
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ issue.created_at|date:"d/m/y" }}</td>
+            <td class="center aligned">
+                {% if issue.is_open %}
+                    <i class="green checkmark icon"></i>
+                {% else %}
+                    <i class="yellow close icon"></i>
+                {% endif %}
+            </td>
+            <td class="center aligned">
+                {% if issue.provided_legal_services %}
+                    <i class="green checkmark icon"></i>
+                {% else %}
+                    <i class="yellow close icon"></i>
+                {% endif %}
+            </td>
+            
+            <td>{{issue.get_stage_display|default:"-" }}</td>
+            <td>{{issue.get_outcome_display|default:"-" }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

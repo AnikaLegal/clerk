@@ -1,0 +1,85 @@
+{% extends "case/_base.html" %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+
+
+
+{% block content %}
+<div class="ui container">
+    <h1 class="ui header">
+        {{ client.get_full_name|title }} (Client)
+        <div class="sub header">
+            Created {{ client.created_at|date:"jS M 'y" }}, updated {{ client.modified_at|date:"jS M 'y" }}
+        </div>
+    </h1>
+    <table class="ui definition table small">
+        <tbody>
+            <tr>
+                <td>Email</td>
+                <td>{{ client.email }}</td>
+            </tr>
+            <tr>
+                <td>Phone</td>
+                <td>{{ client.phone_number }} (call {{ client.call_times|join:', '|lower }})</td>
+            </tr>
+            <tr>
+                <td>Age</td>
+                <td>{{ client.get_age }} years old</td>
+            </tr>
+            <tr>
+                <td>Gender</td>
+                <td>{{ client.gender|title }}</td>
+            </tr>
+            <tr>
+                <td>Employment Status</td>
+                <td>{{ client.employment_status }}</td>
+            </tr>
+            <tr>
+                <td>Special Circumstances</td>
+                <td>{{ client.special_circumstances }}</td>
+            </tr>
+            <tr>
+                <td>Weekly Income</td>
+                <td>{{ client.weekly_income }}</td>
+            </tr>
+            <tr>
+                <td>Weekly Rent</td>
+                <td>{{ client.weekly_rent }}</td>
+            </tr>
+            <tr>
+                <td>Welfare Reliance</td>
+                <td>{{ client.welfare_reliance }}</td>
+            </tr>
+            <tr>
+                <td>Gender</td>
+                <td>{{ client.gender|title }}</td>
+            </tr>
+            <tr>
+                <td>Gender Details</td>
+                <td>{{ client.gender_details }}</td>
+            </tr>
+            <tr>
+                <td>Can speak non-english</td>
+                <td>{{ client.can_speak_non_english }}</td>
+            </tr>
+            <tr>
+                <td>Is Aboriginal or Torres Strait Islander</td>
+                <td>{{ client.is_aboriginal_or_torres_strait_islander }}</td>
+            </tr>
+            <tr>
+                <td>Referrer Type</td>
+                <td>{{ client.referrer_type }}</td>
+            </tr>
+            <tr>
+                <td>Referrer</td>
+                <td>{{ client.referrer }}</td>
+            </tr>
+
+
+        </tbody>
+    </table>
+    <h1>Cases</h1>
+    {% include "case/snippets/_case_list_table.html" with issues=client.issue_set.all %}
+</div>
+{% endblock %}
+

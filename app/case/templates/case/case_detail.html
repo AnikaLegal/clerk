@@ -14,7 +14,11 @@
             <div class="column">
                 <div class="ui card fluid">
                     <div class="content">
-                        <div class="header">{{ issue.client.get_full_name|title }} (Client)</div>
+                        <div class="header">
+                            <a href="{% url 'client-detail' issue.client.pk %}">
+                                {{ issue.client.get_full_name|title }}
+                            </a> (Client)                            
+                        </div>
                         <div class="meta">
                             <span>Created {{ issue.client.created_at|date:"jS M 'y" }}, updated {{ issue.client.modified_at|date:"jS M 'y" }}</span>
                         </div>

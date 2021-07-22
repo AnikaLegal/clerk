@@ -1,1 +1,1 @@
-from . import case, paralegal
+from . import case, paralegal, client

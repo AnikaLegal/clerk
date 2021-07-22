@@ -10,6 +10,8 @@ urlpatterns = [
         views.paralegal.paralegal_detail_view,
         name="paralegal-detail",
     ),
+    # Client
+    path("client/<uuid:pk>/", views.client.client_detail_view, name="client-detail"),
     # Cases
     path("cases/", views.case.case_list_view, name="case-list"),
     path("cases/<uuid:pk>/", views.case.case_detail_view, name="case-detail"),
