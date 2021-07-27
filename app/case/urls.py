@@ -12,6 +12,11 @@ urlpatterns = [
     ),
     # Client
     path("client/<uuid:pk>/", views.client.client_detail_view, name="client-detail"),
+    path(
+        "client/<uuid:pk>/<str:form_slug>/",
+        views.client.client_detail_view,
+        name="client-detail-form",
+    ),
     # Cases
     path("cases/", views.case.case_list_view, name="case-list"),
     path("cases/<uuid:pk>/", views.case.case_detail_view, name="case-detail"),

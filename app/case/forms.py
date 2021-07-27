@@ -2,7 +2,32 @@ from django import forms
 from django.forms.fields import BooleanField
 
 from accounts.models import User
-from core.models import Issue, IssueNote
+from core.models import Issue, IssueNote, Client
+
+from case.utils import DynamicModelForm
+
+
+class ClientContactDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "email",
+            "phone_number",
+            "call_times",
+        ]
+
+
+"""
+TODO
+Editable table with read only and editable fields
+- based on a form
+- edit button depends on a permission class
+- each field has:
+    - display label
+    - display value renderer
+    - form renderer
+    - all in a single view? like @forms or something, each form has a slug
+"""
 
 
 class ParalegalNoteForm(forms.ModelForm):
