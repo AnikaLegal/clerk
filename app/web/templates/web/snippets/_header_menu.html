@@ -1,9 +1,10 @@
+{% load wagtail_clerk %}
 <div class="dropdown">
     <span class="title">Get help</span>
     <div class="options">
         <a href="https://intake.anikalegal.com/">Start your case</a>
-        <a href="{% url 'evictions' %}">Evictions support</a>
-        <a href="{% url 'repairs' %}">Rental repairs</a>
+        <a href="{% url 'evictions' %}">I'm getting evicted</a>
+        <a href="{% url 'repairs' %}">I need something repaired</a>
     </div>
 </div>
 <a class="dropdown" href="{% url 'refer' %}">Refer someone</a>
@@ -13,17 +14,19 @@
         <a href="{% url 'about' %}">Anika</a>
         <a href="{% url 'impact' %}">Impact</a>
         <a href="{% url 'team' %}">Team</a>
+        <a href="{% clerk_slugurl 'news' %}">News</a>
         <a href="{% url 'reports' %}">Reports</a>
     </div>
 </div>
-{% comment %} <div class="dropdown">
+<div class="dropdown">
     <span class="title">Get involved</span>
     <div class="options">
-        <a href="{% url 'philanthropy' %}">Philanthropy</a>
-        <a href="{% url 'corporates' %}">Corporates</a>
-        <a href="{% url 'universities' %}">Universities</a>
-        <a href="{% url 'community' %}">Community</a>
-        <a href="{% url 'jobs' %}">Join the team</a>
+        <a href="{% url 'law-student-partners' %}">Law students</a>
+        <a href="{% url 'philanthropy-partners' %}">Philanthropic partners</a>
+        <a href="{% url 'corporate-partners' %}">Corporate partners</a>
+        <a href="{% url 'university-partners' %}">Universities</a>
+        <a href="{% url 'community-partners' %}">Community organisations</a>
+        <a href="{% clerk_slugurl 'jobs' %}">Join the team</a>
     </div>
-</div> {% endcomment %}
+</div>
 <a href="https://anika-legal.raisely.com/"><button id="donate">Donate</button></a>           

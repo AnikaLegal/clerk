@@ -1,0 +1,55 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% load wagtail_clerk %}
+{% block title %}Philanthropic Partners{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Philanthropic Partners" description="Create effective, sustainable impact with us" %}            
+{% endblock %}
+{% block content %}
+<div class="hero-gold">
+    <div class="external-radius outer">
+        <div class="external-radius inner"></div>
+    </div>
+    <div class="hero-story">
+        <div class="inner">
+            <div class="content">
+                <h1>Create effective, sustainable impact with us</h1>
+                <p style="max-width: 530px">
+                    We work closely with philanthropic trusts, foundations and individuals to power our free legal assistance, develop our sustainable business model and create new, innovative ways to achieve our social impact as effectively as possible.</p>
+                <a href="mailto:partnerships@anikalegal.com">
+                    <button>Get in touch</button>
+                </a>
+            </div>
+            <img 
+                class="round top-left bottom-left" 
+                src="{% static 'web/img/photos/refer-hero.jpg' %}"
+            >
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container">
+        <h2>Why partner with Anika?</h2>
+        <div class="divider"></div>
+        <div class="card-grid tight">
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/impact.svg' %}">
+                <p class="header">Measurable impact</p>
+                <p class="compact">We have an established <a href="{% url 'impact' %}">impact framework</a> and measurement system to demonstrate how your contribution is actually making a difference</p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/star.svg' %}">
+                <p class="header">Promotion of your philanthropic efforts</p>
+                <p class="compact">We offer philanthropic partners exposure to Anika’s extensive corporate, media and community networks</p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/email.svg' %}">
+                <p class="header">We’ll keep you informed</p>
+                <p class="compact">We’ll update you on your impact and key developments. As a charity registered with the ACNC we are also accountable through transparent reporting and leadership practices</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

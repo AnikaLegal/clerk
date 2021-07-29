@@ -42,6 +42,32 @@ urlpatterns = [
         template("web/services/refer-someone.html"),
         name="refer",
     ),
+    # Partners
+    path(
+        "partners/philanthropy/",
+        template("web/partners/philanthropy.html"),
+        name="philanthropy-partners",
+    ),
+    path(
+        "partners/corporates/",
+        template("web/partners/corporates.html"),
+        name="corporate-partners",
+    ),
+    path(
+        "partners/universities/",
+        template("web/partners/universities.html"),
+        name="university-partners",
+    ),
+    path(
+        "partners/community-organisations/",
+        template("web/partners/community-organisations.html"),
+        name="community-partners",
+    ),
+    path(
+        "partners/law-students/",
+        template("web/partners/law-students.html"),
+        name="law-student-partners",
+    ),
     # Wagtail admin - excluded by robots.txt
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
