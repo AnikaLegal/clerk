@@ -18,4 +18,6 @@ ARG ACTIONSTEP_CLIENT_SECRET=not-the-secret
 ARG MAILCHIMP_API_KEY=not-the-key
 ARG TWILIO_ACCOUNT_SID=not-the-id
 ARG TWILIO_AUTH_TOKEN=not-the-token
+ARG AZURE_AD_CLIENT_ID=not-the-id
+ARG AZURE_AD_CLIENT_SECRET=not-the-secret
 RUN mkdir -p /static/ && python3 ./manage.py collectstatic --noinput
