@@ -73,3 +73,6 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 # Google Analytics
 GOOGLE_ANALYTICS_ID = "UA-133303109-1"
 FACEBOOK_PIXEL_ID = "580273702543728"
+
+# MS Graph Integration
+MS_GRAPH_GROUP_ID = "Production Group ID (Replace)"

@@ -29,3 +29,5 @@ services:
       TWILIO_AUTH_TOKEN: ""
       GOOGLE_OAUTH2_KEY: ""
       GOOGLE_OAUTH2_SECRET: ""
+      AZURE_AD_CLIENT_ID: ""
+      AZURE_AD_CLIENT_SECRET: ""
