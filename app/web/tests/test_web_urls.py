@@ -28,6 +28,11 @@ URLS_TO_TEST_BY_NAME = [
     ("evictions", 200),
     ("refer", 200),
     ("landing", 200),
+    ("philanthropy-partners", 200),
+    ("corporate-partners", 200),
+    ("university-partners", 200),
+    ("community-partners", 200),
+    ("law-student-partners", 200),
     ("django.contrib.sitemaps.views.sitemap", 200),
 ]
 

@@ -26,6 +26,11 @@ class StaticSitemap(sitemaps.Sitemap):
             "repairs",
             "evictions",
             "refer",
+            "philanthropy-partners",
+            "corporate-partners",
+            "university-partners",
+            "community-partners",
+            "law-student-partners",
         ]
 
     def location(self, item):
