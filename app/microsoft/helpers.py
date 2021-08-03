@@ -38,3 +38,8 @@ def get_token(client):
         logger.exception(f'{result["error_description"]} - {result["correlation_id"]}')
     else:
         return result["access_token"]
+
+
+# Generate password for creating MS User
+def generate_password():
+    """Must meet complexity requirements set by MS"""
