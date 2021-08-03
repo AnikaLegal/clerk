@@ -29,7 +29,12 @@ p {
   letter-spacing: 0.05em;
   color: var(--dark-4);
 }
-p.light {
+li {
+  letter-spacing: 0.05em;
+  line-height: var(--body-line-height);
+}
+p.light,
+li.light {
   color: var(--dark-6);
 }
 p.compact {
@@ -249,6 +254,7 @@ Each image/icon can have some descriptive test below it.
 }
 .card-grid .card img.icon {
   width: unset;
+  height: 70px;
 }
 .card-grid .card img.headshot {
   max-height: unset;
@@ -881,5 +887,24 @@ before the final footer.
   .article .block-quote blockquote {
     font-size: 26px;
     line-height: 32px;
+  }
+}
+
+.partner-logos {
+  display: flex;
+  justify-content: space-between;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.partner-logos img {
+  height: 100px;
+  width: 180px;
+  object-fit: contain;
+}
+@media (max-width: 600px) {
+  .partner-logos img {
+    height: 50px;
+    width: 75px;
   }
 }
