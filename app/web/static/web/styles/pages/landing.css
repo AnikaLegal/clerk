@@ -217,24 +217,6 @@ Landing page only styles.
   }
 }
 
-#landing-partners {
-  display: flex;
-  justify-content: space-between;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-#landing-partners img {
-  height: 100px;
-  width: 180px;
-}
-@media (max-width: 600px) {
-  #landing-partners img {
-    height: 50px;
-    width: 75px;
-  }
-}
-
 .testamonial-list {
   background-color: var(--white);
   box-shadow: 0px 4px 30px rgba(0, 55, 123, 0.2);

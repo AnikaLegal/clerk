@@ -1,0 +1,30 @@
+{% load static %}
+<div class="segment {{ segment_class }}">
+    <div class="container wide">
+        <h2>Learn more</h2>
+        <div class="divider"></div>
+        <div class="link-list three">
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/team.svg' %}">
+                <h2>Our team</h2>
+                <a href="{% url 'team' %}">
+                     <button>Read more</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/impact.svg' %}">
+                <h2>Our impact</h2>
+                <a href="{% url 'impact' %}">
+                    <button>Read more</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/reports.svg' %}">
+                <h2>Our reports</h2>
+                <a href="{% url 'reports' %}">
+                    <button>Read more</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

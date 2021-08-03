@@ -1,0 +1,84 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% load wagtail_clerk %}
+{% block title %}Law Students{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Law Students" description="Get practical legal experience to set you apart in a competitive legal job market." %}            
+{% endblock %}
+{% block content %}
+<div class="hero-gold">
+    <div class="external-radius outer">
+        <div class="external-radius inner"></div>
+    </div>
+    <div class="hero-story">
+        <div class="inner">
+            <div class="content">
+                <h1>Get practical legal experience to set you apart in a competitive legal job market</h1>
+                <p style="max-width: 530px">
+                    Anika Legal offers practical legal training programs through select university law schools, preparing law students for an evolving legal industry. Find out if your university offers a credit-bearing placement.
+                </p>
+                <a href="https://bit.ly/anikaeoi">
+                    <button>Find out more</button>
+                </a>
+            </div>
+            <img 
+                class="round top-left bottom-left" 
+                src="{% static 'web/img/photos/refer-hero.jpg' %}"
+            >
+        </div>
+    </div>
+</div>
+
+<div class="segment">
+    <div class="container">
+        <h2>Why work at Anika?</h2>
+        <div class="divider"></div>
+        <div class="card-grid tight">
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/law.svg' %}">
+                <p class="header">Real cases</p>
+                <p class="compact">Run your own cases and manage your own clients, under the supervision of experienced lawyers</p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/network.svg' %}">
+                <p class="header">Legal-tech skills</p>
+                <p class="compact">Build legal-tech skills and experience with a virtual legal practice to prepare for an increasingly digital legal industry</p>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/email.svg' %}">
+                <p class="header">Flexible</p>
+                <p class="compact">Take real cases remotely, on your schedule, for course credits. If it gets done, we don’t mind when or where you do it</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="segment gold round-large top-left bottom-right">
+    <div class="container wide">
+        <div class="story right">
+            <div class="blue-ball">
+                <img
+                style="object-position: 50% 20%;max-height: 465px;"
+                    class="round not-responsive top-left bottom-left bottom-right"
+                    src="{% static 'web/img/photos/volunteers.jpeg' %}"
+                >
+            </div>
+            <div class="content">
+                <h2>Interested in more than just a placement?</h2>
+                <p class="light">
+                    Anika’s volunteers comprise 90% of our team. They assist with cases, build our partnerships, design our services, and do our marketing.
+                </p>
+                <p class="light">Dedicated volunteers are what make Anika’s impact possible; see who we’re looking for in our openings.</p>
+                <a href="{% clerk_slugurl 'jobs' %}">
+                    <button>
+                        Join the team
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'web/snippets/_learn_more.html' %}
+
+{% endblock %}
