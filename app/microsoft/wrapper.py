@@ -17,9 +17,15 @@ class MSGraph:
         )
         access_token = get_token(client)
 
-        # Set HTTP Headers for making API calls.
+        # Set HTTP headers and base url
         HTTP_HEADERS["Authorization"] = "Bearer " + access_token
         self.headers = HTTP_HEADERS
+        self.base_url = BASE_URL
+
+    def get(self, path: str):
+        endpoint = self.base_url + path
+        resp = requests.get(endpoint, headers=self.headers, stream=False)
+        return resp
 
 
 """
