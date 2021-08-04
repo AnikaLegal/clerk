@@ -5,4 +5,4 @@ from microsoft.wrapper import MSGraph
 
 def test_constructor():
     api = MSGraph()
-    assert api.headers["Authorization"] != None
+    assert isinstance(api.headers["Authorization"], str)
