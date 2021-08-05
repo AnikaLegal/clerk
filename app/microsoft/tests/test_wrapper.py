@@ -10,5 +10,5 @@ def test_constructor():
 
 def test_get():
     api = MSGraph()
-    resp = api.get(path="/users/bugs.bunny@anikalegal.com")
+    resp = api.get(path="users/bugs.bunny@anikalegal.com")
     assert resp.status_code == 200
