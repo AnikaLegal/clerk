@@ -17,6 +17,27 @@ class ClientContactDynamicForm(DynamicModelForm):
         ]
 
 
+class ClientMiscDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "referrer",
+            "referrer_type",
+            "date_of_birth",
+            "gender",
+            "employment_status",
+            "special_circumstances",
+            "weekly_income",
+            "primary_language",
+            "number_of_dependents",
+            "is_aboriginal_or_torres_strait_islander",
+            "legal_access_difficulties",
+            "rental_circumstances",
+            "weekly_rent",
+            "is_multi_income_household",
+        ]
+
+
 """
 TODO
 Editable table with read only and editable fields

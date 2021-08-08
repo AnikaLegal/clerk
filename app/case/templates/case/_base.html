@@ -11,6 +11,8 @@
     <!-- Styling -->
     <link rel="stylesheet" type="text/css" href="{% static 'semantic/semantic.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'styles/global.css' %}">
+    <script type="text/javascript" src="{% static 'semantic/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'semantic/semantic.min.js' %}"></script>
 </head>
 <body>
     <header class="ui menu">
@@ -44,8 +46,6 @@
         {% block content %}{% endblock %}
     </main>
     <!-- Global Scripts -->
-    <script type="text/javascript" src="{% static 'semantic/jquery.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'semantic/semantic.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'htmx.min.js' %}"></script>
     <script>
       document.body.addEventListener('htmx:configRequest', (event) => {

@@ -5,6 +5,7 @@
             method="post"
             hx-post="./{{ form.slug }}/"
             hx-target="#dynamic-form-{{form.slug}}"
+            hx-swap="outerHTML"
         >
             {% for field in form %}
                 <div class="field {% if field.errors %}error{% endif %}">
@@ -36,8 +37,9 @@
         {% include 'case/snippets/_form_success.html' %}
         <button 
             class="ui positive button"
-            hx-get="./{{ form.slug }}/?edit=true"
+            hx-get="./{{ form.slug }}/?edit=1"
             hx-target="#dynamic-form-{{ form.slug }}"
+            hx-swap="outerHTML"
         >
             Edit
         </button>
