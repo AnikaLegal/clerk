@@ -27,7 +27,6 @@ class ReferrerType:
     POSTER = "POSTER"
 
 
-# TODO
 class GenderType:
     MALE = "male"
     FEMALE = "female"
@@ -147,15 +146,13 @@ class Client(TimestampedModel):
 
     # Demographic info for impact analysis.
     employment_status = ArrayField(
-        models.CharField(max_length=32),
-        choices=EMPLOYMENT_CHOICES,
+        models.CharField(max_length=32, choices=EMPLOYMENT_CHOICES),
         default=list,
         blank=True,
     )
 
     special_circumstances = ArrayField(
-        models.CharField(max_length=32),
-        choices=CIRCUMSTANCE_CHOICES,
+        models.CharField(max_length=32, choices=CIRCUMSTANCE_CHOICES),
         default=list,
         blank=True,
     )
@@ -173,8 +170,7 @@ class Client(TimestampedModel):
     is_multi_income_household = models.BooleanField(null=True)
     number_of_dependents = models.IntegerField(null=True)
     legal_access_difficulties = ArrayField(
-        models.CharField(max_length=32),
-        choices=LEGAL_ACCESS_CHOICES,
+        models.CharField(max_length=32, choices=LEGAL_ACCESS_CHOICES),
         default=list,
         blank=True,
     )

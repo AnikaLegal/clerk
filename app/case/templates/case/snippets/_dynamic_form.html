@@ -29,7 +29,7 @@
                 {% for field in form %}
                     <tr>
                         <td class="three wide">{{ field.label }}</td>
-                        <td>{{ field.value }}</td>
+                        <td>{{ field.display_value }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -44,4 +44,7 @@
             Edit
         </button>
     {% endif %}
+    <script>
+        $('#dynamic-form-{{ form.slug }} .ui.dropdown').dropdown()
+    </script>
 </div>

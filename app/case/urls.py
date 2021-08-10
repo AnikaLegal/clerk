@@ -10,6 +10,20 @@ urlpatterns = [
         views.paralegal.paralegal_detail_view,
         name="paralegal-detail",
     ),
+    # Person
+    path("person/<int:pk>/", views.client.person_detail_view, name="person-detail"),
+    path(
+        "person/<int:pk>/<str:form_slug>/",
+        views.client.person_detail_view,
+        name="person-detail-form",
+    ),
+    # Tenancy
+    path("tenancy/<int:pk>/", views.client.tenancy_detail_view, name="tenancy-detail"),
+    path(
+        "tenancy/<int:pk>/<str:form_slug>/",
+        views.client.tenancy_detail_view,
+        name="tenancy-detail-form",
+    ),
     # Client
     path("client/<uuid:pk>/", views.client.client_detail_view, name="client-detail"),
     path(

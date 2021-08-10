@@ -16,8 +16,8 @@
                     <div class="content">
                         <div class="header">
                             <a href="{% url 'client-detail' issue.client.pk %}">
-                                {{ issue.client.get_full_name|title }}
-                            </a> (Client)                            
+                                {{ issue.client.get_full_name|title }}               
+                            </a>
                         </div>
                         <div class="meta">
                             <span>Created {{ issue.client.created_at|date:"jS M 'y" }}, updated {{ issue.client.modified_at|date:"jS M 'y" }}</span>
@@ -49,8 +49,13 @@
             {# Tenancy card #}
             <div class="column">
                 <div class="ui card fluid">
-                    <div class="content">
-                        <div class="header">Tenancy</div>
+                    <div class="content">                        
+                        <div class="header">
+                            <a href="{% url 'tenancy-detail' tenancy.pk %}">
+                                Tenancy
+                            </a>                       
+                        </div>
+
                         <div class="meta">
                             <span>Created {{ tenancy.created_at|date:"jS M 'y" }}, updated {{ tenancy.modified_at|date:"jS M 'y" }}</span>
                         </div>
@@ -84,7 +89,11 @@
                 <div class="column">
                     <div class="ui card fluid">
                         <div class="content">
-                            <div class="header">Landlord</div>
+                            <div class="header">
+                                <a href="{% url 'person-detail' tenancy.landlord.pk %}">
+                                    Landlord
+                                </a>                       
+                            </div>
                             <div class="meta">
                                 <span>Created {{ tenancy.landlord.created_at|date:"jS M 'y" }}, updated {{ tenancy.landlord.modified_at|date:"jS M 'y" }}</span>
                             </div>
@@ -120,7 +129,11 @@
                 <div class="column">
                     <div class="ui card fluid">
                         <div class="content">
-                            <div class="header">Real estate agent</div>
+                            <div class="header">
+                                <a href="{% url 'person-detail' tenancy.agent.pk %}">
+                                    Real estate agent
+                                </a>                       
+                            </div>
                             <div class="meta">
                                 <span>Created {{ tenancy.agent.created_at|date:"jS M 'y" }}, updated {{ tenancy.agent.modified_at|date:"jS M 'y" }}</span>
                             </div>

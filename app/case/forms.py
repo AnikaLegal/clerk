@@ -2,9 +2,45 @@ from django import forms
 from django.forms.fields import BooleanField
 
 from accounts.models import User
-from core.models import Issue, IssueNote, Client
+from core.models import Issue, IssueNote, Client, Tenancy, Person
 
-from case.utils import DynamicModelForm
+from case.utils import DynamicModelForm, MultiChoiceField, SingleChoiceField
+
+
+class PersonDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Person
+        fields = [
+            "full_name",
+            "email",
+            "address",
+            "phone_number",
+        ]
+
+
+class TenancyDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Tenancy
+        fields = [
+            "address",
+            "suburb",
+            "postcode",
+            "started",
+            "is_on_lease",
+        ]
+
+    is_on_lease = SingleChoiceField("is_on_lease", Tenancy)
+
+
+class ClientPersonalDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "first_name",
+            "last_name",
+            "date_of_birth",
+            "gender",
+        ]
 
 
 class ClientContactDynamicForm(DynamicModelForm):
@@ -16,6 +52,8 @@ class ClientContactDynamicForm(DynamicModelForm):
             "call_times",
         ]
 
+    call_times = MultiChoiceField("call_times", Client)
+
 
 class ClientMiscDynamicForm(DynamicModelForm):
     class Meta:
@@ -23,8 +61,6 @@ class ClientMiscDynamicForm(DynamicModelForm):
         fields = [
             "referrer",
             "referrer_type",
-            "date_of_birth",
-            "gender",
             "employment_status",
             "special_circumstances",
             "weekly_income",
@@ -37,18 +73,11 @@ class ClientMiscDynamicForm(DynamicModelForm):
             "is_multi_income_household",
         ]
 
-
-"""
-TODO
-Editable table with read only and editable fields
-- based on a form
-- edit button depends on a permission class
-- each field has:
-    - display label
-    - display value renderer
-    - form renderer
-    - all in a single view? like @forms or something, each form has a slug
-"""
+    rental_circumstances = SingleChoiceField("rental_circumstances", Client)
+    referrer_type = SingleChoiceField("referrer_type", Client)
+    employment_status = MultiChoiceField("employment_status", Client)
+    special_circumstances = MultiChoiceField("special_circumstances", Client)
+    legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
 
 
 class ParalegalNoteForm(forms.ModelForm):

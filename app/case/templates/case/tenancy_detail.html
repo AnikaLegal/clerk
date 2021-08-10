@@ -1,0 +1,58 @@
+{% extends "case/_base.html" %}
+{% block title %}Tenancy{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+    <h1 class="ui header">
+        Tenancy
+        <div class="sub header">
+            Created {{ tenancy.created_at|date:"jS M 'y" }}, updated {{ tenancy.modified_at|date:"jS M 'y" }}
+        </div>
+    </h1>
+
+    <h2 class="ui header">Property details</h2>
+    {{ forms.form }}
+
+    <h2 class="ui header">Property people</h2>
+    <table class="ui definition table small">
+        <tbody>
+            <tr>
+                <td class="three wide">Client</td>
+                <td>
+                    <a href="{% url 'client-detail' tenancy.client.pk %}">
+                        {{ tenancy.client.get_full_name|title }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td class="three wide">Agent</td>
+                <td>
+                    {% if tenancy.agent %}
+                        <a href="{% url 'person-detail' tenancy.agent.pk %}">
+                            {{ tenancy.agent.full_name|title }}
+                        </a>
+                    {% else %}
+                        No agent
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="three wide">Landlord</td>
+                <td>
+                    {% if tenancy.landlord %}
+                        <a href="{% url 'person-detail' tenancy.landlord.pk %}">
+                            {{ tenancy.landlord.full_name|title }}
+                        </a>
+                    {% else %}
+                        No landlord
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
+
