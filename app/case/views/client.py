@@ -5,7 +5,7 @@ from django.http import Http404
 
 
 from case.forms import (
-    DynamicModelForm,
+    DynamicTableForm,
     ClientContactDynamicForm,
     ClientMiscDynamicForm,
     ClientPersonalDynamicForm,
@@ -43,11 +43,11 @@ def client_detail_view(request, pk, form_slug: str = ""):
     except Client.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, client, CLIENT_DETAIL_FORMS
     )
     context = {"client": client, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:
@@ -65,11 +65,11 @@ def tenancy_detail_view(request, pk, form_slug: str = ""):
     except Tenancy.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, tenancy, TENANCY_DETAIL_FORMS
     )
     context = {"tenancy": tenancy, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:
@@ -87,11 +87,11 @@ def person_detail_view(request, pk, form_slug: str = ""):
     except Person.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, person, PERSON_DETAIL_FORMS
     )
     context = {"person": person, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:

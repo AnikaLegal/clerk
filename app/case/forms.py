@@ -4,10 +4,10 @@ from django.forms.fields import BooleanField
 from accounts.models import User
 from core.models import Issue, IssueNote, Client, Tenancy, Person
 
-from case.utils import DynamicModelForm, MultiChoiceField, SingleChoiceField
+from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 
 
-class PersonDynamicForm(DynamicModelForm):
+class PersonDynamicForm(DynamicTableForm):
     class Meta:
         model = Person
         fields = [
@@ -18,7 +18,7 @@ class PersonDynamicForm(DynamicModelForm):
         ]
 
 
-class TenancyDynamicForm(DynamicModelForm):
+class TenancyDynamicForm(DynamicTableForm):
     class Meta:
         model = Tenancy
         fields = [
@@ -32,7 +32,7 @@ class TenancyDynamicForm(DynamicModelForm):
     is_on_lease = SingleChoiceField("is_on_lease", Tenancy)
 
 
-class ClientPersonalDynamicForm(DynamicModelForm):
+class ClientPersonalDynamicForm(DynamicTableForm):
     class Meta:
         model = Client
         fields = [
@@ -43,7 +43,7 @@ class ClientPersonalDynamicForm(DynamicModelForm):
         ]
 
 
-class ClientContactDynamicForm(DynamicModelForm):
+class ClientContactDynamicForm(DynamicTableForm):
     class Meta:
         model = Client
         fields = [
@@ -55,7 +55,7 @@ class ClientContactDynamicForm(DynamicModelForm):
     call_times = MultiChoiceField("call_times", Client)
 
 
-class ClientMiscDynamicForm(DynamicModelForm):
+class ClientMiscDynamicForm(DynamicTableForm):
     class Meta:
         model = Client
         fields = [

@@ -49,6 +49,15 @@ def case_list_view(request):
 @require_http_methods(["GET"])
 def case_detail_view(request, pk):
     context = _get_case_detail_context(request, pk)
+    notes = _get_issue_notes(pk)
+    context = {
+        **context,
+        "notes": notes,
+        "progress_form": IssueProgressForm(instance=context["issue"]),
+        "case_review_form": ReviewNoteForm(),
+        "paralegal_notes_form": ParalegalNoteForm(),
+    }
+
     return render(request, "case/case_detail.html", context)
 
 
