@@ -22,7 +22,7 @@ def create_client(client_id, authority_url, client_secret):
 # Get access token after authenticating our app.
 def get_token(client):
     # Begin by looking in token cache, first arg is for scopes,
-    # because token is for app rather than user, second arg is None
+    # because token is for app rather than user, second arg is None.
     result = client.acquire_token_silent(
         ["https://graph.microsoft.com/.default"], account=None
     )
@@ -33,13 +33,13 @@ def get_token(client):
             scopes=["https://graph.microsoft.com/.default"]
         )
 
-    # If we can't get access token, see what went wrong, otherwise return it
+    # If we can't get access token, see what went wrong, otherwise return it.
     if "access_token" not in result:
         logger.exception(f'{result["error_description"]} - {result["correlation_id"]}')
     else:
         return result["access_token"]
 
 
-# Generate password for creating MS User
+# Generate password for creating MS User.
 def generate_password():
     """Must meet complexity requirements set by MS"""
