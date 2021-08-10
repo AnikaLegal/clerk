@@ -2,7 +2,82 @@ from django import forms
 from django.forms.fields import BooleanField
 
 from accounts.models import User
-from core.models import Issue, IssueNote
+from core.models import Issue, IssueNote, Client, Tenancy, Person
+
+from case.utils import DynamicModelForm, MultiChoiceField, SingleChoiceField
+
+
+class PersonDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Person
+        fields = [
+            "full_name",
+            "email",
+            "address",
+            "phone_number",
+        ]
+
+
+class TenancyDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Tenancy
+        fields = [
+            "address",
+            "suburb",
+            "postcode",
+            "started",
+            "is_on_lease",
+        ]
+
+    is_on_lease = SingleChoiceField("is_on_lease", Tenancy)
+
+
+class ClientPersonalDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "first_name",
+            "last_name",
+            "date_of_birth",
+            "gender",
+        ]
+
+
+class ClientContactDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "email",
+            "phone_number",
+            "call_times",
+        ]
+
+    call_times = MultiChoiceField("call_times", Client)
+
+
+class ClientMiscDynamicForm(DynamicModelForm):
+    class Meta:
+        model = Client
+        fields = [
+            "referrer",
+            "referrer_type",
+            "employment_status",
+            "special_circumstances",
+            "weekly_income",
+            "primary_language",
+            "number_of_dependents",
+            "is_aboriginal_or_torres_strait_islander",
+            "legal_access_difficulties",
+            "rental_circumstances",
+            "weekly_rent",
+            "is_multi_income_household",
+        ]
+
+    rental_circumstances = SingleChoiceField("rental_circumstances", Client)
+    referrer_type = SingleChoiceField("referrer_type", Client)
+    employment_status = MultiChoiceField("employment_status", Client)
+    special_circumstances = MultiChoiceField("special_circumstances", Client)
+    legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
 
 
 class ParalegalNoteForm(forms.ModelForm):

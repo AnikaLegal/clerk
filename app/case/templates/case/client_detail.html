@@ -1,0 +1,30 @@
+{% extends "case/_base.html" %}
+{% block title %}Client {{ client.get_full_name|title }}{% endblock %}
+
+{% block content %}
+
+<div class="ui container">
+    <h1 class="ui header">
+        {{ client.get_full_name|title }} (Client)
+        <div class="sub header">
+            Created {{ client.created_at|date:"jS M 'y" }}, updated {{ client.modified_at|date:"jS M 'y" }}
+        </div>
+    </h1>
+    <hr class="ui divider" />
+
+    <h3 class="ui header">Contact details</h3>
+    {{ forms.contact }}
+    <h3 class="ui header">Personal details</h3>
+    {{ forms.personal }}
+
+
+    <h3 class="ui header">Other information</h3>
+    {{ forms.misc }}
+
+    <h1>Cases</h1>
+    {% include "case/snippets/_case_list_table.html" with issues=client.issue_set.all %}
+    <div style="padding-bottom: 3rem"></div>
+</div>
+
+{% endblock %}
+
