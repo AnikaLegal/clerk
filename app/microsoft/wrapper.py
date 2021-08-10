@@ -1,6 +1,6 @@
 import requests
 import logging
-import pprint
+from pprint import pformat
 
 from microsoft.helpers import create_client, get_token, BASE_URL, HTTP_HEADERS
 
@@ -48,7 +48,7 @@ class MSGraph:
         try:
             resp.raise_for_status()
         except requests.HTTPError:
-            pretty_json = pprint(json, indent=2)
+            pretty_json = pformat(json, indent=2)
             req = resp.request
             logger.error(
                 f"{req.method} {req.url} failed with response body: {pretty_json}"
