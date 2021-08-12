@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -34,5 +34,10 @@ urlpatterns = [
     # Cases
     path("cases/", views.case.case_list_view, name="case-list"),
     path("cases/<uuid:pk>/", views.case.case_detail_view, name="case-detail"),
+    path(
+        "cases/<uuid:pk>/<str:form_slug>/",
+        views.case.case_detail_view,
+        name="case-detail-form",
+    ),
     path("", views.case.root_view, name="case-root"),
 ]

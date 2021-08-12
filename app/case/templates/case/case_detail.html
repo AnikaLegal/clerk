@@ -12,18 +12,7 @@
         <div class="column">
             {# Select form from dropdown #}
             <div class="ui secondary segment">
-                <select class="ui fluid dropdown" hx-get="./form-select/" hx-target="#form-wrapper">
-                    <option value="">I want to...</option>
-                    <option value="note">Write a case note</option>
-                    <option value="review">Write a paralegal review note</option>
-                    <option value="progress">Update case progress</option>
-                </select>
-                <script>
-                    $('.ui.dropdown').dropdown()
-                </script>
-                <div id="form-wrapper">
-                    {{ form }}   
-                </div>
+                {{ case_selector }}
             </div>
 
             {# Case timeline #}

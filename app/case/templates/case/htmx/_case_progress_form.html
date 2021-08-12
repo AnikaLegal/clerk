@@ -7,7 +7,7 @@ Args:
 {% endcomment %}
 <form 
     class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-    hx-post="{% url 'case-detail-progress-form' issue.pk %}"
+    hx-post="./progress/"
     hx-target="this"
 >
     <div class="inline fields">
