@@ -1,0 +1,24 @@
+.about-graphic {
+  width: 100%;
+}
+.about-graphic.desktop {
+  padding-top: 3rem;
+}
+.about-graphic.mobile {
+  padding-top: 1rem;
+  display: none;
+}
+.brag {
+  padding-bottom: 100px;
+}
+@media (max-width: 1300px) {
+  .about-graphic.desktop {
+    display: none;
+  }
+  .about-graphic.mobile {
+    display: block;
+  }
+  .brag {
+    padding-bottom: 62px;
+  }
+}

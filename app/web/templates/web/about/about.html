@@ -4,9 +4,14 @@
 {% block social_meta %}
 {% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can’t access it through practical legal education and trusted partnerships" %}            
 {% endblock %}
-{% block content %}
 
-<div class="container">
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/about.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="container wide">
     <div class="brag">
         <h1>
             Anika Legal provides free legal assistance to people<br class="desktop-break"> who<br class="mobile-break"> can’t access it through <br class="mobile-break">
@@ -16,6 +21,8 @@
             <span class="callout">trusted partnerships</span>
         </h1>
         <div class="divider"></div>
+        <img class="about-graphic desktop" src="{% static 'web/img/about-graphic-desktop.png' %}">
+        <img class="about-graphic mobile" src="{% static 'web/img/about-graphic-mobile.png' %}">
     </div>
 </div>
 <div class="segment gold round-large top-right bottom-left">
