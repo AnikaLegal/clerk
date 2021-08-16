@@ -12,6 +12,7 @@ django-q
 
 # Authentication
 social-auth-app-django
+msal
 
 # API
 djangorestframework

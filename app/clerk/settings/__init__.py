@@ -289,3 +289,12 @@ MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
 # Analytics
 GOOGLE_ANALYTICS_ID = ""
 FACEBOOK_PIXEL_ID = ""
+
+
+# MS Graph Integration
+AZURE_AD_CLIENT_ID = os.environ["AZURE_AD_CLIENT_ID"]
+AZURE_AD_CLIENT_SECRET = os.environ["AZURE_AD_CLIENT_SECRET"]
+MS_AUTHORITY_URL = (
+    "https://login.microsoftonline.com/e89f1fec-2d50-4795-886e-a3475bdc4e4b"
+)
+MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
