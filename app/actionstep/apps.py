@@ -14,20 +14,20 @@ SCHEDULES = [
 class ActionstepConfig(AppConfig):
     name = "actionstep"
 
-    def ready(self):
-        """
-        Setup new schedules. This might be a stupid way to do this.
-        FIXME: This is stupid, stop doing this.
-        """
-        from django_q.models import Schedule
+    # def ready(self):
+    #     """
+    #     Setup new schedules. This might be a stupid way to do this.
+    #     FIXME: This is stupid, stop doing this.
+    #     """
+    #     from django_q.models import Schedule
 
-        import actionstep.signals
+    #     import actionstep.signals
 
-        for schedule_data in SCHEDULES:
-            try:
-                Schedule.objects.filter(func=schedule_data["func"]).exclude(
-                    **schedule_data
-                ).delete()
-                Schedule.objects.get_or_create(**schedule_data)
-            except (OperationalError, ProgrammingError):
-                pass  # No database available, eg. Docker build.
+    #     for schedule_data in SCHEDULES:
+    #         try:
+    #             Schedule.objects.filter(func=schedule_data["func"]).exclude(
+    #                 **schedule_data
+    #             ).delete()
+    #             Schedule.objects.get_or_create(**schedule_data)
+    #         except (OperationalError, ProgrammingError):
+    #             pass  # No database available, eg. Docker build.

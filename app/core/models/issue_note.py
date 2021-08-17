@@ -31,8 +31,11 @@ class IssueNote(TimestampedModel):
     note_type = models.CharField(max_length=32, choices=NOTE_CHOICES)
 
     # The text content of the note
-    text = models.CharField(max_length=2048, blank=True, default="")
+    text = models.CharField(max_length=4096, blank=True, default="")
 
     # An optional event time, which can be interpreted based on what kind of note this is:
     #  - Review: the time to next review this case.
     event = models.DateTimeField(null=True, blank=True)
+
+    # Actionstep ID
+    actionstep_id = models.IntegerField(blank=True, null=True)

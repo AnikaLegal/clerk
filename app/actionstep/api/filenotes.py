@@ -32,6 +32,13 @@ class FilenoteEndpoint(BaseEndpoint):
         """
         return super().list({"text_ilike": f"*{text}*"})
 
+    def list_by_case(self, action_id: str):
+        """
+        Lists all filenotes for a given action.
+        Returns a list of filenotes.
+        """
+        return super().list({"action": action_id})
+
     def create(self, action_id: str, text: str):
         """
         Create a new filenote.

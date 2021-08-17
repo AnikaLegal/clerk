@@ -28,11 +28,15 @@
                 <div class="content">
                     <div class="header">
                         <a href="{% url 'client-detail' issue.client.pk %}">
-                            {{ issue.client.get_full_name|title }}               
+                            Client
                         </a>
                     </div>
                     <table class="ui definition table small">
                         <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>{{ issue.client.get_full_name|title }}</td>
+                            </tr>
                             <tr>
                                 <td>Email</td>
                                 <td>{{ issue.client.email }}</td>

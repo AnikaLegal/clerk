@@ -1,7 +1,11 @@
 <h1 class="ui header">
     {{ issue.get_topic_display }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
+
+    {% include 'case/htmx/_case_status.html' with issue=issue %}
+
+
     <div class="sub header">
-        Created {{ issue.created_at|date:"jS M 'y" }}, updated {{ issue.modified_at|date:"jS M 'y" }}
+        Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
         <br/>
 
         {% if issue.paralegal %}

@@ -10,6 +10,11 @@ Args:
     hx-post="./progress/"
     hx-target="this"
 >
+    <p>
+        Update the status of the case - this is really important for both managing the case
+        while it is open, but is also crucial for our reporting and decision making.
+    </p>
+    <hr class="ui divider" />
     <div class="inline fields">
         {% include 'case/snippets/_checkbox_field.html' with field=form.is_open %}
         {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
@@ -23,3 +28,8 @@ Args:
     {% include 'case/snippets/_form_success.html' %}
     <button class="ui positive button" type="submit">Update</button>
 </form>
+<script>
+    // Initialize JavaScript enabled Semantic UI elements.
+    $('.selection.dropdown').dropdown()
+</script>
+{% include 'case/htmx/_case_status.html' with issue=issue %}

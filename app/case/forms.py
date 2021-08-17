@@ -108,7 +108,7 @@ class ReviewNoteForm(forms.ModelForm):
     event = forms.DateField(label="Next review date", required=True)
 
 
-class ParalegalDetailsForm(forms.ModelForm):
+class ParalegalDetailsDynamicForm(DynamicTableForm):
     class Meta:
         model = User
         fields = [

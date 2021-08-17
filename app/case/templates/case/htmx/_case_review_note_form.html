@@ -11,6 +11,11 @@ Args:
     hx-post="./review/"
     hx-target="this"
 >
+    <p>
+        Leave a case review note for other coordinators to read. 
+        This note is not visible to paralegals.
+    </p>
+    <hr class="ui divider" />
     {% include 'case/snippets/_textarea_field.html' with field=form.text %}
     {% include 'case/snippets/_calendar_field.html' with field=form.event %}
     {% include 'case/snippets/_form_errors.html' %}
@@ -18,3 +23,19 @@ Args:
     <button class="ui positive button" type="submit">Create note</button>
 </form>
 {% include 'case/htmx/_case_feed.html' with notes=notes %}
+<script>
+$('.ui.calendar').calendar({
+    minDate: new Date(),
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return month + '/' + day + '/' + year;
+      }
+    }
+
+})
+</script>

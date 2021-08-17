@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -7,7 +8,8 @@ from accounts.models import User
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
-from core.models import Issue
+from core.models import Issue, IssueNote
+from core.models.issue_note import NoteType
 from core.models.issue import CaseTopic
 from slack.services import send_slack_message
 from utils.sentry import WithSentryCapture
@@ -51,7 +53,9 @@ def _send_issue_actionstep(issue_pk: str):
     client = issue.client
 
     # Ensure participant is in the system.
-    logger.info("Try to create participant %s, %s.", client.get_full_name(), client.email)
+    logger.info(
+        "Try to create participant %s, %s.", client.get_full_name(), client.email
+    )
     participant_data, created = api.participants.get_or_create(
         client.first_name, client.last_name, client.email, client.phone_number
     )
@@ -81,7 +85,9 @@ def _send_issue_actionstep(issue_pk: str):
         # We need to create a new matter
         file_ref_prefix = PREFIX_LOOKUP[issue.topic]
         fileref_name = api.actions.get_next_ref(file_ref_prefix)
-        logger.info("Creating new matter %s for %s", fileref_name, client.get_full_name())
+        logger.info(
+            "Creating new matter %s for %s", fileref_name, client.get_full_name()
+        )
         action_type_name = ACTION_TYPE_LOOKUP[issue.topic]
         action_type_data = api.actions.action_types.get_for_name(action_type_name)
         action_type_id = action_type_data["id"]
@@ -95,7 +101,9 @@ def _send_issue_actionstep(issue_pk: str):
         Issue.objects.filter(pk=issue_pk).update(fileref=fileref_name)
         action_id = action_data["id"]
         client_id = participant_data["id"]
-        api.participants.set_action_participant(action_id, client_id, Participant.CLIENT)
+        api.participants.set_action_participant(
+            action_id, client_id, Participant.CLIENT
+        )
 
     # Upload files. Note that multiple uploads will create copies.
     logger.info("Generating PDF for Issue<%s>", issue.id)
@@ -162,7 +170,7 @@ def _sync_paralegals():
     issues = Issue.objects.filter(
         paralegal__isnull=True, actionstep_id__isnull=False
     ).all()
-    for idx, issue in enumerate(issues):
+    for issue in issues:
         logging.info("Checking Issue<%s> for paralegal.", issue.pk)
         api = ActionstepAPI()
         action = api.actions.get(issue.actionstep_id)
@@ -206,3 +214,54 @@ def _sync_paralegals():
 
 
 sync_paralegals = WithSentryCapture(_sync_paralegals)
+
+
+def _sync_filenotes():
+    issues = Issue.objects.filter(actionstep_id__isnull=False).all()
+    api = ActionstepAPI()
+    for issue in issues:
+        logging.info("Checking Issue<%s> for filesnotes.", issue.pk)
+        issue_filenotes = api.filenotes.list_by_case(issue.actionstep_id)
+        for filenote in issue_filenotes:
+            is_system = filenote["source"] == "System"
+            is_assign_or_step = filenote["text"].startswith(
+                "Assigned To Participant Id"
+            ) or filenote["text"].startswith("Changed step from")
+            is_link_note = filenote["text"].startswith(
+                "Created automatically by Anika Clerk"
+            )
+            if is_system and is_assign_or_step:
+                print(
+                    "\t",
+                    filenote["id"],
+                    filenote["enteredTimestamp"],
+                    filenote["enteredBy"],
+                    filenote["text"],
+                )
+            elif filenote["source"] == "User" and (not is_link_note):
+                #  O'Connor, Grace
+                lastname, firstname = filenote["enteredBy"].split(",")
+                lastname, firstname = lastname.strip(), firstname.strip()
+                user = User.objects.get(first_name=firstname, last_name=lastname)
+
+                actionstep_id = int(filenote["id"])
+                filenote["enteredTimestamp"]
+
+                # 2021-04-30T12:05:03+12:00'
+                created_at = datetime.strptime(
+                    filenote["enteredTimestamp"], "%Y-%m-%dT%H:%M:%S%z"
+                )
+                IssueNote.objects.get_or_create(
+                    pk=actionstep_id,
+                    defaults={
+                        "issue": issue,
+                        "creator": user,
+                        "note_type": NoteType.PARALEGAL,
+                        "text": filenote["text"],
+                        "created_at": created_at,
+                        "modified_at": created_at,
+                    },
+                )
+
+
+sync_filenotes = WithSentryCapture(_sync_filenotes)

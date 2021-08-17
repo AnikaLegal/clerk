@@ -149,9 +149,9 @@ case_selector = Selector(
         "progress": CaseProgressHtmxFormView(),
     },
     options={
-        "note": "Write a case note",
-        "review": "Write a paralegal review note",
-        "progress": "Update case progress",
+        "note": "Add a file note",
+        "review": "Add a coordinator review note",
+        "progress": "Update case status",
     },
 )
 
