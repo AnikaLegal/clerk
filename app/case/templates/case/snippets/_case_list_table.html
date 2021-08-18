@@ -55,6 +55,12 @@
             <td>{{issue.get_stage_display|default:"-" }}</td>
             <td>{{issue.get_outcome_display|default:"-" }}</td>
         </tr>
+    {% empty %}
+        <tr>
+            <td>
+                No cases found
+            </td>
+        </tr>
     {% endfor %}
     </tbody>
 </table>

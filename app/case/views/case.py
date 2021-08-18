@@ -27,13 +27,21 @@ def root_view(request):
     return redirect("case-list")
 
 
-# FIXME: Permissions
+def not_allowed_view(request):
+    return render(request, "case/not_allowed.html")
+
+
 @login_required
-@user_passes_test(is_superuser, login_url="/")
 @require_http_methods(["GET"])
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
     issue_qs = Issue.objects.select_related("client", "paralegal")
+    if request.user.is_paralegal:
+        # Paralegals can only see assigned cases
+        issue_qs = issue_qs.filter(paralegal=request.user)
+    elif not request.user.is_coordinator:
+        issue_qs = issue_qs.none()
+
     issues = form.search(issue_qs).order_by("-created_at").all()
     page, next_qs, prev_qs = _get_page(request, issues, per_page=14)
     context = {

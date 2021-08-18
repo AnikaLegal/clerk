@@ -31,8 +31,11 @@
 
         {% if user.is_authenticated %}
             <a href="{% url 'case-list' %}" class="item">Cases</a>
+        {% endif %}
+        {% if user.is_coordinator %}
             <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
         {% endif %}
+
 
         <div class="right menu">
             {% if user.is_authenticated %}
@@ -43,6 +46,22 @@
         </div>
     </header>
     <main>
+        {% if user.is_authenticated and not user.is_paralegal %}
+            <div class="ui container" style="margin-bottom:1rem";>
+                <div class="ui teal message">
+                    <div class="content">
+                        <div class="header">
+                            Welcome to Clerk!
+                        </div>
+                        <p>
+                            You have not yet been set up in the system and don't have permission to do anything.
+                            Please wait for a coordinator to configure your account.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
     <!-- Global Scripts -->

@@ -40,5 +40,6 @@ urlpatterns = [
         views.case.case_detail_view,
         name="case-detail",
     ),
+    path("not-allowed/", views.case.not_allowed_view, name="case-not-allowed"),
     path("", views.case.root_view, name="case-root"),
 ]
