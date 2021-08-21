@@ -48,7 +48,9 @@ class DynamicTableForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.editable = editable
         self.slug = slug
+        self.set_display_values()
 
+    def set_display_values(self):
         # Build display value for fields
         for bound_field in self:
             if hasattr(bound_field.field, "display_value"):
@@ -79,9 +81,10 @@ class DynamicTableForm(ModelForm):
             if request.method == "POST" and form_slug == slug:
                 form_kwargs["data"] = request.POST
             # Add in any custom kwargs
-            _extra_kwargs = extra_kwargs.get(form_slug)
-            if _extra_kwargs:
-                form_kwargs = {**form_kwargs, **_extra_kwargs}
+            if extra_kwargs:
+                _extra_kwargs = extra_kwargs.get(form_slug)
+                if _extra_kwargs:
+                    form_kwargs = {**form_kwargs, **_extra_kwargs}
 
             form_instances[form_slug] = form_cls(**form_kwargs)
 

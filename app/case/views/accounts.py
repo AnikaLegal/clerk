@@ -5,12 +5,17 @@ from django.http import Http404
 from django.shortcuts import render
 
 from accounts.models import User, CaseGroups
-from case.forms import UserDetailsDynamicForm, DynamicTableForm
+from case.forms import (
+    UserDetailsDynamicForm,
+    DynamicTableForm,
+    UserPermissionsDynamicForm,
+)
 from .auth import coordinator_or_better_required
 
 PARALEGAL_CAPACITY = 4.0
 PARALEGAL_DETAILS_FORMS = {
-    "form": UserDetailsDynamicForm,
+    "details": UserDetailsDynamicForm,
+    "permissions": UserPermissionsDynamicForm,
 }
 ADMIN_GROUPS = [CaseGroups.PARALEGAL, CaseGroups.COORDINATOR]
 COORDINATOR_GROUPS = [CaseGroups.PARALEGAL]
@@ -83,7 +88,7 @@ def account_detail_view(request, pk, form_slug: str = ""):
     except User.DoesNotExist:
         raise Http404()
 
-    extra_kwargs = {"form": {"requesting_user": request.user}}
+    extra_kwargs = {"permissions": {"requesting_user": request.user}}
     forms = DynamicTableForm.build_forms(
         request, form_slug, user, PARALEGAL_DETAILS_FORMS, extra_kwargs
     )

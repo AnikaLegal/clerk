@@ -29,7 +29,7 @@ class TenancyDynamicForm(DynamicTableForm):
             "is_on_lease",
         ]
 
-    is_on_lease = SingleChoiceField("is_on_lease", Tenancy)
+    is_on_lease = SingleChoiceField(field_name="is_on_lease", model=Tenancy)
 
 
 class ClientPersonalDynamicForm(DynamicTableForm):
@@ -73,8 +73,10 @@ class ClientMiscDynamicForm(DynamicTableForm):
             "is_multi_income_household",
         ]
 
-    rental_circumstances = SingleChoiceField("rental_circumstances", Client)
-    referrer_type = SingleChoiceField("referrer_type", Client)
+    rental_circumstances = SingleChoiceField(
+        field_name="rental_circumstances", model=Client
+    )
+    referrer_type = SingleChoiceField(field_name="referrer_type", model=Client)
     employment_status = MultiChoiceField("employment_status", Client)
     special_circumstances = MultiChoiceField("special_circumstances", Client)
     legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
@@ -121,35 +123,71 @@ class UserDetailsDynamicForm(DynamicTableForm):
             "is_intern",
         ]
 
-    def __init__(self, requesting_user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.available_groups = []
+
+class UserPermissionsDynamicForm(DynamicTableForm):
+    class Meta:
+        model = User
+        fields = []
+
+    def __init__(self, requesting_user, instance, *args, **kwargs):
+        # Figure out which groups the requesting user is allowed to edit.
+        self.editable_groups = []
         if requesting_user.is_admin_or_better:
-            self.available_groups = [CaseGroups.COORDINATOR, CaseGroups.PARALEGAL]
+            self.editable_groups = [CaseGroups.COORDINATOR, CaseGroups.PARALEGAL]
         elif requesting_user.is_coordinator:
-            self.available_groups = [CaseGroups.PARALEGAL]
+            self.editable_groups = [CaseGroups.PARALEGAL]
 
-        # Add possible user groups to form.
-        group_choices = [(None, "-")] + [
-            (g.pk, g.name) for g in Group.objects.filter(name__in=CaseGroups.GROUPS)
+        # Figure out which groups the target user currently has
+        target_user = instance
+        target_user_groups = target_user.groups.filter(
+            name__in=CaseGroups.GROUPS
+        ).values_list("pk", flat=True)
+        initial = {}
+        extra_fields = {}
+        for group in Group.objects.filter(name__in=CaseGroups.GROUPS):
+            field_name = self.get_group_field_name(group.name)
+            initial[field_name] = group.pk in target_user_groups
+            is_readonly = group.name not in self.editable_groups
+            extra_fields[field_name] = forms.BooleanField(
+                disabled=is_readonly, required=False
+            )
+
+        super().__init__(*args, initial=initial, instance=instance, **kwargs)
+        self.fields.update(extra_fields)
+        super().set_display_values()
+
+    @staticmethod
+    def get_display_value(field, bound_field):
+        return "True" if bound_field.value() else "False"
+
+    def get_group_field_name(self, group_name):
+        return "has_" + group_name.lower() + "_permissions"
+
+    def clean(self):
+        super().clean()
+        allowed_field_names = [
+            self.get_group_field_name(gn) for gn in self.editable_groups
         ]
-        self.fields["group"] = forms.ChoiceField(choices=group_choices, required=False)
+        self.cleaned_data = {
+            k: v for k, v in self.cleaned_data.items() if k in allowed_field_names
+        }
 
-    # def clean(self):
-    #     # Add possible user groups to form.
+    def save(self):
+        user = self.instance
+        # This does a bunch of queries and I don't care.
+        for group in Group.objects.filter(name__in=CaseGroups.GROUPS):
+            if group.name not in self.editable_groups:
+                continue
 
-    #     interests = set()
-    #     i = 0
-    #     field_name = 'interest_%s' % (i,)
-    #     while self.cleaned_data.get(field_name):
-    #        interest = self.cleaned_data[field_name]
-    #        if interest in interests:
-    #            self.add_error(field_name, 'Duplicate')
-    #        else:
-    #            interests.add(interest)
-    #        i += 1
-    #        field_name = 'interest_%s' % (i,)
-    #    self.cleaned_data[“interests”] = interests
+            user_has_group = user.groups.filter(pk=group.pk).exists()
+            field_name = self.get_group_field_name(group.name)
+            is_group_selected = self.cleaned_data[field_name]
+            if user_has_group and not is_group_selected:
+                # Remove group
+                user.groups.remove(group)
+            elif is_group_selected and not user_has_group:
+                # Add group
+                user.groups.add(group)
 
 
 class IssueSearchForm(forms.ModelForm):

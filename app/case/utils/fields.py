@@ -7,10 +7,14 @@ from .widgets import FomanticSelect, FomanticSelectMultiple
 class SingleChoiceField(ChoiceField):
     widget = FomanticSelect
 
-    def __init__(self, field_name, model):
-        self.choices = getattr(model, field_name).field.choices
+    def __init__(self, field_name=None, model=None, choices=None, **kwargs):
+        if field_name and model:
+            self.choices = getattr(model, field_name).field.choices
+        elif choices:
+            self.choices = choices
+
         self.choice_map = {v: l for v, l in self.choices}
-        super().__init__(choices=self.choices)
+        super().__init__(choices=self.choices, **kwargs)
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
