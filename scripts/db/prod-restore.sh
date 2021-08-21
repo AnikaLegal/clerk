@@ -42,6 +42,8 @@ SHELL_CMD="\
 Group.objects.get_or_create(name='Impact');\
 u=User.objects.get(username='admin');\
 u.set_password('12345');\
+u.first_name='Admin';\
+u.last_name='Example';\
 u.save();\
 "
 run_docker ./manage.py shell_plus -c "$SHELL_CMD"

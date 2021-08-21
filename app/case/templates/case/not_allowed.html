@@ -5,7 +5,16 @@
     <h1 class="ui header">
         Not Allowed
         <div class="sub header">
-            You aren't currently allowed to view that page. You may need to request permissions from a staff member.
+            {% if request.GET.page %}
+                You aren't currently allowed to view 
+                    <a href="{{ request.GET.page }}">
+                        {{ request.GET.page }}
+                    </a>.
+            {% else %}
+                You aren't currently allowed to view that page.
+            {% endif %}
+            <br/>
+             You may need to request permissions from a staff member.
         </div>
     </h1>
 </div>

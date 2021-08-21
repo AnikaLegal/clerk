@@ -1,24 +1,20 @@
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Max, Q
 from django.http import Http404
 from django.shortcuts import render
 
 from accounts.models import User
-from case.forms import ParalegalDetailsDynamicForm, DynamicTableForm
+from case.forms import UserDetailsDynamicForm, DynamicTableForm
 
-from django.contrib.auth.decorators import user_passes_test
-from .auth import is_superuser
+from .auth import coordinator_or_better_required
 
 PARALEGAL_CAPACITY = 4.0
 
 PARALEGAL_DETAILS_FORMS = {
-    "form": ParalegalDetailsDynamicForm,
+    "form": UserDetailsDynamicForm,
 }
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@coordinator_or_better_required
 def paralegal_detail_view(request, pk, form_slug: str = ""):
     try:
         paralegal = (
@@ -55,9 +51,7 @@ def paralegal_detail_view(request, pk, form_slug: str = ""):
         return render(request, "case/paralegal_detail.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@coordinator_or_better_required
 def paralegal_list_view(request):
     paralegals = (
         User.objects.filter(issue__isnull=False)

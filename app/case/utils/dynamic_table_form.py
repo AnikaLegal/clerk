@@ -68,12 +68,20 @@ class DynamicTableForm(ModelForm):
         return self.render_to_string()
 
     @staticmethod
-    def build_forms(request, slug: str, instance, view_forms: dict) -> dict:
+    def build_forms(
+        request, slug: str, instance, view_forms: dict, extra_kwargs: dict = None
+    ) -> dict:
         form_instances = {}
         for form_slug, form_cls in view_forms.items():
+            # Get default kwargs for this form
             form_kwargs = dict(instance=instance, slug=form_slug, editable=False)
+            # If the POST request is for this particular form, add that in too.
             if request.method == "POST" and form_slug == slug:
                 form_kwargs["data"] = request.POST
+            # Add in any custom kwargs
+            _extra_kwargs = extra_kwargs.get(form_slug)
+            if _extra_kwargs:
+                form_kwargs = {**form_kwargs, **_extra_kwargs}
 
             form_instances[form_slug] = form_cls(**form_kwargs)
 

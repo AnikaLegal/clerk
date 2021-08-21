@@ -5,6 +5,7 @@
 {% block content %}
 <div class="ui container">
     <h1>Paralegals</h1>
+    <p>Every user who is assigned to a case (active or closed)</p>
     <table class="ui celled table">
         <thead>
             <tr>
@@ -19,7 +20,7 @@
         {% for paralegal in paralegals %}
             <tr>
                 <td {% if paralegal.is_intern %}class="blue"{% endif %}>
-                    <a href="{% url 'paralegal-detail' paralegal.pk %}">
+                    <a href="{% url 'account-detail' paralegal.pk %}">
                         {{ paralegal.get_full_name|title }} {% if paralegal.is_intern %}(intern){% endif %}
                     </a>               
                 </td>                

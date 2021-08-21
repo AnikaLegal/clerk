@@ -3,8 +3,9 @@ from datetime import datetime
 from urllib.parse import urljoin
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 
-from accounts.models import User
+from accounts.models import User, CaseGroups
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
@@ -170,6 +171,7 @@ def _sync_paralegals():
     issues = Issue.objects.filter(
         paralegal__isnull=True, actionstep_id__isnull=False
     ).all()
+    paralegal_group = Group.objects.get(name=CaseGroups.PARALEGAL)
     for issue in issues:
         logging.info("Checking Issue<%s> for paralegal.", issue.pk)
         api = ActionstepAPI()
@@ -193,6 +195,7 @@ def _sync_paralegals():
                         "last_name": last,
                     },
                 )
+                user.groups.add(paralegal_group)
                 if created:
                     logging.info(
                         "Created User<%s> as paralegal for Issue<%s>.",

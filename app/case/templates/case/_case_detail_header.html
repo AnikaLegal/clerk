@@ -10,7 +10,7 @@
 
         {% if issue.paralegal %}
             Assigned to 
-            <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+            <a href="{% url 'account-detail' issue.paralegal.pk %}">
                 {{ issue.paralegal.get_full_name|title }}
             </a>               
         {% else %}

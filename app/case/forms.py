@@ -108,7 +108,11 @@ class ReviewNoteForm(forms.ModelForm):
     event = forms.DateField(label="Next review date", required=True)
 
 
-class ParalegalDetailsDynamicForm(DynamicTableForm):
+from django.contrib.auth.models import Group
+from accounts.models import CaseGroups
+
+
+class UserDetailsDynamicForm(DynamicTableForm):
     class Meta:
         model = User
         fields = [
@@ -116,6 +120,36 @@ class ParalegalDetailsDynamicForm(DynamicTableForm):
             "last_name",
             "is_intern",
         ]
+
+    def __init__(self, requesting_user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.available_groups = []
+        if requesting_user.is_admin_or_better:
+            self.available_groups = [CaseGroups.COORDINATOR, CaseGroups.PARALEGAL]
+        elif requesting_user.is_coordinator:
+            self.available_groups = [CaseGroups.PARALEGAL]
+
+        # Add possible user groups to form.
+        group_choices = [(None, "-")] + [
+            (g.pk, g.name) for g in Group.objects.filter(name__in=CaseGroups.GROUPS)
+        ]
+        self.fields["group"] = forms.ChoiceField(choices=group_choices, required=False)
+
+    # def clean(self):
+    #     # Add possible user groups to form.
+
+    #     interests = set()
+    #     i = 0
+    #     field_name = 'interest_%s' % (i,)
+    #     while self.cleaned_data.get(field_name):
+    #        interest = self.cleaned_data[field_name]
+    #        if interest in interests:
+    #            self.add_error(field_name, 'Duplicate')
+    #        else:
+    #            interests.add(interest)
+    #        i += 1
+    #        field_name = 'interest_%s' % (i,)
+    #    self.cleaned_data[“interests”] = interests
 
 
 class IssueSearchForm(forms.ModelForm):

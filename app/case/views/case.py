@@ -19,14 +19,16 @@ from case.utils import Selector
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
 
-from django.contrib.auth.decorators import user_passes_test
-from .auth import is_superuser
+from .auth import login_required, paralegal_or_better_required
 
 
+@require_http_methods(["GET"])
 def root_view(request):
     return redirect("case-list")
 
 
+@login_required
+@require_http_methods(["GET"])
 def not_allowed_view(request):
     return render(request, "case/not_allowed.html")
 
@@ -36,10 +38,11 @@ def not_allowed_view(request):
 def case_list_view(request):
     form = IssueSearchForm(request.GET)
     issue_qs = Issue.objects.select_related("client", "paralegal")
+
     if request.user.is_paralegal:
         # Paralegals can only see assigned cases
         issue_qs = issue_qs.filter(paralegal=request.user)
-    elif not request.user.is_coordinator:
+    elif not request.user.is_coordinator_or_better:
         issue_qs = issue_qs.none()
 
     issues = form.search(issue_qs).order_by("-created_at").all()
@@ -164,14 +167,16 @@ case_selector = Selector(
 )
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def case_detail_view(request, pk, form_slug=""):
     try:
-        # FIXME: Who has access to this?
-        issue = Issue.objects.select_related("client").get(pk=pk)
+        issue_qs = Issue.objects.select_related("client")
+        if request.user.is_paralegal:
+            # Paralegals can only see cases that they are assigned to
+            issue_qs.filter(paralegal=request.user)
+
+        issue = issue_qs.get(pk=pk)
     except Issue.DoesNotExist:
         raise Http404()
 

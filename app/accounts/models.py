@@ -10,6 +10,8 @@ class CaseGroups:
     # Can see assigned cases
     PARALEGAL = "Paralegal"
 
+    GROUPS = [ADMIN, COORDINATOR, PARALEGAL]
+
 
 class User(AbstractUser):
     class Meta:

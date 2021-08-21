@@ -10,11 +10,6 @@ FORM_SLUG_PARAM = r"(?P<form_slug>[\-\w]+)"
 urlpatterns = [
     # Paralegals
     path("paralegals/", views.paralegal.paralegal_list_view, name="paralegal-list"),
-    re_path(
-        fr"^paralegals/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.paralegal.paralegal_detail_view,
-        name="paralegal-detail",
-    ),
     # Person
     re_path(
         fr"^person/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
@@ -32,6 +27,13 @@ urlpatterns = [
         fr"^client/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
         views.client.client_detail_view,
         name="client-detail",
+    ),
+    # Accounts
+    path("accounts/", views.accounts.account_list_view, name="account-list"),
+    re_path(
+        fr"^accounts/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
+        views.accounts.account_detail_view,
+        name="account-detail",
     ),
     # Cases
     path("cases/", views.case.case_list_view, name="case-list"),
