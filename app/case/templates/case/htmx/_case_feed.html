@@ -15,8 +15,7 @@ Args:
                     {{ note.creator.get_full_name }}
                     <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
                 </div>
-
-                <p>{{ note.text }}</p>                           
+                <p style="margin-bottom: 0">{{ note.text }}</p>                           
                 <div class="ui top right attached label primary">File note</div>
             </div>
         {% elif note.note_type == 'REVIEW' %}
@@ -25,8 +24,7 @@ Args:
                     {{ note.creator.get_full_name }}
                     <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
                 </div>
-
-                <p>{{ note.text }}</p>                           
+                <p style="margin-bottom: 0">{{ note.text }}</p>                           
                 <div class="ui top right attached label orange">Case review</div>
                 <div class="ui bottom right attached label">
                     Next review {{note.event|date:"jS M y"}}
@@ -38,8 +36,7 @@ Args:
                     {{ note.creator.get_full_name }}
                     <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
                 </div>
-
-                <p>{{ note.text }}</p>                           
+                <p style="margin-bottom: 0">{{ note.text }}</p>                           
                 <div class="ui top right attached label teal">Performance review</div>
             </div>
         {% endif %}
