@@ -38,8 +38,11 @@ def add_case_permission_groups(apps, schema_editor):
     for groupname, permission_codenames in GROUPS_TO_ADD.items():
         group, _ = Group.objects.get_or_create(name=groupname)
         for codename in permission_codenames:
-            permission = Permission.objects.get(codename=codename)
-            group.permissions.add(permission)
+            try:
+                permission = Permission.objects.get(codename=codename)
+                group.permissions.add(permission)
+            except Permission.DoesNotExist:
+                pass
 
 
 class Migration(migrations.Migration):
