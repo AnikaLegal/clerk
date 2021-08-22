@@ -7,189 +7,179 @@
 {% block content %}
 <div class="ui container">
     {% include 'case/_case_detail_header.html' with active="detail" %}
-    <div class="ui bottom attached tab segment active" data-tab="details">
-        <div class="ui two column grid">
+    <div class="ui two column grid" style="margin-top: 1rem;">
 
-            {# Client card #}
-            <div class="column">
-                <div class="ui card fluid">
-                    <div class="content">
-                        <div class="header">
-                            <a href="{% url 'client-detail' issue.client.pk %}">
-                                {{ issue.client.get_full_name|title }}               
-                            </a>
-                        </div>
-                        <div class="meta">
-                            <span>Created {{ issue.client.created_at|date:"jS M 'y" }}, updated {{ issue.client.modified_at|date:"jS M 'y" }}</span>
-                        </div>
-                        <table class="ui definition table small">
-                            <tbody>
-                                <tr>
-                                    <td>Email</td>
-                                    <td>{{ issue.client.email }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Phone</td>
-                                    <td>{{ issue.client.phone_number }} (call {{ issue.client.call_times|join:', '|lower }})</td>
-                                </tr>
-                                <tr>
-                                    <td>Age</td>
-                                    <td>{{ issue.client.get_age }} years old</td>
-                                </tr>
-                                <tr>
-                                    <td>Gender</td>
-                                    <td>{{ issue.client.gender|title }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="column">
+            {# Select form from dropdown #}
+            <div class="ui secondary segment">
+                {{ case_selector }}
             </div>
 
-            {# Tenancy card #}
-            <div class="column">
-                <div class="ui card fluid">
-                    <div class="content">                        
+            {# Case timeline #}
+            <div class="ui header">
+                Timeline
+            </div>
+            {% include 'case/htmx/_case_feed.html' %}
+        </div>
+
+        <div class="column">
+            {# Client card #}
+            <div class="ui card fluid">
+                <div class="content">
+                    <div class="header">
+                        <a href="{% url 'client-detail' issue.client.pk %}">
+                            Client
+                        </a>
+                    </div>
+                    <table class="ui definition table small">
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>{{ issue.client.get_full_name|title }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ issue.client.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone</td>
+                                <td>{{ issue.client.phone_number }} (call {{ issue.client.call_times|join:', '|lower }})</td>
+                            </tr>
+                            <tr>
+                                <td>Age</td>
+                                <td>{{ issue.client.get_age }} years old</td>
+                            </tr>
+                            <tr>
+                                <td>Gender</td>
+                                <td>{{ issue.client.gender|title }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Tenancy card #}
+                <div class="content">                        
+                    <div class="header">
+                        <a href="{% url 'tenancy-detail' tenancy.pk %}">
+                            Tenancy
+                        </a>                       
+                    </div>
+
+
+                    <table class="ui definition table small">
+                        <tbody>
+                            <tr>
+                                <td>Street Address</td>
+                                <td>{{tenancy.address}}</td>
+                            </tr>
+                            <tr>
+                                <td>Suburb</td>
+                                <td>{{tenancy.suburb}} {{tenancy.postcode}}</td>
+                            </tr>
+                            <tr>
+                                <td>Started</td>
+                                <td>{{ tenancy.started|date:"jS M 'y" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Client on lease</td>
+                                <td>{{ tenancy.is_on_lease|title }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Landord card #}
+                {% if tenancy.landlord %}
+                    <div class="content">
                         <div class="header">
-                            <a href="{% url 'tenancy-detail' tenancy.pk %}">
-                                Tenancy
+                            <a href="{% url 'person-detail' tenancy.landlord.pk %}">
+                                Landlord
                             </a>                       
                         </div>
 
-                        <div class="meta">
-                            <span>Created {{ tenancy.created_at|date:"jS M 'y" }}, updated {{ tenancy.modified_at|date:"jS M 'y" }}</span>
+                        <table class="ui definition table small">
+                            <tbody>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>{{ tenancy.landlord.full_name|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Address</td>
+                                    <td>{{ tenancy.landlord.address|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td>{{  tenancy.landlord.email|default:"-"  }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Phone</td>
+                                    <td>{{  tenancy.landlord.phone_number|default:"-"  }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+
+                {# Real estate agent card #}
+                {% if tenancy.agent %}
+                    <div class="content">
+                        <div class="header">
+                            <a href="{% url 'person-detail' tenancy.agent.pk %}">
+                                Real estate agent
+                            </a>                       
                         </div>
 
                         <table class="ui definition table small">
                             <tbody>
                                 <tr>
-                                    <td>Street Address</td>
-                                    <td>{{tenancy.address}}</td>
+                                    <td>Name</td>
+                                    <td>{{ tenancy.agent.full_name|default:"-" }}</td>
                                 </tr>
                                 <tr>
-                                    <td>Suburb</td>
-                                    <td>{{tenancy.suburb}} {{tenancy.postcode}}</td>
+                                    <td>Address</td>
+                                    <td>{{ tenancy.agent.address|default:"-" }}</td>
                                 </tr>
                                 <tr>
-                                    <td>Started</td>
-                                    <td>{{ tenancy.started|date:"jS M 'y" }}</td>
+                                    <td>Email</td>
+                                    <td>{{  tenancy.agent.email|default:"-"  }}</td>
                                 </tr>
                                 <tr>
-                                    <td>Client on lease</td>
-                                    <td>{{ tenancy.is_on_lease|title }}</td>
+                                    <td>Phone</td>
+                                    <td>{{  tenancy.agent.phone_number|default:"-"  }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-
-            {# Landord card #}
-            {% if tenancy.landlord %}
-                <div class="column">
-                    <div class="ui card fluid">
-                        <div class="content">
-                            <div class="header">
-                                <a href="{% url 'person-detail' tenancy.landlord.pk %}">
-                                    Landlord
-                                </a>                       
-                            </div>
-                            <div class="meta">
-                                <span>Created {{ tenancy.landlord.created_at|date:"jS M 'y" }}, updated {{ tenancy.landlord.modified_at|date:"jS M 'y" }}</span>
-                            </div>
-
-                            <table class="ui definition table small">
-                                <tbody>
-                                    <tr>
-                                        <td>Name</td>
-                                        <td>{{ tenancy.landlord.full_name|default:"-" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Address</td>
-                                        <td>{{ tenancy.landlord.address|default:"-" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Email</td>
-                                        <td>{{  tenancy.landlord.email|default:"-"  }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Phone</td>
-                                        <td>{{  tenancy.landlord.phone|default:"-"  }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-
-            {# Real estate agent card #}
-            {% if tenancy.agent %}
-                <div class="column">
-                    <div class="ui card fluid">
-                        <div class="content">
-                            <div class="header">
-                                <a href="{% url 'person-detail' tenancy.agent.pk %}">
-                                    Real estate agent
-                                </a>                       
-                            </div>
-                            <div class="meta">
-                                <span>Created {{ tenancy.agent.created_at|date:"jS M 'y" }}, updated {{ tenancy.agent.modified_at|date:"jS M 'y" }}</span>
-                            </div>
-
-                            <table class="ui definition table small">
-                                <tbody>
-                                    <tr>
-                                        <td>Name</td>
-                                        <td>{{ tenancy.agent.full_name|default:"-" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Address</td>
-                                        <td>{{ tenancy.agent.address|default:"-" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Email</td>
-                                        <td>{{  tenancy.agent.email|default:"-"  }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Phone</td>
-                                        <td>{{  tenancy.agent.phone|default:"-"  }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-        <div class="ui card fluid">
-            <div class="content">
-                <div class="header">Other submitted data</div>
-                <div class="meta">
-                    <span>This will be more nicely formatted later on.</span>
-                </div>
-                <table class="ui definition table small">
-                    <tbody>
-                        {% for k, v in issue.answers.items %}
-                        <tr>
-                            <td>{{ k }}</td>
-                            <td>{{ v|default:"-" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% endif %}
             </div>
         </div>
-
-        {% comment %}      
-            TODO - Uploaded Images and files 
-            <h2 class="ui horizontal divider header">
-                <i class="image icon"></i>
-                Images
-            </h2>
-        {% endcomment %}
     </div>
+    <div class="ui card fluid">
+        <div class="content">
+            <div class="header">Other submitted data</div>
+            <div class="meta">
+                <span>This will be more nicely formatted later on.</span>
+            </div>
+            <table class="ui definition table small">
+                <tbody>
+                    {% for k, v in issue.answers.items %}
+                    <tr>
+                        <td>{{ k }}</td>
+                        <td>{{ v|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% comment %}      
+        TODO - Uploaded Images and files 
+        <h2 class="ui horizontal divider header">
+            <i class="image icon"></i>
+            Images
+        </h2>
+    {% endcomment %}
 </div>
 {% endblock %}
 

@@ -1,0 +1,49 @@
+<table class="ui celled table" id="account-list">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Created</th>
+            <th>Permissions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        <tr>
+            <td>
+                <a href="{% url 'account-detail' user.pk %}">
+                    {{ user.get_full_name|title }} {% if user.is_intern %}(intern){% endif %}
+                </a>               
+            </td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.date_joined|date:"d/m/y" }}</td>
+            <td>
+                {% for group in user.groups.all %}
+                    {% if group.name == "Admin" %}
+                    <div class="ui label green">
+                    {% elif group.name == "Coordinator" %}
+                    <div class="ui label teal">
+                    {% elif group.name == "Paralegal" %}
+                    <div class="ui label blue">
+                    {% else %}
+                    <div class="ui label">
+                    {% endif %}
+                        {{ group.name }}
+                    </div>
+                {% endfor %}           
+                {% if user.is_superuser %}
+                    <div class="ui label black">
+                        Superuser 😎
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>
+                No cases found
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

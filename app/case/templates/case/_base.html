@@ -20,8 +20,8 @@
             <h5 class="ui header grey">
                 <img class="ui image" src="{% static 'brand/logo-icon-color.png' %}">
                 <div class="content">
-                    {% if user.is_authenticated %}
-                        Hello {{ user.get_full_name }}
+                    {% if request.user.is_authenticated %}
+                        Hello {{ request.user.get_full_name }}
                     {% else %}
                         Clerk
                     {% endif %}
@@ -29,13 +29,21 @@
             </h5>            
         </div>
 
-        {% if user.is_authenticated %}
+        {% if request.user.is_authenticated %}
             <a href="{% url 'case-list' %}" class="item">Cases</a>
-            <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
         {% endif %}
-
-        <div class="right menu">
-            {% if user.is_authenticated %}
+        {% if request.user.is_coordinator_or_better %}
+            <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
+            <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
+            <a href="{% url 'account-list' %}" class="item">Accounts</a>
+        {% endif %}
+        
+        <div class="right menu">          
+            <a href="https://wiki.anikalegal.com" class="item">Wiki</a>
+            <a href="https://anika.retool.com/embedded/public/5200a32b-86fb-45d7-aab7-e0caaceaa80c" class="item">Reports</a>          
+            <a href="https://anika.retool.com" class="item">Retool</a>
+          
+            {% if request.user.is_authenticated %}
             <a href="{% url 'logout' %}" class="item">Logout</a>
             {% else %}
             <a href="{% url 'login' %}" class="item">Login</a>
@@ -43,6 +51,22 @@
         </div>
     </header>
     <main>
+        {% if request.user.is_authenticated and not request.user.is_paralegal_or_better %}
+            <div class="ui container" style="margin-bottom:1rem";>
+                <div class="ui teal message">
+                    <div class="content">
+                        <div class="header">
+                            Welcome to Clerk!
+                        </div>
+                        <p>
+                            You have not yet been set up in the system and don't have permission to do anything.
+                            Please wait for a coordinator to configure your account.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
     <!-- Global Scripts -->

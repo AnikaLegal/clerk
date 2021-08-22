@@ -7,11 +7,12 @@ Requires JavaScript init.
 
 Args:
     field: Django form field (eg form.foo)
+    class: Extra class args
 
 {% endcomment %}
 <div class="field {% if field.errors %}error{% endif %}" id="field-{{ field.name }}">
     <label>{{ field.label }}</label>
-    <div class="ui selection dropdown" tabindex="0">
+    <div class="ui selection dropdown {{ class }} " tabindex="0">
         {% if field.value %}
             <input type="hidden" name="{{ field.name }}" value="{{ field.value }}" class="noselection">
         {% else %}

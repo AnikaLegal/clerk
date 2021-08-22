@@ -1,22 +1,21 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Max, Q
 from django.http import Http404
 from django.shortcuts import render
 
 from accounts.models import User
-from case.forms import ParalegalDetailsForm
+from case.forms import UserDetailsDynamicForm, DynamicTableForm
 
-from django.contrib.auth.decorators import user_passes_test
-from .auth import is_superuser
+from .auth import coordinator_or_better_required
 
 PARALEGAL_CAPACITY = 4.0
 
+PARALEGAL_DETAILS_FORMS = {
+    "form": UserDetailsDynamicForm,
+}
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-def paralegal_detail_view(request, pk):
+
+@coordinator_or_better_required
+def paralegal_detail_view(request, pk, form_slug: str = ""):
     try:
         paralegal = (
             User.objects.filter(issue__isnull=False)
@@ -41,22 +40,18 @@ def paralegal_detail_view(request, pk):
     except User.DoesNotExist:
         raise Http404()
 
-    # FIXME: Permissions
-    if request.method == "POST":
-        form = ParalegalDetailsForm(request.POST, instance=paralegal)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Update successful")
+    forms = DynamicTableForm.build_forms(
+        request, form_slug, paralegal, PARALEGAL_DETAILS_FORMS
+    )
+    context = {"paralegal": paralegal, "forms": forms}
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
+    if form_resp:
+        return form_resp
     else:
-        form = ParalegalDetailsForm(instance=paralegal)
-
-    context = {"paralegal": paralegal, "form": form}
-    return render(request, "case/paralegal_detail.html", context)
+        return render(request, "case/paralegal_detail.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@coordinator_or_better_required
 def paralegal_list_view(request):
     paralegals = (
         User.objects.filter(issue__isnull=False)

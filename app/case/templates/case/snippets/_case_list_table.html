@@ -29,7 +29,7 @@
             <td>
                 {% if issue.paralegal %}
             
-                <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+                <a href="{% url 'account-detail' issue.paralegal.pk %}">
                     {{ issue.paralegal.get_full_name|title }}
                 </a>               
                 {% else %}
@@ -54,6 +54,12 @@
             
             <td>{{issue.get_stage_display|default:"-" }}</td>
             <td>{{issue.get_outcome_display|default:"-" }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>
+                No cases found
+            </td>
         </tr>
     {% endfor %}
     </tbody>

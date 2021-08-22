@@ -1,0 +1,40 @@
+{# Case status icons#}
+<span id="case-status" hx-swap-oob="true">
+    {% if issue.is_open %}
+        <div class="ui blue label">
+            Case open
+        </div>
+    {% else %}
+        <div class="ui green label">
+            Case closed
+        </div>
+    {% endif %}
+
+    {% if not issue.provided_legal_services %}
+        <div class="ui blue label">
+            Legal services not provided
+        </div>
+    {% else %}
+        <div class="ui green label">
+            Legal services provided
+        </div>
+    {% endif %}
+
+    <div class="ui grey label">
+        Stage
+        {% if  issue.stage %}
+            <div class="detail">{{ issue.get_stage_display }}</div>
+        {% else %}
+                <div class="detail">-</div>
+        {% endif %}
+    </div>
+
+    <div class="ui grey label">
+        Outcome
+        {% if  issue.outcome %}
+            <div class="detail">{{ issue.get_outcome_display }}</div>
+        {% else %}
+                <div class="detail">-</div>
+        {% endif %}
+    </div>
+</span>

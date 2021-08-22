@@ -70,6 +70,7 @@ MIDDLEWARE = [
     "social_django.middleware.SocialAuthExceptionMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "web.middleware.RedirectMiddleware",
+    "case.middleware.annotate_group_access_middleware",
 ]
 
 ROOT_URLCONF = "clerk.urls"

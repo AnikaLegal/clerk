@@ -1,39 +1,73 @@
-from urllib.parse import urlencode
-
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import redirect, render
-from django.utils.datastructures import MultiValueDict
 from django.views.decorators.http import require_http_methods
+from django.db.models import Q
 
 from case.forms import (
     IssueProgressForm,
     IssueSearchForm,
     ParalegalNoteForm,
-    ReviewNoteForm,
+    CaseReviewNoteForm,
+    IssueAssignParalegalForm,
+    IssueOpenForm,
+    ParalegalReviewNoteForm,
 )
+from case.utils import Selector, HtmxFormView, get_page
 from core.models import Issue, IssueNote
+from core.models.issue import CaseStage
 from core.models.issue_note import NoteType
 
-from django.contrib.auth.decorators import user_passes_test
-from .auth import is_superuser
+from .auth import (
+    login_required,
+    paralegal_or_better_required,
+    coordinator_or_better_required,
+)
+
+COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
 
+@require_http_methods(["GET"])
 def root_view(request):
     return redirect("case-list")
 
 
-# FIXME: Permissions
 @login_required
-@user_passes_test(is_superuser, login_url="/")
+@require_http_methods(["GET"])
+def not_allowed_view(request):
+    return render(request, "case/not_allowed.html")
+
+
+@coordinator_or_better_required
+@require_http_methods(["GET"])
+def case_inbox_view(request):
+    """Inbox page where coordinators can see new cases for them to review and assign"""
+    is_coordinators = Q(paralegal__email=COORDINATORS_EMAIL)
+    is_open = Q(is_open=True)
+    is_new_stage = Q(stage=CaseStage.SUBMITTED) | Q(stage__isnull=True)
+    is_inbox = is_coordinators & is_open & is_new_stage
+    issues = Issue.objects.select_related("client", "paralegal").filter(is_inbox)
+    context = {"issues": issues}
+    return render(request, "case/case_inbox.html", context)
+
+
+@login_required
 @require_http_methods(["GET"])
 def case_list_view(request):
+    """
+    List of all cases for paralegals and coordinators to view.
+    """
     form = IssueSearchForm(request.GET)
     issue_qs = Issue.objects.select_related("client", "paralegal")
+
+    if request.user.is_paralegal:
+        # Paralegals can only see assigned cases
+        issue_qs = issue_qs.filter(paralegal=request.user)
+    elif not request.user.is_coordinator_or_better:
+        issue_qs = issue_qs.none()
+
     issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = _get_page(request, issues, per_page=14)
+    page, next_qs, prev_qs = get_page(request, issues, per_page=14)
     context = {
         "issue_page": page,
         "form": form,
@@ -43,139 +77,203 @@ def case_list_view(request):
     return render(request, "case/case_list.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-@require_http_methods(["GET"])
-def case_detail_view(request, pk):
-    context = _get_case_detail_context(request, pk)
-    return render(request, "case/case_detail.html", context)
+class CaseReviewHtmxFormView(HtmxFormView):
+    """
+    Form where coordinators can leave a note for other coordinators
+    """
+
+    template = "case/htmx/_case_review_note_form.html"
+    success_message = "Note created"
+    form_cls = CaseReviewNoteForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_success_context(self, request, context, pk, *args, **kwargs):
+        return {"notes": _get_issue_notes(request, pk)}
+
+    def get_default_form_data(self, request, context, *args, **kwargs):
+        return {
+            "issue": context["issue"],
+            "creator": request.user,
+            "note_type": NoteType.REVIEW,
+        }
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-@require_http_methods(["GET"])
-def case_detail_progress_view(request, pk):
-    context = _get_case_detail_context(request, pk)
-    notes = _get_issue_notes(pk)
-    context = {
-        **context,
-        "notes": notes,
-        "progress_form": IssueProgressForm(instance=context["issue"]),
-        "case_review_form": ReviewNoteForm(),
-        "paralegal_notes_form": ParalegalNoteForm(),
+class ParalegalReviewHtmxFormView(HtmxFormView):
+    """
+    Form where coordinators can leave a note on paralegal performance.
+    """
+
+    template = "case/htmx/_paralegal_review_note_form.html"
+    success_message = "Note created"
+    form_cls = ParalegalReviewNoteForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_success_context(self, request, context, pk, *args, **kwargs):
+        return {"notes": _get_issue_notes(request, pk)}
+
+    def get_default_form_data(self, request, context, *args, **kwargs):
+        return {
+            "issue": context["issue"],
+            "creator": request.user,
+            "note_type": NoteType.PERFORMANCE,
+        }
+
+
+class FileNoteHtmxFormView(HtmxFormView):
+    """
+    Form where anyone working on the case can leave a public file note
+    """
+
+    template = "case/htmx/_case_paralegal_note_form.html"
+    success_message = "Note created"
+    form_cls = ParalegalNoteForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_paralegal_or_better
+
+    def get_success_context(self, request, context, pk, *args, **kwargs):
+        return {"notes": _get_issue_notes(request, pk)}
+
+    def get_default_form_data(self, request, context, *args, **kwargs):
+        return {
+            "issue": context["issue"],
+            "creator": request.user,
+            "note_type": NoteType.PARALEGAL,
+        }
+
+
+class AssignParalegalHtmxFormView(HtmxFormView):
+    """
+    Form where coordinators can assign a paralegal to a case
+    """
+
+    template = "case/htmx/_assign_paralegal_form.html"
+    success_message = "Assignment successful"
+    form_cls = IssueAssignParalegalForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_form_instance(self, request, context, *args, **kwargs):
+        return context["issue"]
+
+
+class CaseProgressHtmxFormView(HtmxFormView):
+    """
+    Form where anyone can progress the case.
+    """
+
+    template = "case/htmx/_case_progress_form.html"
+    success_message = "Update successful"
+    form_cls = IssueProgressForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_paralegal_or_better
+
+    def get_form_instance(self, request, context, *args, **kwargs):
+        return context["issue"]
+
+
+class CaseOpenHtmxFormView(HtmxFormView):
+    """
+    Form where you can open or close the case.
+    """
+
+    template = "case/htmx/_case_open_form.html"
+    success_message = "Update successful"
+    form_cls = IssueOpenForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_form_instance(self, request, context, *args, **kwargs):
+        return context["issue"]
+
+
+class CaseSelector(Selector):
+    """
+    A drop down where users can select the actions that they want to take for a case.
+    """
+
+    slug = "case"
+    default_text = "I want to..."
+    child_views = {
+        "note": FileNoteHtmxFormView(),
+        "review": CaseReviewHtmxFormView(),
+        "assign": AssignParalegalHtmxFormView(),
+        "progress": CaseProgressHtmxFormView(),
+        "open": CaseOpenHtmxFormView(),
+        "performance": ParalegalReviewHtmxFormView(),
     }
-    return render(request, "case/case_detail_progress.html", context)
-
-
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-@require_http_methods(["POST"])
-def case_detail_review_note_form_view(request, pk):
-    context = _get_case_detail_context(request, pk)
-    default_data = {
-        "issue": context["issue"],
-        "creator": request.user,
-        "note_type": NoteType.REVIEW,
+    render_when = {
+        k: lambda view, request: view.is_user_allowed(request)
+        for k in ("note", "review", "progress", "assign", "open", "performance")
     }
-    form_data = _add_form_data(request.POST, default_data)
-    form = ReviewNoteForm(form_data)
-    notes = None
-    if form.is_valid():
-        form.save()
-        notes = _get_issue_notes(pk)
-        messages.success(request, "Note created")
-
-    context = {**context, "form": form, "htmx_notes": notes}
-    return render(request, "case/htmx/_case_review_note_form.html", context)
-
-
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-@require_http_methods(["POST"])
-def case_detail_paralegal_note_form_view(request, pk):
-    context = _get_case_detail_context(request, pk)
-    default_data = {
-        "issue": context["issue"],
-        "creator": request.user,
-        "note_type": NoteType.PARALEGAL,
+    options = {
+        "note": "Add a file note",
+        "review": "Add a coordinator's case review note",
+        "performance": "Add a paralegal performance review note",
+        "assign": "Assign a paralegal to the case",
+        "progress": "Progress case status",
+        "open": "Close or re-open the case",
     }
-    form_data = _add_form_data(request.POST, default_data)
-    form = ParalegalNoteForm(form_data)
-    notes = None
-    if form.is_valid():
-        form.save()
-        notes = _get_issue_notes(pk)
-        messages.success(request, "Note created")
-
-    context = {**context, "form": form, "htmx_notes": notes}
-    return render(request, "case/htmx/_case_paralegal_note_form.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
-@require_http_methods(["POST"])
-def case_detail_progress_form_view(request, pk):
-    context = _get_case_detail_context(request, pk)
-    form = IssueProgressForm(request.POST, instance=context["issue"])
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Update successful")
-
-    context = {**context, "form": form}
-    return render(request, "case/htmx/_case_progress_form.html", context)
-
-
-def _get_issue_notes(pk):
-    return (
-        IssueNote.objects.filter(issue=pk)
-        .select_related("creator")
-        .order_by("-created_at")
-        .all()
-    )
-
-
-def _get_case_detail_context(request, pk):
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_view(request, pk, form_slug=""):
+    """
+    The details of a given case.
+    """
     try:
-        # FIXME: Who has access to this?
-        issue = Issue.objects.select_related("client").get(pk=pk)
+        issue_qs = Issue.objects.select_related("client")
+        if request.user.is_paralegal:
+            # Paralegals can only see cases that they are assigned to
+            issue_qs.filter(paralegal=request.user)
+
+        issue = issue_qs.get(pk=pk)
     except Issue.DoesNotExist:
         raise Http404()
 
     # FIXME: Assume only only tenancy but that's not how the models work.
     tenancy = issue.client.tenancy_set.first()
-
-    if issue.actionstep_id:
-        actionstep_url = _get_actionstep_url(issue.actionstep_id)
-    else:
-        actionstep_url = None
-
-    return {
+    case_selector = CaseSelector(request)
+    context = {
         "issue": issue,
         "tenancy": tenancy,
-        "actionstep_url": actionstep_url,
+        "actionstep_url": _get_actionstep_url(issue),
+        "notes": _get_issue_notes(request, pk),
+        "case_selector": case_selector,
     }
+    form_view = case_selector.handle(form_slug, context, pk)
+    if form_view:
+        return form_view
+    else:
+        return render(request, "case/case_detail.html", context)
 
 
-def _get_page(request, items, per_page):
-    page_number = request.GET.get("page", 1) or 1
-    paginator = Paginator(items, per_page=per_page)
-    page = paginator.get_page(page_number)
-    next_page_num = page.next_page_number() if page.has_next() else paginator.num_pages
-    prev_page_num = page.previous_page_number() if page.has_previous() else 1
-    get_query = {k: v for k, v in request.GET.items()}
-    next_qs = "?" + urlencode({**get_query, "page": next_page_num})
-    prev_qs = "?" + urlencode({**get_query, "page": prev_page_num})
-    return page, next_qs, prev_qs
+def _get_issue_notes(request, pk):
+    """
+    Returns the issue notes visible to a given user.
+    """
+    if request.user.is_coordinator_or_better:
+        note_types = IssueNote.COORDINATOR_NOTE_TYPES
+    else:
+        note_types = IssueNote.PARALEGAL_NOTE_TYPES
+
+    return (
+        IssueNote.objects.filter(issue=pk)
+        .select_related("creator")
+        .filter(note_type__in=note_types)
+        .order_by("-created_at")
+        .all()
+    )
 
 
-def _get_actionstep_url(actionstep_id):
-    return f"https://ap-southeast-2.actionstep.com/mym/asfw/workflow/action/overview/action_id/{actionstep_id}"
-
-
-def _add_form_data(form_data, extra_data):
-    return MultiValueDict({**{k: [v] for k, v in extra_data.items()}, **form_data})
+def _get_actionstep_url(issue):
+    if issue.actionstep_id:
+        return f"https://ap-southeast-2.actionstep.com/mym/asfw/workflow/action/overview/action_id/{issue.actionstep_id}"

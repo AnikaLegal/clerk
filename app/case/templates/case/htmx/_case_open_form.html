@@ -1,21 +1,22 @@
-{% comment %} 
-Renders a the IssueProgressForm
-Args:
-    form: IssueProgressForm
-    issue: Issue
-
-{% endcomment %}
 <form 
     class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-    hx-post="./progress/"
+    hx-post="./open/"
     hx-target="this"
 >
     <p>
-        Update the stage of the case.
+        Close or re-open the case. Please make sure you correctly set all of the fields in this form.
     </p>
+    <p>
+        This data is crucial for our reporting and decision making.
+    </p>
+
+
     <hr class="ui divider" />
+    {% include 'case/snippets/_checkbox_field.html' with field=form.is_open %}
     {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
     {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
+    {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
+    {% include 'case/snippets/_textarea_field.html' with field=form.outcome_notes %}
     {% include 'case/snippets/_form_errors.html' %}
     {% include 'case/snippets/_form_success.html' %}
     <button class="ui positive button" type="submit">Update</button>

@@ -1,12 +1,12 @@
 <h1 class="ui header">
     {{ issue.get_topic_display }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
     <div class="sub header">
-        Created {{ issue.created_at|date:"jS M 'y" }}, updated {{ issue.modified_at|date:"jS M 'y" }}
+        Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
         <br/>
 
         {% if issue.paralegal %}
             Assigned to 
-            <a href="{% url 'paralegal-detail' issue.paralegal.pk %}">
+            <a id="assigned-paralegal" href="{% url 'account-detail' issue.paralegal.pk %}">
                 {{ issue.paralegal.get_full_name|title }}
             </a>               
         {% else %}
@@ -19,13 +19,14 @@
         {% endif %}
     </div>
 </h1>
+{% include 'case/htmx/_case_status.html' with issue=issue %}
 <div class="ui top attached tabular menu">
     <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
         <i class="clipboard list icon"></i>
-        Details
+        Summary
     </a>
-    <a href="{% url 'case-detail-progress' issue.pk %}" class="item {% if active == 'progress' %}active{% endif %}">
+    <a href="#" class="item {% if active == 'progress' %}active{% endif %}">
         <i class="chart line icon"></i>
-        Progress
+        Other
     </a>
 </div>

@@ -8,16 +8,15 @@ Args:
 {% endcomment %}
 <form 
     class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-    hx-post="./review/"
+    hx-post="./performance/"
     hx-target="this"
 >
     <p>
-        Leave a case review note for other coordinators to read. 
+        Leave a paralegal performance review note. 
         This note is not visible to paralegals.
     </p>
     <hr class="ui divider" />
     {% include 'case/snippets/_textarea_field.html' with field=form.text %}
-    {% include 'case/snippets/_calendar_field.html' with field=form.event %}
     {% include 'case/snippets/_form_errors.html' %}
     {% include 'case/snippets/_form_success.html' %}
     <button class="ui positive button" type="submit">Create note</button>

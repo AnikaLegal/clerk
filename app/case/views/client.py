@@ -1,21 +1,19 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 
 
 from case.forms import (
-    DynamicModelForm,
+    DynamicTableForm,
     ClientContactDynamicForm,
     ClientMiscDynamicForm,
     ClientPersonalDynamicForm,
     TenancyDynamicForm,
     PersonDynamicForm,
 )
-from core.models import Client, Tenancy, Person
+from core.models import Client, Tenancy, Person, Issue
 
-from django.contrib.auth.decorators import user_passes_test
-from .auth import is_superuser
+from .auth import paralegal_or_better_required
 
 CLIENT_DETAIL_FORMS = {
     "contact": ClientContactDynamicForm,
@@ -32,66 +30,75 @@ PERSON_DETAIL_FORMS = {
 }
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def client_detail_view(request, pk, form_slug: str = ""):
     try:
-        # FIXME: Who has access to this?
         client = Client.objects.prefetch_related("issue_set").get(pk=pk)
+        if request.user.is_paralegal:
+            is_assigned = Issue.objects.filter(
+                client=client, paralegal=request.user
+            ).exists()
+            if not is_assigned:
+                # Not allowed
+                raise Http404()
+
     except Client.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, client, CLIENT_DETAIL_FORMS
     )
     context = {"client": client, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:
         return render(request, "case/client_detail.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def tenancy_detail_view(request, pk, form_slug: str = ""):
     try:
-        # FIXME: Who has access to this?
         tenancy = Tenancy.objects.get(pk=pk)
+        if request.user.is_paralegal:
+            is_assigned = Issue.objects.filter(
+                client=tenancy.client, paralegal=request.user
+            ).exists()
+            if not is_assigned:
+                # Not allowed
+                raise Http404()
+
     except Tenancy.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, tenancy, TENANCY_DETAIL_FORMS
     )
     context = {"tenancy": tenancy, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:
         return render(request, "case/tenancy_detail.html", context)
 
 
-# FIXME: Permissions
-@login_required
-@user_passes_test(is_superuser, login_url="/")
+@paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def person_detail_view(request, pk, form_slug: str = ""):
     try:
-        # FIXME: Who has access to this?
+        # FIXME: Limit access to only paralegals who are assigned to cases where
+        # There people are involved.
         person = Person.objects.get(pk=pk)
     except Person.DoesNotExist:
         raise Http404()
 
-    forms = DynamicModelForm.build_forms(
+    forms = DynamicTableForm.build_forms(
         request, form_slug, person, PERSON_DETAIL_FORMS
     )
     context = {"person": person, "forms": forms}
-    form_resp = DynamicModelForm.get_response(request, form_slug, forms, context)
+    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
     if form_resp:
         return form_resp
     else:
