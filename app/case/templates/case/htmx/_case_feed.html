@@ -9,35 +9,39 @@ Args:
         <p>No notes yet.</p>
     {% endif %}
     {% for note in notes %}
-        <div class="event" style="margin-top: 2rem">
-            <div class="label">
-                {% if note.note_type == 'PARALEGAL' %}
-                    <i class="graduation cap icon"></i>
-                {% elif note.note_type == 'REVIEW'  %}
-                    <i class="search icon"></i>
-                {% endif %}
-            </div>
-            <div class="content">
-                <div class="summary">
+        {% if note.note_type == 'PARALEGAL' %}
+            <div class="ui segment padded">
+                <div class="ui top attached label primary">
                     {{ note.creator.get_full_name }}
-                    {% if note.note_type == 'PARALEGAL' %}
-                        wrote a paralegal note
-                    {% elif note.note_type == 'REVIEW'  %}
-                        performed a case reivew
-                    {% endif %}
-                    <div class="date">
-                        {{note.created_at|date:"jS M y, ga"}}
-                        {% if note.note_type == 'REVIEW' %}
-                            &nbsp;(next review {{note.event|date:"jS M y"}})
-                        {% endif %}
-
-
-                    </div>
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
                 </div>
-                <div class="extra text">
-                    <p>{{ note.text }}</p>                           
+
+                <p>{{ note.text }}</p>                           
+                <div class="ui top right attached label primary">File note</div>
+            </div>
+        {% elif note.note_type == 'REVIEW' %}
+            <div class="ui segment padded">
+                <div class="ui top attached label orange">
+                    {{ note.creator.get_full_name }}
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
+                </div>
+
+                <p>{{ note.text }}</p>                           
+                <div class="ui top right attached label orange">Case review</div>
+                <div class="ui bottom right attached label">
+                    Next review {{note.event|date:"jS M y"}}
                 </div>
             </div>
-        </div>
+        {% elif note.note_type == 'PERFORMANCE' %}
+            <div class="ui segment padded">
+                <div class="ui top attached label teal">
+                    {{ note.creator.get_full_name }}
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
+                </div>
+
+                <p>{{ note.text }}</p>                           
+                <div class="ui top right attached label teal">Performance review</div>
+            </div>
+        {% endif %}
     {% endfor %}
 </div>

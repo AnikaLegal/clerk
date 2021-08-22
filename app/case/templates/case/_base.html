@@ -33,6 +33,7 @@
             <a href="{% url 'case-list' %}" class="item">Cases</a>
         {% endif %}
         {% if request.user.is_coordinator_or_better %}
+            <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
             <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
             <a href="{% url 'account-list' %}" class="item">Accounts</a>
         {% endif %}

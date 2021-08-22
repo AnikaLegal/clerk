@@ -1,9 +1,9 @@
 from django import forms
 from django.forms.fields import BooleanField
+from django.contrib.auth.models import Group
 
-from accounts.models import User
+from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
-
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 
 
@@ -95,7 +95,7 @@ class ParalegalNoteForm(forms.ModelForm):
     text = forms.CharField(label="Paralegal note", min_length=1, max_length=2048)
 
 
-class ReviewNoteForm(forms.ModelForm):
+class CaseReviewNoteForm(forms.ModelForm):
     class Meta:
         model = IssueNote
         fields = [
@@ -110,8 +110,17 @@ class ReviewNoteForm(forms.ModelForm):
     event = forms.DateField(label="Next review date", required=True)
 
 
-from django.contrib.auth.models import Group
-from accounts.models import CaseGroups
+class ParalegalReviewNoteForm(forms.ModelForm):
+    class Meta:
+        model = IssueNote
+        fields = [
+            "issue",
+            "creator",
+            "note_type",
+            "text",
+        ]
+
+    text = forms.CharField(label="Review note", min_length=1, max_length=2048)
 
 
 class UserDetailsDynamicForm(DynamicTableForm):
@@ -224,8 +233,23 @@ class IssueProgressForm(forms.ModelForm):
         model = Issue
         fields = [
             "stage",
+            "provided_legal_services",
+        ]
+
+
+class IssueOpenForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        fields = [
+            "is_open",
+            "stage",
             "outcome",
             "outcome_notes",
             "provided_legal_services",
-            "is_open",
         ]
+
+
+class IssueAssignParalegalForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        fields = ["paralegal"]

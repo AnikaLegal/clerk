@@ -7,8 +7,12 @@ from .timestamped import TimestampedModel
 
 
 class NoteType:
+    # A public file note.
     PARALEGAL = "PARALEGAL"
+    # A case review by coordinators, for coordinators
     REVIEW = "REVIEW"
+    # A review of the paralegal's performance on a given case.
+    PERFORMANCE = "PERFORMANCE"
 
 
 class IssueNote(TimestampedModel):
@@ -16,9 +20,12 @@ class IssueNote(TimestampedModel):
     A note, taken against a issue.
     """
 
+    PARALEGAL_NOTE_TYPES = [NoteType.PARALEGAL]
+    COORDINATOR_NOTE_TYPES = [NoteType.PARALEGAL, NoteType.REVIEW, NoteType.PERFORMANCE]
     NOTE_CHOICES = (
-        (NoteType.PARALEGAL, "Paralegal"),
-        (NoteType.REVIEW, "Review"),
+        (NoteType.PARALEGAL, "File note"),
+        (NoteType.REVIEW, "Case review"),
+        (NoteType.PERFORMANCE, "Paralegal performance review"),
     )
 
     # The case that this note is for
