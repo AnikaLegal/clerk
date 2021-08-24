@@ -6,13 +6,14 @@ Args:
     htmx_notes: List[IssueNote] - only render in reponse to POST
 
 {% endcomment %}
+{% if issue.paralegal %}
 <form 
     class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
     hx-post="./performance/"
     hx-target="this"
->
+>   
     <p>
-        Leave a paralegal performance review note. 
+        Leave a paralegal performance review note for {{ issue.paralegal.get_full_name }}. 
         This note is not visible to paralegals.
     </p>
     <hr class="ui divider" />
@@ -38,3 +39,8 @@ $('.ui.calendar').calendar({
 
 })
 </script>
+{% else %}
+<p>
+    There is no paralegal assigned to this case - cannot create a performance review.
+</p>
+{% endif %}

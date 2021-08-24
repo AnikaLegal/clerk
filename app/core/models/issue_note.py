@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+from django.db import transaction
 
 from accounts.models import User
 
@@ -44,5 +48,22 @@ class IssueNote(TimestampedModel):
     #  - Review: the time to next review this case.
     event = models.DateTimeField(null=True, blank=True)
 
-    # Actionstep ID
+    # Optinal Actionstep ID, for file notes imported from Actionstep
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    # A generic relation to a target object, this could be a paralegal or an issue event
+    # See: https://simpleisbetterthancomplex.com/tutorial/2016/10/13/how-to-use-generic-relations.html
+    content_type = models.ForeignKey(
+        ContentType, blank=True, null=True, on_delete=models.CASCADE
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = GenericForeignKey()
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.note_type == NoteType.PERFORMANCE:
+            # Set the paralegal as the issue target.
+            if self.issue.paralegal:
+                self.content_object = self.issue.paralegal
+
+        super().save(*args, **kwargs)

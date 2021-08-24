@@ -38,6 +38,15 @@ Args:
                 </div>
                 <p style="margin-bottom: 0">{{ note.text }}</p>                           
                 <div class="ui top right attached label teal">Performance review</div>
+                {% if note.content_object %}
+                    <div class="ui bottom right attached label">
+                        About
+                        <a href="{% url 'account-detail' note.content_object.pk %}">
+                            {{ note.content_object.get_full_name }}
+                        </a>
+
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     {% endfor %}

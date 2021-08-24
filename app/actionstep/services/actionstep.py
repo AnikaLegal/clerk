@@ -255,7 +255,7 @@ def _sync_filenotes():
                     filenote["enteredTimestamp"], "%Y-%m-%dT%H:%M:%S%z"
                 )
                 IssueNote.objects.get_or_create(
-                    pk=actionstep_id,
+                    actionstep_id=actionstep_id,
                     defaults={
                         "issue": issue,
                         "creator": user,

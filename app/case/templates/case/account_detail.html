@@ -49,6 +49,29 @@
     </h2>
     {% include "case/snippets/_case_list_table.html" with issues=user.issue_set.all %}
 
+    {% if request.user.is_coordinator_or_better %}
+        <h2 class="ui header dividing">
+            Performance Reviews
+        </h2>
+        {% for note in user.issue_notes.all %}
+            <div class="ui segment padded">
+                <div class="ui top attached label teal">
+                    {{ note.creator.get_full_name }}
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
+                </div>
+                <p style="margin-bottom: 0">{{ note.text }}</p>                           
+                <div class="ui top right attached label teal">Performance review</div>
+                <div class="ui bottom right attached label">
+                    Case 
+                    <a href="{% url 'case-detail' note.issue.pk %}">
+                        {{ note.issue.fileref }}
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+        <p>Nothing here... yet</p>
+        {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
 

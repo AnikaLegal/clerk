@@ -67,7 +67,7 @@ def case_list_view(request):
         issue_qs = issue_qs.none()
 
     issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = get_page(request, issues, per_page=14)
+    page, next_qs, prev_qs = get_page(request, issues, per_page=28)
     context = {
         "issue_page": page,
         "form": form,
@@ -230,7 +230,9 @@ def case_detail_view(request, pk, form_slug=""):
     The details of a given case.
     """
     try:
-        issue_qs = Issue.objects.select_related("client")
+        issue_qs = Issue.objects.select_related("client").prefetch_related(
+            "fileupload_set"
+        )
         if request.user.is_paralegal:
             # Paralegals can only see cases that they are assigned to
             issue_qs.filter(paralegal=request.user)
@@ -242,18 +244,56 @@ def case_detail_view(request, pk, form_slug=""):
     # FIXME: Assume only only tenancy but that's not how the models work.
     tenancy = issue.client.tenancy_set.first()
     case_selector = CaseSelector(request)
+
+    file_urls, image_urls = _get_uploaded_files(issue)
     context = {
         "issue": issue,
         "tenancy": tenancy,
         "actionstep_url": _get_actionstep_url(issue),
         "notes": _get_issue_notes(request, pk),
         "case_selector": case_selector,
+        "details": _get_submitted_details(issue),
+        "file_urls": file_urls,
+        "image_urls": image_urls,
     }
     form_view = case_selector.handle(form_slug, context, pk)
     if form_view:
         return form_view
     else:
         return render(request, "case/case_detail.html", context)
+
+
+MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
+
+
+def _get_uploaded_files(issue):
+    file_urls, image_urls = [], []
+    for upload in issue.fileupload_set.all():
+        is_maybe_image = any(
+            [upload.file.name.endswith(ext) for ext in MAYBE_IMAGE_FILE_EXTENSIONS]
+        )
+        if is_maybe_image:
+            image_urls.append(upload.file.url)
+        else:
+            file_urls.append(upload.file.url)
+
+    return file_urls, image_urls
+
+
+def _get_submitted_details(issue):
+    details = []
+    correct_case = lambda s: s.lower().capitalize()
+    for name, answer in issue.answers.items():
+        if answer is None:
+            continue
+        title = correct_case(" ".join(name.split("_")[1:]))
+        answer = ", ".join(answer) if type(answer) is list else str(answer)
+        if "_" in answer:
+            answer = correct_case(" ".join(answer.split("_")))
+
+        details.append({"title": title, "answer": answer})
+
+    return details
 
 
 def _get_issue_notes(request, pk):

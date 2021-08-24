@@ -8,7 +8,17 @@ from utils.admin import admin_link, dict_to_json_html
 
 from .models import Client, FileUpload, Issue, IssueNote, Person, Submission, Tenancy
 
-admin.site.register(IssueNote)
+
+@admin.register(IssueNote)
+class IssueNoteAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "created_at",
+        "creator",
+        "note_type",
+        "actionstep_id",
+    )
 
 
 @admin.register(Submission)
