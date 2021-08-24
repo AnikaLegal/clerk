@@ -1,4 +1,5 @@
 from django.db import models
+<<<<<<< HEAD
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import transaction
@@ -7,6 +8,10 @@ from accounts.models import User
 
 from .issue import Issue
 from .issue_note import IssueNote, NoteType
+=======
+
+from .issue import Issue
+>>>>>>> Start adding issue events
 from .timestamped import TimestampedModel
 
 
