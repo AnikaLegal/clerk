@@ -3,15 +3,8 @@
     <div class="sub header">
         Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
         <br/>
+        {% include 'case/snippets/_assigned_paralegal_link.html' with issue=issue %}
 
-        {% if issue.paralegal %}
-            Assigned to 
-            <a id="assigned-paralegal" href="{% url 'account-detail' issue.paralegal.pk %}">
-                {{ issue.paralegal.get_full_name|title }}
-            </a>               
-        {% else %}
-            Not assigned
-        {% endif %}
         {% if actionstep_url %}
             (<a href="{{actionstep_url}}">view in Actionstep</a>)
         {% else %}
