@@ -1,3 +1,4 @@
+import re
 import logging
 from datetime import datetime
 from urllib.parse import urljoin
@@ -9,9 +10,9 @@ from accounts.models import User, CaseGroups
 from actionstep.api import ActionstepAPI
 from actionstep.constants import ActionType, Participant
 from actionstep.models import ActionDocument
-from core.models import Issue, IssueNote
+from core.models import Issue, IssueNote, IssueEvent
 from core.models.issue_note import NoteType
-from core.models.issue import CaseTopic
+from core.models.issue import CaseTopic, CaseStage
 from slack.services import send_slack_message
 from utils.sentry import WithSentryCapture
 
@@ -219,6 +220,20 @@ def _sync_paralegals():
 sync_paralegals = WithSentryCapture(_sync_paralegals)
 
 
+STAGE_MAP = {
+    "Setup": CaseStage.SUBMITTED,
+    "Engagement": CaseStage.ENGAGED,
+    "Reviewing documents": CaseStage.ADVICE,
+    "Negotiation": CaseStage.ADVICE,
+    "Inactive": CaseStage.ADVICE,
+    "Drafting documents": CaseStage.ADVICE,
+    "Wrap Up": CaseStage.POST_CASE,
+    "Completed": CaseStage.POST_CASE,
+    "Abandoned": None,
+    "Closed": None,
+}
+
+
 def _sync_filenotes():
     issues = Issue.objects.filter(actionstep_id__isnull=False).all()
     api = ActionstepAPI()
@@ -227,20 +242,50 @@ def _sync_filenotes():
         issue_filenotes = api.filenotes.list_by_case(issue.actionstep_id)
         for filenote in issue_filenotes:
             is_system = filenote["source"] == "System"
-            is_assign_or_step = filenote["text"].startswith(
-                "Assigned To Participant Id"
-            ) or filenote["text"].startswith("Changed step from")
+            is_step = filenote["text"].startswith("Changed step from")
             is_link_note = filenote["text"].startswith(
                 "Created automatically by Anika Clerk"
             )
-            if is_system and is_assign_or_step:
-                print(
-                    "\t",
-                    filenote["id"],
-                    filenote["enteredTimestamp"],
-                    filenote["enteredBy"],
-                    filenote["text"],
+            if is_system and is_step:
+                actionstep_id = int(filenote["id"])
+                # 2021-04-30T12:05:03+12:00'
+                created_at = datetime.strptime(
+                    filenote["enteredTimestamp"], "%Y-%m-%dT%H:%M:%S%z"
                 )
+                # Changed step from Setup to Abandoned
+                text = filenote["text"][18:]
+                before_stage_as, after_stage_as = re.split(" to ", text)
+                before_stage, after_stage = (
+                    STAGE_MAP[before_stage_as],
+                    STAGE_MAP[after_stage_as],
+                )
+                if (
+                    before_stage is not None
+                    and after_stage is not None
+                    and before_stage != after_stage
+                ):
+                    event, _ = IssueEvent.objects.get_or_create(
+                        actionstep_id=actionstep_id,
+                        defaults={
+                            "prev_stage": before_stage,
+                            "next_stage": after_stage,
+                            "issue": issue,
+                            "event_types": ["STAGE"],
+                            "created_at": created_at,
+                            "modified_at": created_at,
+                        },
+                    )
+                    IssueNote.objects.get_or_create(
+                        actionstep_id=actionstep_id,
+                        defaults={
+                            "issue": issue,
+                            "note_type": NoteType.EVENT,
+                            "content_object": event,
+                            "created_at": created_at,
+                            "modified_at": created_at,
+                        },
+                    )
+
             elif filenote["source"] == "User" and (not is_link_note):
                 #  O'Connor, Grace
                 lastname, firstname = filenote["enteredBy"].split(",")

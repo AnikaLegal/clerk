@@ -3,7 +3,7 @@
     <div class="sub header">
         Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
         <br/>
-        {% include 'case/snippets/_assigned_paralegal_link.html' with issue=issue %}
+        {% include 'case/snippets/_assigned_paralegal_link.html' with paralegal=issue.paralegal %}
 
         {% if actionstep_url %}
             (<a href="{{actionstep_url}}">view in Actionstep</a>)
