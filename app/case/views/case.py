@@ -158,6 +158,9 @@ class AssignParalegalHtmxFormView(HtmxFormView):
     def is_user_allowed(self, request):
         return request.user.is_coordinator_or_better
 
+    def get_success_context(self, request, context, pk, *args, **kwargs):
+        return {"new_paralegal": context["issue"].paralegal}
+
     def get_form_instance(self, request, context, *args, **kwargs):
         return context["issue"]
 

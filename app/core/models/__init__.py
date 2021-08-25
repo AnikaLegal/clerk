@@ -6,3 +6,4 @@ from .submission import Submission
 from .tenancy import Tenancy
 from .timestamped import TimestampedModel
 from .upload import FileUpload
+from .issue_event import IssueEvent

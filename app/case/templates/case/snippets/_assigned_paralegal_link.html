@@ -1,8 +1,10 @@
-{% if issue.paralegal %}
+{% if paralegal %}
+    <span id="assigned-paralegal" hx-swap-oob="true">
     Assigned to 
-    <a id="assigned-paralegal" href="{% url 'account-detail' issue.paralegal.pk %}" hx-swap-oob="true">
-        {{ issue.paralegal.get_full_name|title }}
+    <a href="{% url 'account-detail' paralegal.pk %}">
+        {{ paralegal.get_full_name|title }}
     </a>               
+    </span>
 {% else %}
     <span id="assigned-paralegal" hx-swap-oob="true">
         Not assigned

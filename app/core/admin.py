@@ -6,7 +6,19 @@ from actionstep.services.actionstep import send_issue_actionstep
 from core.services.slack import send_issue_slack
 from utils.admin import admin_link, dict_to_json_html
 
-from .models import Client, FileUpload, Issue, IssueNote, Person, Submission, Tenancy
+from .models import Client, FileUpload, Issue, IssueNote, Person, Submission, Tenancy, IssueEvent
+
+
+@admin.register(IssueEvent)
+class IssueEventAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "created_at",
+        "event_types",
+        "issue_id",
+    )
+
 
 
 @admin.register(IssueNote)
@@ -18,6 +30,8 @@ class IssueNoteAdmin(admin.ModelAdmin):
         "creator",
         "note_type",
         "actionstep_id",
+        "issue_id",
+
     )
 
 
