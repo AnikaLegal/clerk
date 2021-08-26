@@ -14,25 +14,71 @@ class CaseTopic:
     RENT_REDUCTION = "RENT_REDUCTION"
     EVICTION = "EVICTION"
     OTHER = "OTHER"
+    CHOICES = (
+        (REPAIRS, "Repairs"),
+        (RENT_REDUCTION, "Rent reduction"),
+        (EVICTION, "Eviction"),
+        (OTHER, "Other"),
+    )
 
 
 class CaseStage:
-    SUBMITTED = "SUBMITTED"
-    ENGAGED = "ENGAGED"
+    UNSTARTED = "UNSTARTED"
+    CLIENT_AGREEMENT = "CLIENT_AGREEMENT"
     ADVICE = "ADVICE"
-    POST_CASE = "POST_CASE"
+    FORMAL_LETTER = "FORMAL_LETTER"
+    NEGOTIATIONS = "NEGOTIATIONS"
+    VCAT_CAV = "VCAT_CAV"
+    POST_CASE_INTERVIEW = "POST_CASE_INTERVIEW"
+    CLOSED = "CLOSED"
+    CHOICES = (
+        (UNSTARTED, "Not started"),
+        (CLIENT_AGREEMENT, "Client agreement"),
+        (ADVICE, "Drafting advice"),
+        (FORMAL_LETTER, "Formal letter sent"),
+        (NEGOTIATIONS, "Negotiations"),
+        (VCAT_CAV, "VCAT/CAV"),
+        (POST_CASE_INTERVIEW, "Post-case interview"),
+        (CLOSED, "Closed"),
+    )
+    HELP_TEXT = {
+        UNSTARTED: "Submission received but not started",
+        CLIENT_AGREEMENT: "Screening call and client agreement",
+        ADVICE: "Assess facts of case, draft advice & letter",
+        FORMAL_LETTER: "Formal letter sent to landlord or agent",
+        NEGOTIATIONS: "Negotiation with landlord or agent to find an outcome",
+        VCAT_CAV: "Case escalated to dispute resolution",
+        POST_CASE_INTERVIEW: "Casework is complete but impact interview needs to be completed",
+        CLOSED: "Case has been closed",
+    }
 
 
 class CaseOutcome:
-    UNKNOWN = "UNKNOWN"
-    UNRESPONSIVE = "UNRESPONSIVE"
     OUT_OF_SCOPE = "OUT_OF_SCOPE"
-    SUCCESS = "SUCCESS"
-    UNSUCCESSFUL = "UNSUCCESSFUL"
-    REFERRED = "REFERRED"
-    ESCALATION = "ESCALATION"
-    DROPPED_OUT = "DROPPED_OUT"
+    CHANGE_OF_SCOPE = "CHANGE_OF_SCOPE"
     RESOLVED_EARLY = "RESOLVED_EARLY"
+    CHURNED = "CHURNED"
+    UNKNOWN = "UNKNOWN"
+    SUCCESSFUL = "SUCCESSFUL"
+    UNSUCCESSFUL = "UNSUCCESSFUL"
+    CHOICES = (
+        (OUT_OF_SCOPE, "Out of scope"),
+        (CHANGE_OF_SCOPE, "Change of scope"),
+        (RESOLVED_EARLY, "Resolved early"),
+        (CHURNED, "Churned"),
+        (UNKNOWN, "Unknown"),
+        (SUCCESSFUL, "Successful"),
+        (UNSUCCESSFUL, "Unsuccessful"),
+    )
+    HELP_TEXT = {
+        OUT_OF_SCOPE: "The client's issue was never appropriate for our services, so we've referred them on to another organisation.",
+        CHANGE_OF_SCOPE: "The client's issue was appropriate for our services when submitted, but because of a development during the case, became inappropriate for our services.",
+        RESOLVED_EARLY: "The client had their issue resolved prior to advice being provided.",
+        CHURNED: "The client was unresponsive or decided not to proceed with our services.",
+        UNKNOWN: "Advice was provided but we are unsure whether the client had a successful outcome as they stopped responding.",
+        SUCCESSFUL: "Client had their repair completed or managed to avoid eviction",
+        UNSUCCESSFUL: "The inverse of successful",
+    }
 
 
 class Issue(TimestampedModel):
@@ -40,42 +86,16 @@ class Issue(TimestampedModel):
     A client's specific issue.
     """
 
-    STAGE_CHOICES = (
-        (CaseStage.SUBMITTED, "Submitted"),
-        (CaseStage.ENGAGED, "Engaged"),
-        (CaseStage.ADVICE, "Advice"),
-        (CaseStage.POST_CASE, "Post-case"),
-    )
-
-    OUTCOME_CHOICES = (
-        (CaseOutcome.UNRESPONSIVE, "Unresponsive"),
-        (CaseOutcome.OUT_OF_SCOPE, "Out of scope"),
-        (CaseOutcome.SUCCESS, "Success"),
-        (CaseOutcome.UNSUCCESSFUL, "Unsuccessful"),
-        (CaseOutcome.REFERRED, "Referred"),
-        (CaseOutcome.ESCALATION, "Escalation"),
-        (CaseOutcome.DROPPED_OUT, "Dropped out"),
-        (CaseOutcome.RESOLVED_EARLY, "Resolved early"),
-        (CaseOutcome.UNKNOWN, "Unknown"),
-    )
-
-    TOPIC_CHOICES = (
-        (CaseTopic.REPAIRS, "Repairs"),
-        (CaseTopic.RENT_REDUCTION, "Rent reduction"),
-        (CaseTopic.EVICTION, "Eviction"),
-        (CaseTopic.OTHER, "Other"),
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # What kind of case it is.
-    topic = models.CharField(max_length=32, choices=TOPIC_CHOICES)
+    topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     # Where the case is at now.
     stage = models.CharField(
-        max_length=32, null=True, blank=True, choices=STAGE_CHOICES
+        max_length=32, choices=CaseStage.CHOICES, default=CaseStage.UNSTARTED
     )
     # An explanation of the outcome
     outcome = models.CharField(
-        max_length=32, null=True, blank=True, choices=OUTCOME_CHOICES
+        max_length=32, null=True, blank=True, choices=CaseOutcome.CHOICES
     )
     outcome_notes = models.CharField(max_length=256, blank=True, default="")
     # Whether we provided legal advice.

@@ -1,3 +1,7 @@
+{% comment %} 
+is_review is True when this is showing case reviews
+is_open is True when all cases are open
+{% endcomment %}
 <table class="ui celled table">
     <thead>
         <tr>
@@ -5,11 +9,16 @@
             <th>Topic</th>
             <th>Client</th>
             <th>Paralegal</th>
+            {% if is_review %}
+                <th>Next Review Due</th>
+            {% endif %}
             <th>Created</th>
-            <th>Open</th>
             <th>Advice</th>
-            <th>Stage</th>
-            <th>Outcome</th>
+            {% if not is_open %}
+                <th>Open</th>
+                <th>Stage</th>
+                <th>Outcome</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -36,14 +45,12 @@
                     -
                 {% endif %}
             </td>
+            {% if is_review %}
+                <td class="center aligned {{ issue.color }}">
+                    {{ issue.next_review|date:"d/m/y" }}
+                </td>
+            {% endif %}
             <td>{{ issue.created_at|date:"d/m/y" }}</td>
-            <td class="center aligned">
-                {% if issue.is_open %}
-                    <i class="green checkmark icon"></i>
-                {% else %}
-                    <i class="yellow close icon"></i>
-                {% endif %}
-            </td>
             <td class="center aligned">
                 {% if issue.provided_legal_services %}
                     <i class="green checkmark icon"></i>
@@ -51,9 +58,18 @@
                     <i class="yellow close icon"></i>
                 {% endif %}
             </td>
-            
-            <td>{{issue.get_stage_display|default:"-" }}</td>
-            <td>{{issue.get_outcome_display|default:"-" }}</td>
+            {% if not is_open %}
+                <td class="center aligned">
+                    {% if issue.is_open %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+                <td>{{issue.get_stage_display|default:"-" }}</td>
+                <td>{{issue.get_outcome_display|default:"-" }}</td>
+            {% endif %}
+
         </tr>
     {% empty %}
         <tr>

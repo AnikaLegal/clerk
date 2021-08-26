@@ -72,9 +72,13 @@ class IssueEvent(TimestampedModel):
                 text += " to " + self.next_user.get_full_name() + "."
         if is_stage_changed:
             fmt_stage = lambda s: s.lower().replace("_", " ").capitalize() if s else s
-            prev_stage = fmt_stage(self.prev_stage)
+            text += f" Stage changed"
+            if self.prev_stage:
+                prev_stage = fmt_stage(self.prev_stage)
+                text += f" from {prev_stage}"
+
             next_stage = fmt_stage(self.next_stage)
-            text += f" Stage changed from {prev_stage} to {next_stage}."
+            text += f" to {next_stage}."
 
         if is_open_changed:
             if self.prev_is_open:

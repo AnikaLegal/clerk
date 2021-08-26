@@ -90,6 +90,7 @@ class IssueFactory(TimestampedModelFactory):
     topic = "REPAIRS"
     answers = {}
     client = factory.SubFactory(ClientFactory)
+    stage = "UNSTARTED"
 
 
 @factory.django.mute_signals(post_save)
