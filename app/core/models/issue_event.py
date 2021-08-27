@@ -60,27 +60,31 @@ class IssueEvent(TimestampedModel):
             )
 
     def get_text(self):
-        text = ''
-        is_user_changed = (self.prev_user is not None or self.next_user is not None)
-        is_stage_changed = (self.prev_stage is not None or self.next_stage is not None)
-        is_open_changed = (self.prev_is_open is not None or self.next_is_open is not None)
+        text = ""
+        is_user_changed = self.prev_user is not None or self.next_user is not None
+        is_stage_changed = self.prev_stage is not None or self.next_stage is not None
+        is_open_changed = self.prev_is_open is not None or self.next_is_open is not None
         if is_user_changed:
-            text += 'Assigned paralegal changed'
+            text += "Assigned paralegal changed"
             if self.prev_user:
-                text += ' from ' + self.prev_user.get_full_name()
+                text += " from " + self.prev_user.get_full_name()
             if self.next_user:
-                text += ' to ' + self.next_user.get_full_name() + '.'
+                text += " to " + self.next_user.get_full_name() + "."
         if is_stage_changed:
-            fmt_stage = lambda s: s.lower().replace('_', ' ').capitalize() if s else s
-            prev_stage = fmt_stage(self.prev_stage)
+            fmt_stage = lambda s: s.lower().replace("_", " ").capitalize() if s else s
+            text += f" Stage changed"
+            if self.prev_stage:
+                prev_stage = fmt_stage(self.prev_stage)
+                text += f" from {prev_stage}"
+
             next_stage = fmt_stage(self.next_stage)
-            text += f' Stage changed from {prev_stage} to {next_stage}.'
+            text += f" to {next_stage}."
 
         if is_open_changed:
             if self.prev_is_open:
-                text += ' Case closed.'
+                text += " Case closed."
             else:
-                text += ' Case re-opened.'
+                text += " Case re-opened."
 
         return text
 

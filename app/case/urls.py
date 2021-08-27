@@ -38,6 +38,7 @@ urlpatterns = [
     # Cases
     path("cases/", views.case.case_list_view, name="case-list"),
     path("cases/inbox/", views.case.case_inbox_view, name="case-inbox"),
+    path("cases/review/", views.case.case_review_view, name="case-review"),
     re_path(
         fr"^cases/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
         views.case.case_detail_view,

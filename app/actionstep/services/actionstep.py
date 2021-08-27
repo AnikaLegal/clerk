@@ -221,16 +221,16 @@ sync_paralegals = WithSentryCapture(_sync_paralegals)
 
 
 STAGE_MAP = {
-    "Setup": CaseStage.SUBMITTED,
-    "Engagement": CaseStage.ENGAGED,
+    "Setup": CaseStage.UNSTARTED,
+    "Engagement": CaseStage.CLIENT_AGREEMENT,
     "Reviewing documents": CaseStage.ADVICE,
-    "Negotiation": CaseStage.ADVICE,
-    "Inactive": CaseStage.ADVICE,
     "Drafting documents": CaseStage.ADVICE,
-    "Wrap Up": CaseStage.POST_CASE,
-    "Completed": CaseStage.POST_CASE,
-    "Abandoned": None,
-    "Closed": None,
+    "Negotiation": CaseStage.NEGOTIATIONS,
+    "Wrap Up": CaseStage.POST_CASE_INTERVIEW,
+    "Inactive": CaseStage.CLOSED,
+    "Completed": CaseStage.CLOSED,
+    "Abandoned": CaseStage.CLOSED,
+    "Closed": CaseStage.CLOSED,
 }
 
 
@@ -290,7 +290,12 @@ def _sync_filenotes():
                 #  O'Connor, Grace
                 lastname, firstname = filenote["enteredBy"].split(",")
                 lastname, firstname = lastname.strip(), firstname.strip()
-                user = User.objects.get(first_name=firstname, last_name=lastname)
+                try:
+                    user = User.objects.get(first_name=firstname, last_name=lastname)
+                except User.DoesNotExist:
+                    import pdb
+
+                    pdb.set_trace()
 
                 actionstep_id = int(filenote["id"])
                 filenote["enteredTimestamp"]

@@ -57,8 +57,9 @@ SlackUser.objects.all().delete()\
 "
 run_docker ./manage.py shell_plus -c "$SHELL_CMD"
 
-echo -e "\nDeleting all Actionstep access tokens."
+echo -e "\nDeleting all Scheduled tasks and Actionstep access tokens."
 SHELL_CMD="\
+Schedule.objects.all().delete();\
 AccessToken.objects.all().delete()\
 "
 run_docker ./manage.py shell_plus -c "$SHELL_CMD"

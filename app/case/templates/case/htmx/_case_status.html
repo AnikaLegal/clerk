@@ -37,4 +37,12 @@
                 <div class="detail">-</div>
         {% endif %}
     </div>
+    {% if not issue.is_open and issue.outcome_notes %}
+            <div class="ui segment padded">
+                <div class="ui top attached label green">
+                    Outcome notes
+                </div>
+                <p style="margin-bottom: 0">{{ issue.outcome_notes }}</p>                           
+            </div>
+    {% endif %}
 </span>
