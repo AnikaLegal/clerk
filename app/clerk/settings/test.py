@@ -23,7 +23,7 @@ Q_CLUSTER = {
     "orm": "default",  # Use Django's ORM + database for broker
 }
 
-
+ACTIONSTEP_SYNC = True
 ACTIONSTEP_SETUP_OWNER = "keithleonardo@anikalegal.com"
 ACTIONSTEP_WEB_URI = "https://example.com"
 

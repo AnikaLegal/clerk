@@ -9,6 +9,7 @@ psycopg2-binary
 gunicorn
 sentry-sdk
 django-q
+awscli
 
 # Authentication
 social-auth-app-django

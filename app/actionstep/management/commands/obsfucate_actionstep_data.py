@@ -6,7 +6,7 @@ from django.db import transaction
 from faker import Faker
 
 from accounts.models import User
-from core.models import Client, Issue, Person, Tenancy
+from core.models import Client, Issue, Person, Tenancy, IssueNote, FileUpload
 from utils.signals import disable_signals, restore_signals
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,7 @@ class Command(BaseCommand):
         issues = Issue.objects.all()
         people = Person.objects.all()
         tenancies = Tenancy.objects.all()
+        notes = IssueNote.objects.exclude(note_type="EVENT")
         paralegals = (
             User.objects.filter(issue__isnull=False)
             .prefetch_related("issue_set")
@@ -56,12 +57,22 @@ class Command(BaseCommand):
             c.save()
 
         for i in issues:
-            i.outcome_notes = fake.sentences()
+            if i.outcome_notes:
+                i.outcome_notes = " ".join(fake.sentences())
+
+            prefix = i.topic.upper()
             i.answers = {
-                "FOO": " ".join(fake.sentences()),
-                "BAR": " ".join(fake.sentences()),
-                "BAZ": " ".join(fake.sentences()),
+                f"{prefix}_FOO": " ".join(fake.sentences()),
+                f"{prefix}_BAR": " ".join(fake.sentences()),
+                f"{prefix}_BAZ": " ".join(fake.sentences()),
             }
             i.save()
+
+        for n in notes:
+            n.text = " ".join(fake.sentences())
+            n.save()
+
+        # Replace uploaded files
+        FileUpload.objects.update(file="file-uploads/do-your-best.png")
 
         restore_signals()
