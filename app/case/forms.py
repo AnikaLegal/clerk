@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 
 from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
+from core.models.issue import CaseStage
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 
 
@@ -236,17 +237,60 @@ class IssueProgressForm(forms.ModelForm):
             "provided_legal_services",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        stage_field = self.fields["stage"]
+        filtered_choices = []
+        for choice in stage_field._choices:
+            if choice[0] != "CLOSED":
+                filtered_choices.append(choice)
 
-class IssueOpenForm(forms.ModelForm):
+        stage_field._choices = filtered_choices
+
+
+class IssueOutcomeForm(forms.ModelForm):
     class Meta:
         model = Issue
         fields = [
-            "is_open",
-            "stage",
             "outcome",
             "outcome_notes",
             "provided_legal_services",
         ]
+
+
+class IssueCloseForm(IssueOutcomeForm):
+    def save(self, commit=True):
+        self.instance.is_open = False
+        self.instance.stage = CaseStage.CLOSED
+        super().save(commit=False)
+        if commit:
+            # If committing, save the instance and the m2m data immediately.
+            self.instance.save()
+            self._save_m2m()
+
+
+class IssueReOpenForm(forms.ModelForm):
+    class Meta:
+        model = Issue
+        fields = ["stage"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        stage_field = self.fields["stage"]
+        filtered_choices = []
+        for choice in stage_field._choices:
+            if choice[0] != "CLOSED":
+                filtered_choices.append(choice)
+
+        stage_field._choices = filtered_choices
+
+    def save(self, commit=True):
+        self.instance.is_open = True
+        super().save(commit=False)
+        if commit:
+            # If committing, save the instance and the m2m data immediately.
+            self.instance.save()
+            self._save_m2m()
 
 
 class IssueAssignParalegalForm(forms.ModelForm):

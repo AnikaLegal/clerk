@@ -11,7 +11,9 @@ from case.forms import (
     ParalegalNoteForm,
     CaseReviewNoteForm,
     IssueAssignParalegalForm,
-    IssueOpenForm,
+    IssueCloseForm,
+    IssueOutcomeForm,
+    IssueReOpenForm,
     ParalegalReviewNoteForm,
 )
 from case.utils import Selector, HtmxFormView, get_page
@@ -215,14 +217,46 @@ class CaseProgressHtmxFormView(HtmxFormView):
         return context["issue"]
 
 
-class CaseOpenHtmxFormView(HtmxFormView):
+class CaseCloseHtmxFormView(HtmxFormView):
     """
-    Form where you can open or close the case.
+    Form where you close the case.
     """
 
-    template = "case/htmx/_case_open_form.html"
-    success_message = "Update successful"
-    form_cls = IssueOpenForm
+    template = "case/htmx/_case_close_form.html"
+    success_message = "Case closed!"
+    form_cls = IssueCloseForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_form_instance(self, request, context, *args, **kwargs):
+        return context["issue"]
+
+
+class CaseOutcomeHtmxFormView(HtmxFormView):
+    """
+    Form where you update the outcome of the case.
+    """
+
+    template = "case/htmx/_case_outcome_form.html"
+    success_message = "Outcome updated"
+    form_cls = IssueOutcomeForm
+
+    def is_user_allowed(self, request):
+        return request.user.is_coordinator_or_better
+
+    def get_form_instance(self, request, context, *args, **kwargs):
+        return context["issue"]
+
+
+class CaseReOpenHtmxFormView(HtmxFormView):
+    """
+    Form where you open the case.
+    """
+
+    template = "case/htmx/_case_reopen_form.html"
+    success_message = "Case re-opened"
+    form_cls = IssueReOpenForm
 
     def is_user_allowed(self, request):
         return request.user.is_coordinator_or_better
@@ -236,19 +270,37 @@ class CaseSelector(Selector):
     A drop down where users can select the actions that they want to take for a case.
     """
 
+    def __init__(self, request, issue):
+        super().__init__(request)
+        self.options = {**CaseSelector.options}
+        if issue.is_open:
+            del self.options["reopen"]
+        else:
+            del self.options["close"]
+
+        when_allowed = lambda view, req: view.is_user_allowed(req)
+        when_closed = lambda view, req: when_allowed(view, req) and not issue.is_open
+        when_open = lambda view, req: when_allowed(view, req) and issue.is_open
+        self.render_when = {
+            k: when_allowed
+            for k in ("note", "review", "progress", "assign", "performance")
+        }
+        self.render_when["close"] = when_open
+        self.render_when["reopen"] = when_closed
+        self.render_when["outcome"] = when_closed
+
     slug = "case"
     default_text = "I want to..."
+    render_when = {}
     child_views = {
         "note": FileNoteHtmxFormView(),
         "review": CaseReviewHtmxFormView(),
         "assign": AssignParalegalHtmxFormView(),
         "progress": CaseProgressHtmxFormView(),
-        "open": CaseOpenHtmxFormView(),
         "performance": ParalegalReviewHtmxFormView(),
-    }
-    render_when = {
-        k: lambda view, request: view.is_user_allowed(request)
-        for k in ("note", "review", "progress", "assign", "open", "performance")
+        "close": CaseCloseHtmxFormView(),
+        "reopen": CaseReOpenHtmxFormView(),
+        "outcome": CaseOutcomeHtmxFormView(),
     }
     options = {
         "note": "Add a file note",
@@ -256,7 +308,9 @@ class CaseSelector(Selector):
         "performance": "Add a paralegal performance review note",
         "assign": "Assign a paralegal to the case",
         "progress": "Progress case status",
-        "open": "Close or re-open the case",
+        "outcome": "Edit case outcome",
+        "close": "Close the case",
+        "reopen": "Re-open the case",
     }
 
 
@@ -280,7 +334,7 @@ def case_detail_view(request, pk, form_slug=""):
 
     # FIXME: Assume only only tenancy but that's not how the models work.
     tenancy = issue.client.tenancy_set.first()
-    case_selector = CaseSelector(request)
+    case_selector = CaseSelector(request, issue)
 
     file_urls, image_urls = _get_uploaded_files(issue)
     context = {
