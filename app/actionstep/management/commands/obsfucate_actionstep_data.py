@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **kwargs):
-        assert settings.DEBUG, "NEVER RUN THIS IN PROD!"
+        assert settings.IS_PROD, "NEVER RUN THIS IN PROD!"
         disable_signals()
         fake = Faker()
         clients = Client.objects.all()

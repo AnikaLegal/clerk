@@ -4,6 +4,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from . import *
 
+IS_PROD = True
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
