@@ -5,7 +5,6 @@ aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-test/imag
 aws s3 sync s3://anika-clerk/original_images/ s3://anika-clerk-test/original_images/
 
 echo -e "\nRestoring database from S3 backups"
-./manage.py reset_db --close-sessions --noinput
 S3_BUCKET=s3://anika-database-backups
 LATEST_BACKUP=`aws s3 ls $S3_BUCKET | sort |  grep postgres_clerk | tail -n 1 | awk '{print $4}'`
 aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - | gunzip | \
