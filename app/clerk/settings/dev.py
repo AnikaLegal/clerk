@@ -25,6 +25,11 @@ MAILCHIMP_REPAIRS_LIST_ID = "aa24ab1b75"
 MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
+# Transactional emails via SendGrid
+# Step 1. setup ngrok https forwarding: https://ngrok.com/
+# Step 2. configure in SendGrid: https://app.sendgrid.com/settings/parse
+EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
+
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
 TWILIO_AUDIO_BASE_URL = (

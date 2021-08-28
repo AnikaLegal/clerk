@@ -13,10 +13,9 @@ is_open is True when all cases are open
                 <th>Next Review Due</th>
             {% endif %}
             <th>Created</th>
+            <th>Stage</th>
             <th>Advice</th>
             {% if not is_open %}
-                <th>Open</th>
-                <th>Stage</th>
                 <th>Outcome</th>
             {% endif %}
         </tr>
@@ -51,6 +50,7 @@ is_open is True when all cases are open
                 </td>
             {% endif %}
             <td>{{ issue.created_at|date:"d/m/y" }}</td>
+            <td>{{issue.get_stage_display|default:"-" }}</td>
             <td class="center aligned">
                 {% if issue.provided_legal_services %}
                     <i class="green checkmark icon"></i>
@@ -59,14 +59,6 @@ is_open is True when all cases are open
                 {% endif %}
             </td>
             {% if not is_open %}
-                <td class="center aligned">
-                    {% if issue.is_open %}
-                        <i class="green checkmark icon"></i>
-                    {% else %}
-                        <i class="yellow close icon"></i>
-                    {% endif %}
-                </td>
-                <td>{{issue.get_stage_display|default:"-" }}</td>
                 <td>{{issue.get_outcome_display|default:"-" }}</td>
             {% endif %}
 

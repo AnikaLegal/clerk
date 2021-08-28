@@ -5,11 +5,6 @@ function run_docker {
    docker-compose -f docker/docker-compose.local.yml run --rm test $@
 } 
 
-# Stop all Docker containers
-echo -e "\nStopping all running Docker containers"
-docker update --restart=no `docker ps -q`
-docker kill `docker ps -q`
-
 # Reset db
 echo -e "\nResetting database"
 run_docker ./manage.py reset_db --close-sessions --noinput
