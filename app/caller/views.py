@@ -33,7 +33,7 @@ Thank you for enquiring about Anika's rental repairs service.
 
 To get help, please fill in this form: https://intake.anikalegal.com
 
-For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+For more info on Anika's services, please visit https://www.anikalegal.com/services/
 
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
@@ -44,7 +44,7 @@ Thank you for enquiring about Anika's evictions service.
 
 To get help, please fill in this form: https://intake.anikalegal.com
 
-For more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+For more info on Anika's services, please visit https://www.anikalegal.com/services/
 
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
@@ -53,7 +53,7 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 CALLBACK_SMS_MESSAGE = """
 Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
 
-In the meantime, for more info on Anika's services, please visit https://www.anikalegal.com/faq/faq-index
+In the meantime, for more info on Anika's services, please visit https://www.anikalegal.com/services/
 
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
