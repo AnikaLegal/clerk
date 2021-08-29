@@ -81,10 +81,23 @@ class CaseOutcome:
     }
 
 
+class IssueManager(models.Manager):
+    def check_permisisons(self, request):
+        if request.user.is_paralegal:
+            # Paralegals can only see cases that they are assigned to
+            return self.filter(paralegal=request.user)
+        elif request.user.is_coordinator_or_better:
+            return self
+        else:
+            return self.none()
+
+
 class Issue(TimestampedModel):
     """
     A client's specific issue.
     """
+
+    objects = IssueManager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # What kind of case it is.

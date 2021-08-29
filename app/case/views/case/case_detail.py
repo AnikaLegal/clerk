@@ -1,13 +1,9 @@
-from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Max
-from django.utils import timezone
 
 from case.forms import (
     IssueProgressForm,
-    IssueSearchForm,
     ParalegalNoteForm,
     CaseReviewNoteForm,
     IssueAssignParalegalForm,
@@ -16,101 +12,51 @@ from case.forms import (
     IssueReOpenForm,
     ParalegalReviewNoteForm,
 )
-from case.utils import Selector, HtmxFormView, get_page
+from case.utils import Selector, HtmxFormView
 from core.models import Issue, IssueNote
-from core.models.issue import CaseStage
 from core.models.issue_note import NoteType
 
-from .auth import (
-    login_required,
-    paralegal_or_better_required,
-    coordinator_or_better_required,
-)
+from case.views.auth import paralegal_or_better_required
 
-COORDINATORS_EMAIL = "coordinators@anikalegal.com"
+MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 
-@require_http_methods(["GET"])
-def root_view(request):
-    return redirect("case-list")
-
-
-@login_required
-@require_http_methods(["GET"])
-def not_allowed_view(request):
-    return render(request, "case/not_allowed.html")
-
-
-@coordinator_or_better_required
-@require_http_methods(["GET"])
-def case_review_view(request):
-    """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_open = Q(is_open=True)
-    has_review = Q(issuenote__note_type=NoteType.REVIEW)
-    is_review = is_open & has_review
-    issues = (
-        Issue.objects.select_related("client", "paralegal")
-        .prefetch_related("issuenote_set")
-        .filter(is_review)
-        .annotate(next_review=Max("issuenote__event"))
-        .order_by("next_review")
-    )
-    # Annotate issues with days from now
-    now = timezone.now()
-    for issue in issues:
-        days = (issue.next_review - now).days
-        if days >= 7:
-            issue.color = ""
-        elif days >= 3:
-            issue.color = "green"
-        elif days >= 2:
-            issue.color = "yellow"
-        elif days >= 0:
-            issue.color = "orange"
-        else:
-            issue.color = "red"
-
-    context = {"issues": issues}
-    return render(request, "case/case_review.html", context)
-
-
-@coordinator_or_better_required
-@require_http_methods(["GET"])
-def case_inbox_view(request):
-    """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_coordinators = Q(paralegal__email=COORDINATORS_EMAIL)
-    is_open = Q(is_open=True)
-    is_new_stage = Q(stage=CaseStage.UNSTARTED) | Q(stage__isnull=True)
-    is_inbox = is_coordinators & is_open & is_new_stage
-    issues = Issue.objects.select_related("client", "paralegal").filter(is_inbox)
-    context = {"issues": issues}
-    return render(request, "case/case_inbox.html", context)
-
-
-@login_required
-@require_http_methods(["GET"])
-def case_list_view(request):
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_view(request, pk, form_slug=""):
     """
-    List of all cases for paralegals and coordinators to view.
+    The details of a given case.
     """
-    form = IssueSearchForm(request.GET)
-    issue_qs = Issue.objects.select_related("client", "paralegal")
+    try:
+        issue = (
+            Issue.objects.check_permisisons(request)
+            .select_related("client")
+            .prefetch_related("fileupload_set")
+            .get(pk=pk)
+        )
+    except Issue.DoesNotExist:
+        raise Http404()
 
-    if request.user.is_paralegal:
-        # Paralegals can only see assigned cases
-        issue_qs = issue_qs.filter(paralegal=request.user)
-    elif not request.user.is_coordinator_or_better:
-        issue_qs = issue_qs.none()
+    # FIXME: Assume only only tenancy but that's not how the models work.
+    tenancy = issue.client.tenancy_set.first()
+    case_selector = CaseSelector(request, issue)
 
-    issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = get_page(request, issues, per_page=28)
+    file_urls, image_urls = _get_uploaded_files(issue)
     context = {
-        "issue_page": page,
-        "form": form,
-        "next_qs": next_qs,
-        "prev_qs": prev_qs,
+        "issue": issue,
+        "tenancy": tenancy,
+        "actionstep_url": _get_actionstep_url(issue),
+        "notes": _get_issue_notes(request, pk),
+        "case_selector": case_selector,
+        "details": _get_submitted_details(issue),
+        "file_urls": file_urls,
+        "image_urls": image_urls,
     }
-    return render(request, "case/case_list.html", context)
+    form_view = case_selector.handle(form_slug, context, pk)
+    if form_view:
+        return form_view
+    else:
+        return render(request, "case/case_detail.html", context)
 
 
 class CaseReviewHtmxFormView(HtmxFormView):
@@ -312,49 +258,6 @@ class CaseSelector(Selector):
         "close": "Close the case",
         "reopen": "Re-open the case",
     }
-
-
-@paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
-def case_detail_view(request, pk, form_slug=""):
-    """
-    The details of a given case.
-    """
-    try:
-        issue_qs = Issue.objects.select_related("client").prefetch_related(
-            "fileupload_set"
-        )
-        if request.user.is_paralegal:
-            # Paralegals can only see cases that they are assigned to
-            issue_qs.filter(paralegal=request.user)
-
-        issue = issue_qs.get(pk=pk)
-    except Issue.DoesNotExist:
-        raise Http404()
-
-    # FIXME: Assume only only tenancy but that's not how the models work.
-    tenancy = issue.client.tenancy_set.first()
-    case_selector = CaseSelector(request, issue)
-
-    file_urls, image_urls = _get_uploaded_files(issue)
-    context = {
-        "issue": issue,
-        "tenancy": tenancy,
-        "actionstep_url": _get_actionstep_url(issue),
-        "notes": _get_issue_notes(request, pk),
-        "case_selector": case_selector,
-        "details": _get_submitted_details(issue),
-        "file_urls": file_urls,
-        "image_urls": image_urls,
-    }
-    form_view = case_selector.handle(form_slug, context, pk)
-    if form_view:
-        return form_view
-    else:
-        return render(request, "case/case_detail.html", context)
-
-
-MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 
 def _get_uploaded_files(issue):

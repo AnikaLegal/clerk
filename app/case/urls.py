@@ -13,13 +13,13 @@ urlpatterns = [
     # Person
     re_path(
         fr"^person/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.person_detail_view,
+        views.person.person_detail_view,
         name="person-detail",
     ),
     # Tenancy
     re_path(
         fr"^tenancy/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.tenancy_detail_view,
+        views.tenancy.tenancy_detail_view,
         name="tenancy-detail",
     ),
     # Client
@@ -39,6 +39,11 @@ urlpatterns = [
     path("cases/", views.case.case_list_view, name="case-list"),
     path("cases/inbox/", views.case.case_inbox_view, name="case-inbox"),
     path("cases/review/", views.case.case_review_view, name="case-review"),
+    re_path(
+        fr"^cases/{UUID_PARAM}/email/{FORM_SLUG_PARAM}?/?$",
+        views.case.case_detail_email_view,
+        name="case-detail-email",
+    ),
     re_path(
         fr"^cases/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
         views.case.case_detail_view,
