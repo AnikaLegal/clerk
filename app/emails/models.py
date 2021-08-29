@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.postgres.fields import ArrayField
 
 from accounts.models import User
 from core.models import Issue
@@ -25,28 +27,27 @@ STATE_CHOICES = (
 
 class Email(models.Model):
 
-    from_addr = models.EmailField()
-    to_addr = models.EmailField(default=None, blank=True)
-    to_addrs = models.TextField()
-    cc_addrs = models.TextField(default="")
-    subject = models.CharField(max_length=1024)
+    from_address = models.EmailField(default="")
+    to_address = models.EmailField(default="", blank=True)
+    cc_addresses = ArrayField(models.EmailField(), default=list, blank=True)
+    subject = models.CharField(max_length=1024, default="")
     state = models.CharField(max_length=32, choices=STATE_CHOICES)
-    text = models.TextField()
-    html = models.TextField(default="")
+    text = models.TextField(default="")
     created_at = models.DateTimeField(default=timezone.now)
     issue = models.ForeignKey(Issue, blank=True, null=True, on_delete=models.PROTECT)
     sender = models.ForeignKey(
         User, blank=True, null=True, on_delete=models.PROTECT, related_name="sent_email"
     )
+    received_data = models.JSONField(encoder=DjangoJSONEncoder)
 
     def __str__(self):
         return f"{self.pk}: {self.subject}"
 
     def get_received_note_text(self):
-        pass
+        return "Email received"
 
     def get_sent_note_text(self):
-        pass
+        return "Email sent"
 
 
 # FIXME: Configure so S3 bucket cannot be publicly read from?

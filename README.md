@@ -97,7 +97,7 @@ ngrok http 8000
 # Then, in a separate terminal session, start a cotnainer
 make bash
 # Then run this management command inside the container
-NGROK_URL="https://7c8e-194-193-130-131.ngrok.io"
+NGROK_URL="https://8fd2-194-193-130-131.ngrok.io"
 ./manage.py setup_dev_inbound_emails "$NGROK_URL"
 ```
 

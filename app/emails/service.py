@@ -70,15 +70,9 @@ def process_inbound_email(data: MultiValueDict, files: MultiValueDict):
     """
     Parse an inbound email from SendGrid and save as an Email.
     """
-    envelope = json.loads(data["envelope"])
     email_data = {
-        "from_addr": envelope["from"],
-        "to_addrs": data["to"],
-        "cc_addrs": data.get("cc", ""),
-        "subject": data["subject"],
+        "received_data": data,
         "state": EmailState.RECEIVED,
-        "text": data["text"].replace("\r\n", "\n"),
-        "html": data.get("html", ""),
     }
     with transaction.atomic():
         email = Email.objects.create(**email_data)

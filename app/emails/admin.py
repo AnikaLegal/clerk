@@ -13,9 +13,9 @@ class EmailAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "state",
-        "from_addr",
-        "to_addrs",
-        "created_at",
+        "from_address",
+        "to_address",
         "subject",
+        "created_at",
     )
     inlines = [AttachmentInline]
