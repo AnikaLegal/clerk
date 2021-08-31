@@ -10,8 +10,8 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-class MSGraph:
-    """This class allows us to make basic API calls to MS Graph."""
+class BaseEndpoint:
+    """Base class for MS Graph endpoints."""
 
     def __init__(self):
         # Authenticate and obtain access token.
@@ -56,9 +56,3 @@ class MSGraph:
             raise
 
         return json
-
-
-"""
-from microsoft.wrapper import MSGraph
-api = MSGraph()
-"""
