@@ -1,11 +1,13 @@
 import os
 import logging
+from typing import List, Tuple
+from django.core.mail import EmailMultiAlternatives
 
-from utils.sentry import WithSentryCapture
 from core.models import IssueNote
 from core.models.issue_note import NoteType
-from .models import Email, EmailState
-from .service import send_email, build_clerk_address, parse_clerk_address
+from emails.models import Email, EmailState
+from utils.sentry import WithSentryCapture
+from .utils import build_clerk_address
 
 logger = logging.getLogger(__name__)
 
@@ -51,34 +53,26 @@ def _send_email_task(email_pk: int):
 send_email_task = WithSentryCapture(_send_email_task)
 
 
-EMAIL_RECEIVE_RULES = (
-    (lambda e: e.state == EmailState.RECEIVED, "not in 'received' state."),
-)
-
-
-def _receive_email_task(email_pk: int):
+def send_email(
+    from_addr: str,
+    to_addr: str,
+    subject: str,
+    body: str,
+    attachments: List[Tuple[str, bytes, str]] = None,
+):
     """
-    Ingests an received emails and attempts to associate them with related issues.
-    Run as a scheduled task.
-    FIXME: TEST ME
+    FIXME: TEST ME.
+    Send an email.
+    https://docs.djangoproject.com/en/3.2/topics/email/#django.core.mail.EmailMessage
+    https://docs.djangoproject.com/en/3.2/topics/email/#sending-alternative-content-types
     """
-    email = Email.objects.get(pk=email_pk)
-    for rule, msg in EMAIL_RECEIVE_RULES:
-        if not rule(email):
-            logger.error(f"Cannot ingest Email[{email_pk}]: {msg}")
-            return
-
-    to_addr, issue_pk = parse_clerk_address(email)
-    if to_addr and issue_pk:
-        IssueNote.objects.create(
-            issue=email.issue,
-            note_type=NoteType.EMAIL,
-            content_object=email,
-            text=email.get_received_note_text(),
-        )
-        Email.objects.filter(pk=email_pk).update(
-            to_addr=to_addr, issue_id=issue_pk, state=EmailState.INGESTED
-        )
-
-
-receive_email_task = WithSentryCapture(_receive_email_task)
+    logger.info("Sending email to %s from %s", to_addr, from_addr)
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=body,
+        from_email=from_addr,
+        to=[to_addr],
+        attachments=attachments,
+        # TODO: BCC? Reply to?
+    )
+    email.send(fail_silently=False)

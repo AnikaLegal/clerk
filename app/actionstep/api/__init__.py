@@ -14,7 +14,6 @@ from .users import UserEndpoint
 class ActionstepAPI:
     """
     Object providing acccess to all Actionstep API endpoints.
-
     """
 
     def __init__(self):

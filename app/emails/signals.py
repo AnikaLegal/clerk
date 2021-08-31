@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from .models import Email, EmailState
-from .tasks import send_email_task, receive_email_task
+from .service import send_email_task, receive_email_task
 
 logger = logging.getLogger(__name__)
 
