@@ -13,16 +13,7 @@ logger = logging.getLogger(__name__)
 class BaseEndpoint:
     """Base class for MS Graph endpoints."""
 
-    def __init__(self):
-        # Authenticate and obtain access token.
-        client = create_client(
-            settings.AZURE_AD_CLIENT_ID,
-            settings.MS_AUTHORITY_URL,
-            settings.AZURE_AD_CLIENT_SECRET,
-        )
-        access_token = get_token(client)
-
-        # Set HTTP headers for making API calls.
+    def __init__(self, access_token):
         HTTP_HEADERS["Authorization"] = "Bearer " + access_token
         self.headers = HTTP_HEADERS
 
