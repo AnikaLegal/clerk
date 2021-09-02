@@ -11,16 +11,17 @@ HTTP_HEADERS = {
     "Content-Type": "application/json",
 }
 
-# Authenticate our app with Azure Active Directory.
+
 def create_client(client_id, authority_url, client_secret):
+    """Authenticate our app with Azure Active Directory."""
     client = msal.ConfidentialClientApplication(
         client_id=client_id, authority=authority_url, client_credential=client_secret
     )
     return client
 
 
-# Get access token after authenticating our app.
 def get_token(client):
+    """Get access token after authenticating our app."""
     # Begin by looking in token cache, first arg is for scopes,
     # because token is for app rather than user, second arg is None.
     result = client.acquire_token_silent(
@@ -40,6 +41,5 @@ def get_token(client):
         return result["access_token"]
 
 
-# Generate password for creating MS User.
 def generate_password():
-    """Must meet complexity requirements set by MS"""
+    """Password for creating MS user must meet complexity requirements."""
