@@ -1,5 +1,8 @@
 import msal
 import logging
+import string
+import secrets
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,4 +45,20 @@ def get_token(client):
 
 
 def generate_password():
-    """Password for creating MS user must meet complexity requirements."""
+    """
+    Generate password of length 16 that meets complexity requirements.
+    Must have at least one: uppercase letter, lowercase letter, and digit.
+    """
+    selection = string.ascii_letters + string.digits
+
+    while True:
+        password = "".join(secrets.choice(selection) for i in range(16))
+
+        if (
+            any(c.isupper() for c in password)
+            and any(c.islower() for c in password)
+            and any(c.isdigit() for c in password)
+        ):
+            break
+
+    return password
