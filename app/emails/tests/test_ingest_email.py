@@ -1,55 +1,86 @@
 import pytest
 
-from emails.service import parse_clerk_address, build_clerk_address
+from emails.service import receive_email_task
+
 from emails.models import EmailState
-from core.factories import EmailFactory, IssueFactory, UserFactory
+from core.factories import EmailFactory, IssueFactory
+
+SUCCESS_TEST_CASES = [
+    # Single recipient.
+    {
+        "expected_parsed": {
+            "from_address": "mattdsegal@gmail.com",
+            "to_address": "case.0e62ccc2@fake.anikalegal.com",
+            "cc_addresses": [],
+            "subject": "Hello World 1",
+            "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
+        },
+        "received_data": {
+            "to": "case.0e62ccc2@fake.anikalegal.com",
+            "from": "matthew segal <mattdsegal@gmail.com>",
+            "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
+            "subject": "Hello World 1",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"mattdsegal@gmail.com"}',
+        },
+    },
+    # Multiple recipients and cc addresses.
+    {
+        "expected_parsed": {
+            "from_address": "mattdsegal@gmail.com",
+            "to_address": "case.0e62ccc2@fake.anikalegal.com",
+            "cc_addresses": ["mattdsegal@gmail.com", "matt@anikalegal.com"],
+            "subject": "Hello World 2",
+            "text": "Elinor’s heart, which had undergone many changes in the course of this",
+        },
+        "received_data": {
+            "cc": "Me <mattdsegal@gmail.com>",
+            "to": "case.0e62ccc2@fake.anikalegal.com,  Matt Segal <matt@anikalegal.com>",
+            "from": "matthew segal <mattdsegal@gmail.com>",
+            "text": "Elinor’s heart, which had undergone many changes in the course of this",
+            "subject": "Hello World 2",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"mattdsegal@gmail.com"}',
+        },
+    },
+    # Multiple recipients and cc addresses, different ordering of addresses.
+    {
+        "expected_parsed": {
+            "from_address": "mattdsegal@gmail.com",
+            "to_address": "case.0e62ccc2@fake.anikalegal.com",
+            "cc_addresses": ["mattdsegal@gmail.com", "matt@anikalegal.com"],
+            "subject": "Hello World 3",
+            "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
+        },
+        "received_data": {
+            "cc": "Me <mattdsegal@gmail.com>",
+            "to": "Matt Segal <matt@anikalegal.com>, case.0e62ccc2@fake.anikalegal.com",
+            "from": "matthew segal <mattdsegal@gmail.com>",
+            "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
+            "subject": "Hello World 3",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"mattdsegal@gmail.com"}',
+        },
+    },
+]
 
 
 @pytest.mark.django_db
-def _test_parse_email_address():
-    issue_pk = "0e62ccc2-b9ee-4a07-979a-da8a9d450404"
-    issue = IssueFactory(pk=issue_pk)
-    sent_email = EmailFactory(
-        to_addr="mattdsegal@gmail.com",
-        to_addrs="mattdsegal@gmail.com",
-        state=EmailState.SENT,
-        issue=issue,
-        sender=None,
+@pytest.mark.parametrize("test_data", SUCCESS_TEST_CASES)
+def test_ingest_email__with_success(settings, test_data):
+    expected_parsed, received_data = (
+        test_data["expected_parsed"],
+        test_data["received_data"],
     )
-    issue_addr = build_clerk_address(sent_email)
-    assert issue_addr == "case.0e62ccc2@fake.anikalegal.com"
-    to_addrs = f"{issue_addr},  Matt Segal <matt@anikalegal.com>"
-    received_email = EmailFactory(to_addrs=to_addrs, issue=None, sender=None)
-    import pdb
-
-    pdb.set_trace()
-
-
-# data = {
-#     "subject": ["Hello World!"],
-#     "envelope": [
-#         '{"to":["foo@em7221.test-mail.anikalegal.com"],"from":"matt@anikalegal.com"}'
-#     ],
-#     "to": [
-#         "foo@em7221.test-mail.anikalegal.com, bar@em7221.test-mail.anikalegal.com,  joe blow <joe@gmail.com>"
-#     ],
-#     "text": [
-#         "Hi Matt\r\n\r\nOn Sun, Jul 18, 2021 at 12:51 PM Matt Segal <matt@anikalegal.com> wrote:\r\n\r\n> hmmm\r\n>\r\n> --\r\n>\r\n> Matthew Segal\r\n>\r\n> Head of Technology\r\n>\r\n> mobile: 0431 417 373\r\n>\r\n> email: matt@anikalegal.com\r\n>\r\n> site: www.anikalegal.com\r\n>\r\n> Level 2/520 Bourke Street\r\n>\r\n> Melbourne VIC 3000\r\n>\n"
-#     ],
-#     "html": ["<div><h1>Hello World</h1></div>"],
-# }
-
-# data = {
-#     "subject": ["Hello World!"],
-#     "envelope": [
-#         '{"to":["foo@em7221.test-mail.anikalegal.com"],"from":"matt@anikalegal.com"}'
-#     ],
-#     "cc": ["bar@em7221.test-mail.anikalegal.com"],
-#     "to": [
-#         "foo@em7221.test-mail.anikalegal.com, bar@em7221.test-mail.anikalegal.com,  joe blow <joe@gmail.com>"
-#     ],
-#     "text": [
-#         "Hi Matt\r\n\r\nOn Sun, Jul 18, 2021 at 12:51 PM Matt Segal <matt@anikalegal.com> wrote:\r\n\r\n> hmmm\r\n>\r\n> --\r\n>\r\n> Matthew Segal\r\n>\r\n> Head of Technology\r\n>\r\n> mobile: 0431 417 373\r\n>\r\n> email: matt@anikalegal.com\r\n>\r\n> site: www.anikalegal.com\r\n>\r\n> Level 2/520 Bourke Street\r\n>\r\n> Melbourne VIC 3000\r\n>\n"
-#     ],
-#     "html": ["<div><h1>Hello World</h1></div>"],
-# }
+    settings.EMAIL_DOMAIN = "fake.anikalegal.com"
+    issue_pk = "0e62ccc2-b9ee-4a07-979a-da8a9d450404"
+    IssueFactory(id=issue_pk)
+    email = EmailFactory(
+        state=EmailState.RECEIVED, received_data=received_data, issue=None
+    )
+    receive_email_task(email.pk)
+    email.refresh_from_db()
+    assert email.state == EmailState.INGESTED
+    assert str(email.issue_id) == issue_pk
+    assert email.from_address == expected_parsed["from_address"]
+    assert email.to_address == expected_parsed["to_address"]
+    assert email.cc_addresses == expected_parsed["cc_addresses"]
+    assert email.subject == expected_parsed["subject"]
+    assert email.text == expected_parsed["text"]

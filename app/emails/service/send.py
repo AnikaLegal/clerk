@@ -2,12 +2,13 @@ import os
 import logging
 from typing import List, Tuple
 from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 
 from core.models import IssueNote
 from core.models.issue_note import NoteType
 from emails.models import Email, EmailState
 from utils.sentry import WithSentryCapture
-from .utils import build_clerk_address
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,6 @@ EMAIL_SEND_RULES = (
 def _send_email_task(email_pk: int):
     """
     Sends an email that is ready to be sent.
-    FIXME: TEST ME
     """
     email = (
         Email.objects.select_related("issue", "sender")
@@ -33,7 +33,7 @@ def _send_email_task(email_pk: int):
             logger.error(f"Cannot sent Email[{email_pk}]: {msg}")
             return
 
-    from_addr = build_clerk_address(email)
+    from_addr = build_clerk_address(email.issue)
     attachments = []
     for att in email.emailattachment_set.all():
         file_name = os.path.basename(att.file.name)
@@ -76,3 +76,12 @@ def send_email(
         # TODO: BCC? Reply to?
     )
     email.send(fail_silently=False)
+
+
+def build_clerk_address(issue):
+    """
+    FIXME: TEST ME.
+    """
+    issue_prefix = str(issue.id).split("-")[0]
+    email = f"case.{issue_prefix}@{settings.EMAIL_DOMAIN}"
+    return f"Anika Legal <{email}>"

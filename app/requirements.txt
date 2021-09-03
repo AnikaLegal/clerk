@@ -3,6 +3,7 @@ requests
 django
 WeasyPrint # Generate PDFs for email
 wagtail
+bleach # Cleans html
 
 # Infrastructure
 psycopg2-binary

@@ -14,6 +14,7 @@ class EmailState:
     SENT = "SENT"
     RECEIVED = "RECEIVED"
     INGESTED = "INGESTED"
+    INGEST_FAILURE = "INGEST_FAILURE"
 
 
 STATE_CHOICES = (
@@ -22,6 +23,7 @@ STATE_CHOICES = (
     (EmailState.SENT, "Sent"),
     (EmailState.RECEIVED, "Received"),
     (EmailState.INGESTED, "Ingested"),
+    (EmailState.INGEST_FAILURE, "Ingest failed"),
 )
 
 
@@ -32,7 +34,8 @@ class Email(models.Model):
     cc_addresses = ArrayField(models.EmailField(), default=list, blank=True)
     subject = models.CharField(max_length=1024, default="")
     state = models.CharField(max_length=32, choices=STATE_CHOICES)
-    text = models.TextField(default="")
+    text = models.TextField(default="", blank=True)
+    html = models.TextField(default="", blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     issue = models.ForeignKey(Issue, blank=True, null=True, on_delete=models.PROTECT)
     sender = models.ForeignKey(

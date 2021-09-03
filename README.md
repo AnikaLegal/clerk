@@ -92,13 +92,11 @@ To listen for inbound emails:
 
 ```bash
 # Start ngrok (https://ngrok.com/) and take note of the address
-# e.g "https://90c8-194-193-130-131.ngrok.io"
 ngrok http 8000
-# Then, in a separate terminal session, start a cotnainer
-make bash
-# Then run this management command inside the container
-NGROK_URL="https://8fd2-194-193-130-131.ngrok.io"
-./manage.py setup_dev_inbound_emails "$NGROK_URL"
+# This will print the public endpoint, e.g "https://90c8-194-193-130-131.ngrok.io"
+# Then, in a separate terminal session, update dev Sendgrid settings via API
+./scripts/ngrok.sh https://90c8-194-193-130-131.ngrok.io
+# Then wait a minute or so.
 ```
 
 ## Deployment

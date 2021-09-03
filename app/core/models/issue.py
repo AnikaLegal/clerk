@@ -132,3 +132,6 @@ class Issue(TimestampedModel):
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id} {self.fileref}"
