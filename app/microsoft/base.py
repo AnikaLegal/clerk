@@ -1,6 +1,5 @@
 import requests
 import logging
-from pprint import pformat
 
 from microsoft.helpers import create_client, get_token, BASE_URL, HTTP_HEADERS
 
@@ -39,11 +38,13 @@ class BaseEndpoint:
         try:
             resp.raise_for_status()
         except requests.HTTPError:
-            pretty_json = pformat(json, indent=2)
-            req = resp.request
             logger.error(
-                f"{req.method} {req.url} failed with response body: {pretty_json}"
+                f"{resp.request.method} {resp.request.url} failed with response body: {json}"
             )
-            raise
+
+            if resp.status_code == 404:
+                return None
+            else:
+                raise
 
         return json
