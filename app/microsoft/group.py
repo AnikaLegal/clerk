@@ -3,15 +3,10 @@ from microsoft.helpers import BASE_URL
 
 from django.conf import settings
 
-"""
-from microsoft.group import GroupEndpoint
-group = GroupEndpoint()
-"""
-
 
 class GroupEndpoint(BaseEndpoint):
     """
-    Endpoint for Group (Staging or Production depending on settings)
+    Endpoint for Group (Staging or Production depending on settings).
     https://docs.microsoft.com/en-us/graph/api/resources/group
     """
 

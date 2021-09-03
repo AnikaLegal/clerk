@@ -1,5 +1,6 @@
 from microsoft.helpers import create_client, get_token
 from microsoft.group import GroupEndpoint
+from microsoft.user import UserEndpoint
 
 from django.conf import settings
 
@@ -17,7 +18,7 @@ class MSGraphAPI:
     def __init__(self):
         """
         Constructor authenticates app and obtains access token.
-        Then it instantiates endpoint objects and sets them as attributes.
+        Then instantiates endpoint objects and sets them as attributes.
         """
         client = create_client(
             settings.AZURE_AD_CLIENT_ID,
@@ -27,3 +28,4 @@ class MSGraphAPI:
         access_token = get_token(client)
 
         self.group = GroupEndpoint(access_token)
+        self.user = UserEndpoint(access_token)
