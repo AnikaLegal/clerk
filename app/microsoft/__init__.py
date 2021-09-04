@@ -1,6 +1,7 @@
 from microsoft.helpers import create_client, get_token
 from microsoft.group import GroupEndpoint
 from microsoft.user import UserEndpoint
+from microsoft.folder import FolderEndpoint
 
 from django.conf import settings
 
@@ -29,3 +30,4 @@ class MSGraphAPI:
 
         self.group = GroupEndpoint(access_token)
         self.user = UserEndpoint(access_token)
+        self.folder = FolderEndpoint(access_token)
