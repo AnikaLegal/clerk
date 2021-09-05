@@ -25,7 +25,7 @@ class FolderEndpoint(BaseEndpoint):
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/children"
         )
 
-        # If there is folder.
+        # If there is Folder.
         if json:
             list_files = []
 
@@ -36,3 +36,63 @@ class FolderEndpoint(BaseEndpoint):
             return list_files
         else:
             return None
+
+    def copy(self, path, name):
+        """
+        Make copy of an existing Folder.
+        Returns None if successful or if Folder doesn't exist.
+        Raises HTTP error if the copy name already exists.
+        """
+        # Optionally specify the name and parent of the copy.
+        data = {"name": name}
+
+        return super().post(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/copy", data
+        )
+
+    def list_permissions(self, path):
+        """
+        List the Folder's permissions.
+        Returns list of permissions or None if Folder doesn't exist.
+        """
+        json = super().get(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions"
+        )
+
+        # If there is Folder.
+        if json:
+            list_permissions = []
+
+            for item in json["value"]:
+                list_permissions.append(item["id"])
+
+            return list_permissions
+        else:
+            return None
+
+    def delete_permissions(self, path, perm_id):
+        """
+        Delete specific permission for a Folder.
+        Returns None if successful or Folder doesn't exist.
+        Raises HTTP error if permission doesn't exist.
+        """
+        return super().delete(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions/{perm_id}"
+        )
+
+    def create_permissions(self, path, role, emails):
+        """
+        Create permissions (read or write) for a Folder.
+        Returns permissions created or None if Folder doesn't exist.
+        """
+        data = {
+            # Do not remove fields or request might fail.
+            "requireSignIn": True,
+            "sendInvitation": False,
+            "roles": [role],
+            "recipients": [{"email": email} for email in emails],
+        }
+
+        return super().post(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/invite", data
+        )
