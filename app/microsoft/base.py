@@ -1,10 +1,7 @@
 import requests
 import logging
 
-from microsoft.helpers import create_client, get_token, BASE_URL, HTTP_HEADERS
-
-from django.conf import settings
-
+from microsoft.helpers import BASE_URL, HTTP_HEADERS
 
 logger = logging.getLogger(__name__)
 

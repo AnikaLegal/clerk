@@ -19,8 +19,8 @@ class GroupEndpoint(BaseEndpoint):
 
     def members(self):
         """
-        Lists the Group's members.
-        Returns list of members or None.
+        List Group members.
+        Returns list of members or empty list.
         """
         json = super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}/members")
 
@@ -34,7 +34,7 @@ class GroupEndpoint(BaseEndpoint):
     def add_user(self, userPrincipalName):
         """
         Add User to the Group.
-        Returns None if sucessful, raises HTTPError if User is already in Group.
+        Returns None if successful or raises HTTPError if User already in Group.
         """
         data = {"@odata.id": f"{BASE_URL}users/{userPrincipalName}"}
 
