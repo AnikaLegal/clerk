@@ -10,18 +10,18 @@ class UserEndpoint(BaseEndpoint):
 
     def get(self, userPrincipalName):
         """
-        Get a User with their userPrincipalName (email).
+        Get User through userPrincipalName (email).
         Returns User object or None.
         """
         return super().get(f"users/{userPrincipalName}")
 
     def create(self, fname, lname, userPrincipalName):
         """
-        Creates a new User.
+        Create new User.
         Returns User object or raises HTTPError.
         """
         data = {
-            # Do not alter fields or request might fail.
+            # Do not remove fields or POST request might fail.
             "accountEnabled": True,
             "displayName": f"{fname} {lname}",
             "mailNickname": fname,
@@ -37,11 +37,11 @@ class UserEndpoint(BaseEndpoint):
 
     def assign_license(self, userPrincipalName):
         """
-        Assigns Office 365 E1 license to User.
-        Returns User object or None if User doesn't exit.
+        Assign Office 365 E1 license to User.
+        Returns User object or None if User doesn't exist.
         """
         data = {
-            # Do not alter fields or request might fail.
+            # Do not remove fields or POST request might fail.
             "addLicenses": [{"skuId": "18181a46-0d4e-45cd-891e-60aabd171b4e"}],
             "removeLicenses": [],
         }

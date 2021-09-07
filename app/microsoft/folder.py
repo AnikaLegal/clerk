@@ -19,13 +19,12 @@ class FolderEndpoint(BaseEndpoint):
     def files(self, path):
         """
         Get the Files inside a Folder.
-        Returns list of Files.
+        Returns list of Files or None if Folder doesn't exist.
         """
         json = super().get(
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/children"
         )
 
-        # If there is Folder.
         if json:
             list_files = []
 
@@ -41,9 +40,9 @@ class FolderEndpoint(BaseEndpoint):
         """
         Make copy of an existing Folder.
         Returns None if successful or if Folder doesn't exist.
-        Raises HTTP error if the copy name already exists.
+        Raises HTTPError if copy name already exists
         """
-        # Optionally specify the name and parent of the copy.
+        # We have the option of specifying the name of the copy and its parent Folder.
         data = {"name": name}
 
         return super().post(
@@ -59,7 +58,6 @@ class FolderEndpoint(BaseEndpoint):
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions"
         )
 
-        # If there is Folder.
         if json:
             list_permissions = []
 
@@ -70,11 +68,11 @@ class FolderEndpoint(BaseEndpoint):
         else:
             return None
 
-    def delete_permissions(self, path, perm_id):
+    def delete_permission(self, path, perm_id):
         """
         Delete specific permission for a Folder.
         Returns None if successful or Folder doesn't exist.
-        Raises HTTP error if permission doesn't exist.
+        Raises HTTPError if permission doesn't exist.
         """
         return super().delete(
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions/{perm_id}"
@@ -86,7 +84,7 @@ class FolderEndpoint(BaseEndpoint):
         Returns permissions created or None if Folder doesn't exist.
         """
         data = {
-            # Do not remove fields or request might fail.
+            # Do not remove fields or POST request might fail.
             "requireSignIn": True,
             "sendInvitation": False,
             "roles": [role],
