@@ -1,11 +1,7 @@
 import requests
 import logging
-from pprint import pformat
 
-from microsoft.helpers import create_client, get_token, BASE_URL, HTTP_HEADERS
-
-from django.conf import settings
-
+from microsoft.helpers import BASE_URL, HTTP_HEADERS
 
 logger = logging.getLogger(__name__)
 
@@ -13,16 +9,7 @@ logger = logging.getLogger(__name__)
 class BaseEndpoint:
     """Base class for MS Graph endpoints."""
 
-    def __init__(self):
-        # Authenticate and obtain access token.
-        client = create_client(
-            settings.AZURE_AD_CLIENT_ID,
-            settings.MS_AUTHORITY_URL,
-            settings.AZURE_AD_CLIENT_SECRET,
-        )
-        access_token = get_token(client)
-
-        # Set HTTP headers for making API calls.
+    def __init__(self, access_token):
         HTTP_HEADERS["Authorization"] = "Bearer " + access_token
         self.headers = HTTP_HEADERS
 
@@ -48,11 +35,13 @@ class BaseEndpoint:
         try:
             resp.raise_for_status()
         except requests.HTTPError:
-            pretty_json = pformat(json, indent=2)
-            req = resp.request
             logger.error(
-                f"{req.method} {req.url} failed with response body: {pretty_json}"
+                f"{resp.request.method} {resp.request.url} failed with response body: {json}"
             )
-            raise
+
+            if resp.status_code == 404:
+                return None
+            else:
+                raise
 
         return json
