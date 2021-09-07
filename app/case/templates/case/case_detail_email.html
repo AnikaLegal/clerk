@@ -34,7 +34,6 @@
         // Initialize JavaScript enabled Semantic UI elements.
         $('.selection.dropdown').dropdown()
     </script>
-
     {% for email in emails %}
         <div class="ui card fluid">
             <div class="content">
@@ -55,10 +54,11 @@
             </div>
             {% if email.emailattachment_set.exists %}
                 <div class="extra content">
+                    <h5>Attached files</h5>
                     <ul>
                         {% for attachment in email.emailattachment_set.all %}
                             <a href="{{ attachment.file.url }}">
-                                {{ attachment.file.name }}
+                                {{ attachment.file.display_name }}
                             </a>
                         {% endfor %}
                     </ul>

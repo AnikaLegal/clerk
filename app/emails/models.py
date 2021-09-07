@@ -43,6 +43,9 @@ class Email(models.Model):
     )
     received_data = models.JSONField(encoder=DjangoJSONEncoder)
 
+    # Actionstep ID
+    actionstep_id = models.IntegerField(blank=True, null=True)
+
     def __str__(self):
         return f"{self.pk}: {self.subject}"
 

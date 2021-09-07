@@ -9,6 +9,7 @@ from .filenotes import FilenoteEndpoint
 from .files import FileEndpoint
 from .participants import ParticipantEndpoint
 from .users import UserEndpoint
+from .emails import EmailEndpoint
 
 
 class ActionstepAPI:
@@ -24,6 +25,7 @@ class ActionstepAPI:
         self.actions = ActionEndpoint(base_url, token)
         self.participants = ParticipantEndpoint(base_url, token)
         self.files = FileEndpoint(base_url, token)
+        self.emails = EmailEndpoint(base_url, token)
 
     def __str__(self):
         return self.base_url

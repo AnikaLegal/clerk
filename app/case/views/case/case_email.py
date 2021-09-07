@@ -1,4 +1,5 @@
 import re
+import os
 
 import bleach
 from django.http import Http404
@@ -36,6 +37,8 @@ def case_detail_email_view(request, pk, form_slug=""):
     )
     for email in emails:
         email.html = get_email_html(email)
+        for attachment in email.emailattachment_set.all():
+            attachment.file.display_name = os.path.basename(attachment.file.name)
 
     context = {
         "issue": issue,
@@ -53,7 +56,6 @@ ALLOWED_TAGS = [
     "i",
     "strong",
     "em",
-    "img",
     "div",
     "span",
     "ul",
@@ -61,13 +63,16 @@ ALLOWED_TAGS = [
     "blockquote",
     "ol",
 ]
-ALLOWED_ATTRS = ["style"]
+ALLOWED_ATTRS = ["style", "href", "src"]
 
 
 def get_email_html(email) -> str:
     if email.html:
-        # Sanitize HTML to prevent script injection attacks.
-        return bleach.clean(email.html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
+        # TODO: Clean this up so it looks nicer
+        html = email.html
+        return bleach.clean(
+            html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True
+        )
     else:
         text = email.text.replace("\r", "")
         text = re.sub("\n(?!\n)", " <br/>", text)
