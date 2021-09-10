@@ -1,11 +1,11 @@
 import re
 import os
 
-import bleach
 from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
+from html_sanitizer import Sanitizer
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
@@ -48,31 +48,67 @@ def case_detail_email_view(request, pk, form_slug=""):
     return render(request, "case/case_detail_email.html", context)
 
 
-ALLOWED_TAGS = [
-    "p",
-    "a",
-    "br",
-    "b",
-    "i",
-    "strong",
-    "em",
-    "div",
-    "span",
-    "ul",
-    "li",
-    "blockquote",
-    "ol",
-]
-ALLOWED_ATTRS = ["style", "href", "src"]
+# ALLOWED_TAGS = [
+#     "p",
+#     "a",
+#     "br",
+#     "b",
+#     "i",
+#     "strong",
+#     "em",
+#     "div",
+#     "span",
+#     "ul",
+#     "li",
+#     "blockquote",
+#     "ol",
+# ]
+# ALLOWED_ATTRS = ["style", "href", "src"]
+
+
+sanitizer = Sanitizer(
+    {
+        "tags": {
+            "a",
+            "b",
+            "blockquote",
+            "br",
+            "div",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "hr",
+            "i",
+            "li",
+            "ol",
+            "p",
+            "span",
+            "strong",
+            "sub",
+            "sup",
+            "ul",
+            "img",
+        },
+        "attributes": {
+            "a": ("href", "name", "target", "title", "id", "rel", "src", "style")
+        },
+        "empty": {"hr", "a", "br"},
+        "separate": {"a", "p", "li"},
+        "whitespace": {"br"},
+        "keep_typographic_whitespace": False,
+        "add_nofollow": False,
+        "autolink": False,
+    }
+)
 
 
 def get_email_html(email) -> str:
     if email.html:
-        # TODO: Clean this up so it looks nicer
-        html = email.html
-        return bleach.clean(
-            html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True
-        )
+        return sanitizer.sanitize(email.html)
+    # return bleach.clean(
+    #     email.html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True
+    # )
     else:
         text = email.text.replace("\r", "")
         text = re.sub("\n(?!\n)", " <br/>", text)

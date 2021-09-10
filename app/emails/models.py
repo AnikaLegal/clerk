@@ -64,3 +64,4 @@ class EmailAttachment(models.Model):
     file = models.FileField(upload_to=get_s3_key)
     content_type = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=timezone.now)
+    actionstep_id = models.IntegerField(blank=True, null=True)

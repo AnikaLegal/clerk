@@ -16,14 +16,16 @@ class EmailEndpoint(BaseEndpoint):
     def get(self, filenote_id: str):
         return super().get({"id": filenote_id})
 
-    def get_emails_by_case(self, action_id: str):
+    def get_emails_associations_by_case(self, action_id: str):
         associations = self._email_associations.list_by_case(action_id)
-        email_ids = ",".join([a["links"]["email"] for a in associations])
-        url = self.url + email_ids
+        return [a["links"]["email"] for a in associations]
+
+    def get_emails(self, email_ids):
+        url = self.url + ",".join(email_ids)
         return self._list(url)
 
     def get_attachments_for_email(self, email_id: str):
-        pass
+        return self._attachments.list_by_email(email_id)
 
 
 class EmailAttachmentEndpoint(BaseEndpoint):
@@ -33,12 +35,8 @@ class EmailAttachmentEndpoint(BaseEndpoint):
 
     resource = "emailattachments"
 
-    def list_by_case(self, action_id: str):
-        """
-        Lists all filenotes for a given action.
-        Returns a list of filenotes.
-        """
-        return super().list({"action": action_id})
+    def list_by_email(self, email_id: str):
+        return super().list({"email": email_id})
 
 
 class EmailAssociationEndpoint(BaseEndpoint):

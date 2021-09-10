@@ -34,46 +34,48 @@
         // Initialize JavaScript enabled Semantic UI elements.
         $('.selection.dropdown').dropdown()
     </script>
-    {% for email in emails %}
-        <div class="ui card fluid">
-            <div class="content">
-                <div class="header">
-                    {{ email.subject|default:"(no subject)" }}
-                </div>
-                <div class="meta">
-                    From {{ email.from_address }} to {{ email.to_address}}
-                </div>
-                {% if email.cc_addresses %}
+    <div class="email-list">
+        {% for email in emails %}
+            <div class="ui card fluid">
+                <div class="content">
+                    <div class="header">
+                        {{ email.subject|default:"(no subject)" }}
+                    </div>
                     <div class="meta">
-                        Also sent to {{ email.cc_addresses|join:', ' }} 
+                        From {{ email.from_address }} to {{ email.to_address}}
+                    </div>
+                    {% if email.cc_addresses %}
+                        <div class="meta">
+                            Also sent to {{ email.cc_addresses|join:', ' }} 
+                        </div>
+                    {% endif %}
+                    <div class="description">
+                        {{ email.html|safe }}
+                    </div>
+                </div>
+                {% if email.emailattachment_set.exists %}
+                    <div class="extra content">
+                        <h5>Attached files</h5>
+                        <ul>
+                            {% for attachment in email.emailattachment_set.all %}
+                                <a href="{{ attachment.file.url }}">
+                                    {{ attachment.file.display_name }}
+                                </a>
+                            {% endfor %}
+                        </ul>
                     </div>
                 {% endif %}
-                <div class="description">
-                    {{ email.html|safe }}
-                </div>
-            </div>
-            {% if email.emailattachment_set.exists %}
                 <div class="extra content">
-                    <h5>Attached files</h5>
-                    <ul>
-                        {% for attachment in email.emailattachment_set.all %}
-                            <a href="{{ attachment.file.url }}">
-                                {{ attachment.file.display_name }}
-                            </a>
-                        {% endfor %}
-                    </ul>
+                    {% if email.state == "INGESTED" %}
+                        Received {{ email.created_at }}
+                    {% else %}
+                        Sent {{ email.created_at }}
+                        by {{ email.sender.get_full_name }}
+                    {% endif %}
                 </div>
-            {% endif %}
-            <div class="extra content">
-                {% if email.state == "INGESTED" %}
-                    Received {{ email.created_at }}
-                {% else %}
-                    Sent {{ email.created_at }}
-                    by {{ email.sender.get_full_name }}
-                {% endif %}
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 

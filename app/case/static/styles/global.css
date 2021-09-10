@@ -2,3 +2,7 @@
 main {
   padding-bottom: 6rem;
 }
+
+.email-list .description {
+  line-height: 1.8;
+}

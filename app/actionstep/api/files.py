@@ -113,7 +113,8 @@ class FileUploadEndpoint(BaseEndpoint):
         """
         chunk_size = FILE_CHUNK_BYTES
         byte_chunks = [
-            file_bytes[i : i + chunk_size] for i in range(0, len(file_bytes), chunk_size)
+            file_bytes[i : i + chunk_size]
+            for i in range(0, len(file_bytes), chunk_size)
         ]
         part_count = len(byte_chunks)
         file_id = None

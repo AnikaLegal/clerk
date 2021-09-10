@@ -329,10 +329,25 @@ def _sync_emails():
     for issue in issues:
         logging.info("Checking Issue<%s> for emails.", issue.pk)
         try:
-            emails = api.emails.get_emails_by_case(issue.actionstep_id)
+            email_ids = api.emails.get_emails_associations_by_case(issue.actionstep_id)
             # Does it time out because we're asking for too many emails a once?
         except ReadTimeout:
-            logger.error("Timed out checking Issue<%s> for emails.", issue.pk)
+            logger.error(
+                "Timed out checking Issue<%s> for email associations.", issue.pk
+            )
+            continue
+
+        if not email_ids:
+            logger.info("No email associations found for Issue<%s>.", issue.pk)
+            continue
+
+        try:
+            emails = api.emails.get_emails(email_ids)
+            # Does it time out because we're asking for too many emails a once?
+        except ReadTimeout:
+            logger.error(
+                "Timed out fetching %s emails Issue<%s>.", len(email_ids), issue.pk
+            )
             continue
 
         for as_email in emails:
@@ -379,7 +394,11 @@ def _sync_emails():
                 },
             )
 
-            # TODO: EmailAttachment
+            # TODO: Download these?
+            # attachments = api.emails.get_attachments_for_email(as_email["id"])
+            # logger.info(
+            #     "Found %s attachments for for Email<%s>.", len(attachments), email.pk
+            # )
 
 
 sync_emails = WithSentryCapture(_sync_emails)
