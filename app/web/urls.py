@@ -5,7 +5,13 @@ from django.contrib.sitemaps.views import sitemap
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from .models import ResourceListPage, BlogListPage, JobListPage, NewsListPage
+from .models import (
+    ResourceListPage,
+    BlogListPage,
+    JobListPage,
+    NewsListPage,
+    VolunteerListPage,
+)
 from .sitemaps import SITEMAPS
 
 from . import views
@@ -83,6 +89,7 @@ urlpatterns = [
     BlogListPage.as_path("blog"),
     JobListPage.as_path("jobs"),
     NewsListPage.as_path("news"),
+    VolunteerListPage.as_path("volunteers"),
     # Robots.txt
     path("robots.txt", views.robots_view),
     # Sitemap
