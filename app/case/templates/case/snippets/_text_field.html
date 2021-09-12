@@ -7,9 +7,10 @@ Args:
 {% endcomment %}
 <div class="field {% if field.errors %}error{% endif %}">
     <label>{{ field.label }}</label>
-    {% if field.value %}
-        <input type="text" name="{{ field.name }}" value="{{ field.value }}">
-    {% else %}
-        <input type="text" name="{{ field.name }}" value="">
-    {% endif %}
+        <input
+            type="text"
+            name="{{ field.name }}"
+            value="{% if field.value %}{{ field.value }}{% endif %}"
+            {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+        >       
 </div>

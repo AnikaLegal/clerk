@@ -37,11 +37,12 @@ class Email(models.Model):
     text = models.TextField(default="", blank=True)
     html = models.TextField(default="", blank=True)
     created_at = models.DateTimeField(default=timezone.now)
+    processed_at = models.DateTimeField(blank=True, null=True)
     issue = models.ForeignKey(Issue, blank=True, null=True, on_delete=models.PROTECT)
     sender = models.ForeignKey(
         User, blank=True, null=True, on_delete=models.PROTECT, related_name="sent_email"
     )
-    received_data = models.JSONField(encoder=DjangoJSONEncoder)
+    received_data = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)

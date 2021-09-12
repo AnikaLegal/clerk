@@ -3,6 +3,7 @@ import logging
 from typing import List, Tuple
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from django.utils import timezone
 
 from core.models import IssueNote
 from core.models.issue_note import NoteType
@@ -47,7 +48,9 @@ def _send_email_task(email_pk: int):
         content_object=email,
         text=email.get_sent_note_text(),
     )
-    Email.objects.filter(pk=email_pk).update(state=EmailState.SENT)
+    Email.objects.filter(pk=email_pk).update(
+        state=EmailState.SENT, processed_at=timezone.now()
+    )
 
 
 send_email_task = WithSentryCapture(_send_email_task)
@@ -78,10 +81,10 @@ def send_email(
     email.send(fail_silently=False)
 
 
-def build_clerk_address(issue):
+def build_clerk_address(issue, email_only=False):
     """
     FIXME: TEST ME.
     """
     issue_prefix = str(issue.id).split("-")[0]
     email = f"case.{issue_prefix}@{settings.EMAIL_DOMAIN}"
-    return f"Anika Legal <{email}>"
+    return email if email_only else f"Anika Legal <{email}>"

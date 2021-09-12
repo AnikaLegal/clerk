@@ -10,32 +10,30 @@
     <div class="ui segment padded">
         Case email address: <strong>{{ case_email_address }}</strong>
     </div>
-    <form 
-        class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-        hx-post="./draft/"
-        hx-target="this"
-    >
-        <p>
-            Close the case. 
-        </p>
-        <p>
-            Please make sure you correctly set all of the fields in this form.
-            This data is crucial for our reporting and decision making.
-        </p>
-        <hr class="ui divider" />
-        {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
-        {% include 'case/snippets/_textarea_field.html' with field=form.outcome_notes %}
-        {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
-        {% include 'case/snippets/_form_errors.html' %}
-        {% include 'case/snippets/_form_success.html' %}
-        <button class="ui positive button" type="submit">Close case</button>
-    </form>
-    <script>
-        // Initialize JavaScript enabled Semantic UI elements.
-        $('.selection.dropdown').dropdown()
-    </script>
+    <h2 class="ui header">Draft Emails</h2>
+    <div class="ui segment padded">
+        {% if draft_emails %}
+            <div class="ui relaxed divided list">
+                {% for email in draft_emails %}
+                    <div class="item">
+                        <i class="large mail middle aligned icon"></i>
+                        <div class="content">
+                        <a href="{% url 'case-detail-email-draft-edit' issue.pk email.pk %}" class="header">
+                            {{ email.subject }}
+                        </a>
+                        <div class="description">To {{ email.to_address }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <a href="{% url 'case-detail-email-draft' issue.pk %}">
+            <button class="ui button primary" type="submit">New Draft</button>
+        </a>
+    </div>
+    <h2 class="ui header">Sent / Received Emails</h2>
     <div class="email-list">
-        {% for email in emails %}
+        {% for email in display_emails %}
             <div class="ui card fluid">
                 <div class="content">
                     <div class="header">
@@ -68,6 +66,8 @@
                 <div class="extra content">
                     {% if email.state == "INGESTED" %}
                         Received {{ email.created_at }}
+                    {% elif email.state == "READY_TO_SEND" %}
+                        Sending...
                     {% else %}
                         Sent {{ email.created_at }}
                         by {{ email.sender.get_full_name }}

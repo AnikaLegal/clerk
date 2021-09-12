@@ -388,6 +388,7 @@ def _sync_emails():
                     "text": as_email["bodyText"],
                     "html": as_email["bodyHtml"],
                     "created_at": created_at,
+                    "processed_at": created_at,
                     "issue": issue,
                     "sender": sender,
                     "received_data": as_email,

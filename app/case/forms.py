@@ -1,11 +1,42 @@
 from django import forms
 from django.forms.fields import BooleanField
 from django.contrib.auth.models import Group
+from django.db import transaction
 
 from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
 from core.models.issue import CaseStage
+from emails.models import Email, EmailState, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
+
+
+class EmailForm(forms.ModelForm):
+    class Meta:
+        model = Email
+        fields = [
+            "from_address",
+            "to_address",
+            "cc_addresses",
+            "subject",
+            "state",
+            "text",
+            "issue",
+            "sender",
+        ]
+
+    attachments = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={"multiple": True}), required=False
+    )
+
+    @transaction.atomic
+    def save(self, commit=True):
+        email = super().save()
+        for f in self.files.getlist("attachments"):
+            EmailAttachment.objects.create(
+                email=email,
+                file=f,
+                content_type=f.content_type,
+            )
 
 
 class PersonDynamicForm(DynamicTableForm):

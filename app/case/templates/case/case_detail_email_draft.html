@@ -1,0 +1,48 @@
+{% extends "case/_base.html" %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+
+
+
+{% block content %}
+<div class="ui container">
+    <h2 class="ui header">
+        Create new draft email
+        <span class="sub header">
+             <a href="{% url 'case-detail-email' issue.pk %}">
+                Back to case emails
+            </a>
+        </span>
+    </h2>
+    <div style="display: flex;flex-wrap: wrap;gap: 0.5rem;margin-bottom:1rem">
+    {% for case_email in case_emails %}
+        <span class="ui blue label">
+            {{ case_email.name }}, {{ case_email.role }}
+            <div class="detail">{{ case_email.email }}</div>
+        </span>
+    {% endfor %}
+    </div>
+    <form 
+        method="post"
+        class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {% include 'case/snippets/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
+        {% include 'case/snippets/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
+        {% include 'case/snippets/_text_field.html' with field=form.subject placeholder="A very important email" %}
+        {% include 'case/snippets/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+        <div class="field {% if field.errors %}error{% endif %}">
+            <label>Attachments</label>
+            <input
+                type="file"
+                multiple
+                name="attachments"
+            >       
+        </div>
+        {% include 'case/snippets/_form_errors.html' %}
+        {% include 'case/snippets/_form_success.html' %}
+        <button class="ui positive button" type="submit">Create draft email</button>
+    </form>
+{% endblock %}
+

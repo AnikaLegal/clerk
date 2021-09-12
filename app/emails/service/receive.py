@@ -4,6 +4,7 @@ import json
 from django.conf import settings
 from django.utils.datastructures import MultiValueDict
 from django.db import transaction
+from django.utils import timezone
 
 from utils.sentry import WithSentryCapture
 from core.models import Issue, IssueNote
@@ -39,6 +40,7 @@ def _receive_email_task(email_pk: int):
         email.subject = parsed_data["subject"]
         email.text = parsed_data["text"]
         email.html = parsed_data["html"]
+        email.processed_at = timezone.now()
         email.save()
         IssueNote.objects.create(
             issue=parsed_data["issue"],

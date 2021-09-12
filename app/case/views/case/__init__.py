@@ -6,4 +6,8 @@ from .case_list import (
     case_inbox_view,
 )
 from .case_detail import case_detail_view
-from .case_email import case_detail_email_view
+from .case_email import (
+    case_detail_email_view,
+    case_detail_email_draft_view,
+    case_detail_email_draft_edit_view,
+)

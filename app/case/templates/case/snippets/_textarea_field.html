@@ -7,9 +7,9 @@ Args:
 {% endcomment %}
 <div class="field {% if field.errors %}error{% endif %}">
     <label>{{ field.label }}</label>
-    {% if field.value %}
-        <textarea rows="3" name="{{ field.name }}">{{ field.value }}</textarea>
-    {% else %}
-        <textarea rows="3" name="{{ field.name }}"></textarea>
-    {% endif %}
+    <textarea 
+        rows="{{ rows|default:3 }}"
+        name="{{ field.name }}"
+        {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+    >{% if field.value %}{{ field.value }}{% endif %}</textarea>
 </div>

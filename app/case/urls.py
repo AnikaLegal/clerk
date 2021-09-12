@@ -40,9 +40,19 @@ urlpatterns = [
     path("cases/inbox/", views.case.case_inbox_view, name="case-inbox"),
     path("cases/review/", views.case.case_review_view, name="case-review"),
     re_path(
-        fr"^cases/{UUID_PARAM}/email/{FORM_SLUG_PARAM}?/?$",
+        fr"^cases/{UUID_PARAM}/email/$",
         views.case.case_detail_email_view,
         name="case-detail-email",
+    ),
+    re_path(
+        fr"^cases/{UUID_PARAM}/email/draft/$",
+        views.case.case_detail_email_draft_view,
+        name="case-detail-email-draft",
+    ),
+    re_path(
+        fr"^cases/{UUID_PARAM}/email/draft/(?P<email_pk>[0-9]+)/$",
+        views.case.case_detail_email_draft_edit_view,
+        name="case-detail-email-draft-edit",
     ),
     re_path(
         fr"^cases/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
