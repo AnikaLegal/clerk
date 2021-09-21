@@ -1,5 +1,5 @@
-from microsoft.base import BaseEndpoint
-from microsoft.helpers import BASE_URL
+from .base import BaseEndpoint
+from .helpers import BASE_URL
 
 from django.conf import settings
 

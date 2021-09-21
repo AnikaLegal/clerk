@@ -1,12 +1,12 @@
-from microsoft.helpers import create_client, get_token
-from microsoft.group import GroupEndpoint
-from microsoft.user import UserEndpoint
-from microsoft.folder import FolderEndpoint
+from .helpers import create_client, get_token
+from .group import GroupEndpoint
+from .user import UserEndpoint
+from .folder import FolderEndpoint
 
 from django.conf import settings
 
 """
-from microsoft import MSGraphAPI
+from microsoft.endpoints import MSGraphAPI
 api = MSGraphAPI()
 """
 

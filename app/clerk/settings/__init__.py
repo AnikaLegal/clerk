@@ -144,6 +144,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     # Ensure new users can access the Wagtail CMS
     "accounts.social_auth.set_new_user_as_cms_editor",
+    # Setup new user with MS account, E1 license, and group
+    "accounts.social_auth.set_up_new_user_in_microsoft",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {

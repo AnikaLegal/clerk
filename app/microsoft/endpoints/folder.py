@@ -1,4 +1,4 @@
-from microsoft.base import BaseEndpoint
+from .base import BaseEndpoint
 
 from django.conf import settings
 
