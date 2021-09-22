@@ -13,7 +13,7 @@ def set_new_user_as_cms_editor(backend, user, is_new=False, *args, **kwargs):
 
 def set_up_new_user_in_microsoft(backend, user, is_new=False, *args, **kwargs):
     """
-    Give new user MS account, E1 license, add to group
+    Give new users MS account and E1 license
     """
     if is_new:
         service.set_up_new_user(user)

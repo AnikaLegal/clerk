@@ -3,7 +3,7 @@ from microsoft.endpoints import MSGraphAPI
 
 def set_up_new_user(user):
     """
-    Create MS account for new user, assign license and add to Group.
+    Create MS account for new user and assign license.
     """
     api = MSGraphAPI()
 
@@ -14,23 +14,27 @@ def set_up_new_user(user):
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         # TODO: send email to user with their password
         api.user.assign_license(user.email)
-        api.group.add_user(user.email)
 
 
 def set_up_new_case(issue):
     """
-    On Issue save signal
-    Test with maangement command?
+    Make copy of templates folder with name of new case.
     """
-    pass
+    path = "templates/repairs" if issue.topic == "REPAIRS" else "templates/evictions"
+    name = issue.id
+    # Corresponds to cases folder.
+    parent_id = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
+
+    api = MSGraphAPI()
+    api.folder.copy(path, name, parent_id)
 
 
 def add_user_to_case(user, issue):
     """
-    On Issue save signal
-    On view for (Coordinators, Admins, Superusers)
+    Give User write permissions for a specific case (folder)
     """
-    pass
+    api = MSGraphAPI()
+    api.folder.create_permissions(f"cases/{issue.id}", "write", [user.email])
 
 
 def remove_user_from_case(user, issue):
@@ -40,16 +44,20 @@ def remove_user_from_case(user, issue):
     pass
 
 
-def tear_down_coordiator(user):
+def get_files_for_case(issue):
     """
-    On User save signal
-    Remove user from all cases that they have access to that they are not assigned to as paralegals
+    Called by case view
     """
     pass
 
 
-def get_files_for_case(issue):
+def set_up_coordinator(user):
+    pass
+
+
+def tear_down_coordinator(user):
     """
-    Called by case view
+    On User save signal
+    Remove user from all cases that they have access to that they are not assigned to as paralegals
     """
     pass
