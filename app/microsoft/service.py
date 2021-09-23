@@ -21,7 +21,7 @@ def set_up_new_case(issue):
     Copy the relevant templates folder, giving it the name of the new case.
     """
     path = "templates/repairs" if issue.topic == "REPAIRS" else "templates/evictions"
-    name = issue.id
+    name = str(issue.id)
     # Place copy inside of cases folder.
     parent_id = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
@@ -58,18 +58,33 @@ def remove_user_from_case(user, issue):
 
 def get_files_for_case(issue):
     """
-    Called by case view
+    Get list of files (name, URL) for preexisting case (folder).
     """
-    pass
+    api = MSGraphAPI()
+    return api.folder.files(f"cases/{issue.id}")
 
 
 def set_up_coordinator(user):
-    pass
+    """
+    Add User as Group member.
+    """
+    api = MSGraphAPI()
+
+    members = api.group.members()
+
+    if user.email not in members:
+        api.group.add_user(user.email)
 
 
 def tear_down_coordinator(user):
     """
-    On User save signal
-    Remove user from all cases that they have access to that they are not assigned to as paralegals
+    Remove User as Group member.
     """
-    pass
+    api = MSGraphAPI()
+
+    members = api.group.members()
+
+    if user.email in members:
+        result = api.user.get(user.email)
+        user_id = result["id"]
+        api.group.remove_user(user_id)
