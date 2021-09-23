@@ -65,7 +65,7 @@ class FolderEndpoint(BaseEndpoint):
             list_permissions = []
 
             for item in json["value"]:
-                list_permissions.append(item["id"])
+                list_permissions.append((item["id"], item["grantedTo"]))
 
             return list_permissions
         else:

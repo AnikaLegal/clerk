@@ -18,11 +18,11 @@ def set_up_new_user(user):
 
 def set_up_new_case(issue):
     """
-    Make copy of templates folder with name of new case.
+    Copy the relevant templates folder, giving it the name of the new case.
     """
     path = "templates/repairs" if issue.topic == "REPAIRS" else "templates/evictions"
     name = issue.id
-    # Corresponds to cases folder.
+    # Place copy inside of cases folder.
     parent_id = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
     api = MSGraphAPI()
@@ -31,7 +31,7 @@ def set_up_new_case(issue):
 
 def add_user_to_case(user, issue):
     """
-    Give User write permissions for a specific case (folder)
+    Give User write permissions for a specific case (folder).
     """
     api = MSGraphAPI()
     api.folder.create_permissions(f"cases/{issue.id}", "write", [user.email])
@@ -39,9 +39,21 @@ def add_user_to_case(user, issue):
 
 def remove_user_from_case(user, issue):
     """
-    On Issue save signal for users
+    Delete the permissions that a User has for a specific case (folder).
     """
-    pass
+    api = MSGraphAPI()
+
+    path = f"cases/{issue.id}"
+
+    # Get the permissions for the case.
+    permissions = api.folder.list_permissions(path)
+
+    # Iterate through the permissions and delete those belonging to the User.
+    if permissions:
+        for permission in permissions:
+            email = permission[1]["user"].get("email")
+            if email == user.email:
+                api.folder.delete_permission(path, permission[0])
 
 
 def get_files_for_case(issue):
