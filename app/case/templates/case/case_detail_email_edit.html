@@ -7,7 +7,7 @@
 {% block content %}
 <div class="ui container">
     <h2 class="ui header">
-        Create new draft email
+        Edit draft email
         <span class="sub header">
              <a href="{% url 'case-detail-email' issue.pk %}">
                 Back to case emails
@@ -33,16 +33,47 @@
         {% include 'case/snippets/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
         {% include 'case/snippets/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
         <div class="field {% if field.errors %}error{% endif %}">
-            <label>Attachments</label>
+            <label>Add new attachments</label>
             <input
                 type="file"
                 multiple
                 name="attachments"
             >       
         </div>
+
+
         {% include 'case/snippets/_form_errors.html' %}
         {% include 'case/snippets/_form_success.html' %}
-        <button class="ui positive button" type="submit">Create draft email</button>
+        <button class="ui positive button" type="submit">Save draft</button>
+        <form 
+            method="post"
+            action="{% url 'case-detail-email-draft-send' issue.pk email.pk %}"
+            style="display: inline-block"
+        >
+            {% csrf_token %}
+            <button type="submit" class="ui button primary">Send email</button>
+        </form>
     </form>
+    {% if email.emailattachment_set.count > 0 %}
+        <h5>Attached files</h5>
+        <ul>
+            {% for attachment in email.emailattachment_set.all %}
+                <li>
+                    <a href="{{ attachment.file.url }}">
+                        {{ attachment.file.name }}
+                    </a>
+                    &nbsp;
+                    <form 
+                        method="post"
+                        action="{% url 'case-detail-email-attachment' issue.pk email.pk attachment.pk %}"
+                        style="display: inline-block"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="ui button red small">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}
 

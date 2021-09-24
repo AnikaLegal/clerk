@@ -21,15 +21,7 @@ DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED, EmailState.READY_T
 @paralegal_or_better_required
 @require_http_methods(["GET"])
 def case_detail_email_view(request, pk):
-    try:
-        issue = (
-            Issue.objects.check_permisisons(request)
-            .prefetch_related("email_set")
-            .get(pk=pk)
-        )
-    except Issue.DoesNotExist:
-        raise Http404()
-
+    issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
     email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
         "-created_at"
@@ -54,15 +46,7 @@ def case_detail_email_view(request, pk):
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def case_detail_email_draft_view(request, pk):
-    try:
-        issue = (
-            Issue.objects.check_permisisons(request)
-            .prefetch_related("email_set")
-            .get(pk=pk)
-        )
-    except Issue.DoesNotExist:
-        raise Http404()
-
+    issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
     if request.method == "POST":
@@ -91,19 +75,15 @@ def case_detail_email_draft_view(request, pk):
 
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
-def case_detail_email_draft_edit_view(request, pk, email_pk):
-    try:
-        issue = (
-            Issue.objects.check_permisisons(request)
-            .prefetch_related("email_set")
-            .get(pk=pk)
-        )
-    except Issue.DoesNotExist:
-        raise Http404()
+def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
 
-    try:
-        email = issue.email_set.prefetch_related("emailattachment_set").get(pk=email_pk)
-    except Email.DoesNotExist:
+    if attach_pk and request.method == "POST":
+        # Delete attachment
+        email.emailattachment_set.filter(id=attach_pk).delete()
+        return redirect("case-detail-email-draft-edit", pk, email_pk)
+    elif attach_pk:
         raise Http404()
 
     case_email_address = build_clerk_address(issue, email_only=True)
@@ -116,9 +96,11 @@ def case_detail_email_draft_edit_view(request, pk, email_pk):
             "sender": request.user,
         }
         data = merge_form_data(request.POST, default_data)
-        form = EmailForm(data, files=request.FILES)
+        form = EmailForm(data, instance=email, files=request.FILES)
         if form.is_valid():
             form.save()
+            return redirect("case-detail-email", pk)
+
     else:
         form = EmailForm(instance=email)
 
@@ -126,9 +108,35 @@ def case_detail_email_draft_edit_view(request, pk, email_pk):
         "issue": issue,
         "form": form,
         "case_emails": case_emails,
+        "email": email,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case_detail_email_draft.html", context)
+    return render(request, "case/case_detail_email_edit.html", context)
+
+
+@paralegal_or_better_required
+@require_http_methods(["POST"])
+def case_detail_email_draft_send_view(request, pk, email_pk):
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
+
+
+def _get_email_for_issue(issue, email_pk):
+    try:
+        return issue.email_set.prefetch_related("emailattachment_set").get(pk=email_pk)
+    except Email.DoesNotExist:
+        raise Http404()
+
+
+def _get_issue_for_emails(request, pk):
+    try:
+        return (
+            Issue.objects.check_permisisons(request)
+            .prefetch_related("email_set")
+            .get(pk=pk)
+        )
+    except Issue.DoesNotExist:
+        raise Http404()
 
 
 def get_case_emails(issue: Issue):

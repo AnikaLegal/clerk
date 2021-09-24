@@ -3,10 +3,16 @@ from django.shortcuts import render
 
 from accounts.models import User
 from .auth import coordinator_or_better_required
+from case.utils.router import Router
 
 PARALEGAL_CAPACITY = 4.0
 
 
+router = Router("paralegal")
+router.add_path("list")
+
+
+@router.use_path("list")
 @coordinator_or_better_required
 def paralegal_list_view(request):
     paralegals = (

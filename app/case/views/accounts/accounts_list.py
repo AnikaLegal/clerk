@@ -5,6 +5,11 @@ from django.shortcuts import render
 
 from accounts.models import User
 from case.views.auth import coordinator_or_better_required
+from case.utils.router import Router
+
+
+router = Router("client")
+router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
 
 
 @require_http_methods(["GET"])

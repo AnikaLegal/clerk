@@ -88,7 +88,7 @@ make shell
 
 ## Emails
 
-To listen for inbound emails:
+To listen for inbound emails in your development environment:
 
 ```bash
 # Start ngrok (https://ngrok.com/) and take note of the address

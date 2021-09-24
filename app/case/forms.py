@@ -37,6 +37,7 @@ class EmailForm(forms.ModelForm):
                 file=f,
                 content_type=f.content_type,
             )
+        return email
 
 
 class PersonDynamicForm(DynamicTableForm):

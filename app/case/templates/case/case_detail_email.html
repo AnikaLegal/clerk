@@ -57,7 +57,7 @@
                         <ul>
                             {% for attachment in email.emailattachment_set.all %}
                                 <a href="{{ attachment.file.url }}">
-                                    {{ attachment.file.display_name }}
+                                    {{ attachment.file.name }}
                                 </a>
                             {% endfor %}
                         </ul>

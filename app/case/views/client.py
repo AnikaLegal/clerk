@@ -10,6 +10,7 @@ from case.forms import (
 )
 from core.models import Client, Issue
 from .auth import paralegal_or_better_required
+from case.utils.router import Router
 
 CLIENT_DETAIL_FORMS = {
     "contact": ClientContactDynamicForm,
@@ -17,9 +18,14 @@ CLIENT_DETAIL_FORMS = {
     "misc": ClientMiscDynamicForm,
 }
 
+router = Router("client")
+router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
 
+
+@router.use_path("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
+# @router.path(f"{router.UUID_PARAM}/{router.FORM_SLUG_PARAM}?/?$", "detail")
 def client_detail_view(request, pk, form_slug: str = ""):
     try:
         client = Client.objects.prefetch_related("issue_set").get(pk=pk)

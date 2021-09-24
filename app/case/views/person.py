@@ -5,12 +5,17 @@ from django.http import Http404
 from case.forms import DynamicTableForm, PersonDynamicForm
 from core.models import Person
 from .auth import paralegal_or_better_required
+from case.utils.router import Router
 
 PERSON_DETAIL_FORMS = {
     "form": PersonDynamicForm,
 }
 
+router = Router("person")
+router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
 
+
+@router.use_path("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def person_detail_view(request, pk, form_slug: str = ""):

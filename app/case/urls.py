@@ -6,28 +6,18 @@ UUID_PARAM = r"(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9
 INT_PK_PARAM = r"(?P<pk>[0-9]+)"
 FORM_SLUG_PARAM = r"(?P<form_slug>[\-\w]+)"
 
+from .views.client import router as client_router
+from .views.paralegal import router as paralegal_router
+from .views.person import router as person_router
+from .views.tenancy import router as tenancy_router
+from .views.case import root_view, not_allowed_view
 
 urlpatterns = [
     # Paralegals
-    path("paralegals/", views.paralegal.paralegal_list_view, name="paralegal-list"),
-    # Person
-    re_path(
-        fr"^person/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.person.person_detail_view,
-        name="person-detail",
-    ),
-    # Tenancy
-    re_path(
-        fr"^tenancy/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.tenancy.tenancy_detail_view,
-        name="tenancy-detail",
-    ),
-    # Client
-    re_path(
-        fr"^client/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.client_detail_view,
-        name="client-detail",
-    ),
+    path("paralegals/", paralegal_router.urls()),
+    path("person/", person_router.urls()),
+    path("tenancy/", tenancy_router.urls()),
+    path("client/", client_router.urls()),
     # Accounts
     path("accounts/", views.accounts.account_list_view, name="account-list"),
     re_path(
@@ -55,10 +45,20 @@ urlpatterns = [
         name="case-detail-email-draft-edit",
     ),
     re_path(
+        fr"^cases/{UUID_PARAM}/email/draft/(?P<email_pk>[0-9]+)/send/$",
+        views.case.case_detail_email_draft_send_view,
+        name="case-detail-email-draft-send",
+    ),
+    re_path(
+        fr"^cases/{UUID_PARAM}/email/draft/(?P<email_pk>[0-9]+)/attachment/(?P<attach_pk>[0-9]+)/$",
+        views.case.case_detail_email_draft_edit_view,
+        name="case-detail-email-attachment",
+    ),
+    re_path(
         fr"^cases/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
         views.case.case_detail_view,
         name="case-detail",
     ),
-    path("not-allowed/", views.case.not_allowed_view, name="case-not-allowed"),
-    path("", views.case.root_view, name="case-root"),
+    path("not-allowed/", not_allowed_view, name="case-not-allowed"),
+    path("", root_view, name="case-root"),
 ]

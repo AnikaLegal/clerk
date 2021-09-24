@@ -10,4 +10,5 @@ from .case_email import (
     case_detail_email_view,
     case_detail_email_draft_view,
     case_detail_email_draft_edit_view,
+    case_detail_email_draft_send_view,
 )

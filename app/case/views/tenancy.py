@@ -6,12 +6,18 @@ from django.http import Http404
 from case.forms import DynamicTableForm, TenancyDynamicForm
 from core.models import Tenancy, Issue
 from .auth import paralegal_or_better_required
+from case.utils.router import Router
 
 TENANCY_DETAIL_FORMS = {
     "form": TenancyDynamicForm,
 }
 
 
+router = Router("tenancy")
+router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
+
+
+@router.use_path("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def tenancy_detail_view(request, pk, form_slug: str = ""):
