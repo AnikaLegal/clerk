@@ -22,4 +22,8 @@
         <i class="mail list icon"></i>
         Email
     </a>
+    <a href="{% url 'case-docs' issue.pk %}" class="item {% if active == 'documents' %}active{% endif %}">
+        <i class="chart line icon"></i>
+        Documents
+    </a>
 </div>

@@ -129,6 +129,8 @@ class Issue(TimestampedModel):
     is_alert_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
     is_case_sent = models.BooleanField(default=False)
+    # Tracks whether a folder (case) has been created in Sharepoint.
+    is_sharepoint_set_up = models.BooleanField(default=False)
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)

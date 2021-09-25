@@ -1,0 +1,17 @@
+{% extends "case/_base.html" %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+
+
+
+{% block content %}
+<div class="ui container">
+    {% include 'case/case/_detail_header.html' with active="documents" %}
+    <h2 class="ui header">Documents</h2>
+    <ul>
+        {% for name, url in documents %}
+            <li><a href="{{ url }}">{{ name }}</a></li>
+        {% endfor %}    
+    </ul>
+{% endblock %}
+

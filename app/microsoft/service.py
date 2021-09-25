@@ -20,6 +20,7 @@ def set_up_new_case(issue):
     """
     Copy the relevant templates folder, giving it the name of the new case.
     """
+    # FIXME: set these as constants
     path = "templates/repairs" if issue.topic == "REPAIRS" else "templates/evictions"
     name = str(issue.id)
     # Place copy inside of cases folder.
@@ -60,6 +61,7 @@ def get_files_for_case(issue):
     """
     Get list of files (name, URL) for preexisting case (folder).
     """
+    # TODO: provide link to the folder itself not just the files inside it.
     api = MSGraphAPI()
     return api.folder.files(f"cases/{issue.id}")
 
