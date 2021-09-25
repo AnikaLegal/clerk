@@ -18,7 +18,7 @@ urlpatterns = [
     path("person/", person_router.urls()),
     path("tenancy/", tenancy_router.urls()),
     path("client/", client_router.urls()),
-    # Accounts
+    # Accounts - TODO next
     path("accounts/", views.accounts.account_list_view, name="account-list"),
     re_path(
         fr"^accounts/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
