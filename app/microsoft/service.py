@@ -1,5 +1,12 @@
 from microsoft.endpoints import MSGraphAPI
 
+# Drive ID of cases folder.
+PARENT_ID = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
+
+# Paths for template folders.
+REPAIRS = "templates/repairs"
+EVICTIONS = "templates/evictions"
+
 
 def set_up_new_user(user):
     """
@@ -18,16 +25,13 @@ def set_up_new_user(user):
 
 def set_up_new_case(issue):
     """
-    Copy the relevant templates folder, giving it the name of the new case.
+    Make a copy of the relevant templates folder with the name of the new case.
     """
-    # FIXME: set these as constants
-    path = "templates/repairs" if issue.topic == "REPAIRS" else "templates/evictions"
+    path = REPAIRS if issue.topic == "REPAIRS" else EVICTIONS
     name = str(issue.id)
-    # Place copy inside of cases folder.
-    parent_id = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
     api = MSGraphAPI()
-    api.folder.copy(path, name, parent_id)
+    api.folder.copy(path, name, PARENT_ID)
 
 
 def add_user_to_case(user, issue):
@@ -51,19 +55,31 @@ def remove_user_from_case(user, issue):
 
     # Iterate through the permissions and delete those belonging to the User.
     if permissions:
-        for permission in permissions:
-            email = permission[1]["user"].get("email")
+        for perm_id, user_object in permissions:
+            email = user_object["user"].get("email")
             if email == user.email:
-                api.folder.delete_permission(path, permission[0])
+                api.folder.delete_permission(path, perm_id)
 
 
 def get_files_for_case(issue):
     """
     Get list of files (name, URL) for preexisting case (folder).
     """
-    # TODO: provide link to the folder itself not just the files inside it.
     api = MSGraphAPI()
     return api.folder.files(f"cases/{issue.id}")
+
+
+def get_case_folder(issue):
+    """
+    Get the folder (id, URL) matching a case.
+    """
+    api = MSGraphAPI()
+    result = api.folder.get(f"cases/{issue.id}")
+
+    if result:
+        return result["id"], result["webUrl"]
+    else:
+        return None
 
 
 def set_up_coordinator(user):
