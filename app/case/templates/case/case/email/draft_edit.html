@@ -9,7 +9,7 @@
     <h2 class="ui header">
         Edit draft email
         <span class="sub header">
-             <a href="{% url 'case-email-detail' issue.pk %}">
+             <a href="{% url 'case-email-list' issue.pk %}">
                 Back to case emails
             </a>
         </span>
@@ -47,33 +47,13 @@
         <button class="ui positive button" type="submit">Save draft</button>
         <form 
             method="post"
-            action="{% url 'case-email-detail-draft-send' issue.pk email.pk %}"
+            action="{% url 'case-email-send' issue.pk email.pk %}"
             style="display: inline-block"
         >
             {% csrf_token %}
             <button type="submit" class="ui button primary">Send email</button>
         </form>
     </form>
-    {% if email.emailattachment_set.count > 0 %}
-        <h5>Attached files</h5>
-        <ul>
-            {% for attachment in email.emailattachment_set.all %}
-                <li>
-                    <a href="{{ attachment.file.url }}">
-                        {{ attachment.file.name }}
-                    </a>
-                    &nbsp;
-                    <form 
-                        method="post"
-                        action="{% url 'case-email-detail-attachment' issue.pk email.pk attachment.pk %}"
-                        style="display: inline-block"
-                    >
-                        {% csrf_token %}
-                        <button type="submit" class="ui button red small">Delete</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    {% include 'case/case/email/_draft_attachments.html' %}
 {% endblock %}
 

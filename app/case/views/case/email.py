@@ -3,6 +3,7 @@ import os
 
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
 from html_sanitizer import Sanitizer
@@ -16,29 +17,35 @@ from case.utils import merge_form_data
 from case.utils.router import Router
 
 
-DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED, EmailState.READY_TO_SEND]
+DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
+DRAFT_EMAIL_STATES = [EmailState.READY_TO_SEND, EmailState.DRAFT]
 
 router = Router("email")
-router.create_route("detail").uuid("pk")
+router.create_route("list").uuid("pk")
 router.create_route("draft").uuid("pk").path("draft")
 router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
 router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
-router.create_route("attach").uuid("pk").path("draft").pk("email_pk").path(
-    "attachment"
-).pk("attach_pk")
+(
+    router.create_route("attach")
+    .uuid("pk")
+    .path("draft")
+    .pk("email_pk")
+    .path("attachment")
+    .pk("attach_pk", optional=True)
+)
 
 
-@router.use_route("detail")
+@router.use_route("list")
 @paralegal_or_better_required
 @require_http_methods(["GET"])
-def case_detail_email_view(request, pk):
+def email_list_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
     email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
         "-created_at"
     )
     display_emails = email_qs.filter(state__in=DISPLAY_EMAIL_STATES)
-    draft_emails = email_qs.filter(state=EmailState.DRAFT)
+    draft_emails = email_qs.filter(state__in=DRAFT_EMAIL_STATES)
     for emails in [display_emails, draft_emails]:
         for email in emails:
             email.html = get_email_html(email)
@@ -51,13 +58,13 @@ def case_detail_email_view(request, pk):
         "draft_emails": draft_emails,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case/email/detail.html", context)
+    return render(request, "case/case/email/list.html", context)
 
 
 @router.use_route("draft")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
-def case_detail_email_draft_view(request, pk):
+def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
@@ -72,7 +79,8 @@ def case_detail_email_draft_view(request, pk):
         form = EmailForm(data, files=request.FILES)
         if form.is_valid():
             email = form.save()
-            return redirect("case-email-detail-draft-edit", issue.pk, email.pk)
+            messages.success(request, "Draft created")
+            return redirect("case-email-edit", issue.pk, email.pk)
     else:
         form = EmailForm()
 
@@ -82,24 +90,15 @@ def case_detail_email_draft_view(request, pk):
         "case_emails": case_emails,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case/case/email/draft_create.html", context)
+    return render(request, "case/case/email/draft_create.html", context)
 
 
 @router.use_route("edit")
-@router.use_route("attach")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
-def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
+def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
-
-    if attach_pk and request.method == "POST":
-        # Delete attachment
-        email.emailattachment_set.filter(id=attach_pk).delete()
-        return redirect("case-email-detail-draft-edit", pk, email_pk)
-    elif attach_pk:
-        raise Http404()
-
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
     if request.method == "POST":
@@ -112,8 +111,8 @@ def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
         data = merge_form_data(request.POST, default_data)
         form = EmailForm(data, instance=email, files=request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect("case-email-detail", pk)
+            messages.success(request, "Draft saved.")
+            email = form.save()
 
     else:
         form = EmailForm(instance=email)
@@ -131,14 +130,30 @@ def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
 @router.use_route("send")
 @paralegal_or_better_required
 @require_http_methods(["POST"])
-def case_detail_email_draft_send_view(request, pk, email_pk):
+def email_draft_send_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
+    if not email.state == EmailState.DRAFT:
+        raise Http404()
+
+
+@router.use_route("attach")
+@paralegal_or_better_required
+@require_http_methods(["DELETE"])
+def email_attachment_delete_view(request, pk, email_pk, attach_pk):
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
+    if not email.state == EmailState.DRAFT:
+        raise Http404()
+
+    email.emailattachment_set.filter(id=attach_pk).delete()
+    context = {"issue": issue, "email": email}
+    return render(request, "case/case/email/_draft_attachments.html", context)
 
 
 def _get_email_for_issue(issue, email_pk):
     try:
-        return issue.email_set.prefetch_related("emailattachment_set").get(pk=email_pk)
+        return issue.email_set.get(pk=email_pk)
     except Email.DoesNotExist:
         raise Http404()
 
