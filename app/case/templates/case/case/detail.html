@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="ui container">
-    {% include 'case/_case_detail_header.html' with active="detail" %}
+    {% include 'case/case/_detail_header.html' with active="detail" %}
     <div class="ui two column grid" style="margin-top: 1rem;">
 
         <div class="column">
@@ -19,7 +19,7 @@
             <div class="ui header">
                 Timeline
             </div>
-            {% include 'case/htmx/_case_feed.html' %}
+            {% include 'case/case/_feed.html' %}
         </div>
 
         <div class="column">

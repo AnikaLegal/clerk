@@ -5,13 +5,12 @@ from django.shortcuts import render
 
 from accounts.models import User
 from case.views.auth import coordinator_or_better_required
-from case.utils.router import Router
+from case.utils.router import Route
+
+list_route = Route("list")
 
 
-router = Router("client")
-router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
-
-
+@list_route
 @require_http_methods(["GET"])
 @coordinator_or_better_required
 def account_list_view(request):
@@ -36,10 +35,10 @@ def account_list_view(request):
             users = users.filter(combine_q_with_or(queries))
 
         context["users"] = users
-        return render(request, "case/snippets/_account_list_table.html", context)
+        return render(request, "case/accounts/_list_table.html", context)
     else:
         context["users"] = users
-        return render(request, "case/account_list.html", context)
+        return render(request, "case/accounts/list.html", context)
 
 
 def combine_q_with_or(queries: List[Q]) -> Q:

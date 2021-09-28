@@ -17,12 +17,12 @@ Args:
         This note is visible to everybody who has access to the case.
     </p>
     <hr class="ui divider" />
-    {% include 'case/snippets/_textarea_field.html' with field=form.text %}
-    {% include 'case/snippets/_form_errors.html' %}
-    {% include 'case/snippets/_form_success.html' %}
+    {% include 'case/forms/_textarea_field.html' with field=form.text %}
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
     <button class="ui positive button" type="submit">Create note</button>
 </form>
-{% include 'case/htmx/_case_feed.html' with notes=notes %}
+{% include 'case/case/_feed.html' with notes=notes %}
 <script>
 document.addEventListener('htmx:afterSettle', e => {
     if (e.detail.target.id === "paralegal-note-form") {

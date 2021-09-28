@@ -9,7 +9,7 @@
     <h2 class="ui header">
         Create new draft email
         <span class="sub header">
-             <a href="{% url 'case-detail-email' issue.pk %}">
+             <a href="{% url 'case-email-detail' issue.pk %}">
                 Back to case emails
             </a>
         </span>
@@ -28,10 +28,10 @@
         enctype="multipart/form-data"
     >
         {% csrf_token %}
-        {% include 'case/snippets/_text_field.html' with field=form.subject placeholder="A very important email" %}
-        {% include 'case/snippets/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
-        {% include 'case/snippets/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
-        {% include 'case/snippets/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+        {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
+        {% include 'case/forms/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
+        {% include 'case/forms/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
+        {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
         <div class="field {% if field.errors %}error{% endif %}">
             <label>Attachments</label>
             <input
@@ -40,8 +40,8 @@
                 name="attachments"
             >       
         </div>
-        {% include 'case/snippets/_form_errors.html' %}
-        {% include 'case/snippets/_form_success.html' %}
+        {% include 'case/forms/_form_errors.html' %}
+        {% include 'case/forms/_form_success.html' %}
         <button class="ui positive button" type="submit">Create draft email</button>
     </form>
 {% endblock %}

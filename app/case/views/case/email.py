@@ -13,11 +13,22 @@ from emails.service import build_clerk_address
 from emails.models import EmailState, Email
 from case.forms import EmailForm
 from case.utils import merge_form_data
+from case.utils.router import Router
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED, EmailState.READY_TO_SEND]
 
+router = Router("email")
+router.create_route("detail").uuid("pk")
+router.create_route("draft").uuid("pk").path("draft")
+router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
+router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
+router.create_route("attach").uuid("pk").path("draft").pk("email_pk").path(
+    "attachment"
+).pk("attach_pk")
 
+
+@router.use_route("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET"])
 def case_detail_email_view(request, pk):
@@ -40,9 +51,10 @@ def case_detail_email_view(request, pk):
         "draft_emails": draft_emails,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case_detail_email.html", context)
+    return render(request, "case/case/email/detail.html", context)
 
 
+@router.use_route("draft")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def case_detail_email_draft_view(request, pk):
@@ -60,7 +72,7 @@ def case_detail_email_draft_view(request, pk):
         form = EmailForm(data, files=request.FILES)
         if form.is_valid():
             email = form.save()
-            return redirect("case-detail-email-draft-edit", issue.pk, email.pk)
+            return redirect("case-email-detail-draft-edit", issue.pk, email.pk)
     else:
         form = EmailForm()
 
@@ -70,9 +82,11 @@ def case_detail_email_draft_view(request, pk):
         "case_emails": case_emails,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case_detail_email_draft.html", context)
+    return render(request, "case/case/case/email/draft_create.html", context)
 
 
+@router.use_route("edit")
+@router.use_route("attach")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
@@ -82,7 +96,7 @@ def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
     if attach_pk and request.method == "POST":
         # Delete attachment
         email.emailattachment_set.filter(id=attach_pk).delete()
-        return redirect("case-detail-email-draft-edit", pk, email_pk)
+        return redirect("case-email-detail-draft-edit", pk, email_pk)
     elif attach_pk:
         raise Http404()
 
@@ -99,7 +113,7 @@ def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
         form = EmailForm(data, instance=email, files=request.FILES)
         if form.is_valid():
             form.save()
-            return redirect("case-detail-email", pk)
+            return redirect("case-email-detail", pk)
 
     else:
         form = EmailForm(instance=email)
@@ -111,9 +125,10 @@ def case_detail_email_draft_edit_view(request, pk, email_pk, attach_pk=None):
         "email": email,
         "case_email_address": case_email_address,
     }
-    return render(request, "case/case_detail_email_edit.html", context)
+    return render(request, "case/case/email/draft_edit.html", context)
 
 
+@router.use_route("send")
 @paralegal_or_better_required
 @require_http_methods(["POST"])
 def case_detail_email_draft_send_view(request, pk, email_pk):

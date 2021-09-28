@@ -19,10 +19,10 @@ CLIENT_DETAIL_FORMS = {
 }
 
 router = Router("client")
-router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
+router.create_route("detail").uuid("pk").slug("form_slug", optional=True)
 
 
-@router.use_path("detail")
+@router.use_route("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 # @router.path(f"{router.UUID_PARAM}/{router.FORM_SLUG_PARAM}?/?$", "detail")

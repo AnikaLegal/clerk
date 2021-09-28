@@ -42,6 +42,6 @@
         $('#account-search input[name="name"]').on('input', () => $submitEl.click())
         $('#account-search input[name="groups"]').on('change', () => $submitEl.click())
     </script>
-    {% include "case/snippets/_account_list_table.html" with issues=issue_page %}
+    {% include "case/accounts/_list_table.html" with issues=issue_page %}
 </div>
 {% endblock %}

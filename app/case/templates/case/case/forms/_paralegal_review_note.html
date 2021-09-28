@@ -6,23 +6,23 @@ Args:
     htmx_notes: List[IssueNote] - only render in reponse to POST
 
 {% endcomment %}
+{% if issue.paralegal %}
 <form 
     class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-    hx-post="./review/"
+    hx-post="./performance/"
     hx-target="this"
->
+>   
     <p>
-        Leave a case review note for other coordinators to read. 
+        Leave a paralegal performance review note for {{ issue.paralegal.get_full_name }}. 
         This note is not visible to paralegals.
     </p>
     <hr class="ui divider" />
-    {% include 'case/snippets/_textarea_field.html' with field=form.text %}
-    {% include 'case/snippets/_calendar_field.html' with field=form.event %}
-    {% include 'case/snippets/_form_errors.html' %}
-    {% include 'case/snippets/_form_success.html' %}
+    {% include 'case/forms/_textarea_field.html' with field=form.text %}
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
     <button class="ui positive button" type="submit">Create note</button>
 </form>
-{% include 'case/htmx/_case_feed.html' with notes=notes %}
+{% include 'case/case/_feed.html' with notes=notes %}
 <script>
 $('.ui.calendar').calendar({
     minDate: new Date(),
@@ -39,3 +39,8 @@ $('.ui.calendar').calendar({
 
 })
 </script>
+{% else %}
+<p>
+    There is no paralegal assigned to this case - cannot create a performance review.
+</p>
+{% endif %}

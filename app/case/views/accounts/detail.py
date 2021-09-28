@@ -10,6 +10,9 @@ from case.forms import (
     UserPermissionsDynamicForm,
 )
 from case.views.auth import coordinator_or_better_required
+from case.utils.router import Route
+
+detail_route = Route("detail").pk("pk").slug("form_slug", optional=True)
 
 ACCOUNT_DETAILS_FORMS = {
     "details": UserDetailsDynamicForm,
@@ -17,6 +20,7 @@ ACCOUNT_DETAILS_FORMS = {
 }
 
 
+@detail_route
 @require_http_methods(["GET", "POST"])
 @coordinator_or_better_required
 def account_detail_view(request, pk, form_slug: str = ""):
@@ -52,4 +56,4 @@ def account_detail_view(request, pk, form_slug: str = ""):
     if form_resp:
         return form_resp
     else:
-        return render(request, "case/account_detail.html", context)
+        return render(request, "case/accounts/detail.html", context)

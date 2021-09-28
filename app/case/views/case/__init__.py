@@ -1,14 +1,12 @@
-from .case_list import (
-    root_view,
-    not_allowed_view,
-    case_list_view,
-    case_review_view,
-    case_inbox_view,
-)
-from .case_detail import case_detail_view
-from .case_email import (
-    case_detail_email_view,
-    case_detail_email_draft_view,
-    case_detail_email_draft_edit_view,
-    case_detail_email_draft_send_view,
-)
+from case.utils.router import Router
+
+from .list import list_route, inbox_route, review_route
+from .detail import detail_route
+from .email import router as email_router
+
+router = Router("case")
+router.add_child("email/", email_router)
+router.add_route(list_route)
+router.add_route(inbox_route)
+router.add_route(review_route)
+router.add_route(detail_route)

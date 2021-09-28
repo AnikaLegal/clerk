@@ -17,10 +17,14 @@ from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
 
 from case.views.auth import paralegal_or_better_required
+from case.utils.router import Route
 
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
+detail_route = Route("detail").uuid("pk").slug("form_slug", optional=True)
 
+
+@detail_route
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def case_detail_view(request, pk, form_slug=""):
@@ -56,7 +60,7 @@ def case_detail_view(request, pk, form_slug=""):
     if form_view:
         return form_view
     else:
-        return render(request, "case/case_detail.html", context)
+        return render(request, "case/case/detail.html", context)
 
 
 class CaseReviewHtmxFormView(HtmxFormView):
@@ -64,7 +68,7 @@ class CaseReviewHtmxFormView(HtmxFormView):
     Form where coordinators can leave a note for other coordinators
     """
 
-    template = "case/htmx/_case_review_note_form.html"
+    template = "case/case/forms/_review_note.html"
     success_message = "Note created"
     form_cls = CaseReviewNoteForm
 
@@ -87,7 +91,7 @@ class ParalegalReviewHtmxFormView(HtmxFormView):
     Form where coordinators can leave a note on paralegal performance.
     """
 
-    template = "case/htmx/_paralegal_review_note_form.html"
+    template = "case/case/forms/_paralegal_review_note.html"
     success_message = "Note created"
     form_cls = ParalegalReviewNoteForm
 
@@ -110,7 +114,7 @@ class FileNoteHtmxFormView(HtmxFormView):
     Form where anyone working on the case can leave a public file note
     """
 
-    template = "case/htmx/_case_paralegal_note_form.html"
+    template = "case/case/forms/_paralegal_note.html"
     success_message = "Note created"
     form_cls = ParalegalNoteForm
 
@@ -133,7 +137,7 @@ class AssignParalegalHtmxFormView(HtmxFormView):
     Form where coordinators can assign a paralegal to a case
     """
 
-    template = "case/htmx/_assign_paralegal_form.html"
+    template = "case/case/forms/_assign_paralegal.html"
     success_message = "Assignment successful"
     form_cls = IssueAssignParalegalForm
 
@@ -152,7 +156,7 @@ class CaseProgressHtmxFormView(HtmxFormView):
     Form where anyone can progress the case.
     """
 
-    template = "case/htmx/_case_progress_form.html"
+    template = "case/case/forms/_progress.html"
     success_message = "Update successful"
     form_cls = IssueProgressForm
 
@@ -168,7 +172,7 @@ class CaseCloseHtmxFormView(HtmxFormView):
     Form where you close the case.
     """
 
-    template = "case/htmx/_case_close_form.html"
+    template = "case/case/forms/_close.html"
     success_message = "Case closed!"
     form_cls = IssueCloseForm
 
@@ -184,7 +188,7 @@ class CaseOutcomeHtmxFormView(HtmxFormView):
     Form where you update the outcome of the case.
     """
 
-    template = "case/htmx/_case_outcome_form.html"
+    template = "case/case/forms/_outcome.html"
     success_message = "Outcome updated"
     form_cls = IssueOutcomeForm
 
@@ -200,7 +204,7 @@ class CaseReOpenHtmxFormView(HtmxFormView):
     Form where you open the case.
     """
 
-    template = "case/htmx/_case_reopen_form.html"
+    template = "case/case/forms/_reopen.html"
     success_message = "Case re-opened"
     form_cls = IssueReOpenForm
 

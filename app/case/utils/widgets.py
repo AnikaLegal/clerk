@@ -2,7 +2,7 @@ from django.forms import SelectMultiple, Select
 
 
 class FomanticSelect(Select):
-    template_name = "case/snippets/_dropdown_widget.html"
+    template_name = "case/forms/_dropdown_widget.html"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -21,7 +21,7 @@ class FomanticSelect(Select):
 
 
 class FomanticSelectMultiple(SelectMultiple):
-    template_name = "case/snippets/_dropdown_widget.html"
+    template_name = "case/forms/_dropdown_widget.html"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)

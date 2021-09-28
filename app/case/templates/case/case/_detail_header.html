@@ -3,7 +3,7 @@
     <div class="sub header">
         Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
         <br/>
-        {% include 'case/snippets/_assigned_paralegal_link.html' with paralegal=issue.paralegal %}
+        {% include 'case/case/_assigned_paralegal_link.html' with paralegal=issue.paralegal %}
 
         {% if actionstep_url %}
             (<a href="{{actionstep_url}}">view in Actionstep</a>)
@@ -12,13 +12,13 @@
         {% endif %}
     </div>
 </h1>
-{% include 'case/htmx/_case_status.html' with issue=issue %}
+{% include 'case/case/_status.html' with issue=issue %}
 <div class="ui top attached tabular menu">
     <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
         <i class="clipboard list icon"></i>
         Summary
     </a>
-    <a href="{% url 'case-detail-email' issue.pk %}" class="item {% if active == 'email' %}active{% endif %}">            
+    <a href="{% url 'case-email-detail' issue.pk %}" class="item {% if active == 'email' %}active{% endif %}">            
         <i class="mail list icon"></i>
         Email
     </a>

@@ -112,11 +112,11 @@
                         <select multiple="" class="ui dropdown" id="filter-select"></select>
                     </div>
                     <div class="equal width fields">
-                        {% include 'case/snippets/_dropdown_field.html' with field=form.topic %}
-                        {% include 'case/snippets/_dropdown_field.html' with field=form.stage %}
+                        {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
+                        {% include 'case/forms/_dropdown_field.html' with field=form.stage %}
                     </div>
                     <div class="equal width fields">
-                        {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
+                        {% include 'case/forms/_dropdown_field.html' with field=form.outcome %}
                         <div class="field" id="field-{{ form.is_open.name }}">
                             <label>{{ form.is_open.label }}</label>
                             <div class="ui selection dropdown" tabindex="0">
@@ -140,6 +140,6 @@
             </a>
         </div>
     </div>
-    {% include "case/snippets/_case_list_table.html" with issues=issue_page %}
+    {% include "case/case/_list_table.html" with issues=issue_page %}
 </div>
 {% endblock %}

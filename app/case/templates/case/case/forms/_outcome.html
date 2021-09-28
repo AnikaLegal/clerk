@@ -11,15 +11,15 @@
         This data is crucial for our reporting and decision making.
     </p>
     <hr class="ui divider" />
-    {% include 'case/snippets/_dropdown_field.html' with field=form.outcome %}
-    {% include 'case/snippets/_textarea_field.html' with field=form.outcome_notes %}
-    {% include 'case/snippets/_checkbox_field.html' with field=form.provided_legal_services %}
-    {% include 'case/snippets/_form_errors.html' %}
-    {% include 'case/snippets/_form_success.html' %}
+    {% include 'case/forms/_dropdown_field.html' with field=form.outcome %}
+    {% include 'case/forms/_textarea_field.html' with field=form.outcome_notes %}
+    {% include 'case/forms/_checkbox_field.html' with field=form.provided_legal_services %}
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
     <button class="ui positive button" type="submit">Update outcome</button>
 </form>
 <script>
     // Initialize JavaScript enabled Semantic UI elements.
     $('.selection.dropdown').dropdown()
 </script>
-{% include 'case/htmx/_case_status.html' with issue=issue %}
+{% include 'case/case/_status.html' with issue=issue %}

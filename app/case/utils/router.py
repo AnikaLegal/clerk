@@ -5,13 +5,18 @@ INT_PK_PARAM = "(?P<{arg_name}>[0-9]+)"
 SLUG_PARAM = "(?P<{arg_name}>[\-\w]+)"
 
 
-class RoutedPath:
+class Route:
     def __init__(self, name: str):
         self.name = name
         self._params = []
+        self._view_func = None
 
-    def to_url(self) -> str:
-        url_path = ""
+    def __call__(self, view_fn):
+        self._view_func = view_fn
+        return view_fn
+
+    def to_url(self, is_base=False) -> str:
+        url_path = "^" if is_base else ""
         for arg_name, param_template, is_optional in self._params:
             if not param_template:
                 url_path += arg_name + "/"
@@ -42,27 +47,60 @@ class RoutedPath:
 class Router:
     def __init__(self, name: str):
         self._name = name
-        self._used_paths = []
-        self._defined_paths = {}
+        self._routes = {}
+        self._children = {}
 
-    def urls(self):
+    def add_child(self, path: str, child_router):
+        assert path not in self._children, f"Child with path {path} already exists."
+        self._children[path] = child_router
+
+    def include(self):
+        return include(self._get_urlpatterns())
+
+    def _get_urlpatterns(self, base_path: str = None, base_name: str = None):
         urlpatterns = []
-        for view_fn, routed_path in self._used_paths:
-            path_name = "-".join([self._name, routed_path.name])
-            path_url = routed_path.to_url()
-            urlpatterns.append(re_path(path_url, view_fn, name=path_name))
+        base_paths = set()
+        for path, child_router in self._children.items():
+            # Check that we don't have a path conflict
+            msg = f"Path {path} already defined for router {self._name}: {base_paths}"
+            assert path not in base_paths, msg
+            base_paths.add(msg)
 
-        return include(urlpatterns)
+            # Add the child URLs with the base path.
+            urlpatterns += child_router._get_urlpatterns(
+                base_path=path, base_name=self._name
+            )
 
-    def add_path(self, name: str) -> RoutedPath:
-        routed_path = RoutedPath(name)
-        self._defined_paths[name] = routed_path
-        return routed_path
+        for route_name, route in self._routes.items():
+            assert route._view_func, f"Route {route_name} not in use."
+            if base_name:
+                name_fragments = [base_name, self._name, route_name]
+            else:
+                name_fragments = [self._name, route_name]
 
-    def use_path(self, name: str):
+            path_name = "-".join(name_fragments)
+            path_url = route.to_url(is_base=not base_path)
+
+            # Add the URL, optionally with base path.
+            if base_path:
+                path_url = base_path + path_url
+
+            urlpatterns.append(re_path(path_url, route._view_func, name=path_name))
+
+        return urlpatterns
+
+    def create_route(self, name: str) -> Route:
+        route = Route(name)
+        self._routes[name] = route
+        return route
+
+    def add_route(self, route: Route):
+        self._routes[route.name] = route
+
+    def use_route(self, name: str):
         def decorator(view_fn):
-            routed_path = self._defined_paths[name]
-            self._used_paths.append((view_fn, routed_path))
+            route = self._routes[name]
+            route._view_func = view_fn
             return view_fn
 
         return decorator

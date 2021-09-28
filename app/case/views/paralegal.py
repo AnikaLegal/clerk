@@ -9,10 +9,10 @@ PARALEGAL_CAPACITY = 4.0
 
 
 router = Router("paralegal")
-router.add_path("list")
+router.create_route("list")
 
 
-@router.use_path("list")
+@router.use_route("list")
 @coordinator_or_better_required
 def paralegal_list_view(request):
     paralegals = (

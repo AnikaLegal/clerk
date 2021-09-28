@@ -14,10 +14,10 @@ TENANCY_DETAIL_FORMS = {
 
 
 router = Router("tenancy")
-router.add_path("detail").uuid("pk").slug("form_slug", optional=True)
+router.create_route("detail").pk("pk").slug("form_slug", optional=True)
 
 
-@router.use_path("detail")
+@router.use_route("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def tenancy_detail_view(request, pk, form_slug: str = ""):

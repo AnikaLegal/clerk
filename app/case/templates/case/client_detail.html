@@ -22,7 +22,7 @@
     {{ forms.misc }}
 
     <h1>Cases</h1>
-    {% include "case/snippets/_case_list_table.html" with issues=client.issue_set.all %}
+    {% include "case/case/_list_table.html" with issues=client.issue_set.all %}
     <div style="padding-bottom: 3rem"></div>
 </div>
 

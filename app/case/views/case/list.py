@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Max
 from django.utils import timezone
@@ -11,21 +11,16 @@ from core.models.issue import CaseStage
 from core.models.issue_note import NoteType
 
 from case.views.auth import login_required, coordinator_or_better_required
+from case.utils.router import Route
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
-
-@require_http_methods(["GET"])
-def root_view(request):
-    return redirect("case-list")
-
-
-@login_required
-@require_http_methods(["GET"])
-def not_allowed_view(request):
-    return render(request, "case/not_allowed.html")
+list_route = Route("list")
+inbox_route = Route("inbox").path("inbox")
+review_route = Route("review").path("review")
 
 
+@list_route
 @login_required
 @require_http_methods(["GET"])
 def case_list_view(request):
@@ -49,9 +44,10 @@ def case_list_view(request):
         "next_qs": next_qs,
         "prev_qs": prev_qs,
     }
-    return render(request, "case/case_list.html", context)
+    return render(request, "case/case/list.html", context)
 
 
+@review_route
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def case_review_view(request):
@@ -82,9 +78,10 @@ def case_review_view(request):
             issue.color = "red"
 
     context = {"issues": issues}
-    return render(request, "case/case_review.html", context)
+    return render(request, "case/case/review.html", context)
 
 
+@inbox_route
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def case_inbox_view(request):
@@ -95,4 +92,4 @@ def case_inbox_view(request):
     is_inbox = is_coordinators & is_open & is_new_stage
     issues = Issue.objects.select_related("client", "paralegal").filter(is_inbox)
     context = {"issues": issues}
-    return render(request, "case/case_inbox.html", context)
+    return render(request, "case/case/inbox.html", context)

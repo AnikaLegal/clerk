@@ -13,7 +13,7 @@
                     {{ field }}
                 </div>
             {% endfor %}
-            {% include 'case/snippets/_form_errors.html' %}
+            {% include 'case/forms/_form_errors.html' %}
             <button class="ui positive button" type="submit">Update</button>
             <button 
                 class="ui button"
@@ -34,7 +34,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% include 'case/snippets/_form_success.html' %}
+        {% include 'case/forms/_form_success.html' %}
         <button 
             class="ui positive button"
             hx-get="./{{ form.slug }}/?edit=1"

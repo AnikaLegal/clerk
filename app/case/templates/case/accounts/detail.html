@@ -47,7 +47,7 @@
     <h2 class="ui header dividing">
         Case List
     </h2>
-    {% include "case/snippets/_case_list_table.html" with issues=user.issue_set.all %}
+    {% include "case/case/_list_table.html" with issues=user.issue_set.all %}
 
     {% if request.user.is_coordinator_or_better %}
         <h2 class="ui header dividing">

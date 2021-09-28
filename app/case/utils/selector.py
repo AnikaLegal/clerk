@@ -6,7 +6,7 @@ CANCEL_SLUG = "cancel"
 
 
 class Selector:
-    template = "case/snippets/_selector.html"
+    template = "case/forms/_selector.html"
 
     slug: str
     default_text: str
