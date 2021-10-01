@@ -58,17 +58,17 @@ BOARD = [
     {
         "image": "web/img/photos/board/dennis.jpeg",
         "name": "Denis Nelthorpe",
-        "title": "Board Member",
+        "title": "President",
         "brags": [
-            "Denis has worked in the community legal centre sector for over 40 years including as the CEO of West Justice, Consumer Credit Legal Service, Footscray and Wyndham CLCs, and is the Chair of St Kilda Legal Service."
+            "Denis joined the Board of Anika Legal in June 2021 and is the organisation’s newly appointed President. He brings a wealth of experience from over 40 years in the legal assistance sector including as the CEO of WEstjustice and other leadership roles. He is currently also the Chair of St Kilda Legal Service and the Deputy Chair of the National Consumer Advisory Committee at the Insurance Council of Australia.",
         ],
     },
     {
         "image": "web/img/photos/board/marcia.jpeg",
-        "name": "Marcia Pinskier",
-        "title": "Board Member",
+        "name": "Marcia Pinskier FAICD",
+        "title": "Chair",
         "brags": [
-            "Marcia (FAICD) is an expert on good governance in the not-for-profit sector. She is a Fellow of the Australian Institute of Company Directors and has chaired numerous not-for-profit boards. She has experience in leadership roles including as a Victorian Multicultural Commissioner, liaison to the Victoria Police Multicultural Advisory Unit and a member of the Victorian Mental Health Reform Council."
+            "Marcia joined the Board of Anika Legal in June 2021 and is the organisation’s newly appointed Chair.  Marcia is an expert on good governance in the not-for-profit sector. She is a Fellow of the Australian Institute of Company Directors and has chaired numerous not-for-profit boards. Marcia is currently a Doctoral Candidate at Monash University, researching Leadership and Institutional Child Sexual Abuse.",
         ],
     },
     {
@@ -76,7 +76,15 @@ BOARD = [
         "name": "Tessa Ramanlal",
         "title": "Board Member & Co-founder",
         "brags": [
-            "Tessa previously volunteered as co-founder and Head of User at Anika. Tessa has practiced as a Corporate lawyer / Innovation lawyer at Herbert Smith Freehills and is an Enterprise Partnerships Associate at DoorDash."
+            "Tessa has over four years of experience in legal and technology sectors. She has practiced as a Corporate lawyer / Innovation lawyer at Herbert Smith Freehills and is currently an Enterprise Partnerships Associate at DoorDash. She is also a co-founder of Anika Legal.",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/noel.jpeg",
+        "name": "Noel Lim",
+        "title": "Board Member & CEO",
+        "brags": [
+            "Noel is the Chief Executive Officer and co-founder of Anika Legal, and has led the founding team to become an organisation of 62 volunteers, and to receive successive AFR Client Choice Awards for Startup of the Year (2019, 2020).",
         ],
     },
     {
@@ -84,14 +92,8 @@ BOARD = [
         "name": "Michael Choong",
         "title": "Board Member",
         "brags": [
-            "Michael previously volunteered as the Head of Strategy at Anika. He is now a Strategy Manager at Seek."
+            "Michael has over five years of experience across the technology, retail, and not-for-profit sectors. He is currently a Strategy Manager at SEEK, responsible for supporting their Latin American businesses. He joined Anika Legal’s leadership team in January 2020.",
         ],
-    },
-    {
-        "image": "web/img/photos/team/noel.jpeg",
-        "name": "Noel Lim",
-        "title": "Board Member & CEO",
-        "brags": ["Noel is the full-time CEO and co-founder of Anika Legal."],
     },
 ]
 

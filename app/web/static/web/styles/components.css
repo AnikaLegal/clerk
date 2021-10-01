@@ -331,6 +331,10 @@ Each image/icon can have some descriptive test below it.
 .card-grid .card.profile .content {
   padding: 5px 33px 33px 33px;
 }
+.card-grid .card.profile .content p {
+  font-size: 0.8rem;
+}
+
 .card-grid .card.profile .content .name {
   font-size: var(--header-mini-font-size);
   color: var(--dark-1);
@@ -340,7 +344,7 @@ Each image/icon can have some descriptive test below it.
 .card-grid .card.profile .content .title {
   font-size: calc(0.9 * var(--body-font-size));
   font-weight: 700;
-  margin-bottom: 22px;
+  margin-bottom: 0.5rem;
   color: var(--dark-6);
   line-height: 1.2;
 }
@@ -357,6 +361,10 @@ Each image/icon can have some descriptive test below it.
   }
 }
 @media (max-width: 600px) {
+  .card-grid .card.profile .content p {
+    font-size: 1rem;
+  }
+
   .card-grid .card.profile img {
     max-height: unset;
   }
