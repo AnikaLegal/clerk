@@ -900,19 +900,20 @@ before the final footer.
 
 .partner-logos {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 5rem;
   max-width: 800px;
   margin: 0 auto;
 }
 
 .partner-logos img {
-  height: 100px;
-  width: 180px;
   object-fit: contain;
+  max-width: 100%;
 }
 @media (max-width: 600px) {
-  .partner-logos img {
-    height: 50px;
-    width: 75px;
+  .partner-logos {
+    flex-direction: column;
+    align-items: center;
   }
 }
