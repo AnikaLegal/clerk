@@ -1,0 +1,53 @@
+<form 
+    id="email-form"
+    method="post"
+    class="ui form {% if form.errors %}error{% else %}success{% endif %}"
+    enctype="multipart/form-data"
+>
+    {% csrf_token %}
+    {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
+    {% include 'case/forms/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
+    {% include 'case/forms/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
+    {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+    <div class="field {% if field.errors %}error{% endif %}">
+        {% if email %}
+            <label>Add new attachments</label>
+            <input
+                type="file"
+                multiple
+                name="attachments"
+                {% if is_disabled %}disabled{% endif %}
+            >       
+        {% else %}
+            <label>Attachments</label>
+            <input
+                type="file"
+                multiple
+                name="attachments"
+                {% if is_disabled %}disabled{% endif %}
+            >       
+        {% endif %}
+    </div>
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
+    {% if email and email.state != "READY_TO_SEND" %}
+        <button class="ui positive button" type="submit">Save draft</button>
+        <button 
+            class="ui button primary"
+            hx-post="{% url 'case-email-send' issue.pk email.pk %}"
+            hx-target="#email-form"
+        >
+            Send email
+        </button>
+    {% elif email and email.state == "READY_TO_SEND" %}
+        <button 
+            class="ui button primary"
+            disabled
+        >
+            Sending email...
+        </button>
+    {% else %}
+        <button class="ui positive button" type="submit">Create draft email</button>
+    {% endif %}
+    {% include 'case/case/email/_draft_attachments.html' %}
+</form>

@@ -2,14 +2,18 @@ import io
 from uuid import uuid4
 
 import factory
+from faker import Faker
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from django.utils import timezone
 
 from accounts.models import User
+from emails.models import Email, EmailState, EmailAttachment
 from core.models import Client, FileUpload, Issue, Person, Tenancy
 
 TINY_PNG = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\tpHYs\x00\x00\x0e\xc4\x00\x00\x0e\xc4\x01\x95+\x0e\x1b\x00\x00\x00\x19tEXtSoftware\x00gnome-screenshot\xef\x03\xbf>\x00\x00\x00\rIDAT\x08\x99c```\xf8\x0f\x00\x01\x04\x01\x00}\xb2\xc8\xdf\x00\x00\x00\x00IEND\xaeB`\x82"
+
+fake = Faker()
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -106,7 +110,45 @@ class FileUploadFactory(TimestampedModelFactory):
         if extracted:
             file_name, file = extracted
         else:
-            file_name = "doc.pdf"
+            file_name = "image.png"
+            file = get_dummy_file(file_name)
+
+        self.file.save(file_name, file)
+
+
+@factory.django.mute_signals(post_save)
+class EmailFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Email
+
+    issue = factory.SubFactory(IssueFactory)
+    sender = factory.SubFactory(UserFactory)
+    subject = factory.Faker("sentence")
+    state = "RECEIVED"
+    text = factory.Faker("sentence")
+    received_data = {}
+    created_at = factory.Faker(
+        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+    )
+
+
+@factory.django.mute_signals(post_save)
+class EmailAttachmentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailAttachment
+
+    email = factory.SubFactory(EmailFactory)
+    content_type = "image/png"
+    created_at = factory.Faker(
+        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+    )
+
+    @factory.post_generation
+    def file(self, create, extracted, **kwargs):
+        if extracted:
+            file_name, file = extracted
+        else:
+            file_name = "image.png"
             file = get_dummy_file(file_name)
 
         self.file.save(file_name, file)

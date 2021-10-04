@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 
-from .service import process_inbound_email
+from .service import save_inbound_email
 
 
 @csrf_exempt
@@ -14,5 +14,5 @@ def receive_email_view(request):
 
     See docs/emails.md for more details.
     """
-    process_inbound_email(request.POST, request.FILES)
+    save_inbound_email(request.POST, request.FILES)
     return HttpResponse(200)

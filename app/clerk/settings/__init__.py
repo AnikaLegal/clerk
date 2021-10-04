@@ -258,6 +258,9 @@ ACTIONSTEP_SCOPES = [
     "actiondocuments",
     "actionfolders",
     "actiontypes",
+    "emails",
+    "emailassociations",
+    "emailattachments",
 ]
 # Override me!
 ACTIONSTEP_SYNC = False  # Only sync in prod and test, never dev or staging

@@ -42,7 +42,7 @@ class DynamicTableForm(ModelForm):
 
     """
 
-    template = "case/snippets/_dynamic_table_form.html"
+    template = "case/forms/_dynamic_table_form.html"
 
     def __init__(self, slug: str, *args, editable: bool = False, **kwargs):
         super().__init__(*args, **kwargs)

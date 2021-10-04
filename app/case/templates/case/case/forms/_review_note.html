@@ -1,0 +1,41 @@
+{% comment %} 
+Renders a the ParalegalNoteForm
+Args:
+    form: ParalegalNoteForm
+    issue: Issue
+    htmx_notes: List[IssueNote] - only render in reponse to POST
+
+{% endcomment %}
+<form 
+    class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
+    hx-post="./review/"
+    hx-target="this"
+>
+    <p>
+        Leave a case review note for other coordinators to read. 
+        This note is not visible to paralegals.
+    </p>
+    <hr class="ui divider" />
+    {% include 'case/forms/_textarea_field.html' with field=form.text %}
+    {% include 'case/forms/_calendar_field.html' with field=form.event %}
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
+    <button class="ui positive button" type="submit">Create note</button>
+</form>
+{% include 'case/case/_feed.html' with notes=notes %}
+<script>
+$('.ui.calendar').calendar({
+    minDate: new Date(),
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return month + '/' + day + '/' + year;
+      }
+    }
+
+})
+</script>

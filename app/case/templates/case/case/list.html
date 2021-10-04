@@ -1,0 +1,145 @@
+{% extends "case/_base.html" %}
+{% block title %}Cases{% endblock %}
+
+{% block scripts%}
+<script>
+    // Initialize JavaScript enabled Semantic UI elements.
+    let values = [
+        {name: 'Topic', value: 'topic'},
+        {name: 'Stage', value: 'stage'},
+        {name: 'Outcome', value: 'outcome'},
+        {name: 'Legal services', value: 'provided_legal_services'},
+        {name: 'Open', value: 'is_open'},
+    ]
+    const fieldNames = values.map(v => v.value)
+    const filterState = {
+        items: Object.keys(Object.fromEntries(new URLSearchParams(location.search))).filter(k => fieldNames.includes(k)) 
+    }
+    values = values.map(v => ({...v, selected:  filterState.items.includes(v.value)}))
+
+    const onUpdateFilters = (items) => {
+        for (let name of fieldNames) {
+            const fieldEl = $('#field-' + name)
+            if (filterState.items.includes(name)) {
+                fieldEl.removeClass('disabled')
+            } else {
+                fieldEl.addClass('disabled')
+            }
+        }
+    }
+    onUpdateFilters()
+    $('.selection.dropdown').dropdown()
+    $('#filter-select').dropdown({
+        placeholder: "Select some search filters",
+        values: values,
+        onAdd: (v) => {
+            filterState.items.push(v)
+            onUpdateFilters()
+        },
+        onRemove: (v) => {
+            filterState.items = filterState.items.filter(i => i !== v)
+            onUpdateFilters()
+        },
+    })
+    // Override filter form submit
+    $("#filter-form").submit((e) => {
+        e.preventDefault()
+        const values = {}
+        $.each($('#filter-form').serializeArray(), (i, field) => {
+            console.log(field)
+            if (filterState.items.includes(field.name)) {
+                values[field.name] = field.value
+            }
+        })
+        window.location.href = "?" + (new URLSearchParams(values)).toString()
+    })
+
+    $('#filter-open').click(() => {
+        $('#filter-card').show()
+    })
+
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="ui container">
+    <h1>Cases</h1>
+    <div class="ui grid middle aligned">
+        <div class="six wide column">
+            <div class="ui pagination menu">
+                {% if issue_page.has_previous %}
+                    <a href="{{ prev_qs }}" class="item">
+                        <i class="chevron left icon"></i>
+                    </a>
+                {% else %}
+                    <a class="item disabled">
+                        <i class="chevron left icon"></i>
+                    </a>        
+                {% endif %}
+                <a class="item">Page {{ issue_page.number }} of {{ issue_page.paginator.num_pages }}</a>
+                {% if issue_page.has_next %}
+                    <a href="{{ next_qs }}" class="item">
+                        <i class="chevron right icon"></i>
+                    </a>
+                {% else %}
+                    <a class="item disabled">
+                        <i class="chevron right icon"></i>
+                    </a>        
+                {% endif %}
+            </div>
+        </div>
+        <div class="four wide column center aligned">
+            Showing {{ issue_page.object_list.count }} of {{ issue_page.paginator.count }} cases
+        </div>
+        <div class="six wide column">
+            <button id="filter-open" class="ui labeled icon right floated button">
+                <i class="filter icon"></i>
+                Filtered Search
+            </button>
+        </div>
+    </div>
+
+    <div class="ui card fluid" id="filter-card" style="display: none;">
+        <div class="content">
+            <div class="header">Filtered Search</div>
+            <div class="meta">
+                <span>Use these filters to find the cases you want.</span>
+            </div>
+            <div class="description">
+                <form class="ui form" id="filter-form">
+                    <div class="field info">
+                        <select multiple="" class="ui dropdown" id="filter-select"></select>
+                    </div>
+                    <div class="equal width fields">
+                        {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
+                        {% include 'case/forms/_dropdown_field.html' with field=form.stage %}
+                    </div>
+                    <div class="equal width fields">
+                        {% include 'case/forms/_dropdown_field.html' with field=form.outcome %}
+                        <div class="field" id="field-{{ form.is_open.name }}">
+                            <label>{{ form.is_open.label }}</label>
+                            <div class="ui selection dropdown" tabindex="0">
+                                <input type="hidden" name="{{ form.is_open.name }}" value="{{ form.is_open.value }}" class="noselection">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select an option</div>
+                                <div class="menu transition hidden" tabindex="-1">
+                                    <div class="item" data-value="True">Open</div>
+                                    <div class="item" data-value="False">Closed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="extra content">
+            <button class="ui button" type="submit" form="filter-form">Search</button>
+            <a href="{% url 'case-list' %}">
+                <button class="ui button" id="filter-clear">Clear</button>
+            </a>
+        </div>
+    </div>
+    {% include "case/case/_list_table.html" with issues=issue_page %}
+</div>
+{% endblock %}

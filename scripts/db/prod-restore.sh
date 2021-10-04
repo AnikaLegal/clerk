@@ -5,11 +5,6 @@ function run_docker {
    docker-compose -f docker/docker-compose.local.yml run --rm test $@
 } 
 
-# Stop all Docker containers
-echo -e "\nStopping all running Docker containers"
-docker update --restart=no `docker ps -q`
-docker kill `docker ps -q`
-
 # Reset db
 echo -e "\nResetting database"
 run_docker ./manage.py reset_db --close-sessions --noinput
@@ -59,7 +54,10 @@ run_docker ./manage.py shell_plus -c "$SHELL_CMD"
 
 echo -e "\nDeleting all Scheduled tasks and Actionstep access tokens."
 SHELL_CMD="\
+Success.objects.all().delete();\
+Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
+OrmQ.objects.all().delete();\
 AccessToken.objects.all().delete()\
 "
 run_docker ./manage.py shell_plus -c "$SHELL_CMD"

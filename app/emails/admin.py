@@ -12,9 +12,10 @@ class AttachmentInline(admin.TabularInline):
 class EmailAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "created_at",
-        "from_addr",
-        "to_addr",
+        "state",
+        "from_address",
+        "to_address",
         "subject",
+        "created_at",
     )
     inlines = [AttachmentInline]

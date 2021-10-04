@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from requests import ReadTimeout
 
 from accounts.models import User, CaseGroups
 from actionstep.api import ActionstepAPI
@@ -13,8 +14,10 @@ from actionstep.models import ActionDocument
 from core.models import Issue, IssueNote, IssueEvent
 from core.models.issue_note import NoteType
 from core.models.issue import CaseTopic, CaseStage
+from emails.models import Email, EmailAttachment, EmailState
 from slack.services import send_slack_message
 from utils.sentry import WithSentryCapture
+from emails.service.receive import clean_email_addr
 
 from .pdf import create_pdf
 
@@ -318,3 +321,100 @@ def _sync_filenotes():
 
 
 sync_filenotes = WithSentryCapture(_sync_filenotes)
+
+
+def _sync_emails():
+    issues = Issue.objects.filter(actionstep_id__isnull=False).all()
+    api = ActionstepAPI()
+    for issue in issues:
+        logging.info("Checking Issue<%s> for emails.", issue.pk)
+        try:
+            email_ids = api.emails.get_emails_associations_by_case(issue.actionstep_id)
+            # Does it time out because we're asking for too many emails a once?
+        except ReadTimeout:
+            logger.error(
+                "Timed out checking Issue<%s> for email associations.", issue.pk
+            )
+            continue
+
+        if not email_ids:
+            logger.info("No email associations found for Issue<%s>.", issue.pk)
+            continue
+
+        try:
+            emails = api.emails.get_emails(email_ids)
+            # Does it time out because we're asking for too many emails a once?
+        except ReadTimeout:
+            logger.error(
+                "Timed out fetching %s emails Issue<%s>.", len(email_ids), issue.pk
+            )
+            continue
+
+        for as_email in emails:
+            logger.info("Processing Actionstep email %s", as_email["id"])
+            if as_email["status"] == "Draft":
+                continue
+
+            created_at = datetime.strptime(
+                as_email["createdTimestamp"], "%Y-%m-%dT%H:%M:%S%z"
+            )
+            to_addrs = clean_email_list(as_email["to"])
+            cc_addrs = clean_email_list(as_email["cc"])
+            try:
+                to_address = to_addrs[0]
+            except IndexError:
+                to_addrs = clean_email_list(as_email["to"], no_ignore=True)
+
+            cc_addresses = to_addrs[1:] + cc_addrs
+            from_address = clean_email_addr(as_email["from"])
+            state = (
+                EmailState.INGESTED if as_email["direction"] == "I" else EmailState.SENT
+            )
+            sender = None
+            if state == EmailState.SENT:
+                try:
+                    sender = User.objects.get(email=from_address)
+                except User.DoesNotExist:
+                    pass
+
+            email, _ = Email.objects.get_or_create(
+                actionstep_id=as_email["id"],
+                defaults={
+                    "from_address": from_address,
+                    "to_address": to_address,
+                    "cc_addresses": cc_addresses,
+                    "subject": as_email["subject"],
+                    "state": state,
+                    "text": as_email["bodyText"],
+                    "html": as_email["bodyHtml"],
+                    "created_at": created_at,
+                    "processed_at": created_at,
+                    "issue": issue,
+                    "sender": sender,
+                    "received_data": as_email,
+                },
+            )
+
+            # TODO: Download these?
+            # attachments = api.emails.get_attachments_for_email(as_email["id"])
+            # logger.info(
+            #     "Found %s attachments for for Email<%s>.", len(attachments), email.pk
+            # )
+
+
+sync_emails = WithSentryCapture(_sync_emails)
+
+IGNORE_EMAIL_ADDRS = ["cases@anikalegal.com", "records@anikalegal.com"]
+
+
+def clean_email_list(emails: str, no_ignore=False):
+    cleaned_emails = []
+    for e in emails.split(","):
+        if "@" not in e:
+            continue
+        cleaned = clean_email_addr(e)
+        if cleaned in IGNORE_EMAIL_ADDRS and not no_ignore:
+            continue
+        cleaned_emails.append(cleaned)
+
+    return cleaned_emails

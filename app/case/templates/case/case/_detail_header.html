@@ -1,0 +1,25 @@
+<h1 class="ui header">
+    {{ issue.get_topic_display }} case for {{ issue.client.get_full_name|title }} ({{ issue.fileref }})
+    <div class="sub header">
+        Created {{ issue.created_at|date:"jS M 'y" }}, last updated {{ issue.modified_at|date:"jS M 'y" }}
+        <br/>
+        {% include 'case/case/_assigned_paralegal_link.html' with paralegal=issue.paralegal %}
+
+        {% if actionstep_url %}
+            (<a href="{{actionstep_url}}">view in Actionstep</a>)
+        {% else %}
+            (Actionstep link not available)
+        {% endif %}
+    </div>
+</h1>
+{% include 'case/case/_status.html' with issue=issue %}
+<div class="ui top attached tabular menu">
+    <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
+        <i class="clipboard list icon"></i>
+        Summary
+    </a>
+    <a href="{% url 'case-email-list' issue.pk %}" class="item {% if active == 'email' %}active{% endif %}">            
+        <i class="mail list icon"></i>
+        Email
+    </a>
+</div>

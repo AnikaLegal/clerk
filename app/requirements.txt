@@ -4,6 +4,10 @@ django
 WeasyPrint # Generate PDFs for email
 wagtail
 
+# Cleans html
+bleach 
+html-sanitizer
+
 # Infrastructure
 psycopg2-binary
 gunicorn

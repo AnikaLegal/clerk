@@ -5,4 +5,4 @@ class EmailsConfig(AppConfig):
     name = "emails"
 
     def ready(self):
-        pass
+        import emails.signals

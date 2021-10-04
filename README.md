@@ -86,6 +86,19 @@ You can also get a Django shell using:
 make shell
 ```
 
+## Emails
+
+To listen for inbound emails in your development environment:
+
+```bash
+# Start ngrok (https://ngrok.com/) and take note of the address
+ngrok http 8000
+# This will print the public endpoint, e.g "https://90c8-194-193-130-131.ngrok.io"
+# Then, in a separate terminal session, update dev Sendgrid settings via API
+./scripts/ngrok.sh https://90c8-194-193-130-131.ngrok.io
+# Then wait a minute or so.
+```
+
 ## Deployment
 
 Deployment is done via a GitHub workflow [here](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy.) A deployment involves SSHing into the target server and updating the Docker Swarm config. Deployment must be manually triggered from GitHub. There are two environments to deploy to, test and prod:

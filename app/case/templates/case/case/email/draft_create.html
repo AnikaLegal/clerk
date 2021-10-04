@@ -1,0 +1,27 @@
+{% extends "case/_base.html" %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+
+
+
+{% block content %}
+<div class="ui container">
+    <h2 class="ui header">
+        Create new draft email
+        <span class="sub header">
+             <a href="{% url 'case-email-list' issue.pk %}">
+                Back to case emails
+            </a>
+        </span>
+    </h2>
+    <div style="display: flex;flex-wrap: wrap;gap: 0.5rem;margin-bottom:1rem">
+    {% for case_email in case_emails %}
+        <span class="ui blue label">
+            {{ case_email.name }}, {{ case_email.role }}
+            <div class="detail">{{ case_email.email }}</div>
+        </span>
+    {% endfor %}
+    </div>
+    {% include 'case/case/email/_email_form.html' %}
+{% endblock %}
+

@@ -1,10 +1,11 @@
 import logging
-from json.decoder import JSONDecodeError
 from urllib.parse import urljoin
 
 import requests
 
 logger = logging.getLogger(__file__)
+
+TIMEOUT = 5  # Seconds
 
 
 class BaseEndpoint:
@@ -47,7 +48,7 @@ class BaseEndpoint:
         return self._list(self.url, params)
 
     def _list(self, url, params=None) -> list:
-        resp = requests.get(url, params=params, headers=self.headers)
+        resp = requests.get(url, params=params, headers=self.headers, timeout=TIMEOUT)
         response_data = self._handle_json_response(url, resp)
         if not response_data:
             # Nothing found.
@@ -73,7 +74,9 @@ class BaseEndpoint:
         """
         url = self.url
         request_data = {self.resource: [data]}
-        resp = requests.post(url, json=request_data, headers=self.headers)
+        resp = requests.post(
+            url, json=request_data, headers=self.headers, timeout=TIMEOUT
+        )
         response_data = self._handle_json_response(url, resp)
         return response_data[self.resource]
 
@@ -84,7 +87,7 @@ class BaseEndpoint:
         """
         url = urljoin(self.url, str(resource_id))
         request_data = {self.resource: [data]}
-        resp = requests.put(url, json=data, headers=self.headers)
+        resp = requests.put(url, json=data, headers=self.headers, timeout=TIMEOUT)
         response_data = self._handle_json_response(url, resp)
         return response_data[self.resource]
 
@@ -95,7 +98,7 @@ class BaseEndpoint:
         Returns None
         """
         url = urljoin(self.url, str(resource_id))
-        resp = requests.delete(url, headers=self.headers)
+        resp = requests.delete(url, headers=self.headers, timeout=TIMEOUT)
         self._handle_json_response(url, resp)
 
     def _handle_json_response(self, url, resp):

@@ -1,0 +1,50 @@
+<div id="dynamic-form-{{ form.slug }}">
+    {% if form.editable %}
+        <form 
+            class="ui form {% if form.errors %}error{% else %}success{% endif %}"
+            method="post"
+            hx-post="./{{ form.slug }}/"
+            hx-target="#dynamic-form-{{form.slug}}"
+            hx-swap="outerHTML"
+        >
+            {% for field in form %}
+                <div class="field {% if field.errors %}error{% endif %}">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            {% include 'case/forms/_form_errors.html' %}
+            <button class="ui positive button" type="submit">Update</button>
+            <button 
+                class="ui button"
+                hx-get="./{{ form.slug }}/"
+                hx-target="#dynamic-form-{{ form.slug }}"
+            >
+                Cancel
+            </button>
+        </form>
+    {% else %}
+        <table class="ui definition table small">
+            <tbody>
+                {% for field in form %}
+                    <tr>
+                        <td class="three wide">{{ field.label }}</td>
+                        <td>{{ field.display_value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'case/forms/_form_success.html' %}
+        <button 
+            class="ui positive button"
+            hx-get="./{{ form.slug }}/?edit=1"
+            hx-target="#dynamic-form-{{ form.slug }}"
+            hx-swap="outerHTML"
+        >
+            Edit
+        </button>
+    {% endif %}
+    <script>
+        $('#dynamic-form-{{ form.slug }} .ui.dropdown').dropdown()
+    </script>
+</div>

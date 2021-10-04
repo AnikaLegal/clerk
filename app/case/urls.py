@@ -1,49 +1,21 @@
-from django.urls import path, re_path
+from django.urls import path
 
-from . import views
+from .views.client import router as client_router
+from .views.paralegal import router as paralegal_router
+from .views.person import router as person_router
+from .views.tenancy import router as tenancy_router
+from .views.accounts import router as accounts_router
+from .views.case import router as case_router
 
-UUID_PARAM = r"(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})"
-INT_PK_PARAM = r"(?P<pk>[0-9]+)"
-FORM_SLUG_PARAM = r"(?P<form_slug>[\-\w]+)"
-
+from .views import root
 
 urlpatterns = [
-    # Paralegals
-    path("paralegals/", views.paralegal.paralegal_list_view, name="paralegal-list"),
-    # Person
-    re_path(
-        fr"^person/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.person_detail_view,
-        name="person-detail",
-    ),
-    # Tenancy
-    re_path(
-        fr"^tenancy/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.tenancy_detail_view,
-        name="tenancy-detail",
-    ),
-    # Client
-    re_path(
-        fr"^client/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.client.client_detail_view,
-        name="client-detail",
-    ),
-    # Accounts
-    path("accounts/", views.accounts.account_list_view, name="account-list"),
-    re_path(
-        fr"^accounts/{INT_PK_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.accounts.account_detail_view,
-        name="account-detail",
-    ),
-    # Cases
-    path("cases/", views.case.case_list_view, name="case-list"),
-    path("cases/inbox/", views.case.case_inbox_view, name="case-inbox"),
-    path("cases/review/", views.case.case_review_view, name="case-review"),
-    re_path(
-        fr"^cases/{UUID_PARAM}/{FORM_SLUG_PARAM}?/?$",
-        views.case.case_detail_view,
-        name="case-detail",
-    ),
-    path("not-allowed/", views.case.not_allowed_view, name="case-not-allowed"),
-    path("", views.case.root_view, name="case-root"),
+    path("paralegals/", paralegal_router.include()),
+    path("person/", person_router.include()),
+    path("tenancy/", tenancy_router.include()),
+    path("client/", client_router.include()),
+    path("accounts/", accounts_router.include()),
+    path("cases/", case_router.include()),
+    path("not-allowed/", root.not_allowed_view, name="case-not-allowed"),
+    path("", root.root_view, name="case-root"),
 ]

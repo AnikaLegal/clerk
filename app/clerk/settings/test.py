@@ -27,6 +27,9 @@ ACTIONSTEP_SYNC = True
 ACTIONSTEP_SETUP_OWNER = "keithleonardo@anikalegal.com"
 ACTIONSTEP_WEB_URI = "https://example.com"
 
+EMAIL_DOMAIN = "fake.anikalegal.com"
+
+
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = ""
 MAILCHIMP_COVID_WORKFLOW_ID = ""

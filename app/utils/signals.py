@@ -31,3 +31,17 @@ def restore_signals():
     for signal in signals:
         signal.receivers = RESTORE[signal]
         del RESTORE[signal]
+
+
+class DisableSignals:
+    def __init__(self):
+        self.restore = {}
+
+    def __enter__(self):
+        for signal in SIGNALS:
+            self.restore[signal] = signal.receivers
+            signal.receivers = []
+
+    def __exit__(self, type, value, traceback):
+        for signal in self.restore.keys():
+            signal.receivers = self.restore[signal]
