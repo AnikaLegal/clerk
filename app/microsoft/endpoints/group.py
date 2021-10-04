@@ -1,5 +1,5 @@
-from microsoft.base import BaseEndpoint
-from microsoft.helpers import BASE_URL
+from .base import BaseEndpoint
+from .helpers import BASE_URL
 
 from django.conf import settings
 
@@ -39,3 +39,12 @@ class GroupEndpoint(BaseEndpoint):
         data = {"@odata.id": f"{BASE_URL}users/{userPrincipalName}"}
 
         return super().post(f"groups/{settings.MS_GRAPH_GROUP_ID}/members/$ref", data)
+
+    def remove_user(self, userId):
+        """
+        Remove User from Group.
+        Returns None if successful or if User isn't in the Group.
+        """
+        return super().delete(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/members/{userId}/$ref"
+        )

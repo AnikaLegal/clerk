@@ -1,4 +1,4 @@
-from microsoft.base import BaseEndpoint
+from .base import BaseEndpoint
 
 from django.conf import settings
 
@@ -36,14 +36,17 @@ class FolderEndpoint(BaseEndpoint):
         else:
             return None
 
-    def copy(self, path, name):
+    def copy(self, path, name, parent_id):
         """
         Make copy of an existing Folder.
         Returns None if successful or if Folder doesn't exist.
-        Raises HTTPError if copy name already exists
+        Raises HTTPError if copy name already exists.
         """
         # We have the option of specifying the name of the copy and its parent Folder.
-        data = {"name": name}
+        data = {
+            "parentReference": {"driveId": settings.MS_GRAPH_DRIVE_ID, "id": parent_id},
+            "name": name,
+        }
 
         return super().post(
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/copy", data
@@ -62,7 +65,7 @@ class FolderEndpoint(BaseEndpoint):
             list_permissions = []
 
             for item in json["value"]:
-                list_permissions.append(item["id"])
+                list_permissions.append((item["id"], item["grantedTo"]))
 
             return list_permissions
         else:

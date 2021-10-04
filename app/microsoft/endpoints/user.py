@@ -1,5 +1,5 @@
-from microsoft.base import BaseEndpoint
-from microsoft.helpers import generate_password
+from .base import BaseEndpoint
+from .helpers import generate_password
 
 
 class UserEndpoint(BaseEndpoint):
@@ -10,7 +10,7 @@ class UserEndpoint(BaseEndpoint):
 
     def get(self, userPrincipalName):
         """
-        Get User through userPrincipalName (email).
+        Get User through their userPrincipalName (usually email).
         Returns User object or None.
         """
         return super().get(f"users/{userPrincipalName}")
@@ -18,8 +18,10 @@ class UserEndpoint(BaseEndpoint):
     def create(self, fname, lname, userPrincipalName):
         """
         Create new User.
-        Returns User object or raises HTTPError.
+        Returns User object and password, or raises HTTPError.
         """
+        password = generate_password()
+
         data = {
             # Do not remove fields or POST request might fail.
             "accountEnabled": True,
@@ -29,11 +31,13 @@ class UserEndpoint(BaseEndpoint):
             "usageLocation": "AU",
             "passwordProfile": {
                 "forceChangePasswordNextSignIn": True,
-                "password": generate_password(),
+                "password": password,
             },
         }
 
-        return super().post("users", data)
+        user = super().post("users", data)
+
+        return user, password
 
     def assign_license(self, userPrincipalName):
         """

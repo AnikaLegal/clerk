@@ -144,6 +144,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     # Ensure new users can access the Wagtail CMS
     "accounts.social_auth.set_new_user_as_cms_editor",
+    # Set up new user with MS account and E1 license
+    "accounts.social_auth.set_up_new_user_in_microsoft",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -304,3 +306,4 @@ MS_AUTHORITY_URL = (
     "https://login.microsoftonline.com/e89f1fec-2d50-4795-886e-a3475bdc4e4b"
 )
 MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
+MS_GRAPH_DRIVE_ID = "b!zBUQNn3jdEO44jZXmI-2GO0Krjc71QFLkmFqmCjMqFZZhq6ZPsfjR6HYQBbAK0_E"

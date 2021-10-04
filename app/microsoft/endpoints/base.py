@@ -1,7 +1,7 @@
 import requests
 import logging
 
-from microsoft.helpers import BASE_URL, HTTP_HEADERS
+from .helpers import BASE_URL, HTTP_HEADERS
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,12 @@ class BaseEndpoint:
         try:
             resp.raise_for_status()
         except requests.HTTPError:
-            logger.error(
-                f"{resp.request.method} {resp.request.url} failed with response body: {json}"
-            )
-
             if resp.status_code == 404:
                 return None
             else:
+                logger.error(
+                    f"{resp.request.method} {resp.request.url} failed with response body: {json}"
+                )
                 raise
 
         return json
