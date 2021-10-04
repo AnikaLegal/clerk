@@ -22,27 +22,6 @@
         </span>
     {% endfor %}
     </div>
-    <form 
-        method="post"
-        class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-        enctype="multipart/form-data"
-    >
-        {% csrf_token %}
-        {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
-        {% include 'case/forms/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
-        {% include 'case/forms/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
-        {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
-        <div class="field {% if field.errors %}error{% endif %}">
-            <label>Attachments</label>
-            <input
-                type="file"
-                multiple
-                name="attachments"
-            >       
-        </div>
-        {% include 'case/forms/_form_errors.html' %}
-        {% include 'case/forms/_form_success.html' %}
-        <button class="ui positive button" type="submit">Create draft email</button>
-    </form>
+    {% include 'case/case/email/_email_form.html' %}
 {% endblock %}
 

@@ -89,6 +89,7 @@ def email_draft_create_view(request, pk):
         "form": form,
         "case_emails": case_emails,
         "case_email_address": case_email_address,
+        "is_disabled": False,
     }
     return render(request, "case/case/email/draft_create.html", context)
 
@@ -99,6 +100,9 @@ def email_draft_create_view(request, pk):
 def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
+    if not email.state in DRAFT_EMAIL_STATES:
+        return redirect("case-email-list", issue.pk)
+
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
     if request.method == "POST":
@@ -123,6 +127,7 @@ def email_draft_edit_view(request, pk, email_pk):
         "case_emails": case_emails,
         "email": email,
         "case_email_address": case_email_address,
+        "is_disabled": email.state != EmailState.DRAFT,
     }
     return render(request, "case/case/email/draft_edit.html", context)
 
@@ -135,6 +140,17 @@ def email_draft_send_view(request, pk, email_pk):
     email = _get_email_for_issue(issue, email_pk)
     if not email.state == EmailState.DRAFT:
         raise Http404()
+
+    email.state = EmailState.READY_TO_SEND
+    email.save()
+    form = EmailForm(instance=email)
+    context = {
+        "issue": issue,
+        "form": form,
+        "email": email,
+        "is_disabled": True,
+    }
+    return render(request, "case/case/email/_email_form.html", context)
 
 
 @router.use_route("attach")

@@ -41,7 +41,14 @@ def _send_email_task(email_pk: int):
         file_bytes = att.file.read()
         attachments.append((file_name, file_bytes, att.content_type))
 
-    send_email(from_addr, email.to_addr, email.subject, email.text, attachments)
+    send_email(
+        from_addr,
+        email.to_address,
+        email.cc_addresses,
+        email.subject,
+        email.text,
+        attachments,
+    )
     IssueNote.objects.create(
         issue=email.issue,
         note_type=NoteType.EMAIL,
@@ -59,6 +66,7 @@ send_email_task = WithSentryCapture(_send_email_task)
 def send_email(
     from_addr: str,
     to_addr: str,
+    cc_addrs: List[str],
     subject: str,
     body: str,
     attachments: List[Tuple[str, bytes, str]] = None,
@@ -75,6 +83,7 @@ def send_email(
         body=body,
         from_email=from_addr,
         to=[to_addr],
+        cc=cc_addrs,
         attachments=attachments,
         # TODO: BCC? Reply to?
     )

@@ -11,5 +11,6 @@ Args:
         rows="{{ rows|default:3 }}"
         name="{{ field.name }}"
         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+        {% if is_disabled %}disabled{% endif %}
     >{% if field.value %}{{ field.value }}{% endif %}</textarea>
 </div>

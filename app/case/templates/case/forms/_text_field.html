@@ -11,6 +11,7 @@ Args:
             type="text"
             name="{{ field.name }}"
             value="{% if field.value %}{{ field.value }}{% endif %}"
+            {% if is_disabled %}disabled{% endif %}
             {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
         >       
 </div>

@@ -13,6 +13,7 @@
                     hx-delete="{% url 'case-email-attach' issue.pk email.pk attachment.pk %}"
                     hx-target="#email-draft-attachments"
                     hx-swap="outerHTML"
+                    {% if is_disabled %}disabled{% endif %}
                 >
                     Delete
                 </button>

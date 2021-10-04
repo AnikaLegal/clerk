@@ -1,3 +1,4 @@
+import os
 from django.urls import re_path, include
 
 UUID_PARAM = "(?P<{arg_name}>[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-4[0-9a-fA-F]{{3}}-[89abAB][0-9a-fA-F]{{3}}-[0-9a-fA-F]{{12}})"
@@ -83,7 +84,7 @@ class Router:
 
             # Add the URL, optionally with base path.
             if base_path:
-                path_url = base_path + path_url
+                path_url = os.path.join(base_path, path_url)
 
             urlpatterns.append(re_path(path_url, route._view_func, name=path_name))
 

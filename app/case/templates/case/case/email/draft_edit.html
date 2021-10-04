@@ -1,13 +1,14 @@
 {% extends "case/_base.html" %}
 {% block title %}Case {{ issue.fileref }}{% endblock %}
 
-
-
-
 {% block content %}
 <div class="ui container">
     <h2 class="ui header">
-        Edit draft email
+        {% if email.state != "DRAFT" %}
+            Sending draft email... 
+        {% else %}
+            Edit draft email 
+        {% endif %}
         <span class="sub header">
              <a href="{% url 'case-email-list' issue.pk %}">
                 Back to case emails
@@ -15,45 +16,13 @@
         </span>
     </h2>
     <div style="display: flex;flex-wrap: wrap;gap: 0.5rem;margin-bottom:1rem">
-    {% for case_email in case_emails %}
-        <span class="ui blue label">
-            {{ case_email.name }}, {{ case_email.role }}
-            <div class="detail">{{ case_email.email }}</div>
-        </span>
-    {% endfor %}
+        {% for case_email in case_emails %}
+            <span class="ui blue label">
+                {{ case_email.name }}, {{ case_email.role }}
+                <div class="detail">{{ case_email.email }}</div>
+            </span>
+        {% endfor %}
     </div>
-    <form 
-        method="post"
-        class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
-        enctype="multipart/form-data"
-    >
-        {% csrf_token %}
-        {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
-        {% include 'case/forms/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
-        {% include 'case/forms/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
-        {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
-        <div class="field {% if field.errors %}error{% endif %}">
-            <label>Add new attachments</label>
-            <input
-                type="file"
-                multiple
-                name="attachments"
-            >       
-        </div>
-
-
-        {% include 'case/forms/_form_errors.html' %}
-        {% include 'case/forms/_form_success.html' %}
-        <button class="ui positive button" type="submit">Save draft</button>
-        <form 
-            method="post"
-            action="{% url 'case-email-send' issue.pk email.pk %}"
-            style="display: inline-block"
-        >
-            {% csrf_token %}
-            <button type="submit" class="ui button primary">Send email</button>
-        </form>
-    </form>
-    {% include 'case/case/email/_draft_attachments.html' %}
+    {% include 'case/case/email/_email_form.html' %}
 {% endblock %}
 

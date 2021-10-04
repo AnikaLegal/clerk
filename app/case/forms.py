@@ -24,6 +24,8 @@ class EmailForm(forms.ModelForm):
             "sender",
         ]
 
+    subject = forms.CharField()
+    to_address = forms.EmailField()
     attachments = forms.FileField(
         widget=forms.ClearableFileInput(attrs={"multiple": True}), required=False
     )

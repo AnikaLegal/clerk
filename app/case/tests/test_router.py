@@ -5,9 +5,9 @@ def test_router__add_child():
     router = Router("test")
     child_router = Router("child")
     router.add_child("extra", child_router)
-    child_router.add_path("foo").pk("pk").path("detail")
+    child_router.create_route("foo").pk("pk").path("detail")
 
-    @child_router.use_path("foo")
+    @child_router.use_route("foo")
     def view():
         pass
 
@@ -18,17 +18,15 @@ def test_router__add_child():
 
 def test_router___include():
     router = Router("test")
-    router.add_path("detail").pk("pk").path("detail")
-    assert router._defined_paths["detail"].to_url() == r"(?P<pk>[0-9]+)/detail/$"
+    router.create_route("detail").pk("pk").path("detail")
+    assert router._routes["detail"].to_url() == r"(?P<pk>[0-9]+)/detail/$"
 
-    @router.use_path("detail")
+    @router.use_route("detail")
     def view():
         pass
 
-    assert router._used_paths[0] == (view, router._defined_paths["detail"])
-
     urlpatterns, _, _ = router.include()
-    assert urlpatterns[0].pattern._regex == r"(?P<pk>[0-9]+)/detail/$"
+    assert urlpatterns[0].pattern._regex == r"^(?P<pk>[0-9]+)/detail/$"
     assert urlpatterns[0].name == r"test-detail"
 
 
