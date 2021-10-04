@@ -22,6 +22,7 @@ RUN echo "Updating apt sources." && apt-get -qq update
 # python3-dev: Header files for the Python C API so we can compile C stuff or something.
 RUN echo "Installing generic stuff." && \
     apt-get -qq install \
+    wget \
     curl \
     iputils-ping \
     postgresql-client \
@@ -46,3 +47,9 @@ RUN echo "Installing Weasyprint dependencies." && \
     libgdk-pixbuf2.0-0 \
     libffi-dev \
     shared-mime-info
+
+# Install Node.js.
+ENV NODE_VERSION=12.18.1
+RUN wget -nv -O - "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" | tar -Jx -C /opt/ -f -
+RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/node" /usr/local/bin/
+RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/npm" /usr/local/bin/

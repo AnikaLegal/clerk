@@ -1,4 +1,6 @@
 {% extends "case/_base.html" %}
+{% load static %}
+{% load render_bundle from webpack_loader %}
 {% block title %}Case {{ issue.fileref }}{% endblock %}
 
 
@@ -7,9 +9,7 @@
 {% block content %}
 <div class="ui container">
     {% include 'case/case/_detail_header.html' with active="email" %}
-    <div class="ui segment padded">
-        Case email address: <strong>{{ case_email_address }}</strong>
-    </div>
+    <div id="app"></div>
     <h2 class="ui header">Draft Emails</h2>
     <div class="ui segment padded">
         {% if draft_emails %}
@@ -79,3 +79,10 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script type="text/javascript">
+    // Used by React app
+    window.initialData = JSON.parse("{{ init_js | escapejs }}");
+</script>
+{% render_bundle 'email' 'js' %}
+{% endblock %}

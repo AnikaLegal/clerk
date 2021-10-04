@@ -1,5 +1,6 @@
 import re
 import os
+import json
 
 from django.http import Http404
 from django.shortcuts import render, redirect
@@ -15,6 +16,8 @@ from emails.models import EmailState, Email
 from case.forms import EmailForm
 from case.utils import merge_form_data
 from case.utils.router import Router
+
+from case.serializers import EmailSerializer
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -57,6 +60,12 @@ def email_list_view(request, pk):
         "display_emails": display_emails,
         "draft_emails": draft_emails,
         "case_email_address": case_email_address,
+        "init_js": json.dumps(
+            {
+                "caseEmailAddress": case_email_address,
+                "drafts": EmailSerializer(draft_emails, many=True).data,
+            }
+        ),
     }
     return render(request, "case/case/email/list.html", context)
 
@@ -89,6 +98,7 @@ def email_draft_create_view(request, pk):
         "form": form,
         "case_emails": case_emails,
         "case_email_address": case_email_address,
+        "is_sending": False,
     }
     return render(request, "case/case/email/draft_create.html", context)
 
@@ -123,6 +133,7 @@ def email_draft_edit_view(request, pk, email_pk):
         "case_emails": case_emails,
         "email": email,
         "case_email_address": case_email_address,
+        "is_sending": email.state == EmailState.READY_TO_SEND,
     }
     return render(request, "case/case/email/draft_edit.html", context)
 
@@ -135,6 +146,17 @@ def email_draft_send_view(request, pk, email_pk):
     email = _get_email_for_issue(issue, email_pk)
     if not email.state == EmailState.DRAFT:
         raise Http404()
+
+    form = EmailForm(instance=email)
+    email.state = EmailState.READY_TO_SEND
+    email.save()
+    context = {
+        "issue": issue,
+        "form": form,
+        "email": email,
+        "is_sending": email.state == EmailState.READY_TO_SEND,
+    }
+    return render(request, "case/case/email/_email_form.html", context)
 
 
 @router.use_route("attach")

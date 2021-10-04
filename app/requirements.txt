@@ -29,6 +29,7 @@ twilio
 
 # Static files
 whitenoise
+django-webpack-loader
 
 # Web scraping
 beautifulsoup4

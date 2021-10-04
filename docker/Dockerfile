@@ -7,7 +7,21 @@ RUN \
   echo "Installing python packages..." && \
   pip install -r requirements.txt
 
+
+# Install JavaScript packages
+COPY app/frontend/package.json /app/frontend/package.json
+COPY app/frontend/package-lock.json /app/frontend/package-lock.json
+WORKDIR /app/frontend
+RUN \
+  echo "Installing JavaScript packages..." && \
+  npm install
+
+RUN \
+  echo "Running Webpack..." && \
+  npm run prod
+
 # Mount the codebase
+WORKDIR /app
 ADD app /app
 
 # Collect static files

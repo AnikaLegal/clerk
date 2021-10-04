@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     # Static files
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "webpack_loader",
     # Dev tools
     "django_extensions",
     # APIs
@@ -304,3 +305,16 @@ MS_AUTHORITY_URL = (
     "https://login.microsoftonline.com/e89f1fec-2d50-4795-886e-a3475bdc4e4b"
 )
 MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
+
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "CACHE": True,  # True in prod
+        "BUNDLE_DIR_NAME": "build/",
+        "STATS_FILE": "/app/frontend/webpack-bundle.json",
+        "POLL_INTERVAL": 0.1,
+        "TIMEOUT": None,
+        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
+        "LOADER_CLASS": "webpack_loader.loader.WebpackLoader",
+    }
+}

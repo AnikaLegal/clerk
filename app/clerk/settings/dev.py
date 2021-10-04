@@ -40,3 +40,6 @@ ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
 ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
+
+
+WEBPACK_LOADER["DEFAULT"]["CACHE"] = False

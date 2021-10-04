@@ -86,6 +86,14 @@ You can also get a Django shell using:
 make shell
 ```
 
+## Webpack
+
+Some JavaScript assets are compiled by Webpack. These live in `app/frontend`. You can re-compile them locally via the Webpack dev server using:
+
+```bash
+make webpack
+```
+
 ## Emails
 
 To listen for inbound emails in your development environment:

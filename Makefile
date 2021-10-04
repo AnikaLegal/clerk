@@ -13,6 +13,10 @@ build:
 web:
 	docker-compose -f docker/docker-compose.local.yml up web
 
+# Run Django website for local development
+webpack:
+	docker-compose -f docker/docker-compose.local.yml up webpack
+
 # Run Django with debugging enabled
 debug:
 	docker-compose -f docker/docker-compose.local.yml run --rm --service-ports web

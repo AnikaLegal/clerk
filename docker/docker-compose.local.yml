@@ -45,6 +45,16 @@ services:
       AZURE_AD_CLIENT_ID: $AZURE_AD_CLIENT_ID
       AZURE_AD_CLIENT_SECRET: $AZURE_AD_CLIENT_SECRET
 
+  webpack:
+    container_name: webpack
+    working_dir: /app/frontend/
+    command: npm run dev
+    image: clerk:local
+    ports:
+      - 3000:3000
+    volumes:
+      - ../app:/app
+
   # Django-q worker.
   worker:
     container_name: worker

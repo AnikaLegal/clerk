@@ -27,3 +27,8 @@ image.tar
 *.retry
 
 legacy_data/
+
+# JS
+node_modules/
+build/
+webpack-bundle.json
