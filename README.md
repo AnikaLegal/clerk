@@ -17,6 +17,8 @@ This Django project has several apps:
 - case: Case management system website
 - clerk: Project settings
 - core: Core domain models and functionality
+- emails: Sending and receiving emails
+- microsoft: Microsoft integration (Sharepoint)
 - slack: Slack integration
 - web: Public website and blog
 - webhooks: Webhooks from 3rd party services
