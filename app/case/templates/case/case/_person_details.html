@@ -1,0 +1,96 @@
+<div id="{{ url_path }}">
+{# Stupid style hack for Semantic UI #}
+<style>
+    #{{ url_path}} h2 {
+        font-weight: 700;
+        font-size: 1.28571429em;
+        margin-top: -.21425em;
+        line-height: 1.28571429em;
+        font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+        color: rgba(0,0,0,.85);
+    }
+</style>
+{% if person %}
+    <h2 class="header">
+        <a href="{% url 'person-detail' person.pk %}">
+            {{ title }}
+        </a>
+        <a 
+            style="font-weight: normal;float: right"
+            hx-delete="{% url url_path issue.pk %}"
+            hx-confirm="Remove {{ title|lower }} from this case: are you sure?"
+            hx-target="#{{ url_path }}"
+            hx-swap="outerHTML"
+        >
+            remove
+        </a>
+    </h2>
+    <table class="ui definition table small" style="margin-bottom: 2rem">
+        <tbody>
+            <tr>
+                <td class="four wide">Name</td>
+                <td>{{ person.full_name|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>{{ person.address|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{  person.email|default:"-"  }}</td>
+            </tr>
+            <tr>
+                <td>Phone</td>
+                <td>{{  person.phone_number|default:"-"  }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% else %}
+    <h2 class="header">
+        Add {{ title }}
+        <a 
+            style="font-weight: normal;float: right"
+            href="{% url 'person-create' %}"
+        >
+            create
+        </a>
+
+    </h2>
+    <form 
+        class="ui segment form"
+    >
+        <div class="field">
+            <div class="ui search selection dropdown">
+                <div class="text"></div>
+                <i class="dropdown icon"></i>
+                <input 
+                    type="hidden"
+                    value=""
+                    class="noselection"
+                    name="person_id"
+                    hx-post="{% url url_path issue.pk %}"
+                    hx-target="#{{ url_path }}"
+                    hx-swap="outerHTML"
+                >
+            </div>
+        </div>
+    </form>
+    <script>
+        // Initialize JavaScript enabled Semantic UI elements.
+        $('.selection.dropdown').dropdown({
+            placeholder: "Select a person",
+            match: 'text',
+            fullTextSearch: true,
+            values: [
+                {% for person in people %}
+                    {
+                        name: "{{ person.full_name|default:'' }} {{ person.email|default:'' }}",
+                        value: {{ person.id }},
+                    },
+                {% endfor %}
+            ]
+        })
+    </script>
+
+{% endif %}
+</div>

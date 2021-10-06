@@ -1,0 +1,30 @@
+<table class="ui celled table" id="person-list">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Phone number</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for person in people %}
+        <tr>
+            <td>
+                <a href="{% url 'person-detail' person.pk %}">
+                    {{ person.full_name|title }}
+                </a>               
+            </td>
+            <td>{{ person.email|default:"" }}</td>
+            <td>{{ person.address|default:"" }}</td>
+            <td>{{ person.phone_number|default:"" }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>
+                No people found
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

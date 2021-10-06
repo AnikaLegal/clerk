@@ -42,6 +42,17 @@ class EmailForm(forms.ModelForm):
         return email
 
 
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = [
+            "full_name",
+            "email",
+            "address",
+            "phone_number",
+        ]
+
+
 class PersonDynamicForm(DynamicTableForm):
     class Meta:
         model = Person

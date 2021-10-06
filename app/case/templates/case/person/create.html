@@ -1,0 +1,29 @@
+{% extends "case/_base.html" %}
+{% block title %}Create person{% endblock %}
+
+
+{% block content %}
+
+<div class="ui container">
+    <h1 class="ui header">
+        Create a person
+    </h1>
+    <form 
+        class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
+        method="post"
+        action="."
+    >
+        {% csrf_token %}
+        {% include 'case/forms/_text_field.html' with field=form.full_name %}
+        {% include 'case/forms/_text_field.html' with field=form.email %}
+        {% include 'case/forms/_text_field.html' with field=form.address %}
+        {% include 'case/forms/_text_field.html' with field=form.phone_number %}
+        <button class="ui positive button" type="submit">Create</button>
+    </form>
+
+
+
+</div>
+
+{% endblock %}
+

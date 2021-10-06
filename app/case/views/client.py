@@ -25,7 +25,6 @@ router.create_route("detail").uuid("pk").slug("form_slug", optional=True)
 @router.use_route("detail")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
-# @router.path(f"{router.UUID_PARAM}/{router.FORM_SLUG_PARAM}?/?$", "detail")
 def client_detail_view(request, pk, form_slug: str = ""):
     try:
         client = Client.objects.prefetch_related("issue_set").get(pk=pk)

@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
@@ -13,7 +13,7 @@ from case.forms import (
     ParalegalReviewNoteForm,
 )
 from case.utils import Selector, HtmxFormView
-from core.models import Issue, IssueNote
+from core.models import Issue, IssueNote, Person
 from core.models.issue_note import NoteType
 
 from case.views.auth import paralegal_or_better_required
@@ -22,6 +22,10 @@ from case.utils.router import Route
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 detail_route = Route("detail").uuid("pk").slug("form_slug", optional=True)
+landlord_route = (
+    Route("landlord").uuid("pk").path("landlord").pk("person_pk", optional=True)
+)
+agent_route = Route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
 
 
 @detail_route
@@ -31,18 +35,7 @@ def case_detail_view(request, pk, form_slug=""):
     """
     The details of a given case.
     """
-    try:
-        issue = (
-            Issue.objects.check_permisisons(request)
-            .select_related("client")
-            .prefetch_related("fileupload_set")
-            .get(pk=pk)
-        )
-    except Issue.DoesNotExist:
-        raise Http404()
-
-    # FIXME: Assume only only tenancy but that's not how the models work.
-    tenancy = issue.client.tenancy_set.first()
+    issue, tenancy = _get_issue_and_tenancy(request, pk)
     case_selector = CaseSelector(request, issue)
 
     file_urls, image_urls = _get_uploaded_files(issue)
@@ -55,12 +48,55 @@ def case_detail_view(request, pk, form_slug=""):
         "details": _get_submitted_details(issue),
         "file_urls": file_urls,
         "image_urls": image_urls,
+        "people": Person.objects.order_by("full_name").all(),
     }
     form_view = case_selector.handle(form_slug, context, pk)
     if form_view:
         return form_view
     else:
         return render(request, "case/case/detail.html", context)
+
+
+@agent_route
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST", "DELETE"])
+def agent_selet_view(request, pk):
+    return _person_select_view(request, pk, "agent")
+
+
+@landlord_route
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST", "DELETE"])
+def landlord_selet_view(request, pk):
+    return _person_select_view(request, pk, "landlord")
+
+
+def _person_select_view(request, pk, person_type):
+    issue, tenancy = _get_issue_and_tenancy(request, pk)
+    title = "Landlord" if person_type == "landlord" else "Real estate agent"
+    context = {
+        "title": title,
+        "issue": issue,
+        "person": None,
+        "url_path": f"case-{person_type}",
+        "people": Person.objects.order_by("full_name").all(),
+    }
+    if request.method == "DELETE":
+        # User is deleting the person from the tenancy.
+        setattr(tenancy, person_type, None)
+        tenancy.save()
+    elif request.method == "POST":
+        # User is adding a person from the tenancy.
+        person_pk = request.POST.get("person_id")
+        if person_pk is None:
+            return HttpResponseBadRequest()
+
+        person = Person.objects.get(pk=int(person_pk))
+        setattr(tenancy, person_type, person)
+        tenancy.save()
+        context["person"] = person
+
+    return render(request, "case/case/_person_details.html", context)
 
 
 class CaseReviewHtmxFormView(HtmxFormView):
@@ -262,6 +298,22 @@ class CaseSelector(Selector):
         "close": "Close the case",
         "reopen": "Re-open the case",
     }
+
+
+def _get_issue_and_tenancy(request, pk):
+    try:
+        issue = (
+            Issue.objects.check_permisisons(request)
+            .select_related("client")
+            .prefetch_related("fileupload_set")
+            .get(pk=pk)
+        )
+    except Issue.DoesNotExist:
+        raise Http404()
+
+    # FIXME: Assume only only tenancy but that's not how the models work.
+    tenancy = issue.client.tenancy_set.first()
+    return issue, tenancy
 
 
 def _get_uploaded_files(issue):
