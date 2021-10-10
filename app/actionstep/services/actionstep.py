@@ -171,7 +171,6 @@ upload_action_document = WithSentryCapture(_upload_action_document)
 
 
 def _sync_paralegals():
-    # from actionstep.services.actionstep import _sync_paralegals;_sync_paralegals()
     issues = Issue.objects.filter(
         paralegal__isnull=True, actionstep_id__isnull=False
     ).all()
@@ -293,13 +292,7 @@ def _sync_filenotes():
                 #  O'Connor, Grace
                 lastname, firstname = filenote["enteredBy"].split(",")
                 lastname, firstname = lastname.strip(), firstname.strip()
-                try:
-                    user = User.objects.get(first_name=firstname, last_name=lastname)
-                except User.DoesNotExist:
-                    import pdb
-
-                    pdb.set_trace()
-
+                user = User.objects.get(first_name=firstname, last_name=lastname)
                 actionstep_id = int(filenote["id"])
                 filenote["enteredTimestamp"]
 
@@ -418,3 +411,12 @@ def clean_email_list(emails: str, no_ignore=False):
         cleaned_emails.append(cleaned)
 
     return cleaned_emails
+
+
+def _prod_sync():
+    _sync_paralegals()
+    _sync_filenotes()
+    _sync_emails()
+
+
+prod_sync = WithSentryCapture(_prod_sync)

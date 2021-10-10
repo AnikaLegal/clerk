@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-echo "Starting clerk web as `whoami`"
+echo -e "\n>>> Starting clerk web as `whoami`"
 
-echo "Setting up logging"
+echo -e "\n>>> Setting up logging"
 # Set up gunicorn logging
 mkdir -p /var/log/gunicorn
 touch /var/log/gunicorn/access.log
@@ -11,10 +11,13 @@ touch /var/log/gunicorn/error.log
 # Set up django logging
 touch /var/log/django.log
 
-echo "Running migrations"
+echo -e "\n>>> Running migrations"
 ./manage.py migrate
 
-echo "Starting gunicorn"
+echo -e "\n>>> Setting up schedules"
+./manage.py setup_actionstep_tasks
+
+echo -e "\n>>> Starting gunicorn"
 gunicorn clerk.wsgi:application \
     --name clerk \
     --workers 2 \

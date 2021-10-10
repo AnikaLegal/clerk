@@ -77,3 +77,22 @@ FACEBOOK_PIXEL_ID = "580273702543728"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "Production Group ID (Replace)"
+
+# Scheduled tasks
+SCHEDULES = [
+    {
+        "func": "actionstep.auth.set_expired_tokens_inactive",
+        "schedule_type": "I",
+        "minutes": 1,
+    },
+    {
+        "func": "actionstep.auth.refresh_tokens",
+        "schedule_type": "I",
+        "minutes": 20,
+    },
+    {
+        "func": "actionstep.services.actionstep.prod_sync",
+        "schedule_type": "I",
+        "minutes": 60,
+    },
+]

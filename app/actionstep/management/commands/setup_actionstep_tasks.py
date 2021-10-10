@@ -1,23 +1,18 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
-
 from django_q.models import Schedule
-
-SCHEDULES = [
-    {
-        "func": "actionstep.auth.set_expired_tokens_inactive",
-        "schedule_type": "I",
-        "minutes": 1,
-    },
-    {"func": "actionstep.auth.refresh_tokens", "schedule_type": "I", "minutes": 20},
-]
 
 
 class Command(BaseCommand):
     help = "Set up scheduled tasks for Actionstep"
 
     def handle(self, *args, **kwargs):
-        for schedule_data in SCHEDULES:
-            Schedule.objects.filter(func=schedule_data["func"]).exclude(
-                **schedule_data
-            ).delete()
+        count = len(settings.SCHEDULES)
+        print(f"Setting up {count} schedules")
+        for schedule_data in settings.SCHEDULES:
+            func_name = schedule_data["func"]
+            print("Setting up schedule for ", func_name)
+            Schedule.objects.filter(func=func_name).exclude(**schedule_data).delete()
             Schedule.objects.get_or_create(**schedule_data)
+
+        print(f"Finished setting up {count} schedules")
