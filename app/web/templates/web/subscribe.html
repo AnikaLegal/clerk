@@ -1,0 +1,68 @@
+{% extends "web/_base.html" %} 
+{# Mailing list subscription #}
+{% block title %}Join our mailing list{% endblock %} 
+{% block content %}
+<style>
+
+form {
+  padding: 80px 75px 70px 75px;
+  width: 100%;
+  max-width: 630px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+input {
+  line-height: var(--body-line-height);
+  margin-bottom: 60px;
+  font-size: var(--body-font-size);
+  border: none;
+  outline: none;
+  color: var(--dark-6);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--dark-6);
+  padding: 8px 8px 8px 8px;
+  background-color: var(--white);
+}
+@media (max-width: 800px) {
+  form {
+    width: calc(100vw);
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    padding: 50px 38px 48px 38px;
+  }
+  .segment {
+      padding-top: 0;
+  }
+}
+</style>
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container">
+            <h1>Join our mailing list</h1>
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container article">
+        {# Mailchimp signup form #}
+        <form
+            action="https://anikalegal.us4.list-manage.com/subscribe/post?u=59dc8d205ab643fb0c4407da7&amp;id=86352e2547" 
+            method="post"
+            name="mc-embedded-subscribe-form"
+            target="_blank"
+        >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                <input type="text" name="b_59dc8d205ab643fb0c4407da7_86352e2547" tabindex="-1" value="">
+            </div>
+            <input type="email" value="" name="EMAIL" required placeholder="Your email" minlength="2" maxlength="64">
+            <input type="text" value="" name="FNAME" required placeholder="Your first name" minlength="2" maxlength="64">
+            <input type="text" value="" name="LNAME" required placeholder="Your last name" minlength="2" maxlength="64">
+            <button type="submit">Subscribe</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

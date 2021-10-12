@@ -68,6 +68,11 @@ urlpatterns = [
         template("web/partners/law-students.html"),
         name="law-student-partners",
     ),
+    path(
+        "subscribe/",
+        template("web/subscribe.html"),
+        name="subscribe",
+    ),
     # Wagtail admin - excluded by robots.txt
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
