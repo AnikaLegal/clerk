@@ -305,8 +305,9 @@ AZURE_AD_CLIENT_SECRET = os.environ["AZURE_AD_CLIENT_SECRET"]
 MS_AUTHORITY_URL = (
     "https://login.microsoftonline.com/e89f1fec-2d50-4795-886e-a3475bdc4e4b"
 )
-MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
-MS_GRAPH_DRIVE_ID = "b!zBUQNn3jdEO44jZXmI-2GO0Krjc71QFLkmFqmCjMqFZZhq6ZPsfjR6HYQBbAK0_E"
+# Set per-environment
+MS_GRAPH_GROUP_ID = None
+MS_GRAPH_DRIVE_ID = None
 
 # Scheduled tasks
 SCHEDULES = []

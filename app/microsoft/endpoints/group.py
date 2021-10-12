@@ -17,6 +17,12 @@ class GroupEndpoint(BaseEndpoint):
         """
         return super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}")
 
+    def get_drive(self):
+        """
+        Return group drive information.
+        """
+        return super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}/drive")
+
     def members(self):
         """
         List Group members.

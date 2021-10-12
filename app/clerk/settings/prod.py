@@ -76,7 +76,8 @@ GOOGLE_ANALYTICS_ID = "UA-133303109-1"
 FACEBOOK_PIXEL_ID = "580273702543728"
 
 # MS Graph Integration
-MS_GRAPH_GROUP_ID = "Production Group ID (Replace)"
+MS_GRAPH_GROUP_ID = "565f3cd9-c16e-49a8-9bba-d2ac86fea77b"
+MS_GRAPH_DRIVE_ID = "b!83_G5n94RUKVhtqomh8QdLsJLbi6tCpKomnhyRvhq7L3St3-kEDdTq9Ft70M4eXu"
 
 # Scheduled tasks
 SCHEDULES = [

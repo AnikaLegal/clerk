@@ -40,3 +40,7 @@ ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
 ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
+
+# MS Graph Integration
+MS_GRAPH_GROUP_ID = "d6b81121-9482-45d4-9acd-6fa42111d5b3"
+MS_GRAPH_DRIVE_ID = "b!Byhxuh0t_ESbqiHJZpNyHbsJLbi6tCpKomnhyRvhq7L3St3-kEDdTq9Ft70M4eXu"

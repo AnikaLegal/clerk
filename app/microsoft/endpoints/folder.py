@@ -86,6 +86,7 @@ class FolderEndpoint(BaseEndpoint):
         Create permissions (read or write) for a Folder.
         Returns permissions created or None if Folder doesn't exist.
         """
+        assert role in ["read", "write"]
         data = {
             # Do not remove fields or POST request might fail.
             "requireSignIn": True,

@@ -32,3 +32,4 @@ See here for documentation:
 - [Infra and deployment](docs/infra.md)
 - [Email integration](docs/emails.md)
 - [Twilio integration](docs/twilio.md)
+- [Sharepoint integration](docs/sharepoint.md)
