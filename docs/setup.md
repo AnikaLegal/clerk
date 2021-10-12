@@ -10,6 +10,8 @@ You will need:
 First, add a file called `.env` to the repository root with the following contents:
 
 ```text
+AZURE_AD_CLIENT_ID=
+AZURE_AD_CLIENT_SECRET=
 SENDGRID_API_KEY=
 MAILCHIMP_API_KEY=
 AWS_ACCESS_KEY_ID=
@@ -22,7 +24,7 @@ GOOGLE_OAUTH2_KEY=
 GOOGLE_OAUTH2_SECRET=
 ```
 
-The values of these secrets will be provided to you if you need them.
+The values of these secrets will be provided to you if you need them. They should be available in the Tech team Bitwarden account.
 
 Next, you want to build the Docker environment that we'll be using:
 
