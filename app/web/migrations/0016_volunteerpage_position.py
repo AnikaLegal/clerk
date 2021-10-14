@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web', '0014_volunteerlistpage_volunteerpage'),
+        ("web", "0015_volunteerlistpage_volunteerpage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='volunteerpage',
-            name='position',
-            field=models.CharField(default='', help_text='The name of their role', max_length=255),
+            model_name="volunteerpage",
+            name="position",
+            field=models.CharField(
+                default="", help_text="The name of their role", max_length=255
+            ),
             preserve_default=False,
         ),
     ]
