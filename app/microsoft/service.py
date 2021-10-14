@@ -18,8 +18,7 @@ def set_up_new_user(user) -> str:
     if not ms_account:
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         api.user.assign_license(user.email)
-
-    return password
+        return password
 
 
 def set_up_new_case(issue):
@@ -48,33 +47,59 @@ def remove_user_from_case(user, issue):
     """
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
-    permissions = api.folder.list_permissions(case_path)
-    if permissions:
-        # Iterate through the permissions and delete those belonging to the User.
-        for perm_id, user_object in permissions:
-            email = user_object["user"].get("email")
-            if email == user.email:
-                api.folder.delete_permission(case_path, perm_id)
+    permissions = _get_permissions_for_paralegal(api, user, issue)
+    for perm in permissions:
+        perm_id = perm["id"]
+        api.folder.delete_permission(case_path, perm_id)
 
 
-def get_files_for_case(issue):
+"""
+from microsoft.endpoints import MSGraphAPI
+api = MSGraphAPI()
+email = "dummy-2.test@anikalegal.com"
+issue_id = "31d97814-603f-41c3-b1c2-d65e0666f5ab"
+case_path = f"cases/{issue_id}"
+
+api.folder.create_permissions(case_path, "write", [email])
+
+z = api.folder.list_permissions(case_path)
+
+{'@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#Collection(permission)',
+ 'value': [{'@odata.type': '#microsoft.graph.permission',
+   'id': 'aTowIy5mfG1lbWJlcnNoaXB8ZHVtbXktMi50ZXN0QGFuaWthbGVnYWwuY29t',
+   'roles': ['write'],
+   'grantedTo': {'user': {'email': 'dummy-2.test@anikalegal.com',
+     'id': '4903d2ea-439a-4abc-8071-db59054b2c3e',
+     'displayName': 'Dummy2 Test'}}}]}
+
+from django.conf import settings
+
+url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{case_path}:/permissions/aTowIy5mfG1lbWJlcnNoaXB8ZHVtbXktMi50ZXN0QGFuaWthbGVnYWwuY29t"
+api.folder
+
+"""
+
+
+def get_docs_info_for_case(issue, user):
     """
-    Get list of files (name, URL) for preexisting case (folder).
+    Returns a thruple:
+        - A list of files (name, URL) for preexisting case (folder).
+        - Get the folder URL matching a case.
+        - Sharing URL for user
     """
     api = MSGraphAPI()
-    return api.folder.files(f"cases/{issue.id}")
+    docs = api.folder.files(f"cases/{issue.id}")
+    url_data = api.folder.get(f"cases/{issue.id}")
+    url = url_data["webUrl"] if url_data else None
 
+    permissions = _get_permissions_for_paralegal(api, user, issue)
+    sharing_url = None
+    for perm in permissions:
+        sharing_url = perm.get("link", {}).get("webUrl")
+        if sharing_url:
+            break
 
-def get_case_folder(issue):
-    """
-    Get the folder (id, URL) matching a case.
-    """
-    api = MSGraphAPI()
-    result = api.folder.get(f"cases/{issue.id}")
-    if result:
-        return result["id"], result["webUrl"]
-    else:
-        return None, None
+    return docs, url, sharing_url
 
 
 def set_up_coordinator(user):
@@ -97,3 +122,31 @@ def tear_down_coordinator(user):
         result = api.user.get(user.email)
         user_id = result["id"]
         api.group.remove_user(user_id)
+
+
+def _get_permissions_for_paralegal(api, user, issue):
+    """
+    Get folder level permissions for a given paralegal.
+    """
+    perms = []
+    case_path = f"cases/{issue.id}"
+    permissions = api.folder.list_permissions(case_path)
+    if permissions:
+        # Iterate through the permissions and delete those belonging to the User.
+        for perm in permissions["value"]:
+            perm_identities = perm.get("grantedToIdentitiesV2")
+            if not perm_identities:
+                perm_identity = perm.get("grantedToV2")
+                if perm_identity:
+                    perm_identities = [perm_identity]
+                else:
+                    continue
+
+            for perm_identity in perm_identities:
+                perm_user = perm_identity.get("user") or perm_identity.get("siteUser")
+                if perm_user:
+                    email = perm_user["email"]
+                    if email == user.email:
+                        perms.append(perm)
+
+    return perms

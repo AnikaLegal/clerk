@@ -1,6 +1,7 @@
-from .base import BaseEndpoint
-
+import os
 from django.conf import settings
+
+from .base import BaseEndpoint
 
 
 class FolderEndpoint(BaseEndpoint):
@@ -9,32 +10,30 @@ class FolderEndpoint(BaseEndpoint):
     https://docs.microsoft.com/en-us/graph/api/resources/driveitem
     """
 
+    base_url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive"
+
     def get(self, path):
         """
         Get the Folder inside the Group (Staging or Production) Drive (filesystem).
         Returns driveItem object or None.
         """
-        return super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}")
+        url = os.path.join(self.base_url, f"root:/{path}")
+        return super().get(url)
 
     def files(self, path):
         """
         Get the Files inside a Folder.
         Returns list of Files or None if Folder doesn't exist.
         """
-        json = super().get(
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/children"
-        )
-
-        if json:
+        url = os.path.join(self.base_url, f"root:/{path}:/children")
+        data = super().get(url)
+        if data:
             list_files = []
-
-            for item in json["value"]:
+            for item in data["value"]:
                 file = item["name"], item["webUrl"]
                 list_files.append(file)
 
             return list_files
-        else:
-            return None
 
     def copy(self, path, name, parent_id):
         """
@@ -44,32 +43,19 @@ class FolderEndpoint(BaseEndpoint):
         """
         # We have the option of specifying the name of the copy and its parent Folder.
         data = {
-            "parentReference": {"driveId": settings.MS_GRAPH_DRIVE_ID, "id": parent_id},
             "name": name,
+            "parentReference": {"driveId": settings.MS_GRAPH_DRIVE_ID, "id": parent_id},
         }
-
-        return super().post(
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/copy", data
-        )
+        url = os.path.join(self.base_url, f"root:/{path}:/copy")
+        return super().post(url, data)
 
     def list_permissions(self, path):
         """
         List the Folder's permissions.
         Returns list of permissions or None if Folder doesn't exist.
         """
-        json = super().get(
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions"
-        )
-
-        if json:
-            list_permissions = []
-
-            for item in json["value"]:
-                list_permissions.append((item["id"], item["grantedTo"]))
-
-            return list_permissions
-        else:
-            return None
+        url = os.path.join(self.base_url, f"root:/{path}:/permissions")
+        return super().get(url)
 
     def delete_permission(self, path, perm_id):
         """

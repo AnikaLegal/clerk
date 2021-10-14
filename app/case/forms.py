@@ -2,12 +2,42 @@ from django import forms
 from django.forms.fields import BooleanField
 from django.contrib.auth.models import Group
 from django.db import transaction
+from django.core.exceptions import ValidationError
+from django_q.tasks import async_task
 
 from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
 from core.models.issue import CaseStage
-from emails.models import Email, EmailState, EmailAttachment
+from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
+from microsoft.tasks import set_up_new_user_task
+
+
+class InviteParalegalForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email", "username"]
+
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            raise ValidationError(f"A user with email {email} already exists.")
+
+        if not email.endswith("@anikalegal.com"):
+            raise ValidationError(
+                f"Can only invite users with an anikalegal.com email."
+            )
+
+        return email
+
+    def save(self, *args, **kwargs):
+        user = super().save(*args, **kwargs)
+        async_task(set_up_new_user_task, user.pk)
+        return user
 
 
 class EmailForm(forms.ModelForm):

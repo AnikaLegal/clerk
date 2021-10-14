@@ -11,9 +11,10 @@
     </a>    
     <form 
         id="search"
-        class="ui segment form"
+        class="ui form"
         hx-get="{% url 'person-search' %}"
         hx-target="#person-list"
+        style="margin-top: 1rem"
     >
         <input type="submit" style="display: none" />
         <div class="field">

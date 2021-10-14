@@ -6,7 +6,7 @@
 
 <div class="ui container">
     <h1 class="ui header">
-        Create a person
+        Invite a paralegal
     </h1>
     <form 
         class="ui form  {% if form.errors %}error{% else %}success{% endif %}"
@@ -14,18 +14,14 @@
         action="."
     >
         {% csrf_token %}
-        {% include 'case/forms/_text_field.html' with field=form.full_name %}
+        {% include 'case/forms/_text_field.html' with field=form.first_name %}
+        {% include 'case/forms/_text_field.html' with field=form.last_name %}
         {% include 'case/forms/_text_field.html' with field=form.email %}
-        {% include 'case/forms/_text_field.html' with field=form.address %}
-        {% include 'case/forms/_text_field.html' with field=form.phone_number %}
+
         {% include 'case/forms/_form_errors.html' %}
         {% include 'case/forms/_form_success.html' %}
-        <button class="ui positive button" type="submit">Create</button>
+        <button class="ui positive button" type="submit">Invite</button>
     </form>
-
-
-
 </div>
-
 {% endblock %}
 
