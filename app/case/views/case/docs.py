@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
-from microsoft.service import get_files_for_case
+from microsoft.service import get_files_for_case, get_case_folder
 from case.views.auth import paralegal_or_better_required
 from case.utils.router import Route
 from core.models import Issue
@@ -32,10 +32,11 @@ def case_detail_documents_view(request, pk):
         raise Http404()
 
     documents = get_files_for_case(issue)
-
+    sharepoint_url = get_case_folder(issue)
     context = {
         "issue": issue,
         "actionstep_url": _get_actionstep_url(issue),
+        "sharepoint_url": sharepoint_url,
         "documents": documents,
     }
     return render(request, "case/docs_list.html", context)

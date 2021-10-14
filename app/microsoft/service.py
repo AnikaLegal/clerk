@@ -18,8 +18,7 @@ def set_up_new_user(user) -> str:
     if not ms_account:
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         api.user.assign_license(user.email)
-
-    return password
+        return password
 
 
 def set_up_new_case(issue):
@@ -67,14 +66,11 @@ def get_files_for_case(issue):
 
 def get_case_folder(issue):
     """
-    Get the folder (id, URL) matching a case.
+    Get the folder URL matching a case.
     """
     api = MSGraphAPI()
     result = api.folder.get(f"cases/{issue.id}")
-    if result:
-        return result["id"], result["webUrl"]
-    else:
-        return None, None
+    return result["webUrl"] if result else None
 
 
 def set_up_coordinator(user):

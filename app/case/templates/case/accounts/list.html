@@ -4,11 +4,17 @@
 <div class="ui container">
     <h1>Accounts</h1>
     <p>All system users</p>
+    <a href="{% url 'account-create' %}">
+        <button class="ui button primary">
+            Invite a paralegal
+        </button>
+    </a>    
     <form 
         id="account-search"
-        class="ui segment form"
+        class="ui form"
         hx-get="."
         hx-target="#account-list"
+        style="margin-top: 1rem"
     >
         <input type="submit" style="display: none" />
         <div class="two fields">
