@@ -860,21 +860,27 @@ before the final footer.
   font-family: var(--font-serif);
   font-size: 40px;
 }
-.article .block-quote {
+.article .block-quote,
+.article .block-attributed_quote {
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 4rem 0;
 }
+.article .block-attributed_quote {
+  flex-direction: column;
+}
 
-.article .block-quote blockquote {
+.article .block-quote blockquote,
+.article .block-attributed_quote blockquote {
   margin: 0;
   text-align: center;
   font-family: var(--font-serif);
   line-height: 46px;
   font-size: 34px;
 }
-.article .block-quote:before {
+.article .block-quote::before,
+.article .block-attributed_quote::before {
   content: "“";
   font-family: var(--font-serif);
   font-size: 96px;
@@ -892,7 +898,8 @@ before the final footer.
   .article .block-quote {
     flex-direction: column;
   }
-  .article .block-quote blockquote {
+  .article .block-quote blockquote,
+  .article .block-attributed_quote blockquote {
     font-size: 26px;
     line-height: 32px;
   }

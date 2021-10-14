@@ -1,0 +1,35 @@
+{% extends "web/_base.html" %} 
+{% load wagtailcore_tags wagtailimages_tags %}
+{% block title %}Volunteers{% endblock %} 
+{% load static %}
+{% block social_meta %}
+    {% include 'web/snippets/_social_meta.html' with title="Anika's Volunteers" description="Anika Legal's volunteers." %}            
+{% endblock %}
+{% block content %}
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="container wide">
+            <h1>Anika's Volunteers</h1>
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container wide">
+        <div class="card-grid tight">
+            {% for page in volunteer_pages %}
+                <div class="card-grid tight">
+                    <a href="{% pageurl page.specific %}">
+                        <div class="card">
+                            {% image page.specific.main_image fill-360x300 class="round-small top-right bottom-left" style="height: 300px;max-height:300px"  %}
+                            <p class="header" style="margin: 0; text-align: left;">{{ page.title }}</p>
+                            <p style="margin-top: 0; text-align: left;">{{ page.position }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <p>Watch this space</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
