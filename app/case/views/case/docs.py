@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
-from microsoft.service import get_files_for_case, get_case_folder
+from microsoft.service import get_docs_info_for_case
 from case.views.auth import paralegal_or_better_required
 from case.utils.router import Route
 from core.models import Issue
@@ -22,21 +22,18 @@ def case_detail_documents_view(request, pk):
     The documents of a given case.
     """
     try:
-        issue_qs = Issue.objects.select_related("client")
-        if request.user.is_paralegal:
-            # Paralegals can only see cases that they are assigned to
-            issue_qs.filter(paralegal=request.user)
-
-        issue = issue_qs.get(pk=pk)
+        issue = (
+            Issue.objects.check_permisisons(request).select_related("client").get(pk=pk)
+        )
     except Issue.DoesNotExist:
         raise Http404()
 
-    documents = get_files_for_case(issue)
-    sharepoint_url = get_case_folder(issue)
+    documents, sharepoint_url, sharing_url = get_docs_info_for_case(issue, request.user)
     context = {
         "issue": issue,
         "actionstep_url": _get_actionstep_url(issue),
         "sharepoint_url": sharepoint_url,
+        "sharing_url": sharing_url,
         "documents": documents,
     }
     return render(request, "case/docs_list.html", context)

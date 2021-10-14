@@ -60,7 +60,7 @@
         class="ui segment form"
     >
         <div class="field">
-            <div class="ui search selection dropdown">
+            <div id="dropdown-{{ url_path }}" class="ui search selection dropdown">
                 <div class="text"></div>
                 <i class="dropdown icon"></i>
                 <input 
@@ -77,7 +77,7 @@
     </form>
     <script>
         // Initialize JavaScript enabled Semantic UI elements.
-        $('.selection.dropdown').dropdown({
+        $('#dropdown-{{ url_path }}').dropdown({
             placeholder: "Select a person",
             match: 'text',
             fullTextSearch: true,

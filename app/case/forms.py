@@ -16,7 +16,7 @@ from microsoft.tasks import set_up_new_user_task
 class InviteParalegalForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["first_name", "last_name", "email", "username"]
 
     first_name = forms.CharField()
     last_name = forms.CharField()
