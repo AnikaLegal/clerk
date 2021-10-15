@@ -16,6 +16,7 @@ from case.utils.router import Route
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
 list_route = Route("list")
+search_route = Route("search").path("search")
 inbox_route = Route("inbox").path("inbox")
 review_route = Route("review").path("review")
 
@@ -45,6 +46,29 @@ def case_list_view(request):
         "prev_qs": prev_qs,
     }
     return render(request, "case/case/list.html", context)
+
+
+@search_route
+@login_required
+@require_http_methods(["GET"])
+def case_search_view(request):
+    form = IssueSearchForm(request.GET)
+    issue_qs = Issue.objects.select_related("client", "paralegal")
+    if request.user.is_paralegal:
+        # Paralegals can only see assigned cases
+        issue_qs = issue_qs.filter(paralegal=request.user)
+    elif not request.user.is_coordinator_or_better:
+        issue_qs = issue_qs.none()
+
+    issues = form.search(issue_qs).order_by("-created_at").all()
+    page, next_qs, prev_qs = get_page(request, issues, per_page=28)
+    context = {
+        "issue_page": page,
+        "form": form,
+        "next_qs": next_qs,
+        "prev_qs": prev_qs,
+    }
+    return render(request, "case/case/_list_results.html", context)
 
 
 @review_route
