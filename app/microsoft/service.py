@@ -53,33 +53,6 @@ def remove_user_from_case(user, issue):
         api.folder.delete_permission(case_path, perm_id)
 
 
-"""
-from microsoft.endpoints import MSGraphAPI
-api = MSGraphAPI()
-email = "dummy-2.test@anikalegal.com"
-issue_id = "31d97814-603f-41c3-b1c2-d65e0666f5ab"
-case_path = f"cases/{issue_id}"
-
-api.folder.create_permissions(case_path, "write", [email])
-
-z = api.folder.list_permissions(case_path)
-
-{'@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#Collection(permission)',
- 'value': [{'@odata.type': '#microsoft.graph.permission',
-   'id': 'aTowIy5mfG1lbWJlcnNoaXB8ZHVtbXktMi50ZXN0QGFuaWthbGVnYWwuY29t',
-   'roles': ['write'],
-   'grantedTo': {'user': {'email': 'dummy-2.test@anikalegal.com',
-     'id': '4903d2ea-439a-4abc-8071-db59054b2c3e',
-     'displayName': 'Dummy2 Test'}}}]}
-
-from django.conf import settings
-
-url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{case_path}:/permissions/aTowIy5mfG1lbWJlcnNoaXB8ZHVtbXktMi50ZXN0QGFuaWthbGVnYWwuY29t"
-api.folder
-
-"""
-
-
 def get_docs_info_for_case(issue, user):
     """
     Returns a thruple:
