@@ -1,6 +1,7 @@
 {% extends "web/_base.html" %} 
 {% load static %}
 {% load wagtailcore_tags %}
+{% load wagtail_clerk %}
 {% block title %}Join our team{% endblock %} 
 {% include 'web/snippets/_social_meta.html' with title="Join Our Team" description="Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice." %}            
 {% block content %}
@@ -49,6 +50,11 @@
                 </p>
             </div>
         </div>
+        <a href="{% clerk_slugurl 'volunteers' %}" style="margin-top: 2rem;display: flex;justify-content:center;">
+            <button>
+                Learn about our volunteers
+            </button>
+        </a>
     </div>
 </div>
 
