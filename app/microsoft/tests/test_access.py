@@ -86,7 +86,7 @@ def test_admin_to_coordinator(
 @patch("core.signals.issue.add_user_to_case")
 def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
     user = UserFactory()
-    issue = IssueFactory(paralegal=None)
+    issue = IssueFactory(is_case_sent=True, paralegal=None)
     add_user_to_case.assert_not_called()
     issue.paralegal = user
     issue.save()
@@ -98,7 +98,7 @@ def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
 @patch("core.signals.issue.add_user_to_case")
 def test_remove_paralegal_from_case(add_user_to_case, remove_user_from_case):
     user = UserFactory()
-    issue = IssueFactory(paralegal=user)
+    issue = IssueFactory(is_case_sent=True, paralegal=user)
     remove_user_from_case.assert_not_called()
     issue.paralegal = UserFactory()
     issue.save()
@@ -121,7 +121,7 @@ def test_remove_paralegal_from_group(
     user = UserFactory()
     group = Group.objects.get(name=CaseGroups.PARALEGAL)
     user.groups.add(group)
-    issue = IssueFactory(paralegal=user)
+    issue = IssueFactory(is_case_sent=True, paralegal=user)
 
     accounts_remove_user_from_case.assert_not_called()
     user.groups.remove(group)

@@ -95,6 +95,7 @@ class IssueFactory(TimestampedModelFactory):
     answers = {}
     client = factory.SubFactory(ClientFactory)
     stage = "UNSTARTED"
+    is_sharepoint_set_up = True
 
 
 @factory.django.mute_signals(post_save)
