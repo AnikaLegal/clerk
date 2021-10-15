@@ -61,10 +61,15 @@ def get_docs_info_for_case(issue, user):
         - Sharing URL for user
     """
     api = MSGraphAPI()
-    docs = api.folder.files(f"cases/{issue.id}")
+    docs_data = api.folder.get_children(f"cases/{issue.id}")
+    docs = []
+    if docs_data:
+        for item in docs_data["value"]:
+            file = item["name"], item["webUrl"]
+            docs.append(file)
+
     url_data = api.folder.get(f"cases/{issue.id}")
     url = url_data["webUrl"] if url_data else None
-
     permissions = _get_permissions_for_paralegal(api, user, issue)
     sharing_url = None
     for perm in permissions:

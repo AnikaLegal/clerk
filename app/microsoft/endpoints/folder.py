@@ -1,7 +1,10 @@
 import os
+
+import requests
 from django.conf import settings
 
 from .base import BaseEndpoint
+from .helpers import BASE_URL
 
 
 class FolderEndpoint(BaseEndpoint):
@@ -20,20 +23,48 @@ class FolderEndpoint(BaseEndpoint):
         url = os.path.join(self.base_url, f"root:/{path}")
         return super().get(url)
 
-    def files(self, path):
+    def get_children(self, path):
         """
-        Get the Files inside a Folder.
-        Returns list of Files or None if Folder doesn't exist.
+        Get the child items inside a folder.
         """
         url = os.path.join(self.base_url, f"root:/{path}:/children")
         data = super().get(url)
-        if data:
-            list_files = []
-            for item in data["value"]:
-                file = item["name"], item["webUrl"]
-                list_files.append(file)
+        return data
 
-            return list_files
+    def get_all_files(self, path):
+        """
+        Get all files inside a folder.
+        """
+        url = os.path.join(self.base_url, f"root:/{path}:/children")
+        children_data = super().get(url)
+        files = []
+        children = children_data["value"] if children_data else []
+        for item in children:
+            if item.get("file"):
+                # It's a file
+                files.append(item)
+            elif item.get("folder"):
+                # It's a folder
+                has_children = item.get("folder", {}).get("childCount", 0) > 0
+                if has_children:
+                    folder_path = os.path.join(path, item["name"])
+                    folder_child_files = self.get_all_files(folder_path)
+                    files += folder_child_files
+
+        return files
+
+    def download_file(self, file_drive_id):
+        """
+        Returns filename, minemtype, file bytes
+        """
+        file_url = os.path.join(self.base_url, f"items/{file_drive_id}")
+        file_data = super().get(file_url)
+        filename = file_data["name"]
+        mimetype = file_data["file"]["mimeType"]
+        url = os.path.join(BASE_URL, self.base_url, f"items/{file_drive_id}/content")
+        resp = requests.get(url, headers=self.headers, stream=False)
+        resp.raise_for_status()
+        return filename, mimetype, resp.content
 
     def copy(self, path, name, parent_id):
         """

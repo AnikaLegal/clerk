@@ -15,6 +15,7 @@ from emails.models import EmailState, Email
 from case.forms import EmailForm
 from case.utils import merge_form_data
 from case.utils.router import Router
+from microsoft.endpoints import MSGraphAPI
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -121,6 +122,11 @@ def email_draft_edit_view(request, pk, email_pk):
     else:
         form = EmailForm(instance=email)
 
+    api = MSGraphAPI()
+    sharepoint_docs = api.folder.get_all_files(f"cases/{issue.id}")
+    sharepoint_options = [
+        {"name": doc["name"], "value": doc["id"]} for doc in sharepoint_docs
+    ]
     context = {
         "issue": issue,
         "form": form,
@@ -128,6 +134,7 @@ def email_draft_edit_view(request, pk, email_pk):
         "email": email,
         "case_email_address": case_email_address,
         "is_disabled": email.state != EmailState.DRAFT,
+        "sharepoint_options": sharepoint_options,
     }
     return render(request, "case/case/email/draft_edit.html", context)
 

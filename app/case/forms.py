@@ -1,9 +1,12 @@
+import io
+
 from django import forms
 from django.forms.fields import BooleanField
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django_q.tasks import async_task
+from django.core.files.base import ContentFile
 
 from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
@@ -11,6 +14,7 @@ from core.models.issue import CaseStage
 from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 from microsoft.tasks import set_up_new_user_task
+from microsoft.endpoints import MSGraphAPI
 
 
 class InviteParalegalForm(forms.ModelForm):
@@ -52,8 +56,10 @@ class EmailForm(forms.ModelForm):
             "text",
             "issue",
             "sender",
+            "sharepoint_attachments",
         ]
 
+    sharepoint_attachments = forms.CharField(required=False)
     subject = forms.CharField()
     to_address = forms.EmailField()
     attachments = forms.FileField(
@@ -63,6 +69,19 @@ class EmailForm(forms.ModelForm):
     @transaction.atomic
     def save(self, commit=True):
         email = super().save()
+        for sharepoint_id in self.data.get("sharepoint_attachments").split(","):
+            # Download attachment
+            api = MSGraphAPI()
+            filename, mimetype, file_bytes = api.folder.download_file(sharepoint_id)
+
+            # Save as email attachment
+            f = ContentFile(file_bytes, name=filename)
+            EmailAttachment.objects.create(
+                email=email,
+                file=f,
+                content_type=mimetype,
+            )
+
         for f in self.files.getlist("attachments"):
             EmailAttachment.objects.create(
                 email=email,

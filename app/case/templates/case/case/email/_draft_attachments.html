@@ -1,10 +1,10 @@
-<div id="email-draft-attachments">
+<div id="email-draft-attachments" style="margin-top: 2rem">
 {% if email.emailattachment_set.count > 0 %}
-    <h5>Attached files</h5>
+    <h3>Attached files</h3>
     <ul>
         {% for attachment in email.emailattachment_set.all %}
             <li>
-                <a href="{{ attachment.file.url }}">
+                <a href="{{ attachment.file.url }}" target="_blank">
                     {{ attachment.file.name }}
                 </a>
                 &nbsp;
