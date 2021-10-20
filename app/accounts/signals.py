@@ -20,6 +20,10 @@ COORDINATOR_GROUPS = [CaseGroups.COORDINATOR, CaseGroups.ADMIN]
 # https://docs.djangoproject.com/en/3.2/ref/signals/#m2m-changed
 @receiver(m2m_changed, sender=User.groups.through)
 def post_save_group(sender, instance, action, **kwargs):
+    if kwargs.get("reverse"):
+        # Do nothing if it's a Group instance rather than a User.
+        return
+
     user = instance
     if action == POST_ADD:
         if not user.is_active:
