@@ -9,9 +9,11 @@ from core.models import Issue
 
 from .detail import _get_actionstep_url
 
-MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 docs_route = Route("docs").uuid("pk").path("docs")
+docs_sharepoint_route = (
+    Route("docs-sharepoint").uuid("pk").path("docs").path("sharepoint")
+)
 
 
 @docs_route
@@ -28,15 +30,30 @@ def case_detail_documents_view(request, pk):
     except Issue.DoesNotExist:
         raise Http404()
 
-    documents, sharepoint_url, sharing_url = get_docs_info_for_case(issue, request.user)
     context = {
         "issue": issue,
         "actionstep_url": _get_actionstep_url(issue),
+        "is_loading": True,
+    }
+    return render(request, "case/docs/list.html", context)
+
+
+@docs_sharepoint_route
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST"])
+def sharepoint_docs_view(request, pk):
+    try:
+        issue = (
+            Issue.objects.check_permisisons(request).select_related("client").get(pk=pk)
+        )
+    except Issue.DoesNotExist:
+        raise Http404()
+
+    documents, sharepoint_url, sharing_url = get_docs_info_for_case(issue, request.user)
+    context = {
+        "is_loading": False,
         "sharepoint_url": sharepoint_url,
         "sharing_url": sharing_url,
         "documents": documents,
     }
-    return render(request, "case/docs_list.html", context)
-
-
-MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
+    return render(request, "case/docs/_sharepoint.html", context)
