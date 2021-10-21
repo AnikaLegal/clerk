@@ -5,7 +5,7 @@ import requests
 
 logger = logging.getLogger(__file__)
 
-TIMEOUT = 5  # Seconds
+TIMEOUT = 30  # Seconds
 
 
 class BaseEndpoint:
