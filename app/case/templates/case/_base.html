@@ -16,41 +16,42 @@
     {% block styles %}{% endblock %}
 </head>
 <body>
-    <header class="ui menu">
-        <div class="item">
-            <h5 class="ui header grey">
-                <img class="ui image" src="{% static 'brand/logo-icon-color.png' %}">
-                <div class="content">
-                    {% if request.user.is_authenticated %}
-                        Hello {{ request.user.get_full_name }}
-                    {% else %}
-                        Clerk
-                    {% endif %}
-                </div>
-            </h5>            
-        </div>
-
-        {% if request.user.is_authenticated %}
-            <a href="{% url 'case-list' %}" class="item">Cases</a>
-            <a href="{% url 'person-list' %}" class="item">People</a>
-        {% endif %}
-        {% if request.user.is_coordinator_or_better %}
-            <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
-            <a href="{% url 'case-review' %}" class="item">Review</a>
-            <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
-            <a href="{% url 'account-list' %}" class="item">Accounts</a>
-        {% endif %}
-        
-        <div class="right menu">          
-            <a href="https://wiki.anikalegal.com" class="item">Wiki</a>
-            <a href="https://anika.retool.com/embedded/public/5200a32b-86fb-45d7-aab7-e0caaceaa80c" class="item">Reports</a>          
-            <a href="https://anika.retool.com" class="item">Retool</a>
-          
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="item">Logout</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="item">Login</a>
-            {% endif %}
+    <header>
+        <div class="inner">
+            <img class="logo" src="{% static 'web/brand/logo-color.svg' %}">
+            <div class="nav-items">
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'case-list' %}" class="item">Cases</a>
+                {% endif %}
+                {% if request.user.is_coordinator_or_better %}
+                    <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
+                    <a href="{% url 'case-review' %}" class="item">Review</a>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'person-list' %}" class="item">People</a>
+                {% endif %}
+                {% if request.user.is_coordinator_or_better %}
+                    <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
+                    <a href="{% url 'account-list' %}" class="item">Accounts</a>
+                {% endif %}
+            </div>           
+            <div class="nav-items">          
+                <a href="https://wiki.anikalegal.com" class="item">Wiki</a>
+                <a href="https://anika.retool.com/embedded/public/5200a32b-86fb-45d7-aab7-e0caaceaa80c" class="item">Reports</a>          
+                <a href="https://anika.retool.com" class="item">Retool</a>
+            
+                {% if request.user.is_authenticated %}
+                <a 
+                    href="{% url 'logout' %}"
+                    class="item"
+                    title="You are logged in as {{ request.user.get_full_name }}"
+                >
+                    Logout
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="item">Login</a>
+                {% endif %}
+            </div>
         </div>
     </header>
     <main>

@@ -1,5 +1,94 @@
 /* Custom global styles go here */
+:root {
+  /* Colors */
+  --blue: #438fef;
+  --blue-mid: #104485;
+  --blue-dark: #00377b;
+  --blue-light: #eff6ff;
+  --gold: #ebb900;
+  --gold-light: #fff9e8;
+  --peach: #f37365;
+  --grey: #434343;
+  --dark-0: #000;
+  --dark-1: #18191f;
+  --dark-3: #333;
+  --dark-4: #3f3f3f;
+  --dark-5: #454545;
+  --dark-6: #505050;
+  --grey: #e8f1f5;
+  --grey-2: #d9dbe1;
+  --white: #fff;
+  /* Sizes */
+  --container-padding: 100px;
+}
+
+/* Responsive variables (phone) */
+@media (max-width: 1000px) {
+  :root {
+    --container-padding: 24px;
+  }
+}
+
+/* Whole page body */
+html,
+body {
+  scrollbar-width: thin;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  box-sizing: border-box;
+  background-color: #eff6ff11;
+}
+
+header {
+  background: var(--gold-light);
+  margin-bottom: 3rem;
+  box-shadow: 0px 0px 10px rgb(0 55 123 / 10%);
+}
+
+header .inner {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1240px;
+  width: calc(100vw - 2 * var(--container-padding));
+  margin: 0 auto;
+  padding: 1.5rem 0;
+  align-items: center;
+}
+header .logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+header img.logo {
+  height: 42px;
+}
+header .nav-items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 0 1.5rem;
+}
+header .nav-items:last-child {
+  margin-right: 0;
+}
+header .nav-items a {
+  color: var(--dark-1);
+}
+header .nav-items a:hover {
+  text-decoration: underline;
+}
+header .nav-items a:visited {
+  color: var(--dark-1);
+}
+
 main {
+  max-width: 1240px;
+  width: calc(100vw - 2 * var(--container-padding));
+  margin: 0 auto;
   padding-bottom: 6rem;
 }
 
