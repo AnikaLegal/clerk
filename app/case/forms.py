@@ -68,7 +68,10 @@ class EmailForm(forms.ModelForm):
     @transaction.atomic
     def save(self, commit=True):
         email = super().save()
-        for sharepoint_id in self.data.get("sharepoint_attachments").split(","):
+        sharepoint_ids = [
+            s for s in self.data.get("sharepoint_attachments", "").split(",") if s
+        ]
+        for sharepoint_id in sharepoint_ids:
             # Download attachment
             api = MSGraphAPI()
             filename, mimetype, file_bytes = api.folder.download_file(sharepoint_id)
