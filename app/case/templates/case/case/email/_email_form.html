@@ -12,6 +12,7 @@
     {% if email %}
         <div class="field {% if field.errors %}error{% endif %}">
                 <label>Add attachments from your computer</label>
+                <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
                 <input
                     type="file"
                     multiple
@@ -20,7 +21,8 @@
                 >       
         </div>
         <div class="field">
-                <label>Add attachments from SharePoint</label>
+            <label>Add attachments from SharePoint</label>
+                <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
             <div id="dropdown-sharepoint" class="ui search multiple selection dropdown {% if is_disabled %}disabled{% endif %}">
                 <div class="text"></div>
                 <i class="dropdown icon"></i>

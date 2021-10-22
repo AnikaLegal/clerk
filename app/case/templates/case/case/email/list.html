@@ -18,7 +18,7 @@
                         <div class="content">
                         <a href="{% url 'case-email-edit' issue.pk email.pk %}" class="header">
                             {{ email.subject }}
-                            {% if email.state != EmailState.DRAFT %}(sending){% endif %}
+                            {% if email.state != "DRAFT" %}(sending){% endif %}
                         </a>
                         <div class="description">To {{ email.to_address }}</div>
                         </div>
