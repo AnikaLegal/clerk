@@ -240,6 +240,7 @@ class SlackMessage:
     ACTIONSTEP_CREATE = "actionstep-create"
     CLIENT_INTAKE = "client-intake"
     LANDING_FORM = "landing-form"
+    WEEKLY_REPORT = "weekly-report"
 
 
 SLACK_MESSAGE = SlackMessage
