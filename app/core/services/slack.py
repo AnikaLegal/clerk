@@ -43,6 +43,7 @@ def get_text(issue: Issue):
 PUBLIC_REPORTING_URL = (
     "https://anika.retool.com/embedded/public/5200a32b-86fb-45d7-aab7-e0caaceaa80c"
 )
+OUTCOME_DEFINITIONS_URL = "https://docs.google.com/document/d/1pLLIE_clzrLk1MiOtw9kIrbYt5phy7ZTGvv3mIouQTs/edit?usp=sharing"
 
 
 def send_weekly_report_slack():
@@ -90,7 +91,7 @@ def get_report_text(num_days: int, show_outcomes=True):
         issues_closed_total = Issue.objects.filter(
             created_at__gte=start_time, is_open=False
         ).count()
-        text = f"Of the {issues_closed_total} closed issues started in this time period, we found these outcomes:"
+        text = f"Of the {issues_closed_total} closed issues started in this time period, we found these <{OUTCOME_DEFINITIONS_URL}|outcomes>:"
         for key, display in CaseOutcome.CHOICES:
             issues_outcome = Issue.objects.filter(
                 created_at__gte=start_time, is_open=False, outcome=key
