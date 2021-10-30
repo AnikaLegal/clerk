@@ -1,4 +1,4 @@
-# Sharepoint integration
+# SharePoint Integration
 
 We use SharePoint to store and edit documents for our cases. Some example documents include:
 
@@ -11,7 +11,7 @@ In general we want each case's documents to be stored with [principle of least p
 
 ## Environments
 
-We have three Active Directory groups (dev, staging, prod), each with their own SharePoint site/filesystem. Access to one group/site does not grant access to others. Environment access is controlled at the user level by group and folder level permissions (see access section) and at the application level buy these two settings:
+We have three Active Directory groups (dev, staging, prod), each with its own SharePoint site/filesystem. Access to one group/site does not grant access to others. Environment access is controlled at the user level by group and folder level permissions (see access section) and at the application level by these two settings:
 
 - `MS_GRAPH_GROUP_ID`: The id of the Active Directory group, used to manage permissions
 - `MS_GRAPH_DRIVE_ID`: The id of the SharePoint drive created for the AD group
