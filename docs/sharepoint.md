@@ -42,7 +42,7 @@ When a case is created in Clerk the system will create the case folder and copy 
 
 Paralegals are only given read/write access only to the folders of the cases that they are working on. This access is added/removed when they are added/removed from a case.
 
-When users become coordinators, admins or super users they join the group as "owners", giving them full access permissions to the SharePoint file system in the environment. These permissions are removed if this access is retracted.
+When users become coordinators, admins or superusers they join the group as "owners", giving them full access permissions to the SharePoint file system in the environment. These permissions are removed if this access is retracted.
 
 ## User accounts
 
