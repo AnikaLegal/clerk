@@ -1,5 +1,5 @@
 # flake8: noqa
-from . import *
+from .base import *
 
 DEBUG = True
 
@@ -44,3 +44,5 @@ ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "d6b81121-9482-45d4-9acd-6fa42111d5b3"
 MS_GRAPH_DRIVE_ID = "b!Byhxuh0t_ESbqiHJZpNyHbsJLbi6tCpKomnhyRvhq7L3St3-kEDdTq9Ft70M4eXu"
+
+CLERK_BASE_URL = "http://localhost:8000"

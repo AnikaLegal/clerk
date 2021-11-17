@@ -22,6 +22,7 @@ TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 GOOGLE_OAUTH2_KEY=
 GOOGLE_OAUTH2_SECRET=
+SLACK_API_TOKEN=
 ```
 
 The values of these secrets will be provided to you if you need them. They should be available in the Tech team Bitwarden account.

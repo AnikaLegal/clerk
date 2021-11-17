@@ -244,6 +244,8 @@ class SlackMessage:
 
 
 SLACK_MESSAGE = SlackMessage
+SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
+SLACK_EMAIL_ALERT_OVERRIDE = "mattdsegal@gmail.com"  # Set to None in prod only
 
 ACTIONSTEP_CLIENT_ID = os.environ["ACTIONSTEP_CLIENT_ID"]
 ACTIONSTEP_CLIENT_SECRET = os.environ["ACTIONSTEP_CLIENT_SECRET"]

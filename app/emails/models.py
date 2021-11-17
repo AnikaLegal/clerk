@@ -44,6 +44,9 @@ class Email(models.Model):
     )
     received_data = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)
 
+    # Tracks whether an alert has been successfully sent.
+    is_alert_sent = models.BooleanField(default=False)
+
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
 

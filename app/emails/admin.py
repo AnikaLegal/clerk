@@ -17,5 +17,6 @@ class EmailAdmin(admin.ModelAdmin):
         "to_address",
         "subject",
         "created_at",
+        "is_alert_sent",
     )
     inlines = [AttachmentInline]

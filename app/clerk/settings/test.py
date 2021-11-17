@@ -1,4 +1,4 @@
-from . import *
+from .base import *
 
 SUBMISSION_EMAILS = ["test@example.com"]
 
@@ -37,3 +37,5 @@ MAILCHIMP_COVID_EMAIL_ID = ""
 MAILCHIMP_REPAIRS_LIST_ID = ""
 MAILCHIMP_REPAIRS_WORKFLOW_ID = ""
 MAILCHIMP_REPAIRS_EMAIL_ID = ""
+
+CLERK_BASE_URL = "http://localhost:8000"

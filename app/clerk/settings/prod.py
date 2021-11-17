@@ -2,7 +2,7 @@
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from . import *
+from .base import *
 
 IS_PROD = True
 DEBUG = False
@@ -97,3 +97,6 @@ SCHEDULES = [
         "minutes": 60,
     },
 ]
+
+SLACK_EMAIL_ALERT_OVERRIDE = None
+CLERK_BASE_URL = "https://clerk.anikalegal.com"
