@@ -38,14 +38,14 @@ Here is the implementation:
     └── f4d5b5a2-c686...   another case
 ```
 
-- currently we have a Group for each of our environments (development, staging, production), each Group is self contained with its own filesystem, Users, and permissions - we use the following values to identify the specific Group and filesystem for our API calls
+- Currently we have a Group for each of our environments (development, staging, production), each Group is self contained with its own filesystem, Users, and permissions - we use the following values to identify the specific Group and filesystem for our API calls
 
 ```
 MS_GRAPH_GROUP_ID
 MS_GRAPH_DRIVE_ID
 ```
 
-- we can also manipulate resources in the Group's filesystem with a User Interface; after logging on to office.com, using either SharePoint or OneDrive we can personally manage documents stored in the Group's filesystem.
-- the issue of permissions (authorisation) over documents in the Group's filesystem follows the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) whereby Users are given enough access to do their job and no more.
-- coordinators are made Group members, giving them read/write access over all the documents in the Group's filesystem; paralegals are not made Group members, they are given read/write access only to the folders corresponding to the cases that they have been assigned.
-- when a case is created, a copy of the relevant templates folder is made with the name of the new case and placed in the `cases` folder.
+- We can also manipulate resources in the Group's filesystem with a User Interface; after logging on to office.com, using either SharePoint or OneDrive we can personally manage documents stored in the Group's filesystem.
+- The issue of permissions (authorisation) over documents in the Group's filesystem follows the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) whereby Users are given enough access to do their job and no more.
+- Coordinators are made Group members, giving them read/write access over all the documents in the Group's filesystem; paralegals are not made Group members, they are given read/write access only to the folders corresponding to the cases that they have been assigned.
+- When a case is created, a copy of the relevant templates folder is made with the name of the new case and placed in the `cases` folder.
