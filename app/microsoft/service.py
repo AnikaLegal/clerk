@@ -28,8 +28,8 @@ def set_up_new_case(issue):
     api = MSGraphAPI()
     template_path = TEMPLATE_PATHS[issue.topic]
     case_folder_name = str(issue.id)
-    case_folder_id = api.folder.get("cases")["id"]
-    api.folder.copy(template_path, case_folder_name, case_folder_id)
+    parent_folder_id = api.folder.get("cases")["id"]
+    api.folder.copy(template_path, case_folder_name, parent_folder_id)
 
 
 def add_user_to_case(user, issue):

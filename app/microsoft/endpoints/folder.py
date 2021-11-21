@@ -1,10 +1,8 @@
 import os
-
 import requests
 from django.conf import settings
 
 from .base import BaseEndpoint
-from .helpers import BASE_URL
 
 
 class FolderEndpoint(BaseEndpoint):
@@ -17,7 +15,7 @@ class FolderEndpoint(BaseEndpoint):
 
     def get(self, path):
         """
-        Get the Folder inside the Group (Staging or Production) Drive (filesystem).
+        Get the Folder inside the Group Drive (filesystem).
         Returns driveItem object or None.
         """
         url = os.path.join(self.base_url, f"root:/{path}")
@@ -104,6 +102,7 @@ class FolderEndpoint(BaseEndpoint):
         Returns permissions created or None if Folder doesn't exist.
         """
         assert role in ["read", "write"]
+
         data = {
             # Do not remove fields or POST request might fail.
             "requireSignIn": True,
