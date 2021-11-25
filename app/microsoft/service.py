@@ -9,12 +9,14 @@ TEMPLATE_PATHS = {
 }
 
 
-def set_up_new_user(user) -> str:
+def set_up_new_user(user):
     """
     Create MS account for new user and assign license.
     """
     api = MSGraphAPI()
+
     ms_account = api.user.get(user.email)
+
     if not ms_account:
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         api.user.assign_license(user.email)
