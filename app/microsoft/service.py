@@ -39,7 +39,9 @@ def add_user_to_case(user, issue):
     Give User write permissions for a specific case (folder).
     """
     api = MSGraphAPI()
+
     case_path = f"cases/{issue.id}"
+
     api.folder.create_permissions(case_path, "write", [user.email])
 
 
@@ -87,7 +89,9 @@ def set_up_coordinator(user):
     Add User as Group member.
     """
     api = MSGraphAPI()
+
     members = api.group.members()
+
     if user.email not in members:
         api.group.add_user(user.email)
 
@@ -97,7 +101,9 @@ def tear_down_coordinator(user):
     Remove User as Group member.
     """
     api = MSGraphAPI()
+
     members = api.group.members()
+
     if user.email in members:
         result = api.user.get(user.email)
         user_id = result["id"]

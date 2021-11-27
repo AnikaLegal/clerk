@@ -1,10 +1,10 @@
 from unittest import mock
 import pytest
 
-from microsoft.service import set_up_new_user
+from microsoft.service import set_up_new_user, add_user_to_case, set_up_coordinator
 from microsoft.endpoints import MSGraphAPI
 
-from core.factories import UserFactory
+from core.factories import UserFactory, IssueFactory
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def mock_client():
 
 @pytest.fixture
 def mock_api():
-    """Mock MSGraph API object instantiated by each service function."""
+    """Mock MSGraphAPI object instantiated by each service function."""
     with mock.patch("microsoft.service.MSGraphAPI") as mock_MSGraphAPI:
         mock_api = mock.Mock()
         mock_MSGraphAPI.return_value = mock_api
@@ -27,7 +27,7 @@ def mock_api():
 
 
 def test_MSGraphAPI(mock_client):
-    """MSGraphAPI contructor obtains access token and uses it to instantiate Endpoint objects."""
+    """MSGraphAPI constructor obtains access token and uses it to instantiate Endpoint objects."""
     api = MSGraphAPI()
 
     mock_client.acquire_token_silent.assert_called_once()
@@ -38,7 +38,7 @@ def test_MSGraphAPI(mock_client):
 
 @pytest.mark.django_db
 def test_set_up_new_user_A(mock_api):
-    """Check set_up_new_user service function works correctly for existing user."""
+    """Check service function does not create MS account or assign license for existing user."""
     user = UserFactory()
     mock_api.user.get.return_value = {
         f"Microsoft Account already exists for {user.email}"
@@ -53,7 +53,7 @@ def test_set_up_new_user_A(mock_api):
 
 @pytest.mark.django_db
 def test_set_up_new_user_B(mock_api):
-    """Check set_up_new_user service function works correctly for new user."""
+    """Check service function creates MS account and assigns license for new user."""
     user = UserFactory()
     mock_api.user.get.return_value = None
     mock_api.user.create.return_value = user, "open sesame"
@@ -66,3 +66,40 @@ def test_set_up_new_user_B(mock_api):
     )
     mock_api.user.assign_license.assert_called_once_with(user.email)
     assert password == "open sesame"
+
+
+@pytest.mark.django_db
+def test_add_user_to_case(mock_api):
+    """Check service function gives user write permissions to existing case folder."""
+    user = UserFactory()
+    issue = IssueFactory()
+
+    add_user_to_case(user, issue)
+
+    mock_api.folder.create_permissions.assert_called_once_with(
+        f"cases/{issue.id}", "write", [user.email]
+    )
+
+
+@pytest.mark.django_db
+def test_set_up_coordinator_A(mock_api):
+    """Check service function doesn't add User who is already Group member."""
+    user = UserFactory()
+    mock_api.group.members.return_value = [user.email]
+
+    set_up_coordinator(user)
+
+    mock_api.group.members.assert_called_once()
+    mock_api.group.add_user.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_set_up_coordinator_B(mock_api):
+    """Check service function adds User who is not a Group member."""
+    user = UserFactory()
+    mock_api.group.members.return_value = []
+
+    set_up_coordinator(user)
+
+    mock_api.group.members.assert_called_once()
+    mock_api.group.add_user.assert_called_once_with(user.email)
