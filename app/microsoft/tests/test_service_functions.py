@@ -1,7 +1,12 @@
 from unittest import mock
 import pytest
 
-from microsoft.service import set_up_new_user, add_user_to_case, set_up_coordinator
+from microsoft.service import (
+    set_up_new_user,
+    add_user_to_case,
+    set_up_coordinator,
+    tear_down_coordinator,
+)
 from microsoft.endpoints import MSGraphAPI
 
 from core.factories import UserFactory, IssueFactory
@@ -83,7 +88,7 @@ def test_add_user_to_case(mock_api):
 
 @pytest.mark.django_db
 def test_set_up_coordinator_A(mock_api):
-    """Check service function doesn't add User who is already Group member."""
+    """Check service function doesn't add User who is already a Group member."""
     user = UserFactory()
     mock_api.group.members.return_value = [user.email]
 
@@ -95,7 +100,7 @@ def test_set_up_coordinator_A(mock_api):
 
 @pytest.mark.django_db
 def test_set_up_coordinator_B(mock_api):
-    """Check service function adds User who is not a Group member."""
+    """Check service function adds User who is not already a Group member."""
     user = UserFactory()
     mock_api.group.members.return_value = []
 
@@ -103,3 +108,30 @@ def test_set_up_coordinator_B(mock_api):
 
     mock_api.group.members.assert_called_once()
     mock_api.group.add_user.assert_called_once_with(user.email)
+
+
+@pytest.mark.django_db
+def test_tear_down_coordinator_A(mock_api):
+    """Check service function removes User who is already a Group member."""
+    user = UserFactory()
+    mock_api.group.members.return_value = [user.email]
+    mock_api.user.get.return_value = {"id": user.id}
+
+    tear_down_coordinator(user)
+
+    mock_api.group.members.assert_called_once()
+    mock_api.user.get.assert_called_once_with(user.email)
+    mock_api.group.remove_user.assert_called_once_with(user.id)
+
+
+@pytest.mark.django_db
+def test_tear_down_coordinator_B(mock_api):
+    """Check service function doesn't remove User who is not already a Group member."""
+    user = UserFactory()
+    mock_api.group.members.return_value = []
+
+    tear_down_coordinator(user)
+
+    mock_api.group.members.assert_called_once()
+    mock_api.user.get.assert_not_called()
+    mock_api.group.remove_user.assert_not_called()
