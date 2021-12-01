@@ -1,5 +1,8 @@
 from core.models.issue import CaseTopic
+
 from microsoft.endpoints import MSGraphAPI
+
+from django.conf import settings
 
 
 # Paths for template folders.
@@ -28,9 +31,11 @@ def set_up_new_case(issue):
     Make a copy of the relevant templates folder with the name of the new case.
     """
     api = MSGraphAPI()
+
     template_path = TEMPLATE_PATHS[issue.topic]
     case_folder_name = str(issue.id)
-    parent_folder_id = api.folder.get("cases")["id"]
+    parent_folder_id = settings.CASES_FOLDER_ID
+
     api.folder.copy(template_path, case_folder_name, parent_folder_id)
 
 

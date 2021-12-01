@@ -2,14 +2,17 @@ from unittest import mock
 import pytest
 
 from microsoft.service import (
+    TEMPLATE_PATHS,
     set_up_new_user,
+    set_up_new_case,
     add_user_to_case,
     set_up_coordinator,
     tear_down_coordinator,
 )
 from microsoft.endpoints import MSGraphAPI
-
 from core.factories import UserFactory, IssueFactory
+
+from django.conf import settings
 
 
 @pytest.fixture
@@ -71,6 +74,18 @@ def test_set_up_new_user_B(mock_api):
     )
     mock_api.user.assign_license.assert_called_once_with(user.email)
     assert password == "open sesame"
+
+
+@pytest.mark.django_db
+def test_set_up_new_case(mock_api):
+    """Check service function creates new case folder and places it inside parent folder."""
+    issue = IssueFactory()
+
+    set_up_new_case(issue)
+
+    mock_api.folder.copy.assert_called_once_with(
+        TEMPLATE_PATHS[issue.topic], str(issue.id), settings.CASES_FOLDER_ID
+    )
 
 
 @pytest.mark.django_db
