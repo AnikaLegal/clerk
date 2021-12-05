@@ -31,3 +31,4 @@ services:
       GOOGLE_OAUTH2_SECRET: ""
       AZURE_AD_CLIENT_ID: ""
       AZURE_AD_CLIENT_SECRET: ""
+      SLACK_API_TOKEN: ""

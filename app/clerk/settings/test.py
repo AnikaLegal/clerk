@@ -1,4 +1,4 @@
-from . import *
+from .base import *
 
 SUBMISSION_EMAILS = ["test@example.com"]
 
@@ -39,3 +39,5 @@ MAILCHIMP_REPAIRS_EMAIL_ID = ""
 
 # MS Graph Integration
 CASES_FOLDER_ID = "014GE5DG2XPLXZF3NLYNGK4IDSYOAG5ICE"
+
+CLERK_BASE_URL = "http://localhost:8000"

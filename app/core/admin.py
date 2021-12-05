@@ -95,6 +95,7 @@ class IssueAdmin(admin.ModelAdmin):
     exclude = ("answers",)
     list_display = (
         "id",
+        "fileref",
         "topic_pretty",
         "client_link",
         "is_alert_sent",
