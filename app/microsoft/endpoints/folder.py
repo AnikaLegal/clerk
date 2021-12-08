@@ -1,5 +1,4 @@
 import os
-
 import requests
 from django.conf import settings
 
@@ -13,58 +12,66 @@ class FolderEndpoint(BaseEndpoint):
     https://docs.microsoft.com/en-us/graph/api/resources/driveitem
     """
 
-    base_url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive"
+    MIDDLE_URL = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/"
 
     def get(self, path):
         """
-        Get the Folder inside the Group (Staging or Production) Drive (filesystem).
+        Get the Folder inside the Group Drive (filesystem).
         Returns driveItem object or None.
         """
-        url = os.path.join(self.base_url, f"root:/{path}")
+        url = os.path.join(self.MIDDLE_URL, path)
+
         return super().get(url)
 
     def get_children(self, path):
         """
-        Get the child items inside a folder.
+        Get child items (folders, files) inside current folder
         """
-        url = os.path.join(self.base_url, f"root:/{path}:/children")
-        data = super().get(url)
-        return data
+        url = os.path.join(self.MIDDLE_URL, f"{path}:/children")
+
+        return super().get(url)
 
     def get_all_files(self, path):
         """
-        Get all files inside a folder.
+        Recursively get all files inside current folder.
         """
-        url = os.path.join(self.base_url, f"root:/{path}:/children")
-        children_data = super().get(url)
-        files = []
+        children_data = self.get_children(path)
         children = children_data["value"] if children_data else []
+
+        all_files = []
+
         for item in children:
             if item.get("file"):
-                # It's a file
-                files.append(item)
+                all_files.append(item)
             elif item.get("folder"):
-                # It's a folder
                 has_children = item.get("folder", {}).get("childCount", 0) > 0
+
                 if has_children:
-                    folder_path = os.path.join(path, item["name"])
-                    folder_child_files = self.get_all_files(folder_path)
-                    files += folder_child_files
+                    folder_children = self.get_all_files(
+                        os.path.join(path, item["name"])
+                    )
+                    all_files += folder_children
 
-        return files
+        return all_files
 
-    def download_file(self, file_drive_id):
+    def download_file(self, file_id):
         """
-        Returns filename, minemtype, file bytes
+        Returns file name, MIME type, file bytes
         """
-        file_url = os.path.join(self.base_url, f"items/{file_drive_id}")
-        file_data = super().get(file_url)
-        filename = file_data["name"]
+        file_data = super().get(
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
+        )
+        file_name = file_data["name"]
         mimetype = file_data["file"]["mimeType"]
-        url = os.path.join(BASE_URL, self.base_url, f"items/{file_drive_id}/content")
+
+        url = os.path.join(
+            BASE_URL,
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}/content",
+        )
         resp = requests.get(url, headers=self.headers, stream=False)
         resp.raise_for_status()
-        return filename, mimetype, resp.content
+
+        return file_name, mimetype, resp.content
 
     def copy(self, path, name, parent_id):
         """
@@ -77,7 +84,8 @@ class FolderEndpoint(BaseEndpoint):
             "name": name,
             "parentReference": {"driveId": settings.MS_GRAPH_DRIVE_ID, "id": parent_id},
         }
-        url = os.path.join(self.base_url, f"root:/{path}:/copy")
+        url = os.path.join(self.MIDDLE_URL, f"{path}:/copy")
+
         return super().post(url, data)
 
     def list_permissions(self, path):
@@ -85,7 +93,8 @@ class FolderEndpoint(BaseEndpoint):
         List the Folder's permissions.
         Returns list of permissions or None if Folder doesn't exist.
         """
-        url = os.path.join(self.base_url, f"root:/{path}:/permissions")
+        url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions")
+
         return super().get(url)
 
     def delete_permission(self, path, perm_id):
@@ -94,9 +103,9 @@ class FolderEndpoint(BaseEndpoint):
         Returns None if successful or Folder doesn't exist.
         Raises HTTPError if permission doesn't exist.
         """
-        return super().delete(
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/permissions/{perm_id}"
-        )
+        url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions/{perm_id}")
+
+        return super().delete(url)
 
     def create_permissions(self, path, role, emails):
         """
@@ -104,6 +113,7 @@ class FolderEndpoint(BaseEndpoint):
         Returns permissions created or None if Folder doesn't exist.
         """
         assert role in ["read", "write"]
+
         data = {
             # Do not remove fields or POST request might fail.
             "requireSignIn": True,
@@ -111,7 +121,6 @@ class FolderEndpoint(BaseEndpoint):
             "roles": [role],
             "recipients": [{"email": email} for email in emails],
         }
+        url = os.path.join(self.MIDDLE_URL, f"{path}:/invite")
 
-        return super().post(
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/{path}:/invite", data
-        )
+        return super().post(url, data)

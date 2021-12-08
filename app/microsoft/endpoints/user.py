@@ -1,7 +1,6 @@
 from .base import BaseEndpoint
 from .helpers import generate_password
 
-# Office E1 License SKU ID
 # https://www.microsoft.com/en-au/microsoft-365/enterprise/office-365-e1
 OFFICE_E1_LICENSE_SKU_ID = "18181a46-0d4e-45cd-891e-60aabd171b4e"
 

@@ -1,7 +1,7 @@
 import requests
 import logging
 
-from .helpers import BASE_URL, HTTP_HEADERS
+from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS
 
 logger = logging.getLogger(__name__)
 
