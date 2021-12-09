@@ -140,12 +140,12 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/cam.jpeg",
-        "name": "Cameron Horn",
+        "image": "web/img/photos/team/zoe.jpeg",
+        "name": "Zoe Chan",
         "title": "Principal Lawyer",
         "brags": [
-            "Cameron is our Principal Lawyer and is responsible for issuing our legal advice",
-            "Cameron was previously the Principal Solicitor of Tenants Victoria and a Legal Counsel at Victoria Legal Aid",
+            "Zoe is our Principal lawyer, and is responsible for developing and delivering the legal service we provide.",
+            "Zoe was previously a lawyer at Justice Connect, where she gained experience in civil litigation, pro bono projects, and designing user centred service improvements.",
         ],
     },
     {
@@ -172,15 +172,6 @@ TEAM_MEMBERS = [
         "brags": [
             "Gwilym leads our Operations portfolio, which keeps the engine of our legal practice running",
             "Gwilym has experience in workforce management, analysis and process optimisation at Uber",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/kate.jpeg",
-        "name": "Kate Robinson",
-        "title": "Head of User",
-        "brags": [
-            "Kate leads our User Portfolio, which ensures that Anika’s marketing and services are user-focused",
-            "Kate is also a Digital producer at Conversion Digital and has extensive marketing and project management experience",
         ],
     },
     {
