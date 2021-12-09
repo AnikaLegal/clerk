@@ -16,7 +16,7 @@
     {% include 'case/case/_status.html' with issue=issue %}
 </div>
 <div class="ui top attached tabular menu">
-    <a href="{% url 'case-detail' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
+    <a href="{% url 'case-detail-view' issue.pk %}" class="item {% if active == 'detail' %}active{% endif %}">            
         <i class="clipboard outline icon"></i>
         Details
     </a>

@@ -21,6 +21,8 @@ class NoteType:
     EVENT = "EVENT"
     # An event related to an email
     EMAIL = "EMAIL"
+    # An event related to a conflict check
+    CONFLICT_CHECK = "CONFLICT_CHECK"
 
 
 class IssueNote(TimestampedModel):
@@ -35,6 +37,7 @@ class IssueNote(TimestampedModel):
         NoteType.PERFORMANCE,
         NoteType.EVENT,
         NoteType.EMAIL,
+        NoteType.CONFLICT_CHECK,
     ]
     NOTE_CHOICES = (
         (NoteType.PARALEGAL, "File note"),
@@ -42,6 +45,7 @@ class IssueNote(TimestampedModel):
         (NoteType.PERFORMANCE, "Paralegal performance review"),
         (NoteType.EVENT, "System generated event"),
         (NoteType.EMAIL, "Email"),
+        (NoteType.CONFLICT_CHECK, "Conflict check"),
     )
 
     # The case that this note is for

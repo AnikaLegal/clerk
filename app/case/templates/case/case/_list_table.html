@@ -24,7 +24,7 @@ is_open is True when all cases are open
     {% for issue in issues %}
         <tr>
             <td>
-                <a href="{% url 'case-detail' issue.pk %}">
+                <a href="{% url 'case-detail-view' issue.pk %}">
                     {{ issue.fileref }}
                 </a>
             </td>

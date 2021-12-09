@@ -179,6 +179,16 @@ class ClientMiscDynamicForm(DynamicTableForm):
     legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
 
 
+class ConflictCheckNoteForm(forms.ModelForm):
+    class Meta:
+        model = IssueNote
+        fields = [
+            "issue",
+            "creator",
+            "note_type",
+        ]
+
+
 class ParalegalNoteForm(forms.ModelForm):
     class Meta:
         model = IssueNote
@@ -400,6 +410,8 @@ class IssueCloseForm(IssueOutcomeForm):
             self.instance.save()
             self._save_m2m()
 
+        return self.instance
+
 
 class IssueReOpenForm(forms.ModelForm):
     class Meta:
@@ -423,6 +435,8 @@ class IssueReOpenForm(forms.ModelForm):
             # If committing, save the instance and the m2m data immediately.
             self.instance.save()
             self._save_m2m()
+
+        return self.instance
 
 
 class IssueAssignParalegalForm(forms.ModelForm):

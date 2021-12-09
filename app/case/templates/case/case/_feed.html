@@ -26,6 +26,16 @@ Args:
                 </div>
                 <p style="margin-bottom: 0">{{ note.get_text }}</p>                           
             </div>
+        {% elif note.note_type == 'CONFLICT_CHECK' %}
+            <div class="ui segment padded">
+                <div class="ui top attached label">
+                    Conflict check
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
+                </div>
+                <p style="margin-bottom: 0">
+                    A conflict check has been performed by {{note.creator.get_full_name}}.
+                </p>                           
+            </div>
         {% elif note.note_type == 'REVIEW' %}
             <div class="ui segment padded">
                 <div class="ui top attached label orange">

@@ -10,10 +10,8 @@
     <div class="ui two column grid" style="margin-top: 1rem;">
 
         <div class="column">
-            {# Select form from dropdown #}
-            <div class="ui secondary segment">
-                {{ case_selector }}
-            </div>
+            {# Select option from list #}
+            {% include 'case/case/_detail_options.html' %}
 
             {# Case timeline #}
             <div class="ui header">
@@ -86,10 +84,10 @@
                     </table>
 
                     {# Landord card #}
-                    {% include 'case/case/_person_details.html' with person=tenancy.landlord title="Landlord" url_path="case-landlord" %}
+                    {% include 'case/case/_person_details.html' with person=tenancy.landlord title="Landlord" url_path="case-detail-landlord" %}
 
                     {# Real estate agent card #}
-                    {% include 'case/case/_person_details.html' with person=tenancy.agent title="Real estate agent" url_path="case-agent" %}
+                    {% include 'case/case/_person_details.html' with person=tenancy.agent title="Real estate agent" url_path="case-detail-agent" %}
 
                     <h2 class="header">Other submitted data</h2>
                     <table class="ui definition table small" style="margin-bottom: 2rem">

@@ -1,6 +1,9 @@
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.utils.datastructures import MultiValueDict
+from django.contrib import messages
+from django.urls import reverse
 
 from case.forms import (
     IssueProgressForm,
@@ -9,62 +12,344 @@ from case.forms import (
     IssueAssignParalegalForm,
     IssueCloseForm,
     IssueOutcomeForm,
+    ConflictCheckNoteForm,
     IssueReOpenForm,
     ParalegalReviewNoteForm,
 )
-from case.utils import Selector, HtmxFormView
+from case.utils.router import Router
+from case.views.auth import paralegal_or_better_required, coordinator_or_better_required
 from core.models import Issue, IssueNote, Person
 from core.models.issue_note import NoteType
 
-from case.views.auth import paralegal_or_better_required
-from case.utils.router import Route
 
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
-detail_route = Route("detail").uuid("pk").slug("form_slug", optional=True)
-landlord_route = (
-    Route("landlord").uuid("pk").path("landlord").pk("person_pk", optional=True)
+router = Router("detail")
+
+
+router.create_route("view").uuid("pk")
+router.create_route("options").uuid("pk").path("options")
+router.create_route("note").uuid("pk").path("note")
+router.create_route("review").uuid("pk").path("review")
+router.create_route("performance").uuid("pk").path("performance")
+router.create_route("conflict").uuid("pk").path("conflict")
+router.create_route("assign").uuid("pk").path("assign")
+router.create_route("progress").uuid("pk").path("progress")
+router.create_route("close").uuid("pk").path("close")
+router.create_route("reopen").uuid("pk").path("reopen")
+router.create_route("outcome").uuid("pk").path("outcome")
+router.create_route("landlord").uuid("pk").path("landlord").pk(
+    "person_pk", optional=True
 )
-agent_route = Route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
+router.create_route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
 
 
-@detail_route
+CASE_DETAIL_OPTIONS = {
+    "note": {
+        "icon": "clipboard outline",
+        "text": "Add a file note",
+        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
+    },
+    "review": {
+        "icon": "clipboard outline",
+        "text": "Add a coordinator case review note",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
+    },
+    "performance": {
+        "icon": "clipboard outline",
+        "text": "Add a paralegal performance review note",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
+    },
+    "conflict": {
+        "icon": "search",
+        "text": "Record a conflict check",
+        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
+    },
+    "assign": {
+        "icon": "graduation cap",
+        "text": "Assign a paralegal to the case",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
+    },
+    "progress": {
+        "icon": "chart line",
+        "text": "Progress the case status",
+        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
+    },
+    "close": {
+        "icon": "times circle outline",
+        "text": "Close the case",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better
+        and issue.is_open,
+    },
+    "reopen": {
+        "icon": "check",
+        "text": "Re-open the case",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better
+        and not issue.is_open,
+    },
+    "outcome": {
+        "icon": "undo",
+        "text": "Edit case outcome",
+        "render_when": lambda req, issue: req.user.is_coordinator_or_better
+        and not issue.is_open,
+    },
+}
+
+
+@router.use_route("view")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
-def case_detail_view(request, pk, form_slug=""):
+def case_detail_view(request, pk):
     """
     The details of a given case.
     """
-    issue, tenancy = _get_issue_and_tenancy(request, pk)
-    case_selector = CaseSelector(request, issue)
-
+    issue = _get_issue(request, pk)
+    tenancy = _get_tenancy(issue)
     file_urls, image_urls = _get_uploaded_files(issue)
+    options = _get_case_detail_options(request, issue)
     context = {
         "issue": issue,
         "tenancy": tenancy,
         "actionstep_url": _get_actionstep_url(issue),
         "notes": _get_issue_notes(request, pk),
-        "case_selector": case_selector,
         "details": _get_submitted_details(issue),
         "file_urls": file_urls,
         "image_urls": image_urls,
         "people": Person.objects.order_by("full_name").all(),
+        "options": options,
     }
-    form_view = case_selector.handle(form_slug, context, pk)
-    if form_view:
-        return form_view
+    return render(request, "case/case/detail.html", context)
+
+
+@router.use_route("options")
+@paralegal_or_better_required
+@require_http_methods(["GET"])
+def case_detail_options_view(request, pk):
+    issue = _get_issue(request, pk)
+    options = _get_case_detail_options(request, issue)
+    context = {"options": options, "issue": issue}
+    return render(request, "case/case/_detail_options.html", context)
+
+
+def _get_case_detail_options(request, issue):
+    return [
+        {**o, "url": reverse(f"case-detail-{slug}", args=(issue.pk,))}
+        for slug, o in CASE_DETAIL_OPTIONS.items()
+        if o["render_when"](request, issue)
+    ]
+
+
+@router.use_route("note")
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_note_view(request, pk):
+    """
+    Form where paralegals can leave notes about case progress.
+    """
+    view = _build_case_note_view(
+        ParalegalNoteForm,
+        "note",
+        "case/case/forms/_file_note.html",
+        "File note created",
+        NoteType.PARALEGAL,
+    )
+    return view(request, pk)
+
+
+@router.use_route("review")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_review_view(request, pk):
+    """
+    Form where coordinators can leave a note for other coordinators
+    """
+    view = _build_case_note_view(
+        CaseReviewNoteForm,
+        "review",
+        "case/case/forms/_review_note.html",
+        "Review note created",
+        NoteType.REVIEW,
+    )
+    return view(request, pk)
+
+
+@router.use_route("performance")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_performance_view(request, pk):
+    """
+    Form where coordinators can leave a note on paralegal performance.
+    """
+    view = _build_case_note_view(
+        ParalegalReviewNoteForm,
+        "performance",
+        "case/case/forms/_paralegal_review_note.html",
+        "Review note created",
+        NoteType.PERFORMANCE,
+    )
+    return view(request, pk)
+
+
+@router.use_route("conflict")
+def case_detail_conflict_view(request, pk):
+    """
+    Form where coordinators can leave a note on paralegal performance.
+    """
+    view = _build_case_note_view(
+        ConflictCheckNoteForm,
+        "conflict",
+        "case/case/forms/_conflict_check.html",
+        "Conflict check record created",
+        NoteType.CONFLICT_CHECK,
+    )
+    return view(request, pk)
+
+
+def _build_case_note_view(Form, slug, template, success_message, note_type):
+    """
+    Returns a view that renders a form where you can add a type of note to the case
+    """
+
+    def case_note_view(request, pk):
+        context = {}
+        issue = _get_issue(request, pk)
+        if request.method == "POST":
+            default_data = {
+                "issue": issue,
+                "creator": request.user,
+                "note_type": note_type,
+            }
+            form_data = _add_form_data(request.POST, default_data)
+            form = Form(form_data)
+            if form.is_valid():
+                form.save()
+                context.update({"notes": _get_issue_notes(request, pk)})
+                messages.success(request, success_message)
+        else:
+            form = Form()
+
+        url = reverse(f"case-detail-{slug}", args=(pk,))
+        options_url = reverse("case-detail-options", args=(pk,))
+        context.update(
+            {"form": form, "issue": issue, "url": url, "options_url": options_url}
+        )
+        return render(request, template, context)
+
+    return case_note_view
+
+
+@router.use_route("assign")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_assign_view(request, pk):
+    """
+    Form where coordinators can assign a paralegal to a case
+    """
+    context = {}
+    issue = _get_issue(request, pk)
+    if request.method == "POST":
+        form = IssueAssignParalegalForm(request.POST, instance=issue)
+        if form.is_valid():
+            issue = form.save()
+            context.update({"new_paralegal": issue.paralegal})
+            messages.success(request, "Assignment successful")
     else:
-        return render(request, "case/case/detail.html", context)
+        form = IssueAssignParalegalForm()
+
+    url = reverse(f"case-detail-assign", args=(pk,))
+    options_url = reverse(f"case-detail-options", args=(pk,))
+    context.update(
+        {"form": form, "issue": issue, "url": url, "options_url": options_url}
+    )
+    return render(request, "case/case/forms/_assign_paralegal.html", context)
 
 
-@agent_route
+@router.use_route("progress")
+@paralegal_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_progress_view(request, pk):
+    """
+    Form where anyone can progress the case.
+    """
+    view = _build_case_update_view(
+        IssueProgressForm,
+        "progress",
+        "case/case/forms/_progress.html",
+        "Update successful",
+    )
+    return view(request, pk)
+
+
+@router.use_route("close")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_close_view(request, pk):
+    """
+    Form where you close the case.
+    """
+    view = _build_case_update_view(
+        IssueCloseForm, "close", "case/case/forms/_close.html", "Case closed!"
+    )
+    return view(request, pk)
+
+
+@router.use_route("reopen")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_reopen_view(request, pk):
+    """
+    Form where you reopen the case.
+    """
+    view = _build_case_update_view(
+        IssueReOpenForm, "reopen", "case/case/forms/_reopen.html", "Case re-opened"
+    )
+    return view(request, pk)
+
+
+@router.use_route("outcome")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def case_detail_outcome_view(request, pk):
+    """
+    Form where you update the outcome of the case.
+    """
+    view = _build_case_update_view(
+        IssueOutcomeForm, "outcome", "case/case/forms/_outcome.html", "Outcome updated"
+    )
+    return view(request, pk)
+
+
+def _build_case_update_view(Form, slug, template, success_message):
+    """
+    Returns a view that renders a form where you update the case.
+    """
+
+    def case_update_view(request, pk):
+        issue = _get_issue(request, pk)
+        if request.method == "POST":
+            form = Form(request.POST, instance=issue)
+            if form.is_valid():
+                issue = form.save()
+                messages.success(request, success_message)
+        else:
+            form = Form(instance=issue)
+
+        url = reverse(f"case-detail-{slug}", args=(pk,))
+        options_url = reverse(f"case-detail-options", args=(pk,))
+        context = {"form": form, "issue": issue, "url": url, "options_url": options_url}
+        return render(request, template, context)
+
+    return case_update_view
+
+
+@router.use_route("agent")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def agent_selet_view(request, pk):
     return _person_select_view(request, pk, "agent")
 
 
-@landlord_route
+@router.use_route("landlord")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def landlord_selet_view(request, pk):
@@ -72,13 +357,14 @@ def landlord_selet_view(request, pk):
 
 
 def _person_select_view(request, pk, person_type):
-    issue, tenancy = _get_issue_and_tenancy(request, pk)
+    issue = _get_issue(request, pk)
+    tenancy = _get_tenancy(issue)
     title = "Landlord" if person_type == "landlord" else "Real estate agent"
     context = {
         "title": title,
         "issue": issue,
         "person": None,
-        "url_path": f"case-{person_type}",
+        "url_path": f"case-detail-{person_type}",
         "people": Person.objects.order_by("full_name").all(),
     }
     if request.method == "DELETE":
@@ -99,221 +385,24 @@ def _person_select_view(request, pk, person_type):
     return render(request, "case/case/_person_details.html", context)
 
 
-class CaseReviewHtmxFormView(HtmxFormView):
-    """
-    Form where coordinators can leave a note for other coordinators
-    """
-
-    template = "case/case/forms/_review_note.html"
-    success_message = "Note created"
-    form_cls = CaseReviewNoteForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_success_context(self, request, context, pk, *args, **kwargs):
-        return {"notes": _get_issue_notes(request, pk)}
-
-    def get_default_form_data(self, request, context, *args, **kwargs):
-        return {
-            "issue": context["issue"],
-            "creator": request.user,
-            "note_type": NoteType.REVIEW,
-        }
+def _get_tenancy(issue):
+    # FIXME: Assume only only tenancy but that's not how the models work.
+    tenancy = issue.client.tenancy_set.first()
+    return tenancy
 
 
-class ParalegalReviewHtmxFormView(HtmxFormView):
-    """
-    Form where coordinators can leave a note on paralegal performance.
-    """
-
-    template = "case/case/forms/_paralegal_review_note.html"
-    success_message = "Note created"
-    form_cls = ParalegalReviewNoteForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_success_context(self, request, context, pk, *args, **kwargs):
-        return {"notes": _get_issue_notes(request, pk)}
-
-    def get_default_form_data(self, request, context, *args, **kwargs):
-        return {
-            "issue": context["issue"],
-            "creator": request.user,
-            "note_type": NoteType.PERFORMANCE,
-        }
-
-
-class FileNoteHtmxFormView(HtmxFormView):
-    """
-    Form where anyone working on the case can leave a public file note
-    """
-
-    template = "case/case/forms/_paralegal_note.html"
-    success_message = "Note created"
-    form_cls = ParalegalNoteForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_paralegal_or_better
-
-    def get_success_context(self, request, context, pk, *args, **kwargs):
-        return {"notes": _get_issue_notes(request, pk)}
-
-    def get_default_form_data(self, request, context, *args, **kwargs):
-        return {
-            "issue": context["issue"],
-            "creator": request.user,
-            "note_type": NoteType.PARALEGAL,
-        }
-
-
-class AssignParalegalHtmxFormView(HtmxFormView):
-    """
-    Form where coordinators can assign a paralegal to a case
-    """
-
-    template = "case/case/forms/_assign_paralegal.html"
-    success_message = "Assignment successful"
-    form_cls = IssueAssignParalegalForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_success_context(self, request, context, pk, *args, **kwargs):
-        return {"new_paralegal": context["issue"].paralegal}
-
-    def get_form_instance(self, request, context, *args, **kwargs):
-        return context["issue"]
-
-
-class CaseProgressHtmxFormView(HtmxFormView):
-    """
-    Form where anyone can progress the case.
-    """
-
-    template = "case/case/forms/_progress.html"
-    success_message = "Update successful"
-    form_cls = IssueProgressForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_paralegal_or_better
-
-    def get_form_instance(self, request, context, *args, **kwargs):
-        return context["issue"]
-
-
-class CaseCloseHtmxFormView(HtmxFormView):
-    """
-    Form where you close the case.
-    """
-
-    template = "case/case/forms/_close.html"
-    success_message = "Case closed!"
-    form_cls = IssueCloseForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_form_instance(self, request, context, *args, **kwargs):
-        return context["issue"]
-
-
-class CaseOutcomeHtmxFormView(HtmxFormView):
-    """
-    Form where you update the outcome of the case.
-    """
-
-    template = "case/case/forms/_outcome.html"
-    success_message = "Outcome updated"
-    form_cls = IssueOutcomeForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_form_instance(self, request, context, *args, **kwargs):
-        return context["issue"]
-
-
-class CaseReOpenHtmxFormView(HtmxFormView):
-    """
-    Form where you open the case.
-    """
-
-    template = "case/case/forms/_reopen.html"
-    success_message = "Case re-opened"
-    form_cls = IssueReOpenForm
-
-    def is_user_allowed(self, request):
-        return request.user.is_coordinator_or_better
-
-    def get_form_instance(self, request, context, *args, **kwargs):
-        return context["issue"]
-
-
-class CaseSelector(Selector):
-    """
-    A drop down where users can select the actions that they want to take for a case.
-    """
-
-    def __init__(self, request, issue):
-        super().__init__(request)
-        self.options = {**CaseSelector.options}
-        if issue.is_open:
-            del self.options["reopen"]
-        else:
-            del self.options["close"]
-
-        when_allowed = lambda view, req: view.is_user_allowed(req)
-        when_closed = lambda view, req: when_allowed(view, req) and not issue.is_open
-        when_open = lambda view, req: when_allowed(view, req) and issue.is_open
-        self.render_when = {
-            k: when_allowed
-            for k in ("note", "review", "progress", "assign", "performance")
-        }
-        self.render_when["close"] = when_open
-        self.render_when["reopen"] = when_closed
-        self.render_when["outcome"] = when_closed
-
-    slug = "case"
-    default_text = "I want to..."
-    render_when = {}
-    child_views = {
-        "note": FileNoteHtmxFormView(),
-        "review": CaseReviewHtmxFormView(),
-        "assign": AssignParalegalHtmxFormView(),
-        "progress": CaseProgressHtmxFormView(),
-        "performance": ParalegalReviewHtmxFormView(),
-        "close": CaseCloseHtmxFormView(),
-        "reopen": CaseReOpenHtmxFormView(),
-        "outcome": CaseOutcomeHtmxFormView(),
-    }
-    options = {
-        "note": "Add a file note",
-        "review": "Add a coordinator's case review note",
-        "performance": "Add a paralegal performance review note",
-        "assign": "Assign a paralegal to the case",
-        "progress": "Progress case status",
-        "outcome": "Edit case outcome",
-        "close": "Close the case",
-        "reopen": "Re-open the case",
-    }
-
-
-def _get_issue_and_tenancy(request, pk):
+def _get_issue(request, pk):
     try:
         issue = (
             Issue.objects.check_permisisons(request)
-            .select_related("client")
+            .select_related("client", "paralegal")
             .prefetch_related("fileupload_set")
             .get(pk=pk)
         )
     except Issue.DoesNotExist:
         raise Http404()
 
-    # FIXME: Assume only only tenancy but that's not how the models work.
-    tenancy = issue.client.tenancy_set.first()
-    return issue, tenancy
+    return issue
 
 
 def _get_uploaded_files(issue):
@@ -367,3 +456,7 @@ def _get_issue_notes(request, pk):
 def _get_actionstep_url(issue):
     if issue.actionstep_id:
         return f"https://ap-southeast-2.actionstep.com/mym/asfw/workflow/action/overview/action_id/{issue.actionstep_id}"
+
+
+def _add_form_data(form_data, extra_data):
+    return MultiValueDict({**{k: [v] for k, v in extra_data.items()}, **form_data})
