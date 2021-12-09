@@ -11,7 +11,7 @@ from .views import root
 
 urlpatterns = [
     path("paralegals/", paralegal_router.include()),
-    path("person/", person_router.include()),
+    path("parties/", person_router.include()),
     path("tenancy/", tenancy_router.include()),
     path("client/", client_router.include()),
     path("accounts/", accounts_router.include()),
