@@ -7,6 +7,7 @@ from microsoft.service import (
     set_up_new_case,
     add_user_to_case,
     remove_user_from_case,
+    get_case_folder_info,
     set_up_coordinator,
     tear_down_coordinator,
 )
@@ -145,6 +146,45 @@ def test_remove_user_from_case_C(mock_api):
     mock_api.folder.delete_permission.assert_called_once_with(
         f"cases/{issue.id}", "666"
     )
+
+
+@pytest.mark.django_db
+def test_get_case_folder_info_A(mock_api):
+    """Check service function when the case folder doesn't exist."""
+    issue = IssueFactory()
+    mock_api.folder.get_children.return_value = None
+    mock_api.folder.get.return_value = None
+
+    documents, url = get_case_folder_info(issue)
+
+    mock_api.folder.get_children.assert_called_once_with(f"cases/{issue.id}")
+    mock_api.folder.get.assert_called_once_with(f"cases/{issue.id}")
+    assert documents == []
+    assert url == None
+
+
+@pytest.mark.django_db
+def test_get_case_folder_info_B(mock_api):
+    """Check service function when there is a proper case folder."""
+    issue = IssueFactory()
+    mock_api.folder.get_children.return_value = {
+        "value": [
+            {
+                "name": "War and Peace",
+                "webUrl": "https://en.wikipedia.org/wiki/War_and_Peace",
+            }
+        ]
+    }
+    mock_api.folder.get.return_value = {
+        "webUrl": "https://en.wikipedia.org/wiki/Leo_Tolstoy"
+    }
+
+    documents, url = get_case_folder_info(issue)
+
+    mock_api.folder.get_children.assert_called_once_with(f"cases/{issue.id}")
+    mock_api.folder.get.assert_called_once_with(f"cases/{issue.id}")
+    assert documents[0][0] == "War and Peace"
+    assert url == "https://en.wikipedia.org/wiki/Leo_Tolstoy"
 
 
 @pytest.mark.django_db
