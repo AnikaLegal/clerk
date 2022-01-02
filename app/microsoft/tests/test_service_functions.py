@@ -6,6 +6,7 @@ from microsoft.service import (
     set_up_new_user,
     set_up_new_case,
     add_user_to_case,
+    remove_user_from_case,
     set_up_coordinator,
     tear_down_coordinator,
 )
@@ -98,6 +99,51 @@ def test_add_user_to_case(mock_api):
 
     mock_api.folder.create_permissions.assert_called_once_with(
         f"cases/{issue.id}", "write", [user.email]
+    )
+
+
+@pytest.mark.django_db
+def test_remove_user_from_case_A(mock_api):
+    """Check service function when there are no permissions on the case folder."""
+    user = UserFactory()
+    issue = IssueFactory()
+    mock_api.folder.list_permissions.return_value = None
+
+    remove_user_from_case(user, issue)
+
+    mock_api.folder.list_permissions.assert_called_once_with(f"cases/{issue.id}")
+    mock_api.folder.delete_permission.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_remove_user_from_case_B(mock_api):
+    """Check service function when there are permissions on the case folder that don't belong to our user."""
+    user = UserFactory(email="donald.duck@anikalegal.com")
+    issue = IssueFactory()
+    mock_api.folder.list_permissions.return_value = [
+        ("666", {"user": {"email": "bugs.bunny@anikalegal.com"}})
+    ]
+
+    remove_user_from_case(user, issue)
+
+    mock_api.folder.list_permissions.assert_called_once_with(f"cases/{issue.id}")
+    mock_api.folder.delete_permission.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_remove_user_from_case_C(mock_api):
+    """Check service function when there are permissions on the case folder belonging to our user."""
+    user = UserFactory(email="donald.duck@anikalegal.com")
+    issue = IssueFactory()
+    mock_api.folder.list_permissions.return_value = [
+        ("666", {"user": {"email": "donald.duck@anikalegal.com"}})
+    ]
+
+    remove_user_from_case(user, issue)
+
+    mock_api.folder.list_permissions.assert_called_once_with(f"cases/{issue.id}")
+    mock_api.folder.delete_permission.assert_called_once_with(
+        f"cases/{issue.id}", "666"
     )
 
 

@@ -77,7 +77,7 @@ def get_case_folder_info(issue):
 
     case_path = f"cases/{issue.id}"
 
-    # Get the list of files (name, file URL) for the case folder
+    # Get the list of files (name, file URL) for the case folder.
     json = api.folder.get_children(case_path)
 
     list_files = []
@@ -86,7 +86,7 @@ def get_case_folder_info(issue):
         for item in json["value"]:
             list_files.append((item["name"], item["webUrl"]))
 
-    # Get the case folder URL
+    # Get the case folder URL.
     folder = api.folder.get(case_path)
     folder_url = folder["webUrl"] if folder else None
 
