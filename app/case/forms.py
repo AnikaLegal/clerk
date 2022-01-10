@@ -66,7 +66,7 @@ class EmailForm(forms.ModelForm):
     )
 
     @transaction.atomic
-    def save(self, commit=True):
+    def save(self):
         email = super().save()
         sharepoint_ids = [
             s for s in self.data.get("sharepoint_attachments", "").split(",") if s

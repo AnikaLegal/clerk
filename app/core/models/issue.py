@@ -13,9 +13,11 @@ class CaseTopic:
     REPAIRS = "REPAIRS"
     RENT_REDUCTION = "RENT_REDUCTION"
     EVICTION = "EVICTION"
+    BONDS = "BONDS"
     OTHER = "OTHER"
     CHOICES = (
         (REPAIRS, "Repairs"),
+        (BONDS, "Bonds"),
         (RENT_REDUCTION, "Rent reduction"),
         (EVICTION, "Eviction"),
         (OTHER, "Other"),
