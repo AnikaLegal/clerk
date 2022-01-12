@@ -101,7 +101,7 @@ def send_weekly_report_slack():
     quarterly_text = get_report_text(90)
     annual_text = get_report_text(365)
     text = (
-        "*Weekly Metrics Report*\n"
+        "*Monthly Metrics Report*\n"
         "This is an automated weekly report on some of our key metrics.\n\n"
         f"\tIn the last 90 days we saw:\n\n{quarterly_text}\n\n"
         f"\tIn the last 365 days we saw:\n\n{annual_text}\n\n"
@@ -145,7 +145,7 @@ def get_report_text(num_days: int, show_outcomes=True):
                 created_at__gte=start_time, is_open=False, outcome=key
             ).count()
             issues_outcome_percent = int(100 * issues_outcome / issues_closed_total)
-            text += f"\n\t\t\t• {display}: {issues_outcome}, {issues_outcome_percent}%"
+            text += f"\n\t\t\t• {display}: {issues_outcome} ({issues_outcome_percent}%)"
 
         stats.append(text)
 
