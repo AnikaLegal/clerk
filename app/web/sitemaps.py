@@ -27,6 +27,7 @@ class StaticSitemap(sitemaps.Sitemap):
             "services",
             "repairs",
             "evictions",
+            "bonds",
             "refer",
             "philanthropy-partners",
             "corporate-partners",
