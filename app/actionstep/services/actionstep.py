@@ -291,11 +291,21 @@ def _sync_filenotes():
                     )
 
             elif filenote["source"] == "User" and (not is_link_note):
-                #  O'Connor, Grace
                 lastname, firstname = filenote["enteredBy"].split(",")
                 lastname, firstname = lastname.strip(), firstname.strip()
-                user = User.objects.get(first_name=firstname, last_name=lastname)
                 actionstep_id = int(filenote["id"])
+                try:
+                    user = User.objects.get(first_name=firstname, last_name=lastname)
+                except User.DoesNotExist:
+                    logging.info(
+                        "Could not find User<%s, %s> when fetching filenote with actionstep ID %s for Issue<%s>.",
+                        firstname,
+                        lastname,
+                        actionstep_id,
+                        issue.pk,
+                    )
+                    continue
+
                 filenote["enteredTimestamp"]
 
                 # 2021-04-30T12:05:03+12:00'
