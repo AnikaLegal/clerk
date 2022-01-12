@@ -31,6 +31,7 @@ Here is the implementation:
 ```
 .
 ├── templates
+|   ├── bonds               bonds templates
 |   ├── repairs             repairs templates
 |   └── evictions           evictions templates
 └── cases

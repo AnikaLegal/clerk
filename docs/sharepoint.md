@@ -31,6 +31,7 @@ When a case is created in Clerk the system will create the case folder and copy 
 ```
 .
 ├── templates
+|   ├── bonds               bonds templates
 |   ├── repairs             repairs templates
 |   └── evictions           evictions templates
 └── cases

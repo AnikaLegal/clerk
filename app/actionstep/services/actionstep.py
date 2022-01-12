@@ -25,12 +25,14 @@ logger = logging.getLogger(__name__)
 
 PREFIX_LOOKUP = {
     CaseTopic.REPAIRS: "R",
+    CaseTopic.BONDS: "B",
     CaseTopic.RENT_REDUCTION: "C",
     CaseTopic.OTHER: "O",
     CaseTopic.EVICTION: "E",
 }
 
 ACTION_TYPE_LOOKUP = {
+    CaseTopic.BONDS: ActionType.BONDS,
     CaseTopic.REPAIRS: ActionType.REPAIRS,
     CaseTopic.RENT_REDUCTION: ActionType.COVID,
     CaseTopic.OTHER: ActionType.GENERAL,

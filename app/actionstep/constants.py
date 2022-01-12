@@ -5,6 +5,7 @@ class ActionType:
 
     GENERAL = "General"
     REPAIRS = "Residential Repairs"
+    BONDS = "Bonds Recovery"
     EVICTION = "Eviction"
     COVID = "COVID Rent Reduction"
 
