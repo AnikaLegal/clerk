@@ -7,6 +7,7 @@ from django.conf import settings
 
 # Paths for template folders.
 TEMPLATE_PATHS = {
+    CaseTopic.BONDS: "templates/bonds",
     CaseTopic.REPAIRS: "templates/repairs",
     CaseTopic.EVICTION: "templates/evictions",
 }
