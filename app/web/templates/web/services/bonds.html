@@ -1,0 +1,97 @@
+{% extends "web/_base.html" %} 
+{% load static %}
+{% block title %}Bond Recovery{% endblock %} 
+{% block social_meta %}
+{% include 'web/snippets/_social_meta.html' with title="Bond Recovery" description="You’re moving out of your rental and it’s time to apply for your bond deposit. Whether you or your landlord are trying to negotiate the amount that is paid back at the end of your tenancy, we can guide you through the steps involved." %}            
+{% endblock %}
+{% block content %}
+<div class="segment">
+    <div class="container wide">
+        <div class="story left">
+            <div class="content">
+                <h1>Need help getting your bond back?</h1>
+                <p>
+                    You’re moving out of your rental and it’s time to apply for your bond deposit.
+                </p>
+                <p>
+                    Has your landlord still not started the process of getting your bond back? What’s changed since the condition report? Are you unsure if an amount is going to be deducted? Whether you or your landlord are trying to negotiate the amount that is paid back at the end of your tenancy, we can guide you through the steps involved.
+                </p>
+                <p>
+                    Need assistance getting your bond back? We’re here to help.
+                </p>
+                <a href="https://intake.anikalegal.com/">
+                    <button>Get started today</button>
+                </a>
+            </div>
+            <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/bonds-hero.jpg' %}">
+        </div>
+    </div>
+</div>
+<div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/services/coffee.jpg' %}">
+    <div class="content">
+        <h2>What does it involve?</h2>
+        <p>
+        Start your case with us and you’ll receive free legal assistance and advice that is:
+        </p>
+        <ul>
+            <li>Specific to your circumstances</li> 
+            <li>Online and easy to understand</li>
+            <li>Within 2 working days of starting your case</li>
+        </ul>
+        <p>
+            Whether it’s assistance applying for your bond, negotiating with the landlord on your behalf, or helping to prepare for VCAT, we’ll do everything we can to help! 
+        </p>
+    </div>
+</div>
+<div class="panel right round top-left bottom-left">
+    <div class="content">
+        <h2>Am I eligible?</h2>
+        <p>
+            You are eligible for this service if you’re a renter living in Victoria who cannot afford to pay for a private lawyer.
+        </p>
+        <p>
+            Still not sure if you're eligible? Submit your case, and we’ll let you know.
+        </p>
+
+
+    </div>
+    <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/services/mum.jpg' %}">
+</div>
+<div class="segment" style="padding-bottom: 0;">
+    <div class="container wide">
+        <h2>Here’s the step-by-step breakdown</h2>
+        <div class="divider"></div>
+        <div class="card-grid tight">
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}">
+                <p class="header">
+                    1. Complete our questionnaire
+                </p>
+                <p class="compact">It is <a href="https://intake.anikalegal.com/">fully online</a>  and takes less than 10 minutes</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}">
+                <p class="header">2. We’ll call you</p>
+                <p class="compact">One of our friendly team will call you within two working days to discuss your situation</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
+                <p class="header">3. Receive your personalised legal advice</p>
+                <p class="compact"> You’ll get an email outlining your rights and options</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/agreement.jpg' %}">
+                <p class="header">4. Help you to take the right next step</p>
+                <p class="compact">Whether that’s negotiating with your landlord or making an application to the Residential Tenancies Bond Authority, we’ll guide you in the right direction.</p>
+            </div>
+            <div class="card">
+                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}">
+                <p class="header">5. Reach a resolution at VCAT</p>
+                <p class="compact">If the claim is disputed, we’ll help you prepare for your VCAT hearing.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'web/snippets/_footer_cta.html' with cta="Applying to get your bond returned?" %}
+{% endblock %}

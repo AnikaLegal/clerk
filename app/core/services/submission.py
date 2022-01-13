@@ -124,6 +124,12 @@ def process_submission(sub_pk: str):
             "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
         ],
         "EVICTION": ["EVICTIONS_DOCUMENTS_UPLOAD"],
+        "BONDS": [
+            "BONDS_RTBA_APPLICATION_UPLOAD",
+            "BONDS_DAMAGE_QUOTE_UPLOAD",
+            "BONDS_CLEANING_DOCUMENT_UPLOADS",
+            "BONDS_LOCKS_CHANGE_QUOTE",
+        ],
     }
     topic = answers["ISSUES"]
     logger.info("Processing %s Issue for Submission[%s]", topic, sub_pk)
@@ -144,7 +150,9 @@ def process_submission(sub_pk: str):
             client=client,
         )
         FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
-        logger.info("Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk)
+        logger.info(
+            "Processed %s Issue[%s] for Submission[%s]", topic, issue.pk, sub_pk
+        )
     except Exception:
         logger.exception("Could not process %s Issue for Submission[%s]", topic, sub_pk)
         raise

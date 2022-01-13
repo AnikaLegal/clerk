@@ -389,6 +389,178 @@ RENT_REDUCTION_UPLOADS = [
     "1f5f6874-9af3-4996-ab8c-022e3877f50f",
 ]
 
+"""
+Test case #3
+- Bonds
+- Mostly same as repairs
+"""
+BONDS_ANSWERS = {
+    "ADDRESS": "123 Fake St",
+    "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
+    # Bonds specific answers
+    "BONDS_CLAIM_REASONS": [
+        "Damage",
+        "Rent or other money owing",
+        "Cleaning",
+        "Locks and security devices",
+        "Other reason",
+    ],
+    "BONDS_MOVE_OUT_DATE": "1990-01-01",
+    "BONDS_LOCKS_CLAIM_AMOUNT": 123,
+    "BONDS_DAMAGE_CLAIM_AMOUNT": 234,
+    "BONDS_OTHER_REASONS_AMOUNT": 345,
+    "BONDS_CLEANING_CLAIM_AMOUNT": 456,
+    "BONDS_MONEY_OWED_CLAIM_AMOUNT": 567,
+    "BONDS_DAMAGE_CAUSED_BY_TENANT": True,
+    "BONDS_LOCKS_CHANGED_BY_TENANT": True,
+    "BONDS_MONEY_IS_OWED_BY_TENANT": True,
+    "BONDS_OTHER_REASONS_DESCRIPTION": "bad breath",
+    "BONDS_CLEANING_CLAIM_DESCRIPTION": "real dirty",
+    "BONDS_MONEY_OWED_CLAIM_DESCRIPTION": "stole my car",
+    "BONDS_DAMAGE_CLAIM_DESCRIPTION": "broke the toilet",
+    "BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM": True,
+    "BONDS_TENANT_HAS_RTBA_APPLICATION_COPY": True,
+    "BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION": True,
+    "BONDS_RTBA_APPLICATION_UPLOAD": [
+        {
+            "id": "24f87cdb-619c-4159-8264-d07c783d4712",
+            "file": "https://example.com/file-uploads/ad3cab0a69bd1b07988130541d168011.pdf",
+        }
+    ],
+    "BONDS_LOCKS_CHANGE_QUOTE": [
+        {
+            "id": "14f87cdb-619c-4159-8264-d07c783d4715",
+            "file": "https://example.com/file-uploads/5d3cab0a69bd1b07988130541d168019.pdf",
+        }
+    ],
+    "BONDS_DAMAGE_QUOTE_UPLOAD": [
+        {
+            "id": "12b25edb-e19d-4a90-a20f-fcfcae84f824",
+            "file": "https://example.com/file-uploads/49e461abed6b9d81d450726f10f64cc6.png",
+        }
+    ],
+    "BONDS_CLEANING_DOCUMENT_UPLOADS": [
+        {
+            "id": "6e51ef33-82a4-4bc5-8a32-e0f883b750fb",
+            "file": "https://example.com/file-uploads/5d3cab0a69bd1b07988130541d168019.pdf",
+        },
+        {
+            "id": "862532ab-e014-4434-9921-8e147fc5d230",
+            "file": "https://example.com/file-uploads/67bdb73c57fa8e3b7f01703ddd34d76b.png",
+        },
+    ],
+    # End bonds specific answers
+    "CAN_SPEAK_NON_ENGLISH": True,
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Chinese",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "male",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
+    "IS_MULTI_INCOME_HOUSEHOLD": True,
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "BONDS",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0411111122",
+    "LAST_NAME": "Segal",
+    "LEGAL_ACCESS_DIFFICULTIES": ["SUBSTANCE_ABUSE", "DISABILITY"],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PROPERTY_MANAGER_IS_AGENT": False,
+    "REFERRER_TYPE": "LEGAL_CENTRE",
+    "SPECIAL_CIRCUMSTANCES": ["CENTRELINK", "PUBLIC_HOUSING"],
+    "START_DATE": "2019-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_INCOME_MULTI": 1000,
+    "WEEKLY_RENT_MULTI": 668,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME"],
+    "RENTAL_CIRCUMSTANCES": "PARTNER",
+}
+BONDS_CLIENT = {
+    "first_name": "Matthew",
+    "last_name": "Segal",
+    "gender": "male",
+    "email": "mattdsegal@gmail.com",
+    "date_of_birth": "1990-08-15",
+    "phone_number": "0431417373",
+    "call_times": ["WEEK_DAY", "WEEK_EVENING"],
+    "employment_status": ["STUDENT", "WORKING_PART_TIME"],
+    "special_circumstances": ["CENTRELINK", "PUBLIC_HOUSING"],
+    "weekly_income": 1000,
+    "weekly_rent": 668,
+    "rental_circumstances": "PARTNER",
+    "legal_access_difficulties": ["SUBSTANCE_ABUSE", "DISABILITY"],
+    "is_multi_income_household": True,
+    "number_of_dependents": 0,
+    "primary_language_non_english": True,
+    "primary_language": "Chinese",
+    "is_aboriginal_or_torres_strait_islander": False,
+    "referrer_type": "LEGAL_CENTRE",
+    "referrer": "Justice Connect",
+}
+BONDS_LANDLORD = {
+    "full_name": "John Smith",
+    "email": "john.smith@landlord.com",
+    "address": "321 Fake St, Fitzroy 3065",
+    "phone_number": "0411111122",
+}
+BONDS_AGENT = None
+BONDS_TENANCY = {
+    "client": "Matthew",
+    "address": "123 Fake St",
+    "suburb": "Fitzroy",
+    "postcode": "3065",
+    "started": "2019-01-01",
+    "is_on_lease": "YES",
+    "landlord": "John Smith",
+    "agent": None,
+}
+BONDS_ISSUE = {
+    "client": "Matthew",
+    "topic": "BONDS",
+    "stage": None,
+    "outcome": None,
+    "outcome_notes": "",
+    "provided_legal_services": False,
+    "answers": {
+        "BONDS_CLAIM_REASONS": [
+            "Damage",
+            "Rent or other money owing",
+            "Cleaning",
+            "Locks and security devices",
+            "Other reason",
+        ],
+        "BONDS_MOVE_OUT_DATE": "1990-01-01",
+        "BONDS_LOCKS_CLAIM_AMOUNT": 123,
+        "BONDS_DAMAGE_CLAIM_AMOUNT": 234,
+        "BONDS_OTHER_REASONS_AMOUNT": 345,
+        "BONDS_CLEANING_CLAIM_AMOUNT": 456,
+        "BONDS_MONEY_OWED_CLAIM_AMOUNT": 567,
+        "BONDS_DAMAGE_CAUSED_BY_TENANT": True,
+        "BONDS_LOCKS_CHANGED_BY_TENANT": True,
+        "BONDS_MONEY_IS_OWED_BY_TENANT": True,
+        "BONDS_OTHER_REASONS_DESCRIPTION": "bad breath",
+        "BONDS_CLEANING_CLAIM_DESCRIPTION": "real dirty",
+        "BONDS_MONEY_OWED_CLAIM_DESCRIPTION": "stole my car",
+        "BONDS_DAMAGE_CLAIM_DESCRIPTION": "broke the toilet",
+        "BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM": True,
+        "BONDS_TENANT_HAS_RTBA_APPLICATION_COPY": True,
+        "BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION": True,
+    },
+}
+BONDS_UPLOADS = [
+    "24f87cdb-619c-4159-8264-d07c783d4712",
+    "14f87cdb-619c-4159-8264-d07c783d4715",
+    "12b25edb-e19d-4a90-a20f-fcfcae84f824",
+    "6e51ef33-82a4-4bc5-8a32-e0f883b750fb",
+    "862532ab-e014-4434-9921-8e147fc5d230",
+]
+
+
 PROCESS_TESTS = (
     # answers, expected_client, expected_landlord, expected_agent, expected_tenancy, expected_issue
     (
@@ -417,6 +589,15 @@ PROCESS_TESTS = (
         RENT_REDUCTION_TENANCY,
         RENT_REDUCTION_ISSUE,
         RENT_REDUCTION_UPLOADS,
+    ),
+    (
+        BONDS_ANSWERS,
+        BONDS_CLIENT,
+        BONDS_LANDLORD,
+        BONDS_AGENT,
+        BONDS_TENANCY,
+        BONDS_ISSUE,
+        BONDS_UPLOADS,
     ),
 )
 

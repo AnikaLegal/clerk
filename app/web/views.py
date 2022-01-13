@@ -180,7 +180,7 @@ TEAM_MEMBERS = [
         "title": "Head of Strategy",
         "brags": [
             "Edward leads our Strategy portfolio, which keeps us focused on success",
-            "Edward is a Management Consultant at McKinsey & Company. Before this he worked as a solicitor at Herbert Smith Freehills.",
+            "Edward runs international expansion strategy for the Minderoo Foundation. Before this, he was a management consultant at McKinsey & Company.",
         ],
     },
     {
@@ -189,7 +189,7 @@ TEAM_MEMBERS = [
         "title": "Head of Product",
         "brags": [
             "Jess leads our Product portfolio which builds the processes and materials used by our clients and students",
-            "Jess is a law graduate at Herbert Smith Freehills",
+            "Jess is a solicitor at Herbert Smith Freehills",
         ],
     },
     {

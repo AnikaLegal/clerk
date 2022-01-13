@@ -11,7 +11,7 @@
             <div class="content">
                 <h1>What can Anika help with?</h1>
                 <p>
-                    Anika provides free legal advice and ongoing casework to vulnerable renters who are being evicted for rental arrears, or who need repairs performed in their rental.
+                    Anika provides free legal advice and ongoing casework to vulnerable renters who are being <strong>evicted</strong> for rental arrears, need <strong>repairs</strong> performed in their rental, or need assistance in getting their <strong>bond</strong> returned.
                 </p>
                 <a href="https://intake.anikalegal.com/">
                     <button>Get started today</button>
@@ -46,6 +46,16 @@
                     We can help Victorian renters who require urgent or non-urgent repairs in their rental property.
                 </p>
                 <a href="{% url 'repairs' %}">
+                    <button>Learn more</button>
+                </a>
+            </div>
+            <div class="card short">
+                <img class="icon" src="{% static 'web/img/icons/cash.svg' %}">
+                <h2>Bond recovery</h2>
+                <p>
+                    We can help Victorian renters negotiate the bond amount that is returned at the end of their tenancy.
+                </p>
+                <a href="{% url 'bonds' %}">
                     <button>Learn more</button>
                 </a>
             </div>
