@@ -26,11 +26,7 @@
         </p>
     </div>
 {% else %}
-    {% if sharing_url %}
-        <p>
-            View case documents in <a href="{{ sharing_url}}">SharePoint</a>.       
-        </p>
-    {% elif sharepoint_url %}
+    {% if sharepoint_url %}
         <p>
             View case documents in <a href="{{ sharepoint_url}}">SharePoint</a>.       
         </p>

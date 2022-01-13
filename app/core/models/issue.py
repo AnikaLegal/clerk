@@ -84,7 +84,7 @@ class CaseOutcome:
 
 
 class IssueManager(models.Manager):
-    def check_permisisons(self, request):
+    def check_permissions(self, request):
         if request.user.is_paralegal:
             # Paralegals can only see cases that they are assigned to
             return self.filter(paralegal=request.user)

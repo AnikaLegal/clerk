@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
-from microsoft.service import get_docs_info_for_case
+from microsoft.service import get_case_folder_info
 from case.views.auth import paralegal_or_better_required
 from case.utils.router import Route
 from core.models import Issue
@@ -25,7 +25,7 @@ def case_detail_documents_view(request, pk):
     """
     try:
         issue = (
-            Issue.objects.check_permisisons(request).select_related("client").get(pk=pk)
+            Issue.objects.check_permissions(request).select_related("client").get(pk=pk)
         )
     except Issue.DoesNotExist:
         raise Http404()
@@ -44,16 +44,15 @@ def case_detail_documents_view(request, pk):
 def sharepoint_docs_view(request, pk):
     try:
         issue = (
-            Issue.objects.check_permisisons(request).select_related("client").get(pk=pk)
+            Issue.objects.check_permissions(request).select_related("client").get(pk=pk)
         )
     except Issue.DoesNotExist:
         raise Http404()
 
-    documents, sharepoint_url, sharing_url = get_docs_info_for_case(issue, request.user)
+    documents, sharepoint_url = get_case_folder_info(issue)
     context = {
         "is_loading": False,
         "sharepoint_url": sharepoint_url,
-        "sharing_url": sharing_url,
         "documents": documents,
     }
     return render(request, "case/docs/_sharepoint.html", context)

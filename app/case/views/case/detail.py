@@ -394,7 +394,7 @@ def _get_tenancy(issue):
 def _get_issue(request, pk):
     try:
         issue = (
-            Issue.objects.check_permisisons(request)
+            Issue.objects.check_permissions(request)
             .select_related("client", "paralegal")
             .prefetch_related("fileupload_set")
             .get(pk=pk)

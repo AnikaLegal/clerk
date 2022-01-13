@@ -95,7 +95,17 @@ class FolderEndpoint(BaseEndpoint):
         """
         url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions")
 
-        return super().get(url)
+        json = super().get(url)
+
+        if json:
+            list_permissions = []
+
+            for item in json["value"]:
+                list_permissions.append((item["id"], item["grantedTo"]))
+
+            return list_permissions
+        else:
+            return None
 
     def delete_permission(self, path, perm_id):
         """

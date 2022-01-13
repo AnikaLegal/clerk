@@ -184,7 +184,7 @@ def _get_email_for_issue(issue, email_pk):
 def _get_issue_for_emails(request, pk):
     try:
         return (
-            Issue.objects.check_permisisons(request)
+            Issue.objects.check_permissions(request)
             .prefetch_related("email_set")
             .get(pk=pk)
         )

@@ -56,38 +56,42 @@ def remove_user_from_case(user, issue):
     Delete the permissions that a User has for a specific case (folder).
     """
     api = MSGraphAPI()
+
     case_path = f"cases/{issue.id}"
-    permissions = _get_permissions_for_paralegal(api, user, issue)
-    for perm in permissions:
-        perm_id = perm["id"]
-        api.folder.delete_permission(case_path, perm_id)
+
+    # Get the permissions for the case.
+    permissions = api.folder.list_permissions(case_path)
+
+    # Iterate through the permissions and delete those belonging to the User.
+    if permissions:
+        for perm_id, user_object in permissions:
+            email = user_object["user"].get("email")
+            if email == user.email:
+                api.folder.delete_permission(case_path, perm_id)
 
 
-def get_docs_info_for_case(issue, user):
+def get_case_folder_info(issue):
     """
-    Returns a thruple:
-        - A list of files (name, URL) for preexisting case (folder).
-        - Get the folder URL matching a case.
-        - Sharing URL for user
+    Return a tuple containing the case folder's list of files and URL.
     """
     api = MSGraphAPI()
-    docs_data = api.folder.get_children(f"cases/{issue.id}")
-    docs = []
-    if docs_data:
-        for item in docs_data["value"]:
-            file = item["name"], item["webUrl"]
-            docs.append(file)
 
-    url_data = api.folder.get(f"cases/{issue.id}")
-    url = url_data["webUrl"] if url_data else None
-    permissions = _get_permissions_for_paralegal(api, user, issue)
-    sharing_url = None
-    for perm in permissions:
-        sharing_url = perm.get("link", {}).get("webUrl")
-        if sharing_url:
-            break
+    case_path = f"cases/{issue.id}"
 
-    return docs, url, sharing_url
+    # Get the list of files (name, file URL) for the case folder.
+    json = api.folder.get_children(case_path)
+
+    list_files = []
+
+    if json:
+        for item in json["value"]:
+            list_files.append((item["name"], item["webUrl"]))
+
+    # Get the case folder URL.
+    folder = api.folder.get(case_path)
+    folder_url = folder["webUrl"] if folder else None
+
+    return list_files, folder_url
 
 
 def set_up_coordinator(user):
@@ -114,31 +118,3 @@ def tear_down_coordinator(user):
         result = api.user.get(user.email)
         user_id = result["id"]
         api.group.remove_user(user_id)
-
-
-def _get_permissions_for_paralegal(api, user, issue):
-    """
-    Get folder level permissions for a given paralegal.
-    """
-    perms = []
-    case_path = f"cases/{issue.id}"
-    permissions = api.folder.list_permissions(case_path)
-    if permissions:
-        # Iterate through the permissions and delete those belonging to the User.
-        for perm in permissions["value"]:
-            perm_identities = perm.get("grantedToIdentitiesV2")
-            if not perm_identities:
-                perm_identity = perm.get("grantedToV2")
-                if perm_identity:
-                    perm_identities = [perm_identity]
-                else:
-                    continue
-
-            for perm_identity in perm_identities:
-                perm_user = perm_identity.get("user") or perm_identity.get("siteUser")
-                if perm_user:
-                    email = perm_user["email"]
-                    if email == user.email:
-                        perms.append(perm)
-
-    return perms
