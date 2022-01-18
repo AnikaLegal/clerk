@@ -27,8 +27,6 @@ class InviteParalegalForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            raise ValidationError(f"A user with email {email} already exists.")
 
         if not email.endswith("@anikalegal.com"):
             raise ValidationError(
