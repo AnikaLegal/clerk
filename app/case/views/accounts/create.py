@@ -20,7 +20,10 @@ def account_detail_view(request):
         email = request.POST.get("email")
 
         # Is this User already in Clerk?
-        existing_user = User.objects.get(email=email)
+        try:
+            existing_user = User.objects.get(email=email)
+        except:
+            existing_user = None
 
         if existing_user and email.endswith("@anikalegal.com"):
             async_task(set_up_new_user_task, existing_user.pk)
