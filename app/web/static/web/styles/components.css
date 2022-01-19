@@ -755,6 +755,7 @@ before the final footer.
   position: relative;
   background: var(--grey);
   padding-top: 180px;
+  z-index: -1;
 }
 .pre-footer:before {
   content: "";
