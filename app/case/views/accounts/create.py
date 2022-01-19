@@ -18,12 +18,7 @@ create_route = Route("create").path("invite")
 def account_detail_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
-
-        # Is this User already in Clerk?
-        try:
-            existing_user = User.objects.get(email=email)
-        except:
-            existing_user = None
+        existing_user = User.objects.filter(email=email).last()
 
         if existing_user and email.endswith("@anikalegal.com"):
             async_task(set_up_new_user_task, existing_user.pk)
@@ -33,6 +28,7 @@ def account_detail_view(request):
             form = InviteParalegalForm(data)
             if form.is_valid():
                 user = form.save()
+                async_task(set_up_new_user_task, user.pk)
                 return redirect("account-detail", user.pk)
     else:
         context = {"form": InviteParalegalForm()}
