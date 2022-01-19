@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 
 from .models import BlogListPage
-from .forms import ContactForm
+from .forms import ContactForm, ContentFeebackForm
 
 
 @require_http_methods(["GET"])
@@ -37,6 +37,22 @@ def landing_contact_form_view(request):
         messages.success(request, "Contact request submitted")
 
     return render(request, "web/htmx/_contact_form.html", {"form": form})
+
+
+@require_http_methods(["POST"])
+def content_feedback_form_view(request):
+    form = ContentFeebackForm(request.POST)
+    is_submitted = False
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Feedback submitted, thank you for your input")
+        is_submitted = True
+
+    return render(
+        request,
+        "web/htmx/_feedback_form.html",
+        {"form": form, "page_id": form.data.get("page"), "is_submitted": is_submitted},
+    )
 
 
 @require_http_methods(["GET"])

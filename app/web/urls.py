@@ -106,5 +106,6 @@ urlpatterns = [
     ),
     # Landing page
     path("landing/contact/", views.landing_contact_form_view, name="landing-contact"),
+    path("feedback/", views.content_feedback_form_view, name="content-feedback"),
     re_path(r"^$", views.landing_view, name="landing"),
 ]

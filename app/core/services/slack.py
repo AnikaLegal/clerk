@@ -102,7 +102,7 @@ def send_weekly_report_slack():
     annual_text = get_report_text(365)
     text = (
         "*Monthly Metrics Report*\n"
-        "This is an automated weekly report on some of our key metrics.\n\n"
+        "This is an automated monthly report on some of our key metrics.\n\n"
         f"\tIn the last 90 days we saw:\n\n{quarterly_text}\n\n"
         f"\tIn the last 365 days we saw:\n\n{annual_text}\n\n"
         f"See more details at our submissions/outcomes <{PUBLIC_REPORTING_URL}|dashboard>."
@@ -131,7 +131,7 @@ def get_report_text(num_days: int, show_outcomes=True):
     ).count()
     issues_total = Issue.objects.filter(created_at__gte=start_time).count()
     serviced_percent = int(100 * issues_serviced / issues_total)
-    text = f"Legal services provided for {issues_serviced} issues started in this time period → {serviced_percent}%"
+    text = f"Legal services provided for {issues_serviced} issues started in this time period ({serviced_percent}% of submitted)"
     stats.append(text)
 
     if show_outcomes:

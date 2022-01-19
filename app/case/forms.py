@@ -181,7 +181,26 @@ class ConflictCheckNoteForm(forms.ModelForm):
             "issue",
             "creator",
             "note_type",
+            "text",
         ]
+
+    text = forms.CharField(
+        label="Conflict check note", min_length=1, max_length=2048, required=False
+    )
+    outcome = forms.ChoiceField(
+        label="Conflict check outcome",
+        choices=[
+            ("cleared", "Cleared"),
+            ("not cleared", "Not cleared"),
+        ],
+    )
+
+    @transaction.atomic
+    def save(self):
+        issue_note = super().save()
+        outcome = self.cleaned_data["outcome"]
+        issue_note.text = f"Outcome: {outcome}. {issue_note.text}"
+        issue_note.save()
 
 
 class ParalegalNoteForm(forms.ModelForm):

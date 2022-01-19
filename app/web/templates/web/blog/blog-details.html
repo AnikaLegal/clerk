@@ -36,15 +36,16 @@
             <p class="compact meta">
                 <span>By {{ page.owner.get_full_name }}</span>
                 <span class="desktop-break">|</span>
-                <span>{{ page.last_published_at|date:"D jS N 'y" }}</span>
+                <span>{{ page.first_published_at|date:"D jS N 'y" }}</span>
             </p>
         </div>
     </div>
 </div>
 
-<div class="segment" style="padding-bottom: 0;margin-bottom: -40px;">
+<div class="segment" style="padding-bottom: 0;">
     <div class="container article">
         {% include_block page.body %}
+        {% include 'web/htmx/_feedback_form.html' with page_id=page.pk %}
     </div>
 </div>
 {% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
