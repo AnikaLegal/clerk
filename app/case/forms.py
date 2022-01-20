@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from django_q.tasks import async_task
 from django.core.files.base import ContentFile
 
 from accounts.models import User, CaseGroups
@@ -12,7 +11,6 @@ from core.models import Issue, IssueNote, Client, Tenancy, Person
 from core.models.issue import CaseStage
 from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
-from microsoft.tasks import set_up_new_user_task
 from microsoft.endpoints import MSGraphAPI
 
 
@@ -27,8 +25,6 @@ class InviteParalegalForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            raise ValidationError(f"A user with email {email} already exists.")
 
         if not email.endswith("@anikalegal.com"):
             raise ValidationError(
@@ -39,7 +35,6 @@ class InviteParalegalForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         user = super().save(*args, **kwargs)
-        async_task(set_up_new_user_task, user.pk)
         return user
 
 

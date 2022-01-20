@@ -53,7 +53,7 @@ def _set_up_new_user_task(user_pk: int):
 
     # Send invite email
     password = set_up_new_user(user)
-    if password and user.email.endswith("@anikalegal.com"):
+    if password:
         # New MS account has been created.
         logger.info("Sending invite email to new User<%s>", user_pk)
         body = INVITE_BODY_TEMPLATE.strip().format(
