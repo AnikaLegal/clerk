@@ -844,12 +844,19 @@ before the final footer.
 .article .block-paragraph p {
   color: var(--dark-0) i !important;
   text-align: left;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
-  letter-spacing: 0.05em;
+  letter-spacing: normal;
 }
-.article .block-paragraph p:last-child {
+.article .block-paragraph p + ul{
+  margin-top: -0.5rem;
+}
+/* zero width space */
+.article .block-paragraph p:empty {
+  display: none;
+}
+.article .block-paragraph p:last-child() {
   margin: 0 !important;
 }
 
