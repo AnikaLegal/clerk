@@ -1,12 +1,11 @@
 # Backend
-requests
-django
-WeasyPrint # Generate PDFs for email
-wagtail
+requests==2.27.1
+Django==3.2.11
+weasyprint==54.0 # Generate PDFs for email
+wagtail==2.15.2
 
 # Cleans html
-bleach 
-html-sanitizer
+html-sanitizer==1.9.3
 
 # Infrastructure
 psycopg2-binary
@@ -16,16 +15,16 @@ django-q
 awscli
 
 # Authentication
-social-auth-app-django
-msal
+social-auth-app-django==5.0.0
+msal==1.16.0
 
 # API
-djangorestframework
-django-cors-headers
+djangorestframework==3.13.1
+django-cors-headers==3.11.0
 
 # Emails and comms
-mailchimp3
-twilio
+mailchimp3==3.0.16
+twilio==7.5.0
 
 # Static files
 whitenoise
