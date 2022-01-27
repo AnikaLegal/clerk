@@ -1,5 +1,7 @@
 import re
 import os
+from typing import List
+from django.utils.text import slugify
 
 from django.http import Http404
 from django.shortcuts import render, redirect
@@ -43,8 +45,9 @@ def email_list_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
     email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
-        "-created_at"
+        "created_at"
     )
+
     display_emails = email_qs.filter(state__in=DISPLAY_EMAIL_STATES)
     draft_emails = email_qs.filter(state__in=DRAFT_EMAIL_STATES)
     for emails in [display_emails, draft_emails]:
@@ -60,6 +63,49 @@ def email_list_view(request, pk):
         "case_email_address": case_email_address,
     }
     return render(request, "case/case/email/list.html", context)
+
+
+class EmailThread:
+    def __init__(self, email: Email):
+        self.emails = [email]
+        self.subject = email.subject
+        self.slug = self.slugify_subject(email.subject)
+        self.most_recent = email.created_at
+
+    @staticmethod
+    def slugify_subject(subject):
+        sub_cleaned = re.sub(r"re\s*:\s*", "", subject, flags=re.IGNORECASE)
+        return slugify(sub_cleaned)
+
+    def is_email_in_thread(self, email: Email) -> bool:
+        return self.slug == self.slugify_subject(email.subject)
+
+    def add_email_if_in_thread(self, email: Email) -> bool:
+        is_in_thread = self.is_email_in_thread(email)
+        if is_in_thread:
+            self.emails.append(email)
+            if email.created_at > self.most_recent:
+                self.most_recent = email.created_at
+
+        return is_in_thread
+
+
+def _get_email_threads(issue) -> List[EmailThread]:
+    email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
+        "created_at"
+    )
+    threads = []
+    for email in email_qs:
+        is_in_a_thread = False
+        for thread in threads:
+            is_in_a_thread = thread.add_email_if_in_thread(email)
+            if is_in_a_thread:
+                break
+
+        if not is_in_a_thread:
+            threads.append(EmailThread(email))
+
+    return threads
 
 
 @router.use_route("draft")
