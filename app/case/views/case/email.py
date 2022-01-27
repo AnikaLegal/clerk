@@ -44,22 +44,10 @@ router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
 def email_list_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
-    email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
-        "created_at"
-    )
-
-    display_emails = email_qs.filter(state__in=DISPLAY_EMAIL_STATES)
-    draft_emails = email_qs.filter(state__in=DRAFT_EMAIL_STATES)
-    for emails in [display_emails, draft_emails]:
-        for email in emails:
-            email.html = get_email_html(email)
-            for attachment in email.emailattachment_set.all():
-                attachment.file.display_name = os.path.basename(attachment.file.name)
-
+    email_threads = _get_email_threads(issue)
     context = {
         "issue": issue,
-        "display_emails": display_emails,
-        "draft_emails": draft_emails,
+        "email_threads": email_threads,
         "case_email_address": case_email_address,
     }
     return render(request, "case/case/email/list.html", context)
@@ -77,6 +65,18 @@ class EmailThread:
         sub_cleaned = re.sub(r"re\s*:\s*", "", subject, flags=re.IGNORECASE)
         return slugify(sub_cleaned)
 
+    def count_drafts(self):
+        return self._get_count(EmailState.DRAFT)
+
+    def count_sent(self):
+        return self._get_count(EmailState.SENT)
+
+    def count_received(self):
+        return self._get_count(EmailState.INGESTED)
+
+    def _get_count(self, state):
+        return len([e for e in self.emails if e.state == state])
+
     def is_email_in_thread(self, email: Email) -> bool:
         return self.slug == self.slugify_subject(email.subject)
 
@@ -90,12 +90,24 @@ class EmailThread:
         return is_in_thread
 
 
+DISPLAY_EMAIL_STATES = [EmailState.DRAFT, EmailState.SENT, EmailState.INGESTED]
+
+
 def _get_email_threads(issue) -> List[EmailThread]:
-    email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
-        "created_at"
+    email_qs = (
+        issue.email_set.filter(state__in=DISPLAY_EMAIL_STATES)
+        .prefetch_related("emailattachment_set")
+        .order_by("created_at")
     )
     threads = []
     for email in email_qs:
+        print(email.subject, email.state)
+
+        # Process the email data
+        email.html = get_email_html(email)
+        for attachment in email.emailattachment_set.all():
+            attachment.file.display_name = os.path.basename(attachment.file.name)
+        # Assign each email to a thread
         is_in_a_thread = False
         for thread in threads:
             is_in_a_thread = thread.add_email_if_in_thread(email)
@@ -105,7 +117,7 @@ def _get_email_threads(issue) -> List[EmailThread]:
         if not is_in_a_thread:
             threads.append(EmailThread(email))
 
-    return threads
+    return sorted(threads, key=lambda t: t.most_recent, reverse=True)
 
 
 @router.use_route("draft")
