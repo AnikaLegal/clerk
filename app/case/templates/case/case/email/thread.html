@@ -1,0 +1,69 @@
+{% extends "case/_base.html" %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <h2 class="ui header">
+        {{ email_thread.subject }}
+        <span class="sub header">
+            <a href="{% url 'case-email-list' issue.pk %}">
+                Back to case emails
+            </a>
+        </span>
+    </h2>
+    <div class="email-list">
+        {% for email in email_thread.emails %}
+        <div class="ui card fluid">
+            {% if email.state == "DRAFT" %}
+            <div class="ui top attached primary label">Draft</div>
+            {% endif %}
+            <div class="content">
+                <div class="header">
+                    {{ email.subject|default:"(no subject)" }}
+                </div>
+                <div class="meta">
+                    From {{ email.from_address }} to {{ email.to_address}}
+                </div>
+                {% if email.cc_addresses %}
+                <div class="meta">
+                    Also sent to {{ email.cc_addresses|join:', ' }}
+                </div>
+                {% endif %}
+                <div class="description">
+                    {{ email.html|safe }}
+                </div>
+            </div>
+            {% if email.emailattachment_set.exists %}
+            <div class="extra content">
+                <h5>Attached files</h5>
+                <ul>
+                    {% for attachment in email.emailattachment_set.all %}
+                    <a href="{{ attachment.file.url }}">
+                        {{ attachment.file.name }}
+                    </a>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="extra content">
+                {% if email.state == "INGESTED" %}
+                Received {{ email.created_at }}
+                {% elif email.state == "DRAFT" %}
+                <a href="{% url 'case-email-edit' issue.pk email.pk %}" class="header">
+                    <button class="ui button primary">Edit Draft</button>
+                </a>
+
+                {% elif email.state == "READY_TO_SEND" %}
+                Sending...
+                {% else %}
+                Sent {{ email.created_at }}
+                by {{ email.sender.get_full_name }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</div>
+{% endblock %}

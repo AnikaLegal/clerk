@@ -1,76 +1,70 @@
-<form 
-    id="email-form"
-    method="post"
-    class="ui form {% if form.errors %}error{% else %}success{% endif %}"
-    enctype="multipart/form-data"
->
+<form id="email-form" method="post" class="ui form {% if form.errors %}error{% else %}success{% endif %}"
+    enctype="multipart/form-data">
     {% csrf_token %}
     {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
     {% include 'case/forms/_text_field.html' with field=form.to_address placeholder="jane@example.com" %}
     {% include 'case/forms/_text_field.html' with field=form.cc_addresses placeholder="anne@example.com, mark@example.com" %}
     {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
     {% if email %}
-        <div class="field {% if field.errors %}error{% endif %}">
-                <label>Add attachments from your computer</label>
-                <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
-                <input
-                    type="file"
-                    multiple
-                    name="attachments"
-                    {% if is_disabled %}disabled{% endif %}
-                >       
+    <div class="field {% if field.errors %}error{% endif %}">
+        <label>Add attachments from your computer</label>
+        <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
+        <input type="file" multiple name="attachments" {% if is_disabled %}disabled{% endif %}>
+    </div>
+    <div class="field">
+        <label>Add attachments from SharePoint</label>
+        <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
+        <div id="dropdown-sharepoint"
+            class="ui search multiple selection dropdown {% if is_disabled %}disabled{% endif %}">
+            <div class="text"></div>
+            <i class="dropdown icon"></i>
+            <input type="hidden" class="noselection" name="sharepoint_attachments">
         </div>
-        <div class="field">
-            <label>Add attachments from SharePoint</label>
-                <p style="opacity: 0.7">You must save these as a draft before sending the email</p>
-            <div id="dropdown-sharepoint" class="ui search multiple selection dropdown {% if is_disabled %}disabled{% endif %}">
-                <div class="text"></div>
-                <i class="dropdown icon"></i>
-                <input 
-                    type="hidden"
-                    class="noselection"
-                    name="sharepoint_attachments"
-                >
-            </div>
-            <script>
-                $('#dropdown-sharepoint').dropdown({
-                    placeholder: "Select a document",
-                    match: 'text',
-                    fullTextSearch: true,
-                    values: [
-                        {% for option in sharepoint_options %}
-                            {
-                                name: "{{ option.name }}",
-                                value: "{{ option.value }}",
-                            },
-                        {% endfor %}
+        <script>
+            $('#dropdown-sharepoint').dropdown({
+                placeholder: "Select a document",
+                match: 'text',
+                fullTextSearch: true,
+                values: [
+                    {% for option in sharepoint_options %}
+                    {
+                        name: "{{ option.name }}",
+                        value: "{{ option.value }}",
+                    },
+                    {% endfor %}
                     ]
                 })
-            </script>
-        </div>
+        </script>
+    </div>
     {% else %}
-        <p>You can add attachments after creating the draft email.</p>
+    <p>You can add attachments after creating the draft email.</p>
     {% endif %}
     {% include 'case/forms/_form_errors.html' %}
     {% include 'case/forms/_form_success.html' %}
     {% if email and email.state != "READY_TO_SEND" %}
-        <button class="ui positive button" type="submit">Save draft</button>
-        <button 
-            class="ui button primary"
-            hx-post="{% url 'case-email-send' issue.pk email.pk %}"
-            hx-target="#email-form"
-        >
-            Send email
-        </button>
+    <button class="ui positive button" type="submit">Save draft</button>
+    <button
+        class="ui button primary"
+        hx-post="{% url 'case-email-send' issue.pk email.pk %}"
+        hx-target="#email-form"
+        hx-confirm="Send this email?"
+    >
+        Send email
+    </button>
+    <button
+        class="ui button red"
+        hx-delete="{% url 'case-email-edit' issue.pk email.pk %}"
+        hx-target="#email-form"
+        hx-confirm="Delete this draft email?"
+    >
+        Delete draft
+    </button>
     {% elif email and email.state == "READY_TO_SEND" %}
-        <button 
-            class="ui button primary"
-            disabled
-        >
-            Sending email...
-        </button>
+    <button class="ui button primary" disabled>
+        Sending email...
+    </button>
     {% else %}
-        <button class="ui positive button" type="submit">Create draft email</button>
+    <button class="ui positive button" type="submit">Create draft email</button>
     {% endif %}
     {% include 'case/case/email/_draft_attachments.html' %}
 </form>

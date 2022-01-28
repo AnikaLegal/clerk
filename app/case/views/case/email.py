@@ -3,12 +3,13 @@ import os
 from typing import List
 from django.utils.text import slugify
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
 from html_sanitizer import Sanitizer
+from django.urls import reverse
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
@@ -25,6 +26,7 @@ DRAFT_EMAIL_STATES = [EmailState.READY_TO_SEND, EmailState.DRAFT]
 
 router = Router("email")
 router.create_route("list").uuid("pk")
+router.create_route("thread").uuid("pk").path("thread").slug("slug")
 router.create_route("draft").uuid("pk").path("draft")
 router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
 router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
@@ -51,6 +53,26 @@ def email_list_view(request, pk):
         "case_email_address": case_email_address,
     }
     return render(request, "case/case/email/list.html", context)
+
+
+@router.use_route("thread")
+@paralegal_or_better_required
+@require_http_methods(["GET"])
+def email_thread_view(request, pk, slug):
+    issue = _get_issue_for_emails(request, pk)
+    case_email_address = build_clerk_address(issue)
+    email_threads = [t for t in _get_email_threads(issue) if t.slug == slug]
+    if email_threads:
+        # Assume thread slugs are unique.
+        email_thread = email_threads[0]
+    else:
+        raise Http404()
+    context = {
+        "issue": issue,
+        "email_thread": email_thread,
+        "case_email_address": case_email_address,
+    }
+    return render(request, "case/case/email/thread.html", context)
 
 
 class EmailThread:
@@ -155,7 +177,7 @@ def email_draft_create_view(request, pk):
 
 @router.use_route("edit")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "POST", "DELETE"])
 def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -176,6 +198,12 @@ def email_draft_edit_view(request, pk, email_pk):
         if form.is_valid():
             messages.success(request, "Draft saved.")
             email = form.save()
+    elif request.method == "DELETE":
+        email.delete()
+        messages.success(request, "Draft deleted")
+        return HttpResponse(
+            headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
+        )
 
     else:
         form = EmailForm(instance=email)

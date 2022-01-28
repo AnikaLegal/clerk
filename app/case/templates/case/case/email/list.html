@@ -17,8 +17,12 @@
         Case emails
         <span class="sub header">
             You can contact this mailbox at: <strong>{{ case_email_address }}</strong>
+            <br>
+            Emails are grouped into threads by subject line <strong>only</strong>.
+            Please verify senders and recipients when reading and sending emails.
         </span>
     </h2>
+    {% include 'case/forms/_form_success.html' %}
     <a href="{% url 'case-email-draft' issue.pk %}">
         <button class="ui button primary" type="submit">New Draft</button>
     </a>
@@ -43,7 +47,9 @@
                 {% endif %}
             </div>
             <div class="content">
-                <div class="header">{{ thread.subject }}</div>
+                <a class="header" href="{% url 'case-email-thread' issue.pk thread.slug %}">
+                    {{ thread.subject }}
+                </a>
                 {{ thread.emails|length }} emails, most recent {{ thread.most_recent|date:"d/m/y" }}
             </div>
         </div>
