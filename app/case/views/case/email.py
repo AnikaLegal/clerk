@@ -1,12 +1,15 @@
 import re
 import os
+from typing import List
+from django.utils.text import slugify
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
 from html_sanitizer import Sanitizer
+from django.urls import reverse
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
@@ -23,6 +26,7 @@ DRAFT_EMAIL_STATES = [EmailState.READY_TO_SEND, EmailState.DRAFT]
 
 router = Router("email")
 router.create_route("list").uuid("pk")
+router.create_route("thread").uuid("pk").path("thread").slug("slug")
 router.create_route("draft").uuid("pk").path("draft")
 router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
 router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
@@ -42,24 +46,102 @@ router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
 def email_list_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
-    email_qs = issue.email_set.prefetch_related("emailattachment_set").order_by(
-        "-created_at"
-    )
-    display_emails = email_qs.filter(state__in=DISPLAY_EMAIL_STATES)
-    draft_emails = email_qs.filter(state__in=DRAFT_EMAIL_STATES)
-    for emails in [display_emails, draft_emails]:
-        for email in emails:
-            email.html = get_email_html(email)
-            for attachment in email.emailattachment_set.all():
-                attachment.file.display_name = os.path.basename(attachment.file.name)
-
+    email_threads = _get_email_threads(issue)
     context = {
         "issue": issue,
-        "display_emails": display_emails,
-        "draft_emails": draft_emails,
+        "email_threads": email_threads,
         "case_email_address": case_email_address,
     }
     return render(request, "case/case/email/list.html", context)
+
+
+@router.use_route("thread")
+@paralegal_or_better_required
+@require_http_methods(["GET"])
+def email_thread_view(request, pk, slug):
+    issue = _get_issue_for_emails(request, pk)
+    case_email_address = build_clerk_address(issue)
+    email_threads = [t for t in _get_email_threads(issue) if t.slug == slug]
+    if email_threads:
+        # Assume thread slugs are unique.
+        email_thread = email_threads[0]
+    else:
+        raise Http404()
+    context = {
+        "issue": issue,
+        "email_thread": email_thread,
+        "case_email_address": case_email_address,
+    }
+    return render(request, "case/case/email/thread.html", context)
+
+
+class EmailThread:
+    def __init__(self, email: Email):
+        self.emails = [email]
+        self.subject = email.subject
+        self.slug = self.slugify_subject(email.subject)
+        self.most_recent = email.created_at
+
+    @staticmethod
+    def slugify_subject(subject):
+        sub_cleaned = re.sub(r"re\s*:\s*", "", subject, flags=re.IGNORECASE)
+        return slugify(sub_cleaned)
+
+    def count_drafts(self):
+        return self._get_count(EmailState.DRAFT)
+
+    def count_sent(self):
+        return self._get_count(EmailState.SENT)
+
+    def count_received(self):
+        return self._get_count(EmailState.INGESTED)
+
+    def _get_count(self, state):
+        return len([e for e in self.emails if e.state == state])
+
+    def is_email_in_thread(self, email: Email) -> bool:
+        return self.slug == self.slugify_subject(email.subject)
+
+    def add_email_if_in_thread(self, email: Email) -> bool:
+        is_in_thread = self.is_email_in_thread(email)
+        if is_in_thread:
+            self.emails.append(email)
+            if email.created_at > self.most_recent:
+                self.most_recent = email.created_at
+
+        return is_in_thread
+
+
+DISPLAY_EMAIL_STATES = [EmailState.DRAFT, EmailState.SENT, EmailState.INGESTED]
+
+
+def _get_email_threads(issue) -> List[EmailThread]:
+    email_qs = (
+        issue.email_set.filter(state__in=DISPLAY_EMAIL_STATES)
+        .prefetch_related("emailattachment_set")
+        .order_by("created_at")
+    )
+    threads = []
+    for email in email_qs:
+        # Process the email data
+        email.html = get_email_html(email)
+        for attachment in email.emailattachment_set.all():
+            attachment.file.display_name = os.path.basename(attachment.file.name)
+
+        # Assign each email to a thread
+        is_in_a_thread = False
+        for thread in threads:
+            is_in_a_thread = thread.add_email_if_in_thread(email)
+            if is_in_a_thread:
+                break
+
+        if not is_in_a_thread:
+            threads.append(EmailThread(email))
+
+    for thread in threads:
+        thread.emails = sorted(thread.emails, key=lambda t: t.created_at, reverse=True)
+
+    return sorted(threads, key=lambda t: t.most_recent, reverse=True)
 
 
 @router.use_route("draft")
@@ -97,7 +179,7 @@ def email_draft_create_view(request, pk):
 
 @router.use_route("edit")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "POST", "DELETE"])
 def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -118,6 +200,12 @@ def email_draft_edit_view(request, pk, email_pk):
         if form.is_valid():
             messages.success(request, "Draft saved.")
             email = form.save()
+    elif request.method == "DELETE":
+        email.delete()
+        messages.success(request, "Draft deleted")
+        return HttpResponse(
+            headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
+        )
 
     else:
         form = EmailForm(instance=email)
