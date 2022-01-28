@@ -1,19 +1,17 @@
 {% extends "case/_base.html" %}
 {% block title %}Case {{ issue.fileref }}{% endblock %}
 
-
-
-
 {% block content %}
 <div class="ui container">
     <h2 class="ui header">
-        Create new draft email
+        Create new draft {% if parent_email %}reply{% endif %} email
         <span class="sub header">
             <a href="{% url 'case-email-list' issue.pk %}">
                 Back to case emails
             </a>
         </span>
     </h2>
+
     <div style="display: flex;flex-wrap: wrap;gap: 0.5rem;margin-bottom:1rem">
         {% for case_email in case_emails %}
         <span class="ui blue label">
@@ -22,6 +20,43 @@
         </span>
         {% endfor %}
     </div>
+
+    {% if parent_email %}
+    <div class="ui card fluid">
+        <div class="ui top attached primary label">
+            You are replying to this email
+        </div>
+        <div class="content">
+            <div class="header">
+                {{ parent_email.subject|default:"(no subject)" }}
+            </div>
+            <div class="meta">
+                From {{ parent_email.from_address }} to {{ parent_email.to_address}}
+            </div>
+            {% if parent_email.cc_addresses %}
+            <div class="meta">
+                Also sent to {{ parent_email.cc_addresses|join:', ' }}
+            </div>
+            {% endif %}
+            <div class="description">
+                {{ parent_email.html|safe }}
+            </div>
+        </div>
+        {% if parent_email.emailattachment_set.exists %}
+        <div class="extra content">
+            <h5>Attached files</h5>
+            <ul>
+                {% for attachment in parent_email.emailattachment_set.all %}
+                <a href="{{ attachment.file.url }}">
+                    {{ attachment.file.name }}
+                </a>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% include 'case/case/email/_email_form.html' %}
 </div>
 {% endblock %}

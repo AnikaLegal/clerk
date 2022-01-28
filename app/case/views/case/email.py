@@ -123,10 +123,7 @@ def _get_email_threads(issue) -> List[EmailThread]:
     )
     threads = []
     for email in email_qs:
-        # Process the email data
-        email.html = get_email_html(email)
-        for attachment in email.emailattachment_set.all():
-            attachment.file.display_name = os.path.basename(attachment.file.name)
+        _process_email_for_display(email)
 
         # Assign each email to a thread
         is_in_a_thread = False
@@ -144,6 +141,12 @@ def _get_email_threads(issue) -> List[EmailThread]:
     return sorted(threads, key=lambda t: t.most_recent, reverse=True)
 
 
+def _process_email_for_display(email: Email):
+    email.html = get_email_html(email)
+    for attachment in email.emailattachment_set.all():
+        attachment.file.display_name = os.path.basename(attachment.file.name)
+
+
 @router.use_route("draft")
 @paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
@@ -151,6 +154,7 @@ def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
+    parent_email = None
     if request.method == "POST":
         default_data = {
             "from_address": case_email_address,
@@ -165,10 +169,24 @@ def email_draft_create_view(request, pk):
             messages.success(request, "Draft created")
             return redirect("case-email-edit", issue.pk, email.pk)
     else:
-        form = EmailForm()
+        # It's a GET request.
+        parent_id = request.GET.get("parent")
+        initial = {}
+        if parent_id:
+            try:
+                parent_email = Email.objects.get(id=parent_id)
+                _process_email_for_display(parent_email)
+                initial = {
+                    "subject": parent_email.subject,
+                    "to_address": parent_email.from_address,
+                }
+            except Email.DoesNotExist:
+                raise Http404()
+        form = EmailForm(initial=initial)
 
     context = {
         "issue": issue,
+        "parent_email": parent_email,
         "form": form,
         "case_emails": case_emails,
         "case_email_address": case_email_address,
@@ -206,7 +224,6 @@ def email_draft_edit_view(request, pk, email_pk):
         return HttpResponse(
             headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
         )
-
     else:
         form = EmailForm(instance=email)
 

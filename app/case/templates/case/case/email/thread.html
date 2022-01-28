@@ -53,12 +53,26 @@
             </div>
             {% endif %}
             {% if email.state == "DRAFT" %}
-            <div class="extra content">
-                <a href="{% url 'case-email-edit' issue.pk email.pk %}" class="header">
-                    <button class="ui button primary">Edit Draft</button>
-                </a>
-            </div>
-        {% endif %}
+                <div class="extra content">
+                    <a 
+                        href="{% url 'case-email-edit' issue.pk email.pk %}"
+                        class="header"
+                        target="_blank"
+                    >
+                        <button class="ui button primary">Edit Draft</button>
+                    </a>
+                </div>
+                {% elif email.state == "INGESTED" %}
+                <div class="extra content">
+                    <a 
+                        href="{% url 'case-email-draft' issue.pk %}?parent={{ email.pk | urlencode }}"
+                        class="header"
+                        target="_blank"
+                    >
+                        <button class="ui button">Reply</button>
+                    </a>
+                </div>
+                {% endif %}
         </div>
         {% endfor %}
     </div>
