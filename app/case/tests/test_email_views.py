@@ -63,12 +63,12 @@ def test_email_thread_aggregation():
     # Thread 2 - r00956-case-closure
     assert threads[2].subject == "R00956 Case Closure"
     assert threads[2].slug == "r00956-case-closure"
-    assert threads[2].emails == emails[0:8]
+    assert threads[2].emails == list(reversed(emails[0:8]))
     # Thread 1 - legal-advice
     assert threads[1].subject == "Legal Advice"
     assert threads[1].slug == "legal-advice"
-    assert threads[1].emails == emails[8:12]
+    assert threads[1].emails == list(reversed(emails[8:12]))
     # Thread 0 - a-quick-question
     assert threads[0].subject == "A quick question"
     assert threads[0].slug == "a-quick-question"
-    assert threads[0].emails == emails[12:13]
+    assert threads[0].emails == list(reversed(emails[12:13]))
