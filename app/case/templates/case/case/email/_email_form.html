@@ -47,7 +47,7 @@
         class="ui button primary"
         hx-post="{% url 'case-email-send' issue.pk email.pk %}"
         hx-target="#email-form"
-        hx-confirm="Send this email?"
+        hx-confirm="Send this email? Remember to save any changes before sending."
     >
         Send email
     </button>
