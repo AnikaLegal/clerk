@@ -123,12 +123,11 @@ def _get_email_threads(issue) -> List[EmailThread]:
     )
     threads = []
     for email in email_qs:
-        print(email.subject, email.state)
-
         # Process the email data
         email.html = get_email_html(email)
         for attachment in email.emailattachment_set.all():
             attachment.file.display_name = os.path.basename(attachment.file.name)
+
         # Assign each email to a thread
         is_in_a_thread = False
         for thread in threads:
@@ -138,6 +137,9 @@ def _get_email_threads(issue) -> List[EmailThread]:
 
         if not is_in_a_thread:
             threads.append(EmailThread(email))
+
+    for thread in threads:
+        thread.emails = sorted(thread.emails, key=lambda t: t.created_at, reverse=True)
 
     return sorted(threads, key=lambda t: t.most_recent, reverse=True)
 

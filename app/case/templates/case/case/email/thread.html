@@ -6,6 +6,7 @@
     <h2 class="ui header">
         {{ email_thread.subject }}
         <span class="sub header">
+            Most recent emails are at the top<br>
             <a href="{% url 'case-email-list' issue.pk %}">
                 Back to case emails
             </a>
@@ -16,6 +17,12 @@
         <div class="ui card fluid">
             {% if email.state == "DRAFT" %}
             <div class="ui top attached primary label">Draft</div>
+            {% elif email.state == "SENT" %}
+            <div class="ui top attached teal label">Sent on {{ email.created_at|date:"l jS F Y, g:i A" }} by by {{ email.sender.get_full_name }}</div>
+            {% elif email.state == "INGESTED" %}
+            <div class="ui top attached orange label">Received at {{ email.created_at|date:"l jS F Y, g:i A" }}</div>
+            {% elif email.state == "READY_TO_SEND" %}
+            <div class="ui top attached primary label">Sending...</div>
             {% endif %}
             <div class="content">
                 <div class="header">
@@ -45,21 +52,13 @@
                 </ul>
             </div>
             {% endif %}
+            {% if email.state == "DRAFT" %}
             <div class="extra content">
-                {% if email.state == "INGESTED" %}
-                Received {{ email.created_at }}
-                {% elif email.state == "DRAFT" %}
                 <a href="{% url 'case-email-edit' issue.pk email.pk %}" class="header">
                     <button class="ui button primary">Edit Draft</button>
                 </a>
-
-                {% elif email.state == "READY_TO_SEND" %}
-                Sending...
-                {% else %}
-                Sent {{ email.created_at }}
-                by {{ email.sender.get_full_name }}
-                {% endif %}
             </div>
+        {% endif %}
         </div>
         {% endfor %}
     </div>
