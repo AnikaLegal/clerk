@@ -115,7 +115,7 @@ class Issue(TimestampedModel):
     outcome_notes = models.CharField(max_length=256, blank=True, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)
-    # File reference number from ActionStep
+    # File reference number for internal comms
     fileref = models.CharField(max_length=8, default="", blank=True)
     # Questionnaire answers
     answers = models.JSONField(encoder=DjangoJSONEncoder)
@@ -136,6 +136,34 @@ class Issue(TimestampedModel):
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.fileref:
+            self.fileref = self.get_next_fileref()
+        super().save(*args, **kwargs)
+
+    def get_next_fileref(self):
+        """
+        Returns next file reference code (eg. "R0023") for this issue topic.
+        """
+        last_fileref = (
+            Issue.objects.exclude(fileref="")
+            .filter(topic=self.topic)
+            .order_by("fileref")
+            .values_list("fileref", flat=True)
+            .last()
+        )
+        if last_fileref:
+            # A prior fileref exists for this topic.
+            next_filref_count = int(last_fileref[1:]) + 1
+            rjust = max(4, len(str(next_filref_count)))
+        else:
+            # This is the first one.
+            rjust = 4
+            next_filref_count = 1
+
+        prefix = self.topic[0].upper()
+        return prefix + str(next_filref_count).rjust(rjust, "0")
 
     def __str__(self):
         return f"{self.id} {self.fileref}"

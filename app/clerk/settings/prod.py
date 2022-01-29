@@ -45,7 +45,6 @@ sentry_sdk.init(
     environment="prod",
 )
 
-ACTIONSTEP_SYNC = True
 ACTIONSTEP_REDIRECT_URI = "https://clerk.anikalegal.com/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"

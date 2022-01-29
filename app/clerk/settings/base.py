@@ -266,7 +266,6 @@ ACTIONSTEP_SCOPES = [
     "emailattachments",
 ]
 # Override me!
-ACTIONSTEP_SYNC = False  # Only sync in prod and test, never dev or staging
 ACTIONSTEP_REDIRECT_URI = None
 ACTIONSTEP_OAUTH_URI = None
 ACTIONSTEP_TOKEN_URI = None
