@@ -24,9 +24,7 @@ def paralegal_list_view(request):
             total_cases=Count("issue"),
             open_cases=Count("issue", Q(issue__is_open=True)),
             open_repairs=Count("issue", Q(issue__is_open=True, issue__topic="REPAIRS")),
-            open_rent_reduction=Count(
-                "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
-            ),
+            open_bonds=Count("issue", Q(issue__is_open=True, issue__topic="BONDS")),
             open_eviction=Count(
                 "issue", Q(issue__is_open=True, issue__topic="EVICTION")
             ),

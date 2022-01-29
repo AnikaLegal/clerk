@@ -12,7 +12,10 @@
                 <th>Name</th>
                 <th class="center aligned">Latest Case</th>
                 <th class="center aligned">Capacity (%)</th>
-                <th class="center aligned">Open (Repairs / COVID / Eviction)</th>
+                <th class="center aligned">Total<br>Open</th>
+                <th class="center aligned">Repairs<br>Open</th>
+                <th class="center aligned">Bonds<br>Open</th>
+                <th class="center aligned">Eviction<br>Open</th>
                 <th class="center aligned">Total Cases</th>
             </tr>
         </thead>
@@ -37,8 +40,11 @@
                     <td class="center aligned red">{{paralegal.capacity|floatformat:'0' }}</td>
                 {% endif %}
 
+                <td class="center aligned">{{paralegal.open_cases }}</td>
+                <td class="center aligned">{{paralegal.open_repairs }}</td>
+                <td class="center aligned">{{paralegal.open_bonds }}</td>
+                <td class="center aligned">{{paralegal.open_eviction }}</td>
 
-                <td class="center aligned">{{paralegal.open_cases }} ({{paralegal.open_repairs }} / {{paralegal.open_rent_reduction }} / {{paralegal.open_eviction }})</td>
                 <td class="center aligned">{{paralegal.total_cases }}</td>
             </tr>
         {% endfor %}
