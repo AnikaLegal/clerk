@@ -40,6 +40,7 @@ ACTION_TYPE_LOOKUP = {
 }
 
 
+# No longer in use. To be removed post Clerk adoption.
 def _send_issue_actionstep(issue_pk: str):
     """
     Send a issue to Actionstep.

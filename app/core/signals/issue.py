@@ -1,11 +1,9 @@
 import logging
 
-from django.conf import settings
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django_q.tasks import async_task
 
-from actionstep.services.actionstep import send_issue_actionstep
 from core.models import Issue, IssueEvent
 from core.services.slack import send_issue_slack
 from microsoft.tasks import set_up_new_case_task
@@ -60,6 +58,3 @@ def post_save_issue(sender, instance, **kwargs):
     if not issue.is_sharepoint_set_up:
         logger.info("Dispatching Sharepoint task for Issue<%s>", issue.id)
         async_task(set_up_new_case_task, str(issue.pk))
-    if settings.ACTIONSTEP_SYNC and not issue.is_case_sent:
-        logger.info("Dispatching Actionstep task for Issue<%s>", issue.id)
-        async_task(send_issue_actionstep, str(issue.pk))
