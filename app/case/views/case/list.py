@@ -110,10 +110,14 @@ def case_review_view(request):
 @require_http_methods(["GET"])
 def case_inbox_view(request):
     """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_coordinators = Q(paralegal__email=COORDINATORS_EMAIL)
+    is_unassigned = Q(paralegal__email=COORDINATORS_EMAIL) | Q(paralegal__isnull=True)
     is_open = Q(is_open=True)
     is_new_stage = Q(stage=CaseStage.UNSTARTED) | Q(stage__isnull=True)
-    is_inbox = is_coordinators & is_open & is_new_stage
-    issues = Issue.objects.select_related("client", "paralegal").filter(is_inbox)
+    is_inbox = is_unassigned & is_open & is_new_stage
+    issues = (
+        Issue.objects.select_related("client", "paralegal")
+        .filter(is_inbox)
+        .order_by("-created_at")
+    )
     context = {"issues": issues}
     return render(request, "case/case/inbox.html", context)

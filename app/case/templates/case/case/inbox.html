@@ -3,8 +3,13 @@
 
 {% block content %}
 <div class="ui container">
-    <h1>Case Inbox</h1>
-    <p>All cases that are open, in the submitted stage, and have not yet been assigned to a paralegal.</p>
+    <h1 class="ui header">
+        Case Inbox
+        <div class="sub header">
+            All cases that are open, in the "not started" stage, and have not yet been assigned to a paralegal.
+        </div>
+    </h1>
+    <p>{{ issues|length }} cases in the inbox. </p>
     {% include "case/case/_list_table.html" with issues=issues is_open=True %}
 </div>
 {% endblock %}
