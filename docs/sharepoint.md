@@ -48,3 +48,14 @@ When users become coordinators, admins or superusers they join the group as "own
 ## User accounts
 
 New users are automatically assigned an [Office 365 E1 License](https://www.microsoft.com/en-au/microsoft-365/enterprise/office-365-e1) when they first sign in.
+
+## Document Backup
+
+If a user or script accidentally deletes documents from our Group filesystem, there are several safety nets built into Sharepoint Online:
+
+- When an item (i.e. case folder) is deleted from the Group (site) filesystem, it is placed in the first stage recycle bin for 93 days (3 months).
+- If the item is deleted from the first stage recycle bin, it is placed in the second stage recycle bin (which appears to be only accessible to Group Owners) where it stays for the remainder of the 93 days.
+- Inside the second stage recycle bin, once the 93 days elapse or the item is deleted again, then that item is usually permanently gone.
+- However Sharepoint Online creates a backup every 12 hours and keeps it for 14 days, so if the item has been deleted from both recycle bins, it can still be retrieved using File Restore or by contacting Microsoft within the 14 days.
+- Please consult this [link](https://docs.microsoft.com/en-us/answers/questions/348043/back-up-and-restore-in-sharepoint-online.html) to Microsoft Q&A for additional details and links to official documents.
+- Furthermore, even if the Group (site) itself is deleted using Azure Portal, it can be restored within 30 days.

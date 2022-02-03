@@ -33,3 +33,4 @@ See here for documentation:
 - [Email integration](docs/emails.md)
 - [Twilio integration](docs/twilio.md)
 - [Sharepoint integration](docs/sharepoint.md)
+- [Microsoft Graph integration](docs/msgraph.md)

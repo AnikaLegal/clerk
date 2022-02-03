@@ -39,7 +39,7 @@ Here is the implementation:
     └── f4d5b5a2-c686...   another case
 ```
 
-- Currently we have a Group for each of our environments (development, staging, production), each Group is self contained with its own filesystem, Users, and permissions - we use the following values to identify the specific Group and filesystem for our API calls
+- Currently we have a Group for each of our environments (development, staging, production), each Group is self contained with its own filesystem, Users, and permissions - we use the following values to identify the specific Group and filesystem for our API calls.
 
 ```
 MS_GRAPH_GROUP_ID
@@ -50,3 +50,14 @@ MS_GRAPH_DRIVE_ID
 - The issue of permissions (authorisation) over documents in the Group's filesystem follows the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) whereby Users are given enough access to do their job and no more.
 - Coordinators are made Group members, giving them read/write access over all the documents in the Group's filesystem; paralegals are not made Group members, they are given read/write access only to the folders corresponding to the cases that they have been assigned.
 - When a case is created, a copy of the relevant templates folder is made with the name of the new case and placed in the `cases` folder.
+
+## Document Backup
+
+If a user or script accidentally deletes documents from our Group filesystem, there are several safety nets built into Sharepoint Online:
+
+- When an item (i.e. case folder) is deleted from the Group (site) filesystem, it is placed in the first stage recycle bin for 93 days (3 months).
+- If the item is deleted from the first stage recycle bin, it is placed in the second stage recycle bin (which appears to be only accessible to Group Owners) where it stays for the remainder of the 93 days.
+- Inside the second stage recycle bin, once the 93 days elapse or the item is deleted again, then that item is usually permanently gone.
+- However Sharepoint Online creates a backup every 12 hours and keeps it for 14 days, so if the item has been deleted from both recycle bins, it can still be retrieved using File Restore or by contacting Microsoft within the 14 days.
+- Please consult this [link](https://docs.microsoft.com/en-us/answers/questions/348043/back-up-and-restore-in-sharepoint-online.html) to Microsoft Q&A for additional details and links to official documents.
+- Furthermore, even if the Group (site) itself is deleted using Azure Portal, it can be restored within 30 days.
