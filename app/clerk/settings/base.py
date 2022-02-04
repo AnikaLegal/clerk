@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
     "emails.apps.EmailsConfig",
+    "microsoft.apps.MicrosoftConfig",
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",

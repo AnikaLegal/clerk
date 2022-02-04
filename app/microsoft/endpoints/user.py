@@ -29,7 +29,7 @@ class UserEndpoint(BaseEndpoint):
             # Do not remove fields or POST request might fail.
             "accountEnabled": True,
             "displayName": f"{fname} {lname}",
-            "mailNickname": fname,
+            "mailNickname": fname.split(" ")[0],
             "userPrincipalName": userPrincipalName,
             "usageLocation": "AU",
             "passwordProfile": {
