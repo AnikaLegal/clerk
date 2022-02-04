@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
+from django_q.tasks import async_task
 
 from accounts.models import User, CaseGroups
 from core.models import Issue, IssueNote, Client, Tenancy, Person
@@ -12,6 +13,7 @@ from core.models.issue import CaseStage
 from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 from microsoft.endpoints import MSGraphAPI
+from microsoft.tasks import set_up_new_user_task
 
 
 class InviteParalegalForm(forms.ModelForm):
@@ -318,6 +320,8 @@ class UserPermissionsDynamicForm(DynamicTableForm):
             elif is_group_selected and not user_has_group:
                 # Add group
                 user.groups.add(group)
+                # Setup Microsoft account if not already exists
+                async_task(set_up_new_user_task, user.pk)
 
 
 class IssueSearchForm(forms.ModelForm):
