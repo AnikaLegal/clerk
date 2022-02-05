@@ -1,4 +1,6 @@
+from re import I
 import pytest
+from unittest import mock
 
 from emails.service import receive_email_task
 
@@ -64,6 +66,7 @@ SUCCESS_TEST_CASES = [
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_data", SUCCESS_TEST_CASES)
+@mock.patch("core.services.slack.send_slack_message")
 def test_ingest_email__with_success(settings, test_data):
     expected_parsed, received_data = (
         test_data["expected_parsed"],

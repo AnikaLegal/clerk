@@ -8,6 +8,8 @@ from django.db import transaction
 from webhooks.models import WebflowContact
 from web.models import RootPage, BlogListPage, BlogPage
 
+from utils.signals import DisableSignals
+
 
 @pytest.fixture
 @pytest.mark.django_db
@@ -65,7 +67,9 @@ def test_contact_form(client):
         "phone": "0431 111 222 66",
         "referral": "A ghost told me!",
     }
-    resp = client.post(url, data)
+    with DisableSignals():
+        resp = client.post(url, data)
+
     assert resp.status_code == 200
 
     assert WebflowContact.objects.count() == 1
