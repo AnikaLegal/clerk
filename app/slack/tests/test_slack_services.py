@@ -2,6 +2,7 @@ import json
 
 import pytest
 import responses
+from django.test import override_settings
 
 from slack.models import SlackChannel, SlackMessage, SlackUser
 from slack.services import send_slack_message
@@ -10,6 +11,7 @@ from slack.services import send_slack_message
 @responses.activate
 @pytest.mark.django_db
 @pytest.mark.parametrize("slug", ["client-intake", "landing-form"])
+@override_settings(SLACK_MESSAGE_DISABLED=False)
 def test_send_issue_slack(slug):
     """
     Ensure send_issue_slack call Slack without anything exploding

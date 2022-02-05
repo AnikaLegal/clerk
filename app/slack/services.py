@@ -32,10 +32,11 @@ def send_slack_message(message_slug: str, message_text: str):
 
     logging.info("Sending %s", slack_msg)
     url = slack_msg.channel.webhook_url
-    resp = requests.post(
-        url, json={"text": text}, headers={"Content-Type": "application/json"}
-    )
-    resp.raise_for_status()
+    if not settings.SLACK_MESSAGE_DISABLED:
+        resp = requests.post(
+            url, json={"text": text}, headers={"Content-Type": "application/json"}
+        )
+        resp.raise_for_status()
     logger.info(f"Finished sending Slack message of type {message_slug}")
 
 
