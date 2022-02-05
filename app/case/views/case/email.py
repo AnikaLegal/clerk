@@ -78,8 +78,8 @@ def email_thread_view(request, pk, slug):
 class EmailThread:
     def __init__(self, email: Email):
         self.emails = [email]
-        self.subject = email.subject
-        self.slug = self.slugify_subject(email.subject)
+        self.subject = email.subject or "No Subject"
+        self.slug = self.slugify_subject(self.subject)
         self.most_recent = email.created_at
 
     @staticmethod
@@ -110,6 +110,9 @@ class EmailThread:
                 self.most_recent = email.created_at
 
         return is_in_thread
+
+    def __repr__(self):
+        return f"EmailThread<{self.subject}>"
 
 
 DISPLAY_EMAIL_STATES = [EmailState.DRAFT, EmailState.SENT, EmailState.INGESTED]
