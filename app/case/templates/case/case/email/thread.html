@@ -46,7 +46,11 @@
                 <ul>
                     {% for attachment in email.emailattachment_set.all %}
                     <a href="{{ attachment.file.url }}">
+                        {% if attachment.file.is_image %}
+                        <img src="{{ attachment.file.url }}" style="height: 200px;width: 200px; object-fit: contain;">
+                        {% else %}
                         {{ attachment.file.name }}
+                        {% endif %}
                     </a>
                     {% endfor %}
                 </ul>

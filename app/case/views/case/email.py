@@ -84,7 +84,8 @@ class EmailThread:
 
     @staticmethod
     def slugify_subject(subject):
-        sub_cleaned = re.sub(r"re\s*:\s*", "", subject, flags=re.IGNORECASE)
+        sub = subject or "No Subject"
+        sub_cleaned = re.sub(r"re\s*:\s*", "", sub, flags=re.IGNORECASE)
         return slugify(sub_cleaned)
 
     def count_drafts(self):
@@ -144,10 +145,16 @@ def _get_email_threads(issue) -> List[EmailThread]:
     return sorted(threads, key=lambda t: t.most_recent, reverse=True)
 
 
+IMAGE_SUFFIXES = [".jpg", ".jpeg", ".png", ".gif"]
+
+
 def _process_email_for_display(email: Email):
     email.html = get_email_html(email)
     for attachment in email.emailattachment_set.all():
         attachment.file.display_name = os.path.basename(attachment.file.name)
+        attachment.file.is_image = any(
+            [attachment.file.display_name.endswith(suf) for suf in IMAGE_SUFFIXES]
+        )
 
 
 @router.use_route("draft")
