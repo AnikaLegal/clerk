@@ -4,6 +4,7 @@ You will need:
 
 - `docker` ([install](https://docs.docker.com/install/#supported-platforms))
 - `docker-compose` ([install](https://docs.docker.com/compose/install/))
+- PyInvoke
 
 ## Getting Started
 
@@ -30,38 +31,25 @@ The values of these secrets will be provided to you if you need them. They shoul
 Next, you want to build the Docker environment that we'll be using:
 
 ```bash
-make build
+inv build
 ```
 
-Now you can set up your database with this reset script:
+Now you can set up your database with this reset command:
 
 ```bash
-./scripts/db/reset.sh
-```
-
-To do this manually, you can to get a bash shell into the web container and run a Django database migration:
-
-```bash
-# Get a bash shell in the container
-make bash
-
-# Setup the development database for Django - you only need to do this once.
-./manage.py migrate
-
-# Create a local admin user
-./manage.py createsuperuser
+inv reset
 ```
 
 Finallly you can exit the container shell and bring up the webserver:
 
 ```bash
-make web
+inv dev
 ```
 
 Now you should be able to visit [`http://localhost:8000/admin`](http://localhost:8000/admin) and see the Clerk site.
 
-You can also get a Django shell running using:
+You can view other commands with
 
 ```bash
-make shell
+inv -l
 ```

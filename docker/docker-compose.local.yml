@@ -2,8 +2,8 @@ version: "3"
 
 services:
   # Local development database.
-  database:
-    container_name: database
+  clerk_db:
+    container_name: clerk_db
     image: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -23,17 +23,17 @@ services:
       - ../app:/app
     links:
       - worker
-      - database
+      - clerk_db
     environment:
       PGDATABASE: postgres
       PGUSER: postgres
       PGPASSWORD: password
-      PGHOST: database
+      PGHOST: clerk_db
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.dev
       # Read from .env
     env_file:
-    - ../.env
+      - ../.env
 
   # Django-q worker.
   worker:
@@ -43,16 +43,16 @@ services:
     volumes:
       - ../app:/app
     links:
-      - database
+      - clerk_db
     environment:
       PGDATABASE: postgres
       PGUSER: postgres
       PGPASSWORD: password
-      PGHOST: database
+      PGHOST: clerk_db
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.dev
     env_file:
-    - ../.env
+      - ../.env
 
   # For testing.
   test:
@@ -61,12 +61,12 @@ services:
     volumes:
       - ../app:/app
     links:
-      - database
+      - clerk_db
     environment:
       PGDATABASE: postgres
       PGUSER: postgres
       PGPASSWORD: password
-      PGHOST: database
+      PGHOST: clerk_db
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: clerk.settings.test
       ACTIONSTEP_CLIENT_ID: ""
