@@ -68,13 +68,6 @@ def bash(c):
 
 
 @task
-def manage(c, *args):
-    """Run a management command"""
-    cmds = " ".join(args)
-    run_web(c, f"/app/manage.py {cmds}")
-
-
-@task
 def shell(c):
     """Get a Django shell in a Docker container"""
     run_web(c, "./manage.py shell_plus")
@@ -140,7 +133,7 @@ def restore(c):
     dump_name = result.stdout.strip()
     c.run(
         (
-            f"aws --profile anika s3 cp {s3_bucket}{dump_name} - | gunzip | "
+            f"aws --profile anika s3 cp {s3_bucket}/{dump_name} - | gunzip | "
             "pg_restore "
             "--clean "
             "--dbname postgres "
@@ -191,6 +184,42 @@ def _post_reset(c):
     print("\nSetting superuser 'admin' password to 12345")
     shell_cmd = "u=User.objects.get(username='admin');u.set_password('12345');u.save();"
     run_web(c, f'./manage.py shell_plus -c "{shell_cmd}"')
+
+
+S3_PROD = "anika-clerk"
+S3_TEST = "anika-clerk-test"
+SYNC_DIRS = [
+    "images",
+    "original_images",
+    "file-uploads",
+    "action-documents",
+    "email-attachments",
+]
+
+
+@task
+def sync_s3(c):
+    """
+    Sync S3 assets from prod to test
+    FIXME: Improve upon public read status.
+    """
+    for sync_dir in SYNC_DIRS:
+        cmd = f"aws --profile anika s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
+        c.run(cmd, pty=True)
+
+
+@task
+def sync_actionstep(c):
+    """Pull data from Actionstep prod"""
+    run_web(c, "./manage.py migrate_actionstep_paralegals")
+    run_web(c, "./manage.py migrate_actionstep_filenotes")
+    run_web(c, "./manage.py migrate_actionstep_emails")
+
+
+@task
+def obsfucate(c):
+    """Obsfucate personally identifiable info from prod"""
+    run_web(c, "./manage.py obsfucate_actionstep_data")
 
 
 def run_web(c, cmd: str):
