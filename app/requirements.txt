@@ -32,9 +32,11 @@ whitenoise
 # Web scraping
 beautifulsoup4
 
-# Admin
-django-extensions
+# Dev helpers
 ipython
+django-extensions
+django-browser-reload
+django-debug-toolbar
 
 # Development
 watchdog[watchmedo]

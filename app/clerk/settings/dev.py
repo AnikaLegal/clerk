@@ -1,7 +1,12 @@
 # flake8: noqa
+import socket
 from .base import *
 
 DEBUG = True
+
+# Django debug toolbar + Docker setup
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 SECRET_KEY = "its-a-secret-key!"
 

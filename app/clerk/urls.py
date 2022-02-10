@@ -1,6 +1,7 @@
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
 from rest_framework import routers
 
 from web import urls as web_urls
@@ -35,3 +36,9 @@ urlpatterns = [
     path("email/", include(email_urls)),
     path("", include(web_urls)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("__reload__/", include("django_browser_reload.urls")),
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]

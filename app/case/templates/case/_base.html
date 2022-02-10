@@ -33,6 +33,7 @@
                 {% if request.user.is_coordinator_or_better %}
                     <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
                     <a href="{% url 'account-list' %}" class="item">Accounts</a>
+                    <a href="{% url 'template-list' %}" class="item">Templates</a>
                 {% endif %}
             </div>           
             <div class="nav-items">          

@@ -1,1 +1,1 @@
-from . import case, paralegal, client, accounts, person, tenancy
+from . import case, paralegal, client, accounts, person, tenancy, templates

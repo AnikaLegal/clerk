@@ -4,7 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.postgres.fields import ArrayField
 
 from accounts.models import User
-from core.models import Issue
+from core.models import Issue, TimestampedModel, CaseTopic
 from utils.uploads import get_s3_key
 
 
@@ -58,6 +58,12 @@ class Email(models.Model):
 
     def get_sent_note_text(self):
         return "Email sent"
+
+
+class EmailTemplate(TimestampedModel):
+    name = models.CharField(max_length=64)
+    topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
+    text = models.TextField(default="", blank=True)
 
 
 # FIXME: Configure so S3 bucket cannot be publicly read from?

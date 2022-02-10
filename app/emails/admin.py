@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Email, EmailAttachment
+from .models import Email, EmailAttachment, EmailTemplate
 
 
 class AttachmentInline(admin.TabularInline):
@@ -20,3 +20,13 @@ class EmailAdmin(admin.ModelAdmin):
         "is_alert_sent",
     )
     inlines = [AttachmentInline]
+
+
+@admin.register(EmailTemplate)
+class EmailTemplateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "topic",
+        "name",
+        "created_at",
+    )

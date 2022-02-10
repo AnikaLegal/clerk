@@ -1,5 +1,6 @@
 import re
 import os
+from urllib.parse import urlencode
 from typing import List
 from django.utils.text import slugify
 
@@ -14,7 +15,7 @@ from django.urls import reverse
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
 from emails.service import build_clerk_address
-from emails.models import EmailState, Email
+from emails.models import EmailState, Email, EmailTemplate
 from case.forms import EmailForm
 from case.utils import merge_form_data
 from case.utils.router import Router
@@ -164,6 +165,13 @@ def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
+    templates = EmailTemplate.objects.filter(topic=issue.topic).order_by("-created_at")
+    for template in templates:
+        # Annotate with url
+        qs = request.GET.copy()
+        qs["template"] = template.pk
+        template.url = "?" + qs.urlencode()
+
     parent_email = None
     if request.method == "POST":
         default_data = {
@@ -181,17 +189,23 @@ def email_draft_create_view(request, pk):
     else:
         # It's a GET request.
         parent_id = request.GET.get("parent")
+        template_id = request.GET.get("template")
         initial = {}
         if parent_id:
             try:
                 parent_email = Email.objects.get(id=parent_id)
                 _process_email_for_display(parent_email)
-                initial = {
-                    "subject": parent_email.subject,
-                    "to_address": parent_email.from_address,
-                }
+                initial["subject"] = parent_email.subject
+                initial["to_address"] = parent_email.from_address
             except Email.DoesNotExist:
                 raise Http404()
+        if template_id:
+            try:
+                template = EmailTemplate.objects.get(id=template_id)
+                initial["text"] = template.text
+            except EmailTemplate.DoesNotExist:
+                raise Http404()
+
         form = EmailForm(initial=initial)
 
     context = {
@@ -200,6 +214,7 @@ def email_draft_create_view(request, pk):
         "form": form,
         "case_emails": case_emails,
         "case_email_address": case_email_address,
+        "templates": templates,
         "is_disabled": False,
     }
     return render(request, "case/case/email/draft_create.html", context)

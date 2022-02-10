@@ -1,0 +1,21 @@
+<form 
+    id="template-form" 
+    method="post" 
+    class="ui form {% if form.errors %}error{% else %}success{% endif %}"
+    enctype="multipart/form-data"
+>
+    {% csrf_token %}
+    {% include 'case/forms/_text_field.html' with field=form.name placeholder="Template name" %}
+    {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
+    {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+    {% include 'case/forms/_form_errors.html' %}
+    {% include 'case/forms/_form_success.html' %}
+    {% if template %}
+        <button class="ui positive button" type="submit">Update email template</button>
+    {% else %}
+    <button class="ui positive button" type="submit">Create email template</button>
+    {% endif %}
+</form>
+<script>
+    $('.selection.dropdown').dropdown()
+</script>
