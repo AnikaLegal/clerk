@@ -21,5 +21,5 @@ def get_text(webflow_contact: WebflowContact):
     return (
         "A client has just submitted a contact form on the landing page.\n"
         f"Check out ID #{webflow_contact.pk} at "
-        "https://clerk.anikalegal.com/admin/webhooks/webflowcontact/"
+        "https://www.anikalegal.com/admin/webhooks/webflowcontact/"
     )

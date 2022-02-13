@@ -81,7 +81,7 @@ INVITE_BODY_TEMPLATE = """
 Hello {name},
 
 You have been invited to join Anika's Clerk case management system.
-You can log in at https://clerk.anikalegal.com/case/ using your Anika Gmail account.
+You can log in at https://www.anikalegal.com/case/ using your Anika Gmail account.
 
 You have also been granted a Microsoft Office 365 login so that you can access case documents:
 

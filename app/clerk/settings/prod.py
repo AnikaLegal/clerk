@@ -9,8 +9,7 @@ DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "www.anikalegal.com",
-    "anikalegal.com",
-    "clerk.anikalegal.com",
+    "clerk.anikalegal.com", # TODO: Remove
     "127.0.0.1",
     "localhost",
 ]
@@ -45,7 +44,7 @@ sentry_sdk.init(
     environment="prod",
 )
 
-ACTIONSTEP_REDIRECT_URI = "https://clerk.anikalegal.com/actionstep/end/"
+ACTIONSTEP_REDIRECT_URI = "https://www.anikalegal.com/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
@@ -99,4 +98,4 @@ SCHEDULES = [
 ]
 
 SLACK_EMAIL_ALERT_OVERRIDE = None
-CLERK_BASE_URL = "https://clerk.anikalegal.com"
+CLERK_BASE_URL = "https://www.anikalegal.com"

@@ -1,8 +1,9 @@
 from django.conf.urls import include
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf import settings
 from rest_framework import routers
+from django.views.generic.base import RedirectView
 
 from web import urls as web_urls
 from emails import urls as email_urls
@@ -31,7 +32,8 @@ urlpatterns = [
     path("api/webhooks/jotform-form/", jotform_form_view, name="jotform-form"),
     # TODO: Move router to core
     path("api/", include(router.urls)),
-    path("case/", include("case.urls")),
+    path("clerk/", include("case.urls")),
+    re_path(r"^case/(?P<path>.*)", RedirectView.as_view(url="/clerk/%(path)s")),
     path("accounts/", include("accounts.urls")),
     path("email/", include(email_urls)),
     path("", include(web_urls)),

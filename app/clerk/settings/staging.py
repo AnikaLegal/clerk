@@ -7,8 +7,8 @@ from .base import *
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
-    "test-clerk.anikalegal.com",
-    "test-reports.anikalegal.com",
+    "test.anikalegal.com",
+    "test-clerk.anikalegal.com", # TODO: Remove
     "127.0.0.1",
     "localhost",
 ]
@@ -62,7 +62,7 @@ TWILIO_AUDIO_BASE_URL = (
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
-ACTIONSTEP_REDIRECT_URI = "https://test-clerk.anikalegal.com/actionstep/end/"
+ACTIONSTEP_REDIRECT_URI = "https://test.anikalegal.com/actionstep/end/"
 ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
 ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
 ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
@@ -73,4 +73,4 @@ MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
 MS_GRAPH_DRIVE_ID = "b!zBUQNn3jdEO44jZXmI-2GO0Krjc71QFLkmFqmCjMqFZZhq6ZPsfjR6HYQBbAK0_E"
 CASES_FOLDER_ID = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
-CLERK_BASE_URL = "https://test-clerk.anikalegal.com"
+CLERK_BASE_URL = "https://test.anikalegal.com"
