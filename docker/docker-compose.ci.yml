@@ -15,6 +15,6 @@ services:
     container_name: test
     image: anikalaw/clerk:${TAG}
     links:
-      - database
+      - clerk_db
     env_file:
       - ../env/test.env
