@@ -15,4 +15,4 @@ services:
     links:
       - database
     env_file:
-      - ../env/.env.test
+      - ../env/test.env
