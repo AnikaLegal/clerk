@@ -849,7 +849,7 @@ before the final footer.
   line-height: var(--body-line-height);
   letter-spacing: normal;
 }
-.article .block-paragraph p + ul{
+.article .block-paragraph p + ul {
   margin-top: -0.5rem;
 }
 /* zero width space */
@@ -917,7 +917,7 @@ before the final footer.
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2rem 5rem;
+  gap: 2.5rem 5rem;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -928,6 +928,7 @@ before the final footer.
 }
 @media (max-width: 600px) {
   .partner-logos {
+    gap: 5rem;
     flex-direction: column;
     align-items: center;
   }
