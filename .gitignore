@@ -13,6 +13,3 @@ venv/
 # Tests
 *pytest_cache*
 test_media/
-
-# Local envars
-local.env

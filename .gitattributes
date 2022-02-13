@@ -1,3 +1,1 @@
-env/dev.env        filter=crypt diff=crypt merge=crypt
-env/prod.env       filter=crypt diff=crypt merge=crypt
-env/test.env       filter=crypt diff=crypt merge=crypt
+env/*.env      filter=crypt diff=crypt merge=crypt

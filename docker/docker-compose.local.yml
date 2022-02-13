@@ -24,16 +24,8 @@ services:
     links:
       - worker
       - clerk_db
-    environment:
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: password
-      PGHOST: clerk_db
-      PGPORT: 5432
-      DJANGO_SETTINGS_MODULE: clerk.settings.dev
-      # Read from .env
     env_file:
-      - ../.env
+      - ../env/dev.env
 
   # Django-q worker.
   worker:
@@ -44,15 +36,8 @@ services:
       - ../app:/app
     links:
       - clerk_db
-    environment:
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: password
-      PGHOST: clerk_db
-      PGPORT: 5432
-      DJANGO_SETTINGS_MODULE: clerk.settings.dev
     env_file:
-      - ../.env
+      - ../env/dev.env
 
   # For testing.
   test:
@@ -62,20 +47,8 @@ services:
       - ../app:/app
     links:
       - clerk_db
-    environment:
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: password
-      PGHOST: clerk_db
-      PGPORT: 5432
-      DJANGO_SETTINGS_MODULE: clerk.settings.test
-      ACTIONSTEP_CLIENT_ID: ""
-      ACTIONSTEP_CLIENT_SECRET: ""
-      MAILCHIMP_API_KEY: ""
-      TWILIO_ACCOUNT_SID: ""
-      TWILIO_AUTH_TOKEN: ""
-      AZURE_AD_CLIENT_ID: ""
-      AZURE_AD_CLIENT_SECRET: ""
+    env_file:
+      - ../env/test.env
 
 volumes:
   clerk-postgres-data:
