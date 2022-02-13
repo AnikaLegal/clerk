@@ -1,0 +1,1 @@
+env/*.env      filter=crypt diff=crypt merge=crypt

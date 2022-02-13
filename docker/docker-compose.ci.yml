@@ -2,7 +2,8 @@ version: "3"
 
 services:
   # Test database.
-  database:
+  clerk_db:
+    container_name: clerk_db
     image: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -11,24 +12,9 @@ services:
 
   # Test container.
   test:
+    container_name: test
     image: anikalaw/clerk:${TAG}
     links:
-      - database
-    environment:
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: password
-      PGHOST: database
-      PGPORT: 5432
-      DJANGO_SETTINGS_MODULE: clerk.settings.test
-      SENDGRID_API_KEY: ""
-      ACTIONSTEP_CLIENT_ID: ""
-      ACTIONSTEP_CLIENT_SECRET: ""
-      MAILCHIMP_API_KEY: ""
-      TWILIO_ACCOUNT_SID: ""
-      TWILIO_AUTH_TOKEN: ""
-      GOOGLE_OAUTH2_KEY: ""
-      GOOGLE_OAUTH2_SECRET: ""
-      AZURE_AD_CLIENT_ID: ""
-      AZURE_AD_CLIENT_SECRET: ""
-      SLACK_API_TOKEN: ""
+      - clerk_db
+    env_file:
+      - ../env/test.env

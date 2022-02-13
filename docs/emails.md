@@ -21,7 +21,7 @@ ngrok http 8000
 Then, in a separate terminal session, update dev Sendgrid settings via API
 
 ```
-./scripts/ngrok.sh https://90c8-194-193-130-131.ngrok.io
+inv ngrok https://90c8-194-193-130-131.ngrok.io
 ```
 
 Then wait a minute or so for these settings to propagate. You can see these settings in the SendGrid web UI [here](https://app.sendgrid.com/settings/parse).

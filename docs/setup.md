@@ -1,29 +1,22 @@
 ## Prerequisites for Local Development
 
+This repository should work on Linux, Mac and maybe WSL. It is unlikely to work with Windows machines.
+
 You will need:
 
 - `docker` ([install](https://docs.docker.com/install/#supported-platforms))
 - `docker-compose` ([install](https://docs.docker.com/compose/install/))
-- PyInvoke
+- `transcrypt` ([install](https://github.com/elasticdog/transcrypt#usage))
+- `inv` ([install](https://www.pyinvoke.org/installing.html))
 
 ## Getting Started
 
-First, add a file called `.env` to the repository root with the following contents:
+Envars are stored in .env and encrypted using transcrypt. You can see encryoted files with `transcrypt --list`.
 
-```text
-AZURE_AD_CLIENT_ID=
-AZURE_AD_CLIENT_SECRET=
-SENDGRID_API_KEY=
-MAILCHIMP_API_KEY=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-ACTIONSTEP_CLIENT_ID=
-ACTIONSTEP_CLIENT_SECRET=
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-GOOGLE_OAUTH2_KEY=
-GOOGLE_OAUTH2_SECRET=
-SLACK_API_TOKEN=
+To intialise the repository on cloning run
+
+```bash
+transcrypt -c aes-256-cbc -p $TRANSCRYPT_PASSWORD
 ```
 
 The values of these secrets will be provided to you if you need them. They should be available in the Tech team Bitwarden account.

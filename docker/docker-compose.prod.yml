@@ -9,29 +9,8 @@ services:
     volumes:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/prod/web:/var/log
-    environment:
-      DJANGO_SETTINGS_MODULE: clerk.settings.prod
-      GUNICORN_PORT: 8000
-      PGHOST: /app/postgres.sock
-      PGPORT: 5432
-      PGDATABASE: clerk
-      PGUSER: $PGUSER
-      PGPASSWORD: $PGPASSWORD
-      # Pass through
-      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
-      SENDGRID_API_KEY: $SENDGRID_API_KEY
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      RAVEN_DSN: $RAVEN_DSN
-      ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_PROD_CLIENT_ID
-      ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_PROD_CLIENT_SECRET
-      MAILCHIMP_API_KEY: $MAILCHIMP_PROD_API_KEY
-      TWILIO_ACCOUNT_SID: $PROD_TWILIO_ACCOUNT_SID
-      TWILIO_AUTH_TOKEN: $PROD_TWILIO_AUTH_TOKEN
-      GOOGLE_OAUTH2_KEY: $GOOGLE_OAUTH2_KEY
-      GOOGLE_OAUTH2_SECRET: $GOOGLE_OAUTH2_SECRET
-      AZURE_AD_CLIENT_ID: $AZURE_AD_CLIENT_ID
-      AZURE_AD_CLIENT_SECRET: $AZURE_AD_CLIENT_SECRET
+    env_file:
+      - env.prod
 
   worker:
     command: bash /app/scripts/worker/prod.sh
@@ -39,24 +18,5 @@ services:
     volumes:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/prod/worker:/var/log
-    environment:
-      DJANGO_SETTINGS_MODULE: clerk.settings.prod
-      PGHOST: /app/postgres.sock
-      PGPORT: 5432
-      PGDATABASE: clerk
-      PGUSER: $PGUSER
-      PGPASSWORD: $PGPASSWORD
-      # Pass through
-      DJANGO_SECRET_KEY: $DJANGO_SECRET_KEY
-      SENDGRID_API_KEY: $SENDGRID_API_KEY
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      RAVEN_DSN: $RAVEN_DSN
-      ACTIONSTEP_CLIENT_ID: $ACTIONSTEP_PROD_CLIENT_ID
-      ACTIONSTEP_CLIENT_SECRET: $ACTIONSTEP_PROD_CLIENT_SECRET
-      MAILCHIMP_API_KEY: $MAILCHIMP_PROD_API_KEY
-      TWILIO_ACCOUNT_SID: $PROD_TWILIO_ACCOUNT_SID
-      TWILIO_AUTH_TOKEN: $PROD_TWILIO_AUTH_TOKEN
-      AZURE_AD_CLIENT_ID: $AZURE_AD_CLIENT_ID
-      AZURE_AD_CLIENT_SECRET: $AZURE_AD_CLIENT_SECRET
-      SLACK_API_TOKEN: $SLACK_API_TOKEN
+    env_file:
+      - env.prod

@@ -8,22 +8,8 @@
 
 # Python
 *.pyc
-env/
+venv/
 
 # Tests
 *pytest_cache*
 test_media/
-
-# Docker stuff
-.docker_temp*
-image.tar
-.env
-
-# CircleCI stuff
-.checksum
-
-# Ansible
-*.secret.*
-*.retry
-
-legacy_data/
