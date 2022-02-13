@@ -1,6 +1,6 @@
 # Backend
 requests==2.27.1
-Django==3.2.11
+Django==3.2.12
 weasyprint==54.0 # Generate PDFs for email
 wagtail==2.15.2
 
