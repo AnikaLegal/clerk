@@ -1,1 +1,6 @@
 env/
+venv/
+docs/
+infra/
+scripts/
+.github/
