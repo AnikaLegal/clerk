@@ -7,6 +7,7 @@ jobs:
     steps:
       # Checkout repo from GitHub
       - uses: actions/checkout@v2
+
       # Set envars for deployment.
       - name: Set env vars
         run: |
@@ -20,9 +21,20 @@ jobs:
             echo "Please specify either the develop branch for staging or master branch for prod"
             exit 1
           fi
+
+      # Setup transcrypt so that we can read secrets
+      - name: Checkout transcrypt
+        uses: actions/checkout@v2
+        with:
+          repository: elasticdog/transcrypt
+          path: transcrypt
+
+      - name: Initialise transcrypt
+        run: ./transcrypt/transcrypt -c aes-256-cbc -p '${{ secrets.TRANSCRYPT_PASSWORD }}' --yes
+
       # Update Docker Swarm on clerk server to deploy new container.
       - name: Run deploy script
-        run: ./scripts/deploy/deploy.sh
+        run: ./infra/deploy.sh
         shell: bash
         env:
           CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}

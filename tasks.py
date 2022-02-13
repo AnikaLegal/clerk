@@ -31,6 +31,12 @@ def ssh(c):
 
 
 @task
+def ngrok(c, url):
+    """Add ngrok URL to sendgrid to receive emails on dev address"""
+    run_web(c, f"./manage.py setup_dev_inbound_emails {url}")
+
+
+@task
 def own(c, username):
     """Assert file ownership of project"""
     c.run(f"sudo chown -R {username}:{username} .", pty=True)

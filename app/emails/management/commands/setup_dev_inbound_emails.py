@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "ngrok_url",
+            "url",
             type=str,
             help="New ngrok url to use, eg 'https://90c8-194-193-130-131.ngrok.io'",
         )
@@ -23,9 +23,9 @@ class Command(BaseCommand):
         https://app.sendgrid.com/settings/parse
         https://sendgrid.api-docs.io/v3.0/settings-inbound-parse/update-a-parse-setting
         """
-        ngrok_url = kwargs["ngrok_url"]
+        url = kwargs["url"]
         data = {
-            "url": ngrok_url.rstrip("/") + "/email/receive/",
+            "url": url.rstrip("/") + "/email/receive/",
             "spam_check": False,
             "send_raw": False,
         }

@@ -253,8 +253,8 @@ SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 SLACK_EMAIL_ALERT_OVERRIDE = "mattdsegal@gmail.com"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
-ACTIONSTEP_CLIENT_ID = os.environ["ACTIONSTEP_CLIENT_ID"]
-ACTIONSTEP_CLIENT_SECRET = os.environ["ACTIONSTEP_CLIENT_SECRET"]
+ACTIONSTEP_CLIENT_ID = os.environ.get("ACTIONSTEP_CLIENT_ID")
+ACTIONSTEP_CLIENT_SECRET = os.environ.get("ACTIONSTEP_CLIENT_SECRET")
 ACTIONSTEP_SCOPES = [
     "filenotes",
     "users",
@@ -281,8 +281,8 @@ ADMIN_PREFIX = None
 
 
 # Call Centre powered by Twilio
-TWILIO_ACCOUNT_SID = os.environ["TWILIO_ACCOUNT_SID"]
-TWILIO_AUTH_TOKEN = os.environ["TWILIO_AUTH_TOKEN"]
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = None  # Overwrite me
 TWILIO_AUDIO_BASE_URL = None  # Overwrite me
 
@@ -298,7 +298,7 @@ EMAIL_DOMAIN = "em7221.test-mail.anikalegal.com"
 
 
 # Marketing emails via MailChimp
-MAILCHIMP_API_KEY = os.environ["MAILCHIMP_API_KEY"]
+MAILCHIMP_API_KEY = os.environ.get("MAILCHIMP_API_KEY")
 
 # Analytics
 GOOGLE_ANALYTICS_ID = ""
@@ -306,8 +306,8 @@ FACEBOOK_PIXEL_ID = ""
 
 
 # MS Graph Integration
-AZURE_AD_CLIENT_ID = os.environ["AZURE_AD_CLIENT_ID"]
-AZURE_AD_CLIENT_SECRET = os.environ["AZURE_AD_CLIENT_SECRET"]
+AZURE_AD_CLIENT_ID = os.environ.get("AZURE_AD_CLIENT_ID")
+AZURE_AD_CLIENT_SECRET = os.environ.get("AZURE_AD_CLIENT_SECRET")
 MS_AUTHORITY_URL = (
     "https://login.microsoftonline.com/e89f1fec-2d50-4795-886e-a3475bdc4e4b"
 )

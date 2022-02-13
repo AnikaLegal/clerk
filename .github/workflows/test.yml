@@ -15,6 +15,7 @@ jobs:
     steps:
       # Check out GitHub reportiory
       - uses: actions/checkout@v2
+
       # Set the tag for the build
       - name: Set tag name
         run: |
@@ -23,12 +24,25 @@ jobs:
           else
               echo "TAG=prod" >> $GITHUB_ENV
           fi
+
+      # Setup transcrypt so that we can read secrets
+      - name: Checkout transcrypt
+        uses: actions/checkout@v2
+        with:
+          repository: elasticdog/transcrypt
+          path: transcrypt
+
+      - name: Initialise transcrypt
+        run: ./transcrypt/transcrypt -c aes-256-cbc -p '${{ secrets.TRANSCRYPT_PASSWORD }}' --yes
+
       # Build the clerk Docker image so that we can run tests
       - name: Build container image
         run: docker build -t anikalaw/clerk:${TAG} -f docker/Dockerfile .
+
       # Run clerk unit tests
       - name: Run unit tests
         run: docker-compose -f docker/docker-compose.ci.yml run --rm test  pytest -vv
+
       # If the tests passed and we're on master/develop, then login to DockerHub
       - name: Login to DockerHub
         if: success() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
@@ -36,6 +50,7 @@ jobs:
         with:
           username: anikalaw
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       # If the tests passed and we're on master/develop, then push the image to DockerHub
       # This image will be used for the next deployment.
       - name: Push container image
