@@ -180,7 +180,7 @@ SHELL_PLUS = "ipython"
 # Static files
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.ManifestStaticFilesStorage"
 
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
