@@ -71,7 +71,7 @@
         hx-swap="outerHTML"
         hx-trigger="change, keyup delay:0.3s"
     >
-        {% include 'case/forms/_text_field.html' with field=form.search placeholder="Search for paralegals or clients by name or email" %}
+        {% include 'case/forms/_text_field.html' with field=form.search placeholder="Find cases with the name or email of paralegals and clients, or by using the file ref" %}
         <div class="equal width fields">
             {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
             {% include 'case/forms/_dropdown_field.html' with field=form.stage %}
