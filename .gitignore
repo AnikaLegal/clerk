@@ -1,6 +1,7 @@
 # General
 *.log
 .DS_Store
+__target__
 
 # IDE
 .idea/

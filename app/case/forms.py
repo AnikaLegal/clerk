@@ -378,6 +378,7 @@ class IssueSearchForm(forms.ModelForm):
                     | Q(client__first_name__icontains=search_part)
                     | Q(client__last_name__icontains=search_part)
                     | Q(client__email__icontains=search_part)
+                    | Q(fileref__icontains=search_part)
                 )
                 if search_query:
                     search_query |= part_query
