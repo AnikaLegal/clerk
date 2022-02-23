@@ -53,6 +53,7 @@ class EmailForm(forms.ModelForm):
             "issue",
             "sender",
             "sharepoint_attachments",
+            "html",
         ]
 
     sharepoint_attachments = forms.CharField(required=False)

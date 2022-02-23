@@ -1,6 +1,26 @@
 {% extends "case/_base.html" %}
 {% block title %}Case {{ issue.fileref }}{% endblock %}
 
+{% block styles %}
+<style>
+.template-list {
+    display: flex;
+    gap: 2em;
+    flex-wrap: wrap;    
+}
+.template-list .template {
+    padding: 0.5em 1em;
+    background: var(--blue-light);
+    border-radius: 0.5em;
+    color: var(--dark-2);
+}
+.template-list .template h5 {
+    margin: 0.5em 0;
+}
+
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="ui container">
     <h2 class="ui header">
@@ -27,17 +47,16 @@
           Use an email template
         </div>
         <div class="content">
-            <div class="ui relaxed divided list">
+            <div class="template-list">
             {% for template in templates %}
-            <div class="item">
-                <div class="right floated middle aligned content">
-                    <a href="{{ template.url }}">
-                        <div class="ui button">Use</div>
-                    </a>
-                  </div>          
-                  <div class="middle aligned content">
-                      <a href="{% url 'template-detail' template.pk %}" target="_blank" class="header">{{ template.name }}</a>
-                  </div>
+            <div class="template">
+                <h5>{{ template.name }}</h5>
+                <a class="ui label" href="{% url 'template-detail' template.pk %}" target="_blank">
+                  <i class="eye icon"></i> View
+                </a>
+                <a class="ui label" href="{{ template.url }}">
+                  <i class="mail icon"></i> Use
+                </a>
             </div>
             {% endfor %}            
             </div>
@@ -84,7 +103,6 @@
         </div>
     </div>      
     {% endif %}
-
     {% include 'case/case/email/_email_form.html' %}
 </div>
 {% endblock %}

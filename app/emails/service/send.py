@@ -48,6 +48,7 @@ def _send_email_task(email_pk: int):
         email.subject,
         email.text,
         attachments,
+        html=email.html,
     )
     IssueNote.objects.create(
         issue=email.issue,
@@ -70,9 +71,9 @@ def send_email(
     subject: str,
     body: str,
     attachments: List[Tuple[str, bytes, str]] = None,
+    html: str = None,
 ):
     """
-    FIXME: TEST ME.
     Send an email.
     https://docs.djangoproject.com/en/3.2/topics/email/#django.core.mail.EmailMessage
     https://docs.djangoproject.com/en/3.2/topics/email/#sending-alternative-content-types
@@ -85,8 +86,10 @@ def send_email(
         to=[to_addr],
         cc=cc_addrs,
         attachments=attachments,
-        # TODO: BCC? Reply to?
     )
+    if html:
+        email.attach_alternative(html, "text/html")
+
     email.send(fail_silently=False)
 
 

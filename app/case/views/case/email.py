@@ -275,11 +275,18 @@ def email_draft_edit_view(request, pk, email_pk):
 def email_draft_send_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
-    if not email.state == EmailState.DRAFT:
+    if email.state == EmailState.DRAFT:
+        email.state = EmailState.READY_TO_SEND
+        email.save()
+    elif email.state == EmailState.SENT:
+        # Redirect to list view
+        messages.success(request, "Email sent")
+        return HttpResponse(
+            headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
+        )
+    elif email.state != EmailState.READY_TO_SEND:
         raise Http404()
 
-    email.state = EmailState.READY_TO_SEND
-    email.save()
     form = EmailForm(instance=email)
     context = {
         "issue": issue,

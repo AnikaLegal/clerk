@@ -1,3 +1,24 @@
+{% load static %}
+<style>
+    .email-content {
+        padding: 1em 0;
+    }
+    .email-content label {
+        display: none !important;
+    }
+    .email-content .text {
+        display: grid;
+        gap: 2em;
+        padding-top: 1em;
+        grid-template-columns: 1fr 1fr;
+    }
+    .email-content textarea {
+        overflow: hidden;
+        resize: none !important;
+        min-height: 240px;
+    }
+
+</style>
 <form 
     id="template-form" 
     method="post" 
@@ -7,7 +28,19 @@
     {% csrf_token %}
     {% include 'case/forms/_text_field.html' with field=form.name placeholder="Template name" %}
     {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
-    {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+    <div class="email-content">
+        <div class="ui segment secondary">
+            Emails can be formatted using Markdown. See
+            <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank" rel="noopener noreferrer">here</a>
+            for a basic reference.
+        </div>
+        <div class="text">
+            {% include 'case/forms/_textarea_field.html' with field=form.text rows=12 placeholder="Dear Ms Example..." %}
+            <div class="field ">
+                <div id="email-html"></div>
+            </div>
+        </div>
+    </div>
     {% include 'case/forms/_form_errors.html' %}
     {% include 'case/forms/_form_success.html' %}
     {% if template %}
@@ -18,4 +51,19 @@
 </form>
 <script>
     $('.selection.dropdown').dropdown()
+</script>
+<script src="{% static 'showdown.min.js' %}"></script>
+<script>
+    const converter = new showdown.Converter()
+    showdown.setFlavor('github');
+    const textEl = document.querySelector('textarea')
+    const htmlEl = document.getElementById("email-html")
+    const onTextChange = s => {
+        textEl.style.height = textEl.scrollHeight
+        const html = converter.makeHtml(s);
+        htmlEl.innerHTML = html
+    }
+
+    onTextChange(textEl.value)
+    textEl.addEventListener('input', e => onTextChange(e.target.value))
 </script>
