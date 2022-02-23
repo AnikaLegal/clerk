@@ -4,7 +4,10 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 
-from .models import BlogListPage
+from case.views.auth import login_required
+
+
+from .models import BlogListPage, DashboardItem
 from .forms import ContactForm, ContentFeebackForm
 
 
@@ -20,6 +23,13 @@ def landing_view(request):
     return render(
         request, "web/landing.html", {"form": form, "testimonials": TESTIMONIALS}
     )
+
+
+@login_required
+@require_http_methods(["GET"])
+def dashboard_view(request):
+    context = {"items": DashboardItem.objects.all()}
+    return render(request, "web/dashboard.html", context)
 
 
 @require_http_methods(["GET"])

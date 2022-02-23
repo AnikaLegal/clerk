@@ -1,0 +1,41 @@
+{% extends "case/_base.html" %}
+{% load wagtailimages_tags %}
+{% block title %}Paralegal Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+.ui.link.cards>.card>.image {
+    padding: 1em;
+    background: #eff6ff55;
+}
+.ui.card>.image>img, .ui.cards>.card>.image>img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="ui container">
+    <h1>Paralegal Dashboard</h1>
+    <div class="ui link cards">
+        {% for item in items %}
+            <div class="card">
+                <a class="image" href="{{ item.link }}" target="_blank" rel="noreferrer noopener">
+                    {% image item.icon max-64x64 %}
+                </a>
+                <div class="content">
+                    <a class="header" href="{{ item.link }}" target="_blank" rel="noreferrer noopener">{{ item.title }}</a>
+                    <div class="description">
+                        {{ item.description }}
+                    </div>
+                    </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

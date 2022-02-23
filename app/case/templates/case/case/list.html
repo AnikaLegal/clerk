@@ -1,64 +1,6 @@
 {% extends "case/_base.html" %}
 {% block title %}Cases{% endblock %}
 
-{% comment %} {% block scripts%}
-<script>
-    // Initialize JavaScript enabled Semantic UI elements.
-    let values = [
-        {name: 'Topic', value: 'topic'},
-        {name: 'Stage', value: 'stage'},
-        {name: 'Outcome', value: 'outcome'},
-        {name: 'Legal services', value: 'provided_legal_services'},
-        {name: 'Open', value: 'is_open'},
-    ]
-    const fieldNames = values.map(v => v.value)
-    const filterState = {
-        items: Object.keys(Object.fromEntries(new URLSearchParams(location.search))).filter(k => fieldNames.includes(k)) 
-    }
-    values = values.map(v => ({...v, selected:  filterState.items.includes(v.value)}))
-
-    const onUpdateFilters = (items) => {
-        for (let name of fieldNames) {
-            const fieldEl = $('#field-' + name)
-            if (filterState.items.includes(name)) {
-                fieldEl.removeClass('disabled')
-            } else {
-                fieldEl.addClass('disabled')
-            }
-        }
-    }
-    onUpdateFilters()
-    $('.selection.dropdown').dropdown()
-    $('#filter-select').dropdown({
-        placeholder: "Select some search filters",
-        values: values,
-        onAdd: (v) => {
-            filterState.items.push(v)
-            onUpdateFilters()
-        },
-        onRemove: (v) => {
-            filterState.items = filterState.items.filter(i => i !== v)
-            onUpdateFilters()
-        },
-    })
-    // Override filter form submit
-    $("#filter-form").submit((e) => {
-        e.preventDefault()
-        const values = {}
-        $.each($('#filter-form').serializeArray(), (i, field) => {
-            console.log(field)
-            if (filterState.items.includes(field.name)) {
-                values[field.name] = field.value
-            }
-        })
-        window.location.href = "?" + (new URLSearchParams(values)).toString()
-    })
-
-
-</script>
-{% endblock %} {% endcomment %}
-
-
 {% block content %}
 <div class="ui container">
     <h1>Cases</h1>

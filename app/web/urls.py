@@ -90,6 +90,7 @@ urlpatterns = [
     path("cms/pages/", include(wagtail_urls)),
     path("blog/search/", views.blog_search_view, name="blog-search"),
     # Wagtail entry points.
+    path("dash/", views.dashboard_view, name="dashboard"),
     ResourceListPage.as_path("resources"),
     BlogListPage.as_path("blog"),
     JobListPage.as_path("jobs"),

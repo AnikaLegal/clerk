@@ -8,6 +8,13 @@ class LoginView(BaseLoginView):
     template_name = "case/login.html"
     redirect_authenticated_user = True
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return {
+            **context,
+            "qs": self.request.GET.urlencode(),
+        }
+
 
 login_view = LoginView.as_view()
 

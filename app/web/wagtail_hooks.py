@@ -5,7 +5,7 @@ from wagtail.core import hooks
 
 from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 
-from .models import ExternalNews
+from .models import ExternalNews, DashboardItem
 
 
 @hooks.register("insert_global_admin_css")
@@ -19,7 +19,7 @@ class ExternalNewsAdmin(ModelAdmin):
     model = ExternalNews
     menu_label = "External News"
     menu_icon = "pick"
-    menu_order = 200
+    menu_order = 201
     add_to_settings_menu = False
     exclude_from_explorer = False
     list_display = (
@@ -30,3 +30,17 @@ class ExternalNewsAdmin(ModelAdmin):
 
 
 modeladmin_register(ExternalNewsAdmin)
+
+
+class DashboardItemAdmin(ModelAdmin):
+    model = DashboardItem
+    menu_label = "Paralegal Dashboard"
+    menu_icon = "group"
+    menu_order = 200
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    list_display = ("title", "link")
+    search_fields = ("title",)
+
+
+modeladmin_register(DashboardItemAdmin)
