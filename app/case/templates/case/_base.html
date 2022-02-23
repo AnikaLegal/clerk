@@ -36,11 +36,7 @@
                     <a href="{% url 'template-list' %}" class="item">Templates</a>
                 {% endif %}
             </div>           
-            <div class="nav-items">          
-                <a href="https://wiki.anikalegal.com" class="item">Wiki</a>
-                <a href="https://anika.retool.com/embedded/public/5200a32b-86fb-45d7-aab7-e0caaceaa80c" class="item">Reports</a>          
-                <a href="https://anika.retool.com" class="item">Retool</a>
-            
+            <div class="nav-items">                     
                 {% if request.user.is_authenticated %}
                 <a 
                     href="{% url 'logout' %}"
