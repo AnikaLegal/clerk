@@ -4,15 +4,16 @@
 {% block styles %}
 <style>
 .template-list {
-    display: flex;
+    display: grid;
     gap: 2em;
-    flex-wrap: wrap;    
+    grid-template-columns: 1fr 1fr 1fr;
 }
 .template-list .template {
     padding: 0.5em 1em;
     background: var(--blue-light);
     border-radius: 0.5em;
     color: var(--dark-2);
+    border: 1px solid var(--grey-2);
 }
 .template-list .template h5 {
     margin: 0.5em 0;
@@ -51,6 +52,7 @@
             {% for template in templates %}
             <div class="template">
                 <h5>{{ template.name }}</h5>
+                <p>{{ template.subject }}</p>
                 <a class="ui label" href="{% url 'template-detail' template.pk %}" target="_blank">
                   <i class="eye icon"></i> View
                 </a>

@@ -64,6 +64,7 @@ class EmailTemplate(TimestampedModel):
     name = models.CharField(max_length=64)
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     text = models.TextField(default="", blank=True)
+    subject = models.CharField(max_length=1024, default="")
 
 
 # FIXME: Configure so S3 bucket cannot be publicly read from?

@@ -7,4 +7,4 @@ from .models import EmailTemplate
 class EmailTemplateForm(forms.ModelForm):
     class Meta:
         model = EmailTemplate
-        fields = ["name", "topic", "text"]
+        fields = ["name", "topic", "subject", "text"]

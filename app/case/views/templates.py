@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.contrib import messages
+from django.db.models import Q
 
 from emails.forms import EmailTemplateForm
 from emails.models import EmailTemplate
@@ -30,7 +31,9 @@ def template_search_view(request):
     templates = EmailTemplate.objects.order_by("-created_at").all()
     name = request.GET.get("name")
     if name:
-        templates = templates.filter(name__icontains=name)
+        templates = templates.filter(
+            Q(name__icontains=name) | Q(subject__icontains=name)
+        )
 
     topic = request.GET.get("topic")
     if topic:
@@ -74,6 +77,7 @@ def template_create_view(request):
         form = EmailTemplateForm(request.POST)
         if form.is_valid():
             template = form.save()
+            messages.success(request, "Template created")
             return redirect("template-detail", template.pk)
     else:
         form = EmailTemplateForm()

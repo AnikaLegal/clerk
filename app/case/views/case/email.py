@@ -203,6 +203,7 @@ def email_draft_create_view(request, pk):
             try:
                 template = EmailTemplate.objects.get(id=template_id)
                 initial["text"] = template.text
+                initial["subject"] = template.subject
             except EmailTemplate.DoesNotExist:
                 raise Http404()
 

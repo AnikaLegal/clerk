@@ -26,8 +26,9 @@
     enctype="multipart/form-data"
 >
     {% csrf_token %}
-    {% include 'case/forms/_text_field.html' with field=form.name placeholder="Template name" %}
     {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
+    {% include 'case/forms/_text_field.html' with field=form.name placeholder="Template name" %}
+     {% include 'case/forms/_text_field.html' with field=form.subject placeholder="A very important email" %}
     <div class="email-content">
         <div class="ui segment secondary">
             Emails can be formatted using Markdown. See
