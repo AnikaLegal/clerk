@@ -1,8 +1,9 @@
-from core.models.issue import CaseTopic, Issue
-
-from microsoft.endpoints import MSGraphAPI
-
 from django.conf import settings
+from django.utils import timezone
+
+from accounts.models import User
+from core.models.issue import CaseTopic, Issue
+from microsoft.endpoints import MSGraphAPI
 
 
 # Paths for template folders.
