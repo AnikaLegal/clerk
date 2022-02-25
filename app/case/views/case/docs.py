@@ -18,7 +18,7 @@ docs_sharepoint_route = (
 
 @docs_route
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def case_detail_documents_view(request, pk):
     """
     The documents of a given case.
@@ -40,7 +40,7 @@ def case_detail_documents_view(request, pk):
 
 @docs_sharepoint_route
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def sharepoint_docs_view(request, pk):
     try:
         issue = (

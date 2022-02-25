@@ -1,4 +1,4 @@
-from core.models.issue import CaseTopic
+from core.models.issue import CaseTopic, Issue
 
 from microsoft.endpoints import MSGraphAPI
 
@@ -13,6 +13,37 @@ TEMPLATE_PATHS = {
 }
 
 
+def get_user_permissions(user):
+    api = MSGraphAPI()
+    ms_account = api.user.get(user.email)
+    has_coordinator_perms = False
+    paralegal_perm_issues = []
+    paralegal_perm_missing_issues = []
+
+    if ms_account:
+        members = api.group.members()
+        has_coordinator_perms = user.email in members
+        for issue in Issue.objects.filter(paralegal=user).all():
+            case_path = f"cases/{issue.id}"
+            permissions = api.folder.list_permissions(case_path)
+            has_access = False
+            for perm in permissions or []:
+                _, perm_data = perm
+                email = perm_data.get("user", {}).get("email")
+                if email == user.email:
+                    has_access = True
+            if has_access:
+                paralegal_perm_issues.append(issue)
+            else:
+                paralegal_perm_missing_issues.append(issue)
+
+    return {
+        "has_coordinator_perms": has_coordinator_perms,
+        "paralegal_perm_issues": paralegal_perm_issues,
+        "paralegal_perm_missing_issues": paralegal_perm_missing_issues,
+    }
+
+
 def set_up_new_user(user):
     """
     Create MS account for new user and assign license.
@@ -24,6 +55,8 @@ def set_up_new_user(user):
     if not ms_account:
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         api.user.assign_license(user.email)
+        User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
+
         return password
 
 

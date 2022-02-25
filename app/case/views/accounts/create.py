@@ -22,14 +22,14 @@ def account_detail_view(request):
 
         if existing_user and email.endswith("@anikalegal.com"):
             async_task(set_up_new_user_task, existing_user.pk)
-            return redirect("account-detail", existing_user.pk)
+            return redirect("account-user-detail", existing_user.pk)
         else:
             data = merge_form_data(request.POST, {"username": email})
             form = InviteParalegalForm(data)
             if form.is_valid():
                 user = form.save()
                 async_task(set_up_new_user_task, user.pk)
-                return redirect("account-detail", user.pk)
+                return redirect("account-user-detail", user.pk)
     else:
         context = {"form": InviteParalegalForm()}
         return render(request, "case/accounts/create.html", context)

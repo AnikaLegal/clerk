@@ -1,11 +1,12 @@
 import logging
 
 from django.conf import settings
+from django.utils import timezone
+from django.contrib.auth.models import Group
 
 from utils.sentry import WithSentryCapture
 from core.models import Issue
 from accounts.models import User, CaseGroups
-from django.contrib.auth.models import Group
 from emails.service.send import send_email
 from .service import set_up_new_case, set_up_new_user, add_user_to_case
 
@@ -70,7 +71,7 @@ def _set_up_new_user_task(user_pk: int):
     user.groups.add(paralegal_group)
 
     _invite_user_if_not_exists(user)
-
+    User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
     logger.info("Finished setting up MS account for new User<%s>", user_pk)
 
 

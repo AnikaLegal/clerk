@@ -10,9 +10,12 @@ from case.forms import (
     UserPermissionsDynamicForm,
 )
 from case.views.auth import coordinator_or_better_required
-from case.utils.router import Route
+from case.utils.router import Router
+from microsoft.service import get_user_permissions
 
-detail_route = Route("detail").pk("pk").slug("form_slug", optional=True)
+router = Router("user")
+router.create_route("ms-perms").pk("pk").path("ms-perms")
+router.create_route("detail").pk("pk").slug("form_slug", optional=True)
 
 ACCOUNT_DETAILS_FORMS = {
     "details": UserDetailsDynamicForm,
@@ -20,7 +23,7 @@ ACCOUNT_DETAILS_FORMS = {
 }
 
 
-@detail_route
+@router.use_route("detail")
 @require_http_methods(["GET", "POST"])
 @coordinator_or_better_required
 def account_detail_view(request, pk, form_slug: str = ""):
@@ -57,3 +60,22 @@ def account_detail_view(request, pk, form_slug: str = ""):
         return form_resp
     else:
         return render(request, "case/accounts/detail.html", context)
+
+
+@router.use_route("ms-perms")
+@coordinator_or_better_required
+@require_http_methods(["GET"])
+def account_detail_ms_permissions_view(request, pk):
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        raise Http404()
+
+    perms = get_user_permissions(user)
+    context = {
+        "user": user,
+        "has_coordinator_perms": perms["has_coordinator_perms"],
+        "paralegal_perm_issues": perms["paralegal_perm_issues"],
+        "paralegal_perm_missing_issues": perms["paralegal_perm_missing_issues"],
+    }
+    return render(request, "case/accounts/_detail_ms_perms.html", context)
