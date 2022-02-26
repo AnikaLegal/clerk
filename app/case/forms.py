@@ -1,19 +1,17 @@
 from django import forms
 from django.forms.fields import BooleanField
-from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django_q.tasks import async_task
+from django.utils import timezone
 
-from accounts.models import User, CaseGroups
+from accounts.models import User
 from core.models import Issue, IssueNote, Client, Tenancy, Person
 from core.models.issue import CaseStage
 from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 from microsoft.endpoints import MSGraphAPI
-from microsoft.tasks import set_up_new_user_task
 
 
 class InviteParalegalForm(forms.ModelForm):
@@ -257,74 +255,6 @@ class UserDetailsDynamicForm(DynamicTableForm):
         ]
 
 
-class UserPermissionsDynamicForm(DynamicTableForm):
-    class Meta:
-        model = User
-        fields = []
-
-    def __init__(self, requesting_user, instance, *args, **kwargs):
-        # Figure out which groups the requesting user is allowed to edit.
-        self.editable_groups = []
-        if requesting_user.is_admin_or_better:
-            self.editable_groups = [CaseGroups.COORDINATOR, CaseGroups.PARALEGAL]
-        elif requesting_user.is_coordinator:
-            self.editable_groups = [CaseGroups.PARALEGAL]
-
-        # Figure out which groups the target user currently has
-        target_user = instance
-        target_user_groups = target_user.groups.filter(
-            name__in=CaseGroups.GROUPS
-        ).values_list("pk", flat=True)
-        initial = {}
-        extra_fields = {}
-        for group in Group.objects.filter(name__in=CaseGroups.GROUPS):
-            field_name = self.get_group_field_name(group.name)
-            initial[field_name] = group.pk in target_user_groups
-            is_readonly = group.name not in self.editable_groups
-            extra_fields[field_name] = forms.BooleanField(
-                disabled=is_readonly, required=False
-            )
-
-        super().__init__(*args, initial=initial, instance=instance, **kwargs)
-        self.fields.update(extra_fields)
-        super().set_display_values()
-
-    @staticmethod
-    def get_display_value(field, bound_field):
-        return "True" if bound_field.value() else "False"
-
-    def get_group_field_name(self, group_name):
-        return "has_" + group_name.lower() + "_permissions"
-
-    def clean(self):
-        super().clean()
-        allowed_field_names = [
-            self.get_group_field_name(gn) for gn in self.editable_groups
-        ]
-        self.cleaned_data = {
-            k: v for k, v in self.cleaned_data.items() if k in allowed_field_names
-        }
-
-    def save(self):
-        user = self.instance
-        # This does a bunch of queries and I don't care.
-        for group in Group.objects.filter(name__in=CaseGroups.GROUPS):
-            if group.name not in self.editable_groups:
-                continue
-
-            user_has_group = user.groups.filter(pk=group.pk).exists()
-            field_name = self.get_group_field_name(group.name)
-            is_group_selected = self.cleaned_data[field_name]
-            if user_has_group and not is_group_selected:
-                # Remove group
-                user.groups.remove(group)
-            elif is_group_selected and not user_has_group:
-                # Add group
-                user.groups.add(group)
-                # Setup Microsoft account if not already exists
-                async_task(set_up_new_user_task, user.pk)
-
-
 class IssueSearchForm(forms.ModelForm):
     class Meta:
         model = Issue
@@ -463,3 +393,10 @@ class IssueAssignParalegalForm(forms.ModelForm):
     class Meta:
         model = Issue
         fields = ["paralegal"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+        self.fields["paralegal"].queryset = User.objects.filter(
+            ms_account_created_at__lte=fifteen_minutes_ago
+        )

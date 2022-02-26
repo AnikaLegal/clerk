@@ -12,6 +12,10 @@ from .models import User
 class UserAdmin(BaseUserAdmin):
 
     actions = ["invite"]
+    fieldsets = (
+        *BaseUserAdmin.fieldsets,
+        (("Other info"), {"fields": ("ms_account_created_at",)}),
+    )
 
     def invite(self, request, queryset):
         for user in queryset:

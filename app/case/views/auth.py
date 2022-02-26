@@ -20,6 +20,10 @@ def _coordinator_or_better_test(user):
     return user.is_coordinator_or_better
 
 
+def _admin_or_better_test(user):
+    return user.is_admin_or_better
+
+
 _paralegal_or_better_tester = user_passes_test(
     _paralegal_or_better_test, **FAILED_TEST_KWARGS
 )
@@ -27,6 +31,9 @@ _paralegal_or_better_tester = user_passes_test(
 _coordinator_or_better_tester = user_passes_test(
     _coordinator_or_better_test, **FAILED_TEST_KWARGS
 )
+
+
+_admin_or_better_tester = user_passes_test(_admin_or_better_test, **FAILED_TEST_KWARGS)
 
 
 def paralegal_or_better_required(view):
@@ -39,5 +46,12 @@ def paralegal_or_better_required(view):
 def coordinator_or_better_required(view):
     def view_wrapper(*args, **kwargs):
         return _coordinator_or_better_tester(view)(*args, **kwargs)
+
+    return view_wrapper
+
+
+def admin_or_better_required(view):
+    def view_wrapper(*args, **kwargs):
+        return _admin_or_better_tester(view)(*args, **kwargs)
 
     return view_wrapper

@@ -18,32 +18,36 @@
     <h2 class="ui header dividing">
         User Permissions
     </h2>
-    {{ forms.permissions }}
+    <style>
+        .htmx-request {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        #loading:after {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+            animation: ellipsis steps(4,end) 900ms infinite;
+            content: "\2026";
+            width: 0px;
+        }
+
+        @keyframes ellipsis {
+            to {
+                width: 1.25em;    
+            }
+        }
+    </style>
     <div 
-        id="ms-perms"
-        hx-target="#ms-perms"
+        id="perms"
+        hx-target="#perms"
         hx-trigger="load"
-        hx-get="{% url 'account-user-ms-perms' user.pk %}"
+        hx-get="{% url 'account-user-perms' user.pk %}"
         style="margin: 1em 0;"
     >
-        <style>
-            #loading:after {
-                overflow: hidden;
-                display: inline-block;
-                vertical-align: bottom;
-                animation: ellipsis steps(4,end) 900ms infinite;
-                content: "\2026";
-                width: 0px;
-            }
-
-            @keyframes ellipsis {
-                to {
-                    width: 1.25em;    
-                }
-            }
-        </style>
         <p id="loading">
-            Loading MS Online permissions
+            Loading user permissions
         </p>
     </div>
 

@@ -1,0 +1,136 @@
+<table class="ui definition table small">
+    <tbody>
+        <tr>
+            <td class="three wide">Permission groups</td>
+            <td>
+                {% for group in user.groups.all %}
+                    {% if group.name == "Admin" %}
+                    <div class="ui label green">
+                    {% elif group.name == "Coordinator" %}
+                    <div class="ui label teal">
+                    {% elif group.name == "Paralegal" %}
+                    <div class="ui label blue">
+                    {% else %}
+                    <div class="ui label">
+                    {% endif %}
+                        {{ group.name }}
+                    </div>
+                {% endfor %}           
+                {% if user.is_superuser %}
+                    <div class="ui label black">
+                        Superuser 😎
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+        {% if is_perms_load_success %}
+            <tr>
+                <td class="three wide">Microsoft account</td>
+                {% if user.ms_account_created_at %}
+                    <td>
+                        Created {{ user.ms_account_created_at|date:"jS M 'y" }} 
+                    </td>
+
+
+                {% else %}
+                    <td>
+                        Not yet created
+                    </td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td class="three wide">Sharepoint access</td>
+                {% if not is_ms_account_set_up %}
+                    No access - account setup in progress
+                {% elif has_coordinator_perms %}
+                    <td>Full access</td>
+                {% elif  paralegal_perm_issues or paralegal_perm_missing_issues  %}
+                    <td style="display: flex !important; gap: 0.5em;flex-wrap: wrap;">
+                        {% for issue in paralegal_perm_issues %}
+                            <a href="{% url 'case-detail-view' issue.pk %}" class="ui green label">
+                                {{ issue.fileref }}
+                                <div class="detail">Has access</div>
+                            </a>
+                        {% endfor %}
+                        {% for issue in paralegal_perm_missing_issues %}
+                            {% if issue.actionstep_id %}
+                                <a href="{% url 'case-detail-view' issue.pk %}" class="ui olive label">
+                                    {{ issue.fileref }}
+                                    <div class="detail">Actionstep</div>
+                                </a>
+                            {% else %}
+                                <a href="{% url 'case-detail-view' issue.pk %}" class="ui yellow label">
+                                    {{ issue.fileref }}
+                                    <div class="detail">No access</div>
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                {% else %}
+                    <td>No assigned cases</td>
+                {% endif %}
+            </tr>
+        {% else %}
+            <tr>
+                <td class="three wide">Microsoft account</td>
+                <td>Failed to load</td>
+            </tr>
+            <tr>
+                <td class="three wide">Sharepoint access</td>
+                <td>Failed to load</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% if not is_admin and request.user.is_admin_or_better %}
+    <div style="display: flex; gap: 0.5em;flex-wrap: wrap;margin-bottom:0.5em;">
+        {% if is_coordinator %}
+            <button 
+                class="ui button red"
+                hx-post="{% url 'account-user-perms-demote' user.pk %}"
+                hx-target="#perms"
+                hx-indicator="#perms"
+            >
+                Demote to paralegal
+            </button>
+        {% elif is_paralegal%}
+            <button 
+                class="ui button green"
+                hx-post="{% url 'account-user-perms-promote' user.pk %}"
+                hx-target="#perms"
+                hx-indicator="#perms"
+            >
+                Promote to coordinator
+            </button>
+            <button 
+                class="ui button red"
+                hx-post="{% url 'account-user-perms-demote' user.pk %}"
+                hx-target="#perms"
+                hx-indicator="#perms"
+            >
+                Remove paralegal permissions
+            </button>
+        {% else %}
+            <button 
+                class="ui button green"
+                hx-post="{% url 'account-user-perms-promote' user.pk %}"
+                hx-target="#perms"
+                hx-indicator="#perms"
+            >
+                Promote to paralegal
+            </button>
+        {% endif %}
+    </div>
+{% endif %}
+{% if is_ms_account_set_up %}
+    <div style="display: flex; gap: 0.5em;flex-wrap: wrap;margin-bottom:0.5em;">
+        <button 
+            class="ui button primary"
+            hx-post="{% url 'account-user-perms-resync' user.pk %}"
+            hx-target="#perms"
+            hx-indicator="#perms"
+        >
+            Resync permissions
+        </button>
+    </div>
+{% endif %}

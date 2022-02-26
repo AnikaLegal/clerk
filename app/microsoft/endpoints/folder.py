@@ -1,9 +1,14 @@
 import os
+import logging
+
 import requests
 from django.conf import settings
 
 from .base import BaseEndpoint
 from .helpers import BASE_URL
+
+
+logger = logging.getLogger(__name__)
 
 
 class FolderEndpoint(BaseEndpoint):
@@ -101,7 +106,10 @@ class FolderEndpoint(BaseEndpoint):
             list_permissions = []
 
             for item in json["value"]:
-                list_permissions.append((item["id"], item["grantedTo"]))
+                try:
+                    list_permissions.append((item["id"], item["grantedTo"]))
+                except Exception:
+                    logger.exception("Malformed Sharepoint permission")
 
             return list_permissions
         else:

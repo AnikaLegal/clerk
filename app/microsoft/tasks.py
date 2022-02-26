@@ -8,44 +8,63 @@ from utils.sentry import WithSentryCapture
 from core.models import Issue
 from accounts.models import User, CaseGroups
 from emails.service.send import send_email
-from .service import set_up_new_case, set_up_new_user, add_user_to_case
+from .service import (
+    set_up_new_case,
+    set_up_new_user,
+    add_user_to_case,
+    set_up_coordinator,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-def _refresh_permissions():
+def refresh_ms_permissions(user):
     """
     Ensure all users who should have MS accounts get those accounts with correct permissions.
     """
-    case_users = User.objects.filter(groups__name__in=CaseGroups.GROUPS).all()
-    for user in case_users:
+    logger.info(
+        "Refreshing MS account creation for User<%s:%s>",
+        user.pk,
+        user.get_full_name(),
+    )
+    _invite_user_if_not_exists(user)
+
+    fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+    is_ms_account_set_up = user.ms_account_created_at and (
+        user.ms_account_created_at < fifteen_minutes_ago
+    )
+    if not is_ms_account_set_up:
         logger.info(
-            "Refreshing MS account creation for User<%s:%s>",
+            "Halting MS permission refresh for User<%s:%s> - account too new.",
             user.pk,
             user.get_full_name(),
         )
-        _invite_user_if_not_exists(user)
+        return
 
-    sharepoint_issues = (
-        Issue.objects.select_related("paralegal")
-        .filter(is_sharepoint_set_up=True, created_at__year__gte=2022)
-        .all()
+    is_coordinator_or_better = (
+        user.is_superuser
+        or user.groups.filter(
+            name__in=[CaseGroups.COORDINATOR, CaseGroups.ADMIN]
+        ).exists()
     )
-    for issue in sharepoint_issues:
-        if not issue.paralegal:
-            continue
-
-        logger.info(
-            "Refreshing Sharepoint access for User<%s:%s> + Issue<%s>",
-            issue.paralegal.pk,
-            issue.paralegal.get_full_name(),
-            issue.pk,
+    is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
+    if is_coordinator_or_better:
+        set_up_coordinator(user)
+    elif is_paralegal:
+        sharepoint_issues = (
+            user.issue_set.select_related("paralegal")
+            .filter(is_sharepoint_set_up=True, created_at__year__gte=2022)
+            .all()
         )
-        add_user_to_case(issue.paralegal, issue)
-
-
-refresh_permissions = WithSentryCapture(_refresh_permissions)
+        for issue in sharepoint_issues:
+            logger.info(
+                "Refreshing Sharepoint access for User<%s:%s> + Issue<%s>",
+                issue.paralegal.pk,
+                issue.paralegal.get_full_name(),
+                issue.pk,
+            )
+            add_user_to_case(issue.paralegal, issue)
 
 
 def _set_up_new_case_task(issue_pk: str):
