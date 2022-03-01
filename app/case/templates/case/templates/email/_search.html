@@ -1,0 +1,30 @@
+<table class="ui celled table" id="template-list">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Topic</th>
+            <th>Subject</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for template in templates %}
+        <tr>
+            <td>
+                <a href="{% url 'template-email-detail' template.pk %}">
+                    {{ template.name }}
+                </a>               
+            </td>
+            <td>{{ template.topic }}</td>
+            <td>{{ template.subject }}</td>
+            <td>{{ template.created_at }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>
+                No templates found
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

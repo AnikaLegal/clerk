@@ -53,7 +53,7 @@
             <div class="template">
                 <h5>{{ template.name }}</h5>
                 <p>{{ template.subject }}</p>
-                <a class="ui label" href="{% url 'template-detail' template.pk %}" target="_blank">
+                <a class="ui label" href="{% url 'template-email-detail' template.pk %}" target="_blank">
                   <i class="eye icon"></i> View
                 </a>
                 <a class="ui label" href="{{ template.url }}">
