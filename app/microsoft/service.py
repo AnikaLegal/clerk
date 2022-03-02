@@ -50,14 +50,12 @@ def set_up_new_user(user):
     Create MS account for new user and assign license.
     """
     api = MSGraphAPI()
-
     ms_account = api.user.get(user.email)
 
     if not ms_account:
         _, password = api.user.create(user.first_name, user.last_name, user.email)
         api.user.assign_license(user.email)
         User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
-
         return password
 
 
@@ -66,11 +64,9 @@ def set_up_new_case(issue):
     Make a copy of the relevant templates folder with the name of the new case.
     """
     api = MSGraphAPI()
-
     template_path = TEMPLATE_PATHS[issue.topic]
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-
     api.folder.copy(template_path, case_folder_name, parent_folder_id)
 
 
@@ -79,9 +75,7 @@ def add_user_to_case(user, issue):
     Give User write permissions for a specific case (folder).
     """
     api = MSGraphAPI()
-
     case_path = f"cases/{issue.id}"
-
     api.folder.create_permissions(case_path, "write", [user.email])
 
 
@@ -90,7 +84,6 @@ def remove_user_from_case(user, issue):
     Delete the permissions that a User has for a specific case (folder).
     """
     api = MSGraphAPI()
-
     case_path = f"cases/{issue.id}"
 
     # Get the permissions for the case.
@@ -152,3 +145,18 @@ def tear_down_coordinator(user):
         result = api.user.get(user.email)
         user_id = result["id"]
         api.group.remove_user(user_id)
+
+
+def list_templates(topic):
+    api = MSGraphAPI()
+    path = TEMPLATE_PATHS[topic]
+    results = api.folder.get_children(path)
+    return [
+        {
+            "name": doc["name"],
+            "url": doc["webUrl"],
+            "created_at": doc["createdDateTime"],
+            "modified_at": doc["lastModifiedDateTime"],
+        }
+        for doc in results["value"]
+    ]

@@ -3,21 +3,21 @@
         <tr>
             <th>Name</th>
             <th>Topic</th>
-            <th>Subject</th>
             <th>Created At</th>
+            <th>Modified At</th>
         </tr>
     </thead>
     <tbody>
     {% for template in templates %}
         <tr>
             <td>
-                <a href="{% url 'template-doc-detail' template.pk %}">
+                <a href="{{ template.url }}">
                     {{ template.name }}
                 </a>               
             </td>
-            <td>{{ template.topic }}</td>
-            <td>{{ template.subject }}</td>
+            <td>{{ topic }}</td>
             <td>{{ template.created_at }}</td>
+            <td>{{ template.modified_at }}</td>
         </tr>
     {% empty %}
         <tr>

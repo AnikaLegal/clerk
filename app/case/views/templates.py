@@ -6,8 +6,12 @@ from django.db.models import Q
 
 from emails.forms import EmailTemplateForm
 from emails.models import EmailTemplate
-from .auth import paralegal_or_better_required, coordinator_or_better_required
 from case.utils.router import Router
+from core.models.issue import CaseTopic
+
+from microsoft.service import list_templates
+
+from .auth import paralegal_or_better_required, coordinator_or_better_required
 
 router = Router("template")
 router.create_route("list")
@@ -16,7 +20,6 @@ router.create_route("email-detail").path("email").pk("pk")
 router.create_route("email-create").path("email").path("create")
 router.create_route("email-search").path("email").path("search")
 router.create_route("doc-list").path("doc")
-router.create_route("doc-detail").path("doc").pk("pk")
 router.create_route("doc-create").path("doc").path("create")
 router.create_route("doc-search").path("doc").path("search")
 
@@ -103,7 +106,8 @@ def template_email_create_view(request):
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def template_doc_list_view(request):
-    context = {"templates": EmailTemplate.objects.order_by("-created_at").all()}
+    topic = request.GET.get("topic", CaseTopic.REPAIRS)
+    context = {"templates": list_templates(topic), "topic": topic}
     return render(request, "case/templates/doc/list.html", context)
 
 
@@ -122,34 +126,8 @@ def template_doc_search_view(request):
     if topic:
         templates = templates.filter(topic=topic)
 
-    context = {"templates": templates}
+    context = {"templates": templates, "topic": topic}
     return render(request, "case/templates/doc/_search.html", context)
-
-
-@router.use_route("doc-detail")
-@paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
-def template_doc_detail_view(request, pk):
-    try:
-        template = EmailTemplate.objects.get(pk=pk)
-    except EmailTemplate.DoesNotExist:
-        raise Http404()
-
-    if request.user.is_coordinator_or_better:
-        if request.method == "POST":
-            form = EmailTemplateForm(request.POST, instance=template)
-            if form.is_valid():
-                person = form.save()
-                messages.success(request, "Edit successful")
-                return redirect("template-doc-detail", person.pk)
-        else:
-            form = EmailTemplateForm(instance=template)
-
-        context = {"template": template, "form": form}
-        return render(request, "case/templates/doc/edit.html", context)
-    else:
-        context = {"template": template}
-        return render(request, "case/templates/doc/detail.html", context)
 
 
 @router.use_route("doc-create")
