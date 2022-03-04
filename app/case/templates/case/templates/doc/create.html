@@ -1,0 +1,30 @@
+{% extends "case/_base.html" %}
+{% load static %}
+{% block title %}Case {{ issue.fileref }}{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <h2 class="ui header">
+        Upload document templates
+    </h2>
+    <form 
+        id="template-form" 
+        method="post" 
+        class="ui form {% if form.errors %}error{% else %}success{% endif %}"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {% include 'case/forms/_dropdown_field.html' with field=form.topic %}
+        <div class="field {% if field.errors %}error{% endif %}">
+            <label>Document templates (one or more)</label>
+            <input name="files" type="file" multiple>
+        </div>
+        {% include 'case/forms/_form_errors.html' %}
+        {% include 'case/forms/_form_success.html' %}
+        <button class="ui positive button" type="submit">Upload</button>
+    </form>
+</div>
+<script>
+    $('.selection.dropdown').dropdown()
+</script>
+{% endblock %}

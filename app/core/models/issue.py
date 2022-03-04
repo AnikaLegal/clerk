@@ -15,6 +15,11 @@ class CaseTopic:
     EVICTION = "EVICTION"
     BONDS = "BONDS"
     OTHER = "OTHER"
+    ACTIVE_CHOICES = [
+        (REPAIRS, "Repairs"),
+        (BONDS, "Bonds"),
+        (EVICTION, "Eviction"),
+    ]
     CHOICES = (
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
