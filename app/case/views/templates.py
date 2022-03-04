@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.contrib import messages
 from django.db.models import Q
 
@@ -8,10 +8,10 @@ from emails.forms import EmailTemplateForm
 from emails.models import EmailTemplate
 from case.utils.router import Router
 from core.models.issue import CaseTopic
+from case.forms import DocumentTemplateForm
+from microsoft.service import list_templates, upload_template, delete_template
 
-from microsoft.service import list_templates
-
-from .auth import paralegal_or_better_required, coordinator_or_better_required
+from .auth import coordinator_or_better_required
 
 router = Router("template")
 router.create_route("list")
@@ -22,6 +22,7 @@ router.create_route("email-search").path("email").path("search")
 router.create_route("doc-list").path("doc")
 router.create_route("doc-create").path("doc").path("create")
 router.create_route("doc-search").path("doc").path("search")
+router.create_route("doc-delete").path("doc").slug("file_id").path("delete")
 
 
 @router.use_route("list")
@@ -41,7 +42,7 @@ def template_email_list_view(request):
 
 
 @router.use_route("email-search")
-@paralegal_or_better_required
+@coordinator_or_better_required
 @require_http_methods(["GET"])
 def template_email_search_view(request):
     templates = EmailTemplate.objects.order_by("-created_at").all()
@@ -60,7 +61,7 @@ def template_email_search_view(request):
 
 
 @router.use_route("email-detail")
-@paralegal_or_better_required
+@coordinator_or_better_required
 @require_http_methods(["GET", "POST"])
 def template_email_detail_view(request, pk):
     try:
@@ -112,22 +113,26 @@ def template_doc_list_view(request):
 
 
 @router.use_route("doc-search")
-@paralegal_or_better_required
-@require_http_methods(["GET"])
+@coordinator_or_better_required
+@require_http_methods(["GET", "DELETE"])
 def template_doc_search_view(request):
-    templates = EmailTemplate.objects.order_by("-created_at").all()
+    topic = request.GET.get("topic", CaseTopic.REPAIRS)
+    templates = list_templates(topic)
     name = request.GET.get("name")
     if name:
-        templates = templates.filter(
-            Q(name__icontains=name) | Q(subject__icontains=name)
-        )
+        templates = [t for t in templates if name.lower() in t["name"].lower()]
 
-    topic = request.GET.get("topic")
-    if topic:
-        templates = templates.filter(topic=topic)
-
+    templates = sorted(templates, key=lambda t: t["name"])
     context = {"templates": templates, "topic": topic}
     return render(request, "case/templates/doc/_search.html", context)
+
+
+@router.use_route("doc-delete")
+@coordinator_or_better_required
+@require_http_methods(["DELETE"])
+def template_doc_delete_view(request, file_id):
+    delete_template(file_id)
+    return HttpResponse()
 
 
 @router.use_route("doc-create")
@@ -135,13 +140,16 @@ def template_doc_search_view(request):
 @require_http_methods(["GET", "POST"])
 def template_doc_create_view(request):
     if request.method == "POST":
-        form = EmailTemplateForm(request.POST)
+        form = DocumentTemplateForm(request.POST, files=request.FILES)
         if form.is_valid():
-            template = form.save()
-            messages.success(request, "Template created")
-            return redirect("template-doc-detail", template.pk)
+            files = request.FILES.getlist("files")
+            for f in files:
+                upload_template(form.cleaned_data["topic"], f)
+
+            messages.success(request, "Templates uploaded")
+            return redirect("template-doc-list")
     else:
-        form = EmailTemplateForm()
+        form = DocumentTemplateForm()
 
     context = {"form": form}
     return render(request, "case/templates/doc/create.html", context)

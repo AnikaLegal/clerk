@@ -5,9 +5,10 @@
     <h1>Document Templates</h1>
     <a href="{% url 'template-doc-create' %}">
         <button class="ui button primary">
-            Create a new document template
+            Upload document templates
         </button>
     </a>    
+     {% include 'case/forms/_form_success.html' %}
     <form 
         id="search"
         class="ui form"

@@ -153,10 +153,27 @@ def list_templates(topic):
     results = api.folder.get_children(path)
     return [
         {
+            "id": doc["id"],
             "name": doc["name"],
             "url": doc["webUrl"],
-            "created_at": doc["createdDateTime"],
-            "modified_at": doc["lastModifiedDateTime"],
+            "created_at": timezone.datetime.fromisoformat(
+                doc["createdDateTime"].replace("Z", "")
+            ),
+            "modified_at": timezone.datetime.fromisoformat(
+                doc["lastModifiedDateTime"].replace("Z", "")
+            ),
         }
         for doc in results["value"]
     ]
+
+
+def upload_template(topic, file):
+    api = MSGraphAPI()
+    path = TEMPLATE_PATHS[topic]
+    parent = api.folder.get(path)
+    api.folder.upload_file(file, parent["id"])
+
+
+def delete_template(file_id):
+    api = MSGraphAPI()
+    api.folder.delete_file(file_id)

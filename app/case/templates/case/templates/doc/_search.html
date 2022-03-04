@@ -3,21 +3,33 @@
         <tr>
             <th>Name</th>
             <th>Topic</th>
-            <th>Created At</th>
-            <th>Modified At</th>
+            <th>Created</th>
+            <th>Modified</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
     {% for template in templates %}
-        <tr>
+        <tr id="template-{{ template.id }}">
             <td>
                 <a href="{{ template.url }}">
                     {{ template.name }}
                 </a>               
             </td>
             <td>{{ topic }}</td>
-            <td>{{ template.created_at }}</td>
-            <td>{{ template.modified_at }}</td>
+            <td>{{ template.created_at|date:"d/m/y" }}</td>
+            <td>{{ template.modified_at|date:"d/m/y" }}</td>
+            <td>
+                <button
+                    class="ui negative basic button"
+                    hx-delete="{% url 'template-doc-delete' template.id %}"
+                    hx-target="#template-{{ template.id }}"
+                    hx-confirm="Delete {{ template.name }}?"
+                >
+                    Delete
+                </button>
+
+            </td>
         </tr>
     {% empty %}
         <tr>
