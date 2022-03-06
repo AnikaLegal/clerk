@@ -2,57 +2,21 @@
 {% block title %}Templates{% endblock %}
 {% block content %}
 <div class="ui container">
-    <h1>Email Templates</h1>
-    <a href="{% url 'template-create' %}">
-        <button class="ui button primary">
-            Create a new email template
-        </button>
-    </a>    
-    <form 
-        id="search"
-        class="ui form"
-        hx-get="{% url 'template-search' %}"
-        style="margin-top: 1rem"
-        hx-target="#template-list"
-        hx-swap="outerHTML"
-        hx-trigger="change, keyup delay:0.3s"
-    >
-        <input type="submit" style="display: none" />
-        <div class="equal width fields">
-            <div class="field">
-                <div class="ui search">
-                    <div class="ui icon input">
-                        <input 
-                            name="name"
-                            class="prompt"
-                            type="text"
-                            placeholder="Search by template name or subject..."
-                        >
-                        <i class="search icon"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui selection dropdown" tabindex="0">
-                    <input type="hidden" name="topic" value="" class="noselection">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">Select a case type</div>
-                    <div class="menu transition hidden" tabindex="-1">
-                        <div class="item" data-value="REPAIRS">Repairs</div>
-                        <div class="item" data-value="BONDS">Bonds</div>
-                        <div class="item" data-value="EVICTION">Eviction</div>
-                    </div>
-                </div>
+    <h1>Templates</h1>
+    <div class="ui large relaxed divided list">
+        <div class="item">
+            <i class="envelope outline icon" style="vertical-align: middle;"></i>
+            <div class="content">
+                <a href="{% url 'template-email-list' %}" class="header">Email templates</a>
+                <div class="description">Common emails sent by paralegals</div>
             </div>
         </div>
-    </form>
-    {% include "case/templates/_search.html" %}
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Initialize JavaScript enabled Semantic UI elements.
-    $('.selection.dropdown').dropdown()
-</script>
+        <div class="item">
+            <i class="file outline icon" style="vertical-align: middle;"></i>
+            <div class="content">
+                <a href="{% url 'template-doc-list' %}" class="header">Document templates</a>
+                <div class="description">Documents automatically added to every new case</div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

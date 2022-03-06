@@ -59,6 +59,21 @@ class FolderEndpoint(BaseEndpoint):
 
         return all_files
 
+    def upload_file(self, file, parent_id):
+        """
+        Uploads file to parent
+        """
+        url = os.path.join(
+            BASE_URL,
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{file.name}:/content",
+        )
+        resp = requests.put(url, data=file, headers=self.headers, stream=True)
+        resp.raise_for_status()
+
+    def delete_file(self, file_id):
+        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
+        return super().delete(url)
+
     def download_file(self, file_id):
         """
         Returns file name, MIME type, file bytes

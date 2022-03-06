@@ -8,10 +8,15 @@ from django.utils import timezone
 
 from accounts.models import User
 from core.models import Issue, IssueNote, Client, Tenancy, Person
-from core.models.issue import CaseStage
+from core.models.issue import CaseStage, CaseTopic
 from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
 from microsoft.endpoints import MSGraphAPI
+
+
+class DocumentTemplateForm(forms.Form):
+    topic = forms.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES)
+    files = forms.FileField()
 
 
 class InviteParalegalForm(forms.ModelForm):
