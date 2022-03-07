@@ -65,20 +65,36 @@ class FolderEndpoint(BaseEndpoint):
         Uploads file to parent
         """
         original_filename = file.name
-        filename, ext = os.path.splitext(original_filename)
-        filename = slugify(filename) + ext
+        base, ext = os.path.splitext(original_filename)
+        upload_filename = slugify(base) + ext
+        self.delete_file_if_exists(upload_filename, parent_id)
         url = os.path.join(
             BASE_URL,
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{filename}:/content",
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/content",
         )
         headers = {**self.headers}
         headers["Content-Type"] = file.content_type
         resp = requests.put(url, data=file, headers=headers, stream=True)
         data = self.handle(resp)
+
         # Rename file
+        self.delete_file_if_exists(original_filename, parent_id)
         file_id = data["id"]
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
         return super().patch(url, data={"name": original_filename})
+
+    def delete_file_if_exists(self, filename, parent_id):
+        file = self.get_child_if_exists(filename, parent_id)
+        if file:
+            self.delete_file(file["id"])
+
+    def get_child_if_exists(self, filename, parent_id):
+        # Check for existing file.
+        url = f"/groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
+        resp = super().get(url)
+        for f in resp["value"]:
+            if filename == f["name"]:
+                return f
 
     def delete_file(self, file_id):
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
