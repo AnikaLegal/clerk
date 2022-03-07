@@ -3,6 +3,15 @@
 
 {% block content %}
 <div class="ui container">
+    <h1>Alerts</h1>
+    <p>All running cases that are missing a conflict or eligibility check.</p>
+
+
+
+
+
+
+
     <h1>Case Review Queue</h1>
     <p>All open cases that are marked for review by coordinators, sorted by next review date.</p>
     {% include "case/case/_list_table.html" with issues=issues is_review=True is_open=True %}

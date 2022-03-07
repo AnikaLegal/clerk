@@ -1,14 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Exists, OuterRef
 from django.utils import timezone
 
 from case.forms import IssueSearchForm
 from case.utils import get_page
 from core.models import Issue
 from core.models.issue import CaseStage
-from core.models.issue_note import NoteType
+from core.models.issue_note import NoteType, IssueNote
 
 from case.views.auth import login_required, coordinator_or_better_required
 from case.utils.router import Route
@@ -76,19 +76,21 @@ def case_search_view(request):
 @require_http_methods(["GET"])
 def case_review_view(request):
     """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_open = Q(is_open=True)
-    has_review = Q(issuenote__note_type=NoteType.REVIEW)
-    is_review = is_open & has_review
     issues = (
         Issue.objects.select_related("client", "paralegal")
         .prefetch_related("issuenote_set")
-        .filter(is_review)
+        .filter(is_open=True)
         .annotate(next_review=Max("issuenote__event"))
         .order_by("next_review")
     )
+    issues = _annotate_with_checks(issues)
     # Annotate issues with days from now
     now = timezone.now()
     for issue in issues:
+        if not issue.next_review:
+            issue.color = ""
+            continue
+
         days = (issue.next_review - now).days
         if days >= 7:
             issue.color = ""
@@ -119,5 +121,24 @@ def case_inbox_view(request):
         .filter(is_inbox)
         .order_by("-created_at")
     )
+    issues = _annotate_with_checks(issues)
     context = {"issues": issues}
     return render(request, "case/case/inbox.html", context)
+
+
+def _annotate_with_checks(issue_qs):
+    is_conflict_check = Q(note_type=NoteType.CONFLICT_CHECK_FAILURE) | Q(
+        note_type=NoteType.CONFLICT_CHECK_SUCCESS
+    )
+    conflict_check_subquery = IssueNote.objects.filter(is_conflict_check).filter(
+        issue=OuterRef("pk")
+    )
+    is_eligibility_check = Q(note_type=NoteType.ELIGIBILITY_CHECK_FAILURE) | Q(
+        note_type=NoteType.ELIGIBILITY_CHECK_SUCCESS
+    )
+    eligibility_check_subquery = IssueNote.objects.filter(is_eligibility_check).filter(
+        issue=OuterRef("pk")
+    )
+    return issue_qs.annotate(
+        is_conflict_check=Exists(conflict_check_subquery)
+    ).annotate(is_eligibility_check=Exists(eligibility_check_subquery))

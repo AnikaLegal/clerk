@@ -26,10 +26,18 @@ Args:
                 </div>
                 <p style="margin-bottom: 0">{{ note.get_text }}</p>
             </div>
-        {% elif note.note_type == 'CONFLICT_CHECK' %}
+        {% elif note.note_type == 'CONFLICT_CHECK_SUCCESS' %}
             <div class="ui segment padded">
                 <div class="ui top attached label">
-                    Conflict check by {{note.creator.get_full_name}}
+                    Conflict check <strong>cleared</strong> by {{note.creator.get_full_name}}
+                    <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
+                </div>
+                <p style="margin-bottom: 0">{{ note.get_text }}</p>
+            </div>
+        {% elif note.note_type == 'CONFLICT_CHECK_FAILURE' %}
+            <div class="ui segment padded">
+                <div class="ui top attached label">
+                    Conflict check <strong>not cleared</strong> by {{note.creator.get_full_name}}
                     <div class="detail">{{note.created_at|date:"jS M y, ga"}}</div>
                 </div>
                 <p style="margin-bottom: 0">{{ note.get_text }}</p>

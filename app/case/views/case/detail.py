@@ -13,6 +13,7 @@ from case.forms import (
     IssueCloseForm,
     IssueOutcomeForm,
     ConflictCheckNoteForm,
+    EligibilityCheckNoteForm,
     IssueReOpenForm,
     ParalegalReviewNoteForm,
 )
@@ -33,6 +34,7 @@ router.create_route("note").uuid("pk").path("note")
 router.create_route("review").uuid("pk").path("review")
 router.create_route("performance").uuid("pk").path("performance")
 router.create_route("conflict").uuid("pk").path("conflict")
+router.create_route("eligibility").uuid("pk").path("eligibility")
 router.create_route("assign").uuid("pk").path("assign")
 router.create_route("progress").uuid("pk").path("progress")
 router.create_route("close").uuid("pk").path("close")
@@ -63,6 +65,11 @@ CASE_DETAIL_OPTIONS = {
     "conflict": {
         "icon": "search",
         "text": "Record a conflict check",
+        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
+    },
+    "eligibility": {
+        "icon": "search",
+        "text": "Record an eligibility check",
         "render_when": lambda req, issue: req.user.is_paralegal_or_better,
     },
     "assign": {
@@ -190,21 +197,6 @@ def case_detail_performance_view(request, pk):
     return view(request, pk)
 
 
-@router.use_route("conflict")
-def case_detail_conflict_view(request, pk):
-    """
-    Form where coordinators can leave a note on paralegal performance.
-    """
-    view = _build_case_note_view(
-        ConflictCheckNoteForm,
-        "conflict",
-        "case/case/forms/_conflict_check.html",
-        "Conflict check record created",
-        NoteType.CONFLICT_CHECK,
-    )
-    return view(request, pk)
-
-
 def _build_case_note_view(Form, slug, template, success_message, note_type):
     """
     Returns a view that renders a form where you can add a type of note to the case
@@ -236,6 +228,64 @@ def _build_case_note_view(Form, slug, template, success_message, note_type):
         return render(request, template, context)
 
     return case_note_view
+
+
+@router.use_route("conflict")
+def case_detail_conflict_view(request, pk):
+    """
+    Form where coordinators can leave a note of a completed conflict check.
+    """
+    context = {}
+    issue = _get_issue(request, pk)
+    if request.method == "POST":
+        default_data = {
+            "issue": issue,
+            "creator": request.user,
+        }
+        form_data = _add_form_data(request.POST, default_data)
+        form = ConflictCheckNoteForm(form_data)
+        if form.is_valid():
+            form.save()
+            context.update({"notes": _get_issue_notes(request, pk)})
+            messages.success(request, "Conflict check record created")
+    else:
+        form = ConflictCheckNoteForm()
+
+    url = reverse(f"case-detail-conflict", args=(pk,))
+    options_url = reverse("case-detail-options", args=(pk,))
+    context.update(
+        {"form": form, "issue": issue, "url": url, "options_url": options_url}
+    )
+    return render(request, "case/case/forms/_conflict_check.html", context)
+
+
+@router.use_route("eligibility")
+def case_detail_eligibility_view(request, pk):
+    """
+    Form where coordinators can leave a note of a completed eligibility check.
+    """
+    context = {}
+    issue = _get_issue(request, pk)
+    if request.method == "POST":
+        default_data = {
+            "issue": issue,
+            "creator": request.user,
+        }
+        form_data = _add_form_data(request.POST, default_data)
+        form = EligibilityCheckNoteForm(form_data)
+        if form.is_valid():
+            form.save()
+            context.update({"notes": _get_issue_notes(request, pk)})
+            messages.success(request, "Eligibility check record created")
+    else:
+        form = EligibilityCheckNoteForm()
+
+    url = reverse(f"case-detail-eligibility", args=(pk,))
+    options_url = reverse("case-detail-options", args=(pk,))
+    context.update(
+        {"form": form, "issue": issue, "url": url, "options_url": options_url}
+    )
+    return render(request, "case/case/forms/_eligibility_check.html", context)
 
 
 @router.use_route("assign")
