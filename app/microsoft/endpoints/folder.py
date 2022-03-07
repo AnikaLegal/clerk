@@ -3,6 +3,7 @@ import logging
 
 import requests
 from django.conf import settings
+from django.utils.text import slugify
 
 from .base import BaseEndpoint
 from .helpers import BASE_URL
@@ -63,12 +64,21 @@ class FolderEndpoint(BaseEndpoint):
         """
         Uploads file to parent
         """
+        original_filename = file.name
+        filename, ext = os.path.splitext(original_filename)
+        filename = slugify(filename) + ext
         url = os.path.join(
             BASE_URL,
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{file.name}:/content",
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{filename}:/content",
         )
-        resp = requests.put(url, data=file, headers=self.headers, stream=True)
-        resp.raise_for_status()
+        headers = {**self.headers}
+        headers["Content-Type"] = file.content_type
+        resp = requests.put(url, data=file, headers=headers, stream=True)
+        data = self.handle(resp)
+        # Rename file
+        file_id = data["id"]
+        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
+        return super().patch(url, data={"name": original_filename})
 
     def delete_file(self, file_id):
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"

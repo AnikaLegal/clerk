@@ -1,5 +1,5 @@
-import requests
 import logging
+import requests
 
 from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS
 
@@ -23,6 +23,12 @@ class BaseEndpoint:
         )
         return self.handle(resp)
 
+    def patch(self, path, data):
+        resp = requests.patch(
+            BASE_URL + path, headers=self.headers, json=data, stream=False
+        )
+        return self.handle(resp)
+
     def delete(self, path):
         resp = requests.delete(BASE_URL + path, headers=self.headers, stream=False)
         return self.handle(resp)
@@ -34,7 +40,7 @@ class BaseEndpoint:
         # Deal with unsuccessful requests.
         try:
             resp.raise_for_status()
-        except requests.HTTPError:
+        except requests.exceptions.HTTPError:
             if resp.status_code == 404:
                 return None
             else:
