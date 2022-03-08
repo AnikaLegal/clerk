@@ -829,17 +829,30 @@ before the final footer.
   }
 }
 
+.article {
+  --body-font-size: 18px;
+  --body-line-height: 1.6;
+}
+
 /* Blog post articles */
 .article .block-image img {
   max-width: 100% !important;
   height: unset;
-  margin-bottom: 2rem;
   border-top-left-radius: calc(120px * var(--radius-multiplier));
   border-bottom-right-radius: calc(120px * var(--radius-multiplier));
   max-height: 550px;
   object-fit: cover;
   box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
 }
+.article .block-image {
+  margin-bottom: 1.5rem;
+}
+.article .block-paragraph li {
+  font-size: var(--body-font-size);
+  line-height: var(--body-line-height);
+  letter-spacing: normal;
+}
+
 .article .block-paragraph,
 .article .block-paragraph p {
   color: var(--dark-0) i !important;
@@ -852,6 +865,7 @@ before the final footer.
 .article .block-paragraph p + ul {
   margin-top: -0.5rem;
 }
+
 /* zero width space */
 .article .block-paragraph p:empty {
   display: none;
@@ -868,6 +882,15 @@ before the final footer.
   font-family: var(--font-serif);
   font-size: 40px;
 }
+.article .block-paragraph h3 {
+  text-align: left;
+  margin: 1.5rem 0 0.3rem 0;
+  line-height: 1;
+  font-size: var(--body-font-size);
+  font-weight: bold;
+  opacity: 0.85;
+}
+
 .article .block-quote,
 .article .block-attributed_quote {
   display: flex;
@@ -900,8 +923,12 @@ before the final footer.
 }
 
 @media (max-width: 1300px) {
+  .article {
+    --body-font-size: 16px;
+  }
+
   .article .block-heading {
-    font-size: 26px;
+    font-size: 30px;
   }
   .article .block-quote {
     flex-direction: column;

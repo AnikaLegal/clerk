@@ -7,7 +7,7 @@ from django.urls import re_path
 # See here for details
 # https://docs.wagtail.io/en/stable/advanced_topics/customisation/page_editing_interface.html#limiting-features-in-a-rich-text-field
 RICH_TEXT_FEATURES = [
-    "h2",
+    "h3",
     "bold",
     "italic",  # bold / italic text
     "ol",
