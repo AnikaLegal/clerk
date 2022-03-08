@@ -1,0 +1,75 @@
+{% extends "case/_base.html" %}
+{% block title %}Case Checks Missing{% endblock %}
+
+{% block content %}
+<div class="ui container">
+    <h1 class="ui header">
+        Checks Missing
+        <div class="sub header">
+            {{ alert_issues|length }} active cases are missing a conflict or eligibility check.
+        </div>
+    </h1>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>File Ref</th>
+                <th>Topic</th>
+                <th>Client</th>
+                <th>Paralegal</th>
+                <th>Stage</th>
+                <th style="text-align: center">Conflict Check<br>Performed</th>
+                <th style="text-align: center">Eligibility Check<br>Performed</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for issue in alert_issues %}
+            <tr>
+                <td>
+                    <a href="{% url 'case-detail-view' issue.pk %}">
+                        {{ issue.fileref }}
+                    </a>
+                </td>
+                <td>{{ issue.get_topic_display }}</td>
+                <td>
+                    <a href="{% url 'client-detail' issue.client.pk %}">
+                        {{ issue.client.get_full_name|title }}
+                    </a>                    
+                </td>
+                <td>
+                    {% if issue.paralegal %}
+                
+                    <a href="{% url 'account-user-detail' issue.paralegal.pk %}">
+                        {{ issue.paralegal.get_full_name|title }}
+                    </a>               
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{issue.get_stage_display|default:"-" }}</td>
+                <td class="center aligned">
+                    {% if issue.is_conflict_check %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+                <td class="center aligned">
+                    {% if issue.is_eligibility_check %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td>
+                    No cases found
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

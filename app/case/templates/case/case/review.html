@@ -3,17 +3,25 @@
 
 {% block content %}
 <div class="ui container">
-    <h1>Alerts</h1>
-    <p>All running cases that are missing a conflict or eligibility check.</p>
-
-
-
-
-
-
-
-    <h1>Case Review Queue</h1>
-    <p>All open cases that are marked for review by coordinators, sorted by next review date.</p>
+    {% if alert_issues %}
+        <div class="ui segment inverted red tertiary padded">
+            <h2 class="ui header">
+                Checks Missing
+                <div class="sub header">
+                    {{ alert_issues|length }} active cases are missing a conflict or eligibility check.
+                </div>
+            </h2>
+            <a href="{% url 'case-checks' %}">
+                <button class="ui button red">View</button>
+            </a>
+        </div>
+    {% endif %}
+    <h1 class="ui header">
+        Case Review Queue
+        <div class="sub header">
+            All open and assigned cases, sorted by next review date.
+        </div>
+    </h1>
     {% include "case/case/_list_table.html" with issues=issues is_review=True is_open=True %}
 </div>
 {% endblock %}

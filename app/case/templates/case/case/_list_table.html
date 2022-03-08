@@ -26,11 +26,7 @@ is_open is True when all cases are open
     </thead>
     <tbody>
     {% for issue in issues %}
-        {% if issue.is_conflict_check and issue.is_eligibility_check %}
-            <tr>
-        {% else %}
-            <tr class="red">
-        {% endif %}
+        <tr>
             <td>
                 <a href="{% url 'case-detail-view' issue.pk %}">
                     {{ issue.fileref }}
@@ -85,11 +81,6 @@ is_open is True when all cases are open
                     {% endif %}
                 </td>
             {% endif %}
-            {% if not issue.is_conflict_check or not issue.is_eligibility_check %}
-                <td>WAKKA WAKKA WAKKA</td>
-            {% endif %}
-
-
         </tr>
     {% empty %}
         <tr>
