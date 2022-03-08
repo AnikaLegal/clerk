@@ -18,6 +18,10 @@ is_open is True when all cases are open
             {% if not is_open %}
                 <th>Outcome</th>
             {% endif %}
+            {% if is_inbox %}
+                <th style="text-align: center">Conflict Check<br>Performed</th>
+                <th style="text-align: center">Eligibility Check<br>Performed</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -61,7 +65,22 @@ is_open is True when all cases are open
             {% if not is_open %}
                 <td>{{issue.get_outcome_display|default:"-" }}</td>
             {% endif %}
-
+            {% if  is_inbox %}
+                <td class="center aligned">
+                    {% if issue.is_conflict_check %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+                <td class="center aligned">
+                    {% if issue.is_eligibility_check %}
+                        <i class="green checkmark icon"></i>
+                    {% else %}
+                        <i class="yellow close icon"></i>
+                    {% endif %}
+                </td>
+            {% endif %}
         </tr>
     {% empty %}
         <tr>

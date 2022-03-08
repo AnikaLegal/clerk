@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.fields import BooleanField
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, TextChoices
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.utils import timezone
@@ -180,7 +180,33 @@ class ClientMiscDynamicForm(DynamicTableForm):
     legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
 
 
+class EligibilityCheckNoteForm(forms.ModelForm):
+    class OutcomeType(TextChoices):
+        ELIGIBILITY_CHECK_SUCCESS = "ELIGIBILITY_CHECK_SUCCESS", "Cleared"
+        ELIGIBILITY_CHECK_FAILURE = "ELIGIBILITY_CHECK_FAILURE", "Not cleared"
+
+    class Meta:
+        model = IssueNote
+        fields = [
+            "issue",
+            "creator",
+            "note_type",
+            "text",
+        ]
+
+    text = forms.CharField(
+        label="Eligibility check note", min_length=1, max_length=2048, required=False
+    )
+    note_type = forms.ChoiceField(
+        label="Eligibility check outcome", choices=OutcomeType.choices
+    )
+
+
 class ConflictCheckNoteForm(forms.ModelForm):
+    class OutcomeType(TextChoices):
+        CONFLICT_CHECK_SUCCESS = "CONFLICT_CHECK_SUCCESS", "Cleared"
+        CONFLICT_CHECK_FAILURE = "CONFLICT_CHECK_FAILURE", "Not cleared"
+
     class Meta:
         model = IssueNote
         fields = [
@@ -193,20 +219,9 @@ class ConflictCheckNoteForm(forms.ModelForm):
     text = forms.CharField(
         label="Conflict check note", min_length=1, max_length=2048, required=False
     )
-    outcome = forms.ChoiceField(
-        label="Conflict check outcome",
-        choices=[
-            ("cleared", "Cleared"),
-            ("not cleared", "Not cleared"),
-        ],
+    note_type = forms.ChoiceField(
+        label="Conflict check outcome", choices=OutcomeType.choices
     )
-
-    @transaction.atomic
-    def save(self):
-        issue_note = super().save()
-        outcome = self.cleaned_data["outcome"]
-        issue_note.text = f"Outcome: {outcome}. {issue_note.text}"
-        issue_note.save()
 
 
 class ParalegalNoteForm(forms.ModelForm):

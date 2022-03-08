@@ -1,14 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Exists, OuterRef
 from django.utils import timezone
 
 from case.forms import IssueSearchForm
 from case.utils import get_page
 from core.models import Issue
+from core.models.issue_note import NoteType, IssueNote
 from core.models.issue import CaseStage
-from core.models.issue_note import NoteType
 
 from case.views.auth import login_required, coordinator_or_better_required
 from case.utils.router import Route
@@ -19,6 +19,7 @@ list_route = Route("list")
 search_route = Route("search").path("search")
 inbox_route = Route("inbox").path("inbox")
 review_route = Route("review").path("review")
+checks_route = Route("checks").path("checks")
 
 
 @list_route
@@ -75,20 +76,29 @@ def case_search_view(request):
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def case_review_view(request):
-    """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_open = Q(is_open=True)
-    has_review = Q(issuenote__note_type=NoteType.REVIEW)
-    is_review = is_open & has_review
+    """Page where coordinators can see existing cases for them to review"""
     issues = (
         Issue.objects.select_related("client", "paralegal")
         .prefetch_related("issuenote_set")
-        .filter(is_review)
+        .filter(is_open=True)
+        .exclude(paralegal__isnull=True)
         .annotate(next_review=Max("issuenote__event"))
         .order_by("next_review")
     )
+    issues = _annotate_with_checks(issues)
+    alert_issues = [
+        i
+        for i in issues
+        if i.stage != CaseStage.UNSTARTED
+        and not (i.is_conflict_check and i.is_eligibility_check)
+    ]
     # Annotate issues with days from now
     now = timezone.now()
     for issue in issues:
+        if not issue.next_review:
+            issue.color = ""
+            continue
+
         days = (issue.next_review - now).days
         if days >= 7:
             issue.color = ""
@@ -101,23 +111,65 @@ def case_review_view(request):
         else:
             issue.color = "red"
 
-    context = {"issues": issues}
+    context = {"issues": issues, "alert_issues": alert_issues}
     return render(request, "case/case/review.html", context)
+
+
+@checks_route
+@coordinator_or_better_required
+@require_http_methods(["GET"])
+def case_checks_view(request):
+    """Page where coordinators can see new cases which are missing manual checks"""
+    issues = (
+        Issue.objects.select_related("client", "paralegal")
+        .prefetch_related("issuenote_set")
+        .filter(is_open=True)
+        .exclude(paralegal__isnull=True)
+        .annotate(next_review=Max("issuenote__event"))
+        .order_by("next_review")
+    )
+    issues = _annotate_with_checks(issues)
+    alert_issues = [
+        i
+        for i in issues
+        if i.stage != CaseStage.UNSTARTED
+        and not (i.is_conflict_check and i.is_eligibility_check)
+    ]
+    context = {"alert_issues": alert_issues}
+    return render(request, "case/case/checks_missing.html", context)
 
 
 @inbox_route
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def case_inbox_view(request):
-    """Inbox page where coordinators can see new cases for them to review and assign"""
-    is_unassigned = Q(paralegal__email=COORDINATORS_EMAIL) | Q(paralegal__isnull=True)
+    """Inbox page where coordinators can see new cases for them to assign"""
+    is_unassigned = Q(paralegal__isnull=True)
     is_open = Q(is_open=True)
-    is_new_stage = Q(stage=CaseStage.UNSTARTED) | Q(stage__isnull=True)
-    is_inbox = is_unassigned & is_open & is_new_stage
+    is_inbox = is_unassigned & is_open
     issues = (
         Issue.objects.select_related("client", "paralegal")
         .filter(is_inbox)
-        .order_by("-created_at")
+        .order_by("created_at")
     )
+    issues = _annotate_with_checks(issues)
     context = {"issues": issues}
     return render(request, "case/case/inbox.html", context)
+
+
+def _annotate_with_checks(issue_qs):
+    is_conflict_check = Q(note_type=NoteType.CONFLICT_CHECK_FAILURE) | Q(
+        note_type=NoteType.CONFLICT_CHECK_SUCCESS
+    )
+    conflict_check_subquery = IssueNote.objects.filter(is_conflict_check).filter(
+        issue=OuterRef("pk")
+    )
+    is_eligibility_check = Q(note_type=NoteType.ELIGIBILITY_CHECK_FAILURE) | Q(
+        note_type=NoteType.ELIGIBILITY_CHECK_SUCCESS
+    )
+    eligibility_check_subquery = IssueNote.objects.filter(is_eligibility_check).filter(
+        issue=OuterRef("pk")
+    )
+    return issue_qs.annotate(
+        is_conflict_check=Exists(conflict_check_subquery)
+    ).annotate(is_eligibility_check=Exists(eligibility_check_subquery))
