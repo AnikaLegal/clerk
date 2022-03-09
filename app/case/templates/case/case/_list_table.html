@@ -2,7 +2,7 @@
 is_review is True when this is showing case reviews
 is_open is True when all cases are open
 {% endcomment %}
-<table class="ui celled table">
+<table class="ui celled table" id="{{ table_id }}">
     <thead>
         <tr>
             <th>File Ref</th>
@@ -10,6 +10,7 @@ is_open is True when all cases are open
             <th>Client</th>
             <th>Paralegal</th>
             {% if is_review %}
+                <th>Lawyer</th>
                 <th>Next Review Due</th>
             {% endif %}
             <th>Created</th>
@@ -49,6 +50,16 @@ is_open is True when all cases are open
                 {% endif %}
             </td>
             {% if is_review %}
+                <td>
+                    {% if issue.lawyer %}
+                
+                    <a href="{% url 'account-user-detail' issue.lawyer.pk %}">
+                        {{ issue.lawyer.get_full_name|title }}
+                    </a>               
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td class="center aligned {{ issue.color }}">
                     {{ issue.next_review|date:"d/m/y" }}
                 </td>

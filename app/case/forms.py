@@ -453,7 +453,7 @@ class IssueAssignParalegalForm(forms.ModelForm):
         self.fields["paralegal"].queryset = User.objects.filter(
             ms_account_created_at__lte=fifteen_minutes_ago, groups__name="Paralegal"
         )
-        # self.fields["lawyer"].queryset = User.objects.filter(groups__name="Lawyer")
+        self.fields["lawyer"].queryset = User.objects.filter(groups__name="Lawyer")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -463,3 +463,10 @@ class IssueAssignParalegalForm(forms.ModelForm):
             raise ValidationError(
                 "A paralegal can only be assigned if a lawyer is also assigned"
             )
+
+
+class LawyerFilterForm(forms.Form):
+
+    lawyer = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name="Lawyer"), empty_label="All lawyers"
+    )

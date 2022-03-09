@@ -4,7 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Max, Exists, OuterRef
 from django.utils import timezone
 
-from case.forms import IssueSearchForm
+from case.forms import IssueSearchForm, LawyerFilterForm
 from case.utils import get_page
 from core.models import Issue
 from core.models.issue_note import NoteType, IssueNote
@@ -18,6 +18,7 @@ COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 list_route = Route("list")
 search_route = Route("search").path("search")
 inbox_route = Route("inbox").path("inbox")
+review_search_route = Route("review-search").path("review").path("search")
 review_route = Route("review").path("review")
 checks_route = Route("checks").path("checks")
 
@@ -77,21 +78,54 @@ def case_search_view(request):
 @require_http_methods(["GET"])
 def case_review_view(request):
     """Page where coordinators can see existing cases for them to review"""
-    issues = (
-        Issue.objects.select_related("client", "paralegal")
-        .prefetch_related("issuenote_set")
-        .filter(is_open=True)
-        .exclude(paralegal__isnull=True)
-        .annotate(next_review=Max("issuenote__event"))
-        .order_by("next_review")
-    )
-    issues = _annotate_with_checks(issues)
+    issues = _get_review_issue_qs()
+    _annotate_issue_review_color(issues)
     alert_issues = [
         i
         for i in issues
         if i.stage != CaseStage.UNSTARTED
         and not (i.is_conflict_check and i.is_eligibility_check)
     ]
+    form = LawyerFilterForm()
+    context = {"issues": issues, "alert_issues": alert_issues, "form": form}
+    return render(request, "case/case/review.html", context)
+
+
+@review_search_route
+@coordinator_or_better_required
+@require_http_methods(["GET"])
+def case_review_search_view(request):
+    """Page where coordinators can see existing cases for them to review"""
+    issues = _get_review_issue_qs()
+    _annotate_issue_review_color(issues)
+    form = LawyerFilterForm(request.GET)
+    if form.is_valid():
+        lawyer = form.cleaned_data["lawyer"]
+        if lawyer:
+            issues = issues.filter(lawyer=lawyer)
+
+    context = {
+        "issues": issues,
+        "table_id": "review-table",
+        "is_review": True,
+        "is_open": True,
+    }
+    return render(request, "case/case/_list_table.html", context)
+
+
+def _get_review_issue_qs():
+    issues = (
+        Issue.objects.select_related("client", "paralegal", "lawyer")
+        .prefetch_related("issuenote_set")
+        .filter(is_open=True)
+        .exclude(paralegal__isnull=True)
+        .annotate(next_review=Max("issuenote__event"))
+        .order_by("next_review")
+    )
+    return _annotate_with_checks(issues)
+
+
+def _annotate_issue_review_color(issues):
     # Annotate issues with days from now
     now = timezone.now()
     for issue in issues:
@@ -110,9 +144,6 @@ def case_review_view(request):
             issue.color = "orange"
         else:
             issue.color = "red"
-
-    context = {"issues": issues, "alert_issues": alert_issues}
-    return render(request, "case/case/review.html", context)
 
 
 @checks_route
