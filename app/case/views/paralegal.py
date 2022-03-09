@@ -32,7 +32,7 @@ def paralegal_list_view(request):
         .order_by("-latest_issue_created_at")
     )
     for p in paralegals:
-        p.capacity = 100 * p.open_cases / PARALEGAL_CAPACITY
+        p.capacity = 100 * p.open_cases / p.case_capacity
 
     context = {
         "paralegals": paralegals,

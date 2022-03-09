@@ -18,6 +18,7 @@ class User(AbstractUser):
     class Meta:
         db_table = "auth_user"
 
+    case_capacity = models.PositiveIntegerField(default=4)
     is_intern = models.BooleanField(default=False)
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)

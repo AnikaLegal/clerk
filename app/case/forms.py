@@ -268,11 +268,7 @@ class ParalegalReviewNoteForm(forms.ModelForm):
 class UserDetailsDynamicForm(DynamicTableForm):
     class Meta:
         model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "is_intern",
-        ]
+        fields = ["first_name", "last_name", "is_intern", "case_capacity"]
 
 
 class IssueSearchForm(forms.ModelForm):
