@@ -271,6 +271,43 @@ class UserDetailsDynamicForm(DynamicTableForm):
         fields = ["first_name", "last_name", "is_intern", "case_capacity"]
 
 
+class ParalegalSearchForm(forms.Form):
+
+    name = forms.CharField(required=False, label="Name or email")
+    is_intern = forms.ChoiceField(
+        choices=[
+            ("", "-"),
+            ("True", "Intern"),
+            ("False", "Volunteer"),
+        ],
+        required=False,
+    )
+
+    def search_queryset(self, paralegal_qs):
+        is_intern = self.data.get("is_intern")
+        if is_intern:
+            paralegal_qs = paralegal_qs.filter(is_intern=is_intern == "True")
+
+        name = self.data.get("name")
+        if name:
+            search_parts = name.split(" ")
+            search_query = None
+            for search_part in search_parts:
+                part_query = (
+                    Q(first_name__icontains=search_part)
+                    | Q(last_name__icontains=search_part)
+                    | Q(email__icontains=search_part)
+                )
+                if search_query:
+                    search_query |= part_query
+                else:
+                    search_query = part_query
+
+            paralegal_qs = paralegal_qs.filter(search_query)
+
+        return paralegal_qs
+
+
 class IssueSearchForm(forms.ModelForm):
     class Meta:
         model = Issue

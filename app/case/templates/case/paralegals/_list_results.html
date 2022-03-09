@@ -1,0 +1,47 @@
+<table id="{{ table_id }}" class="ui celled table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th class="center aligned">Latest Case</th>
+            <th class="center aligned">Capacity (%)</th>
+            <th class="center aligned">Total<br>Open</th>
+            <th class="center aligned">Repairs<br>Open</th>
+            <th class="center aligned">Bonds<br>Open</th>
+            <th class="center aligned">Eviction<br>Open</th>
+            <th class="center aligned">Total Cases</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        <tr>
+            <td {% if lawyer.is_intern %}class="blue"{% endif %}>
+                <a href="{% url 'account-user-detail' user.pk %}">
+                    {{ user.get_full_name|title }} {% if user.is_intern %}(intern){% endif %}
+                </a>               
+            </td>                
+            <td class="center aligned">{{ user.latest_issue_created_at|date:"d/m/y" }}</td>
+            {% if user.capacity == 0 %}
+                <td class="center aligned">{{user.capacity|floatformat:'0' }}</td>
+            {% elif user.capacity < 50 %}
+                <td class="center aligned green">{{user.capacity|floatformat:'0' }}</td>
+            {% elif user.capacity < 75 %}
+                <td class="center aligned yellow">{{user.capacity|floatformat:'0' }}</td>
+            {% elif user.capacity < 100 %}
+                <td class="center aligned orange">{{user.capacity|floatformat:'0' }}</td>
+            {% else %}
+                <td class="center aligned red">{{user.capacity|floatformat:'0' }}</td>
+            {% endif %}
+
+            <td class="center aligned">{{user.open_cases }}</td>
+            <td class="center aligned">{{user.open_repairs }}</td>
+            <td class="center aligned">{{user.open_bonds }}</td>
+            <td class="center aligned">{{user.open_eviction }}</td>
+            <td class="center aligned">{{user.total_cases }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>No users found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
