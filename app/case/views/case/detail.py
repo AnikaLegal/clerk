@@ -301,10 +301,12 @@ def case_detail_assign_view(request, pk):
         form = IssueAssignParalegalForm(request.POST, instance=issue)
         if form.is_valid():
             issue = form.save()
-            context.update({"new_paralegal": issue.paralegal})
+            context.update(
+                {"new_paralegal": issue.paralegal, "new_lawyer": issue.lawyer}
+            )
             messages.success(request, "Assignment successful")
     else:
-        form = IssueAssignParalegalForm()
+        form = IssueAssignParalegalForm(instance=issue)
 
     url = reverse(f"case-detail-assign", args=(pk,))
     options_url = reverse(f"case-detail-options", args=(pk,))
@@ -445,7 +447,7 @@ def _get_issue(request, pk):
     try:
         issue = (
             Issue.objects.check_permissions(request)
-            .select_related("client", "paralegal")
+            .select_related("client", "paralegal", "lawyer")
             .prefetch_related("fileupload_set")
             .get(pk=pk)
         )

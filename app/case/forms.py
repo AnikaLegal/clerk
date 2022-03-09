@@ -408,11 +408,21 @@ class IssueReOpenForm(forms.ModelForm):
 class IssueAssignParalegalForm(forms.ModelForm):
     class Meta:
         model = Issue
-        fields = ["paralegal"]
+        fields = ["paralegal", "lawyer"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
         self.fields["paralegal"].queryset = User.objects.filter(
-            ms_account_created_at__lte=fifteen_minutes_ago
+            ms_account_created_at__lte=fifteen_minutes_ago, groups__name="Paralegal"
         )
+        # self.fields["lawyer"].queryset = User.objects.filter(groups__name="Lawyer")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        paralegal = cleaned_data.get("paralegal")
+        lawyer = cleaned_data.get("lawyer")
+        if paralegal and not lawyer:
+            raise ValidationError(
+                "A paralegal can only be assigned if a lawyer is also assigned"
+            )

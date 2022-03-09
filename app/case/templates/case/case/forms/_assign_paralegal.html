@@ -17,6 +17,7 @@ Args:
         hx-swap="outerHTML"
     >
         {% include 'case/forms/_dropdown_field.html' with field=form.paralegal class="search" %}
+        {% include 'case/forms/_dropdown_field.html' with field=form.lawyer class="search" %}
         {% include 'case/forms/_form_errors.html' %}
         {% include 'case/forms/_form_success.html' %}
         <button class="ui positive button" type="submit">Update</button>
@@ -34,6 +35,6 @@ Args:
         $('.selection.dropdown').dropdown()
     </script>
 </div>
-{% if new_paralegal %}
-    {% include 'case/case/_assigned_paralegal_link.html' with paralegal=new_paralegal %}
+{% if new_paralegal or new_lawyer %}
+    {% include 'case/case/_assigned_paralegal_link.html' with paralegal=new_paralegal lawyer=new_lawyer %}
 {% endif %}

@@ -130,6 +130,15 @@ class Issue(TimestampedModel):
     paralegal = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL
     )
+    # The lawyer who is responsible for the case.
+    lawyer = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lawyer_issues",
+        related_query_name="lawyer_issue",
+    )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
     # Tracks whether a Slack alert has been successfully sent.

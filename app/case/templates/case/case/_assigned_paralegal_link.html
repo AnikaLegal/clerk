@@ -2,11 +2,23 @@
     <span id="assigned-paralegal" hx-swap-oob="true">
     Assigned to 
     <a href="{% url 'account-user-detail' paralegal.pk %}">
-        {{ paralegal.get_full_name|title }}
+        {{ paralegal.get_full_name|title }},
     </a>               
     </span>
 {% else %}
     <span id="assigned-paralegal" hx-swap-oob="true">
-        Not assigned
+        Not assigned,
+    </span>
+{% endif %}
+{% if lawyer %}
+    <span id="assigned-lawyer" hx-swap-oob="true">
+    supervised by 
+    <a href="{% url 'account-user-detail' lawyer.pk %}">
+        {{ lawyer.get_full_name|title }}
+    </a>               
+    </span>
+{% else %}
+    <span id="assigned-lawyer" hx-swap-oob="true">
+        not supervised
     </span>
 {% endif %}

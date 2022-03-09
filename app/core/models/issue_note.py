@@ -22,7 +22,6 @@ class NoteType(models.TextChoices):
     # An event related to an email
     EMAIL = "EMAIL", "Email"
     # An event related to a conflict check.
-    CONFLICT_CHECK = "CONFLICT_CHECK", "Conflict check"
     CONFLICT_CHECK_SUCCESS = "CONFLICT_CHECK_SUCCESS", "Conflict check cleared"
     CONFLICT_CHECK_FAILURE = "CONFLICT_CHECK_FAILURE", "Conflict check not cleared"
     # An event related to an elgibility check
@@ -45,7 +44,6 @@ class IssueNote(TimestampedModel):
         NoteType.PERFORMANCE,
         NoteType.EVENT,
         NoteType.EMAIL,
-        NoteType.CONFLICT_CHECK,
         NoteType.CONFLICT_CHECK_SUCCESS,
         NoteType.CONFLICT_CHECK_FAILURE,
         NoteType.ELIGIBILITY_CHECK_SUCCESS,

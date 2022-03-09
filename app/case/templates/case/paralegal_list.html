@@ -4,8 +4,55 @@
 
 {% block content %}
 <div class="ui container">
+    <h1>Lawyer</h1>
+    <p>Every user who a part of the Lawyer group</p>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th class="center aligned">Latest Case</th>
+                <th class="center aligned">Capacity (%)</th>
+                <th class="center aligned">Total<br>Open</th>
+                <th class="center aligned">Repairs<br>Open</th>
+                <th class="center aligned">Bonds<br>Open</th>
+                <th class="center aligned">Eviction<br>Open</th>
+                <th class="center aligned">Total Cases</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for lawyer in lawyers %}
+            <tr>
+                <td {% if lawyer.is_intern %}class="blue"{% endif %}>
+                    <a href="{% url 'account-user-detail' lawyer.pk %}">
+                        {{ lawyer.get_full_name|title }} {% if lawyer.is_intern %}(intern){% endif %}
+                    </a>               
+                </td>                
+                <td class="center aligned">{{ lawyer.latest_issue_created_at|date:"d/m/y" }}</td>
+                {% if lawyer.capacity == 0 %}
+                    <td class="center aligned">{{lawyer.capacity|floatformat:'0' }}</td>
+                {% elif lawyer.capacity < 50 %}
+                    <td class="center aligned green">{{lawyer.capacity|floatformat:'0' }}</td>
+                {% elif lawyer.capacity < 75 %}
+                    <td class="center aligned yellow">{{lawyer.capacity|floatformat:'0' }}</td>
+                {% elif lawyer.capacity < 100 %}
+                    <td class="center aligned orange">{{lawyer.capacity|floatformat:'0' }}</td>
+                {% else %}
+                    <td class="center aligned red">{{lawyer.capacity|floatformat:'0' }}</td>
+                {% endif %}
+
+                <td class="center aligned">{{lawyer.open_cases }}</td>
+                <td class="center aligned">{{lawyer.open_repairs }}</td>
+                <td class="center aligned">{{lawyer.open_bonds }}</td>
+                <td class="center aligned">{{lawyer.open_eviction }}</td>
+                <td class="center aligned">{{lawyer.total_cases }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
     <h1>Paralegals</h1>
-    <p>Every user who is assigned to a case (active or closed)</p>
+    <p>Every user who is a part of the Paralegal group</p>
     <table class="ui celled table">
         <thead>
             <tr>
@@ -44,7 +91,6 @@
                 <td class="center aligned">{{paralegal.open_repairs }}</td>
                 <td class="center aligned">{{paralegal.open_bonds }}</td>
                 <td class="center aligned">{{paralegal.open_eviction }}</td>
-
                 <td class="center aligned">{{paralegal.total_cases }}</td>
             </tr>
         {% endfor %}

@@ -6,6 +6,8 @@
                 {% for group in user.groups.all %}
                     {% if group.name == "Admin" %}
                     <div class="ui label green">
+                    {% elif group.name == "Lawyer" %}
+                    <div class="ui label orange">
                     {% elif group.name == "Coordinator" %}
                     <div class="ui label teal">
                     {% elif group.name == "Paralegal" %}
