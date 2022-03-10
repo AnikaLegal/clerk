@@ -1,4 +1,4 @@
-from django.db.models import Count, Max, Q, F
+from django.db.models import Count, Max, Q, F, Case, When
 from django.shortcuts import render
 
 from accounts.models import User
@@ -66,7 +66,12 @@ def _calculate_user_capacity(user_qs, issue_rel):
                 Q(**{f"{issue_rel}__is_open": True, f"{issue_rel}__topic": "EVICTION"}),
             ),
         )
-        .annotate(capacity=100 * F("open_cases") / F("case_capacity"))
+        .annotate(
+            capacity=Case(
+                When(case_capacity=0, then=-1),
+                default=100 * F("open_cases") / F("case_capacity"),
+            )
+        )
         .order_by("-capacity")
     )
     return user_qs

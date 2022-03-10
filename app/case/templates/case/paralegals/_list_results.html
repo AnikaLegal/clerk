@@ -22,6 +22,8 @@
             <td class="center aligned">{{ user.latest_issue_created_at|date:"d/m/y" }}</td>
             {% if user.capacity == 0 %}
                 <td class="center aligned">{{user.capacity|floatformat:'0' }}</td>
+            {% elif user.capacity < 0 %}
+                <td class="center aligned blue">No capacity</td>
             {% elif user.capacity < 50 %}
                 <td class="center aligned green">{{user.capacity|floatformat:'0' }}</td>
             {% elif user.capacity < 75 %}
