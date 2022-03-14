@@ -17,7 +17,35 @@ from emails.models import Email
 logger = logging.getLogger(__name__)
 
 
+def send_case_assignment_slack(issue_pk: str):
+    """
+    Notify assigned paralegak of new case assignment.
+    """
+    issue = Issue.objects.select_related("paralegal", "client").get(pk=issue_pk)
+    assert issue.paralegal, f"Assigned paralegal not found for Issue<{issue_pk}>"
+    assert issue.lawyer, f"Assigned lawyer not found for Issue<{issue_pk}>"
+    logging.info(
+        "Notifying User<%s> of assignment to Issue<%s>", issue.paralegal.pk, issue_pk
+    )
+    slack_user = get_slack_user_by_email(issue.paralegal.email)
+    assert slack_user, f"Slack user not found for User<{issue.paralegal.pk}>"
+    msg = CASE_ASSIGNMENT_MSG.format(
+        case_start_date=issue.created_at.strftime("%d/%m/%Y"),
+        client_name=issue.client.get_full_name(),
+        fileref=issue.fileref,
+        lawyer_email=issue.lawyer.email,
+        lawyer_name=issue.lawyer.get_full_name(),
+        paralegal_name=issue.paralegal.get_full_name(),
+        case_url=settings.CLERK_BASE_URL
+        + reverse("case-detail-view", args=(str(issue.pk),)),
+    )
+    send_slack_direct_message(msg, slack_user["id"])
+
+
 def send_issue_slack(issue_pk: str):
+    """
+    Notify alerts channel of new submission.
+    """
     issue = Issue.objects.select_related("client").get(pk=issue_pk)
     text = get_text(issue)
     logging.info("Notifying Slack of Issue<%s>", issue_pk)
@@ -27,6 +55,9 @@ def send_issue_slack(issue_pk: str):
 
 
 def send_email_alert_slack(email_pk: str):
+    """
+    Notify alerts channel of new unhandled email.
+    """
     logging.info("Sending alert for Email<%s>", email_pk)
     email = Email.objects.get(pk=email_pk)
     issue = email.issue
@@ -150,3 +181,41 @@ def get_report_text(num_days: int, show_outcomes=True):
         stats.append(text)
 
     return "\n".join([f"\t\t• {s}" for s in stats])
+
+
+CASE_ASSIGNMENT_MSG = """
+Hi {paralegal_name},
+ 
+You've been assigned {client_name} case <{case_url}|{fileref}>.
+The materials needed to advise the client are located in the client file. 
+Please use this, along with information from the client call, to populate the file note.
+ 
+*Your case*:
+
+- *Case reference*: <{case_url}|{fileref}>
+- *Case start date*: {case_start_date}
+- *Supervising lawyer*: {lawyer_name} at {lawyer_email}
+ 
+Please do not distribute any of these materials.
+ 
+*Steps*
+
+- Assume that the client has already undertaken a conflict check.
+- Populate the file note based on questionnaire responses. Fields the client didn't answer in the questionnaire won't show up on the responses.
+- Call the client and get any other information you'll need (per the Case Manual). We haven't formally engaged the client yet so be careful not to say we can help them at this point.
+- Send the client the first email using the engagement letter template. However, tweak this as you see fit. We want our clients to receive the best service possible, and that means personalised interactions!
+- When the client has agreed to the terms of the engagement letter, begin the process per the Case Manual.
+
+*Compliance*
+
+- *Other than the client's email, _all_ email correspondence* must be sent to Anika email addresses only. Any email otherwise sent to an external email address is a breach of client confidentiality. Do not send case emails to any other email domain under any circumstance.
+- If someone at Anika asks you to CC them at their personal email, please don’t! This is a breach of confidentiality.
+- *All information relating to the case is confidential* and can only be shared with Anika inducted staff.
+- For legal questions about the case contact {lawyer_name} at {lawyer_email}.
+- For questions about the general process contact your supervising coordinator for the particular day (please see case team slack channel).
+
+Be sure to keep track of all feedback!
+
+Good luck,
+Anika Case Team Leadership
+"""

@@ -50,7 +50,13 @@ def send_slack_direct_message(markdown_text: str, user_id: str):
     logger.info(f"Finished sending Slack message to user {user_id}")
 
 
+NON_STANDARD_SLACK_EMAILS = {
+    "matt@anikalegal.com": "mattdsegal@gmail.com",
+}
+
+
 def get_slack_user_by_email(email: str):
+    email = NON_STANDARD_SLACK_EMAILS.get(email, email)
     url = "https://slack.com/api/users.lookupByEmail"
     data = {"email": email}
     resp = requests.get(url, params=data, headers=HEADERS)

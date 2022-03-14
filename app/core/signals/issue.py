@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from core.models import Issue, IssueEvent
-from core.services.slack import send_issue_slack
+from core.services.slack import send_issue_slack, send_case_assignment_slack
 from microsoft.tasks import set_up_new_case_task
 from microsoft.service import add_user_to_case, remove_user_from_case
 
@@ -47,6 +47,8 @@ def pre_save_issue(sender, instance, **kwargs):
                 issue.id,
             )
             add_user_to_case(issue.paralegal, issue)
+            # Send Slack message to paralegal
+            async_task(send_case_assignment_slack, str(issue.pk))
 
 
 @receiver(post_save, sender=Issue)
