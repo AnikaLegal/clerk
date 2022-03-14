@@ -48,7 +48,7 @@ def pre_save_issue(sender, instance, **kwargs):
             )
             add_user_to_case(issue.paralegal, issue)
             # Send Slack message to paralegal
-            async_task(send_case_assignment_slack, str(issue.pk))
+            send_case_assignment_slack(issue)
 
 
 @receiver(post_save, sender=Issue)

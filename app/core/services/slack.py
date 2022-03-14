@@ -17,29 +17,30 @@ from emails.models import Email
 logger = logging.getLogger(__name__)
 
 
-def send_case_assignment_slack(issue_pk: str):
+def send_case_assignment_slack(issue: str):
     """
     Notify assigned paralegak of new case assignment.
     """
-    issue = Issue.objects.select_related("paralegal", "client").get(pk=issue_pk)
-    assert issue.paralegal, f"Assigned paralegal not found for Issue<{issue_pk}>"
-    assert issue.lawyer, f"Assigned lawyer not found for Issue<{issue_pk}>"
+    assert issue.paralegal, f"Assigned paralegal not found for Issue<{issue.pk}>"
+    assert issue.lawyer, f"Assigned lawyer not found for Issue<{issue.pk}>"
     logging.info(
-        "Notifying User<%s> of assignment to Issue<%s>", issue.paralegal.pk, issue_pk
+        "Notifying User<%s> of assignment to Issue<%s>", issue.paralegal.pk, issue.pk
     )
     slack_user = get_slack_user_by_email(issue.paralegal.email)
-    assert slack_user, f"Slack user not found for User<{issue.paralegal.pk}>"
-    msg = CASE_ASSIGNMENT_MSG.format(
-        case_start_date=issue.created_at.strftime("%d/%m/%Y"),
-        client_name=issue.client.get_full_name(),
-        fileref=issue.fileref,
-        lawyer_email=issue.lawyer.email,
-        lawyer_name=issue.lawyer.get_full_name(),
-        paralegal_name=issue.paralegal.get_full_name(),
-        case_url=settings.CLERK_BASE_URL
-        + reverse("case-detail-view", args=(str(issue.pk),)),
-    )
-    send_slack_direct_message(msg, slack_user["id"])
+    if slack_user:
+        msg = CASE_ASSIGNMENT_MSG.format(
+            case_start_date=issue.created_at.strftime("%d/%m/%Y"),
+            client_name=issue.client.get_full_name(),
+            fileref=issue.fileref,
+            lawyer_email=issue.lawyer.email,
+            lawyer_name=issue.lawyer.get_full_name(),
+            paralegal_name=issue.paralegal.get_full_name(),
+            case_url=settings.CLERK_BASE_URL
+            + reverse("case-detail-view", args=(str(issue.pk),)),
+        )
+        send_slack_direct_message(msg, slack_user["id"])
+    else:
+        logger.error(f"Slack user not found for User<{issue.paralegal.pk}>")
 
 
 def send_issue_slack(issue_pk: str):

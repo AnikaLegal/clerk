@@ -45,8 +45,9 @@ def send_slack_direct_message(markdown_text: str, user_id: str):
     headers = {"Content-Type": "application/json", **HEADERS}
     url = "https://slack.com/api/chat.postMessage"
     data = {"channel": user_id, "text": markdown_text}
-    resp = requests.post(url, json=data, headers=headers)
-    resp.raise_for_status()
+    if not settings.SLACK_MESSAGE_DISABLED:
+        resp = requests.post(url, json=data, headers=headers)
+        resp.raise_for_status()
     logger.info(f"Finished sending Slack message to user {user_id}")
 
 
@@ -60,8 +61,9 @@ def get_slack_user_by_email(email: str):
     url = "https://slack.com/api/users.lookupByEmail"
     data = {"email": email}
     resp = requests.get(url, params=data, headers=HEADERS)
-    resp.raise_for_status()
-    user_data = resp.json()
-    logging.info(user_data)
-    if user_data["ok"]:
-        return user_data["user"]
+    if not settings.SLACK_MESSAGE_DISABLED:
+        resp.raise_for_status()
+        user_data = resp.json()
+        logging.info(user_data)
+        if user_data["ok"]:
+            return user_data["user"]

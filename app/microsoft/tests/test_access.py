@@ -89,6 +89,7 @@ def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
     issue = IssueFactory(is_case_sent=True, paralegal=None)
     add_user_to_case.assert_not_called()
     issue.paralegal = user
+    issue.lawyer = UserFactory()
     issue.save()
     add_user_to_case.assert_called_once_with(user, issue)
 
@@ -98,7 +99,7 @@ def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
 @patch("core.signals.issue.add_user_to_case")
 def test_remove_paralegal_from_case(add_user_to_case, remove_user_from_case):
     user = UserFactory()
-    issue = IssueFactory(is_case_sent=True, paralegal=user)
+    issue = IssueFactory(is_case_sent=True, paralegal=user, lawyer=UserFactory())
     remove_user_from_case.assert_not_called()
     issue.paralegal = UserFactory()
     issue.save()
