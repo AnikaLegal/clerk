@@ -171,6 +171,8 @@ class ClientMiscDynamicForm(DynamicTableForm):
             "is_multi_income_household",
         ]
 
+    not_required_fields = [*Meta.fields]
+
     rental_circumstances = SingleChoiceField(
         field_name="rental_circumstances", model=Client
     )

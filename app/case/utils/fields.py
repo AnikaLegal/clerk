@@ -29,10 +29,10 @@ class SingleChoiceField(ChoiceField):
 class MultiChoiceField(SimpleArrayField):
     widget = FomanticSelectMultiple
 
-    def __init__(self, field_name, model):
+    def __init__(self, field_name, model, **kwargs):
         self.choices = getattr(model, field_name).field.base_field.choices
         self.choice_map = {v: l for v, l in self.choices}
-        super().__init__(ChoiceField(choices=self.choices))
+        super().__init__(ChoiceField(choices=self.choices), **kwargs)
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)

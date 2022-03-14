@@ -43,12 +43,15 @@ class DynamicTableForm(ModelForm):
     """
 
     template = "case/forms/_dynamic_table_form.html"
+    not_required_fields = []
 
     def __init__(self, slug: str, *args, editable: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         self.editable = editable
         self.slug = slug
         self.set_display_values()
+        for fname in self.not_required_fields:
+            self.fields[fname].required = False
 
     def set_display_values(self):
         # Build display value for fields
