@@ -187,7 +187,7 @@ CASE_ASSIGNMENT_MSG = """
 Hi {paralegal_name},
  
 You've been assigned {client_name} case <{case_url}|{fileref}>.
-The materials needed to advise the client are located in the client file. 
+The materials needed to advise the client are located in the <{case_url}|client file>. 
 Please use this, along with information from the client call, to populate the file note.
  
 *Your case*:
