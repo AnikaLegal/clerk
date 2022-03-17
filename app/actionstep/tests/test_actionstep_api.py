@@ -1,5 +1,6 @@
 import json
 
+import pytest
 import responses
 
 from actionstep.api.base import BaseEndpoint
@@ -26,6 +27,7 @@ def _add_response(method, data, status, suffix=""):
     )
 
 
+@pytest.mark.skip
 def test_endpoint_construction():
     endpoint = _get_endpoint()
     assert endpoint.url == TEST_URL
@@ -37,6 +39,7 @@ def test_endpoint_construction():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_create():
     data = {"test": {"id": 1, "value": 12345}}
     _add_response(responses.POST, data, 200)
@@ -46,6 +49,7 @@ def test_create():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_update():
     data = {"test": {"id": 1, "value": 12345}}
     _add_response(responses.PUT, data, 200, suffix="1")
@@ -55,6 +59,7 @@ def test_update():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_delete():
     data = ""
     _add_response(responses.DELETE, data, 204, suffix="1")
@@ -64,6 +69,7 @@ def test_delete():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_list__with_single_result():
     data = {"test": {"value": 12345}}
     _add_response(responses.GET, data, 200)
@@ -73,6 +79,7 @@ def test_list__with_single_result():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_list__with_no_results():
     data = ""
     _add_response(responses.GET, data, 204)
@@ -82,6 +89,7 @@ def test_list__with_no_results():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_list__with_multiple_results():
     data = {
         "test": [{"value": 12345}, {"value": 56789}],
@@ -105,6 +113,7 @@ def test_list__with_multiple_results():
 
 
 @responses.activate
+@pytest.mark.skip
 def test_list__with_pagination():
     page_1 = {
         "test": [{"value": 1}, {"value": 2}],

@@ -7,6 +7,7 @@ from core.factories import ClientFactory, IssueFactory, TenancyFactory
 from core.models.issue import Issue
 
 
+@pytest.mark.skip
 @pytest.mark.django_db
 @mock.patch("actionstep.services.actionstep.send_slack_message")
 @mock.patch("actionstep.services.actionstep.ActionstepAPI")

@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import weasyprint
 from django.template.loader import render_to_string
 
 from core.models import FileUpload, Issue, Tenancy
@@ -58,7 +57,9 @@ def create_pdf(issue: Issue):
         if person.email:
             people_info.append({"name": f"{title} email", "answers": [person.email]})
         if person.address:
-            people_info.append({"name": f"{title} address", "answers": [person.address]})
+            people_info.append(
+                {"name": f"{title} address", "answers": [person.address]}
+            )
         if person.phone_number:
             people_info.append(
                 {"name": f"{title} phone number", "answers": [person.phone_number]}
@@ -85,5 +86,6 @@ def create_pdf(issue: Issue):
         "uploads": uploads,
     }
     pdf_html_str = render_to_string("actionstep/client-intake.html", context=context)
-    pdf_bytes = weasyprint.HTML(string=pdf_html_str).write_pdf()
+    assert False, "This doesn't work anymore"
+    # pdf_bytes = weasyprint.HTML(string=pdf_html_str).write_pdf()
     return pdf_bytes

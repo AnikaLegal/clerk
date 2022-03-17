@@ -1,8 +1,7 @@
 # Backend
 requests==2.27.1
-Django==3.2.12
-weasyprint==54.0 # Generate PDFs for email
-wagtail==2.15.2
+Django>=4
+wagtail==2.16.1
 
 # Cleans html
 html-sanitizer==1.9.3
