@@ -201,11 +201,11 @@ Please do not distribute any of these materials.
  
 *Steps*
 
-- Assume that the client has already undertaken a conflict check.
-- Populate the file note based on questionnaire responses. Fields the client didn't answer in the questionnaire won't show up on the responses.
-- Call the client and get any other information you'll need (per the Case Manual). We haven't formally engaged the client yet so be careful not to say we can help them at this point.
-- Send the client the first email using the engagement letter template. However, tweak this as you see fit. We want our clients to receive the best service possible, and that means personalised interactions!
-- When the client has agreed to the terms of the engagement letter, begin the process per the Case Manual.
+- Jump into the Clerk file immediately and file note "Confirmed receipt of assignment".
+- Read any file notes the Paralegal Leads have left for you during preliminary triage - particularly regarding outstanding information for eligibility checks, conflict checks, or client engagement notes.
+- Start following the case manual by populating the file note based on questionnaire responses.
+- You are expected to start giving case up dates on this matter within 2 business days.
+- Any questions you have please get in touch with the Paralegal Lead of the day
 
 *Compliance*
 
