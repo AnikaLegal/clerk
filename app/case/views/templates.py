@@ -11,7 +11,7 @@ from core.models.issue import CaseTopic
 from case.forms import DocumentTemplateForm
 from microsoft.service import list_templates, upload_template, delete_template
 
-from .auth import coordinator_or_better_required
+from .auth import coordinator_or_better_required, paralegal_or_better_required
 
 router = Router("template")
 router.create_route("list")
@@ -61,7 +61,7 @@ def template_email_search_view(request):
 
 
 @router.use_route("email-detail")
-@coordinator_or_better_required
+@paralegal_or_better_required
 @require_http_methods(["GET", "POST"])
 def template_email_detail_view(request, pk):
     try:
