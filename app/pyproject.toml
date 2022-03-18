@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 filterwarnings = [
     "ignore::UserWarning",
-    "ignore::django.utils.deprecation.RemovedInDjango40Warning",
-    "ignore::django.utils.deprecation.RemovedInDjango41Warning",
+    "ignore::django.utils.deprecation.RemovedInDjango50Warning",
+    "ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
 ]
