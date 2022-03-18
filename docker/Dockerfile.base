@@ -33,12 +33,6 @@ RUN echo "Installing generic stuff." && \
     python3-setuptools \
     python3-dev
 
-# Install Node.
-ENV NODE_VERSION=16.14.1
-RUN wget -nv -O - "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" | tar -Jx -C /opt/ -f -
-RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/node" /usr/local/bin/
-RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/npm" /usr/local/bin/
-
 # Add deadsnakes PPA so we can install Python.
 RUN echo "Adding Deadsnakes PPA." && \
     add-apt-repository ppa:deadsnakes/ppa --yes
