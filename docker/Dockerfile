@@ -12,5 +12,8 @@ RUN \
 # Mount the codebase
 ADD app /app
 
+# Copy Webpack prod build artifacts from clerk-webpack image
+COPY --from=clerk-webpack:local /build /build
+
 # Collect static files
 RUN mkdir -p /static/ && python3 ./manage.py collectstatic --noinput

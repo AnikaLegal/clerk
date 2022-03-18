@@ -14,3 +14,7 @@ venv/
 # Tests
 *pytest_cache*
 test_media/
+
+# Webpack
+node_modules/
+build/

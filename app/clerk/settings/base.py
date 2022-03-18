@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "wagtail.core",
     "modelcluster",
     "taggit",
+    "webpack_loader",
 ]
 
 MIDDLEWARE = [
@@ -181,6 +182,20 @@ SHELL_PLUS = "ipython"
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
 STATICFILES_STORAGE = "whitenoise.storage.ManifestStaticFilesStorage"
+STATICFILES_DIRS = [
+    ("webpack_bundles", "/build/bundles/"),
+]
+
+# Webpack loader
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "CACHE": True,
+        "STATS_FILE": "/build/webpack-stats.json",
+        "POLL_INTERVAL": 0.1,
+        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
+    }
+}
+
 
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

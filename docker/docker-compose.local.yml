@@ -21,8 +21,10 @@ services:
       - 8000:8000
     volumes:
       - ../app:/app
+      - build:/build
     links:
       - worker
+      - webpack
       - clerk_db
     env_file:
       - ../env/dev.env
@@ -39,6 +41,20 @@ services:
     env_file:
       - ../env/dev.env
 
+  webpack:
+    image: clerk-webpack:local
+    command: npm run dev
+    ports:
+      - 3000:3000
+    volumes:
+      - ../frontend/src:/frontend/src
+      - ../frontend/webpack.config.js:/frontend/webpack.config.js
+      - ../frontend/babel.config.js:/frontend/babel.config.js
+      - ../frontend/package.json:/frontend/package.json
+      - ../frontend/node_modules:/frontend/node_modules
+      - build:/build
+
+
   # For testing.
   test:
     container_name: test
@@ -52,3 +68,4 @@ services:
 
 volumes:
   clerk-postgres-data:
+  build:

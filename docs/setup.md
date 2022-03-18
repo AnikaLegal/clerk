@@ -24,6 +24,9 @@ The values of these secrets will be provided to you if you need them. They shoul
 Next, you want to build the Docker environment that we'll be using:
 
 ```bash
+# Build Webpack container
+inv build -w
+# Build Django container
 inv build
 ```
 

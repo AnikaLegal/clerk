@@ -4,3 +4,5 @@ docs/
 infra/
 scripts/
 .github/
+node_modules/
+build/

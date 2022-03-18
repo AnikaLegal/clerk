@@ -1,0 +1,37 @@
+FROM ubuntu:focal
+
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
+ENV TIMEZONE Australia/Melbourne
+
+WORKDIR /frontend
+
+RUN echo "Updating apt sources." && apt-get -qq update
+
+# Install generic useful stuff.
+# wget: for HTTP requests, downloading, debugging
+RUN echo "Installing generic stuff." && \
+    apt-get -qq install \
+    wget \
+    xz-utils
+
+# Install Node.
+ENV NODE_VERSION=12.18.1
+RUN wget -nv -O - "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" | tar -Jx -C /opt/ -f -
+RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/node" /usr/local/bin/
+RUN ln -s "/opt/node-v${NODE_VERSION}-linux-x64/bin/npm" /usr/local/bin/
+
+
+# Install Node modules, build Webpack for prod.
+COPY frontend/package.json .
+COPY frontend/package-lock.json .
+RUN echo "Installing Node modules." && \
+    npm install --silent
+
+# Mount the codebase
+ADD frontend /frontend
+
+# Build webpack from production
+RUN echo "Building Webpack." && \ 
+    npm run build

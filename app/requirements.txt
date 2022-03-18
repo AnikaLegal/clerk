@@ -13,6 +13,11 @@ sentry-sdk
 django-q
 awscli
 
+# Frontend and static files
+django-webpack-loader==1.4.1
+whitenoise
+
+
 # Authentication
 social-auth-app-django==5.0.0
 msal==1.16.0
@@ -24,9 +29,6 @@ django-cors-headers==3.11.0
 # Emails and comms
 mailchimp3==3.0.16
 twilio==7.5.0
-
-# Static files
-whitenoise
 
 # Web scraping
 beautifulsoup4

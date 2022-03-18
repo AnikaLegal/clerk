@@ -7,14 +7,31 @@ BACKUP_BUCKET_NAME = "anika-database-backups"
 
 
 @task
-def build(c):
+def build(c, webpack=False):
     """Build Docker environment locally"""
-    c.run(f"docker build -f docker/Dockerfile -t {APP_NAME}:local .")
+    if webpack:
+        c.run(
+            f"docker build -f docker/Dockerfile.webpack -t {APP_NAME}-webpack:local ."
+        )
+    else:
+        c.run(f"docker build -f docker/Dockerfile -t {APP_NAME}:local .")
 
 
 @task
 def dev(c):
     """Run Django dev server within a Docker container"""
+    c.run(f"{COMPOSE} up web", pty=True)
+
+
+@task
+def down(c):
+    """Stop docker-compose"""
+    c.run(f"{COMPOSE} down", pty=True)
+
+
+@task
+def debug(c):
+    """Run Django dev server with debug ports"""
     c.run(f"{COMPOSE} run --rm --service-ports web", pty=True)
 
 
@@ -22,6 +39,12 @@ def dev(c):
 def worker(c):
     """View worker logs"""
     c.run(f"{COMPOSE} logs --tail 100 -f worker ", pty=True)
+
+
+@task
+def webpack(c):
+    """Read webpack logs"""
+    c.run(f"{COMPOSE} logs --tail 200 -f webpack", pty=True)
 
 
 @task
@@ -33,7 +56,7 @@ def ssh(c):
 @task
 def ngrok(c, url):
     """Add ngrok URL to sendgrid to receive emails on dev address"""
-    run_web(c, f"./manage.py setup_dev_inbound_emails {url}")
+    run(c, f"./manage.py setup_dev_inbound_emails {url}")
 
 
 @task
@@ -68,21 +91,22 @@ def clean(c):
 
 
 @task
-def bash(c):
-    """Get a bash shell in a Docker container)"""
-    run_web(c, "bash")
+def bash(c, webpack=False):
+    """Get a bash shell in a Docker container"""
+    s = "webpack" if webpack else "web"
+    run(c, "bash", service=s)
 
 
 @task
 def shell(c):
     """Get a Django shell in a Docker container"""
-    run_web(c, "./manage.py shell_plus")
+    run(c, "./manage.py shell_plus")
 
 
 @task
 def psql(c):
     """Get a Django shell in a Docker container"""
-    run_web(c, "psql")
+    run(c, "psql")
 
 
 @task
@@ -114,7 +138,7 @@ def test(c, recreate=False, interactive=False):
 def reset(c):
     """Reset local database"""
     print("\nResetting database")
-    run_web(c, "./manage.py reset_db --close-sessions --noinput")
+    run(c, "./manage.py reset_db --close-sessions --noinput")
     _post_reset(c)
     print("\nDatabase reset finished.")
 
@@ -123,7 +147,7 @@ def reset(c):
 def restore(c):
     """Reset local database"""
     print("\nResetting database")
-    run_web(c, "./manage.py reset_db --close-sessions --noinput")
+    run(c, "./manage.py reset_db --close-sessions --noinput")
 
     s3_bucket = f"s3://{BACKUP_BUCKET_NAME}"
     print(f"\nRestoring database from S3 backups at {s3_bucket}")
@@ -160,7 +184,7 @@ def restore(c):
         "SlackMessage.objects.all().update(channel=c);"
         "SlackUser.objects.all().delete()"
     )
-    run_web(c, f'./manage.py shell_plus -c "{shell_cmd}"')
+    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
 
     print("\nDeleting all Scheduled tasks and Actionstep access tokens.")
     shell_cmd = (
@@ -170,17 +194,17 @@ def restore(c):
         "OrmQ.objects.all().delete();"
         "AccessToken.objects.all().delete()"
     )
-    run_web(c, f'./manage.py shell_plus -c "{shell_cmd}"')
+    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
 
     print("\nDatabase restore finished.")
 
 
 def _post_reset(c):
     print("\nRunning migrations")
-    run_web(c, "./manage.py migrate")
+    run(c, "./manage.py migrate")
 
     print("\nCreating new superuser 'admin'")
-    run_web(
+    run(
         c,
         "./manage.py createsuperuser "
         "--username admin "
@@ -189,7 +213,7 @@ def _post_reset(c):
     )
     print("\nSetting superuser 'admin' password to 12345")
     shell_cmd = "u=User.objects.get(username='admin');u.set_password('12345');u.save();"
-    run_web(c, f'./manage.py shell_plus -c "{shell_cmd}"')
+    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
 
 
 S3_PROD = "anika-clerk"
@@ -217,16 +241,16 @@ def sync_s3(c):
 @task
 def sync_actionstep(c):
     """Pull data from Actionstep prod"""
-    run_web(c, "./manage.py migrate_actionstep_paralegals")
-    run_web(c, "./manage.py migrate_actionstep_filenotes")
-    run_web(c, "./manage.py migrate_actionstep_emails")
+    run(c, "./manage.py migrate_actionstep_paralegals")
+    run(c, "./manage.py migrate_actionstep_filenotes")
+    run(c, "./manage.py migrate_actionstep_emails")
 
 
 @task
 def obsfucate(c):
     """Obsfucate personally identifiable info from prod"""
-    run_web(c, "./manage.py obsfucate_actionstep_data")
+    run(c, "./manage.py obsfucate_actionstep_data")
 
 
-def run_web(c, cmd: str):
-    c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
+def run(c, cmd: str, service="web"):
+    c.run(f"{COMPOSE} run --rm {service} {cmd}", pty=True)
