@@ -36,15 +36,15 @@ def debug(c):
 
 
 @task
-def worker(c):
-    """View worker logs"""
-    c.run(f"{COMPOSE} logs --tail 100 -f worker ", pty=True)
+def restart(c, service_name):
+    """Restart Docker-Compose service"""
+    c.run(f"{COMPOSE} restart {service_name}", pty=True)
 
 
 @task
-def webpack(c):
-    """Read webpack logs"""
-    c.run(f"{COMPOSE} logs --tail 200 -f webpack", pty=True)
+def logs(c, service_name):
+    """View logs for Docker-Compose service"""
+    c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
 
 
 @task

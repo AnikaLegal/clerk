@@ -3,6 +3,9 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404, HttpResponse
 from django.contrib import messages
 from django.db.models import Q
+from django.urls import reverse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from emails.forms import EmailTemplateForm
 from emails.models import EmailTemplate
@@ -10,6 +13,8 @@ from case.utils.router import Router
 from core.models.issue import CaseTopic
 from case.forms import DocumentTemplateForm
 from microsoft.service import list_templates, upload_template, delete_template
+from case.utils.react import render_react_page
+from case.serializers import EmailTemplateSerializer
 
 from .auth import coordinator_or_better_required, paralegal_or_better_required
 
@@ -29,21 +34,25 @@ router.create_route("doc-delete").path("doc").slug("file_id").path("delete")
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def template_list_view(request):
-    context = {"templates": EmailTemplate.objects.order_by("-created_at").all()}
-    return render(request, "case/templates/list.html", context)
+    return render(request, "case/templates/list.html")
 
 
 @router.use_route("email-list")
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def template_email_list_view(request):
-    context = {"templates": EmailTemplate.objects.order_by("-created_at").all()}
-    return render(request, "case/templates/email/list.html", context)
+    templates = EmailTemplate.objects.order_by("-created_at").all()
+    context = {
+        "templates": EmailTemplateSerializer(templates, many=True).data,
+        "create_url": reverse("template-email-create"),
+        "search_url": reverse("template-email-search"),
+    }
+    return render_react_page(request, "Email Templates", "email-templates", context)
 
 
 @router.use_route("email-search")
 @coordinator_or_better_required
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def template_email_search_view(request):
     templates = EmailTemplate.objects.order_by("-created_at").all()
     name = request.GET.get("name")
@@ -56,8 +65,7 @@ def template_email_search_view(request):
     if topic:
         templates = templates.filter(topic=topic)
 
-    context = {"templates": templates}
-    return render(request, "case/templates/email/_search.html", context)
+    return Response(data=EmailTemplateSerializer(templates, many=True).data)
 
 
 @router.use_route("email-detail")

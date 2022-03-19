@@ -1,0 +1,15 @@
+{% extends "case/_base.html" %}
+{% load render_bundle from webpack_loader %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div id="app"></div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    window.reactContext = JSON.parse("{{ react_context | escapejs }}");
+</script>
+{% render_bundle react_page_name %}
+{% endblock %}
+

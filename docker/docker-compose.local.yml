@@ -54,7 +54,6 @@ services:
       - ../frontend/node_modules:/frontend/node_modules
       - build:/build
 
-
   # For testing.
   test:
     container_name: test
