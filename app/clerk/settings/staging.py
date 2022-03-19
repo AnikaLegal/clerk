@@ -8,7 +8,7 @@ DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "test.anikalegal.com",
-    "test-clerk.anikalegal.com", # TODO: Remove
+    "test-clerk.anikalegal.com",  # TODO: Remove
     "127.0.0.1",
     "localhost",
 ]
@@ -20,7 +20,7 @@ SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 SESSION_COOKIE_DOMAIN = ".anikalegal.com"
 SESSION_SAVE_EVERY_REQUEST = True
 CSRF_COOKIE_DOMAIN = ".anikalegal.com"
-CSRF_TRUSTED_ORIGINS = [".anikalegal.com"]
+CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.com"]
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
