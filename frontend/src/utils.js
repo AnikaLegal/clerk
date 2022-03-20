@@ -1,5 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { hydrate, render } from "react-dom";
+
+// Skips first update
+export const useEffectLazy = (func, vars) => {
+  const isFirstUpdate = useRef(true);
+  useEffect(() => {
+    if (isFirstUpdate.current) {
+      isFirstUpdate.current = false;
+    } else {
+      func();
+    }
+  }, vars);
+};
 
 export const mount = (App) => {
   const root = document.getElementById("app");

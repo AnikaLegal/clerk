@@ -18,14 +18,14 @@ const transitionStyles = {
 export const FadeTransition = ({ in: inProp, children }) => (
   <Transition in={inProp} timeout={DURATION}>
     {(state) => (
-      <span
+      <div
         style={{
           ...defaultStyle,
           ...transitionStyles[state],
         }}
       >
         {children}
-      </span>
+      </div>
     )}
   </Transition>
 );

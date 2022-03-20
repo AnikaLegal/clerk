@@ -45,9 +45,8 @@ def template_email_list_view(request):
     context = {
         "templates": EmailTemplateSerializer(templates, many=True).data,
         "create_url": reverse("template-email-create"),
-        "search_url": reverse("template-email-search"),
     }
-    return render_react_page(request, "Email Templates", "email-templates", context)
+    return render_react_page(request, "Email Templates", "email-template-list", context)
 
 
 @router.use_route("email-search")
@@ -66,6 +65,27 @@ def template_email_search_view(request):
         templates = templates.filter(topic=topic)
 
     return Response(data=EmailTemplateSerializer(templates, many=True).data)
+
+
+@router.use_route("email-create")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def template_email_create_view(request):
+    if request.method == "POST":
+        form = EmailTemplateForm(request.POST)
+        if form.is_valid():
+            template = form.save()
+            messages.success(request, "Template created")
+            return redirect("template-email-detail", template.pk)
+    else:
+        form = EmailTemplateForm()
+
+    # context = {"form": form}
+    context = {}
+    return render_react_page(
+        request, "Email Templates", "email-template-create", context
+    )
+    # return render(request, "case/templates/email/create.html", context)
 
 
 @router.use_route("email-detail")
@@ -92,23 +112,6 @@ def template_email_detail_view(request, pk):
     else:
         context = {"template": template}
         return render(request, "case/templates/email/detail.html", context)
-
-
-@router.use_route("email-create")
-@coordinator_or_better_required
-@require_http_methods(["GET", "POST"])
-def template_email_create_view(request):
-    if request.method == "POST":
-        form = EmailTemplateForm(request.POST)
-        if form.is_valid():
-            template = form.save()
-            messages.success(request, "Template created")
-            return redirect("template-email-detail", template.pk)
-    else:
-        form = EmailTemplateForm()
-
-    context = {"form": form}
-    return render(request, "case/templates/email/create.html", context)
 
 
 @router.use_route("doc-list")

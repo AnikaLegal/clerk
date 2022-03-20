@@ -8,7 +8,7 @@
 
 {% block scripts %}
 <script type="text/javascript">
-    window.reactContext = JSON.parse("{{ react_context | escapejs }}");
+    window.REACT_CONTEXT = JSON.parse("{{ react_context | escapejs }}");
 </script>
 {% render_bundle react_page_name %}
 {% endblock %}
