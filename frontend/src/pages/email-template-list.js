@@ -30,7 +30,7 @@ const App = () => {
     setIsLoading(true);
     api.templates.email
       .search({ name, topic })
-      .then((data) => {
+      .then(({ data }) => {
         setTemplates(data);
         setIsLoading(false);
       })

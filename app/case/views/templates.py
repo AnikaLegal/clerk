@@ -4,6 +4,7 @@ from django.http import Http404, HttpResponse
 from django.contrib import messages
 from django.db.models import Q
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
@@ -69,49 +70,42 @@ def template_email_search_view(request):
 
 @router.use_route("email-create")
 @coordinator_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET", "POST"])
 def template_email_create_view(request):
     if request.method == "POST":
-        form = EmailTemplateForm(request.POST)
-        if form.is_valid():
-            template = form.save()
-            messages.success(request, "Template created")
-            return redirect("template-email-detail", template.pk)
-    else:
-        form = EmailTemplateForm()
+        serializer = EmailTemplateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # context = {"form": form}
-    context = {}
-    return render_react_page(
-        request, "Email Templates", "email-template-create", context
-    )
-    # return render(request, "case/templates/email/create.html", context)
+    return render_react_page(request, "Email Templates", "email-template-create", {})
 
 
 @router.use_route("email-detail")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET", "PUT"])
 def template_email_detail_view(request, pk):
     try:
         template = EmailTemplate.objects.get(pk=pk)
     except EmailTemplate.DoesNotExist:
         raise Http404()
 
-    if request.user.is_coordinator_or_better:
-        if request.method == "POST":
-            form = EmailTemplateForm(request.POST, instance=template)
-            if form.is_valid():
-                person = form.save()
-                messages.success(request, "Edit successful")
-                return redirect("template-email-detail", person.pk)
+    if request.method == "PUT":
+        if request.user.is_coordinator_or_better:
+            serializer = EmailTemplateSerializer(instance=template, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            form = EmailTemplateForm(instance=template)
+            raise Http404()
 
-        context = {"template": template, "form": form}
-        return render(request, "case/templates/email/edit.html", context)
-    else:
-        context = {"template": template}
-        return render(request, "case/templates/email/detail.html", context)
+    context = {
+        "template": EmailTemplateSerializer(template).data,
+        "editable": request.user.is_coordinator_or_better,
+    }
+    return render_react_page(
+        request, "Email Templates", "email-template-detail", context
+    )
 
 
 @router.use_route("doc-list")

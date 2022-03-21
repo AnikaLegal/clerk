@@ -5,7 +5,13 @@ import { Converter, setFlavor } from "showdown";
 const converter = new Converter();
 setFlavor("github");
 
-export const MarkdownEditor = ({ text, html, onChangeText, onChangeHtml }) => {
+export const MarkdownEditor = ({
+  text,
+  html,
+  onChangeText,
+  onChangeHtml,
+  disabled,
+}) => {
   const textAreaRef = useRef(null);
   const setScrollHeight = () => {
     const el = textAreaRef.current;
@@ -50,6 +56,7 @@ export const MarkdownEditor = ({ text, html, onChangeText, onChangeHtml }) => {
           ref={textAreaRef}
           placeholder="Dear Ms Example..."
           onChange={onTextAreaChange}
+          disabled={disabled}
           rows={12}
           style={{
             overflow: "hidden",

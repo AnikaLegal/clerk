@@ -7,7 +7,8 @@ from emails.models import EmailTemplate
 class EmailTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailTemplate
-        fields = ("name", "topic", "subject", "created_at", "url")
+        fields = ("id", "name", "topic", "subject", "text", "created_at", "url")
+        read_only_fields = ("created_at", "url")
 
     url = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
