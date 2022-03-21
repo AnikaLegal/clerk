@@ -60,6 +60,16 @@ const http = {
 
 export const api = {
   templates: {
+    doc: {
+      search: (query) => {
+        const url = "/clerk/templates/doc/search/";
+        return http.get(url, query);
+      },
+      delete: (pk) => {
+        const url = `/clerk/templates/doc/${pk}/delete/`;
+        return http.delete(url);
+      },
+    },
     email: {
       search: (query) => {
         const url = "/clerk/templates/email/search/";

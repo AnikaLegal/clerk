@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from emails.forms import EmailTemplateForm
 from emails.models import EmailTemplate
 from case.utils.router import Router
 from core.models.issue import CaseTopic
@@ -112,24 +111,27 @@ def template_email_detail_view(request, pk):
 @coordinator_or_better_required
 @require_http_methods(["GET"])
 def template_doc_list_view(request):
-    topic = request.GET.get("topic", CaseTopic.REPAIRS)
-    context = {"templates": list_templates(topic), "topic": topic}
-    return render(request, "case/templates/doc/list.html", context)
+    context = {
+        "topic": CaseTopic.REPAIRS,
+        "create_url": reverse("template-doc-create"),
+    }
+    return render_react_page(
+        request, "Document Templates", "doc-template-list", context
+    )
 
 
 @router.use_route("doc-search")
 @coordinator_or_better_required
-@require_http_methods(["GET", "DELETE"])
+@api_view(["GET"])
 def template_doc_search_view(request):
     topic = request.GET.get("topic", CaseTopic.REPAIRS)
-    templates = list_templates(topic)
+    templates = [{**t, "topic": topic} for t in list_templates(topic)]
     name = request.GET.get("name")
     if name:
         templates = [t for t in templates if name.lower() in t["name"].lower()]
 
     templates = sorted(templates, key=lambda t: t["name"])
-    context = {"templates": templates, "topic": topic}
-    return render(request, "case/templates/doc/_search.html", context)
+    return Response(data=templates)
 
 
 @router.use_route("doc-delete")

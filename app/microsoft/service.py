@@ -158,10 +158,10 @@ def list_templates(topic):
             "url": doc["webUrl"],
             "created_at": timezone.datetime.fromisoformat(
                 doc["createdDateTime"].replace("Z", "")
-            ),
+            ).strftime("%d/%m/%Y"),
             "modified_at": timezone.datetime.fromisoformat(
                 doc["lastModifiedDateTime"].replace("Z", "")
-            ),
+            ).strftime("%d/%m/%Y"),
         }
         for doc in results["value"]
     ]
