@@ -10,6 +10,7 @@ const BASE_CONFIG = {
   method: null,
   credentials: "include",
   headers: {
+    "X-React": "true",
     "X-CSRFToken": getCookie("csrftoken"),
     "Content-Type": "application/json",
   },
@@ -59,6 +60,12 @@ const http = {
 };
 
 export const api = {
+  accounts: {
+    search: (query) => {
+      const url = "/clerk/accounts/";
+      return http.get(url, query);
+    },
+  },
   templates: {
     doc: {
       search: (query) => {

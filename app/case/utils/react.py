@@ -10,3 +10,7 @@ def render_react_page(request, title, react_page_name, react_context):
         "title": title,
     }
     return render(request, "case/react_base.html", context)
+
+
+def is_react_api_call(request):
+    return bool(request.META.get("HTTP_X_REACT"))

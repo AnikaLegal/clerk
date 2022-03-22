@@ -1,17 +1,19 @@
-from typing import List
 from django.db.models import Q
-from django.views.decorators.http import require_http_methods
-from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.urls import reverse
 
 from accounts.models import User
+from case.serializers import UserSerializer
 from case.views.auth import coordinator_or_better_required
 from case.utils.router import Route
+from case.utils.react import render_react_page, is_react_api_call
 
 list_route = Route("list")
 
 
 @list_route
-@require_http_methods(["GET"])
+@api_view(["GET"])
 @coordinator_or_better_required
 def account_list_view(request):
     users = (
@@ -20,34 +22,24 @@ def account_list_view(request):
         .filter(is_active=True)
         .all()
     )
-    context = {}
-    if "name" in request.GET or "groups" in request.GET:
-        name, groups = request.GET.get("name"), request.GET.get("groups")
-        queries = []
+    if "name" in request.GET or "group" in request.GET:
+        name, group = request.GET.get("name"), request.GET.get("group")
+        query = None
         if name:
-            queries.append(Q(first_name__icontains=name))
-            queries.append(Q(last_name__icontains=name))
-        if groups:
-            for group in groups.split(","):
-                queries.append(Q(groups__name=group))
+            query = Q(first_name__icontains=name) | Q(last_name__icontains=name)
 
-        if queries:
-            users = users.filter(combine_q_with_or(queries))
+        if group:
+            group_query = Q(groups__name=group)
+            query = (query & group_query) if query else group_query
 
-        context["users"] = users
-        return render(request, "case/accounts/_list_table.html", context)
-    else:
-        context["users"] = users
-        return render(request, "case/accounts/list.html", context)
-
-
-def combine_q_with_or(queries: List[Q]) -> Q:
-    assert queries, "List of Q expressions cannot be empty"
-    query = None
-    for q in queries:
         if query:
-            query |= q
-        else:
-            query = q
+            users = users.filter(query)
 
-    return query
+    context = {
+        "users": UserSerializer(users, many=True).data,
+        "create_url": reverse("account-create"),
+    }
+    if is_react_api_call(request):
+        return Response(data=context["users"])
+    else:
+        return render_react_page(request, "Accounts", "accounts-list", context)

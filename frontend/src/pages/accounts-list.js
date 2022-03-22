@@ -5,6 +5,7 @@ import {
   Header,
   Table,
   Input,
+  Label,
   Dropdown,
 } from "semantic-ui-react";
 
@@ -13,35 +14,43 @@ import { api } from "api";
 import { FadeTransition } from "comps/transitions";
 
 const CONTEXT = window.REACT_CONTEXT;
-const TOPIC_OPTIONS = [
-  { key: "REPAIRS", value: "REPAIRS", text: "Repairs" },
-  { key: "BONDS", value: "BONDS", text: "Bonds" },
-  { key: "EVICTION", value: "EVICTION", text: "Eviction" },
+const GROUP_OPTIONS = [
+  { key: "", value: "", text: "All groups" },
+  { key: "Paralegal", value: "Paralegal", text: "Paralegal" },
+  { key: "Coordinator", value: "Coordinator", text: "Coordinator" },
+  { key: "Admin", value: "Admin", text: "Admin" },
 ];
+
+const GROUP_COLORS = {
+  Admin: "green",
+  Lawyer: "orange",
+  Coordinator: "teal",
+  Paralegal: "blue",
+};
 
 const debouncer = debounce(300);
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [templates, setTemplates] = useState(CONTEXT.templates);
+  const [users, setUsers] = useState(CONTEXT.users);
   const [name, setName] = useState("");
-  const [topic, setTopic] = useState("");
+  const [group, setGroups] = useState("");
   const search = debouncer(() => {
     setIsLoading(true);
-    api.templates.email
-      .search({ name, topic })
+    api.accounts
+      .search({ name, group })
       .then(({ data }) => {
-        setTemplates(data);
+        setUsers(data);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
   });
-  useEffectLazy(() => search(), [name, topic]);
+  useEffectLazy(() => search(), [name, group]);
   return (
     <Container>
-      <Header as="h1">Email Templates</Header>
+      <Header as="h1">Accounts</Header>
       <a href={CONTEXT.create_url}>
-        <Button primary>Create a new email template</Button>
+        <Button primary>Invite a paralegal</Button>
       </a>
       <div
         style={{
@@ -53,17 +62,17 @@ const App = () => {
       >
         <Input
           icon="search"
-          placeholder="Search by template name or subject..."
+          placeholder="Search names..."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <Dropdown
           fluid
           selection
-          placeholder="Select a case type"
-          options={TOPIC_OPTIONS}
-          onChange={(e, { value }) => setTopic(value)}
-          value={topic}
+          placeholder="Filter groups"
+          options={GROUP_OPTIONS}
+          onChange={(e, { value }) => setGroups(value)}
+          value={group}
         />
       </div>
       <FadeTransition in={!isLoading}>
@@ -71,25 +80,34 @@ const App = () => {
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Subject</Table.HeaderCell>
-              <Table.HeaderCell>Created At</Table.HeaderCell>
+              <Table.HeaderCell>Org</Table.HeaderCell>
+              <Table.HeaderCell>Email</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
+              <Table.HeaderCell>Permissions</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {templates.length < 1 && (
+            {users.length < 1 && (
               <Table.Row>
-                <td>No templates found</td>
+                <td>No users found</td>
               </Table.Row>
             )}
-            {templates.map((t) => (
-              <Table.Row key={t.url}>
+            {users.map((u) => (
+              <Table.Row key={u.url}>
                 <Table.Cell>
-                  <a href={t.url}>{t.name}</a>
+                  <a href={u.url}>{u.full_name}</a>
                 </Table.Cell>
-                <Table.Cell>{t.topic}</Table.Cell>
-                <Table.Cell>{t.subject}</Table.Cell>
-                <Table.Cell>{t.created_at}</Table.Cell>
+                <Table.Cell>{u.is_intern ? "Intern" : "Staff"}</Table.Cell>
+                <Table.Cell>{u.email}</Table.Cell>
+                <Table.Cell>{u.created_at}</Table.Cell>
+                <Table.Cell>
+                  {u.groups.map((groupName) => (
+                    <Label color={GROUP_COLORS[groupName]} key={groupName}>
+                      {groupName}
+                    </Label>
+                  ))}
+                  {u.is_superuser && <Label color="black">Superuser 😎</Label>}
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

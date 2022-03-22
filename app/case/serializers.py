@@ -25,15 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
+    groups = serializers.SerializerMethodField()
 
     def get_groups(self, obj):
-        return list(obj.groups.values_list("name", flat=True))
+        return [g.name for g in obj.groups.all()]
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()
 
     def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y")
+        return obj.date_joined.strftime("%d/%m/%Y")
 
     def get_url(self, obj):
         return reverse("account-user-detail", args=(obj.pk,))
