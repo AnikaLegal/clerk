@@ -4,6 +4,8 @@ from django.views.decorators.http import require_http_methods
 from django.utils.datastructures import MultiValueDict
 from django.contrib import messages
 from django.urls import reverse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from case.forms import (
     IssueProgressForm,
@@ -21,7 +23,8 @@ from case.utils.router import Router
 from case.views.auth import paralegal_or_better_required, coordinator_or_better_required
 from core.models import Issue, IssueNote, Person
 from core.models.issue_note import NoteType
-
+from case.utils.react import render_react_page
+from case.serializers import IssueSerializer, TenancySerializer
 
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
@@ -105,7 +108,7 @@ CASE_DETAIL_OPTIONS = {
 
 @router.use_route("view")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET"])
 def case_detail_view(request, pk):
     """
     The details of a given case.
@@ -115,17 +118,22 @@ def case_detail_view(request, pk):
     file_urls, image_urls = _get_uploaded_files(issue)
     options = _get_case_detail_options(request, issue)
     context = {
-        "issue": issue,
-        "tenancy": tenancy,
-        "actionstep_url": _get_actionstep_url(issue),
-        "notes": _get_issue_notes(request, pk),
+        "issue": IssueSerializer(issue).data,
+        "tenancy": TenancySerializer(tenancy).data,
         "details": _get_submitted_details(issue),
         "file_urls": file_urls,
         "image_urls": image_urls,
-        "people": Person.objects.order_by("full_name").all(),
-        "options": options,
+        "urls": {
+            "detail": reverse("case-detail-view", args=(pk,)),
+            "email": reverse("case-email-list", args=(pk,)),
+            "docs": reverse("case-docs", args=(pk,)),
+        }
+        # "actionstep_url": _get_actionstep_url(issue),
+        # "notes": _get_issue_notes(request, pk),
+        # "people": Person.objects.order_by("full_name").all(),
+        # "options": options,
     }
-    return render(request, "case/case/detail.html", context)
+    return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
 
 
 @router.use_route("options")
@@ -468,11 +476,11 @@ def _get_uploaded_files(issue):
         else:
             file_urls.append(upload.file.url)
 
-    return file_urls, image_urls
+    return file_urls or None, image_urls or None
 
 
 def _get_submitted_details(issue):
-    details = []
+    details = {}
     correct_case = lambda s: s.lower().capitalize()
     for name, answer in issue.answers.items():
         if answer is None:
@@ -482,7 +490,7 @@ def _get_submitted_details(issue):
         if "_" in answer:
             answer = correct_case(" ".join(answer.split("_")))
 
-        details.append({"title": title, "answer": answer})
+        details[title] = answer
 
     return details
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.urls import reverse
 
+from core.models import Issue, IssueEvent, Tenancy, IssueNote, Person, Client
 from accounts.models import User
 from emails.models import EmailTemplate
 
@@ -38,6 +39,121 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_url(self, obj):
         return reverse("account-user-detail", args=(obj.pk,))
+
+
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = (
+            "full_name",
+            "email",
+            "address",
+            "phone_number",
+        )
+
+
+class TenancySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tenancy
+        fields = (
+            "address",
+            "suburb",
+            "postcode",
+            "started",
+            "is_on_lease",
+            "landlord",
+            "agent",
+            "url",
+        )
+
+    landlord = PersonSerializer(read_only=True)
+    agent = PersonSerializer(read_only=True)
+    url = serializers.SerializerMethodField()
+    started = serializers.SerializerMethodField()
+    is_on_lease = serializers.CharField(source="get_is_on_lease_display")
+
+    def get_started(self, obj):
+        return obj.started.strftime("%d/%m/%Y")
+
+    def get_url(self, obj):
+        return reverse("tenancy-detail", args=(obj.pk,))
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "date_of_birth",
+            "phone_number",
+            "employment_status",
+            "special_circumstances",
+            "weekly_income",
+            "weekly_rent",
+            "gender",
+            "primary_language_non_english",
+            "primary_language",
+            "is_aboriginal_or_torres_strait_islander",
+            "rental_circumstances",
+            "is_multi_income_household",
+            "number_of_dependents",
+            "legal_access_difficulties",
+            "referrer_type",
+            "referrer",
+            "age",
+            "full_name",
+            "url",
+        )
+
+    id = serializers.CharField(read_only=True)
+    age = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("client-detail", args=(obj.pk,))
+
+    def get_age(self, obj):
+        return obj.get_age()
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
+
+class IssueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = (
+            "id",
+            "topic",
+            "stage",
+            "outcome",
+            "outcome_notes",
+            "provided_legal_services",
+            "fileref",
+            "client",
+            "paralegal",
+            "lawyer",
+            "is_open",
+            "is_sharepoint_set_up",
+            "actionstep_id",
+            "created_at",
+        )
+
+    id = serializers.CharField(read_only=True)
+    client = ClientSerializer(read_only=True)
+    lawyer = UserSerializer(read_only=True)
+    paralegal = UserSerializer(read_only=True)
+    created_at = serializers.SerializerMethodField()
+    topic = serializers.CharField(source="get_topic_display")
+    outcome = serializers.CharField(source="get_outcome_display")
+    stage = serializers.CharField(source="get_stage_display")
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime("%d/%m/%Y")
 
 
 class EmailTemplateSerializer(serializers.ModelSerializer):
