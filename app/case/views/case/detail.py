@@ -24,7 +24,7 @@ from case.views.auth import paralegal_or_better_required, coordinator_or_better_
 from core.models import Issue, IssueNote, Person
 from core.models.issue_note import NoteType
 from case.utils.react import render_react_page
-from case.serializers import IssueSerializer, TenancySerializer
+from case.serializers import IssueSerializer, TenancySerializer, IssueNoteSerializer
 
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
@@ -115,25 +115,67 @@ def case_detail_view(request, pk):
     """
     issue = _get_issue(request, pk)
     tenancy = _get_tenancy(issue)
+    notes = _get_issue_notes(request, pk)
     file_urls, image_urls = _get_uploaded_files(issue)
-    options = _get_case_detail_options(request, issue)
     context = {
         "issue": IssueSerializer(issue).data,
         "tenancy": TenancySerializer(tenancy).data,
+        "notes": IssueNoteSerializer(notes, many=True).data,
         "details": _get_submitted_details(issue),
         "file_urls": file_urls,
         "image_urls": image_urls,
+        "actionstep_url": _get_actionstep_url(issue),
         "urls": {
             "detail": reverse("case-detail-view", args=(pk,)),
             "email": reverse("case-email-list", args=(pk,)),
             "docs": reverse("case-docs", args=(pk,)),
-        }
-        # "actionstep_url": _get_actionstep_url(issue),
-        # "notes": _get_issue_notes(request, pk),
-        # "people": Person.objects.order_by("full_name").all(),
-        # "options": options,
+        },
+        "permissions": {
+            "is_paralegal_or_better": request.user.is_paralegal_or_better,
+            "is_coordinator_or_better": request.user.is_coordinator_or_better,
+        },
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
+
+
+@router.use_route("agent")
+@paralegal_or_better_required
+@api_view(["POST", "DELETE"])
+def agent_selet_view(request, pk):
+    """
+    User can add or remove an agent for a given case.
+    """
+    return _person_select_view(request, pk, "agent")
+
+
+@router.use_route("landlord")
+@paralegal_or_better_required
+@api_view(["POST", "DELETE"])
+def landlord_selet_view(request, pk):
+    """
+    User can add or remove a landlord for a given case.
+    """
+    return _person_select_view(request, pk, "landlord")
+
+
+def _person_select_view(request, pk, person_type):
+    issue = _get_issue(request, pk)
+    tenancy = _get_tenancy(issue)
+    if request.method == "DELETE":
+        # User is deleting the person from the tenancy.
+        setattr(tenancy, person_type, None)
+        tenancy.save()
+    elif request.method == "POST":
+        # User is adding a person from the tenancy.
+        person_pk = request.data.get("person_id")
+        if person_pk is None:
+            return HttpResponseBadRequest()
+
+        person = Person.objects.get(pk=int(person_pk))
+        setattr(tenancy, person_type, person)
+        tenancy.save()
+
+    return Response(TenancySerializer(tenancy).data)
 
 
 @router.use_route("options")
@@ -400,49 +442,6 @@ def _build_case_update_view(Form, slug, template, success_message):
         return render(request, template, context)
 
     return case_update_view
-
-
-@router.use_route("agent")
-@paralegal_or_better_required
-@require_http_methods(["GET", "POST", "DELETE"])
-def agent_selet_view(request, pk):
-    return _person_select_view(request, pk, "agent")
-
-
-@router.use_route("landlord")
-@paralegal_or_better_required
-@require_http_methods(["GET", "POST", "DELETE"])
-def landlord_selet_view(request, pk):
-    return _person_select_view(request, pk, "landlord")
-
-
-def _person_select_view(request, pk, person_type):
-    issue = _get_issue(request, pk)
-    tenancy = _get_tenancy(issue)
-    title = "Landlord" if person_type == "landlord" else "Real estate agent"
-    context = {
-        "title": title,
-        "issue": issue,
-        "person": None,
-        "url_path": f"case-detail-{person_type}",
-        "people": Person.objects.order_by("full_name").all(),
-    }
-    if request.method == "DELETE":
-        # User is deleting the person from the tenancy.
-        setattr(tenancy, person_type, None)
-        tenancy.save()
-    elif request.method == "POST":
-        # User is adding a person from the tenancy.
-        person_pk = request.POST.get("person_id")
-        if person_pk is None:
-            return HttpResponseBadRequest()
-
-        person = Person.objects.get(pk=int(person_pk))
-        setattr(tenancy, person_type, person)
-        tenancy.save()
-        context["person"] = person
-
-    return render(request, "case/case/_person_details.html", context)
 
 
 def _get_tenancy(issue):

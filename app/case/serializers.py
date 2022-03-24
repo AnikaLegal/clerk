@@ -44,12 +44,12 @@ class UserSerializer(serializers.ModelSerializer):
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = (
-            "full_name",
-            "email",
-            "address",
-            "phone_number",
-        )
+        fields = ("id", "full_name", "email", "address", "phone_number", "url")
+
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("person-detail", args=(obj.pk,))
 
 
 class TenancySerializer(serializers.ModelSerializer):
@@ -77,6 +77,38 @@ class TenancySerializer(serializers.ModelSerializer):
 
     def get_url(self, obj):
         return reverse("tenancy-detail", args=(obj.pk,))
+
+
+class IssueNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "id",
+            "creator",
+            "note_type",
+            "note_type_display",
+            "text",
+            "created_at",
+            "event",
+            "reviewee",
+        )
+
+    creator = UserSerializer(read_only=True)
+    text = serializers.CharField(source="get_text")
+    note_type_display = serializers.CharField(source="get_note_type_display")
+    created_at = serializers.SerializerMethodField()
+    event = serializers.SerializerMethodField()
+    reviewee = serializers.SerializerMethodField()
+
+    def get_reviewee(self, obj):
+        if obj.note_type == "PERFORMANCE":
+            return UserSerializer(obj.content_object).data
+
+    def get_event(self, obj):
+        return obj.event.strftime("%d/%m/%Y") if obj.event else None
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime("%d/%m/%Y")
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -147,10 +179,10 @@ class IssueSerializer(serializers.ModelSerializer):
     client = ClientSerializer(read_only=True)
     lawyer = UserSerializer(read_only=True)
     paralegal = UserSerializer(read_only=True)
-    created_at = serializers.SerializerMethodField()
     topic = serializers.CharField(source="get_topic_display")
     outcome = serializers.CharField(source="get_outcome_display")
     stage = serializers.CharField(source="get_stage_display")
+    created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, obj):
         return obj.created_at.strftime("%d/%m/%Y")

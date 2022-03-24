@@ -2,11 +2,16 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.db.models import Q
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
+from case.serializers import PersonSerializer
+from case.utils.react import is_react_api_call
 from case.forms import DynamicTableForm, PersonDynamicForm, PersonForm
 from core.models import Person, Issue
 from .auth import paralegal_or_better_required
 from case.utils.router import Router
+
 
 PERSON_DETAIL_FORMS = {
     "form": PersonDynamicForm,
@@ -56,10 +61,14 @@ def person_search_view(request):
 
 @router.use_route("list")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET"])
 def person_list_view(request):
-    context = {"people": Person.objects.order_by("full_name").all()}
-    return render(request, "case/person/list.html", context)
+    people = Person.objects.order_by("full_name").all()
+    if is_react_api_call(request):
+        return Response(data=PersonSerializer(people, many=True).data)
+    else:
+        context = {"people": people}
+        return render(request, "case/person/list.html", context)
 
 
 @router.use_route("detail")

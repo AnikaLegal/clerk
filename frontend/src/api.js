@@ -1,3 +1,5 @@
+import { URLS } from "consts";
+
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -60,10 +62,37 @@ const http = {
 };
 
 export const api = {
+  person: {
+    list: () => {
+      return http.get(URLS.PERSON.LIST);
+    },
+  },
+  case: {
+    agent: {
+      add: (caseId, agentId) => {
+        const url = `/clerk/cases/detail/${caseId}/agent/`;
+        return http.post(url, { person_id: agentId });
+      },
+      remove: (caseId) => {
+        const url = `/clerk/cases/detail/${caseId}/agent/`;
+        return http.delete(url);
+      },
+    },
+    landlord: {
+      add: (caseId, landlordId) => {
+        const url = `/clerk/cases/detail/${caseId}/landlord/`;
+        return http.post(url, { person_id: landlordId });
+      },
+      remove: (caseId) => {
+        const url = `/clerk/cases/detail/${caseId}/landlord/`;
+        return http.delete(url);
+      },
+    },
+  },
   accounts: {
     search: (query) => {
       const url = "/clerk/accounts/";
-      return http.get(url, query);
+      return http.get(URLS.ACCOUNTS.SEARCH, query);
     },
   },
   templates: {
