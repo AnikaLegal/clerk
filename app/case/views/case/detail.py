@@ -29,10 +29,7 @@ from case.serializers import IssueSerializer, TenancySerializer, IssueNoteSerial
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 router = Router("detail")
-
-
 router.create_route("view").uuid("pk")
-router.create_route("options").uuid("pk").path("options")
 router.create_route("note").uuid("pk").path("note")
 router.create_route("review").uuid("pk").path("review")
 router.create_route("performance").uuid("pk").path("performance")
@@ -47,63 +44,6 @@ router.create_route("landlord").uuid("pk").path("landlord").pk(
     "person_pk", optional=True
 )
 router.create_route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
-
-
-CASE_DETAIL_OPTIONS = {
-    "note": {
-        "icon": "clipboard outline",
-        "text": "Add a file note",
-        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
-    },
-    "review": {
-        "icon": "clipboard outline",
-        "text": "Add a coordinator case review note",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
-    },
-    "performance": {
-        "icon": "clipboard outline",
-        "text": "Add a paralegal performance review note",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
-    },
-    "conflict": {
-        "icon": "search",
-        "text": "Record a conflict check",
-        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
-    },
-    "eligibility": {
-        "icon": "search",
-        "text": "Record an eligibility check",
-        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
-    },
-    "assign": {
-        "icon": "graduation cap",
-        "text": "Assign a paralegal to the case",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better,
-    },
-    "progress": {
-        "icon": "chart line",
-        "text": "Progress the case status",
-        "render_when": lambda req, issue: req.user.is_paralegal_or_better,
-    },
-    "close": {
-        "icon": "times circle outline",
-        "text": "Close the case",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better
-        and issue.is_open,
-    },
-    "reopen": {
-        "icon": "check",
-        "text": "Re-open the case",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better
-        and not issue.is_open,
-    },
-    "outcome": {
-        "icon": "undo",
-        "text": "Edit case outcome",
-        "render_when": lambda req, issue: req.user.is_coordinator_or_better
-        and not issue.is_open,
-    },
-}
 
 
 @router.use_route("view")
@@ -176,24 +116,6 @@ def _person_select_view(request, pk, person_type):
         tenancy.save()
 
     return Response(TenancySerializer(tenancy).data)
-
-
-@router.use_route("options")
-@paralegal_or_better_required
-@require_http_methods(["GET"])
-def case_detail_options_view(request, pk):
-    issue = _get_issue(request, pk)
-    options = _get_case_detail_options(request, issue)
-    context = {"options": options, "issue": issue}
-    return render(request, "case/case/_detail_options.html", context)
-
-
-def _get_case_detail_options(request, issue):
-    return [
-        {**o, "url": reverse(f"case-detail-{slug}", args=(issue.pk,))}
-        for slug, o in CASE_DETAIL_OPTIONS.items()
-        if o["render_when"](request, issue)
-    ]
 
 
 @router.use_route("note")
@@ -505,7 +427,7 @@ def _get_issue_notes(request, pk):
 
     return (
         IssueNote.objects.filter(issue=pk)
-        .select_related("creator")
+        .prefetch_related("creator__groups")
         .filter(note_type__in=note_types)
         .order_by("-created_at")
         .all()

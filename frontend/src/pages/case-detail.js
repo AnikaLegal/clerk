@@ -16,63 +16,11 @@ import { URLS } from "consts";
 const { details, urls, file_urls, image_urls, actionstep_url, permissions } =
   window.REACT_CONTEXT;
 
-const CASE_OPTIONS = [
-  {
-    icon: "clipboard outline",
-    text: "Add a file note",
-    when: (perms, issue) => perms.is_paralegal_or_better,
-  },
-  {
-    icon: "clipboard outline",
-    text: "Add a coordinator case review note",
-    when: (perms, issue) => perms.is_coordinator_or_better,
-  },
-  {
-    icon: "clipboard outline",
-    text: "Add a paralegal performance review note",
-    when: (perms, issue) => perms.is_coordinator_or_better,
-  },
-  {
-    icon: "search",
-    text: "Record a conflict check",
-    when: (perms, issue) => perms.is_paralegal_or_better,
-  },
-  {
-    icon: "search",
-    text: "Record an eligibility check",
-    when: (perms, issue) => perms.is_paralegal_or_better,
-  },
-  {
-    icon: "graduation cap",
-    text: "Assign a paralegal to the case",
-    when: (perms, issue) => perms.is_coordinator_or_better,
-  },
-  {
-    icon: "chart line",
-    text: "Progress the case status",
-    when: (perms, issue) => perms.is_paralegal_or_better,
-  },
-  {
-    icon: "times circle outline",
-    text: "Close the case",
-    when: (perms, issue) => perms.is_coordinator_or_better && issue.is_open,
-  },
-  {
-    icon: "check",
-    text: "Re-open the case",
-    when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
-  },
-  {
-    icon: "undo",
-    text: "Edit case outcome",
-    when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
-  },
-];
-
 const App = () => {
   const [issue, setIssue] = useState(window.REACT_CONTEXT.issue);
   const [notes, setNotes] = useState(window.REACT_CONTEXT.notes);
   const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy);
+  const [activeFormId, setActiveFormId] = useState(null);
   const onRemoveLandlord = () => {
     if (confirm("Remove the landlord for this case?")) {
       api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data));
@@ -91,6 +39,7 @@ const App = () => {
       .add(issue.id, landlordId)
       .then(({ data }) => setTenancy(data));
   };
+  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null;
   return (
     <Container>
       <CaseHeader issue={issue} actionstep_url={actionstep_url} />
@@ -99,9 +48,17 @@ const App = () => {
         <div className="column">
           <Segment>
             <List divided verticalAlign="middle" selection>
-              {CASE_OPTIONS.filter((o) => o.when(permissions, issue)).map(
-                ({ icon, text }) => (
-                  <List.Item key={text}>
+              {CASE_FORM_OPTIONS.filter((o) => o.when(permissions, issue)).map(
+                ({ id, icon, text }) => (
+                  <List.Item
+                    active={id === activeFormId}
+                    key={text}
+                    onClick={() =>
+                      id === activeFormId
+                        ? setActiveFormId(null)
+                        : setActiveFormId(id)
+                    }
+                  >
                     <List.Content>
                       <div className="header">
                         <i className={`${icon} icon`}></i>
@@ -113,6 +70,8 @@ const App = () => {
               )}
             </List>
           </Segment>
+          {activeFormId && <ActiveForm />}
+
           <Header as="h2">Timeline</Header>
           {notes.length < 1 && <Feed>No notes yet</Feed>}
           {notes.map((note) => {
@@ -316,7 +275,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
             &nbsp;
           </span>
         ) : (
-          "Not assigned,"
+          "Not assigned, "
         )}
         {issue.lawyer ? (
           <span>
@@ -324,13 +283,9 @@ const CaseHeader = ({ issue, actionstep_url }) => (
             <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>&nbsp;
           </span>
         ) : (
-          "not supervised"
+          "not supervised "
         )}
-        {actionstep_url ? (
-          <a href="{actionstep_url}">view in Actionstep</a>
-        ) : (
-          "(Actionstep link not available)"
-        )}
+        {actionstep_url && <a href="{actionstep_url}">view in Actionstep</a>}
       </div>
     </Header>
     <span id="case-status" hx-swap-oob="true">
@@ -372,34 +327,195 @@ const CaseHeader = ({ issue, actionstep_url }) => (
   </>
 );
 
+const TimelineItem = ({
+  title,
+  detail,
+  content,
+  label,
+  bottomLabel,
+  color,
+}) => (
+  <div className="ui segment padded">
+    <div className={`ui top attached label ${color}`}>
+      {title}
+      <div className="detail">{detail}</div>
+    </div>
+    <p style={{ marginBottom: bottomLabel ? "1rem" : 0 }}>{content}</p>
+    {label && (
+      <div className={`ui top right attached label ${color}`}>{label}</div>
+    )}
+    {bottomLabel && (
+      <div className="ui bottom right attached label">{bottomLabel}</div>
+    )}
+  </div>
+);
+
 const NOTE_TYPES = {
   PARALEGAL: (note) => (
-    <div className="ui segment padded">
-      <div className="ui top attached label primary">
-        {note.creator.full_name}
-        <div className="detail">{note.created_at}</div>
-      </div>
-      <p style={{ marginBottom: 0 }}>{note.text}</p>
-      <div className="ui top right attached label primary">File note</div>
-    </div>
+    <TimelineItem
+      title={note.creator.full_name}
+      detail={note.created_at}
+      content={note.text}
+      label="File note"
+      color="primary"
+    />
   ),
-  EVENT: (note) => (note) =>
-    (
-      <div className="ui segment padded">
-        <div className="ui top attached label">
-          Case Update
-          <div className="detail">{note.created_at}</div>
-        </div>
-        <p style={{ marginBottom: 0 }}>{note.text}</p>
-      </div>
-    ),
-  ELIGIBILITY_CHECK_SUCCESS: (note) => "ELIGIBILITY_CHECK_SUCCESS",
-  ELIGIBILITY_CHECK_FAILURE: (note) => "ELIGIBILITY_CHECK_FAILURE",
-  CONFLICT_CHECK_SUCCESS: (note) => "CONFLICT_CHECK_SUCCESS",
-  CONFLICT_CHECK_FAILURE: (note) => "CONFLICT_CHECK_FAILURE",
-  REVIEW: (note) => "REVIEW",
-  PERFORMANCE: (note) => "PERFORMANCE",
-  EMAIL: (note) => "EMAIL",
+  EVENT: (note) => (
+    <TimelineItem
+      title="Case Update"
+      detail={note.created_at}
+      content={note.text}
+      color="primary"
+    />
+  ),
+  ELIGIBILITY_CHECK_SUCCESS: (note) => (
+    <TimelineItem
+      title={
+        <span>
+          Eligibility check <strong>cleared</strong> by {note.creator.full_name}
+        </span>
+      }
+      detail={note.created_at}
+      content={note.text}
+    />
+  ),
+  ELIGIBILITY_CHECK_FAILURE: (note) => (
+    <TimelineItem
+      title={
+        <span>
+          Eligibility check <strong>not cleared</strong> by{" "}
+          {note.creator.full_name}
+        </span>
+      }
+      detail={note.created_at}
+      content={note.text}
+    />
+  ),
+  CONFLICT_CHECK_SUCCESS: (note) => (
+    <TimelineItem
+      title={
+        <span>
+          Conflict check <strong>cleared</strong> by {note.creator.full_name}
+        </span>
+      }
+      detail={note.created_at}
+      content={note.text}
+    />
+  ),
+  CONFLICT_CHECK_FAILURE: (note) => (
+    <TimelineItem
+      title={
+        <span>
+          Conflict check <strong>not cleared</strong> by{" "}
+          {note.creator.full_name}
+        </span>
+      }
+      detail={note.created_at}
+      content={note.text}
+    />
+  ),
+  REVIEW: (note) => (
+    <TimelineItem
+      title={note.creator.full_name}
+      detail={note.created_at}
+      content={note.text}
+      label="Case review"
+      color="orange"
+      bottomLabel={<span>Next review {note.event}</span>}
+    />
+  ),
+  PERFORMANCE: (note) => (
+    <TimelineItem
+      title={note.creator.full_name}
+      detail={note.created_at}
+      content={note.text}
+      label="Performance review"
+      color="teal"
+      bottomLabel={
+        <span>
+          About
+          <a href={note.reviewee.url}>{note.reviewee.full_name}</a>
+        </span>
+      }
+    />
+  ),
+  EMAIL: (note) => null,
+};
+
+const CASE_FORM_OPTIONS = [
+  {
+    id: "filenote",
+    icon: "clipboard outline",
+    text: "Add a file note",
+    when: (perms, issue) => perms.is_paralegal_or_better,
+  },
+  {
+    id: "review",
+    icon: "clipboard outline",
+    text: "Add a coordinator case review note",
+    when: (perms, issue) => perms.is_coordinator_or_better,
+  },
+  {
+    id: "performance",
+    icon: "clipboard outline",
+    text: "Add a paralegal performance review note",
+    when: (perms, issue) => perms.is_coordinator_or_better,
+  },
+  {
+    id: "conflict",
+    icon: "search",
+    text: "Record a conflict check",
+    when: (perms, issue) => perms.is_paralegal_or_better,
+  },
+  {
+    id: "eligibility",
+    icon: "search",
+    text: "Record an eligibility check",
+    when: (perms, issue) => perms.is_paralegal_or_better,
+  },
+  {
+    id: "assign",
+    icon: "graduation cap",
+    text: "Assign a paralegal to the case",
+    when: (perms, issue) => perms.is_coordinator_or_better,
+  },
+  {
+    id: "progress",
+    icon: "chart line",
+    text: "Progress the case status",
+    when: (perms, issue) => perms.is_paralegal_or_better,
+  },
+  {
+    id: "close",
+    icon: "times circle outline",
+    text: "Close the case",
+    when: (perms, issue) => perms.is_coordinator_or_better && issue.is_open,
+  },
+  {
+    id: "reopen",
+    icon: "check",
+    text: "Re-open the case",
+    when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
+  },
+  {
+    id: "outcome",
+    icon: "undo",
+    text: "Edit case outcome",
+    when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
+  },
+];
+
+const CASE_FORMS = {
+  filenote: () => <h1>filenote</h1>,
+  review: () => <h1>review</h1>,
+  performance: () => <h1>performance</h1>,
+  conflict: () => <h1>conflict</h1>,
+  eligibility: () => <h1>eligibility</h1>,
+  assign: () => <h1>assign</h1>,
+  progress: () => <h1>progress</h1>,
+  close: () => <h1>close</h1>,
+  reopen: () => <h1>reopen</h1>,
+  outcome: () => <h1>outcome</h1>,
 };
 
 mount(App);
