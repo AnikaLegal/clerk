@@ -68,6 +68,12 @@ export const api = {
     },
   },
   case: {
+    filenote: {
+      add: (caseId, text) => {
+        const url = `/clerk/cases/detail/${caseId}/note/`;
+        return http.post(url, { text });
+      },
+    },
     agent: {
       add: (caseId, agentId) => {
         const url = `/clerk/cases/detail/${caseId}/agent/`;

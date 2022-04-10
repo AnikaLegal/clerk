@@ -24,7 +24,12 @@ from case.views.auth import paralegal_or_better_required, coordinator_or_better_
 from core.models import Issue, IssueNote, Person
 from core.models.issue_note import NoteType
 from case.utils.react import render_react_page
-from case.serializers import IssueSerializer, TenancySerializer, IssueNoteSerializer
+from case.serializers import (
+    IssueSerializer,
+    TenancySerializer,
+    IssueNoteSerializer,
+    IssueNoteCreateSerializer,
+)
 
 MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
@@ -118,21 +123,31 @@ def _person_select_view(request, pk, person_type):
     return Response(TenancySerializer(tenancy).data)
 
 
+# FIXME: Test API endpoint
 @router.use_route("note")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["POST"])
 def case_detail_note_view(request, pk):
     """
     Form where paralegals can leave notes about case progress.
     """
-    view = _build_case_note_view(
-        ParalegalNoteForm,
-        "note",
-        "case/case/forms/_file_note.html",
-        "File note created",
-        NoteType.PARALEGAL,
+    issue = _get_issue(request, pk)
+    data = {
+        "issue": issue.id,
+        "creator": request.user.id,
+        "note_type": NoteType.PARALEGAL,
+        **request.data,
+    }
+    serializer = IssueNoteCreateSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    notes = _get_issue_notes(request, pk)
+    return Response(
+        {
+            "issue": IssueSerializer(issue).data,
+            "notes": IssueNoteSerializer(notes, many=True).data,
+        }
     )
-    return view(request, pk)
 
 
 @router.use_route("review")

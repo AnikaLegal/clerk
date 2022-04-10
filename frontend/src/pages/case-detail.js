@@ -3,15 +3,30 @@ import { Formik } from "formik";
 import {
   Container,
   Header,
+  Divider,
+  Form,
+  Button,
   Dropdown,
+  Message,
   Segment,
   List,
   Feed,
 } from "semantic-ui-react";
-
 import { mount } from "utils";
 import { api } from "api";
 import { URLS } from "consts";
+import {
+  FilenoteForm,
+  ReviewForm,
+  ReopenForm,
+  PerformanceForm,
+  CloseForm,
+  EligibilityForm,
+  AssignForm,
+  OutcomeForm,
+  ProgressForm,
+  ConflictForm,
+} from "forms";
 
 const { details, urls, file_urls, image_urls, actionstep_url, permissions } =
   window.REACT_CONTEXT;
@@ -70,7 +85,14 @@ const App = () => {
               )}
             </List>
           </Segment>
-          {activeFormId && <ActiveForm />}
+          {activeFormId && (
+            <ActiveForm
+              issue={issue}
+              setIssue={setIssue}
+              setNotes={setNotes}
+              onCancel={() => setActiveFormId(null)}
+            />
+          )}
 
           <Header as="h2">Timeline</Header>
           {notes.length < 1 && <Feed>No notes yet</Feed>}
@@ -355,7 +377,7 @@ const NOTE_TYPES = {
     <TimelineItem
       title={note.creator.full_name}
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
       label="File note"
       color="primary"
     />
@@ -364,7 +386,7 @@ const NOTE_TYPES = {
     <TimelineItem
       title="Case Update"
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
       color="primary"
     />
   ),
@@ -376,7 +398,7 @@ const NOTE_TYPES = {
         </span>
       }
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
     />
   ),
   ELIGIBILITY_CHECK_FAILURE: (note) => (
@@ -388,7 +410,7 @@ const NOTE_TYPES = {
         </span>
       }
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
     />
   ),
   CONFLICT_CHECK_SUCCESS: (note) => (
@@ -399,7 +421,7 @@ const NOTE_TYPES = {
         </span>
       }
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
     />
   ),
   CONFLICT_CHECK_FAILURE: (note) => (
@@ -411,14 +433,14 @@ const NOTE_TYPES = {
         </span>
       }
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
     />
   ),
   REVIEW: (note) => (
     <TimelineItem
       title={note.creator.full_name}
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
       label="Case review"
       color="orange"
       bottomLabel={<span>Next review {note.event}</span>}
@@ -428,7 +450,7 @@ const NOTE_TYPES = {
     <TimelineItem
       title={note.creator.full_name}
       detail={note.created_at}
-      content={note.text}
+      content={note.text_display}
       label="Performance review"
       color="teal"
       bottomLabel={
@@ -440,6 +462,19 @@ const NOTE_TYPES = {
     />
   ),
   EMAIL: (note) => null,
+};
+
+const CASE_FORMS = {
+  filenote: FilenoteForm,
+  review: ReviewForm,
+  performance: PerformanceForm,
+  conflict: ConflictForm,
+  eligibility: EligibilityForm,
+  assign: AssignForm,
+  progress: ProgressForm,
+  close: CloseForm,
+  reopen: ReopenForm,
+  outcome: OutcomeForm,
 };
 
 const CASE_FORM_OPTIONS = [
@@ -459,7 +494,7 @@ const CASE_FORM_OPTIONS = [
     id: "performance",
     icon: "clipboard outline",
     text: "Add a paralegal performance review note",
-    when: (perms, issue) => perms.is_coordinator_or_better,
+    when: (perms, issue) => perms.is_coordinator_or_better && issue.paralegal,
   },
   {
     id: "conflict",
@@ -504,18 +539,5 @@ const CASE_FORM_OPTIONS = [
     when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
   },
 ];
-
-const CASE_FORMS = {
-  filenote: () => <h1>filenote</h1>,
-  review: () => <h1>review</h1>,
-  performance: () => <h1>performance</h1>,
-  conflict: () => <h1>conflict</h1>,
-  eligibility: () => <h1>eligibility</h1>,
-  assign: () => <h1>assign</h1>,
-  progress: () => <h1>progress</h1>,
-  close: () => <h1>close</h1>,
-  reopen: () => <h1>reopen</h1>,
-  outcome: () => <h1>outcome</h1>,
-};
 
 mount(App);

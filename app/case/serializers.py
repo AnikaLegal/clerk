@@ -79,6 +79,18 @@ class TenancySerializer(serializers.ModelSerializer):
         return reverse("tenancy-detail", args=(obj.pk,))
 
 
+class IssueNoteCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "creator",
+            "note_type",
+            "text",
+            "issue",
+            "event",
+        )
+
+
 class IssueNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssueNote
@@ -88,14 +100,17 @@ class IssueNoteSerializer(serializers.ModelSerializer):
             "note_type",
             "note_type_display",
             "text",
+            "text_display",
             "created_at",
             "event",
             "reviewee",
         )
 
     creator = UserSerializer(read_only=True)
-    text = serializers.CharField(source="get_text")
-    note_type_display = serializers.CharField(source="get_note_type_display")
+    text_display = serializers.CharField(source="get_text", read_only=True)
+    note_type_display = serializers.CharField(
+        source="get_note_type_display", read_only=True
+    )
     created_at = serializers.SerializerMethodField()
     event = serializers.SerializerMethodField()
     reviewee = serializers.SerializerMethodField()
