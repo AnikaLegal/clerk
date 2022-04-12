@@ -1,8 +1,34 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
+import moment from "moment";
 
 import { api } from "api";
+
+export const submitNote =
+  (issue, setIssue, setNotes, setSuccess) =>
+  (values, { setSubmitting, setErrors }) => {
+    const note = { ...values };
+    note.event = note.event
+      ? moment.utc(values.event, "DD/MM/YYYY").format()
+      : note.event;
+
+    api.case.note.add(issue.id, note).then(({ resp, data }) => {
+      if (resp.status === 400) {
+        setErrors(data);
+      } else if (resp.ok) {
+        setIssue(data.issue);
+        setNotes(data.notes);
+        setSuccess(true);
+      } else {
+        setErrors({
+          "Submission failure":
+            "We could not perform this action because something went wrong.",
+        });
+      }
+      setSubmitting(false);
+    });
+  };
 
 export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -14,29 +40,11 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
         note is visible to everybody who has access to the case.
       </p>
       <Formik
-        initialValues={{ text: "" }}
+        initialValues={{ text: "", note_type: "PARALEGAL" }}
         validate={({ text }) =>
           text ? null : { "File note text": "File note cannot be empty" }
         }
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          api.case.filenote
-            .add(issue.id, values.text)
-            .then(({ resp, data }) => {
-              if (resp.status === 400) {
-                setErrors(data);
-              } else if (resp.ok) {
-                setIssue(data.issue);
-                setNotes(data.notes);
-                setSuccess(true);
-              } else {
-                setErrors({
-                  "Submission failure":
-                    "We could not perform this action because something went wrong.",
-                });
-              }
-              setSubmitting(false);
-            });
-        }}
+        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
         {({
           values,
@@ -55,6 +63,7 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
               onChange={(e) => setFieldValue("text", e.target.value)}
               disabled={isSubmitting}
               rows={3}
+              placeholder="Write case details here"
               value={values.text}
               style={{ marginBottom: "1em" }}
             />
@@ -73,7 +82,7 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Create note
             </Button>
             <Button disabled={isSubmitting} onClick={onCancel}>
-              Cancel
+              Close
             </Button>
             <Message success>File note created</Message>
           </Form>

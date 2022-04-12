@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.urls import reverse
+from django.utils import timezone
 
-from core.models import Issue, IssueEvent, Tenancy, IssueNote, Person, Client
+from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
 from emails.models import EmailTemplate
 
@@ -176,8 +177,11 @@ class IssueSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "topic",
+            "topic_display",
+            "stage_display",
             "stage",
             "outcome",
+            "outcome_display",
             "outcome_notes",
             "provided_legal_services",
             "fileref",
@@ -194,13 +198,35 @@ class IssueSerializer(serializers.ModelSerializer):
     client = ClientSerializer(read_only=True)
     lawyer = UserSerializer(read_only=True)
     paralegal = UserSerializer(read_only=True)
-    topic = serializers.CharField(source="get_topic_display")
-    outcome = serializers.CharField(source="get_outcome_display")
-    stage = serializers.CharField(source="get_stage_display")
+    topic_display = serializers.CharField(source="get_topic_display")
+    outcome_display = serializers.CharField(source="get_outcome_display")
+    stage_display = serializers.CharField(source="get_stage_display")
     created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, obj):
         return obj.created_at.strftime("%d/%m/%Y")
+
+
+class IssueAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = ("paralegal", "lawyer")
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+        # Wait 15 mins for Sharepoint data sync
+        fields["paralegal"].queryset = fields["paralegal"].queryset.filter(
+            ms_account_created_at__lte=fifteen_minutes_ago
+        )
+        return fields
+
+    paralegal = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(groups__name="Paralegal"), allow_null=True
+    )
+    lawyer = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(groups__name="Lawyer"), allow_null=True
+    )
 
 
 class EmailTemplateSerializer(serializers.ModelSerializer):

@@ -4,25 +4,23 @@ import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
-import { api } from "api";
+import { submitNote } from "./case-file-note";
 
 export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
   return (
     <Segment>
-      <Header> Add a paralegal performance review note</Header>
+      <Header> Add a paralegal performance review</Header>
       <p>
         Leave a paralegal performance review note for{" "}
         {issue.paralegal.full_name}. This note is not visible to paralegals.
       </p>
       <Formik
-        initialValues={{ text: "" }}
+        initialValues={{ text: "", note_type: "PERFORMANCE" }}
         validate={({ text }) =>
           text ? null : { "File note text": "File note cannot be empty" }
         }
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          // TODO
-        }}
+        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
         {({
           values,
@@ -42,6 +40,7 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
               disabled={isSubmitting}
               rows={3}
               value={values.text}
+              placeholder="Write your review here (this is not a filenote, paralegals cannot see this)"
               style={{ marginBottom: "1em" }}
             />
             {Object.entries(errors).map(([k, v]) => (
@@ -59,7 +58,7 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Create note
             </Button>
             <Button disabled={isSubmitting} onClick={onCancel}>
-              Cancel
+              Close
             </Button>
             <Message success>File note created</Message>
           </Form>

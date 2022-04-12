@@ -68,10 +68,19 @@ export const api = {
     },
   },
   case: {
-    filenote: {
-      add: (caseId, text) => {
+    update: (caseId, issue) => {
+      const url = `/clerk/cases/detail/${caseId}/update/`;
+      return http.post(url, issue);
+    },
+    // Assign a paralegal + lawyer
+    assign: (caseId, issue) => {
+      const url = `/clerk/cases/detail/${caseId}/assign/`;
+      return http.post(url, issue);
+    },
+    note: {
+      add: (caseId, note) => {
         const url = `/clerk/cases/detail/${caseId}/note/`;
-        return http.post(url, { text });
+        return http.post(url, note);
       },
     },
     agent: {

@@ -286,7 +286,7 @@ const CaseTabMenu = () => (
 const CaseHeader = ({ issue, actionstep_url }) => (
   <>
     <Header as="h1">
-      {issue.topic} case for {issue.client.full_name} ({issue.fileref})
+      {issue.topic_display} case for {issue.client.full_name} ({issue.fileref})
       <div className="sub header">
         Created {issue.created_at}
         <br />
@@ -325,7 +325,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
       <div className="ui grey label">
         Stage
         {issue.stage ? (
-          <div className="detail">{issue.stage}</div>
+          <div className="detail">{issue.stage_display}</div>
         ) : (
           <div className="detail">-</div>
         )}
@@ -334,7 +334,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
       <div className="ui grey label">
         Outcome
         {issue.outcome ? (
-          <div className="detail">{issue.outcome}</div>
+          <div className="detail">{issue.outcome_display}</div>
         ) : (
           <div className="detail">-</div>
         )}
@@ -455,7 +455,7 @@ const NOTE_TYPES = {
       color="teal"
       bottomLabel={
         <span>
-          About
+          About&nbsp;
           <a href={note.reviewee.url}>{note.reviewee.full_name}</a>
         </span>
       }
@@ -518,7 +518,7 @@ const CASE_FORM_OPTIONS = [
     id: "progress",
     icon: "chart line",
     text: "Progress the case status",
-    when: (perms, issue) => perms.is_paralegal_or_better,
+    when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
   },
   {
     id: "close",

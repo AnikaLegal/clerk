@@ -4,7 +4,7 @@ import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
-import { api } from "api";
+import { submitNote } from "./case-file-note";
 
 export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -16,17 +16,14 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
         not visible to paralegals.
       </p>
       <Formik
-        initialValues={{ text: "", event: "" }}
+        initialValues={{ text: "", event: "", note_type: "REVIEW" }}
         validate={({ text, event }) => {
           const errors = {};
           if (!text) errors.text = "File note cannot be empty";
           if (!event) errors.event = "Next review date is required";
           return errors;
         }}
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          setSubmitting(false);
-          // Submit here
-        }}
+        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
         {({
           values,
@@ -49,12 +46,15 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
               rows={3}
               value={values.text}
               style={{ marginBottom: "1em" }}
+              placeholder="Write your review here (this is not a filenote, paralegals cannot see this)"
             />
 
             <DateInput
               name="event"
               dateFormat="DD/MM/YYYY"
+              autoComplete="off"
               minDate={moment()}
+              placeholder="Select a next review date"
               onChange={(e, { name, value }) =>
                 setFieldValue(name, value, false)
               }
@@ -77,7 +77,7 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Create note
             </Button>
             <Button disabled={isSubmitting} onClick={onCancel}>
-              Cancel
+              Close
             </Button>
             <Message success>File note created</Message>
           </Form>
