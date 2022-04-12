@@ -12,6 +12,9 @@ import {
   List,
   Feed,
 } from "semantic-ui-react";
+import { Converter, setFlavor } from "showdown";
+import xss from "xss";
+
 import { mount } from "utils";
 import { api } from "api";
 import { URLS } from "consts";
@@ -27,6 +30,9 @@ import {
   ProgressForm,
   ConflictForm,
 } from "forms";
+
+const converter = new Converter();
+setFlavor("github");
 
 const { details, urls, file_urls, image_urls, actionstep_url, permissions } =
   window.REACT_CONTEXT;
@@ -85,14 +91,6 @@ const App = () => {
               )}
             </List>
           </Segment>
-          {activeFormId && (
-            <ActiveForm
-              issue={issue}
-              setIssue={setIssue}
-              setNotes={setNotes}
-              onCancel={() => setActiveFormId(null)}
-            />
-          )}
 
           <Header as="h2">Timeline</Header>
           {notes.length < 1 && <Feed>No notes yet</Feed>}
@@ -102,99 +100,111 @@ const App = () => {
           })}
         </div>
         <div className="column">
-          <EntityCard
-            title="Client"
-            url={issue.client.url}
-            tableData={{
-              Name: issue.client.full_name,
-              Email: issue.client.email,
-              Phone: issue.client.phone_number,
-              Age: issue.client.age,
-              Gender: issue.client.gender,
-            }}
-          />
-          <EntityCard
-            title="Tenancy"
-            url={tenancy.url}
-            tableData={{
-              ["Street Address"]: tenancy.address,
-              Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
-              Started: tenancy.started,
-              ["Client on lease"]: tenancy.is_on_lease,
-            }}
-          />
-          {tenancy.landlord ? (
-            <EntityCard
-              title="Landlord"
-              url={tenancy.landlord.url}
-              onRemove={onRemoveLandlord}
-              tableData={{
-                Name: tenancy.landlord.full_name,
-                Address: tenancy.landlord.address,
-                Email: tenancy.landlord.email,
-                Phone: tenancy.landlord.phone,
-              }}
-            />
-          ) : (
-            <PersonSearchCard
-              title="Add a landlord"
-              createUrl={URLS.PERSON.CREATE}
-              onSelect={onAddLandlord}
+          {activeFormId && (
+            <ActiveForm
+              issue={issue}
+              setIssue={setIssue}
+              setNotes={setNotes}
+              onCancel={() => setActiveFormId(null)}
             />
           )}
-          {tenancy.agent ? (
-            <EntityCard
-              title="Real estate agent"
-              onRemove={onRemoveAgent}
-              url={tenancy.agent.url}
-              tableData={{
-                Name: tenancy.agent.full_name,
-                Address: tenancy.agent.address,
-                Email: tenancy.agent.email,
-                Phone: tenancy.agent.phone,
-              }}
-            />
-          ) : (
-            <PersonSearchCard
-              title="Add an agent"
-              createUrl={URLS.PERSON.CREATE}
-              onSelect={onAddAgent}
-            />
-          )}
-          <EntityCard title="Other submitted data" tableData={details} />
-          {file_urls && (
-            <>
-              <h2 className="header">Submitted documents</h2>
-              <table
-                className="ui definition table small"
-                style={{ marginBottom: "2rem" }}
-              >
-                <tbody>
-                  {file_urls.map((url, idx) => (
-                    <tr key={url}>
-                      <td className="four wide">Document #{idx}</td>
-                      <td>
-                        <a href={url}>Open document</a>
-                      </td>
-                    </tr>
+          {!activeFormId && (
+            <React.Fragment>
+              <EntityCard
+                title="Client"
+                url={issue.client.url}
+                tableData={{
+                  Name: issue.client.full_name,
+                  Email: issue.client.email,
+                  Phone: issue.client.phone_number,
+                  Age: issue.client.age,
+                  Gender: issue.client.gender,
+                }}
+              />
+              <EntityCard
+                title="Tenancy"
+                url={tenancy.url}
+                tableData={{
+                  ["Street Address"]: tenancy.address,
+                  Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
+                  Started: tenancy.started,
+                  ["Client on lease"]: tenancy.is_on_lease,
+                }}
+              />
+              {tenancy.landlord ? (
+                <EntityCard
+                  title="Landlord"
+                  url={tenancy.landlord.url}
+                  onRemove={onRemoveLandlord}
+                  tableData={{
+                    Name: tenancy.landlord.full_name,
+                    Address: tenancy.landlord.address,
+                    Email: tenancy.landlord.email,
+                    Phone: tenancy.landlord.phone,
+                  }}
+                />
+              ) : (
+                <PersonSearchCard
+                  title="Add a landlord"
+                  createUrl={URLS.PERSON.CREATE}
+                  onSelect={onAddLandlord}
+                />
+              )}
+              {tenancy.agent ? (
+                <EntityCard
+                  title="Real estate agent"
+                  onRemove={onRemoveAgent}
+                  url={tenancy.agent.url}
+                  tableData={{
+                    Name: tenancy.agent.full_name,
+                    Address: tenancy.agent.address,
+                    Email: tenancy.agent.email,
+                    Phone: tenancy.agent.phone,
+                  }}
+                />
+              ) : (
+                <PersonSearchCard
+                  title="Add an agent"
+                  createUrl={URLS.PERSON.CREATE}
+                  onSelect={onAddAgent}
+                />
+              )}
+              <EntityCard title="Other submitted data" tableData={details} />
+              {file_urls && (
+                <>
+                  <h2 className="header">Submitted documents</h2>
+                  <table
+                    className="ui definition table small"
+                    style={{ marginBottom: "2rem" }}
+                  >
+                    <tbody>
+                      {file_urls.map((url, idx) => (
+                        <tr key={url}>
+                          <td className="four wide">Document #{idx}</td>
+                          <td>
+                            <a href={url}>Open document</a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+              {image_urls && (
+                <>
+                  <h2 className="header">Submitted images</h2>
+                  {image_urls.map((url) => (
+                    <a href={url} key={url}>
+                      <img
+                        className="ui small rounded image"
+                        src={url}
+                        style={{ marginBottom: "1rem" }}
+                      />
+                    </a>
                   ))}
-                </tbody>
-              </table>
-            </>
-          )}
-          {image_urls && (
-            <>
-              <h2 className="header">Submitted images</h2>
-              {image_urls.map((url) => (
-                <a href={url} key={url}>
-                  <img
-                    className="ui small rounded image"
-                    src={url}
-                    style={{ marginBottom: "1rem" }}
-                  />
-                </a>
-              ))}
-            </>
+                </>
+              )}
+            </React.Fragment>
           )}
         </div>
       </div>
@@ -362,7 +372,10 @@ const TimelineItem = ({
       {title}
       <div className="detail">{detail}</div>
     </div>
-    <p style={{ marginBottom: bottomLabel ? "1rem" : 0 }}>{content}</p>
+    <div
+      style={{ marginBottom: bottomLabel ? "1rem" : 0 }}
+      dangerouslySetInnerHTML={{ __html: xss(converter.makeHtml(content)) }}
+    />
     {label && (
       <div className={`ui top right attached label ${color}`}>{label}</div>
     )}

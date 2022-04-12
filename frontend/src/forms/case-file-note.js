@@ -4,6 +4,7 @@ import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
 import moment from "moment";
 
 import { api } from "api";
+import { MarkdownTextArea } from "comps/markdown-editor";
 
 export const submitNote =
   (issue, setIssue, setNotes, setSuccess) =>
@@ -59,7 +60,7 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
             success={isSuccess}
             error={Object.keys(errors).length > 0}
           >
-            <textarea
+            <MarkdownTextArea
               onChange={(e) => setFieldValue("text", e.target.value)}
               disabled={isSubmitting}
               rows={3}
