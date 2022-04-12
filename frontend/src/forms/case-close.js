@@ -11,6 +11,7 @@ import {
 } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
+import * as Yup from "yup";
 
 import { submitCaseUpdate } from "./case-progress";
 import { OUTCOMES } from "consts";
@@ -20,6 +21,12 @@ const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   value: k,
   text: v,
 }));
+
+const FormSchema = Yup.object().shape({
+  outcome: Yup.string().nullable().required("Required"),
+  outcome_notes: Yup.string().required("Required"),
+  provided_legal_services: Yup.bool(),
+});
 
 export const CloseForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -31,6 +38,7 @@ export const CloseForm = ({ issue, setIssue, setNotes, onCancel }) => {
         data is crucial for our reporting and decision making.
       </p>
       <Formik
+        validationSchema={FormSchema}
         initialValues={{
           is_open: false,
           stage: "CLOSED",

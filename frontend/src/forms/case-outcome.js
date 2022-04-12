@@ -9,6 +9,7 @@ import {
   Dropdown,
   Checkbox,
 } from "semantic-ui-react";
+import * as Yup from "yup";
 
 import { submitCaseUpdate } from "./case-progress";
 import { OUTCOMES } from "consts";
@@ -18,6 +19,12 @@ const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   value: k,
   text: v,
 }));
+
+const FormSchema = Yup.object().shape({
+  outcome: Yup.string().nullable().required("Required"),
+  outcome_notes: Yup.string().required("Required"),
+  provided_legal_services: Yup.bool(),
+});
 
 export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -29,6 +36,7 @@ export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
         data is crucial for our reporting and decision making.
       </p>
       <Formik
+        validationSchema={FormSchema}
         initialValues={{
           outcome: issue.outcome,
           provided_legal_services: issue.provided_legal_services,

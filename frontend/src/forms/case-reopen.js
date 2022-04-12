@@ -8,6 +8,7 @@ import {
   Segment,
   Dropdown,
 } from "semantic-ui-react";
+import * as Yup from "yup";
 
 import { submitCaseUpdate } from "./case-progress";
 import { STAGES } from "consts";
@@ -20,6 +21,10 @@ const STAGE_OPTIONS = Object.entries(STAGES)
     text: v,
   }));
 
+const FormSchema = Yup.object().shape({
+  stage: Yup.string().required("Required"),
+});
+
 export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
   return (
@@ -28,9 +33,9 @@ export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
       <Formik
         initialValues={{
           is_open: true,
-          stage: issue.stage,
+          stage: "",
         }}
-        validate={() => {}}
+        validationSchema={FormSchema}
         onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
       >
         {({
