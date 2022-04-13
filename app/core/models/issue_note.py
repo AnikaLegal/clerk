@@ -37,7 +37,15 @@ class IssueNote(TimestampedModel):
     A note, taken against a issue.
     """
 
-    PARALEGAL_NOTE_TYPES = [NoteType.PARALEGAL, NoteType.EVENT, NoteType.EMAIL]
+    PARALEGAL_NOTE_TYPES = [
+        NoteType.PARALEGAL,
+        NoteType.EVENT,
+        NoteType.EMAIL,
+        NoteType.CONFLICT_CHECK_SUCCESS,
+        NoteType.CONFLICT_CHECK_FAILURE,
+        NoteType.ELIGIBILITY_CHECK_SUCCESS,
+        NoteType.ELIGIBILITY_CHECK_FAILURE,
+    ]
     COORDINATOR_NOTE_TYPES = [
         NoteType.PARALEGAL,
         NoteType.REVIEW,
