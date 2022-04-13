@@ -37,7 +37,7 @@ const App = () => {
   const [issue, setIssue] = useState(window.REACT_CONTEXT.issue);
   const [notes, setNotes] = useState(window.REACT_CONTEXT.notes);
   const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy);
-  const [activeFormId, setActiveFormId] = useState("filenote");
+  const [activeFormId, setActiveFormId] = useState(null);
   const onRemoveLandlord = () => {
     if (confirm("Remove the landlord for this case?")) {
       api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data));
