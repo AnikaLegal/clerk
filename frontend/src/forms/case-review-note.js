@@ -5,6 +5,9 @@ import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
 import { submitNote } from "./case-file-note";
+import { TimelineNote } from "comps/timeline-item";
+import { MarkdownExplainer } from "comps/markdown-editor";
+import { TextArea } from "comps/textarea";
 
 export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -40,7 +43,7 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
             success={isSuccess}
             error={Object.keys(errors).length > 0}
           >
-            <textarea
+            <TextArea
               onChange={(e) => setFieldValue("text", e.target.value, false)}
               disabled={isSubmitting}
               rows={3}
@@ -80,6 +83,18 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Close
             </Button>
             <Message success>File note created</Message>
+            <MarkdownExplainer />
+            <TimelineNote
+              note={{
+                note_type: values.note_type,
+                created_at: "Now",
+                event: values.event,
+                text_display: values.text || "start typing...",
+                creator: {
+                  full_name: "You",
+                },
+              }}
+            />
           </Form>
         )}
       </Formik>

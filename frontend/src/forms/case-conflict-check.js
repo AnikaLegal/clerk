@@ -11,6 +11,7 @@ import {
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
+import { TextArea } from "comps/textarea";
 import { submitNote } from "./case-file-note";
 
 export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
@@ -67,7 +68,7 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
               }
             />
 
-            <textarea
+            <TextArea
               onChange={(e) => setFieldValue("text", e.target.value, false)}
               disabled={isSubmitting}
               placeholder="Write a note describing why the outcome was chosen."

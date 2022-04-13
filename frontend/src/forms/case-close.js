@@ -13,6 +13,7 @@ import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 import * as Yup from "yup";
 
+import { TextArea } from "comps/textarea";
 import { submitCaseUpdate } from "./case-progress";
 import { OUTCOMES } from "consts";
 
@@ -74,8 +75,10 @@ export const CloseForm = ({ issue, setIssue, setNotes, onCancel }) => {
                 setFieldValue("outcome", value, false)
               }
             />
-            <textarea
-              onChange={(e) => setFieldValue("outcome_notes", e.target.value)}
+            <TextArea
+              onChange={(e) =>
+                setFieldValue("outcome_notes", e.target.value, false)
+              }
               disabled={isSubmitting}
               rows={3}
               value={values.outcome_notes}

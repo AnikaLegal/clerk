@@ -12,6 +12,7 @@ import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
 import { submitNote } from "./case-file-note";
+import { TextArea } from "comps/textarea";
 
 export const EligibilityForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false);
@@ -67,7 +68,7 @@ export const EligibilityForm = ({ issue, setIssue, setNotes, onCancel }) => {
               }
             />
 
-            <textarea
+            <TextArea
               onChange={(e) => setFieldValue("text", e.target.value, false)}
               disabled={isSubmitting}
               placeholder="Write a note describing why the outcome was chosen."

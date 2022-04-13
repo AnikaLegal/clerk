@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Form, Segment } from "semantic-ui-react";
-import { Converter, setFlavor } from "showdown";
-import xss from "xss";
 
 import { TextArea } from "comps/textarea";
+import { markdownToHtml } from "utils";
 
-const converter = new Converter();
-setFlavor("github");
-
-const convert = (text) => {
-  const html = converter.makeHtml(text);
-  const sanitisedHtml = xss(html);
-  return sanitisedHtml;
-};
+export const MarkdownExplainer = () => (
+  <Segment secondary>
+    Text can be formatted using Markdown. See&nbsp;
+    <a
+      href="https://www.markdownguide.org/cheat-sheet/#basic-syntax"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      here
+    </a>
+    &nbsp;for a basic reference.
+  </Segment>
+);
 
 export const MarkdownEditor = ({
   text,
@@ -23,27 +27,17 @@ export const MarkdownEditor = ({
 }) => {
   useEffect(() => {
     if (text) {
-      onChangeHtml(convert(text));
+      onChangeHtml(markdownToHtml(text));
     }
   }, []);
 
   const onTextAreaChange = (e) => {
     onChangeText(e.target.value);
-    onChangeHtml(convert(e.target.value));
+    onChangeHtml(markdownToHtml(e.target.value));
   };
   return (
     <div style={{ padding: "1em 0" }}>
-      <Segment secondary>
-        Emails can be formatted using Markdown. See&nbsp;
-        <a
-          href="https://www.markdownguide.org/cheat-sheet/#basic-syntax"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          here
-        </a>
-        &nbsp;for a basic reference.
-      </Segment>
+      <MarkdownExplainer />
       <div
         style={{
           display: "grid",
@@ -71,7 +65,7 @@ export const MarkdownTextArea = (props) => {
   const [html, setHtml] = useState("");
   useEffect(() => {
     if (props.value) {
-      setHtml(convert(props.value));
+      setHtml(markdownToHtml(props.value));
     } else {
       setHtml("");
     }

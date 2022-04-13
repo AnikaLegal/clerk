@@ -13,6 +13,7 @@ import * as Yup from "yup";
 
 import { submitCaseUpdate } from "./case-progress";
 import { OUTCOMES } from "consts";
+import { TextArea } from "comps/textarea";
 
 const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   key: k,
@@ -70,7 +71,7 @@ export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
                 setFieldValue("outcome", value, false)
               }
             />
-            <textarea
+            <TextArea
               onChange={(e) => setFieldValue("outcome_notes", e.target.value)}
               disabled={isSubmitting}
               rows={3}

@@ -4,7 +4,9 @@ import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
 import moment from "moment";
 
 import { api } from "api";
-import { MarkdownTextArea } from "comps/markdown-editor";
+import { TextArea } from "comps/textarea";
+import { TimelineNote } from "comps/timeline-item";
+import { MarkdownExplainer } from "comps/markdown-editor";
 
 export const submitNote =
   (issue, setIssue, setNotes, setSuccess) =>
@@ -60,7 +62,7 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
             success={isSuccess}
             error={Object.keys(errors).length > 0}
           >
-            <MarkdownTextArea
+            <TextArea
               onChange={(e) => setFieldValue("text", e.target.value)}
               disabled={isSubmitting}
               rows={3}
@@ -86,6 +88,17 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Close
             </Button>
             <Message success>File note created</Message>
+            <MarkdownExplainer />
+            <TimelineNote
+              note={{
+                note_type: values.note_type,
+                created_at: "Now",
+                text_display: values.text || "start typing...",
+                creator: {
+                  full_name: "You",
+                },
+              }}
+            />
           </Form>
         )}
       </Formik>

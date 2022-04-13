@@ -1,5 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import { hydrate, render } from "react-dom";
+import { Converter, setFlavor } from "showdown";
+import xss from "xss";
+
+const converter = new Converter();
+setFlavor("github");
+
+export const markdownToHtml = (markdownText) => {
+  const html = converter.makeHtml(markdownText);
+  // Sanitise HTML removing <script> tags and the like.
+  return xss(html);
+};
 
 // Skips first update
 export const useEffectLazy = (func, vars) => {
