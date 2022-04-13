@@ -1,6 +1,5 @@
 import re
 import os
-from urllib.parse import urlencode
 from typing import List
 from django.utils.text import slugify
 
@@ -11,6 +10,10 @@ from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
 from html_sanitizer import Sanitizer
 from django.urls import reverse
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+from bs4 import BeautifulSoup
+
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
@@ -31,6 +34,7 @@ router.create_route("thread").uuid("pk").path("thread").slug("slug")
 router.create_route("draft").uuid("pk").path("draft")
 router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
 router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
+router.create_route("preview").uuid("pk").path("draft").pk("email_pk").path("preview")
 (
     router.create_route("attach")
     .uuid("pk")
@@ -270,6 +274,31 @@ def email_draft_edit_view(request, pk, email_pk):
     return render(request, "case/case/email/draft_edit.html", context)
 
 
+@router.use_route("preview")
+@paralegal_or_better_required
+@require_http_methods(["GET"])
+def email_draft_preview_view(request, pk, email_pk):
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
+    if not email.state in DRAFT_EMAIL_STATES:
+        return redirect("case-email-list", issue.pk)
+
+    html = _render_email_template(email.html)
+    return HttpResponse(html, "text/html", 200)
+
+
+def _render_email_template(html):
+    soup = BeautifulSoup(html, parser="lxml", features="lxml")
+    for p_tag in soup.find_all("p"):
+        p_tag["style"] = "margin:0 0 12px 0;"
+
+    for a_tag in soup.find_all("a"):
+        a_tag["style"] = "color:#438fef;text-decoration:underline;"
+
+    context = {"html": mark_safe(soup.body.decode_contents())}
+    return render_to_string("case/case/email/preview.html", context)
+
+
 @router.use_route("send")
 @paralegal_or_better_required
 @require_http_methods(["POST"])
@@ -278,6 +307,7 @@ def email_draft_send_view(request, pk, email_pk):
     email = _get_email_for_issue(issue, email_pk)
     if email.state == EmailState.DRAFT:
         email.state = EmailState.READY_TO_SEND
+        email.html = _render_email_template(email.html)
         email.save()
     elif email.state == EmailState.SENT:
         # Redirect to list view

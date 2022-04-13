@@ -86,6 +86,13 @@
     >
         Send email
     </button>
+
+    <a href="{% url 'case-email-preview' issue.pk email.pk %}" target="_blank">
+        <button class="ui button" type="button">
+            Preview
+        </button>
+    </a>
+
     <button
         class="ui button red"
         hx-delete="{% url 'case-email-edit' issue.pk email.pk %}"
