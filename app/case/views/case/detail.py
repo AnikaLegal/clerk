@@ -128,7 +128,7 @@ def case_detail_note_view(request, pk):
 
 
 @router.use_route("update")
-@coordinator_or_better_required
+@paralegal_or_better_required
 @api_view(["POST"])
 def case_detail_update_view(request, pk):
     """
