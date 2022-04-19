@@ -57,10 +57,12 @@ def test_collect_view(mock_VR, mock_G, mock_C, client):
     mock_client = mock.Mock()
     mock_C.return_value = mock_client
     from_number = "+61456654377"
-    choice = "3"
+    choice = "4"
 
     client.get(reverse("caller-answer"), {"From": from_number})
-    resp = client.get(reverse("caller-collect"), {"From": from_number, "Digits": choice})
+    resp = client.get(
+        reverse("caller-collect"), {"From": from_number, "Digits": choice}
+    )
 
     mock_client.messages.create.assert_called_once()
     call = Call.objects.last()

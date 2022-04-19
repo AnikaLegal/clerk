@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.twiml.voice_response import Gather, VoiceResponse
 
@@ -18,7 +19,9 @@ CALL_INTRO_AUDIO = "call-intro.wav"
 OPTION_REPAIRS_AUDIO = "option-repairs.wav"
 # Response when user selects evictions option.
 OPTION_EVICTIONS_AUDIO = "option-evictions.wav"
-# Response when user selects callbacl option.
+# Response when user selects evictions option.
+OPTION_BONDS_AUDIO = "option-bonds.wav"
+# Response when user selects callback option.
 OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
 CALL_TIMEOUT_AUDIO = "call-timeout.wav"
@@ -26,6 +29,7 @@ CALL_TIMEOUT_AUDIO = "call-timeout.wav"
 # The SMS message we send to people who send us SMS's.
 # We don't do inbound SMS communications so we ask them to send us an email instead.
 INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
+
 
 # The SMS message we send to people who are enquiring about repairs.
 REPAIRS_SMS_MESSAGE = """
@@ -49,6 +53,19 @@ For more info on Anika's services, please visit https://www.anikalegal.com/servi
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
 
+
+# The SMS message we send to people who are enquiring about bonds.
+BONDS_SMS_MESSAGE = """
+Thank you for enquiring about Anika's bonds service.
+
+To get help, please fill in this form: https://intake.anikalegal.com
+
+For more info on Anika's services, please visit https://www.anikalegal.com/services/
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+
 # The SMS message we send to people who want a callback about another issue.
 CALLBACK_SMS_MESSAGE = """
 Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
@@ -61,8 +78,9 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 
 TOPIC_MAPPING = {
     "1": CaseTopic.REPAIRS,
-    "2": CaseTopic.EVICTION,
-    "3": CaseTopic.OTHER,
+    "2": CaseTopic.BONDS,
+    "3": CaseTopic.EVICTION,
+    "4": CaseTopic.OTHER,
 }
 
 
@@ -103,10 +121,14 @@ def collect_view(request):
         audio_url = _get_audio_url(OPTION_REPAIRS_AUDIO)
         message_text = REPAIRS_SMS_MESSAGE
     elif choice == "2":
+        # Bonds option.
+        audio_url = _get_audio_url(OPTION_BONDS_AUDIO)
+        message_text = BONDS_SMS_MESSAGE
+    elif choice == "3":
         # Evictions option.
         audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
         message_text = EVICTIONS_SMS_MESSAGE
-    elif choice == "3":
+    elif choice == "4":
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = CALLBACK_SMS_MESSAGE
     else:
@@ -115,16 +137,20 @@ def collect_view(request):
 
     # Send an SMS for valid choices.
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    # TODO: Validate whether this number is a mobile number.
-    client.messages.create(
-        to=number, from_=settings.TWILIO_PHONE_NUMBER, body=message_text
-    )
+
+    try:
+        client.messages.create(
+            to=number, from_=settings.TWILIO_PHONE_NUMBER, body=message_text
+        )
+    except TwilioRestException:
+        pass  # It's not a mobile number
+
     response.play(audio_url)
 
     # Retrieve and update corresponding entry for valid choices.
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
     call.topic = TOPIC_MAPPING[choice]
-    call.requires_callback = choice == "3"
+    call.requires_callback = choice == "4"
     call.save()
 
     return TwimlResponse(response)
