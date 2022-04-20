@@ -17,8 +17,6 @@ from case.serializers import (
     IssueAssignmentSerializer,
 )
 
-MAYBE_IMAGE_FILE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
-
 router = Router("detail")
 router.create_route("view").uuid("pk")
 router.create_route("note").uuid("pk").path("note")
@@ -40,14 +38,11 @@ def case_detail_view(request, pk):
     issue = _get_issue(request, pk)
     tenancy = _get_tenancy(issue)
     notes = _get_issue_notes(request, pk)
-    file_urls, image_urls = _get_uploaded_files(issue)
     context = {
         "issue": IssueSerializer(issue).data,
         "tenancy": TenancySerializer(tenancy).data,
         "notes": IssueNoteSerializer(notes, many=True).data,
         "details": _get_submitted_details(issue),
-        "file_urls": file_urls,
-        "image_urls": image_urls,
         "actionstep_url": _get_actionstep_url(issue),
         "urls": {
             "detail": reverse("case-detail-view", args=(pk,)),
@@ -173,20 +168,6 @@ def _get_issue(request, pk):
         raise Http404()
 
     return issue
-
-
-def _get_uploaded_files(issue):
-    file_urls, image_urls = [], []
-    for upload in issue.fileupload_set.all():
-        is_maybe_image = any(
-            [upload.file.name.endswith(ext) for ext in MAYBE_IMAGE_FILE_EXTENSIONS]
-        )
-        if is_maybe_image:
-            image_urls.append(upload.file.url)
-        else:
-            file_urls.append(upload.file.url)
-
-    return file_urls or None, image_urls or None
 
 
 def _get_submitted_details(issue):

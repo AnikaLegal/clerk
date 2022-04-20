@@ -30,8 +30,7 @@ import {
   ConflictForm,
 } from "forms";
 
-const { details, urls, file_urls, image_urls, actionstep_url, permissions } =
-  window.REACT_CONTEXT;
+const { details, urls, actionstep_url, permissions } = window.REACT_CONTEXT;
 
 const App = () => {
   const [issue, setIssue] = useState(window.REACT_CONTEXT.issue);
@@ -165,40 +164,6 @@ const App = () => {
                 />
               )}
               <EntityCard title="Other submitted data" tableData={details} />
-              {file_urls && (
-                <>
-                  <h2 className="header">Submitted documents</h2>
-                  <table
-                    className="ui definition table small"
-                    style={{ marginBottom: "2rem" }}
-                  >
-                    <tbody>
-                      {file_urls.map((url, idx) => (
-                        <tr key={url}>
-                          <td className="four wide">Document #{idx}</td>
-                          <td>
-                            <a href={url}>Open document</a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </>
-              )}
-              {image_urls && (
-                <>
-                  <h2 className="header">Submitted images</h2>
-                  {image_urls.map((url) => (
-                    <a href={url} key={url}>
-                      <img
-                        className="ui small rounded image"
-                        src={url}
-                        style={{ marginBottom: "1rem" }}
-                      />
-                    </a>
-                  ))}
-                </>
-              )}
             </React.Fragment>
           )}
         </div>
