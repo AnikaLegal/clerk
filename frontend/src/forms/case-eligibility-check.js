@@ -11,6 +11,8 @@ import {
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
+import { TimelineNote } from "comps/timeline-item";
+import { MarkdownExplainer } from "comps/markdown-editor";
 import { submitNote } from "./case-file-note";
 import { TextArea } from "comps/textarea";
 
@@ -95,6 +97,17 @@ export const EligibilityForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Close
             </Button>
             <Message success>Eligibility check created</Message>
+            <MarkdownExplainer />
+            <TimelineNote
+              note={{
+                note_type: values.note_type || "ELIGIBILITY_CHECK_SUCCESS",
+                created_at: "Now",
+                text_display: values.text || "start typing...",
+                creator: {
+                  full_name: "You",
+                },
+              }}
+            />
           </Form>
         )}
       </Formik>

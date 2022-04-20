@@ -11,6 +11,8 @@ import {
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
+import { TimelineNote } from "comps/timeline-item";
+import { MarkdownExplainer } from "comps/markdown-editor";
 import { TextArea } from "comps/textarea";
 import { submitNote } from "./case-file-note";
 
@@ -94,6 +96,17 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
               Close
             </Button>
             <Message success>Conflict check created</Message>
+            <MarkdownExplainer />
+            <TimelineNote
+              note={{
+                note_type: values.note_type || "CONFLICT_CHECK_SUCCESS",
+                created_at: "Now",
+                text_display: values.text || "start typing...",
+                creator: {
+                  full_name: "You",
+                },
+              }}
+            />
           </Form>
         )}
       </Formik>

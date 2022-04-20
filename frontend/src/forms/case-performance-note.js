@@ -4,6 +4,8 @@ import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 
+import { TimelineNote } from "comps/timeline-item";
+import { MarkdownExplainer } from "comps/markdown-editor";
 import { submitNote } from "./case-file-note";
 
 export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
@@ -60,7 +62,19 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
             <Button disabled={isSubmitting} onClick={onCancel}>
               Close
             </Button>
-            <Message success>File note created</Message>
+            <Message success>Performance note created</Message>
+            <MarkdownExplainer />
+            <TimelineNote
+              note={{
+                note_type: values.note_type,
+                created_at: "Now",
+                text_display: values.text || "start typing...",
+                creator: {
+                  full_name: "You",
+                },
+                reviewee: issue.paralegal,
+              }}
+            />
           </Form>
         )}
       </Formik>
