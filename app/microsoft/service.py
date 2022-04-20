@@ -1,9 +1,13 @@
+import logging
+
 from django.conf import settings
 from django.utils import timezone
 
 from accounts.models import User
-from core.models.issue import CaseTopic, Issue
+from core.models import CaseTopic, Issue, FileUpload
 from microsoft.endpoints import MSGraphAPI
+
+logger = logging.getLogger(__name__)
 
 
 # Paths for template folders.
@@ -12,6 +16,7 @@ TEMPLATE_PATHS = {
     CaseTopic.REPAIRS: "templates/repairs",
     CaseTopic.EVICTION: "templates/evictions",
 }
+CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 
 
 def get_user_permissions(user):
@@ -59,15 +64,42 @@ def set_up_new_user(user):
         return password
 
 
-def set_up_new_case(issue):
+def set_up_new_case(issue: Issue):
     """
     Make a copy of the relevant templates folder with the name of the new case.
     """
     api = MSGraphAPI()
-    template_path = TEMPLATE_PATHS[issue.topic]
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-    api.folder.copy(template_path, case_folder_name, parent_folder_id)
+    template_path = TEMPLATE_PATHS[issue.topic]
+    # Copy templates to the case folder if not already done.
+    case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
+    if not case_folder:
+        logger.info("Creating case folder for Issue<%s>", issue.pk)
+        case_folder = api.folder.copy(template_path, case_folder_name, parent_folder_id)
+    else:
+        logger.info("Case folder already exists for Issue<%s>", issue.pk)
+
+    # Copy client uploaded files to the case folder
+    file_uploads = FileUpload.objects.filter(issue=issue).all()
+    if file_uploads.exists():
+        uploads_folder = api.folder.get_child_if_exists(
+            CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
+        )
+        if not uploads_folder:
+            logger.info("Creating intake uploads folder for Issue<%s>", issue.pk)
+            uploads_folder = api.folder.create_folder(
+                CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
+            )
+        else:
+            logger.info("Intake uploads folder already exists for Issue<%s>", issue.pk)
+
+        for file_upload in file_uploads:
+            name = file_upload.file.name.split("/")[1]
+            logger.info(
+                "Uploading case file %s to Sharepoint for Issue<%s>", name, issue.pk
+            )
+            api.folder.upload_file(file_upload.file, uploads_folder["id"], name=name)
 
 
 def add_user_to_case(user, issue):

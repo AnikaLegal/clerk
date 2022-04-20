@@ -60,11 +60,25 @@ class FolderEndpoint(BaseEndpoint):
 
         return all_files
 
-    def upload_file(self, file, parent_id):
+    def create_folder(self, folder_name, parent_id):
+        """
+        Create a folder in the parent
+        """
+        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
+        return super().post(
+            url,
+            data={
+                "name": folder_name,
+                "folder": {},  # They do it like this in the docs /shrug
+                "@microsoft.graph.conflictBehavior": "rename",
+            },
+        )
+
+    def upload_file(self, file, parent_id, name=None):
         """
         Uploads file to parent
         """
-        original_filename = file.name
+        original_filename = name or file.name
         base, ext = os.path.splitext(original_filename)
         upload_filename = slugify(base) + ext
         self.delete_file_if_exists(upload_filename, parent_id)
@@ -73,12 +87,16 @@ class FolderEndpoint(BaseEndpoint):
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/content",
         )
         headers = {**self.headers}
-        headers["Content-Type"] = file.content_type
+        content_type = getattr(file, "content_type", "")
+        if content_type:
+            headers["Content-Type"] = content_type
         resp = requests.put(url, data=file, headers=headers, stream=True)
         data = self.handle(resp)
 
         # Rename file
-        self.delete_file_if_exists(original_filename, parent_id)
+        if upload_filename != original_filename:
+            self.delete_file_if_exists(original_filename, parent_id)
+
         file_id = data["id"]
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
         return super().patch(url, data={"name": original_filename})
