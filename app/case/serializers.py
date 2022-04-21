@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
-from emails.models import EmailTemplate
+from emails.models import EmailTemplate, Email, EmailAttachment
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -243,3 +244,59 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return obj.created_at.strftime("%d/%m/%Y")
+
+
+class EmailAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailAttachment
+        fields = (
+            "id",
+            "url",
+            "name",
+            "is_image",
+        )
+
+    url = serializers.URLField(source="file.url")
+    name = serializers.CharField(source="file.name")
+    is_image = serializers.BooleanField(source="file.is_image")
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = (
+            "id",
+            "cc_addresses",
+            "created_at",
+            "from_address",
+            "html",
+            "pk",
+            "sender",
+            "state",
+            "subject",
+            "to_address",
+            "reply_url",
+            "attachments",
+            "edit_url",
+        )
+
+    sender = UserSerializer(read_only=True)
+    attachments = EmailAttachmentSerializer(
+        many=True, read_only=True, source="emailattachment_set"
+    )
+    edit_url = serializers.SerializerMethodField()
+    reply_url = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+
+    def get_edit_url(self, obj):
+        return reverse("case-email-edit", args=(obj.issue.pk, obj.pk))
+
+    def get_reply_url(self, obj):
+        return (
+            reverse("case-email-draft", args=(obj.issue.pk,))
+            + "?"
+            + urlencode({"parent_id": obj.pk})
+        )
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime("%d/%m/%Y at %H:%M:%S")

@@ -23,6 +23,11 @@ from case.forms import EmailForm
 from case.utils import merge_form_data
 from case.utils.router import Router
 from microsoft.endpoints import MSGraphAPI
+from case.utils.react import render_react_page
+from case.serializers import (
+    IssueSerializer,
+    EmailSerializer,
+)
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -73,11 +78,13 @@ def email_thread_view(request, pk, slug):
     else:
         raise Http404()
     context = {
-        "issue": issue,
-        "email_thread": email_thread,
+        "issue": IssueSerializer(issue).data,
+        "subject": email_thread.subject,
+        "emails": EmailSerializer(email_thread.emails, many=True).data,
         "case_email_address": case_email_address,
+        "case_email_list_url": reverse("case-email-list", args=(issue.pk,)),
     }
-    return render(request, "case/case/email/thread.html", context)
+    return render_react_page(request, f"Case {issue.fileref}", "email-thread", context)
 
 
 class EmailThread:
@@ -356,7 +363,7 @@ def _get_issue_for_emails(request, pk):
     try:
         return (
             Issue.objects.check_permissions(request)
-            .prefetch_related("email_set")
+            .prefetch_related("email_set__emailattachment_set")
             .get(pk=pk)
         )
     except Issue.DoesNotExist:
