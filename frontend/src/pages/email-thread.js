@@ -50,10 +50,56 @@ const App = () => (
               dangerouslySetInnerHTML={{ __html: xss(email.html) }}
             />
           </Card.Content>
+          {email.attachments.length > 0 && (
+            <Card.Content extra>
+              <h5>Attached files</h5>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1em",
+                }}
+              >
+                {email.attachments.map((a) => (
+                  <Attachment {...a} key={a.id} />
+                ))}
+              </div>
+            </Card.Content>
+          )}
+          {email.state == "DRAFT" ? (
+            <Card.Content extra>
+              <a href={email.edit_url} className="header" target="_blank">
+                <button className="ui button primary">Edit Draft</button>
+              </a>
+            </Card.Content>
+          ) : (
+            <Card.Content extra>
+              <a href={email.reply_url} className="header" target="_blank">
+                <button className="ui button">Reply</button>
+              </a>
+            </Card.Content>
+          )}
         </Card>
       ))}
     </div>
   </Container>
+);
+
+const Attachment = ({ url, is_image, name }) => (
+  <a href={url}>
+    {is_image ? (
+      <img
+        src={url}
+        style={{
+          maxHeight: "200px",
+          maxWidth: "200px",
+          objectFit: "contain",
+        }}
+      />
+    ) : (
+      name
+    )}
+  </a>
 );
 
 mount(App);
