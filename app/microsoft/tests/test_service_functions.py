@@ -82,6 +82,7 @@ def test_set_up_new_user_B(mock_api):
 def test_set_up_new_case(mock_api):
     """Check service function creates new case folder and places it inside parent folder."""
     issue = IssueFactory()
+    mock_api.folder.get_child_if_exists.return_value = None
 
     set_up_new_case(issue)
 
