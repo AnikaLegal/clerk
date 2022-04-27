@@ -15,7 +15,16 @@ class BaseEndpoint:
 
     def get(self, path):
         resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)
-        return self.handle(resp)
+        json = self.handle(resp)
+        if json:
+            next_url = json.get("@odata.nextLink", "")
+            while next_url:
+                resp = requests.get(next_url, headers=self.headers, stream=False)
+                next_json = self.handle(resp)
+                json["values"] += next_json["values"]
+                next_url = next_json.get("@odata.nextLink", "")
+
+        return json
 
     def post(self, path, data):
         resp = requests.post(
