@@ -106,7 +106,7 @@ def parse_received_data(email_data: dict) -> dict:
             cc_addrs.append(addr_cleaned)
 
     parsed_data["cc_addresses"] = cc_addrs
-    parsed_data["text"] = email_data["text"]
+    parsed_data["text"] = email_data.get("text", "")
     parsed_data["subject"] = email_data["subject"]
     parsed_data["html"] = email_data.get("html", "")
 
