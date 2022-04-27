@@ -76,11 +76,13 @@ def set_up_new_case(issue: Issue):
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
-        case_folder = api.folder.copy(template_path, case_folder_name, parent_folder_id)
+        api.folder.copy(template_path, case_folder_name, parent_folder_id)
+        case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     else:
         logger.info("Case folder already exists for Issue<%s>", issue.pk)
 
     # Copy client uploaded files to the case folder
+    assert case_folder, f"Expect a case folder to exist for Issue<{issue.pk}>"
     file_uploads = FileUpload.objects.filter(issue=issue).all()
     if file_uploads.exists():
         uploads_folder = api.folder.get_child_if_exists(
