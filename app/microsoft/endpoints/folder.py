@@ -34,18 +34,14 @@ class FolderEndpoint(BaseEndpoint):
         Get child items (folders, files) inside current folder
         """
         url = os.path.join(self.MIDDLE_URL, f"{path}:/children")
-
-        return super().get(url)
+        return super().get_list(url)
 
     def get_all_files(self, path):
         """
         Recursively get all files inside current folder.
         """
-        children_data = self.get_children(path)
-        children = children_data["value"] if children_data else []
-
+        children = self.get_children(path)
         all_files = []
-
         for item in children:
             if item.get("file"):
                 all_files.append(item)
@@ -109,8 +105,8 @@ class FolderEndpoint(BaseEndpoint):
     def get_child_if_exists(self, filename, parent_id):
         # Check for existing file.
         url = f"/groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
-        resp = super().get(url)
-        for f in resp["value"]:
+        children = super().get_all(url)
+        for f in children:
             if filename == f["name"]:
                 return f
 
@@ -159,12 +155,11 @@ class FolderEndpoint(BaseEndpoint):
         """
         url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions")
 
-        json = super().get(url)
+        perms = super().get_list(url)
 
-        if json:
+        if perms:
             list_permissions = []
-
-            for item in json["value"]:
+            for item in perms:
                 try:
                     list_permissions.append((item["id"], item["grantedTo"]))
                 except Exception:

@@ -15,16 +15,23 @@ class BaseEndpoint:
 
     def get(self, path):
         resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)
+        return self.handle(resp)
+
+    def get_list(self, path) -> list:
+        """Get request but follows pagination and always returns a list"""
+        resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)
         json = self.handle(resp)
+        resp_list = []
         if json:
+            resp_list += json["value"]
             next_url = json.get("@odata.nextLink", "")
             while next_url:
                 resp = requests.get(next_url, headers=self.headers, stream=False)
                 next_json = self.handle(resp)
-                json["values"] += next_json["values"]
+                resp_list += next_json["value"]
                 next_url = next_json.get("@odata.nextLink", "")
 
-        return json
+        return resp_list
 
     def post(self, path, data):
         resp = requests.post(

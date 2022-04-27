@@ -153,7 +153,7 @@ def test_remove_user_from_case_C(mock_api):
 def test_get_case_folder_info_A(mock_api):
     """Check service function when the case folder doesn't exist."""
     issue = IssueFactory()
-    mock_api.folder.get_children.return_value = None
+    mock_api.folder.get_children.return_value = []
     mock_api.folder.get.return_value = None
 
     documents, url = get_case_folder_info(issue)
@@ -168,14 +168,12 @@ def test_get_case_folder_info_A(mock_api):
 def test_get_case_folder_info_B(mock_api):
     """Check service function when there is a proper case folder."""
     issue = IssueFactory()
-    mock_api.folder.get_children.return_value = {
-        "value": [
-            {
-                "name": "War and Peace",
-                "webUrl": "https://en.wikipedia.org/wiki/War_and_Peace",
-            }
-        ]
-    }
+    mock_api.folder.get_children.return_value = [
+        {
+            "name": "War and Peace",
+            "webUrl": "https://en.wikipedia.org/wiki/War_and_Peace",
+        }
+    ]
     mock_api.folder.get.return_value = {
         "webUrl": "https://en.wikipedia.org/wiki/Leo_Tolstoy"
     }

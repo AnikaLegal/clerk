@@ -138,18 +138,12 @@ def get_case_folder_info(issue):
     case_path = f"cases/{issue.id}"
 
     # Get the list of files (name, file URL) for the case folder.
-    json = api.folder.get_children(case_path)
-
-    list_files = []
-
-    if json:
-        for item in json["value"]:
-            list_files.append((item["name"], item["webUrl"]))
+    children = api.folder.get_children(case_path)
+    list_files = [(item["name"], item["webUrl"]) for item in children]
 
     # Get the case folder URL.
     folder = api.folder.get(case_path)
     folder_url = folder["webUrl"] if folder else None
-
     return list_files, folder_url
 
 
@@ -182,7 +176,7 @@ def tear_down_coordinator(user):
 def list_templates(topic):
     api = MSGraphAPI()
     path = TEMPLATE_PATHS[topic]
-    results = api.folder.get_children(path)
+    children = api.folder.get_children(path)
     return [
         {
             "id": doc["id"],
@@ -195,7 +189,7 @@ def list_templates(topic):
                 doc["lastModifiedDateTime"].replace("Z", "")
             ).strftime("%d/%m/%Y"),
         }
-        for doc in results["value"]
+        for doc in children
     ]
 
 

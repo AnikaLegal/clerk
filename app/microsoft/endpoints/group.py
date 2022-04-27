@@ -28,14 +28,8 @@ class GroupEndpoint(BaseEndpoint):
         List Group members.
         Returns list of members or empty list.
         """
-        json = super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}/members")
-
-        list_members = []
-
-        for item in json["value"]:
-            list_members.append(item["userPrincipalName"])
-
-        return list_members
+        members = super().get_list(f"groups/{settings.MS_GRAPH_GROUP_ID}/members")
+        return [item["userPrincipalName"] for item in members]
 
     def add_user(self, userPrincipalName):
         """
