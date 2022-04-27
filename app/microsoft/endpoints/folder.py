@@ -12,6 +12,9 @@ from .helpers import BASE_URL
 logger = logging.getLogger(__name__)
 
 
+FILE_UPLOAD_SIZE_LIMIT = 4194304  # bytes
+
+
 class FolderEndpoint(BaseEndpoint):
     """
     Endpoint for Folder.
@@ -78,16 +81,10 @@ class FolderEndpoint(BaseEndpoint):
         base, ext = os.path.splitext(original_filename)
         upload_filename = slugify(base) + ext
         self.delete_file_if_exists(upload_filename, parent_id)
-        url = os.path.join(
-            BASE_URL,
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/content",
-        )
-        headers = {**self.headers}
-        content_type = getattr(file, "content_type", "")
-        if content_type:
-            headers["Content-Type"] = content_type
-        resp = requests.put(url, data=file, headers=headers, stream=True)
-        data = self.handle(resp)
+        if file.size < FILE_UPLOAD_SIZE_LIMIT:
+            data = self._upload_small_file(file, parent_id, upload_filename)
+        else:
+            data = self._upload_large_file(file, parent_id, upload_filename)
 
         # Rename file
         if upload_filename != original_filename:
@@ -196,3 +193,49 @@ class FolderEndpoint(BaseEndpoint):
         url = os.path.join(self.MIDDLE_URL, f"{path}:/invite")
 
         return super().post(url, data)
+
+    def _upload_small_file(self, file, parent_id, upload_filename):
+        url = os.path.join(
+            BASE_URL,
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/content",
+        )
+        headers = {**self.headers}
+        content_type = getattr(file, "content_type", "")
+        if content_type:
+            headers["Content-Type"] = content_type
+        resp = requests.put(url, data=file, headers=headers, stream=True)
+        return self.handle(resp)
+
+    def _upload_large_file(self, file, parent_id, upload_filename):
+        # Start an upload session
+        url = os.path.join(
+            BASE_URL,
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/createUploadSession",
+        )
+        data = {"name": upload_filename}
+        resp = requests.post(url, json=data, headers=self.headers, stream=False)
+
+        session_data = self.handle(resp)
+        upload_url = session_data["uploadUrl"]
+
+        CHUNK_SIZE = 10485760
+        chunks = int(file.size / CHUNK_SIZE) + 1 if file.size % CHUNK_SIZE > 0 else 0
+        start = 0
+        file.seek(0)
+        for _ in range(chunks):
+            chunk = file.read(CHUNK_SIZE)
+            bytes_read = len(chunk)
+            upload_range = f"bytes {start}-{start + bytes_read - 1}/{file.size}"
+            resp = requests.put(
+                upload_url,
+                headers={
+                    "Content-Length": str(bytes_read),
+                    "Content-Range": upload_range,
+                    **self.headers,
+                },
+                data=chunk,
+            )
+            resp.raise_for_status()
+            start += bytes_read
+
+        return self.get_child_if_exists(upload_filename, parent_id)
