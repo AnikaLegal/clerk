@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 EMAIL_RECEIVE_RULES = (
-    (lambda e: e.state == EmailState.RECEIVED, "not in 'received' state."),
+    (
+        lambda e: e.state in [EmailState.RECEIVED, EmailState.INGEST_FAILURE],
+        "not in 'received' or 'failure' state.",
+    ),
 )
 
 
@@ -30,7 +33,12 @@ def _receive_email_task(email_pk: int):
             logger.error(f"Cannot ingest Email[{email_pk}]: {msg}")
             return
 
-    parsed_data = parse_received_data(email.received_data)
+    parsed_data = None
+    try:
+        parsed_data = parse_received_data(email.received_data)
+    except Exception:
+        pass
+
     if parsed_data:
         email.state = EmailState.INGESTED
         email.issue = parsed_data["issue"]
@@ -50,6 +58,7 @@ def _receive_email_task(email_pk: int):
             text=email.get_received_note_text(),
         )
     else:
+        logger.error(f"Cannot ingest Email[{email_pk}]: Parsing failure")
         email.state = EmailState.INGEST_FAILURE
         email.save()
 
