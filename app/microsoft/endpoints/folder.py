@@ -105,7 +105,7 @@ class FolderEndpoint(BaseEndpoint):
     def get_child_if_exists(self, filename, parent_id):
         # Check for existing file.
         url = f"/groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
-        children = super().get_all(url)
+        children = super().get_list(url)
         for f in children:
             if filename == f["name"]:
                 return f
