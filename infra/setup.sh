@@ -9,6 +9,7 @@ echo -e "\n>>> Setting up $HOST"
 
 echo -e "\n>>> Uploading infra files to $HOST"
 ssh root@$HOST mkdir -p /srv/
+ssh root@$HOST rm -rf /srv/infra/
 scp -r infra/ root@$HOST:/srv/infra/
 
 echo -e "\n>>> Updating apt sources on $HOST"
