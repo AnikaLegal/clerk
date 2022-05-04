@@ -441,7 +441,7 @@ def get_email_html(email) -> str:
         return sanitizer.sanitize(email.html)
     else:
         text = email.text.replace("\r", "")
-        text = re.sub("\n(?!\n)", " <br/>", text)
+        text = re.sub("\n(?!\n)", "<br/>", text)
         return "".join(
             [f"<p>{line}</p>" for line in strip_tags(text).split("\n") if line]
         )
