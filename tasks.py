@@ -20,31 +20,31 @@ def build(c, webpack=False):
 @task
 def dev(c):
     """Run Django dev server within a Docker container"""
-    c.run(f"{COMPOSE} up web", pty=True)
+    c.run(f"{COMPOSE} up web", pty=False)
 
 
 @task
 def down(c):
     """Stop docker-compose"""
-    c.run(f"{COMPOSE} down", pty=True)
+    c.run(f"{COMPOSE} down", pty=False)
 
 
 @task
 def debug(c):
     """Run Django dev server with debug ports"""
-    c.run(f"{COMPOSE} run --rm --service-ports web", pty=True)
+    c.run(f"{COMPOSE} run --rm --service-ports web", pty=False)
 
 
 @task
 def restart(c, service_name):
     """Restart Docker-Compose service"""
-    c.run(f"{COMPOSE} restart {service_name}", pty=True)
+    c.run(f"{COMPOSE} restart {service_name}", pty=False)
 
 
 @task
 def logs(c, service_name):
     """View logs for Docker-Compose service"""
-    c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
+    c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=False)
 
 
 @task
@@ -62,7 +62,7 @@ def ngrok(c, url):
 @task
 def own(c, username):
     """Assert file ownership of project"""
-    c.run(f"sudo chown -R {username}:{username} .", pty=True)
+    c.run(f"sudo chown -R {username}:{username} .", pty=False)
 
 
 @task
@@ -115,7 +115,7 @@ def test(c, recreate=False, interactive=False):
     if interactive:
         c.run(
             f"{COMPOSE} run --rm test bash",
-            pty=True,
+            pty=False,
             env={
                 "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
             },
@@ -127,7 +127,7 @@ def test(c, recreate=False, interactive=False):
         cmd = "pytest -vv --reuse-db"
     c.run(
         f"{COMPOSE} run --rm test {cmd}",
-        pty=True,
+        pty=False,
         env={
             "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
         },
@@ -158,7 +158,7 @@ def restore(c):
             "tail -n 1 | "
             "awk '{{print $4}}'"
         ),
-        pty=True,
+        pty=False,
     )
     dump_name = result.stdout.strip()
     c.run(
@@ -173,7 +173,7 @@ def restore(c):
             "--no-owner"
         ),
         warn=True,
-        pty=True,
+        pty=False,
     )
     _post_reset(c)
 
@@ -235,7 +235,7 @@ def sync_s3(c):
     """
     for sync_dir in SYNC_DIRS:
         cmd = f"aws --profile anika s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(cmd, pty=True)
+        c.run(cmd, pty=False)
 
 
 @task
@@ -253,4 +253,4 @@ def obsfucate(c):
 
 
 def run(c, cmd: str, service="web"):
-    c.run(f"{COMPOSE} run --rm {service} {cmd}", pty=True)
+    c.run(f"{COMPOSE} run --rm {service} {cmd}", pty=False)
