@@ -11,6 +11,14 @@ You will need:
 
 ## Getting Started
 
+If you are using Windows ensure that git is setup to use LF not CLRF
+
+```
+git config core.autocrlf false 
+git rm --cached -r . 
+git reset --hard
+```
+
 Envars are stored in .env and encrypted using transcrypt. You can see encryoted files with `transcrypt --list`.
 
 To intialise the repository on cloning run
