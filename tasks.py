@@ -3,7 +3,6 @@ from invoke import task
 APP_NAME = "clerk"
 HOST = "3.106.55.74"
 COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
-BACKUP_BUCKET_NAME = "anika-database-backups"
 
 
 @task
@@ -137,83 +136,13 @@ def test(c, recreate=False, interactive=False):
 @task
 def reset(c):
     """Reset local database"""
-    print("\nResetting database")
-    run(c, "./manage.py reset_db --close-sessions --noinput")
-    _post_reset(c)
-    print("\nDatabase reset finished.")
+    run(c, "/app/scripts/tasks/dev-reset.sh")
 
 
 @task
 def restore(c):
     """Reset local database"""
-    print("\nResetting database")
-    run(c, "./manage.py reset_db --close-sessions --noinput")
-
-    s3_bucket = f"s3://{BACKUP_BUCKET_NAME}"
-    print(f"\nRestoring database from S3 backups at {s3_bucket}")
-    result = c.run(
-        (
-            f"aws --profile anika s3 ls {s3_bucket} | "
-            "sort | grep postgres_clerk | "
-            "tail -n 1 | "
-            "awk '{{print $4}}'"
-        ),
-        pty=False,
-    )
-    dump_name = result.stdout.strip()
-    c.run(
-        (
-            f"aws --profile anika s3 cp {s3_bucket}/{dump_name} - | gunzip | "
-            "pg_restore "
-            "--clean "
-            "--dbname postgres "
-            "--host localhost "
-            "--port 25432 "
-            "--username postgres "
-            "--no-owner"
-        ),
-        warn=True,
-        pty=False,
-    )
-    _post_reset(c)
-
-    print("\nSetting all Slack messages to send to test alerts channel.")
-    shell_cmd = (
-        "space=chr(32);"
-        "c=SlackChannel.objects.get(name=f'Test{space}Alerts');"
-        "SlackMessage.objects.all().update(channel=c);"
-        "SlackUser.objects.all().delete()"
-    )
-    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
-
-    print("\nDeleting all Scheduled tasks and Actionstep access tokens.")
-    shell_cmd = (
-        "Success.objects.all().delete();"
-        "Failure.objects.all().delete();"
-        "Schedule.objects.all().delete();"
-        "OrmQ.objects.all().delete();"
-        "AccessToken.objects.all().delete()"
-    )
-    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
-
-    print("\nDatabase restore finished.")
-
-
-def _post_reset(c):
-    print("\nRunning migrations")
-    run(c, "./manage.py migrate")
-
-    print("\nCreating new superuser 'admin'")
-    run(
-        c,
-        "./manage.py createsuperuser "
-        "--username admin "
-        "--email admin@example.com "
-        "--noinput",
-    )
-    print("\nSetting superuser 'admin' password to 12345")
-    shell_cmd = "u=User.objects.get(username='admin');u.set_password('12345');u.save();"
-    run(c, f'./manage.py shell_plus -c "{shell_cmd}"')
+    run(c, "/app/scripts/tasks/deb-restore.sh")
 
 
 S3_PROD = "anika-clerk"
