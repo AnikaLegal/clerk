@@ -142,7 +142,7 @@ def reset(c):
 @task
 def restore(c):
     """Reset local database"""
-    run(c, "/app/scripts/tasks/deb-restore.sh")
+    run(c, "/app/scripts/tasks/dev-restore.sh")
 
 
 S3_PROD = "anika-clerk"

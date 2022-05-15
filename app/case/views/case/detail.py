@@ -177,7 +177,9 @@ def _get_submitted_details(issue):
         if answer is None:
             continue
         title = correct_case(" ".join(name.split("_")[1:]))
-        answer = ", ".join(answer) if type(answer) is list else str(answer)
+        answer = (
+            ", ".join([str(s) for s in answer]) if type(answer) is list else str(answer)
+        )
         if "_" in answer:
             answer = correct_case(" ".join(answer.split("_")))
 
