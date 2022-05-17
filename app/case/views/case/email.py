@@ -200,7 +200,10 @@ def email_draft_create_view(request, pk):
                 parent_email = Email.objects.get(id=parent_id)
                 _process_email_for_display(parent_email)
                 initial["subject"] = parent_email.subject
-                initial["to_address"] = parent_email.from_address
+                if parent_email.state == EmailState.INGESTED:
+                    initial["to_address"] = parent_email.from_address
+                else:
+                    initial["to_address"] = parent_email.to_address
             except Email.DoesNotExist:
                 raise Http404()
         if template_id:
