@@ -253,12 +253,11 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
             "id",
             "url",
             "name",
-            "is_image",
+            "sharepoint_state",
         )
 
     url = serializers.URLField(source="file.url")
     name = serializers.CharField(source="file.name")
-    is_image = serializers.BooleanField(source="file.is_image")
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -270,6 +269,7 @@ class EmailSerializer(serializers.ModelSerializer):
             "created_at",
             "from_address",
             "html",
+            "text",
             "pk",
             "sender",
             "state",
@@ -295,7 +295,7 @@ class EmailSerializer(serializers.ModelSerializer):
         return (
             reverse("case-email-draft", args=(obj.issue.pk,))
             + "?"
-            + urlencode({"parent_id": obj.pk})
+            + urlencode({"parent": obj.pk})
         )
 
     def get_created_at(self, obj):
