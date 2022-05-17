@@ -1,5 +1,5 @@
 const presets = ["@babel/preset-react"];
-const plugins = ["@babel/transform-runtime"];
+const plugins = ["@babel/transform-runtime", "babel-plugin-styled-components"];
 
 module.exports = (api) => {
   if (api.env("development")) {

@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from core.models import CaseTopic, Issue, FileUpload
+from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
@@ -17,6 +18,7 @@ TEMPLATE_PATHS = {
     CaseTopic.EVICTION: "templates/evictions",
 }
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
+EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
 
 def get_user_permissions(user):
@@ -85,23 +87,47 @@ def set_up_new_case(issue: Issue):
     assert case_folder, f"Expect a case folder to exist for Issue<{issue.pk}>"
     file_uploads = FileUpload.objects.filter(issue=issue).all()
     if file_uploads.exists():
-        uploads_folder = api.folder.get_child_if_exists(
-            CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
+        uploads_folder = _create_folder_if_not_exists(
+            api, issue, CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
         )
-        if not uploads_folder:
-            logger.info("Creating intake uploads folder for Issue<%s>", issue.pk)
-            uploads_folder = api.folder.create_folder(
-                CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
-            )
-        else:
-            logger.info("Intake uploads folder already exists for Issue<%s>", issue.pk)
-
         for file_upload in file_uploads:
             name = file_upload.file.name.split("/")[1]
             logger.info(
                 "Uploading case file %s to Sharepoint for Issue<%s>", name, issue.pk
             )
             api.folder.upload_file(file_upload.file, uploads_folder["id"], name=name)
+
+
+def save_email_attachment(email: Email, att: EmailAttachment):
+    """
+    Send email attachments to Sharepoint
+    """
+    api = MSGraphAPI()
+    issue = email.issue
+    case_folder_name = str(issue.id)
+    parent_folder_id = settings.CASES_FOLDER_ID
+    case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
+    assert case_folder, f"Case folder not found for Issue<{issue.pk}>"
+    uploads_folder = _create_folder_if_not_exists(
+        api, issue, EMAIL_ATTACHMENT_FOLDER_NAME, case_folder["id"]
+    )
+    name = att.file.name.split("/")[-1]
+    att.file.content_type = att.content_type
+    logger.info(
+        "Uploading email attachment %s to Sharepoint for Issue<%s>", name, issue.pk
+    )
+    api.folder.upload_file(att.file, uploads_folder["id"], name=name)
+
+
+def _create_folder_if_not_exists(api, issue, name, parent_id):
+    folder = api.folder.get_child_if_exists(name, parent_id)
+    if not folder:
+        logger.info("Creating folder %s for Issue<%s>", name, issue.pk)
+        folder = api.folder.create_folder(name, parent_id)
+    else:
+        logger.info("Folder %s already exists for Issue<%s>", name, issue.pk)
+
+    return folder
 
 
 def add_user_to_case(user, issue):

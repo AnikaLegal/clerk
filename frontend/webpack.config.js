@@ -3,6 +3,7 @@ const path = require("path");
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const entry = glob
   .sync("./src/pages/*.js")
@@ -15,8 +16,9 @@ const config = {
     filename: "[name].[chunkhash].js",
   },
   plugins: [
-    new BundleTracker({ filename: "/build/webpack-stats.json" }),
     new webpack.NoEmitOnErrorsPlugin(),
+    new MiniCssExtractPlugin(),
+    new BundleTracker({ filename: "/build/webpack-stats.json" }),
   ],
   resolve: {
     extensions: ["*", ".js", ".jsx"],
@@ -34,7 +36,7 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "style-loader", "css-loader"],
       },
     ],
   },

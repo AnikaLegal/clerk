@@ -2,6 +2,13 @@
 {% load render_bundle from webpack_loader %}
 {% block title %}{{ title }}{% endblock %}
 
+{% block styles %}
+{% render_bundle react_page_name 'css' %}
+{% endblock %}
+
+
+
+
 {% block content %}
 <div id="app"></div>
 {% endblock %}
@@ -10,6 +17,6 @@
 <script type="text/javascript">
     window.REACT_CONTEXT = JSON.parse("{{ react_context | escapejs }}");
 </script>
-{% render_bundle react_page_name %}
+{% render_bundle react_page_name 'js' %}
 {% endblock %}
 

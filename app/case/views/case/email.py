@@ -13,16 +13,27 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
 from emails.service import build_clerk_address
-from emails.models import EmailState, Email, EmailTemplate
+from emails.models import (
+    EmailState,
+    Email,
+    EmailTemplate,
+    EmailAttachment,
+    SharepointState,
+)
 from case.forms import EmailForm
 from case.utils import merge_form_data
 from case.utils.router import Router
 from microsoft.endpoints import MSGraphAPI
+from microsoft.service import save_email_attachment
+from case.utils.react import render_react_page
+from case.serializers import IssueSerializer, EmailSerializer, EmailAttachmentSerializer
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -43,6 +54,7 @@ router.create_route("preview").uuid("pk").path("draft").pk("email_pk").path("pre
     .path("attachment")
     .pk("attach_pk", optional=True)
 )
+router.create_route("attach-upload").uuid("pk").pk("email_pk").pk("attach_pk")
 
 
 @router.use_route("list")
@@ -73,11 +85,13 @@ def email_thread_view(request, pk, slug):
     else:
         raise Http404()
     context = {
-        "issue": issue,
-        "email_thread": email_thread,
+        "issue": IssueSerializer(issue).data,
+        "subject": email_thread.subject,
+        "emails": EmailSerializer(email_thread.emails, many=True).data,
         "case_email_address": case_email_address,
+        "case_email_list_url": reverse("case-email-list", args=(issue.pk,)),
     }
-    return render(request, "case/case/email/thread.html", context)
+    return render_react_page(request, f"Case {issue.fileref}", "email-thread", context)
 
 
 class EmailThread:
@@ -157,9 +171,6 @@ def _process_email_for_display(email: Email):
     email.html = get_email_html(email)
     for attachment in email.emailattachment_set.all():
         attachment.file.display_name = os.path.basename(attachment.file.name)
-        attachment.file.is_image = any(
-            [attachment.file.display_name.endswith(suf) for suf in IMAGE_SUFFIXES]
-        )
 
 
 @router.use_route("draft")
@@ -334,7 +345,8 @@ def email_draft_send_view(request, pk, email_pk):
 @router.use_route("attach")
 @paralegal_or_better_required
 @require_http_methods(["DELETE"])
-def email_attachment_delete_view(request, pk, email_pk, attach_pk):
+def email_attachment_view(request, pk, email_pk, attach_pk):
+    """Delete the email attachment, return HTML fragment for htmx."""
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
     if not email.state == EmailState.DRAFT:
@@ -343,6 +355,26 @@ def email_attachment_delete_view(request, pk, email_pk, attach_pk):
     email.emailattachment_set.filter(id=attach_pk).delete()
     context = {"issue": issue, "email": email}
     return render(request, "case/case/email/_draft_attachments.html", context)
+
+
+@router.use_route("attach-upload")
+@paralegal_or_better_required
+@api_view(["POST"])
+def email_attachment_upload_view(request, pk, email_pk, attach_pk):
+    """Save the attachment to Sharepoint"""
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
+    try:
+        attachment = EmailAttachment.objects.get(pk=attach_pk)
+    except EmailAttachment.DoesNotExist:
+        raise Http404()
+
+    attachment.sharepoint_state = SharepointState.UPLOADING
+    attachment.save()
+    save_email_attachment(email, attachment)
+    attachment.sharepoint_state = SharepointState.UPLOADED
+    attachment.save()
+    return Response(data=EmailAttachmentSerializer(instance=attachment).data)
 
 
 def _get_email_for_issue(issue, email_pk):
@@ -356,7 +388,7 @@ def _get_issue_for_emails(request, pk):
     try:
         return (
             Issue.objects.check_permissions(request)
-            .prefetch_related("email_set")
+            .prefetch_related("email_set__emailattachment_set")
             .get(pk=pk)
         )
     except Issue.DoesNotExist:
@@ -434,7 +466,7 @@ def get_email_html(email) -> str:
         return sanitizer.sanitize(email.html)
     else:
         text = email.text.replace("\r", "")
-        text = re.sub("\n(?!\n)", " <br/>", text)
+        text = re.sub("\n(?!\n)", "<br/>", text)
         return "".join(
             [f"<p>{line}</p>" for line in strip_tags(text).split("\n") if line]
         )

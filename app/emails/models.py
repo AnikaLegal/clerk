@@ -67,6 +67,12 @@ class EmailTemplate(TimestampedModel):
     subject = models.CharField(max_length=1024, default="")
 
 
+class SharepointState(models.TextChoices):
+    NOT_UPLOADED = "NOT_UPLOADED", "Not uploaded"
+    UPLOADING = "UPLOADING", "Uploading"
+    UPLOADED = "UPLOADED", "Uploaded"
+
+
 # FIXME: Configure so S3 bucket cannot be publicly read from?
 class EmailAttachment(models.Model):
     UPLOAD_KEY = "email-attachments"
@@ -76,3 +82,8 @@ class EmailAttachment(models.Model):
     content_type = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=timezone.now)
     actionstep_id = models.IntegerField(blank=True, null=True)
+    sharepoint_state = models.CharField(
+        max_length=16,
+        default=SharepointState.NOT_UPLOADED,
+        choices=SharepointState.choices,
+    )

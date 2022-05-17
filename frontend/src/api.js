@@ -104,6 +104,13 @@ export const api = {
       },
     },
   },
+  email: {
+    // Upload email attachment to sharepoint
+    uploadAttachment: (issuePk, emailPk, attachmentPk) => {
+      const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachmentPk}/`;
+      return http.post(url, {});
+    },
+  },
   accounts: {
     search: (query) => {
       const url = "/clerk/accounts/";
