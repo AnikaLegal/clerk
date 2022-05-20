@@ -87,7 +87,8 @@ def send_email_alert_slack(email_pk: str):
         f"A new email has been received for case <{case_url}|{issue.fileref}> .\n"
         f"You can view this case's emails here: <{case_email_url}|here>.\n"
     )
-    if paralegal:
+    if paralegal and issue.is_open:
+        # Send alert directly to paralegal for open issues.
         alert_email = settings.SLACK_EMAIL_ALERT_OVERRIDE or paralegal.email
         logging.info("Looking up %s in Slack", alert_email)
         slack_user = get_slack_user_by_email(alert_email)
@@ -97,6 +98,7 @@ def send_email_alert_slack(email_pk: str):
             alert_sent = True
 
     if not alert_sent:
+        # In all other cases send to alerts channel.
         logging.info(
             "Could not find someone to DM in Slack, sending generic alert for Email<%s>",
             email_pk,
