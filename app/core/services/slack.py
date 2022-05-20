@@ -1,10 +1,10 @@
 import logging
-import os
 
 from django.conf import settings
 from django.utils import timezone
 from django.urls import reverse
 
+from utils.sentry import sentry_task
 from core.models import Issue, Submission
 from core.models.issue import CaseOutcome
 from slack.services import (
@@ -15,6 +15,17 @@ from slack.services import (
 from emails.models import Email
 
 logger = logging.getLogger(__name__)
+
+
+@sentry_task
+def send_submission_failure_slack(sub_pk: str):
+    logger.info("Sending failure Slack message for Submission[%s]", sub_pk)
+    msg = (
+        "*Submission failed to process*\n"
+        f"A new client intake submission ({sub_pk}) has failed to process.\n"
+        f"The tech team needs to fix this manually\n"
+    )
+    send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, msg)
 
 
 def send_case_assignment_slack(issue: str):
