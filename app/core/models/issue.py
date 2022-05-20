@@ -145,6 +145,8 @@ class Issue(TimestampedModel):
     is_alert_sent = models.BooleanField(default=False)
     # Tracks whether the case data has been successfully sent to Actionstep.
     is_case_sent = models.BooleanField(default=False)
+    # Tracks we have sent the welcome email.
+    is_welcome_email_sent = models.BooleanField(default=False)
     # Tracks whether a matching folder has been set up in Sharepoint.
     is_sharepoint_set_up = models.BooleanField(default=False)
 

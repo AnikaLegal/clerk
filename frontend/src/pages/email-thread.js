@@ -120,6 +120,8 @@ const EmailList = styled.div`
 
 const Email = styled.div`
   border: 6px solid var(--grey);
+  box-shadow: 1px 1px 5px -2px #999;
+
   ${({ received }) =>
     received &&
     `
@@ -160,7 +162,7 @@ const EmailBody = styled.div`
     margin: 0 0 1em;
   }
   blockquote {
-    opacity: 0.6;
+    color: var(--dark-6);
     border-left: solid 4px var(--grey);
     padding-left: 1em;
   }

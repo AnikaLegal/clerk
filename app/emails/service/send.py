@@ -8,7 +8,7 @@ from django.utils import timezone
 from core.models import IssueNote
 from core.models.issue_note import NoteType
 from emails.models import Email, EmailState
-from utils.sentry import WithSentryCapture
+from utils.sentry import sentry_task
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,8 @@ EMAIL_SEND_RULES = (
 )
 
 
-def _send_email_task(email_pk: int):
+@sentry_task
+def send_email_task(email_pk: int):
     """
     Sends an email that is ready to be sent.
     """
@@ -59,9 +60,6 @@ def _send_email_task(email_pk: int):
     Email.objects.filter(pk=email_pk).update(
         state=EmailState.SENT, processed_at=timezone.now()
     )
-
-
-send_email_task = WithSentryCapture(_send_email_task)
 
 
 def send_email(

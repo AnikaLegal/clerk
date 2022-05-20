@@ -6,6 +6,7 @@ from django_q.tasks import async_task
 
 from core.models import Issue, IssueEvent
 from core.services.slack import send_issue_slack, send_case_assignment_slack
+from emails.service.welcome import send_welcome_email
 from microsoft.tasks import set_up_new_case_task
 from microsoft.service import add_user_to_case, remove_user_from_case
 
@@ -60,3 +61,6 @@ def post_save_issue(sender, instance, **kwargs):
     if not issue.is_sharepoint_set_up:
         logger.info("Dispatching Sharepoint task for Issue<%s>", issue.id)
         async_task(set_up_new_case_task, str(issue.pk))
+    if not issue.is_welcome_email_sent:
+        logger.info("Dispatching welcome email task for Issue<%s>", issue.id)
+        async_task(send_welcome_email, str(issue.pk))
