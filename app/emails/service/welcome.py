@@ -62,8 +62,6 @@ If you have any questions in the meantime, or decide you no longer wish to proce
 </p>
 <p>
 Kind regards,
-<br/>
-Anika Legal
 </p>
 """
 
