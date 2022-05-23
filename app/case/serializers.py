@@ -6,6 +6,14 @@ from django.utils.http import urlencode
 from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
 from emails.models import EmailTemplate, Email, EmailAttachment
+from core.models.client import (
+    CallTime,
+    ReferrerType,
+    RentalType,
+    LegalAccessType,
+    CircumstanceType,
+    EmploymentType,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -172,7 +180,7 @@ class ClientSerializer(serializers.ModelSerializer):
         return obj.get_full_name()
 
 
-class IssueSerializer(serializers.ModelSerializer):
+class BaseIssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = (
@@ -186,26 +194,85 @@ class IssueSerializer(serializers.ModelSerializer):
             "outcome_notes",
             "provided_legal_services",
             "fileref",
-            "client",
             "paralegal",
             "lawyer",
             "is_open",
             "is_sharepoint_set_up",
             "actionstep_id",
             "created_at",
+            "url",
         )
 
     id = serializers.CharField(read_only=True)
-    client = ClientSerializer(read_only=True)
     lawyer = UserSerializer(read_only=True)
     paralegal = UserSerializer(read_only=True)
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
     created_at = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("case-detail-view", args=(obj.pk,))
 
     def get_created_at(self, obj):
         return obj.created_at.strftime("%d/%m/%Y")
+
+
+class IssueListSerializer(BaseIssueSerializer):
+    class Meta:
+        model = Issue
+        fields = (*BaseIssueSerializer.Meta.fields,)
+
+
+class IssueDetailSerializer(BaseIssueSerializer):
+    class Meta:
+        model = Issue
+        fields = (
+            *BaseIssueSerializer.Meta.fields,
+            "client",
+        )
+
+    client = ClientSerializer(read_only=True)
+
+
+class TextChoiceField(serializers.CharField):
+    def __init__(self, text_choice_cls, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text_choice_cls = text_choice_cls
+
+    def to_representation(self, value):
+        display = self.text_choice_cls[value].label
+        return {"display": display, "value": value}
+
+
+class TextChoiceListField(serializers.Field):
+    def __init__(self, text_choice_cls, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text_choice_cls = text_choice_cls
+
+    def to_representation(self, value):
+        display = " | ".join(self.text_choice_cls[s].label for s in value)
+        return {"display": display, "value": value}
+
+
+class ClientDetailSerializer(ClientSerializer):
+    class Meta:
+        model = Client
+        fields = (
+            *ClientSerializer.Meta.fields,
+            "issue_set",
+            "call_times",
+        )
+
+    issue_set = IssueListSerializer(read_only=True, many=True)
+    # TODO - hoist these fields up into ClientSerializer, fix whatever breaks
+    referrer_type = TextChoiceField(ReferrerType)
+    call_times = TextChoiceListField(CallTime)
+    employment_status = TextChoiceListField(EmploymentType)
+    special_circumstances = TextChoiceListField(CircumstanceType)
+    legal_access_difficulties = TextChoiceListField(LegalAccessType)
+    rental_circumstances = TextChoiceField(RentalType)
 
 
 class IssueAssignmentSerializer(serializers.ModelSerializer):

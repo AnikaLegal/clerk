@@ -7,127 +7,74 @@ from django.utils import timezone
 from .timestamped import TimestampedModel
 
 
-class CallTime:
-    WEEK_DAY = "WEEK_DAY"
-    WEEK_EVENING = "WEEK_EVENING"
-    SATURDAY = "SATURDAY"
-    SUNDAY = "SUNDAY"
+class CallTime(models.TextChoices):
+    WEEK_DAY = "WEEK_DAY", "Week day"
+    WEEK_EVENING = "WEEK_EVENING", "Week evening"
+    SATURDAY = "SATURDAY", "Saturday"
+    SUNDAY = "SUNDAY", "Sunday"
 
 
-class ReferrerType:
-    LEGAL_CENTRE = "LEGAL_CENTRE"
-    CHARITY = "CHARITY"
-    SEARCH = "SEARCH"
-    SOCIAL_MEDIA = "SOCIAL_MEDIA"
-    WORD_OF_MOUTH = "WORD_OF_MOUTH"
-    ONLINE_AD = "ONLINE_AD"
-    HOUSING_SERVICE = "HOUSING_SERVICE"
-    RADIO = "RADIO"
-    BILLBOARD = "BILLBOARD"
-    POSTER = "POSTER"
+class ReferrerType(models.TextChoices):
+    LEGAL_CENTRE = "LEGAL_CENTRE", "Legal centre"
+    CHARITY = "CHARITY", "Charity"
+    SEARCH = "SEARCH", "Search"
+    SOCIAL_MEDIA = "SOCIAL_MEDIA", "Social media"
+    WORD_OF_MOUTH = "WORD_OF_MOUTH", "Word of mouth"
+    ONLINE_AD = "ONLINE_AD", "Online ad"
+    HOUSING_SERVICE = "HOUSING_SERVICE", "Housing service"
+    RADIO = "RADIO", "Radio"
+    BILLBOARD = "BILLBOARD", "Billboard"
+    POSTER = "POSTER", "Poster"
 
 
-class GenderType:
-    MALE = "male"
-    FEMALE = "female"
-    GENDERQUEER = "genderqueer"
-    OMITTED = "omitted"
-    OTHER = "other"
+class RentalType(models.TextChoices):
+    SOLO = "SOLO", "Renting solo"
+    FLATMATES = "FLATMATES", "Renting with flatmates"
+    PARTNER = "PARTNER", "Renting with a partner"
+    FAMILY = "FAMILY", "Renting with family"
+    OTHER = "OTHER", "Other"
 
 
-class EmploymentType:
-    WORKING_PART_TIME = "WORKING_PART_TIME"
-    WORKING_FULL_TIME = "WORKING_FULL_TIME"
-    APPRENTICE = "APPRENTICE"
-    LOOKING_FOR_WORK = "LOOKING_FOR_WORK"
-    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID"
-    RETIRED = "RETIRED"
+class LegalAccessType(models.TextChoices):
+    SUBSTANCE_ABUSE = "SUBSTANCE_ABUSE", "Substance abuse issues"
+    CARING = "CARING", "Caring for another"
+    DISABILITY = "DISABILITY", "Disability"
+    OTHER = "OTHER", "Other"
 
 
-class CircumstanceType:
-    CENTRELINK = "CENTRELINK"
-    MENTAL_ILLNESS_OR_DISABILITY = "MENTAL_ILLNESS_OR_DISABILITY"
-    PUBLIC_HOUSING = "PUBLIC_HOUSING"
-    FAMILY_VIOLENCE = "FAMILY_VIOLENCE"
-    HEALTH_CONDITION = "HEALTH_CONDITION"
-    REFUGEE = "REFUGEE"
+class CircumstanceType(models.TextChoices):
+    CENTRELINK = "CENTRELINK", "Centrelink"
+    MENTAL_ILLNESS_OR_DISABILITY = (
+        "MENTAL_ILLNESS_OR_DISABILITY",
+        "Mental illness or disability",
+    )
+    PUBLIC_HOUSING = "PUBLIC_HOUSING", "Public housing"
+    FAMILY_VIOLENCE = "FAMILY_VIOLENCE", "Risk of family violence"
+    HEALTH_CONDITION = "HEALTH_CONDITION", "Health condition"
+    REFUGEE = "REFUGEE", "Refugee"
 
 
-class LegalAccessType:
-    SUBSTANCE_ABUSE = "SUBSTANCE_ABUSE"
-    CARING = "CARING"
-    DISABILITY = "DISABILITY"
-    OTHER = "OTHER"
+class EmploymentType(models.TextChoices):
+    WORKING_PART_TIME = "WORKING_PART_TIME", "Working part time"
+    WORKING_FULL_TIME = "WORKING_FULL_TIME", "Working full time"
+    APPRENTICE = "APPRENTICE", "Apprentice"
+    LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
+    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19"
+    RETIRED = "RETIRED", "Retired"
 
 
-class RentalType:
-    SOLO = "SOLO"
-    FLATMATES = "FLATMATES"
-    PARTNER = "PARTNER"
-    FAMILY = "FAMILY"
-    OTHER = "OTHER"
+class GenderType(models.TextChoices):
+    MALE = "MALE", "Male"
+    FEMALE = "FEMALE", "Female"
+    GENDERQUEER = "GENDERQUEER", "Genderqueer"
+    OMITTED = "OMITTED", "Omitted"
+    OTHER = "OTHER", "Other"
 
 
 class Client(TimestampedModel):
     """
     A person that we are helping.
     """
-
-    GENDER_CHOICES = (
-        (GenderType.MALE, "Male"),
-        (GenderType.FEMALE, "Female"),
-        (GenderType.GENDERQUEER, "Genderqueer"),
-        (GenderType.OMITTED, "Omitted"),
-        (GenderType.OTHER, "Other"),
-    )
-    EMPLOYMENT_CHOICES = (
-        (EmploymentType.WORKING_PART_TIME, "Working part time"),
-        (EmploymentType.WORKING_FULL_TIME, "Working full time"),
-        (EmploymentType.APPRENTICE, "Apprentice"),
-        (EmploymentType.LOOKING_FOR_WORK, "Looking for work"),
-        (EmploymentType.INCOME_REDUCED_COVID, "Income reduced due to COVID-19"),
-        (EmploymentType.RETIRED, "Retired"),
-    )
-    CIRCUMSTANCE_CHOICES = (
-        (CircumstanceType.CENTRELINK, "Centrelink"),
-        (CircumstanceType.MENTAL_ILLNESS_OR_DISABILITY, "Mental illness or disability"),
-        (CircumstanceType.PUBLIC_HOUSING, "Public housing"),
-        (CircumstanceType.FAMILY_VIOLENCE, "Risk of family violence"),
-        (CircumstanceType.HEALTH_CONDITION, "Health condition"),
-        (CircumstanceType.REFUGEE, "Refugee"),
-    )
-    LEGAL_ACCESS_CHOICES = (
-        (LegalAccessType.SUBSTANCE_ABUSE, "Substance abuse issues"),
-        (LegalAccessType.CARING, "Caring for another"),
-        (LegalAccessType.DISABILITY, "Disability"),
-        (LegalAccessType.OTHER, "Other"),
-    )
-    RENTAL_CHOICES = (
-        (RentalType.SOLO, "Renting solo"),
-        (RentalType.FLATMATES, "Renting with flatmates"),
-        (RentalType.PARTNER, "Renting with a partner"),
-        (RentalType.FAMILY, "Renting with family"),
-        (RentalType.OTHER, "Other"),
-    )
-    CALL_TIME_CHOICES = (
-        (CallTime.WEEK_DAY, "Week day"),
-        (CallTime.WEEK_EVENING, "Week evening"),
-        (CallTime.SATURDAY, "Saturday"),
-        (CallTime.SUNDAY, "Sunday"),
-    )
-
-    REFERRER_TYPE_CHOICES = (
-        (ReferrerType.LEGAL_CENTRE, "Legal centre"),
-        (ReferrerType.CHARITY, "Charity"),
-        (ReferrerType.SEARCH, "Search"),
-        (ReferrerType.SOCIAL_MEDIA, "Social media"),
-        (ReferrerType.WORD_OF_MOUTH, "Word of mouth"),
-        (ReferrerType.ONLINE_AD, "Online ad"),
-        (ReferrerType.HOUSING_SERVICE, "Housing service"),
-        (ReferrerType.RADIO, "Radio"),
-        (ReferrerType.BILLBOARD, "Billboard"),
-        (ReferrerType.POSTER, "Poster"),
-    )
 
     # Identifying info
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -139,45 +86,45 @@ class Client(TimestampedModel):
     date_of_birth = models.DateTimeField(null=True, blank=True)
     phone_number = models.CharField(max_length=32, blank=True, default="")
     call_times = ArrayField(
-        models.CharField(max_length=32, choices=CALL_TIME_CHOICES),
+        models.CharField(max_length=32, choices=CallTime.choices),
         default=list,
         blank=True,
     )
 
     # Demographic info for impact analysis.
     employment_status = ArrayField(
-        models.CharField(max_length=32, choices=EMPLOYMENT_CHOICES),
+        models.CharField(max_length=32, choices=EmploymentType.choices),
         default=list,
         blank=True,
     )
 
     special_circumstances = ArrayField(
-        models.CharField(max_length=32, choices=CIRCUMSTANCE_CHOICES),
+        models.CharField(max_length=32, choices=CircumstanceType.choices),
         default=list,
         blank=True,
     )
     weekly_income = models.IntegerField(null=True, blank=True)
     weekly_rent = models.IntegerField(null=True, blank=True)
     gender = models.CharField(
-        max_length=64, null=True, choices=GENDER_CHOICES, blank=True
+        max_length=64, null=True, choices=GenderType.choices, blank=True
     )
     primary_language_non_english = models.BooleanField(default=False)
     primary_language = models.CharField(max_length=32, blank=True, default="")
     is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
     rental_circumstances = models.CharField(
-        max_length=32, choices=RENTAL_CHOICES, blank=True, default=""
+        max_length=32, choices=RentalType.choices, blank=True, default=""
     )
     is_multi_income_household = models.BooleanField(null=True)
     number_of_dependents = models.IntegerField(null=True)
     legal_access_difficulties = ArrayField(
-        models.CharField(max_length=32, choices=LEGAL_ACCESS_CHOICES),
+        models.CharField(max_length=32, choices=LegalAccessType.choices),
         default=list,
         blank=True,
     )
 
     # Referrer info: how did the client find us?
     referrer_type = models.CharField(
-        max_length=64, choices=REFERRER_TYPE_CHOICES, blank=True, default=""
+        max_length=64, choices=ReferrerType.choices, blank=True, default=""
     )
     # Specific referrer name.
     referrer = models.CharField(max_length=64, blank=True, default="")
