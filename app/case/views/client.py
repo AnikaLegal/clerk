@@ -1,13 +1,6 @@
-from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 
-from case.forms import (
-    DynamicTableForm,
-    ClientContactDynamicForm,
-    ClientMiscDynamicForm,
-    ClientPersonalDynamicForm,
-)
 from case.serializers import ClientDetailSerializer
 from core.models import Client, Issue
 from .auth import paralegal_or_better_required

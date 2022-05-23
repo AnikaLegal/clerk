@@ -130,58 +130,6 @@ class TenancyDynamicForm(DynamicTableForm):
     is_on_lease = SingleChoiceField(field_name="is_on_lease", model=Tenancy)
 
 
-class ClientPersonalDynamicForm(DynamicTableForm):
-    class Meta:
-        model = Client
-        fields = [
-            "first_name",
-            "last_name",
-            "date_of_birth",
-            "gender",
-        ]
-
-
-class ClientContactDynamicForm(DynamicTableForm):
-    class Meta:
-        model = Client
-        fields = [
-            "email",
-            "phone_number",
-            "call_times",
-        ]
-
-    call_times = MultiChoiceField("call_times", Client)
-
-
-class ClientMiscDynamicForm(DynamicTableForm):
-    class Meta:
-        model = Client
-        fields = [
-            "referrer",
-            "referrer_type",
-            "employment_status",
-            "special_circumstances",
-            "weekly_income",
-            "primary_language",
-            "number_of_dependents",
-            "is_aboriginal_or_torres_strait_islander",
-            "legal_access_difficulties",
-            "rental_circumstances",
-            "weekly_rent",
-            "is_multi_income_household",
-        ]
-
-    not_required_fields = [*Meta.fields]
-
-    rental_circumstances = SingleChoiceField(
-        field_name="rental_circumstances", model=Client
-    )
-    referrer_type = SingleChoiceField(field_name="referrer_type", model=Client)
-    employment_status = MultiChoiceField("employment_status", Client)
-    special_circumstances = MultiChoiceField("special_circumstances", Client)
-    legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
-
-
 class UserDetailsDynamicForm(DynamicTableForm):
     class Meta:
         model = User

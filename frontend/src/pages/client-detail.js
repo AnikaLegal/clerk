@@ -22,53 +22,64 @@ import { api } from "api";
 const { client } = window.REACT_CONTEXT;
 
 const App = () => {
+  const [isEditMode, setEditMode] = useState(false);
+  const toggleEditModel = () => {
+    setEditMode(!isEditMode);
+  };
   return (
     <Container>
       <Header as="h1">{client.full_name} (Client)</Header>
-      <Header as="h3">Personal details</Header>
-      <FieldTable
-        client={client}
-        fields={{
-          "First name": client.first_name,
-          "Last name": client.last_name,
-          "Date of birth": client.date_of_birth,
-          Gender: client.gender,
-        }}
-      />
-      <Header as="h3">Contact details</Header>
-      <FieldTable
-        client={client}
-        fields={{
-          Email: client.email,
-          "Phone number": client.phone_number,
-          "Call times": client.call_times.display,
-        }}
-      />
-      <Header as="h3">Other Information</Header>
-      <FieldTable
-        client={client}
-        fields={{
-          Referrer: client.referrer,
-          "Referrer type": client.referrer_type.display,
-          "Employment status": client.employment_status.display,
-          "Special circumstances": client.special_circumstances.display,
-          "Weekly income": client.weekly_income,
-          "Primary language": client.primary_language,
-          "Number of dependents": client.number_of_dependents,
-          "Is Aboriginal or Torres Strait Islander":
-            client.is_aboriginal_or_torres_strait_islander,
-          "Legal access difficulties": client.legal_access_difficulties.display,
-          "Rental circumstances": client.rental_circumstances.display,
-          "Weekly rent": client.weekly_rent,
-          "Is in a multi income household": client.is_multi_income_household,
-        }}
-      />
-
-      <Header as="h3">Cases</Header>
-      <CaseListTable issues={client.issue_set} />
+      {!isEditMode && <Button onClick={toggleEditModel}>Edit</Button>}
+      {!isEditMode && <ClientDisplay client={client} />}
+      {/* TODO - client-edit.js FORM */}
     </Container>
   );
 };
+
+const ClientDisplay = ({ client }) => (
+  <>
+    <Header as="h3">Personal details</Header>
+    <FieldTable
+      client={client}
+      fields={{
+        "First name": client.first_name,
+        "Last name": client.last_name,
+        "Date of birth": client.date_of_birth,
+        Gender: client.gender,
+      }}
+    />
+    <Header as="h3">Contact details</Header>
+    <FieldTable
+      client={client}
+      fields={{
+        Email: client.email,
+        "Phone number": client.phone_number,
+        "Call times": client.call_times.display,
+      }}
+    />
+    <Header as="h3">Other Information</Header>
+    <FieldTable
+      client={client}
+      fields={{
+        Referrer: client.referrer,
+        "Referrer type": client.referrer_type.display,
+        "Employment status": client.employment_status.display,
+        "Special circumstances": client.special_circumstances.display,
+        "Weekly income": client.weekly_income,
+        "Primary language": client.primary_language,
+        "Number of dependents": client.number_of_dependents,
+        "Is Aboriginal or Torres Strait Islander":
+          client.is_aboriginal_or_torres_strait_islander,
+        "Legal access difficulties": client.legal_access_difficulties.display,
+        "Rental circumstances": client.rental_circumstances.display,
+        "Weekly rent": client.weekly_rent,
+        "Is in a multi income household": client.is_multi_income_household,
+      }}
+    />
+    <Header as="h3">Cases</Header>
+    <CaseListTable issues={client.issue_set} />
+  </>
+);
 
 const FieldTable = ({ client, fields }) => (
   <Table size="small" definition>
