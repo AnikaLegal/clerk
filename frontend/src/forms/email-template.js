@@ -12,6 +12,7 @@ import {
 import { MarkdownEditor } from "comps/markdown-editor";
 
 const TOPIC_OPTIONS = [
+  { key: "GENERAL", value: "GENERAL", text: "General" },
   { key: "REPAIRS", value: "REPAIRS", text: "Repairs" },
   { key: "BONDS", value: "BONDS", text: "Bonds" },
   { key: "EVICTION", value: "EVICTION", text: "Eviction" },

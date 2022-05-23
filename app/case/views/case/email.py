@@ -12,6 +12,7 @@ from html_sanitizer import Sanitizer
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.db.models import Q
 from bs4 import BeautifulSoup
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -180,7 +181,9 @@ def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
-    templates = EmailTemplate.objects.filter(topic=issue.topic).order_by("-created_at")
+    templates = EmailTemplate.objects.filter(
+        Q(topic=issue.topic) | Q(topic="GENERAL")
+    ).order_by("-created_at")
     for template in templates:
         # Annotate with url
         qs = request.GET.copy()

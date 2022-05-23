@@ -17,6 +17,7 @@ const TOPIC_OPTIONS = [
   { key: "REPAIRS", value: "REPAIRS", text: "Repairs" },
   { key: "BONDS", value: "BONDS", text: "Bonds" },
   { key: "EVICTION", value: "EVICTION", text: "Eviction" },
+  { key: "GENERAL", value: "GENERAL", text: "General" },
 ];
 
 const debouncer = debounce(300);
