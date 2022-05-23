@@ -302,14 +302,17 @@ def email_draft_preview_view(request, pk, email_pk):
 
 
 def _render_email_template(html):
-    soup = BeautifulSoup(html, parser="lxml", features="lxml")
-    for p_tag in soup.find_all("p"):
-        p_tag["style"] = "margin:0 0 12px 0;"
+    if html:
+        soup = BeautifulSoup(html, parser="lxml", features="lxml")
+        for p_tag in soup.find_all("p"):
+            p_tag["style"] = "margin:0 0 12px 0;"
 
-    for a_tag in soup.find_all("a"):
-        a_tag["style"] = "color:#438fef;text-decoration:underline;"
+        for a_tag in soup.find_all("a"):
+            a_tag["style"] = "color:#438fef;text-decoration:underline;"
 
-    context = {"html": mark_safe(soup.body.decode_contents())}
+        context = {"html": mark_safe(soup.body.decode_contents())}
+    else:
+        context = {"html": ""}
     return render_to_string("case/case/email/preview.html", context)
 
 
