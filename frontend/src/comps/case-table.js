@@ -24,10 +24,18 @@ export const CaseListTable = ({ issues }) => (
           </Table.Cell>
           <Table.Cell>{issue.topic_display}</Table.Cell>
           <Table.Cell>
-            <a href={issue.paralegal.url}>{issue.paralegal.full_name}</a>
+            {issue.paralegal ? (
+              <a href={issue.paralegal.url}>{issue.paralegal.full_name}</a>
+            ) : (
+              "-"
+            )}
           </Table.Cell>
           <Table.Cell>
-            <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>
+            {issue.lawyer ? (
+              <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>
+            ) : (
+              "-"
+            )}
           </Table.Cell>
           <Table.Cell>{issue.created_at}</Table.Cell>
           <Table.Cell>{issue.stage_display || "-"}</Table.Cell>

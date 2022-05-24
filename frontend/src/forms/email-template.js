@@ -1,13 +1,5 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Table,
-  Input,
-  Dropdown,
-  TextArea,
-  Segment,
-  Form,
-} from "semantic-ui-react";
+import React from "react";
+import { Button, Input, Dropdown, Form } from "semantic-ui-react";
 
 import { MarkdownEditor } from "comps/markdown-editor";
 

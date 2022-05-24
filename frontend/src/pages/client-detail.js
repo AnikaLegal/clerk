@@ -1,23 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Formik } from "formik";
-import {
-  Container,
-  Header,
-  Divider,
-  Form,
-  Button,
-  Dropdown,
-  Message,
-  Segment,
-  List,
-  Table,
-  Feed,
-  Tab,
-} from "semantic-ui-react";
+import React, { useState } from "react";
+import { Container, Header, Button, Table } from "semantic-ui-react";
 
 import { CaseListTable } from "comps/case-table";
+import { ClientEditForm } from "forms/client-edit";
 import { mount } from "utils";
-import { api } from "api";
 
 const { client } = window.REACT_CONTEXT;
 
@@ -31,7 +17,7 @@ const App = () => {
       <Header as="h1">{client.full_name} (Client)</Header>
       {!isEditMode && <Button onClick={toggleEditModel}>Edit</Button>}
       {!isEditMode && <ClientDisplay client={client} />}
-      {/* TODO - client-edit.js FORM */}
+      {isEditMode && <ClientEditForm />}
     </Container>
   );
 };
