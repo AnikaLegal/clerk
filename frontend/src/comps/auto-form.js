@@ -1,0 +1,176 @@
+// Form framework
+import React from "react";
+import { DateInput } from "semantic-ui-calendar-react";
+import { Button, Input, Form, Dropdown } from "semantic-ui-react";
+import * as Yup from "yup";
+
+export const FIELD_TYPES = {
+  TEXT: "TEXT",
+  DATE: "DATE",
+  SINGLE_CHOICE: "SINGLE_CHOICE",
+  MULTI_CHOICE: "MULTI_CHOICE",
+};
+
+export const getFormSchema = (formFields) =>
+  Yup.object().shape(
+    formFields.reduce(
+      (acc, val) =>
+        val.schema
+          ? {
+              ...acc,
+              [val.name]: val.schema,
+            }
+          : acc,
+      {}
+    )
+  );
+
+export const getModelChoices = (formFields, model) =>
+  formFields.reduce((acc, field) => {
+    const fieldVal = model[field.name];
+    if (fieldVal.choices) {
+      return { ...acc, [field.name]: fieldVal.choices };
+    } else {
+      return acc;
+    }
+  }, {});
+
+export const getModelInitialValues = (formFields, model) =>
+  formFields.reduce((acc, field) => {
+    const fieldVal = model[field.name];
+    const value = fieldVal.value ? fieldVal.value : fieldVal;
+    return { ...acc, [field.name]: value };
+  }, {});
+
+/*
+Field schema
+{
+    label: string,
+    name: string,
+    type: string (FIELD_TYPES),
+    placeholder: string (optional)
+    schema: Yup field schema (optional)
+}
+*/
+
+export const AutoForm = ({
+  fields,
+  choices,
+  formik: {
+    values,
+    errors,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    setFieldValue,
+  },
+  onCancel = () => {},
+  submitText = "Submit",
+  cancelText = "Cancel",
+}) => {
+  return (
+    <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+      {fields.map((f) => {
+        const FieldComponent = FIELD_COMPONENTS[f.type];
+        return (
+          <Form.Field key={f.name} error={!!errors[f.name]}>
+            <label>{f.label}</label>
+            <FieldComponent
+              {...f}
+              value={values[f.name]}
+              handleChange={handleChange}
+              isSubmitting={isSubmitting}
+              setFieldValue={setFieldValue}
+              choices={choices[f.name]}
+            />
+          </Form.Field>
+        );
+      })}
+      {Object.entries(errors).map(([k, v]) => (
+        <div key={k} className="ui error message">
+          <div className="header">{k}</div>
+          <p>{v}</p>
+        </div>
+      ))}
+      <Button
+        primary
+        type="submit"
+        disabled={isSubmitting}
+        loading={isSubmitting}
+      >
+        {submitText}
+      </Button>
+      <Button
+        disabled={isSubmitting}
+        onClick={(e) => {
+          e.preventDefault();
+          onCancel();
+        }}
+      >
+        {cancelText}
+      </Button>
+    </Form>
+  );
+};
+
+const TextField = ({
+  name,
+  placeholder,
+  value,
+  handleChange,
+  isSubmitting,
+}) => (
+  <Input
+    placeholder={placeholder}
+    value={value}
+    name={name}
+    onChange={handleChange}
+    disabled={isSubmitting}
+  />
+);
+
+const DateField = ({
+  name,
+  placeholder,
+  value,
+  setFieldValue,
+  isSubmitting,
+}) => (
+  <DateInput
+    placeholder={placeholder}
+    value={value}
+    name={name}
+    dateFormat="DD/MM/YYYY"
+    disabled={isSubmitting}
+    autoComplete="off"
+    onChange={(e, { name, value }) => setFieldValue(name, value, false)}
+  />
+);
+
+const ChoiceField =
+  (multiple) =>
+  ({ name, placeholder, value, choices, setFieldValue, isSubmitting }) =>
+    (
+      <Dropdown
+        fluid
+        selection
+        multiple={multiple}
+        value={value}
+        style={{ margin: "1em 0" }}
+        loading={isSubmitting}
+        placeholder={placeholder}
+        options={choices.map(([value, label]) => ({
+          key: value,
+          value: value,
+          text: label,
+        }))}
+        onChange={(e, { value }) => setFieldValue(name, value, false)}
+      />
+    );
+
+const FIELD_COMPONENTS = {
+  TEXT: TextField,
+  DATE: DateField,
+  SINGLE_CHOICE: ChoiceField(false),
+  MULTI_CHOICE: ChoiceField(true),
+};

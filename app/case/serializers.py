@@ -169,6 +169,9 @@ class ClientSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+    date_of_birth = serializers.DateTimeField(
+        format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
+    )
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))
@@ -243,17 +246,27 @@ class TextChoiceField(serializers.CharField):
 
     def to_representation(self, value):
         display = self.text_choice_cls[value].label
-        return {"display": display, "value": value}
+        return {
+            "display": display,
+            "value": value,
+            "choices": self.text_choice_cls.choices,
+        }
 
 
-class TextChoiceListField(serializers.Field):
+class TextChoiceListField(serializers.ListField):
+    child = serializers.CharField()
+
     def __init__(self, text_choice_cls, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.text_choice_cls = text_choice_cls
 
     def to_representation(self, value):
         display = " | ".join(self.text_choice_cls[s].label for s in value)
-        return {"display": display, "value": value}
+        return {
+            "display": display,
+            "value": value,
+            "choices": self.text_choice_cls.choices,
+        }
 
 
 class ClientDetailSerializer(ClientSerializer):

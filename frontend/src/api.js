@@ -67,6 +67,12 @@ export const api = {
       return http.get(URLS.PERSON.LIST);
     },
   },
+  client: {
+    update: (clientId, client) => {
+      const url = `/clerk/client/${clientId}/`;
+      return http.post(url, client);
+    },
+  },
   case: {
     update: (caseId, issue) => {
       const url = `/clerk/cases/detail/${caseId}/update/`;
