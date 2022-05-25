@@ -9,6 +9,7 @@ export const FIELD_TYPES = {
   DATE: "DATE",
   SINGLE_CHOICE: "SINGLE_CHOICE",
   MULTI_CHOICE: "MULTI_CHOICE",
+  BOOL: "BOOL",
 };
 
 export const getFormSchema = (formFields) =>
@@ -42,16 +43,15 @@ export const getModelInitialValues = (formFields, model) =>
     return { ...acc, [field.name]: value };
   }, {});
 
-/*
-Field schema
-{
-    label: string,
-    name: string,
-    type: string (FIELD_TYPES),
-    placeholder: string (optional)
-    schema: Yup field schema (optional)
-}
-*/
+const FieldSchema = Yup.array().of(
+  Yup.object().shape({
+    label: Yup.string().required(),
+    name: Yup.string().required(),
+    type: Yup.string().oneOf(Object.values(FIELD_TYPES)).required(),
+    placeholder: Yup.string(),
+    schema: Yup.object(),
+  })
+);
 
 export const AutoForm = ({
   fields,
@@ -68,6 +68,7 @@ export const AutoForm = ({
   submitText = "Submit",
   cancelText = "Cancel",
 }) => {
+  FieldSchema.validateSync(fields);
   return (
     <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
       {fields.map((f) => {
@@ -168,9 +169,40 @@ const ChoiceField =
       />
     );
 
+const BoolField = ({
+  name,
+  placeholder,
+  value,
+  setFieldValue,
+  isSubmitting,
+}) => (
+  <Dropdown
+    fluid
+    selection
+    value={value}
+    style={{ margin: "1em 0" }}
+    loading={isSubmitting}
+    placeholder={placeholder}
+    options={[
+      {
+        key: "Yes",
+        text: "Yes",
+        value: true,
+      },
+      {
+        key: "No",
+        text: "No",
+        value: false,
+      },
+    ]}
+    onChange={(e, { value }) => setFieldValue(name, value, false)}
+  />
+);
+
 const FIELD_COMPONENTS = {
   TEXT: TextField,
   DATE: DateField,
+  BOOL: BoolField,
   SINGLE_CHOICE: ChoiceField(false),
   MULTI_CHOICE: ChoiceField(true),
 };

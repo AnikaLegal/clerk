@@ -11,6 +11,7 @@ from core.models.client import (
     ReferrerType,
     RentalType,
     LegalAccessType,
+    GenderType,
     CircumstanceType,
     EmploymentType,
 )
@@ -245,10 +246,10 @@ class TextChoiceField(serializers.CharField):
         self.text_choice_cls = text_choice_cls
 
     def to_representation(self, value):
-        display = self.text_choice_cls[value].label
+        display = self.text_choice_cls[value.upper()].label if value else ""
         return {
             "display": display,
-            "value": value,
+            "value": value.upper(),
             "choices": self.text_choice_cls.choices,
         }
 
@@ -261,10 +262,10 @@ class TextChoiceListField(serializers.ListField):
         self.text_choice_cls = text_choice_cls
 
     def to_representation(self, value):
-        display = " | ".join(self.text_choice_cls[s].label for s in value)
+        display = " | ".join(self.text_choice_cls[s.upper()].label for s in value if s)
         return {
             "display": display,
-            "value": value,
+            "value": [v.upper() for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
 
@@ -281,6 +282,7 @@ class ClientDetailSerializer(ClientSerializer):
     issue_set = IssueListSerializer(read_only=True, many=True)
     # TODO - hoist these fields up into ClientSerializer, fix whatever breaks
     referrer_type = TextChoiceField(ReferrerType)
+    gender = TextChoiceField(GenderType)
     call_times = TextChoiceListField(CallTime)
     employment_status = TextChoiceListField(EmploymentType)
     special_circumstances = TextChoiceListField(CircumstanceType)
