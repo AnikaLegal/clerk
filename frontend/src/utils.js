@@ -3,6 +3,8 @@ import { hydrate, render } from "react-dom";
 import { Converter, setFlavor } from "showdown";
 import xss from "xss";
 
+import { ErrorBoundary } from "comps/error-boundary";
+
 const converter = new Converter();
 setFlavor("github");
 
@@ -26,10 +28,15 @@ export const useEffectLazy = (func, vars) => {
 
 export const mount = (App) => {
   const root = document.getElementById("app");
+  const rootComponent = (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  );
   if (root.hasChildNodes()) {
-    hydrate(<App />, root);
+    hydrate(rootComponent, root);
   } else {
-    render(<App />, root);
+    render(rootComponent, root);
   }
 };
 

@@ -332,3 +332,5 @@ MS_GRAPH_DRIVE_ID = None
 
 # Scheduled tasks
 SCHEDULES = []
+
+SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN")

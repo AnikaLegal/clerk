@@ -66,7 +66,8 @@ const App = () => {
               {email.state == "DRAFT" && <div className="label">Draft</div>}
               {email.state == "SENT" && (
                 <div className="label">
-                  Sent on {email.created_at} by by {email.sender.full_name}
+                  Sent on {email.created_at}{" "}
+                  {email.sender ? `by ${email.sender.full_name}` : null}
                 </div>
               )}
               {email.state == "INGESTED" && (

@@ -16,6 +16,9 @@
 {% block scripts %}
 <script type="text/javascript">
     window.REACT_CONTEXT = JSON.parse("{{ react_context | escapejs }}");
+    {% if SENTRY_JS_DSN %}
+    window.SENTRY_JS_DSN = "{{ SENTRY_JS_DSN }}"
+    {% endif %}
 </script>
 {% render_bundle react_page_name 'js' %}
 {% endblock %}
