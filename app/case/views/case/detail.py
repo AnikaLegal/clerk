@@ -10,7 +10,7 @@ from case.views.auth import paralegal_or_better_required, coordinator_or_better_
 from core.models import Issue, IssueNote, Person
 from case.utils.react import render_react_page
 from case.serializers import (
-    IssueSerializer,
+    IssueDetailSerializer,
     TenancySerializer,
     IssueNoteSerializer,
     IssueNoteCreateSerializer,
@@ -39,7 +39,7 @@ def case_detail_view(request, pk):
     tenancy = _get_tenancy(issue)
     notes = _get_issue_notes(request, pk)
     context = {
-        "issue": IssueSerializer(issue).data,
+        "issue": IssueDetailSerializer(issue).data,
         "tenancy": TenancySerializer(tenancy).data,
         "notes": IssueNoteSerializer(notes, many=True).data,
         "details": _get_submitted_details(issue),
@@ -116,7 +116,7 @@ def case_detail_note_view(request, pk):
     notes = _get_issue_notes(request, pk)
     return Response(
         {
-            "issue": IssueSerializer(issue).data,
+            "issue": IssueDetailSerializer(issue).data,
             "notes": IssueNoteSerializer(notes, many=True).data,
         }
     )
@@ -130,10 +130,10 @@ def case_detail_update_view(request, pk):
     Form where you update the case status.
     """
     issue = _get_issue(request, pk)
-    serializer = IssueSerializer(data=request.data, instance=issue, partial=True)
+    serializer = IssueDetailSerializer(data=request.data, instance=issue, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response({"issue": IssueSerializer(issue).data})
+    return Response({"issue": IssueDetailSerializer(issue).data})
 
 
 @router.use_route("assign")
@@ -147,7 +147,7 @@ def case_detail_assign_view(request, pk):
     serializer = IssueAssignmentSerializer(data=request.data, instance=issue)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response({"issue": IssueSerializer(issue).data})
+    return Response({"issue": IssueDetailSerializer(issue).data})
 
 
 def _get_tenancy(issue):

@@ -61,15 +61,15 @@ export const MarkdownEditor = ({
   );
 };
 
-export const MarkdownTextArea = (props) => {
+export const MarkdownTextArea = ({ value, ...props }) => {
   const [html, setHtml] = useState("");
   useEffect(() => {
-    if (props.value) {
-      setHtml(markdownToHtml(props.value));
+    if (value) {
+      setHtml(markdownToHtml(value));
     } else {
       setHtml("");
     }
-  }, [props.value]);
+  }, [value]);
   return (
     <>
       <Segment secondary>
@@ -83,10 +83,17 @@ export const MarkdownTextArea = (props) => {
         </a>
         &nbsp;for a basic reference.
       </Segment>
-      <TextArea {...props} />
+      <TextArea value={value} {...props} />
       <div
-        style={{ padding: "0 1em" }}
-        dangerouslySetInnerHTML={{ __html: html }}
+        style={{
+          margin: "1em 0",
+          padding: "1em",
+          border: "1px solid rgba(34,36,38,.15)",
+          borderRadius: "0.28571429rem",
+        }}
+        dangerouslySetInnerHTML={{
+          __html: html || "<span style='opacity: 0.5'>Start typing...</span>",
+        }}
       />
     </>
   );

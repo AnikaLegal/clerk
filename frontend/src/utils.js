@@ -2,11 +2,19 @@ import React, { useEffect, useRef } from "react";
 import { hydrate, render } from "react-dom";
 import { Converter, setFlavor } from "showdown";
 import xss from "xss";
+import styled from "styled-components";
 
 import { ErrorBoundary } from "comps/error-boundary";
 
 const converter = new Converter();
 setFlavor("github");
+
+export const MarkdownAsHtmlDisplay = ({ markdown, ...props }) => (
+  <div
+    dangerouslySetInnerHTML={{ __html: markdownToHtml(markdown) }}
+    {...props}
+  />
+);
 
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText);
@@ -30,7 +38,9 @@ export const mount = (App) => {
   const root = document.getElementById("app");
   const rootComponent = (
     <ErrorBoundary>
-      <App />
+      <FadeInOnLoad>
+        <App />
+      </FadeInOnLoad>
     </ErrorBoundary>
   );
   if (root.hasChildNodes()) {
@@ -39,6 +49,18 @@ export const mount = (App) => {
     render(rootComponent, root);
   }
 };
+
+const FadeInOnLoad = styled.div`
+  animation: fadein 0.3s;
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+`;
 
 export const debounce = (delay) => {
   let timer = null;

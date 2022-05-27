@@ -34,7 +34,11 @@ from case.utils.router import Router
 from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
 from case.utils.react import render_react_page
-from case.serializers import IssueSerializer, EmailSerializer, EmailAttachmentSerializer
+from case.serializers import (
+    IssueDetailSerializer,
+    EmailSerializer,
+    EmailAttachmentSerializer,
+)
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -86,7 +90,7 @@ def email_thread_view(request, pk, slug):
     else:
         raise Http404()
     context = {
-        "issue": IssueSerializer(issue).data,
+        "issue": IssueDetailSerializer(issue).data,
         "subject": email_thread.subject,
         "emails": EmailSerializer(email_thread.emails, many=True).data,
         "case_email_address": case_email_address,
