@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Container, Header, Button, Table } from "semantic-ui-react";
 import { Formik } from "formik";
+import { markdownToHtml } from "utils";
+
 import * as Yup from "yup";
 
 import { CaseListTable } from "comps/case-table";
@@ -37,6 +39,11 @@ const PERSONAL_FIELDS = [
     label: "Date of birth",
     type: FIELD_TYPES.DATE,
     name: "date_of_birth",
+  },
+  {
+    label: "Notes",
+    type: FIELD_TYPES.TEXTAREA,
+    name: "notes",
   },
 ];
 const CONTACT_FIELDS = [
@@ -170,7 +177,7 @@ const ClientDetailsForm = ({ fields, schema, client, setClient }) => {
   if (!isEditMode) {
     return (
       <>
-        <FieldTable fields={fields.map((f) => [f.label, client[f.name]])} />
+        <FieldTable fields={fields} client={client} />
         <Button onClick={toggleEditMode}>Edit</Button>
       </>
     );
@@ -204,13 +211,21 @@ const ClientDetailsForm = ({ fields, schema, client, setClient }) => {
   );
 };
 
-const FieldTable = ({ fields }) => (
+const FieldTable = ({ fields, client }) => (
   <Table size="small" definition>
     <Table.Body>
-      {fields.map(([label, value]) => (
+      {fields.map(({ label, name, type }) => (
         <Table.Row key={label}>
           <Table.Cell width={3}>{label}</Table.Cell>
-          <Table.Cell>{getValueDisplay(value)}</Table.Cell>
+          {type === "TEXTAREA" ? (
+            <td
+              dangerouslySetInnerHTML={{
+                __html: client[name] ? markdownToHtml(client[name]) : "-",
+              }}
+            />
+          ) : (
+            <Table.Cell>{getValueDisplay(client[name])}</Table.Cell>
+          )}
         </Table.Row>
       ))}
     </Table.Body>

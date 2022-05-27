@@ -1,11 +1,14 @@
 // Form framework
 import React from "react";
 import { DateInput } from "semantic-ui-calendar-react";
-import { Button, Input, Form, Dropdown } from "semantic-ui-react";
+import { Button, Input, Form, Dropdown, TextArea } from "semantic-ui-react";
+import { MarkdownTextArea } from "comps/markdown-editor";
+
 import * as Yup from "yup";
 
 export const FIELD_TYPES = {
   TEXT: "TEXT",
+  TEXTAREA: "TEXTAREA",
   DATE: "DATE",
   SINGLE_CHOICE: "SINGLE_CHOICE",
   MULTI_CHOICE: "MULTI_CHOICE",
@@ -199,8 +202,25 @@ const BoolField = ({
   />
 );
 
+const TextAreaField = ({
+  name,
+  placeholder,
+  value,
+  handleChange,
+  isSubmitting,
+}) => (
+  <MarkdownTextArea
+    name={name}
+    value={value}
+    placeholder={placeholder}
+    onChange={handleChange}
+    disabled={isSubmitting}
+  />
+);
+
 const FIELD_COMPONENTS = {
   TEXT: TextField,
+  TEXTAREA: TextAreaField,
   DATE: DateField,
   BOOL: BoolField,
   SINGLE_CHOICE: ChoiceField(false),

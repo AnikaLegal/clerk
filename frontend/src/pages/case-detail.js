@@ -14,7 +14,7 @@ import {
 } from "semantic-ui-react";
 
 import { TimelineNote } from "comps/timeline-item";
-import { mount } from "utils";
+import { mount, MarkdownAsHtmlDisplay } from "utils";
 import { api } from "api";
 import { URLS } from "consts";
 import {
@@ -313,6 +313,12 @@ const CaseHeader = ({ issue, actionstep_url }) => (
         <div className="ui segment padded">
           <div className="ui top attached label green">Outcome notes</div>
           <p style={{ marginBottom: 0 }}>{issue.outcome_notes}</p>
+        </div>
+      )}
+      {issue.client.notes && (
+        <div className="ui segment padded">
+          <div className="ui top attached label">Client notes</div>
+          <MarkdownAsHtmlDisplay markdown={issue.client.notes} />
         </div>
       )}
     </span>

@@ -163,6 +163,7 @@ class ClientSerializer(serializers.ModelSerializer):
             "referrer",
             "age",
             "full_name",
+            "notes",
             "url",
         )
 

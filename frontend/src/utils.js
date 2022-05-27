@@ -9,6 +9,13 @@ import { ErrorBoundary } from "comps/error-boundary";
 const converter = new Converter();
 setFlavor("github");
 
+export const MarkdownAsHtmlDisplay = ({ markdown, ...props }) => (
+  <div
+    dangerouslySetInnerHTML={{ __html: markdownToHtml(markdown) }}
+    {...props}
+  />
+);
+
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText);
   // Sanitise HTML removing <script> tags and the like.

@@ -81,6 +81,9 @@ class Client(TimestampedModel):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
 
+    # Notes on the client
+    notes = models.TextField(default="", blank=True)
+
     # Contact details
     email = models.EmailField(max_length=150)
     date_of_birth = models.DateTimeField(null=True, blank=True)
