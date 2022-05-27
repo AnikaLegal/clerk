@@ -2,8 +2,7 @@ version: "3"
 
 services:
   # Test database.
-  clerk_db:
-    container_name: clerk_db
+  db:
     image: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -12,9 +11,8 @@ services:
 
   # Test container.
   test:
-    container_name: test
     image: anikalaw/clerk:${TAG}
     links:
-      - clerk_db
+      - db
     env_file:
       - ../env/test.env

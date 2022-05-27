@@ -46,6 +46,18 @@ def logs(c, service_name):
     c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
 
 
+@task(name="exec")
+def exec_task(c, service_name):
+    """Get a bash shell in a running container"""
+    c.run(f"{COMPOSE} exec {service_name} bash", pty=True)
+
+
+@task(name="run")
+def run_task(c, service_name):
+    """Get a bash shell in a new container"""
+    run(c, "bash", service=service_name)
+
+
 @task
 def ssh(c):
     """SSH into prod"""

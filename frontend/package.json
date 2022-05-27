@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "ssr": "nodemon --watch /build/ /build/server.js",
     "build": "NODE_ENV=production webpack --config webpack.config.js --mode production",
-    "dev": "NODE_ENV=development webpack-dev-server --config webpack.config.js --progress --mode development"
+    "dev": "NODE_ENV=development webpack --config webpack.config.js --progress --watch --mode development"
   },
   "keywords": [],
   "author": "",
@@ -33,10 +34,10 @@
   "devDependencies": {
     "@babel/core": "^7.17.2",
     "@babel/preset-react": "^7.16.7",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "babel-loader": "^8.2.3",
     "babel-plugin-styled-components": "^2.0.7",
     "css-loader": "^6.6.0",
+    "nodemon": "^2.0.16",
     "react-refresh": "^0.11.0",
     "style-loader": "^3.3.1"
   }

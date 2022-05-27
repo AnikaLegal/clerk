@@ -1,6 +1,7 @@
 version: "3"
 
 services:
+  # Django webserver.
   web:
     command: bash /app/scripts/web/prod.sh
     image: anikalaw/clerk:prod
@@ -12,6 +13,7 @@ services:
     env_file:
       - prod.env
 
+  # Django-q worker.
   worker:
     command: bash /app/scripts/worker/prod.sh
     image: anikalaw/clerk:prod
@@ -20,3 +22,12 @@ services:
       - /var/log/clerk/prod/worker:/var/log
     env_file:
       - prod.env
+
+  # Server-side rendering of React pages.
+  ssr:
+    image: anikalaw/clerk-webpack:prod
+    command: npm run ssr
+    ports:
+      - 3002:3002
+    environment:
+      EXPRESS_PORT: 3002

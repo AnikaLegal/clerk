@@ -59,3 +59,7 @@ jobs:
       - name: Push container image
         if: success() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
         run: docker push anikalaw/clerk:${TAG}
+
+      - name: Push Webpack container image
+        if: success() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master')
+        run: docker push anikalaw/clerk-webpack:${TAG}

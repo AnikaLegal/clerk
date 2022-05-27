@@ -2,8 +2,7 @@ version: "3"
 
 services:
   # Local development database.
-  clerk_db:
-    container_name: clerk_db
+  db:
     image: postgres
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -14,7 +13,6 @@ services:
 
   # Django webserver.
   web:
-    container_name: web
     command: bash /app/scripts/web/local.sh
     image: clerk:local
     ports:
@@ -23,24 +21,38 @@ services:
       - ../app:/app
       - build:/build
     links:
+      - db
       - worker
       - webpack
-      - clerk_db
+      - ssr
     env_file:
       - ../env/dev.env
 
   # Django-q worker.
   worker:
-    container_name: worker
     command: bash /app/scripts/worker/local.sh
     image: clerk:local
     volumes:
       - ../app:/app
     links:
-      - clerk_db
+      - db
     env_file:
       - ../env/dev.env
 
+  # Server-side rendering of React pages.
+  ssr:
+    image: clerk-webpack:local
+    command: npm run ssr
+    ports:
+      - 3002:3002
+    environment:
+      EXPRESS_PORT: 3002
+    volumes:
+      - ../frontend/package.json:/frontend/package.json
+      - ../frontend/node_modules:/frontend/node_modules
+      - build:/build
+
+  # Webpack build server
   webpack:
     image: clerk-webpack:local
     command: npm run dev
@@ -56,12 +68,11 @@ services:
 
   # For testing.
   test:
-    container_name: test
     image: clerk:local
     volumes:
       - ../app:/app
     links:
-      - clerk_db
+      - db
     env_file:
       - ../env/test.env
 

@@ -2,24 +2,10 @@ const glob = require("glob");
 const path = require("path");
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const entry = glob
-  .sync("./src/pages/*.js")
-  .map((s) => [s.split("/").pop().split(".")[0], s])
-  .reduce((acc, val) => ({ ...acc, [val[0]]: val[1] }), {});
-const config = {
-  entry,
-  output: {
-    path: "/build/bundles",
-    filename: "[name].[chunkhash].js",
-  },
-  plugins: [
-    new webpack.NoEmitOnErrorsPlugin(),
-    new MiniCssExtractPlugin(),
-    new BundleTracker({ filename: "/build/webpack-stats.json" }),
-  ],
+const baseConfig = {
+  plugins: [new webpack.NoEmitOnErrorsPlugin(), new MiniCssExtractPlugin()],
   resolve: {
     extensions: ["*", ".js", ".jsx"],
     modules: [
@@ -42,26 +28,39 @@ const config = {
   },
 };
 
+const clientConfig = {
+  ...baseConfig,
+  target: "web",
+  entry: glob
+    .sync("./src/pages/*.js")
+    .map((s) => [s.split("/").pop().split(".")[0], s])
+    .reduce((acc, val) => ({ ...acc, [val[0]]: val[1] }), {}),
+  output: {
+    path: "/build/bundles",
+    filename: "[name].[chunkhash].js",
+  },
+  plugins: [
+    ...baseConfig.plugins,
+    new BundleTracker({ filename: "/build/webpack-stats.json" }),
+  ],
+};
+const serverConfig = {
+  ...baseConfig,
+  target: "node",
+  entry: {
+    server: path.resolve(__dirname, "src/server.js"),
+  },
+  output: {
+    path: "/build/",
+    filename: "[name].js",
+  },
+};
+
 module.exports = (env, argv) => {
-  const isDeveopment = argv.mode === "development";
-  if (isDeveopment) {
-    // Setup dev server for hot reload
-    config.devtool = "inline-source-map";
-    config.devServer = {
-      port: 3000,
-      host: "0.0.0.0",
-      hot: true,
-      headers: { "Access-Control-Allow-Origin": "*" },
-    };
-    config.output = {
-      publicPath: "http://0.0.0.0:3000/build/",
-    };
-    // Add React refresh plugin.
-    config.plugins = [
-      ...config.plugins,
-      new webpack.HotModuleReplacementPlugin(),
-      new ReactRefreshWebpackPlugin(),
-    ];
+  const isDevelopment = argv.mode === "development";
+  if (isDevelopment) {
+    clientConfig.devtool = "inline-source-map";
+    clientConfig.output.filename = "[name].js";
   }
-  return config;
+  return [clientConfig, serverConfig];
 };

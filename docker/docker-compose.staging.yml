@@ -20,3 +20,12 @@ services:
       - /var/log/clerk/test/worker:/var/log
     env_file:
       - staging.env
+
+  # Server-side rendering of React pages.
+  ssr:
+    image: anikalaw/clerk-webpack:staging
+    command: npm run ssr
+    ports:
+      - 3002:3002
+    environment:
+      EXPRESS_PORT: 3002

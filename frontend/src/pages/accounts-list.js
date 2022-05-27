@@ -13,7 +13,6 @@ import { mount, debounce, useEffectLazy } from "utils";
 import { api } from "api";
 import { FadeTransition } from "comps/transitions";
 
-const CONTEXT = window.REACT_CONTEXT;
 const GROUP_OPTIONS = [
   { key: "", value: "", text: "All groups" },
   { key: "Paralegal", value: "Paralegal", text: "Paralegal" },
@@ -30,7 +29,7 @@ const GROUP_COLORS = {
 
 const debouncer = debounce(300);
 
-const App = () => {
+export const getApp = (CONTEXT) => () => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState(CONTEXT.users);
   const [name, setName] = useState("");
@@ -117,4 +116,7 @@ const App = () => {
   );
 };
 
-mount(App);
+if (!window.IS_SSR) {
+  const App = getApp(window.REACT_CONTEXT);
+  mount(App);
+}

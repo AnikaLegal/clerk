@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-export PGHOST=clerk_db
+export PGHOST=db
 export PGPORT=5432
 export PGDATABASE=postgres
 export PGUSER=postgres

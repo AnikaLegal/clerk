@@ -30,12 +30,11 @@ import {
   ConflictForm,
 } from "forms";
 
-const { details, urls, actionstep_url, permissions } = window.REACT_CONTEXT;
-
-const App = () => {
-  const [issue, setIssue] = useState(window.REACT_CONTEXT.issue);
-  const [notes, setNotes] = useState(window.REACT_CONTEXT.notes);
-  const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy);
+export const getApp = (REACT_CONTEXT) => () => {
+  const { details, urls, actionstep_url, permissions } = REACT_CONTEXT;
+  const [issue, setIssue] = useState(REACT_CONTEXT.issue);
+  const [notes, setNotes] = useState(REACT_CONTEXT.notes);
+  const [tenancy, setTenancy] = useState(REACT_CONTEXT.tenancy);
   const [activeFormId, setActiveFormId] = useState(null);
   const onRemoveLandlord = () => {
     if (confirm("Remove the landlord for this case?")) {
@@ -59,7 +58,7 @@ const App = () => {
   return (
     <Container>
       <CaseHeader issue={issue} actionstep_url={actionstep_url} />
-      <CaseTabMenu />
+      <CaseTabMenu urls={REACT_CONTEXT.urls} />
       <div className="ui two column grid" style={{ marginTop: "1rem" }}>
         <div className="column">
           <Segment>
@@ -236,7 +235,7 @@ const EntityCard = ({ title, url, onRemove, tableData }) => (
   </div>
 );
 
-const CaseTabMenu = () => (
+const CaseTabMenu = ({ urls }) => (
   <div className="ui top attached tabular menu">
     <a href={urls.detail} className="item active">
       <i className="clipboard outline icon"></i>
@@ -395,4 +394,7 @@ const CASE_FORM_OPTIONS = [
   },
 ];
 
-mount(App);
+if (!window.IS_SSR) {
+  const App = getApp(window.REACT_CONTEXT);
+  mount(App);
+}
