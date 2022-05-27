@@ -70,7 +70,7 @@ export const api = {
   client: {
     update: (clientId, client) => {
       const url = `/clerk/client/${clientId}/`;
-      return http.post(url, client);
+      return http.patch(url, client);
     },
   },
   case: {

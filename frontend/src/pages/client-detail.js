@@ -14,7 +14,7 @@ import {
 import { mount } from "utils";
 import { api } from "api";
 
-const FORM_FIELDS = [
+const PERSONAL_FIELDS = [
   {
     label: "First name",
     schema: Yup.string().required("Required"),
@@ -38,6 +38,8 @@ const FORM_FIELDS = [
     type: FIELD_TYPES.DATE,
     name: "date_of_birth",
   },
+];
+const CONTACT_FIELDS = [
   {
     label: "Email",
     type: FIELD_TYPES.TEXT,
@@ -55,6 +57,8 @@ const FORM_FIELDS = [
     type: FIELD_TYPES.MULTI_CHOICE,
     name: "call_times",
   },
+];
+const OTHER_FIELDS = [
   {
     label: "Referrer",
     name: "referrer",
@@ -124,104 +128,89 @@ const FORM_FIELDS = [
     type: FIELD_TYPES.BOOL,
   },
 ];
-
-const FORM_SCHEMA = getFormSchema(FORM_FIELDS);
+const PERSONAL_SCHEMA = getFormSchema(PERSONAL_FIELDS);
+const CONTACT_SCHEMA = getFormSchema(CONTACT_FIELDS);
+const OTHER_SCHEMA = getFormSchema(OTHER_FIELDS);
 
 const App = () => {
-  const [isEditMode, setEditMode] = useState(false);
   const [client, setClient] = useState(window.REACT_CONTEXT.client);
-  const toggleEditMode = () => {
-    2;
-    setEditMode(!isEditMode);
-  };
   return (
     <Container>
       <Header as="h1">{client.full_name} (Client)</Header>
-      {!isEditMode && <Button onClick={toggleEditMode}>Edit</Button>}
-      {!isEditMode && <ClientDisplay client={client} />}
-      {isEditMode && (
-        <Formik
-          initialValues={getModelInitialValues(FORM_FIELDS, client)}
-          validationSchema={FORM_SCHEMA}
-          onSubmit={(values, { setSubmitting, setErrors }) => {
-            api.client.update(client.id, values).then(({ resp, data }) => {
-              if (resp.status === 400) {
-                setErrors(data);
-              } else if (resp.ok) {
-                setClient(data.client);
-                toggleEditMode();
-              }
-              setSubmitting(false);
-            });
-          }}
-        >
-          {(formik) => (
-            <AutoForm
-              fields={FORM_FIELDS}
-              choices={getModelChoices(FORM_FIELDS, client)}
-              formik={formik}
-              onCancel={toggleEditMode}
-              submitText="Update client"
-            />
-          )}
-        </Formik>
-      )}
+      <Header as="h3">Personal details</Header>
+      <ClientDetailsForm
+        fields={PERSONAL_FIELDS}
+        schema={PERSONAL_SCHEMA}
+        client={client}
+        setClient={setClient}
+      />
+      <Header as="h3">Contact details</Header>
+      <ClientDetailsForm
+        fields={CONTACT_FIELDS}
+        schema={CONTACT_SCHEMA}
+        client={client}
+        setClient={setClient}
+      />
+      <Header as="h3">Other Information</Header>
+      <ClientDetailsForm
+        fields={OTHER_FIELDS}
+        schema={OTHER_SCHEMA}
+        client={client}
+        setClient={setClient}
+      />
+      <Header as="h3">Cases</Header>
+      <CaseListTable issues={client.issue_set} />
     </Container>
   );
 };
 
-const ClientDisplay = ({ client }) => (
-  <>
-    <Header as="h3">Personal details</Header>
-    <FieldTable
-      client={client}
-      fields={{
-        "First name": client.first_name,
-        "Last name": client.last_name,
-        Gender: client.gender.display,
-        "Date of birth": client.date_of_birth,
+const ClientDetailsForm = ({ fields, schema, client, setClient }) => {
+  const [isEditMode, setEditMode] = useState(false);
+  const toggleEditMode = () => setEditMode(!isEditMode);
+  if (!isEditMode) {
+    return (
+      <>
+        <FieldTable fields={fields.map((f) => [f.label, client[f.name]])} />
+        <Button onClick={toggleEditMode}>Edit</Button>
+      </>
+    );
+  }
+  return (
+    <Formik
+      initialValues={getModelInitialValues(fields, client)}
+      validationSchema={schema}
+      onSubmit={(values, { setSubmitting, setErrors }) => {
+        api.client.update(client.id, values).then(({ resp, data }) => {
+          if (resp.status === 400) {
+            setErrors(data);
+          } else if (resp.ok) {
+            setClient(data.client);
+            toggleEditMode();
+          }
+          setSubmitting(false);
+        });
       }}
-    />
-    <Header as="h3">Contact details</Header>
-    <FieldTable
-      client={client}
-      fields={{
-        Email: client.email,
-        "Phone number": client.phone_number,
-        "Call times": client.call_times.display,
-      }}
-    />
-    <Header as="h3">Other Information</Header>
-    <FieldTable
-      client={client}
-      fields={{
-        Referrer: client.referrer,
-        "Referrer type": client.referrer_type.display,
-        "Special circumstances": client.special_circumstances.display,
-        "Primary language": client.primary_language,
-        "Is Aboriginal or Torres Strait Islander":
-          client.is_aboriginal_or_torres_strait_islander,
-        "Legal access difficulties": client.legal_access_difficulties.display,
-        "Rental circumstances": client.rental_circumstances.display,
-        "Employment status": client.employment_status.display,
-        "Weekly income": client.weekly_income,
-        "Weekly rent": client.weekly_rent,
-        "Number of dependents": client.number_of_dependents,
-        "Is in a multi income household": client.is_multi_income_household,
-      }}
-    />
-    <Header as="h3">Cases</Header>
-    <CaseListTable issues={client.issue_set} />
-  </>
-);
+    >
+      {(formik) => (
+        <AutoForm
+          fields={fields}
+          choices={getModelChoices(fields, client)}
+          formik={formik}
+          onCancel={toggleEditMode}
+          submitText="Update"
+        />
+      )}
+    </Formik>
+  );
+};
 
-const FieldTable = ({ client, fields }) => (
+const FieldTable = ({ fields }) => (
   <Table size="small" definition>
     <Table.Body>
-      {Object.entries(fields).map(([key, val]) => (
-        <Table.Row key={key}>
-          <Table.Cell width={3}>{key}</Table.Cell>
-          <Table.Cell>{getValueDisplay(val)}</Table.Cell>
+      {fields.map(([label, value]) => (
+        <Table.Row key={label}>
+          <Table.Cell width={3}>{label}</Table.Cell>
+          <Table.Cell>{getValueDisplay(value)}</Table.Cell>
         </Table.Row>
       ))}
     </Table.Body>
@@ -230,6 +219,9 @@ const FieldTable = ({ client, fields }) => (
 
 const getValueDisplay = (val) => {
   const t = typeof val;
+  if (t === "object" && val.display) {
+    return val.display;
+  }
   if (t === "undefined" || t === null || val === "") {
     return "-";
   }
