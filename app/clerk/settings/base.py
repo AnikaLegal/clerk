@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     # Internal apps
     "accounts.apps.AccountsConfig",
     "web.apps.WebConfig",
-    "actionstep.apps.ActionstepConfig",
     "slack.apps.SlackConfig",
     "webhooks.apps.WebhooksConfig",
     "case.apps.CaseConfig",
@@ -268,30 +267,7 @@ SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 SLACK_EMAIL_ALERT_OVERRIDE = "mattdsegal@gmail.com"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
-ACTIONSTEP_CLIENT_ID = os.environ.get("ACTIONSTEP_CLIENT_ID")
-ACTIONSTEP_CLIENT_SECRET = os.environ.get("ACTIONSTEP_CLIENT_SECRET")
-ACTIONSTEP_SCOPES = [
-    "filenotes",
-    "users",
-    "actions",
-    "actioncreate",
-    "participants",
-    "actionparticipants",
-    "participanttypes",
-    "files",
-    "actiondocuments",
-    "actionfolders",
-    "actiontypes",
-    "emails",
-    "emailassociations",
-    "emailattachments",
-]
 # Override me!
-ACTIONSTEP_REDIRECT_URI = None
-ACTIONSTEP_OAUTH_URI = None
-ACTIONSTEP_TOKEN_URI = None
-ACTIONSTEP_SETUP_OWNER = None
-ACTIONSTEP_WEB_URI = None
 ADMIN_PREFIX = None
 
 
@@ -330,7 +306,5 @@ MS_AUTHORITY_URL = (
 MS_GRAPH_GROUP_ID = None
 MS_GRAPH_DRIVE_ID = None
 
-# Scheduled tasks
-SCHEDULES = []
 
 SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN")

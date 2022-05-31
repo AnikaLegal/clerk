@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.messages import constants as messages
 from django_q.tasks import async_task
 
-from actionstep.services.actionstep import send_issue_actionstep
 from core.services.slack import send_issue_slack
 from utils.admin import admin_link, dict_to_json_html
 
@@ -116,15 +115,7 @@ class IssueAdmin(admin.ModelAdmin):
     def client_link(self, client):
         return client.get_full_name()
 
-    actions = ["notify", "integrate"]
-
-    def integrate(self, request, queryset):
-        for issue in queryset:
-            async_task(send_issue_actionstep, str(issue.pk))
-
-        self.message_user(request, "Integrations sent.", level=messages.INFO)
-
-    integrate.short_description = "Integrate with external systems"
+    actions = ["notify"]
 
     def notify(self, request, queryset):
         for issue in queryset:

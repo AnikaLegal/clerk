@@ -168,17 +168,9 @@ def sync_s3(c):
 
 
 @task
-def sync_actionstep(c):
-    """Pull data from Actionstep prod"""
-    run(c, "./manage.py migrate_actionstep_paralegals")
-    run(c, "./manage.py migrate_actionstep_filenotes")
-    run(c, "./manage.py migrate_actionstep_emails")
-
-
-@task
 def obsfucate(c):
     """Obsfucate personally identifiable info from prod"""
-    run(c, "./manage.py obsfucate_actionstep_data")
+    run(c, "./manage.py obsfucate_data")
 
 
 def run(c, cmd: str, service="web"):

@@ -11,7 +11,6 @@ This site is used by new Anika clients who want to submit their legal problem. C
 This Django project has several apps:
 
 - accounts: User accounts
-- actionstep: Actionstep integration
 - admin: Customization of Admin interface
 - caller: Call centre
 - case: Case management system website

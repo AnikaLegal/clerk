@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Sync Actionstep paralegals to issues / users"
+    help = "Hide personal information"
 
     @transaction.atomic
     def handle(self, *args, **kwargs):

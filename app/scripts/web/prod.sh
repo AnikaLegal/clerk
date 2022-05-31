@@ -14,9 +14,6 @@ touch /var/log/django.log
 echo -e "\n>>> Running migrations"
 ./manage.py migrate
 
-echo -e "\n>>> Setting up schedules"
-./manage.py setup_actionstep_tasks
-
 echo -e "\n>>> Starting gunicorn"
 gunicorn clerk.wsgi:application \
     --name clerk \

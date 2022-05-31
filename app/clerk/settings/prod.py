@@ -44,11 +44,6 @@ sentry_sdk.init(
     environment="prod",
 )
 
-ACTIONSTEP_REDIRECT_URI = "https://www.anikalegal.com/actionstep/end/"
-ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
-ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
-ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
-ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
 
 ADMIN_PREFIX = "prod"
 
@@ -77,25 +72,6 @@ FACEBOOK_PIXEL_ID = "580273702543728"
 MS_GRAPH_GROUP_ID = "565f3cd9-c16e-49a8-9bba-d2ac86fea77b"
 MS_GRAPH_DRIVE_ID = "b!83_G5n94RUKVhtqomh8QdLsJLbi6tCpKomnhyRvhq7L3St3-kEDdTq9Ft70M4eXu"
 CASES_FOLDER_ID = "017MQILZDHEEIISZQLR5HZOMU4KKAUM34D"
-
-# Scheduled tasks
-SCHEDULES = [
-    {
-        "func": "actionstep.auth.set_expired_tokens_inactive",
-        "schedule_type": "I",
-        "minutes": 1,
-    },
-    {
-        "func": "actionstep.auth.refresh_tokens",
-        "schedule_type": "I",
-        "minutes": 20,
-    },
-    {
-        "func": "actionstep.services.actionstep.prod_sync",
-        "schedule_type": "I",
-        "minutes": 60,
-    },
-]
 
 SLACK_EMAIL_ALERT_OVERRIDE = None
 CLERK_BASE_URL = "https://www.anikalegal.com"

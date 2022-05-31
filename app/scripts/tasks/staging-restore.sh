@@ -28,17 +28,16 @@ SlackUser.objects.all().delete()\
 "
 ./manage.py shell_plus -c "$SHELL_CMD"
 
-echo -e "\nDeleting all Scheduled tasks and Actionstep access tokens."
+echo -e "\nDeleting all Scheduled tasks."
 SHELL_CMD="\
 Success.objects.all().delete();\
 Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
 OrmQ.objects.all().delete();\
-AccessToken.objects.all().delete()\
 "
 ./manage.py shell_plus -c "$SHELL_CMD"
 
 echo -e "\nObsfucating all personally identifiable information."
- ./manage.py obsfucate_actionstep_data
+ ./manage.py obsfucate_data
 
 echo -e "\nDatabase restore finished."

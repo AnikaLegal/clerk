@@ -30,12 +30,11 @@ SlackMessage.objects.all().update(channel=c);\
 SlackUser.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "${SHELL_CMD}"
 
-echo -e "\nDeleting all Scheduled tasks and Actionstep access tokens."
+echo -e "\nDeleting all Scheduled tasks."
 SHELL_CMD="Success.objects.all().delete();\
 Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
 OrmQ.objects.all().delete();\
-AccessToken.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "${SHELL_CMD}"
 
 echo -e "\nDatabase restore finished."

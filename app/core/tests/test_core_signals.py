@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 
-from actionstep.services.actionstep import send_issue_actionstep
 from core.factories import IssueFactory
 from core.models import Submission
 from core.services.slack import send_issue_slack
@@ -57,7 +56,6 @@ def test_all_tasks_dispatched_when_complete(mock_async):
     # Ensure tasks were dispatched
     mock_async.assert_has_calls(
         [mock.call(send_issue_slack, str(issue.pk))],
-        [mock.call(send_issue_actionstep, str(issue.pk))],
     )
 
 

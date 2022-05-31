@@ -62,11 +62,6 @@ TWILIO_AUDIO_BASE_URL = (
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
-ACTIONSTEP_REDIRECT_URI = "https://test.anikalegal.com/actionstep/end/"
-ACTIONSTEP_WEB_URI = "https://ap-southeast-2.actionstep.com"
-ACTIONSTEP_OAUTH_URI = "https://go.actionstep.com"
-ACTIONSTEP_TOKEN_URI = "https://api.actionstep.com"
-ACTIONSTEP_SETUP_OWNER = "coordinators@anikalegal.com"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
