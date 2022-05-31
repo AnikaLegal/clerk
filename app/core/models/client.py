@@ -57,6 +57,7 @@ class CircumstanceType(models.TextChoices):
 class EmploymentType(models.TextChoices):
     WORKING_PART_TIME = "WORKING_PART_TIME", "Working part time"
     WORKING_FULL_TIME = "WORKING_FULL_TIME", "Working full time"
+    STUDENT = "STUDENT", "Student"
     APPRENTICE = "APPRENTICE", "Apprentice"
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19"

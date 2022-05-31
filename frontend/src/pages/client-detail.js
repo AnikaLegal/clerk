@@ -234,8 +234,8 @@ const FieldTable = ({ fields, client }) => (
 
 const getValueDisplay = (val) => {
   const t = typeof val;
-  if (t === "object" && val.display) {
-    return val.display;
+  if (t === "object" && val.choices) {
+    return val.display || "-";
   }
   if (t === "undefined" || t === null || val === "") {
     return "-";

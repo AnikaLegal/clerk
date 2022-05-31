@@ -247,10 +247,10 @@ class TextChoiceField(serializers.CharField):
         self.text_choice_cls = text_choice_cls
 
     def to_representation(self, value):
-        display = self.text_choice_cls[value.upper()].label if value else ""
+        display = self.text_choice_cls[value].label if value else ""
         return {
             "display": display,
-            "value": value.upper(),
+            "value": value,
             "choices": self.text_choice_cls.choices,
         }
 
@@ -263,10 +263,10 @@ class TextChoiceListField(serializers.ListField):
         self.text_choice_cls = text_choice_cls
 
     def to_representation(self, value):
-        display = " | ".join(self.text_choice_cls[s.upper()].label for s in value if s)
+        display = " | ".join(self.text_choice_cls[s].label for s in value if s)
         return {
             "display": display,
-            "value": [v.upper() for v in value if v],
+            "value": [v for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
 
