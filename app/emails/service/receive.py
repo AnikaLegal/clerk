@@ -6,7 +6,7 @@ from django.utils.datastructures import MultiValueDict
 from django.db import transaction
 from django.utils import timezone
 
-from utils.sentry import WithSentryCapture
+from utils.sentry import sentry_task
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
 from emails.models import Email, EmailAttachment, EmailState
@@ -22,7 +22,8 @@ EMAIL_RECEIVE_RULES = (
 )
 
 
-def _receive_email_task(email_pk: int):
+@sentry_task
+def receive_email_task(email_pk: int):
     """
     Ingests an received emails and attempts to associate them with related issues.
     Run as a scheduled task.
@@ -61,9 +62,6 @@ def _receive_email_task(email_pk: int):
         logger.error(f"Cannot ingest Email[{email_pk}]: Parsing failure")
         email.state = EmailState.INGEST_FAILURE
         email.save()
-
-
-receive_email_task = WithSentryCapture(_receive_email_task)
 
 
 def save_inbound_email(data: MultiValueDict, files: MultiValueDict):

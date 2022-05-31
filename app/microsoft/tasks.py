@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import Group
 
-from utils.sentry import WithSentryCapture
+from utils.sentry import sentry_task
 from core.models import Issue
 from accounts.models import User, CaseGroups
 from emails.service.send import send_email
@@ -67,7 +67,8 @@ def refresh_ms_permissions(user):
             add_user_to_case(issue.paralegal, issue)
 
 
-def _set_up_new_case_task(issue_pk: str):
+@sentry_task
+def set_up_new_case_task(issue_pk: str):
     logger.info("Setting up folder on Sharepoint for Issue<%s>", issue_pk)
     issue = Issue.objects.get(pk=issue_pk)
     set_up_new_case(issue)
@@ -75,10 +76,8 @@ def _set_up_new_case_task(issue_pk: str):
     logger.info("Finished setting up folder on Sharepoint for Issue<%s>", issue_pk)
 
 
-set_up_new_case_task = WithSentryCapture(_set_up_new_case_task)
-
-
-def _set_up_new_user_task(user_pk: int):
+@sentry_task
+def set_up_new_user_task(user_pk: int):
     """
     Give new users MS account and E1 license
     """
@@ -92,9 +91,6 @@ def _set_up_new_user_task(user_pk: int):
     _invite_user_if_not_exists(user)
     User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
     logger.info("Finished setting up MS account for new User<%s>", user_pk)
-
-
-set_up_new_user_task = WithSentryCapture(_set_up_new_user_task)
 
 
 INVITE_BODY_TEMPLATE = """

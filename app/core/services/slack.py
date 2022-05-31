@@ -54,6 +54,7 @@ def send_case_assignment_slack(issue: str):
         logger.error(f"Slack user not found for User<{issue.paralegal.pk}>")
 
 
+@sentry_task
 def send_issue_slack(issue_pk: str):
     """
     Notify alerts channel of new submission.
@@ -66,6 +67,7 @@ def send_issue_slack(issue_pk: str):
     Issue.objects.filter(pk=issue.pk).update(is_alert_sent=True)
 
 
+@sentry_task
 def send_email_alert_slack(email_pk: str):
     """
     Notify alerts channel of new unhandled email.
@@ -139,6 +141,7 @@ PUBLIC_REPORTING_URL = (
 OUTCOME_DEFINITIONS_URL = "https://docs.google.com/document/d/1pLLIE_clzrLk1MiOtw9kIrbYt5phy7ZTGvv3mIouQTs/edit?usp=sharing"
 
 
+@sentry_task
 def send_weekly_report_slack():
     """
     Tell #general about our metrics.

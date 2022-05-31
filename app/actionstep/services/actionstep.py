@@ -16,7 +16,7 @@ from core.models.issue_note import NoteType
 from core.models.issue import CaseTopic, CaseStage
 from emails.models import Email, EmailAttachment, EmailState
 from slack.services import send_slack_message
-from utils.sentry import WithSentryCapture
+from utils.sentry import sentry_task
 from emails.service.receive import clean_email_addr
 
 from .pdf import create_pdf
@@ -41,7 +41,8 @@ ACTION_TYPE_LOOKUP = {
 
 
 # No longer in use. To be removed post Clerk adoption.
-def _send_issue_actionstep(issue_pk: str):
+@sentry_task
+def send_issue_actionstep(issue_pk: str):
     """
     Send a issue to Actionstep.
     """
@@ -148,10 +149,8 @@ def _send_issue_actionstep(issue_pk: str):
     send_slack_message(settings.SLACK_MESSAGE.ACTIONSTEP_CREATE, text)
 
 
-send_issue_actionstep = WithSentryCapture(_send_issue_actionstep)
-
-
-def _upload_action_document(doc_pk: str):
+@sentry_task
+def upload_action_document(doc_pk: str):
     """
     Send a issue to Actionstep.
     """
@@ -170,10 +169,8 @@ def _upload_action_document(doc_pk: str):
     logger.info("Sucessfully uploaded ActionDocument<%s]> to Actionstep", doc_pk)
 
 
-upload_action_document = WithSentryCapture(_upload_action_document)
-
-
-def _sync_paralegals():
+@sentry_task
+def sync_paralegals():
     issues = Issue.objects.filter(
         paralegal__isnull=True, actionstep_id__isnull=False
     ).all()
@@ -222,9 +219,6 @@ def _sync_paralegals():
                 Issue.objects.filter(pk=issue.pk).update(paralegal=user)
 
 
-sync_paralegals = WithSentryCapture(_sync_paralegals)
-
-
 STAGE_MAP = {
     "Setup": CaseStage.UNSTARTED,
     "Engagement": CaseStage.CLIENT_AGREEMENT,
@@ -239,7 +233,8 @@ STAGE_MAP = {
 }
 
 
-def _sync_filenotes():
+@sentry_task
+def sync_filenotes():
     issues = Issue.objects.filter(actionstep_id__isnull=False).all()
     api = ActionstepAPI()
     for issue in issues:
@@ -326,10 +321,8 @@ def _sync_filenotes():
                 )
 
 
-sync_filenotes = WithSentryCapture(_sync_filenotes)
-
-
-def _sync_emails():
+@sentry_task
+def sync_emails():
     issues = Issue.objects.filter(actionstep_id__isnull=False).all()
     api = ActionstepAPI()
     for issue in issues:
@@ -408,8 +401,6 @@ def _sync_emails():
             # )
 
 
-sync_emails = WithSentryCapture(_sync_emails)
-
 IGNORE_EMAIL_ADDRS = ["cases@anikalegal.com", "records@anikalegal.com"]
 
 
@@ -426,10 +417,8 @@ def clean_email_list(emails: str, no_ignore=False):
     return cleaned_emails
 
 
-def _prod_sync():
-    _sync_paralegals()
-    _sync_filenotes()
-    _sync_emails()
-
-
-prod_sync = WithSentryCapture(_prod_sync)
+@sentry_task
+def prod_sync():
+    sync_paralegals()
+    sync_filenotes()
+    sync_emails()
