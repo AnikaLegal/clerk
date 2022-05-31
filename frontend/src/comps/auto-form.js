@@ -8,6 +8,7 @@ import * as Yup from "yup";
 
 export const FIELD_TYPES = {
   TEXT: "TEXT",
+  EMAIL: "EMAIL",
   TEXTAREA: "TEXTAREA",
   DATE: "DATE",
   SINGLE_CHOICE: "SINGLE_CHOICE",
@@ -32,7 +33,7 @@ export const getFormSchema = (formFields) =>
 export const getModelChoices = (formFields, model) =>
   formFields.reduce((acc, field) => {
     const fieldVal = model[field.name];
-    if (fieldVal.choices) {
+    if (fieldVal && fieldVal.choices) {
       return { ...acc, [field.name]: fieldVal.choices };
     } else {
       return acc;
@@ -62,22 +63,24 @@ export const AutoForm = ({
   formik: {
     values,
     errors,
+    touched,
     handleChange,
     handleSubmit,
     isSubmitting,
     setFieldValue,
   },
-  onCancel = () => {},
+  onCancel = null,
   submitText = "Submit",
   cancelText = "Cancel",
 }) => {
   FieldSchema.validateSync(fields);
+  const labels = fields.reduce((acc, f) => ({ ...acc, [f.name]: f.label }), {});
   return (
     <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
       {fields.map((f) => {
         const FieldComponent = FIELD_COMPONENTS[f.type];
         return (
-          <Form.Field key={f.name} error={!!errors[f.name]}>
+          <Form.Field key={f.name} error={touched[f.name] && !!errors[f.name]}>
             <label>{f.label}</label>
             <FieldComponent
               {...f}
@@ -90,12 +93,15 @@ export const AutoForm = ({
           </Form.Field>
         );
       })}
-      {Object.entries(errors).map(([k, v]) => (
-        <div key={k} className="ui error message">
-          <div className="header">{k}</div>
-          <p>{v}</p>
-        </div>
-      ))}
+      {Object.entries(errors).map(
+        ([k, v]) =>
+          touched[k] && (
+            <div key={k} className="ui error message">
+              <div className="header">{labels[k]}</div>
+              <p>{v}</p>
+            </div>
+          )
+      )}
       <Button
         primary
         type="submit"
@@ -104,15 +110,17 @@ export const AutoForm = ({
       >
         {submitText}
       </Button>
-      <Button
-        disabled={isSubmitting}
-        onClick={(e) => {
-          e.preventDefault();
-          onCancel();
-        }}
-      >
-        {cancelText}
-      </Button>
+      {onCancel && (
+        <Button
+          disabled={isSubmitting}
+          onClick={(e) => {
+            e.preventDefault();
+            onCancel();
+          }}
+        >
+          {cancelText}
+        </Button>
+      )}
     </Form>
   );
 };
@@ -123,6 +131,7 @@ const TextField = ({
   value,
   handleChange,
   isSubmitting,
+  type,
 }) => (
   <Input
     placeholder={placeholder}
@@ -130,6 +139,7 @@ const TextField = ({
     name={name}
     onChange={handleChange}
     disabled={isSubmitting}
+    type={type}
   />
 );
 
@@ -161,14 +171,14 @@ const ChoiceField =
         multiple={multiple}
         value={value}
         style={{ margin: "1em 0" }}
-        loading={isSubmitting}
         placeholder={placeholder}
+        disabled={isSubmitting}
         options={choices.map(([value, label]) => ({
           key: value,
           value: value,
           text: label,
         }))}
-        onChange={(e, { value }) => setFieldValue(name, value, false)}
+        onChange={(e, { value }) => setFieldValue(name, value, true)}
       />
     );
 
@@ -219,7 +229,8 @@ const TextAreaField = ({
 );
 
 const FIELD_COMPONENTS = {
-  TEXT: TextField,
+  TEXT: (props) => <TextField {...props} type="text" />,
+  EMAIL: (props) => <TextField {...props} type="email" />,
   TEXTAREA: TextAreaField,
   DATE: DateField,
   BOOL: BoolField,

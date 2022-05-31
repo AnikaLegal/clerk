@@ -4,6 +4,17 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from core.models.timestamped import TimestampedModel
+from core.models.issue import CaseTopic
+
+
+class ClosedContact(TimestampedModel):
+    """
+    A contact from when the intake form is closed.
+    """
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
 
 
 class WebflowContact(TimestampedModel):

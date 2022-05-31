@@ -6,6 +6,7 @@
     </title>
     <!-- Meta tags -->
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'brand/logo-icon-color.png' %}">
     <!-- Styling -->
@@ -19,40 +20,42 @@
     <header>
         <div class="inner">
             <img class="logo" src="{% static 'web/brand/logo-icon-color.svg' %}">
-            <div class="nav-items">
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'case-list' %}" class="item">Cases</a>
-                {% endif %}
-                {% if request.user.is_coordinator_or_better %}
-                    <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
-                    <a href="{% url 'case-review' %}" class="item">Review</a>
-                {% endif %}
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'person-list' %}" class="item">Parties</a>
-                {% endif %}
-                {% if request.user.is_coordinator_or_better %}
-                    <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
-                    <a href="{% url 'account-list' %}" class="item">Accounts</a>
-                    <a href="{% url 'template-list' %}" class="item">Templates</a>
-                {% endif %}
-            </div>           
-            <div class="nav-items">                     
-                {% if request.user.is_authenticated %}
-                <a 
-                    href="{% url 'logout' %}"
-                    class="item"
-                    title="You are logged in as {{ request.user.get_full_name }}"
-                >
-                    Logout
-                </a>
-                {% else %}
-                <a href="{% url 'login' %}" class="item">Login</a>
-                {% endif %}
-            </div>
+            {% if not public %}
+                <div class="nav-items">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'case-list' %}" class="item">Cases</a>
+                    {% endif %}
+                    {% if request.user.is_coordinator_or_better %}
+                        <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
+                        <a href="{% url 'case-review' %}" class="item">Review</a>
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'person-list' %}" class="item">Parties</a>
+                    {% endif %}
+                    {% if request.user.is_coordinator_or_better %}
+                        <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
+                        <a href="{% url 'account-list' %}" class="item">Accounts</a>
+                        <a href="{% url 'template-list' %}" class="item">Templates</a>
+                    {% endif %}
+                </div>           
+                <div class="nav-items">                     
+                    {% if request.user.is_authenticated %}
+                    <a 
+                        href="{% url 'logout' %}"
+                        class="item"
+                        title="You are logged in as {{ request.user.get_full_name }}"
+                    >
+                        Logout
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="item">Login</a>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </header>
     <main>
-        {% if request.user.is_authenticated and not request.user.is_paralegal_or_better %}
+        {% if not public and request.user.is_authenticated and not request.user.is_paralegal_or_better %}
             <div class="ui container" style="margin-bottom:1rem";>
                 <div class="ui teal message">
                     <div class="content">

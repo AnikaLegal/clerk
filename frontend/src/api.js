@@ -62,6 +62,12 @@ const http = {
 };
 
 export const api = {
+  contact: {
+    create: (contact) => {
+      const url = `/closed-contact/`;
+      return http.post(url, contact);
+    },
+  },
   person: {
     list: () => {
       return http.get(URLS.PERSON.LIST);

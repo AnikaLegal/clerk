@@ -10,6 +10,33 @@ from case.views.auth import login_required
 from .models import BlogListPage, DashboardItem
 from .forms import ContactForm, ContentFeebackForm
 
+# TEMPORARY: CLOSED CONTACT
+from case.utils.react import render_react_page
+from webhooks.models import ClosedContact
+from rest_framework import status, serializers
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+
+class ClosedContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClosedContact
+        fields = ("name", "email", "topic")
+
+
+@api_view(["GET", "POST"])
+def closed_contact_view(request):
+    if request.method == "POST":
+        serializer = ClosedContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return render_react_page(request, "Contact Us", "closed-contact", {}, public=True)
+
+
+# END CLOSED CONTACT
+
 
 @require_http_methods(["GET"])
 def robots_view(request):
