@@ -80,6 +80,10 @@ export const api = {
     },
   },
   case: {
+    search: (query) => {
+      const url = `/clerk/cases/`;
+      return http.get(url, query);
+    },
     update: (caseId, issue) => {
       const url = `/clerk/cases/detail/${caseId}/update/`;
       return http.post(url, issue);

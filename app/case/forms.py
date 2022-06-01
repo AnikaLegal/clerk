@@ -182,6 +182,8 @@ class IssueSearchForm(forms.ModelForm):
             "outcome",
             "provided_legal_services",
             "is_open",
+            "lawyer",
+            "paralegal",
         ]
 
     is_open = forms.ChoiceField(

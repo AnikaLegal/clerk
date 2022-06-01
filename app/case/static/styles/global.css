@@ -91,3 +91,9 @@ main {
   margin: 0 auto;
   padding-bottom: 6rem;
 }
+
+/* Semantic UI fix */
+.ui.dropdown > .dropdown.icon.clear:before {
+  content: "\f00d";
+  font-family: Icons;
+}

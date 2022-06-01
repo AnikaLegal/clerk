@@ -16,6 +16,17 @@ import {
 import { mount } from "utils";
 import { api } from "api";
 
+const TABLE_FIELDS = [
+  "fileref",
+  "topic",
+  "paralegal",
+  "lawyer",
+  "created_at",
+  "stage",
+  "provided_legal_services",
+  "outcome",
+];
+
 const PERSONAL_FIELDS = [
   {
     label: "First name",
@@ -166,7 +177,7 @@ const App = () => {
         setClient={setClient}
       />
       <Header as="h3">Cases</Header>
-      <CaseListTable issues={client.issue_set} />
+      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
     </Container>
   );
 };

@@ -3,20 +3,23 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Max, Exists, OuterRef
 from django.utils import timezone
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from case.forms import IssueSearchForm, LawyerFilterForm
-from case.utils import get_page
 from core.models import Issue
 from core.models.issue_note import NoteType, IssueNote
-from core.models.issue import CaseStage
-
+from core.models.issue import CaseStage, CaseOutcome, CaseTopic
+from case.forms import IssueSearchForm, LawyerFilterForm
+from case.utils import get_page
+from case.utils.react import render_react_page, is_react_api_call
 from case.views.auth import coordinator_or_better_required
 from case.utils.router import Route
+
+from case.serializers import IssueDetailSerializer
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
 list_route = Route("list")
-search_route = Route("search").path("search")
 inbox_route = Route("inbox").path("inbox")
 review_search_route = Route("review-search").path("review").path("search")
 review_route = Route("review").path("review")
@@ -25,52 +28,51 @@ checks_route = Route("checks").path("checks")
 
 @list_route
 @login_required
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def case_list_view(request):
     """
     List of all cases for paralegals and coordinators to view.
     """
+    issue_qs = _get_issue_qs_for_user(request.user)
     form = IssueSearchForm(request.GET)
-    issue_qs = Issue.objects.select_related("client", "paralegal")
+    issue_qs = form.search(issue_qs).order_by("-created_at").all()
+    page, next_page, prev_page = get_page(
+        request, issue_qs, per_page=14, return_qs=False
+    )
+    context = {
+        "issues": IssueDetailSerializer(page.object_list, many=True).data,
+        "next_page": next_page,
+        "total_pages": page.paginator.num_pages,
+        "total_count": page.paginator.count,
+        "prev_page": prev_page,
+        "choices": {
+            "stage": CaseStage.CHOICES,
+            "topic": CaseTopic.CHOICES,
+            "outcome": CaseOutcome.CHOICES,
+            "is_open": [
+                ("True", "Open"),
+                ("False", "Closed"),
+            ],
+        },
+    }
+    if is_react_api_call(request):
+        return Response(context)
+    else:
+        return render_react_page(request, f"Cases", "case-list", context)
 
-    if request.user.is_paralegal:
+
+def _get_issue_qs_for_user(user):
+    issue_qs = Issue.objects.select_related("client").prefetch_related(
+        "paralegal__groups", "lawyer__groups"
+    )
+    if user.is_paralegal:
         # Paralegals can only see assigned cases
-        issue_qs = issue_qs.filter(paralegal=request.user)
-    elif not request.user.is_coordinator_or_better:
+        issue_qs = issue_qs.filter(paralegal=user)
+    elif not user.is_coordinator_or_better:
+        # If you're not a paralegal or coordinator you can't see nuthin.
         issue_qs = issue_qs.none()
 
-    issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = get_page(request, issues, per_page=28)
-    context = {
-        "issue_page": page,
-        "form": form,
-        "next_qs": next_qs,
-        "prev_qs": prev_qs,
-    }
-    return render(request, "case/case/list.html", context)
-
-
-@search_route
-@login_required
-@require_http_methods(["GET"])
-def case_search_view(request):
-    form = IssueSearchForm(request.GET)
-    issue_qs = Issue.objects.select_related("client", "paralegal")
-    if request.user.is_paralegal:
-        # Paralegals can only see assigned cases
-        issue_qs = issue_qs.filter(paralegal=request.user)
-    elif not request.user.is_coordinator_or_better:
-        issue_qs = issue_qs.none()
-
-    issues = form.search(issue_qs).order_by("-created_at").all()
-    page, next_qs, prev_qs = get_page(request, issues, per_page=28)
-    context = {
-        "issue_page": page,
-        "form": form,
-        "next_qs": next_qs,
-        "prev_qs": prev_qs,
-    }
-    return render(request, "case/case/_list_results.html", context)
+    return issue_qs
 
 
 @review_route
