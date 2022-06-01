@@ -5,6 +5,7 @@ from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 from core.models import Issue
+from case.middleware import COORDINATOR_GROUPS
 from accounts.models import User, CaseGroups
 from microsoft.service import (
     remove_user_from_case,
@@ -15,7 +16,6 @@ from microsoft.service import (
 
 POST_ADD = "post_add"
 POST_REMOVE = "post_remove"
-COORDINATOR_GROUPS = [CaseGroups.COORDINATOR, CaseGroups.ADMIN]
 
 # https://docs.djangoproject.com/en/3.2/ref/signals/#m2m-changed
 @receiver(m2m_changed, sender=User.groups.through)

@@ -10,7 +10,7 @@ from core.models import Issue
 from core.models.issue_note import NoteType, IssueNote
 from core.models.issue import CaseStage
 
-from case.views.auth import login_required, coordinator_or_better_required
+from case.views.auth import coordinator_or_better_required
 from case.utils.router import Route
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"

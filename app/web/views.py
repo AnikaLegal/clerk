@@ -2,9 +2,8 @@ import random
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from case.views.auth import login_required
 
 
 from .models import BlogListPage, DashboardItem

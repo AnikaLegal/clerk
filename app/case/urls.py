@@ -18,6 +18,5 @@ urlpatterns = [
     path("accounts/", accounts_router.include()),
     path("templates/", templates_router.include()),
     path("cases/", case_router.include()),
-    path("not-allowed/", root.not_allowed_view, name="case-not-allowed"),
     path("", root.root_view, name="case-root"),
 ]
