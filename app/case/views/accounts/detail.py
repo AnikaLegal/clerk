@@ -1,24 +1,19 @@
 import logging
 
-from django.db.models import Count, Max, Q
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
-
 from django.contrib.auth.models import Group
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from accounts.models import User, CaseGroups
-
-
+from case.utils.react import render_react_page
 from accounts.models import User
-from case.forms import (
-    DynamicTableForm,
-    UserDetailsDynamicForm,
-)
 from case.views.auth import coordinator_or_better_required, admin_or_better_required
 from case.utils.router import Router
+from case.serializers import UserDetailSerializer
 from microsoft.service import get_user_permissions
 from microsoft.tasks import refresh_ms_permissions
 
@@ -29,48 +24,37 @@ router.create_route("perms-demote").pk("pk").path("perms").path("demote")
 router.create_route("perms").pk("pk").path("perms")
 router.create_route("detail").pk("pk").slug("form_slug", optional=True)
 
-ACCOUNT_DETAILS_FORMS = {
-    "details": UserDetailsDynamicForm,
-}
-
 
 @router.use_route("detail")
-@require_http_methods(["GET", "POST"])
+@api_view(["GET", "PATCH"])
 @coordinator_or_better_required
 def account_detail_view(request, pk, form_slug: str = ""):
     try:
         user = (
-            User.objects.prefetch_related("issue_set")
-            .distinct()
-            .annotate(
-                latest_issue_created_at=Max("issue__created_at"),
-                total_cases=Count("issue"),
-                open_cases=Count("issue", Q(issue__is_open=True)),
-                open_repairs=Count(
-                    "issue", Q(issue__is_open=True, issue__topic="REPAIRS")
-                ),
-                open_rent_reduction=Count(
-                    "issue", Q(issue__is_open=True, issue__topic="RENT_REDUCTION")
-                ),
-                open_eviction=Count(
-                    "issue", Q(issue__is_open=True, issue__topic="EVICTION")
-                ),
+            User.objects.prefetch_related(
+                "groups",
+                "issue_set__paralegal__groups",
+                "issue_set__lawyer__groups",
+                "lawyer_issues__paralegal__groups",
+                "lawyer_issues__lawyer__groups",
             )
+            .distinct()
             .get(pk=pk)
         )
     except User.DoesNotExist:
         raise Http404()
 
-    extra_kwargs = {"permissions": {"requesting_user": request.user}}
-    forms = DynamicTableForm.build_forms(
-        request, form_slug, user, ACCOUNT_DETAILS_FORMS, extra_kwargs
-    )
-    context = {"user": user, "forms": forms}
-    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
-    if form_resp:
-        return form_resp
-    else:
-        return render(request, "case/accounts/detail.html", context)
+    if request.method == "GET":
+        name = user.get_full_name()
+        context = {"account": UserDetailSerializer(user).data}
+        return render_react_page(request, f"Client {name}", "account-detail", context)
+    elif request.method == "PATCH":
+        serializer = UserDetailSerializer(
+            instance=user, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"account": serializer.data})
 
 
 @router.use_route("perms")

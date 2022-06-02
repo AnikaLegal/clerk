@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "full_name",
             "email",
+            "case_capacity",
             "is_intern",
             "is_superuser",
             "created_at",
@@ -272,6 +273,19 @@ class TextChoiceListField(serializers.ListField):
             "value": [v for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
+
+
+class UserDetailSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = (
+            *UserSerializer.Meta.fields,
+            "issue_set",
+            "lawyer_issues",
+        )
+
+    lawyer_issues = IssueDetailSerializer(read_only=True, many=True)
+    issue_set = IssueDetailSerializer(read_only=True, many=True)
 
 
 class ClientDetailSerializer(ClientSerializer):

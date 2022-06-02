@@ -1,20 +1,50 @@
 import React, { useState } from "react";
-import { Container, Header, Button, Table } from "semantic-ui-react";
-import { Formik } from "formik";
-import { markdownToHtml } from "utils";
-
+import { Container, Header, Button } from "semantic-ui-react";
 import * as Yup from "yup";
 
+import { TableForm } from "comps/table-form";
+import { getFormSchema, FIELD_TYPES } from "comps/auto-form";
 import { CaseListTable } from "comps/case-table";
-import {
-  AutoForm,
-  getModelChoices,
-  getModelInitialValues,
-  getFormSchema,
-  FIELD_TYPES,
-} from "comps/auto-form";
 import { mount } from "utils";
 import { api } from "api";
+
+const App = () => {
+  const [client, setClient] = useState(window.REACT_CONTEXT.client);
+  return (
+    <Container>
+      <Header as="h1">{client.full_name} (Client)</Header>
+      <Header as="h3">Personal details</Header>
+      <TableForm
+        fields={PERSONAL_FIELDS}
+        schema={PERSONAL_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Contact details</Header>
+      <TableForm
+        fields={CONTACT_FIELDS}
+        schema={CONTACT_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Other Information</Header>
+      <TableForm
+        fields={OTHER_FIELDS}
+        schema={OTHER_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Cases</Header>
+      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
+    </Container>
+  );
+};
 
 const TABLE_FIELDS = [
   "fileref",
@@ -136,7 +166,7 @@ const OTHER_FIELDS = [
   {
     label: "Number of dependents",
     name: "number_of_dependents",
-    schema: Yup.number().integer().positive(),
+    schema: Yup.number().integer(),
     type: FIELD_TYPES.TEXT,
   },
   {
@@ -150,6 +180,7 @@ const PERSONAL_SCHEMA = getFormSchema(PERSONAL_FIELDS);
 const CONTACT_SCHEMA = getFormSchema(CONTACT_FIELDS);
 const OTHER_SCHEMA = getFormSchema(OTHER_FIELDS);
 
+<<<<<<< HEAD
 const App = () => {
   const [client, setClient] = useState(window.REACT_CONTEXT.client);
   return (
@@ -261,4 +292,6 @@ const getValueDisplay = (val) => {
   return val;
 };
 
+=======
+>>>>>>> Start account page react
 mount(App);
