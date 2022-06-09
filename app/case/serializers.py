@@ -84,7 +84,10 @@ class TenancySerializer(serializers.ModelSerializer):
     is_on_lease = serializers.CharField(source="get_is_on_lease_display")
 
     def get_started(self, obj):
-        return obj.started.strftime("%d/%m/%Y")
+        if obj.started:
+            return obj.started.strftime("%d/%m/%Y")
+        else:
+            return None
 
     def get_url(self, obj):
         return reverse("tenancy-detail", args=(obj.pk,))

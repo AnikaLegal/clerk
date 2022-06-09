@@ -244,12 +244,13 @@ const FieldTable = ({ fields, client }) => (
 );
 
 const getValueDisplay = (val) => {
+  console.log(val);
   const t = typeof val;
+  if (t === "undefined" || val === null || val === "") {
+    return "-";
+  }
   if (t === "object" && val.choices) {
     return val.display || "-";
-  }
-  if (t === "undefined" || t === null || val === "") {
-    return "-";
   }
   if (val === false) {
     return "No";

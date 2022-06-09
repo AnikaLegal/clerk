@@ -43,7 +43,12 @@ export const getModelChoices = (formFields, model) =>
 export const getModelInitialValues = (formFields, model) =>
   formFields.reduce((acc, field) => {
     const fieldVal = model[field.name];
-    const value = fieldVal.value ? fieldVal.value : fieldVal;
+    let value;
+    if (fieldVal === null) {
+      value = null;
+    } else {
+      value = fieldVal.value ? fieldVal.value : fieldVal;
+    }
     return { ...acc, [field.name]: value };
   }, {});
 
