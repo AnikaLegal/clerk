@@ -282,10 +282,16 @@ class UserDetailSerializer(UserSerializer):
             *UserSerializer.Meta.fields,
             "issue_set",
             "lawyer_issues",
+            "performance_notes",
         )
 
     lawyer_issues = IssueDetailSerializer(read_only=True, many=True)
     issue_set = IssueDetailSerializer(read_only=True, many=True)
+    performance_notes = serializers.SerializerMethodField()
+
+    def get_performance_notes(self, user):
+        qs = user.issue_notes.all()
+        return IssueNoteSerializer(qs, many=True).data
 
 
 class ClientDetailSerializer(ClientSerializer):

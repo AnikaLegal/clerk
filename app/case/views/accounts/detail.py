@@ -22,7 +22,7 @@ router.create_route("perms-resync").pk("pk").path("perms").path("resync")
 router.create_route("perms-promote").pk("pk").path("perms").path("promote")
 router.create_route("perms-demote").pk("pk").path("perms").path("demote")
 router.create_route("perms").pk("pk").path("perms")
-router.create_route("detail").pk("pk").slug("form_slug", optional=True)
+router.create_route("detail").pk("pk")
 
 
 @router.use_route("detail")
@@ -33,10 +33,13 @@ def account_detail_view(request, pk, form_slug: str = ""):
         user = (
             User.objects.prefetch_related(
                 "groups",
+                "issue_notes",
                 "issue_set__paralegal__groups",
                 "issue_set__lawyer__groups",
+                "issue_set__client",
                 "lawyer_issues__paralegal__groups",
                 "lawyer_issues__lawyer__groups",
+                "lawyer_issues__client",
             )
             .distinct()
             .get(pk=pk)

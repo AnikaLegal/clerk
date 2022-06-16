@@ -128,6 +128,10 @@ export const api = {
     },
   },
   accounts: {
+    update: (accountId, account) => {
+      const url = `/clerk/accounts/user/${accountId}/`;
+      return http.patch(url, account);
+    },
     search: (query) => {
       const url = "/clerk/accounts/";
       return http.get(URLS.ACCOUNTS.SEARCH, query);

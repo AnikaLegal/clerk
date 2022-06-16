@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, Header, Button, Tab } from "semantic-ui-react";
 import * as Yup from "yup";
 
+import { TimelineNote } from "comps/timeline-item";
 import { TableForm } from "comps/table-form";
 import { getFormSchema, FIELD_TYPES } from "comps/auto-form";
 import { CaseListTable } from "comps/case-table";
@@ -11,7 +12,7 @@ import { AccountPermissions } from "comps/account-permissions";
 
 const App = () => {
   const [account, setAccount] = useState(window.REACT_CONTEXT.account);
-  const tabPanes = [
+  let tabPanes = [
     {
       menuItem: "Paralegal cases",
       render: () => (
@@ -38,9 +39,20 @@ const App = () => {
     },
     {
       menuItem: "Performance notes",
-      render: () => <Tab.Pane>Tab 3 Content</Tab.Pane>,
+      render: () => (
+        <Tab.Pane>
+          {account.performance_notes.length < 1 && "No notes yet"}
+          {account.performance_notes.map((note) => (
+            <TimelineNote note={note} key={note.id} />
+          ))}
+        </Tab.Pane>
+      ),
     },
   ];
+  // Prioritise lawyer issues if they exist
+  if (account.lawyer_issues.length > 0) {
+    tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]];
+  }
   return (
     <Container>
       <Header as="h1">
@@ -54,7 +66,7 @@ const App = () => {
         model={account}
         setModel={setAccount}
         modelName="account"
-        onUpdate={api.client.update}
+        onUpdate={api.accounts.update}
       />
 
       <Tab style={{ marginTop: "2em" }} panes={tabPanes} />
