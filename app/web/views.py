@@ -9,6 +9,10 @@ from django.contrib import messages
 from .models import BlogListPage, DashboardItem
 from .forms import ContactForm, ContentFeebackForm
 
+from django.utils import timezone
+from core.models import Issue
+from core.models.issue import CaseTopic
+
 # TEMPORARY: CLOSED CONTACT
 from case.utils.react import render_react_page
 from webhooks.models import ClosedContact
@@ -34,21 +38,43 @@ def closed_contact_view(request):
     return render_react_page(request, "Contact Us", "closed-contact", {}, public=True)
 
 
-# END CLOSED CONTACT
-
-
 @require_http_methods(["GET"])
 def robots_view(request):
     """robots.txt for web crawlers"""
     return render(request, "web/robots.txt", content_type="text/plain")
 
 
+# END: CLOSED CONTACT
+
+
 @require_http_methods(["GET"])
 def landing_view(request):
     form = ContactForm()
-    return render(
-        request, "web/landing.html", {"form": form, "testimonials": TESTIMONIALS}
+    issues_serviced = Issue.objects.filter(provided_legal_services=True).count()
+    context = {
+        "form": form,
+        "testimonials": TESTIMONIALS,
+        "issues_serviced": issues_serviced,
+    }
+    return render(request, "web/landing.html", context)
+
+
+@require_http_methods(["GET"])
+def impact_view(request):
+    start_time = timezone.now() - timezone.timedelta(days=365)
+    issues_serviced = Issue.objects.filter(
+        created_at__gte=start_time, provided_legal_services=True
     )
+    repairs_count = issues_serviced.filter(topic=CaseTopic.REPAIRS).count()
+    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION).count()
+    bonds_count = issues_serviced.filter(topic=CaseTopic.BONDS).count()
+    context = {
+        "repairs_advice_count": repairs_count,
+        "evictions_advice_count": evictions_count,
+        "bonds_advice_count": bonds_count,
+    }
+
+    return render(request, "web/about/impact.html", context)
 
 
 @login_required

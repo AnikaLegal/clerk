@@ -28,7 +28,7 @@ urlpatterns = [
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
     path("about/team/", views.team_view, name="team"),
-    path("about/impact/", template("web/about/impact.html"), name="impact"),
+    path("about/impact/", views.impact_view, name="impact"),
     # Services
     path(
         "services/",
