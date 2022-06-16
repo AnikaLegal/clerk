@@ -9,6 +9,7 @@ import { CaseListTable } from "comps/case-table";
 import { mount } from "utils";
 import { api } from "api";
 import { AccountPermissions } from "comps/account-permissions";
+import { ErrorBoundary } from "comps/error-boundary";
 
 const App = () => {
   const [account, setAccount] = useState(window.REACT_CONTEXT.account);
@@ -33,7 +34,9 @@ const App = () => {
       menuItem: "Permissions",
       render: () => (
         <Tab.Pane>
-          <AccountPermissions account={account} />
+          <ErrorBoundary>
+            <AccountPermissions account={account} />
+          </ErrorBoundary>
         </Tab.Pane>
       ),
     },
@@ -53,6 +56,9 @@ const App = () => {
   if (account.lawyer_issues.length > 0) {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]];
   }
+  // DEBUG
+  tabPanes = [tabPanes[2]];
+
   return (
     <Container>
       <Header as="h1">

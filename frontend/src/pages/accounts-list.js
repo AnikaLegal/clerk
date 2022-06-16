@@ -12,7 +12,7 @@ import {
 import { mount, debounce, useEffectLazy } from "utils";
 import { api } from "api";
 import { FadeTransition } from "comps/transitions";
-
+import { GroupLabels } from "comps/group-label";
 const CONTEXT = window.REACT_CONTEXT;
 const GROUP_OPTIONS = [
   { key: "", value: "", text: "All groups" },
@@ -20,13 +20,6 @@ const GROUP_OPTIONS = [
   { key: "Coordinator", value: "Coordinator", text: "Coordinator" },
   { key: "Admin", value: "Admin", text: "Admin" },
 ];
-
-const GROUP_COLORS = {
-  Admin: "green",
-  Lawyer: "orange",
-  Coordinator: "teal",
-  Paralegal: "blue",
-};
 
 const debouncer = debounce(300);
 
@@ -101,12 +94,7 @@ const App = () => {
                 <Table.Cell>{u.email}</Table.Cell>
                 <Table.Cell>{u.created_at}</Table.Cell>
                 <Table.Cell>
-                  {u.groups.map((groupName) => (
-                    <Label color={GROUP_COLORS[groupName]} key={groupName}>
-                      {groupName}
-                    </Label>
-                  ))}
-                  {u.is_superuser && <Label color="black">Superuser 😎</Label>}
+                  <GroupLabels groups={u.groups} isSuperUser={u.is_superuser} />
                 </Table.Cell>
               </Table.Row>
             ))}

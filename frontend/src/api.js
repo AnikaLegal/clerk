@@ -132,6 +132,10 @@ export const api = {
       const url = `/clerk/accounts/user/${accountId}/`;
       return http.patch(url, account);
     },
+    getPermissions: (accountId) => {
+      const url = `/clerk/accounts/user/${accountId}/perms/`;
+      return http.get(url);
+    },
     search: (query) => {
       const url = "/clerk/accounts/";
       return http.get(URLS.ACCOUNTS.SEARCH, query);

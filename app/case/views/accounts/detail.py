@@ -13,7 +13,7 @@ from case.utils.react import render_react_page
 from accounts.models import User
 from case.views.auth import coordinator_or_better_required, admin_or_better_required
 from case.utils.router import Router
-from case.serializers import UserDetailSerializer
+from case.serializers import UserDetailSerializer, IssueListSerializer
 from microsoft.service import get_user_permissions
 from microsoft.tasks import refresh_ms_permissions
 
@@ -23,6 +23,8 @@ router.create_route("perms-promote").pk("pk").path("perms").path("promote")
 router.create_route("perms-demote").pk("pk").path("perms").path("demote")
 router.create_route("perms").pk("pk").path("perms")
 router.create_route("detail").pk("pk")
+
+logger = logging.getLogger(__name__)
 
 
 @router.use_route("detail")
@@ -62,7 +64,7 @@ def account_detail_view(request, pk, form_slug: str = ""):
 
 @router.use_route("perms")
 @coordinator_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET"])
 def account_detail_permissions_view(request, pk):
     try:
         user = User.objects.prefetch_related("groups").get(pk=pk)
@@ -77,24 +79,24 @@ def account_detail_permissions_view(request, pk):
     try:
         perms = get_user_permissions(user)
     except Exception:
-        logging.exception("Failed to load user account permissions from Microsoft")
+        logger.exception("Failed to load user account permissions from Microsoft")
 
-    context = {
-        "user": user,
+    data = {
         "is_ms_account_set_up": is_ms_account_set_up,
         "is_perms_load_success": bool(perms),
-        "is_paralegal": user.groups.filter(name=CaseGroups.PARALEGAL).exists(),
-        "is_coordinator": user.groups.filter(name=CaseGroups.COORDINATOR).exists(),
-        "is_admin": user.is_superuser
-        or user.groups.filter(name=CaseGroups.ADMIN).exists(),
+        # "is_paralegal": user.groups.filter(name=CaseGroups.PARALEGAL).exists(),
+        # "is_coordinator": user.groups.filter(name=CaseGroups.COORDINATOR).exists(),
+        # "is_admin": user.is_superuser
+        # or user.groups.filter(name=CaseGroups.ADMIN).exists(),
     }
     if perms:
-        context["has_coordinator_perms"] = perms["has_coordinator_perms"]
-        context["paralegal_perm_issues"] = perms["paralegal_perm_issues"]
-        context["paralegal_perm_missing_issues"] = perms[
-            "paralegal_perm_missing_issues"
-        ]
-    return render(request, "case/accounts/_detail_perms.html", context)
+        data["has_coordinator_perms"] = perms["has_coordinator_perms"]
+        data["paralegal_perm_issues"] = perms["paralegal_perm_issues"]
+        data["paralegal_perm_missing_issues"] = IssueListSerializer(
+            perms["paralegal_perm_missing_issues"], many=True
+        ).data
+
+    return Response(data)
 
 
 @router.use_route("perms-resync")

@@ -283,11 +283,16 @@ class UserDetailSerializer(UserSerializer):
             "issue_set",
             "lawyer_issues",
             "performance_notes",
+            "ms_account_created_at",
         )
 
     lawyer_issues = IssueDetailSerializer(read_only=True, many=True)
     issue_set = IssueDetailSerializer(read_only=True, many=True)
     performance_notes = serializers.SerializerMethodField()
+    ms_account_created_at = serializers.SerializerMethodField()
+
+    def get_ms_account_created_at(self, obj):
+        return obj.ms_account_created_at.strftime("%d/%m/%Y")
 
     def get_performance_notes(self, user):
         qs = user.issue_notes.all()
