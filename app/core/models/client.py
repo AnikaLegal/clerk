@@ -21,43 +21,63 @@ class ReferrerType:
     SOCIAL_MEDIA = "SOCIAL_MEDIA"
     WORD_OF_MOUTH = "WORD_OF_MOUTH"
     ONLINE_AD = "ONLINE_AD"
-    HOUSING_SERVICE = "HOUSING_SERVICE"
+    # HOUSING_SERVICE = "HOUSING_SERVICE" - Not in use at the moment
     RADIO = "RADIO"
     BILLBOARD = "BILLBOARD"
     POSTER = "POSTER"
 
 
 class GenderType:
-    MALE = "male"
-    FEMALE = "female"
-    GENDERQUEER = "genderqueer"
-    OMITTED = "omitted"
-    OTHER = "other"
+    MALE = "MALE"
+    FEMALE = "FEMALE"
+    GENDERQUEER = "GENDERQUEER"
+    OMITTED = "OMITTED"
+    PREFER_TO_SELF_DESCRIBE = "user_input" # Does another value need to be used here?
+
 
 
 class EmploymentType:
     WORKING_PART_TIME = "WORKING_PART_TIME"
     WORKING_FULL_TIME = "WORKING_FULL_TIME"
+    STUDENT = "STUDENT"
     APPRENTICE = "APPRENTICE"
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK"
     INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID"
     RETIRED = "RETIRED"
+    FULL_TIME_PARENT = "PARENT"
+    CURRENTLY_UNEMPLOYED = "UNEMPLOYED"
+    NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK"
+    NONE_OF_THE_ABOVE = None # Is this the correct value to be used? - Intake code uses null
 
 
-class CircumstanceType:
-    CENTRELINK = "CENTRELINK"
-    MENTAL_ILLNESS_OR_DISABILITY = "MENTAL_ILLNESS_OR_DISABILITY"
-    PUBLIC_HOUSING = "PUBLIC_HOUSING"
+class CircumstanceLegalAccessType:
+    PUBLIC_HOUSING_OR_COMMUNITY_HOUSING = "HOUSING"
+    MENTAL_ILLNESS = "MENTAL_ILLNESS"
+    INTELLECTUAL_DISABILITY = "INTELLECTUAL_DISABILITY"
+    PHYSICAL_DISABILITY = "PHYSICAL_DISABILITY"
+    VISA = "VISA"
     FAMILY_VIOLENCE = "FAMILY_VIOLENCE"
-    HEALTH_CONDITION = "HEALTH_CONDITION"
-    REFUGEE = "REFUGEE"
-
-
-class LegalAccessType:
+    UNEXPECTED_CIRCUMSTANCE = "UNEXPECTED_CIRCUMSTANCE"
     SUBSTANCE_ABUSE = "SUBSTANCE_ABUSE"
-    CARING = "CARING"
-    DISABILITY = "DISABILITY"
-    OTHER = "OTHER"
+    ABORIGINAL_OR_TORRES_STRAIT = "ABORIGINAL_OR_TORRES_STRAIT"
+    RENTING = "RENTING"
+    STRUGGLING = "STRUGGLING"
+
+# not in use at the moment
+#class CircumstanceType:
+    #CENTRELINK = "CENTRELINK"
+    #MENTAL_ILLNESS_OR_DISABILITY = "MENTAL_ILLNESS_OR_DISABILITY"
+    #PUBLIC_HOUSING = "PUBLIC_HOUSING"
+    #FAMILY_VIOLENCE = "FAMILY_VIOLENCE"
+    #HEALTH_CONDITION = "HEALTH_CONDITION"
+    #REFUGEE = "REFUGEE"
+
+# not in use at the moment
+#class LegalAccessType:
+    #SUBSTANCE_ABUSE = "SUBSTANCE_ABUSE"
+    #CARING = "CARING"
+    #DISABILITY = "DISABILITY"
+    #OTHER = "OTHER"
 
 
 class RentalType:
@@ -78,30 +98,50 @@ class Client(TimestampedModel):
         (GenderType.FEMALE, "Female"),
         (GenderType.GENDERQUEER, "Genderqueer"),
         (GenderType.OMITTED, "Omitted"),
-        (GenderType.OTHER, "Other"),
+        (GenderType.PREFER_TO_SELF_DESCRIBE, "user_input"), # Does another value need to be used here?
     )
     EMPLOYMENT_CHOICES = (
         (EmploymentType.WORKING_PART_TIME, "Working part time"),
         (EmploymentType.WORKING_FULL_TIME, "Working full time"),
+        (EmploymentType.STUDENT, "Student"),
         (EmploymentType.APPRENTICE, "Apprentice"),
         (EmploymentType.LOOKING_FOR_WORK, "Looking for work"),
         (EmploymentType.INCOME_REDUCED_COVID, "Income reduced due to COVID-19"),
         (EmploymentType.RETIRED, "Retired"),
+        (EmploymentType.FULL_TIME_PARENT, "Full time parent"),
+        (EmploymentType.CURRENTLY_UNEMPLOYED, "Currently unemployed"),
+        (EmploymentType.NOT_LOOKING_FOR_WORK, "Not looking for work"),
+        (EmploymentType.NONE_OF_THE_ABOVE, None), # Is this the correct value to be used? - Intake code uses null
     )
-    CIRCUMSTANCE_CHOICES = (
-        (CircumstanceType.CENTRELINK, "Centrelink"),
-        (CircumstanceType.MENTAL_ILLNESS_OR_DISABILITY, "Mental illness or disability"),
-        (CircumstanceType.PUBLIC_HOUSING, "Public housing"),
-        (CircumstanceType.FAMILY_VIOLENCE, "Risk of family violence"),
-        (CircumstanceType.HEALTH_CONDITION, "Health condition"),
-        (CircumstanceType.REFUGEE, "Refugee"),
+    CIRCUMSTANCE_LEGAL_ACCESS_CHOICES = (
+        (CircumstanceLegalAccessType.PUBLIC_HOUSING_OR_COMMUNITY_HOUSING, "Public housing or community housing"),
+        (CircumstanceLegalAccessType.MENTAL_ILLNESS, "Mental illness"),
+        (CircumstanceLegalAccessType.INTELLECTUAL_DISABILITY, "Intellectual disability"),
+        (CircumstanceLegalAccessType.PHYSICAL_DISABILITY, "Physical disability"),
+        (CircumstanceLegalAccessType.VISA, "Visa"),
+        (CircumstanceLegalAccessType.FAMILY_VIOLENCE, "Risk of family violence"),
+        (CircumstanceLegalAccessType.UNEXPECTED_CIRCUMSTANCE, "Unexpected circumstance"),
+        (CircumstanceLegalAccessType.SUBSTANCE_ABUSE, "Substance abuse"),
+        (CircumstanceLegalAccessType.ABORIGINAL_OR_TORRES_STRAIT, "Aboriginal or Torres Strait Islander"),
+        (CircumstanceLegalAccessType.RENTING, "Renting in a remote or regional location"),
+        (CircumstanceLegalAccessType.STRUGGLING, "Struggling to pay bills"),
     )
-    LEGAL_ACCESS_CHOICES = (
-        (LegalAccessType.SUBSTANCE_ABUSE, "Substance abuse issues"),
-        (LegalAccessType.CARING, "Caring for another"),
-        (LegalAccessType.DISABILITY, "Disability"),
-        (LegalAccessType.OTHER, "Other"),
-    )
+    # not in use at the moment
+    #CIRCUMSTANCE_CHOICES = (
+        #(CircumstanceType.CENTRELINK, "Centrelink"),
+        #(CircumstanceType.MENTAL_ILLNESS_OR_DISABILITY, "Mental illness or disability"),
+        #(CircumstanceType.PUBLIC_HOUSING, "Public housing"),
+        #(CircumstanceType.FAMILY_VIOLENCE, "Risk of family violence"),
+        #(CircumstanceType.HEALTH_CONDITION, "Health condition"),
+        #(CircumstanceType.REFUGEE, "Refugee"),
+    #)
+    # not in use at the moment
+    #LEGAL_ACCESS_CHOICES = (
+        #(LegalAccessType.SUBSTANCE_ABUSE, "Substance abuse issues"),
+        #(LegalAccessType.CARING, "Caring for another"),
+        #(LegalAccessType.DISABILITY, "Disability"),
+        #(LegalAccessType.OTHER, "Other"),
+    #)
     RENTAL_CHOICES = (
         (RentalType.SOLO, "Renting solo"),
         (RentalType.FLATMATES, "Renting with flatmates"),
@@ -123,7 +163,7 @@ class Client(TimestampedModel):
         (ReferrerType.SOCIAL_MEDIA, "Social media"),
         (ReferrerType.WORD_OF_MOUTH, "Word of mouth"),
         (ReferrerType.ONLINE_AD, "Online ad"),
-        (ReferrerType.HOUSING_SERVICE, "Housing service"),
+        #(ReferrerType.HOUSING_SERVICE, "Housing service"), - Not in use at the moment
         (ReferrerType.RADIO, "Radio"),
         (ReferrerType.BILLBOARD, "Billboard"),
         (ReferrerType.POSTER, "Poster"),
