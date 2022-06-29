@@ -31,8 +31,9 @@ def create_pdf(issue: Issue):
         {"name": "Client phone", "answers": [client.phone_number]},
         {"name": "Client call times", "answers": [client.call_times]},
         {
-            "name": "Client special circumstances",
-            "answers": [client.special_circumstances],
+            "name": "Client legal access and special circumstances",
+            "answers": [client.legal_access_and_special_circumstances],
+            #"answers": [client.special_circumstances], - Not in use
         },
     ]
     tenancy_info = [

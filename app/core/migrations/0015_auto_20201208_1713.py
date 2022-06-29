@@ -23,17 +23,24 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='client',
-            name='special_circumstances',
+            name='legal_access_and_special_circumstances',
+            #name='special_circumstances', - Not in use
             field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=32), blank=True, default=list, size=None),
         ),
+        # Not in use
+        #migrations.AddField(
+            #model_name='client',
+            #name='weekly_income',
+            #field=models.IntegerField(blank=True, null=True),
+        #),
+        #migrations.AddField(
+            #model_name='client',
+            #name='weekly_rent',
+            #field=models.IntegerField(blank=True, null=True),
+        #),
         migrations.AddField(
             model_name='client',
-            name='weekly_income',
-            field=models.IntegerField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='client',
-            name='weekly_rent',
+            name='weekly_household_income',
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(

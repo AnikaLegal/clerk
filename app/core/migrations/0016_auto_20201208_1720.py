@@ -29,16 +29,18 @@ def migrate_client_data(apps, schema_editor):
         if client.call_time:
             client.call_times = [client.call_time]
 
-        weekly_income = None
+        #weekly_income = None - Not in use
         special_circumstances = []
         can_speak_non_english = False
         is_aboriginal_or_torres_strait_islander = False
 
+
         for issue in client.issue_set.all():
-            if "CLIENT_WEEKLY_EARNINGS" in issue.answers:
-                weekly_income = issue.answers["CLIENT_WEEKLY_EARNINGS"]
-                if weekly_income > 5000 or weekly_income < 100:
-                    weekly_income = None
+            # Not in use
+            #if "CLIENT_WEEKLY_EARNINGS" in issue.answers:
+                #weekly_income = issue.answers["CLIENT_WEEKLY_EARNINGS"]
+                #if weekly_income > 5000 or weekly_income < 100:
+                    #weekly_income = None
 
             if "CLIENT_SPECIAL_CIRCUMSTANCES" in issue.answers:
                 circs = issue.answers["CLIENT_SPECIAL_CIRCUMSTANCES"]
@@ -63,8 +65,9 @@ def migrate_client_data(apps, schema_editor):
             is_aboriginal_or_torres_strait_islander
         )
 
-        if weekly_income is not None:
-            client.weekly_income = weekly_income
+        # Not in use
+        #if weekly_income is not None:
+            #client.weekly_income = weekly_income
 
         client.save()
 

@@ -27,7 +27,7 @@ def process_submission(sub_pk: str):
     logger.info("Processing Client for Submission[%s]", sub_pk)
     try:
         referrer = None
-        referrer = answers.get("LEGAL_CENTER_REFERRER") or referrer
+        referrer = answers.get("LEGAL_CENTRE_REFERRER") or referrer
         referrer = answers.get("HOUSING_SERVICE_REFERRER") or referrer
         referrer = answers.get("CHARITY_REFERRER") or referrer
         referrer = answers.get("SOCIAL_REFERRER") or referrer
@@ -39,12 +39,13 @@ def process_submission(sub_pk: str):
         else:
             call_times.append(call_times_answer)
 
-        if answers["IS_MULTI_INCOME_HOUSEHOLD"]:
-            weekly_rent = answers["WEEKLY_RENT_MULTI"]
-            weekly_income = answers["WEEKLY_INCOME_MULTI"]
-        else:
-            weekly_rent = answers["WEEKLY_RENT"]
-            weekly_income = answers["WEEKLY_INCOME"]
+        # Not in use
+        #if answers["IS_MULTI_INCOME_HOUSEHOLD"]:
+           # weekly_rent = answers["WEEKLY_RENT_MULTI"]
+           # weekly_income = answers["WEEKLY_INCOME_MULTI"]
+        #else:
+           # weekly_rent = answers["WEEKLY_RENT"]
+           # weekly_income = answers["WEEKLY_INCOME"]
 
         client, _ = Client.objects.get_or_create(
             email=answers["EMAIL"],
@@ -53,24 +54,31 @@ def process_submission(sub_pk: str):
                 "last_name": answers["LAST_NAME"],
                 "date_of_birth": parse_date_string(answers["DOB"]),
                 "phone_number": answers["PHONE"],
-                "referrer_type": answers["REFERRER_TYPE"] or "",
-                "referrer": referrer or "",
                 "gender": answers["GENDER"],
+                "postcode": answers["POSTCODE"],
+                "call_times": call_times,
+                "dependents": answers["DEPENDENTS"],
                 "primary_language_non_english": answers["CAN_SPEAK_NON_ENGLISH"],
+                "interpreter": answers["INTERPRETER"],
+                "primary_language": answers.get("FIRST_LANGUAGE") or "",
                 "is_aboriginal_or_torres_strait_islander": answers[
                     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
                 ],
-                "weekly_rent": weekly_rent,
-                "weekly_income": weekly_income,
+                "weekly_household_income": answers["WEEKLY_HOUSEHOLD_INCOME"],
+                #"is_multi_income_household": answers["IS_MULTI_INCOME_HOUSEHOLD"], - Not in use
+                # Not in use
+                #"weekly_rent": weekly_rent,
+                #"weekly_income": weekly_income,
                 "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
-                "call_times": call_times,
-                "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
                 "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
-                "legal_access_difficulties": answers.get("LEGAL_ACCESS_DIFFICULTIES")
-                or [],
-                "is_multi_income_household": answers["IS_MULTI_INCOME_HOUSEHOLD"],
-                "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
-                "primary_language": answers.get("FIRST_LANGUAGE") or "",
+                "legal_access_and_special_circumstances": answers.get("LEGAL_ACCESS_AND_SPECIAL_CIRCUMSTANCES") OR [],
+                # Not in use
+                #"special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
+                #"legal_access_difficulties": answers.get("LEGAL_ACCESS_DIFFICULTIES")
+                #or [],
+                "referrer_type": answers["REFERRER_TYPE"] or "",
+                "referrer": referrer or "",
+                "centrelink_support": answers["CENTRELINK_SUPPORT"],
             },
         )
         logger.info("Processed Client[%s] for Submission[%s]", client.pk, sub_pk)
@@ -119,10 +127,11 @@ def process_submission(sub_pk: str):
         "REPAIRS": [
             "REPAIRS_ISSUE_PHOTO",
         ],
-        "RENT_REDUCTION": [
-            "RENT_REDUCTION_ISSUE_PHOTO",
-            "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
-        ],
+        # Need to figure out if still in use or not
+        #"RENT_REDUCTION": [
+            #"RENT_REDUCTION_ISSUE_PHOTO",
+            #"RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
+        #],
         "EVICTION": ["EVICTIONS_DOCUMENTS_UPLOAD"],
         "BONDS": [
             "BONDS_RTBA_APPLICATION_UPLOAD",

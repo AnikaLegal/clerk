@@ -21,7 +21,7 @@ class ReferrerType:
     SOCIAL_MEDIA = "SOCIAL_MEDIA"
     WORD_OF_MOUTH = "WORD_OF_MOUTH"
     ONLINE_AD = "ONLINE_AD"
-    # HOUSING_SERVICE = "HOUSING_SERVICE" - Not in use at the moment
+    HOUSING_SERVICE = "HOUSING_SERVICE"
     RADIO = "RADIO"
     BILLBOARD = "BILLBOARD"
     POSTER = "POSTER"
@@ -50,7 +50,7 @@ class EmploymentType:
     NONE_OF_THE_ABOVE = None # Is this the correct value to be used? - Intake code uses null
 
 
-class CircumstanceLegalAccessType:
+class LegalAccessAndSpecialCircumstanceType:
     PUBLIC_HOUSING_OR_COMMUNITY_HOUSING = "HOUSING"
     MENTAL_ILLNESS = "MENTAL_ILLNESS"
     INTELLECTUAL_DISABILITY = "INTELLECTUAL_DISABILITY"
@@ -113,18 +113,18 @@ class Client(TimestampedModel):
         (EmploymentType.NOT_LOOKING_FOR_WORK, "Not looking for work"),
         (EmploymentType.NONE_OF_THE_ABOVE, None), # Is this the correct value to be used? - Intake code uses null
     )
-    CIRCUMSTANCE_LEGAL_ACCESS_CHOICES = (
-        (CircumstanceLegalAccessType.PUBLIC_HOUSING_OR_COMMUNITY_HOUSING, "Public housing or community housing"),
-        (CircumstanceLegalAccessType.MENTAL_ILLNESS, "Mental illness"),
-        (CircumstanceLegalAccessType.INTELLECTUAL_DISABILITY, "Intellectual disability"),
-        (CircumstanceLegalAccessType.PHYSICAL_DISABILITY, "Physical disability"),
-        (CircumstanceLegalAccessType.VISA, "Visa"),
-        (CircumstanceLegalAccessType.FAMILY_VIOLENCE, "Risk of family violence"),
-        (CircumstanceLegalAccessType.UNEXPECTED_CIRCUMSTANCE, "Unexpected circumstance"),
-        (CircumstanceLegalAccessType.SUBSTANCE_ABUSE, "Substance abuse"),
-        (CircumstanceLegalAccessType.ABORIGINAL_OR_TORRES_STRAIT, "Aboriginal or Torres Strait Islander"),
-        (CircumstanceLegalAccessType.RENTING, "Renting in a remote or regional location"),
-        (CircumstanceLegalAccessType.STRUGGLING, "Struggling to pay bills"),
+    LEGAL_ACCESS_AND_SPECIAL_CIRCUMSTANCE_CHOICES = (
+        (LegalAccessAndSpecialCircumstanceType.PUBLIC_HOUSING_OR_COMMUNITY_HOUSING, "Public housing or community housing"),
+        (LegalAccessAndSpecialCircumstanceType.MENTAL_ILLNESS, "Mental illness"),
+        (LegalAccessAndSpecialCircumstanceType.INTELLECTUAL_DISABILITY, "Intellectual disability"),
+        (LegalAccessAndSpecialCircumstanceType.PHYSICAL_DISABILITY, "Physical disability"),
+        (LegalAccessAndSpecialCircumstanceType.VISA, "Visa"),
+        (LegalAccessAndSpecialCircumstanceType.FAMILY_VIOLENCE, "Risk of family violence"),
+        (LegalAccessAndSpecialCircumstanceType.UNEXPECTED_CIRCUMSTANCE, "Unexpected circumstance"),
+        (LegalAccessAndSpecialCircumstanceType.SUBSTANCE_ABUSE, "Substance abuse"),
+        (LegalAccessAndSpecialCircumstanceType.ABORIGINAL_OR_TORRES_STRAIT, "Aboriginal or Torres Strait Islander"),
+        (LegalAccessAndSpecialCircumstanceType.RENTING, "Renting in a remote or regional location"),
+        (LegalAccessAndSpecialCircumstanceType.STRUGGLING, "Struggling to pay bills"),
     )
     # not in use at the moment
     #CIRCUMSTANCE_CHOICES = (
@@ -163,7 +163,7 @@ class Client(TimestampedModel):
         (ReferrerType.SOCIAL_MEDIA, "Social media"),
         (ReferrerType.WORD_OF_MOUTH, "Word of mouth"),
         (ReferrerType.ONLINE_AD, "Online ad"),
-        #(ReferrerType.HOUSING_SERVICE, "Housing service"), - Not in use at the moment
+        (ReferrerType.HOUSING_SERVICE, "Housing service"),
         (ReferrerType.RADIO, "Radio"),
         (ReferrerType.BILLBOARD, "Billboard"),
         (ReferrerType.POSTER, "Poster"),
@@ -191,29 +191,45 @@ class Client(TimestampedModel):
         blank=True,
     )
 
-    special_circumstances = ArrayField(
-        models.CharField(max_length=32, choices=CIRCUMSTANCE_CHOICES),
+    legal_access_and_special_circumstances = ArrayField(
+        models.CharField(max_length=32, choices=LEGAL_ACCESS_AND_SPECIAL_CIRCUMSTANCE_CHOICES),
         default=list,
         blank=True,
     )
-    weekly_income = models.IntegerField(null=True, blank=True)
-    weekly_rent = models.IntegerField(null=True, blank=True)
+
+    # Not in use
+    #special_circumstances = ArrayField(
+        #models.CharField(max_length=32, choices=CIRCUMSTANCE_CHOICES),
+        #default=list,
+        #blank=True,
+    #)
+
+    # Not in use
+    #weekly_income = models.IntegerField(null=True, blank=True)
+    #weekly_rent = models.IntegerField(null=True, blank=True)
+
     gender = models.CharField(
         max_length=64, null=True, choices=GENDER_CHOICES, blank=True
     )
     primary_language_non_english = models.BooleanField(default=False)
+    interpreter = models.BooleanField(default=False)
     primary_language = models.CharField(max_length=32, blank=True, default="")
     is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
     rental_circumstances = models.CharField(
         max_length=32, choices=RENTAL_CHOICES, blank=True, default=""
     )
-    is_multi_income_household = models.BooleanField(null=True)
-    number_of_dependents = models.IntegerField(null=True)
-    legal_access_difficulties = ArrayField(
-        models.CharField(max_length=32, choices=LEGAL_ACCESS_CHOICES),
-        default=list,
-        blank=True,
-    )
+    #is_multi_income_household = models.BooleanField(null=True) - Not in use
+    weekly_household_income = models.IntegerField(null=True, blank=True)
+    dependents = models.IntegerField(null=True)
+    centrelink_support = models.BooleanField(default=False)
+    #number_of_dependents = models.IntegerField(null=True) - Not in use
+
+    # Not in use
+    #legal_access_difficulties = ArrayField(
+        #models.CharField(max_length=32, choices=LEGAL_ACCESS_CHOICES),
+        #default=list,
+        #blank=True,
+    #)
 
     # Referrer info: how did the client find us?
     referrer_type = models.CharField(

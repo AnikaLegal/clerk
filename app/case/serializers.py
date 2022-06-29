@@ -138,19 +138,25 @@ class ClientSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "phone_number",
             "employment_status",
-            "special_circumstances",
-            "weekly_income",
-            "weekly_rent",
+            #"special_circumstances", - Not in use
+            # Not in use
+            #"weekly_income",
+            #"weekly_rent",
             "gender",
             "primary_language_non_english",
+            "interpreter",
             "primary_language",
             "is_aboriginal_or_torres_strait_islander",
+            "legal_access_and_special_circumstances",
             "rental_circumstances",
-            "is_multi_income_household",
-            "number_of_dependents",
-            "legal_access_difficulties",
+            #"is_multi_income_household", - Not in use
+            "weekly_household_income",
+            "dependents",
+            #"number_of_dependents", - Not in use
+            #"legal_access_difficulties", - Not in use
             "referrer_type",
             "referrer",
+            "centrelink_support",
             "age",
             "full_name",
             "url",

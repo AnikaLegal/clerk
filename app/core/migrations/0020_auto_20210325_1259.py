@@ -31,17 +31,20 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='client',
-            name='is_multi_income_household',
+            name='weekly_household_income',
+            #name='is_multi_income_household', - Not in use
             field=models.BooleanField(null=True),
         ),
         migrations.AddField(
             model_name='client',
-            name='legal_access_difficulties',
+            name='legal_access_and_special_circumstances',
+            #name='legal_access_difficulties', - Not in use
             field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=32), blank=True, default=list, size=None),
         ),
         migrations.AddField(
             model_name='client',
-            name='number_of_dependents',
+            name='dependents',
+            #name='number_of_dependents', - Not in use
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(

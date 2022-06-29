@@ -160,15 +160,23 @@ class ClientMiscDynamicForm(DynamicTableForm):
             "referrer",
             "referrer_type",
             "employment_status",
-            "special_circumstances",
-            "weekly_income",
+            "postcode",
+            "legal_access_and_special_circumstances",
+            #"special_circumstances", - Not in use
+            "weekly_household_income",
+            #"weekly_income", - Not in use
+            "primary_language_non_english",
+            "interpreter",
             "primary_language",
-            "number_of_dependents",
+            "dependents",
+            #"number_of_dependents", - not in use
             "is_aboriginal_or_torres_strait_islander",
-            "legal_access_difficulties",
+            #"legal_access_difficulties", - Not in use
             "rental_circumstances",
-            "weekly_rent",
-            "is_multi_income_household",
+            "legal_access_and_special_circumstances",
+            "centrelink_support",
+            #"weekly_rent", - Not in use
+            #"is_multi_income_household", - Not in use
         ]
 
     not_required_fields = [*Meta.fields]
@@ -178,8 +186,10 @@ class ClientMiscDynamicForm(DynamicTableForm):
     )
     referrer_type = SingleChoiceField(field_name="referrer_type", model=Client)
     employment_status = MultiChoiceField("employment_status", Client)
-    special_circumstances = MultiChoiceField("special_circumstances", Client)
-    legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
+    # Not in use
+    #special_circumstances = MultiChoiceField("special_circumstances", Client)
+    #legal_access_difficulties = MultiChoiceField("legal_access_difficulties", Client)
+    legal_access_and_special_circumstances = MultiChoiceField("legal_access_and_special_circumstances", Client)
 
 
 class UserDetailsDynamicForm(DynamicTableForm):
