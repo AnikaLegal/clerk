@@ -71,7 +71,7 @@ def process_submission(sub_pk: str):
                 #"weekly_income": weekly_income,
                 "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
                 "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
-                "legal_access_and_special_circumstances": answers.get("LEGAL_ACCESS_AND_SPECIAL_CIRCUMSTANCES") OR [],
+                "legal_access_and_special_circumstances": answers.get("LEGAL_ACCESS_AND_SPECIAL_CIRCUMSTANCES") or [],
                 # Not in use
                 #"special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
                 #"legal_access_difficulties": answers.get("LEGAL_ACCESS_DIFFICULTIES")
@@ -127,11 +127,11 @@ def process_submission(sub_pk: str):
         "REPAIRS": [
             "REPAIRS_ISSUE_PHOTO",
         ],
-        # Need to figure out if still in use or not
-        #"RENT_REDUCTION": [
-            #"RENT_REDUCTION_ISSUE_PHOTO",
-            #"RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
-        #],
+        # Not in use but keep
+        "RENT_REDUCTION": [
+            "RENT_REDUCTION_ISSUE_PHOTO",
+            "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
+        ],
         "EVICTION": ["EVICTIONS_DOCUMENTS_UPLOAD"],
         "BONDS": [
             "BONDS_RTBA_APPLICATION_UPLOAD",
