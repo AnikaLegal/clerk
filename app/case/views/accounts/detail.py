@@ -84,10 +84,6 @@ def account_detail_permissions_view(request, pk):
     data = {
         "is_ms_account_set_up": is_ms_account_set_up,
         "is_perms_load_success": bool(perms),
-        # "is_paralegal": user.groups.filter(name=CaseGroups.PARALEGAL).exists(),
-        # "is_coordinator": user.groups.filter(name=CaseGroups.COORDINATOR).exists(),
-        # "is_admin": user.is_superuser
-        # or user.groups.filter(name=CaseGroups.ADMIN).exists(),
     }
     if perms:
         data["has_coordinator_perms"] = perms["has_coordinator_perms"]
@@ -95,6 +91,10 @@ def account_detail_permissions_view(request, pk):
         data["paralegal_perm_missing_issues"] = IssueListSerializer(
             perms["paralegal_perm_missing_issues"], many=True
         ).data
+    else:
+        data["has_coordinator_perms"] = False
+        data["paralegal_perm_issues"] = []
+        data["paralegal_perm_missing_issues"] = []
 
     return Response(data)
 

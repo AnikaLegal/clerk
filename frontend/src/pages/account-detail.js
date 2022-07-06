@@ -57,7 +57,7 @@ const App = () => {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]];
   }
   // DEBUG
-  tabPanes = [tabPanes[2]];
+  tabPanes = [tabPanes[2], tabPanes[1], tabPanes[0], tabPanes[3]];
 
   return (
     <Container>

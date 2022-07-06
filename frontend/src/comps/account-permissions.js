@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Table, Label, Button } from "semantic-ui-react";
+import styled from "styled-components";
 
 import { api } from "api";
+import { GROUPS } from "consts";
 import { GroupLabels } from "comps/group-label";
+
+const { user } = window.REACT_CONTEXT;
 
 export const AccountPermissions = ({ account }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -14,59 +18,89 @@ export const AccountPermissions = ({ account }) => {
     });
   }, []);
   return (
-    <Table size="small" definition>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell width={3}>Permission grops</Table.Cell>
-          <Table.Cell>
-            <GroupLabels
-              groups={account.groups}
-              isSuperUser={account.is_superuser}
-            />
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell width={3}>Microsoft account</Table.Cell>
-          <Table.Cell>
-            {account.ms_account_created_at
-              ? `Created on ${account.ms_account_created_at}`
-              : "No Sharepoint access - account setup in progress"}
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell width={3}>Sharepoint access</Table.Cell>
-          <Table.Cell>
-            {isLoading ? (
-              "Loading..."
-            ) : (
-              <>
-                {perms.paralegal_perm_issues.map((i) => (
-                  <Label color="green" href={i.url}>
-                    {i.fileref}
-                    <Label.Detail>Has access</Label.Detail>
-                  </Label>
-                ))}
-                {perms.paralegal_perm_missing_issues
-                  .filter((i) => i.actionstep_id)
-                  .map((i) => (
-                    <Label color="olive" href={i.url}>
+    <>
+      <Table size="small" definition>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell width={3}>Permission grops</Table.Cell>
+            <Table.Cell>
+              <GroupLabels
+                groups={account.groups}
+                isSuperUser={account.is_superuser}
+              />
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell width={3}>Microsoft account</Table.Cell>
+            <Table.Cell>
+              {account.ms_account_created_at
+                ? `Created on ${account.ms_account_created_at}`
+                : "No Sharepoint access - account setup in progress"}
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell width={3}>Sharepoint access</Table.Cell>
+            <Table.Cell>
+              {isLoading ? (
+                "Loading..."
+              ) : (
+                <>
+                  {perms.paralegal_perm_issues.map((i) => (
+                    <Label color="green" href={i.url} key={i.id}>
                       {i.fileref}
-                      <Label.Detail>Actionstep</Label.Detail>
+                      <Label.Detail>Has access</Label.Detail>
                     </Label>
                   ))}
-                {perms.paralegal_perm_missing_issues
-                  .filter((i) => !i.actionstep_id)
-                  .map((i) => (
-                    <Label color="yellow" href={i.url}>
-                      {i.fileref}
-                      <Label.Detail>No access</Label.Detail>
-                    </Label>
-                  ))}
-              </>
-            )}
-          </Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>
+                  {perms.paralegal_perm_missing_issues
+                    .filter((i) => i.actionstep_id)
+                    .map((i) => (
+                      <Label color="olive" href={i.url} key={i.id}>
+                        {i.fileref}
+                        <Label.Detail>Actionstep</Label.Detail>
+                      </Label>
+                    ))}
+                  {perms.paralegal_perm_missing_issues
+                    .filter((i) => !i.actionstep_id)
+                    .map((i) => (
+                      <Label color="yellow" href={i.url} key={i.id}>
+                        {i.fileref}
+                        <Label.Detail>No access</Label.Detail>
+                      </Label>
+                    ))}
+                </>
+              )}
+            </Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+      {user.is_admin_or_better && (
+        <ButtonList>
+          {isLoading && <Button loading>Loading...</Button>}
+          {!isLoading && (
+            <>
+              {account.groups.includes(GROUPS.COORDINATOR) && (
+                <Button color="red">Demote to paralegal</Button>
+              )}
+              {!account.groups.includes(GROUPS.COORDINATOR) &&
+                account.groups.includes(GROUPS.PARALEGAL) && (
+                  <>
+                    <Button color="green">Promote to coordinator</Button>
+                    <Button color="red">Remove paralegal permissions</Button>
+                  </>
+                )}
+              <Button color="green">Promote to paralegal</Button>
+              <Button>Resync permissions</Button>
+            </>
+          )}
+        </ButtonList>
+      )}
+    </>
   );
 };
+
+const ButtonList = styled.div`
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  margin-bottom: 0.5em;
+`;

@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
     groups = serializers.SerializerMethodField()
 
     def get_groups(self, obj):
-        return [g.name for g in obj.groups.all()]
+        return list(obj.groups.values_list("name", flat=True))
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()
