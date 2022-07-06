@@ -35,23 +35,51 @@ class RentalType(models.TextChoices):
     OTHER = "OTHER", "Other"
 
 
-class LegalAccessType(models.TextChoices):
-    SUBSTANCE_ABUSE = "SUBSTANCE_ABUSE", "Substance abuse issues"
-    CARING = "CARING", "Caring for another"
-    DISABILITY = "DISABILITY", "Disability"
-    OTHER = "OTHER", "Other"
-
-
-class CircumstanceType(models.TextChoices):
-    CENTRELINK = "CENTRELINK", "Centrelink"
-    MENTAL_ILLNESS_OR_DISABILITY = (
-        "MENTAL_ILLNESS_OR_DISABILITY",
-        "Mental illness or disability",
+class EligibilityCircumstanceType(models.TextChoices):
+    HOUSING = (
+        "HOUSING",
+        "Public housing",
     )
-    PUBLIC_HOUSING = "PUBLIC_HOUSING", "Public housing"
-    FAMILY_VIOLENCE = "FAMILY_VIOLENCE", "Risk of family violence"
-    HEALTH_CONDITION = "HEALTH_CONDITION", "Health condition"
-    REFUGEE = "REFUGEE", "Refugee"
+    MENTAL_ILLNESS = (
+        "MENTAL_ILLNESS",
+        "Mental illness",
+    )
+    INTELLECTUAL_DISABILITY = (
+        "INTELLECTUAL_DISABILITY",
+        "Intellectual disability",
+    )
+    PHYSICAL_DISABILITY = (
+        "PHYSICAL_DISABILITY",
+        "Physical disability",
+    )
+    VISA = (
+        "VISA",
+        "Eligible visa type",
+    )
+    FAMILY_VIOLENCE = (
+        "FAMILY_VIOLENCE",
+        "Family violence",
+    )
+    UNEXPECTED_CIRCUMSTANCE = (
+        "UNEXPECTED_CIRCUMSTANCE",
+        "Unexpected circumstance",
+    )
+    SUBSTANCE_ABUSE = (
+        "SUBSTANCE_ABUSE",
+        "Substance abuse",
+    )
+    ABORIGINAL_OR_TORRES_STRAIT = (
+        "ABORIGINAL_OR_TORRES_STRAIT",
+        "Aboriginal or Torres Strait Islander",
+    )
+    RENTING = (
+        "RENTING",
+        "Renting in a remote or regional location",
+    )
+    STRUGGLING = (
+        "STRUGGLING",
+        "Struggling with bills",
+    )
 
 
 class EmploymentType(models.TextChoices):
@@ -62,14 +90,9 @@ class EmploymentType(models.TextChoices):
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19"
     RETIRED = "RETIRED", "Retired"
-
-
-class GenderType(models.TextChoices):
-    MALE = "MALE", "Male"
-    FEMALE = "FEMALE", "Female"
-    GENDERQUEER = "GENDERQUEER", "Genderqueer"
-    OMITTED = "OMITTED", "Omitted"
-    OTHER = "OTHER", "Other"
+    PARENT = "PARENT", "Full time parent"
+    UNEMPLOYED = "UNEMPLOYED", "Currently unemployed"
+    NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
 
 
 class Client(TimestampedModel):
@@ -96,35 +119,35 @@ class Client(TimestampedModel):
     )
 
     # Demographic info for impact analysis.
+    gender = models.CharField(max_length=64, null=True, blank=True)
     employment_status = ArrayField(
         models.CharField(max_length=32, choices=EmploymentType.choices),
         default=list,
         blank=True,
     )
 
-    special_circumstances = ArrayField(
-        models.CharField(max_length=32, choices=CircumstanceType.choices),
-        default=list,
-        blank=True,
-    )
+    # Eligibility
+    centrelink_support = models.BooleanField(default=False)
+    eligibility_notes = models.CharField(max_length=1024, default="", blank=True)
     weekly_income = models.IntegerField(null=True, blank=True)
-    weekly_rent = models.IntegerField(null=True, blank=True)
-    gender = models.CharField(
-        max_length=64, null=True, choices=GenderType.choices, blank=True
-    )
-    primary_language_non_english = models.BooleanField(default=False)
-    primary_language = models.CharField(max_length=32, blank=True, default="")
     is_aboriginal_or_torres_strait_islander = models.BooleanField(default=False)
+    number_of_dependents = models.IntegerField(null=True, blank=True)
     rental_circumstances = models.CharField(
         max_length=32, choices=RentalType.choices, blank=True, default=""
     )
-    is_multi_income_household = models.BooleanField(null=True)
-    number_of_dependents = models.IntegerField(null=True)
-    legal_access_difficulties = ArrayField(
-        models.CharField(max_length=32, choices=LegalAccessType.choices),
+    eligibility_circumstances = ArrayField(
+        models.CharField(
+            max_length=32,
+            choices=EligibilityCircumstanceType.choices,
+        ),
         default=list,
         blank=True,
     )
+
+    # Language
+    primary_language_non_english = models.BooleanField(default=False)
+    primary_language = models.CharField(max_length=32, blank=True, default="")
+    requires_interpreter = models.BooleanField(default=False)
 
     # Referrer info: how did the client find us?
     referrer_type = models.CharField(
@@ -132,6 +155,20 @@ class Client(TimestampedModel):
     )
     # Specific referrer name.
     referrer = models.CharField(max_length=64, blank=True, default="")
+
+    # Deprecated fields: do not use.
+    weekly_rent = models.IntegerField(null=True, blank=True)
+    legal_access_difficulties = ArrayField(
+        models.CharField(max_length=32),
+        default=list,
+        blank=True,
+    )
+    special_circumstances = ArrayField(
+        models.CharField(max_length=32),
+        default=list,
+        blank=True,
+    )
+    # End deprecated fields.
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()

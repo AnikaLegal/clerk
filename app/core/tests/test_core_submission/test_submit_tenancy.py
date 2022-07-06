@@ -80,6 +80,22 @@ CASE_2_TENANCY = {
     "agent": "Sarah Smith",
 }
 
+"""
+Case 3: No agent, no landlord.
+"""
+CASE_3_ANSWERS = {
+    **BASE_ANSWERS,
+    "PROPERTY_MANAGER_IS_AGENT": False,
+}
+
+CASE_3_LANDLORD = None
+CASE_3_AGENT = None
+CASE_3_TENANCY = {
+    **BASE_TENANCY,
+    "landlord": None,
+    "agent": None,
+}
+
 
 PROCESS_TESTS = (
     (
@@ -93,6 +109,12 @@ PROCESS_TESTS = (
         CASE_2_LANDLORD,
         CASE_2_AGENT,
         CASE_2_TENANCY,
+    ),
+    (
+        CASE_3_ANSWERS,
+        CASE_3_LANDLORD,
+        CASE_3_AGENT,
+        CASE_3_TENANCY,
     ),
 )
 

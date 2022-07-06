@@ -11,9 +11,7 @@ from core.models.client import (
     CallTime,
     ReferrerType,
     RentalType,
-    LegalAccessType,
-    GenderType,
-    CircumstanceType,
+    EligibilityCircumstanceType,
     EmploymentType,
 )
 
@@ -190,17 +188,17 @@ class ClientSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "phone_number",
             "employment_status",
-            "special_circumstances",
             "weekly_income",
-            "weekly_rent",
             "gender",
+            "centrelink_support",
+            "eligibility_notes",
+            "requires_interpreter",
             "primary_language_non_english",
             "primary_language",
             "is_aboriginal_or_torres_strait_islander",
             "rental_circumstances",
-            "is_multi_income_household",
             "number_of_dependents",
-            "legal_access_difficulties",
+            "eligibility_circumstances",
             "referrer_type",
             "referrer",
             "age",
@@ -366,11 +364,9 @@ class ClientDetailSerializer(ClientSerializer):
     issue_set = IssueListSerializer(read_only=True, many=True)
     # TODO - hoist these fields up into ClientSerializer, fix whatever breaks
     referrer_type = TextChoiceField(ReferrerType)
-    gender = TextChoiceField(GenderType)
     call_times = TextChoiceListField(CallTime)
     employment_status = TextChoiceListField(EmploymentType)
-    special_circumstances = TextChoiceListField(CircumstanceType)
-    legal_access_difficulties = TextChoiceListField(LegalAccessType)
+    eligibility_circumstances = TextChoiceListField(EligibilityCircumstanceType)
     rental_circumstances = TextChoiceField(RentalType)
 
 

@@ -104,26 +104,11 @@ UPLOAD_ANSWERS = {
 
 
 def process_client(answers):
-    referrer = None
-    referrer = answers.get("LEGAL_CENTER_REFERRER") or referrer
-    referrer = answers.get("HOUSING_SERVICE_REFERRER") or referrer
-    referrer = answers.get("CHARITY_REFERRER") or referrer
-    referrer = answers.get("SOCIAL_REFERRER") or referrer
-
-    call_times = []
-    call_times_answer = answers["AVAILIBILITY"]
-    if type(call_times_answer) is list:
-        call_times = call_times_answer
-    else:
-        call_times.append(call_times_answer)
-
-    if answers["IS_MULTI_INCOME_HOUSEHOLD"]:
-        weekly_rent = answers["WEEKLY_RENT_MULTI"]
-        weekly_income = answers["WEEKLY_INCOME_MULTI"]
-    else:
-        weekly_rent = answers["WEEKLY_RENT"]
-        weekly_income = answers["WEEKLY_INCOME"]
-
+    referrer = ""
+    referrer = get_with_default(answers, "LEGAL_CENTER_REFERRER", referrer)
+    referrer = get_with_default(answers, "HOUSING_SERVICE_REFERRER", referrer)
+    referrer = get_with_default(answers, "CHARITY_REFERRER", referrer)
+    referrer = get_with_default(answers, "SOCIAL_REFERRER", referrer)
     client, _ = Client.objects.get_or_create(
         email=answers["EMAIL"],
         defaults={
@@ -131,23 +116,25 @@ def process_client(answers):
             "last_name": answers["LAST_NAME"],
             "date_of_birth": parse_date_string(answers["DOB"]),
             "phone_number": answers["PHONE"],
-            "referrer_type": answers["REFERRER_TYPE"] or "",
-            "referrer": referrer or "",
+            "referrer_type": get_as_string(answers, "REFERRER_TYPE"),
+            "referrer": referrer,
             "gender": answers["GENDER"],
             "primary_language_non_english": answers["CAN_SPEAK_NON_ENGLISH"],
             "is_aboriginal_or_torres_strait_islander": answers[
                 "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
             ],
-            "weekly_rent": weekly_rent,
-            "weekly_income": weekly_income,
-            "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES") or "",
-            "call_times": call_times,
-            "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES") or [],
+            "weekly_income": answers.get("WEEKLY_HOUSEHOLD_INCOME"),
+            "employment_status": get_as_list(answers, "WORK_OR_STUDY_CIRCUMSTANCES"),
+            "call_times": get_as_list(answers, "AVAILIBILITY"),
+            "eligibility_circumstances": get_as_list(
+                answers, "ELIGIBILITY_CIRCUMSTANCES"
+            ),
             "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
-            "legal_access_difficulties": answers.get("LEGAL_ACCESS_DIFFICULTIES") or [],
-            "is_multi_income_household": answers["IS_MULTI_INCOME_HOUSEHOLD"],
             "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
-            "primary_language": answers.get("FIRST_LANGUAGE") or "",
+            "primary_language": get_as_string(answers, "FIRST_LANGUAGE"),
+            "requires_interpreter": answers.get("INTERPRETER", False),
+            "centrelink_support": answers.get("CENTRELINK_SUPPORT", False),
+            "eligibility_notes": get_as_string(answers, "ELIGIBILITY_NOTES"),
         },
     )
     return client
@@ -156,7 +143,7 @@ def process_client(answers):
 def process_tenancy(answers, client):
     agent = None
     landlord = None
-    if answers["PROPERTY_MANAGER_IS_AGENT"]:
+    if answers.get("AGENT_NAME"):
         agent = Person.objects.create(
             full_name=answers["AGENT_NAME"].title(),
             address=answers["AGENT_ADDRESS"],
@@ -164,7 +151,7 @@ def process_tenancy(answers, client):
             phone_number=answers["AGENT_PHONE"],
         )
 
-    if answers["LANDLORD_NAME"]:
+    if answers.get("LANDLORD_NAME"):
         landlord = Person.objects.create(
             full_name=answers["LANDLORD_NAME"].title(),
             address=answers.get("LANDLORD_ADDRESS") or "",
@@ -193,3 +180,21 @@ def parse_date_string(s: str):
     tz = timezone.get_current_timezone()
     dt = timezone.make_aware(dt, timezone=tz)
     return dt.replace(hour=0, minute=0)
+
+
+def get_as_list(answers, key):
+    val = answers.get(key)
+    if type(val) is list:
+        return val
+    elif not val:
+        return []
+    else:
+        return [val]
+
+
+def get_as_string(answers, key):
+    return answers.get(key) or ""
+
+
+def get_with_default(answers, key, default):
+    return answers.get(key) or default

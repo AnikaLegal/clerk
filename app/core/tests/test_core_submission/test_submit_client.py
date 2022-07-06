@@ -13,6 +13,9 @@ BASE_ANSWERS = {
     "FIRST_NAME": "Matthew",
     "LAST_NAME": "Segal",
     "PHONE": "0431417373",
+    "INTERPRETER": True,
+    "CENTRELINK_SUPPORT": True,
+    "ELIGIBILITY_NOTES": None,
 }
 BASE_CLIENT = {
     "date_of_birth": "1990-08-15",
@@ -20,6 +23,9 @@ BASE_CLIENT = {
     "first_name": "Matthew",
     "last_name": "Segal",
     "phone_number": "0431417373",
+    "requires_interpreter": True,
+    "centrelink_support": True,
+    "eligibility_notes": "",
 }
 
 
@@ -27,43 +33,42 @@ BASE_CLIENT = {
 Case 1:
 - speaks Chinese as 1st language
 - partner helps with rent
-- Not aboriginal etc
 """
 CASE_1_ANSWERS = {
     **BASE_ANSWERS,
+    "INTERPRETER": False,
+    "CENTRELINK_SUPPORT": False,
+    "ELIGIBILITY_NOTES": "I need help pls.",
     "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
     "CAN_SPEAK_NON_ENGLISH": True,
     "FIRST_LANGUAGE": "Chinese",
     "GENDER": "male",
     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
-    "IS_MULTI_INCOME_HOUSEHOLD": True,
-    "LEGAL_ACCESS_DIFFICULTIES": ["SUBSTANCE_ABUSE", "DISABILITY"],
     "LEGAL_CENTER_REFERRER": "Justice Connect",
     "NUMBER_OF_DEPENDENTS": 0,
     "REFERRER_TYPE": "LEGAL_CENTRE",
     "RENTAL_CIRCUMSTANCES": "PARTNER",
-    "SPECIAL_CIRCUMSTANCES": ["CENTRELINK", "PUBLIC_HOUSING"],
-    "WEEKLY_INCOME_MULTI": 1000,
-    "WEEKLY_RENT_MULTI": 668,
-    "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME"],
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
+    "ELIGIBILITY_CIRCUMSTANCES": ["SUBSTANCE_ABUSE", "PHYSICAL_DISABILITY"],
 }
 CASE_1_CLIENT = {
     **BASE_CLIENT,
+    "requires_interpreter": False,
+    "centrelink_support": False,
+    "eligibility_notes": "I need help pls.",
     "call_times": ["WEEK_DAY", "WEEK_EVENING"],
-    "employment_status": ["STUDENT", "WORKING_PART_TIME"],
+    "employment_status": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
     "gender": "male",
     "is_aboriginal_or_torres_strait_islander": False,
-    "is_multi_income_household": True,
-    "legal_access_difficulties": ["SUBSTANCE_ABUSE", "DISABILITY"],
     "number_of_dependents": 0,
     "primary_language_non_english": True,
     "primary_language": "Chinese",
     "referrer_type": "LEGAL_CENTRE",
     "referrer": "Justice Connect",
     "rental_circumstances": "PARTNER",
-    "special_circumstances": ["CENTRELINK", "PUBLIC_HOUSING"],
+    "eligibility_circumstances": ["SUBSTANCE_ABUSE", "PHYSICAL_DISABILITY"],
     "weekly_income": 1000,
-    "weekly_rent": 668,
 }
 
 """
@@ -80,32 +85,26 @@ CASE_2_ANSWERS = {
     "FIRST_NAME": "Matthew",
     "GENDER": "genderqueer",
     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": True,
-    "IS_MULTI_INCOME_HOUSEHOLD": False,
     "NUMBER_OF_DEPENDENTS": 1,
     "REFERRER_TYPE": "WORD_OF_MOUTH",
     "RENTAL_CIRCUMSTANCES": "PARTNER",
-    "WEEKLY_INCOME": 2000,
-    "WEEKLY_RENT": 1100,
+    "WEEKLY_HOUSEHOLD_INCOME": 2000,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["WORKING_FULL_TIME"],
 }
-
 CASE_2_CLIENT = {
     **BASE_CLIENT,
     "call_times": ["WEEK_DAY", "SUNDAY"],
     "employment_status": ["WORKING_FULL_TIME"],
     "gender": "genderqueer",
     "is_aboriginal_or_torres_strait_islander": True,
-    "is_multi_income_household": False,
-    "legal_access_difficulties": [],
+    "eligibility_circumstances": [],
     "number_of_dependents": 1,
     "primary_language_non_english": False,
     "primary_language": "",
     "referrer_type": "WORD_OF_MOUTH",
     "referrer": "",
     "rental_circumstances": "PARTNER",
-    "special_circumstances": [],
     "weekly_income": 2000,
-    "weekly_rent": 1100,
 }
 
 
@@ -122,34 +121,28 @@ CASE_3_ANSWERS = {
     "FIRST_LANGUAGE": "Russian",
     "GENDER": "omitted",
     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
-    "IS_MULTI_INCOME_HOUSEHOLD": False,
     "NUMBER_OF_DEPENDENTS": 0,
     "REFERRER_TYPE": "CHARITY",
     "RENTAL_CIRCUMSTANCES": "SOLO",
-    "SPECIAL_CIRCUMSTANCES": ["REFUGEE"],
+    "WEEKLY_HOUSEHOLD_INCOME": 1337,
     "SUBURB": "Fitzroy",
-    "WEEKLY_INCOME": 1337,
-    "WEEKLY_RENT": 1336,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["LOOKING_FOR_WORK", "STUDENT"],
+    "ELIGIBILITY_CIRCUMSTANCES": ["VISA"],
 }
-
 CASE_3_CLIENT = {
     **BASE_CLIENT,
     "call_times": ["SUNDAY"],
     "employment_status": ["LOOKING_FOR_WORK", "STUDENT"],
     "gender": "omitted",
     "is_aboriginal_or_torres_strait_islander": False,
-    "is_multi_income_household": False,
-    "legal_access_difficulties": [],
     "number_of_dependents": 0,
     "primary_language_non_english": True,
     "primary_language": "Russian",
     "referrer_type": "CHARITY",
     "referrer": "Jewish Care",
     "rental_circumstances": "SOLO",
-    "special_circumstances": ["REFUGEE"],
     "weekly_income": 1337,
-    "weekly_rent": 1336,
+    "eligibility_circumstances": ["VISA"],
 }
 
 
@@ -165,16 +158,13 @@ CASE_4_ANSWERS = {
     "FIRST_LANGUAGE": "Chinese",
     "GENDER": "male",
     "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": False,
-    "IS_MULTI_INCOME_HOUSEHOLD": True,
-    "LEGAL_ACCESS_DIFFICULTIES": ["SUBSTANCE_ABUSE", "DISABILITY"],
     "LEGAL_CENTER_REFERRER": "Justice Connect",
     "NUMBER_OF_DEPENDENTS": 0,
     "REFERRER_TYPE": "LEGAL_CENTRE",
     "RENTAL_CIRCUMSTANCES": "PARTNER",
-    "SPECIAL_CIRCUMSTANCES": ["CENTRELINK", "PUBLIC_HOUSING"],
-    "WEEKLY_INCOME_MULTI": 1000,
-    "WEEKLY_RENT_MULTI": 668,
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME"],
+    "ELIGIBILITY_CIRCUMSTANCES": ["SUBSTANCE_ABUSE"],
 }
 CASE_4_CLIENT = {
     **BASE_CLIENT,
@@ -182,17 +172,14 @@ CASE_4_CLIENT = {
     "employment_status": ["STUDENT", "WORKING_PART_TIME"],
     "gender": "male",
     "is_aboriginal_or_torres_strait_islander": False,
-    "is_multi_income_household": True,
-    "legal_access_difficulties": ["SUBSTANCE_ABUSE", "DISABILITY"],
     "number_of_dependents": 0,
     "primary_language_non_english": True,
     "primary_language": "Chinese",
     "referrer_type": "LEGAL_CENTRE",
     "referrer": "Justice Connect",
     "rental_circumstances": "PARTNER",
-    "special_circumstances": ["CENTRELINK", "PUBLIC_HOUSING"],
     "weekly_income": 1000,
-    "weekly_rent": 668,
+    "eligibility_circumstances": ["SUBSTANCE_ABUSE"],
 }
 
 
