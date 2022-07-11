@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from .models import FileUpload, Submission
-from emails.admin import NoEmailAdmin
+from .models import FileUpload, Submission, NoEmailAdmin
 
 
 class SubmissionSerializer(serializers.ModelSerializer):

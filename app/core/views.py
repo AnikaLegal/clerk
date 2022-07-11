@@ -4,8 +4,7 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateMo
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from core.models import FileUpload, Submission
-from emails.admin import NoEmailAdmin
+from core.models import FileUpload, Submission, NoEmailAdmin
 from core.serializers import FileUploadSerializer, SubmissionSerializer, NoEmailAdminSerializer
 
 

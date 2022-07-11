@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
-from emails.models import EmailTemplate
+from emails.models import EmailTemplate, NoEmail
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -240,6 +240,16 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
 
     def get_url(self, obj):
         return reverse("template-email-detail", args=(obj.pk,))
+
+    def get_created_at(self, obj):
+        return obj.created_at.strftime("%d/%m/%Y")
+
+class NoEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NoEmail
+        fields = ("id", "name", "phone_number", "created_at")
+
+    created_at = serializers.SerializerMethodField()
 
     def get_created_at(self, obj):
         return obj.created_at.strftime("%d/%m/%Y")

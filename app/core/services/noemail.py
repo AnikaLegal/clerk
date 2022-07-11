@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db import transaction
 from django.utils import timezone
 
-from emails.admin import NoEmailAdmin
+from core.models import NoEmailAdmin
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +21,12 @@ def process_noemail(sub_pk: str):
 
     try:
         info, _ = NoEmailAdmin.objects.get_or_create(
-            name = answers.get("name"),
-            phone_number = answers.get("phone_number"),
+            name=answers["name"],
+            phone_number=answers["phone_number"],
         )
-        logger.info("Processed Tenancy[%s] for Submission[%s]", info.pk, sub_pk)
+        logger.info("Processed NoEmail[%s] for Submission[%s]", info.pk, sub_pk)
     except Exception:
-        logger.exception("Could not process Tenancy for Submission[%s]")
+        logger.exception("Could not process NoEmail for Submission[%s]")
         raise
 
     NoEmailAdmin.objects.filter(pk=sub_pk).update(is_processed=True)
