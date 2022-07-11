@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import FileUpload, Submission
-from core.serializers import FileUploadSerializer, SubmissionSerializer
+from emails.admin import NoEmailAdmin
+from core.serializers import FileUploadSerializer, SubmissionSerializer, NoEmailAdminSerializer
 
 
 class UploadViewSet(GenericViewSet, CreateModelMixin):
@@ -47,6 +48,22 @@ class SubmissionViewSet(
             raise SubmittedException()
 
         return super().update(request, *args, **kwargs)
+
+class NoEmailViewSet(GenericViewSet, CreateModelMixin):
+    """
+    An endpoint for questionnaire users to submit their contact details when they have no email.
+    """
+
+    queryset = NoEmailAdmin.objects.all()
+    serializer_class = NoEmailAdminSerializer
+
+    @action(detail=True, methods=["post"])
+    def submit(self, request, *args, **kwargs):
+        submission = self.get_object()
+        submission.is_complete = True
+        submission.save()
+        return Response({}, status=200)
+
 
 
 class SubmittedException(APIException):

@@ -66,6 +66,9 @@ class EmailTemplate(TimestampedModel):
     text = models.TextField(default="", blank=True)
     subject = models.CharField(max_length=1024, default="")
 
+class NoEmail(TimestampedModel):
+    name = models.CharField(max_length=64)
+    phone_number = models.CharField(max_length=32)
 
 # FIXME: Configure so S3 bucket cannot be publicly read from?
 class EmailAttachment(models.Model):

@@ -16,6 +16,7 @@ from webhooks.views import jotform_form_view, webflow_form_view
 router = routers.SimpleRouter()
 router.register("upload", core_views.UploadViewSet, basename="upload")
 router.register("submission", core_views.SubmissionViewSet, basename="submission")
+router.register("noemail", core_views.NoEmailViewSet, basename="noemail")
 
 urlpatterns = [
     path("oauth/", include("social_django.urls", namespace="social")),
