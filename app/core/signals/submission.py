@@ -14,5 +14,5 @@ logger = logging.getLogger(__name__)
 def save_submission(sender, instance, **kwargs):
     sub = instance
     if sub.is_complete and not sub.is_processed:
-        logger.info("Dispatching processing task for Submission<%s]>", sub.pk)
+        logger.info("Dispatching processing task for NoEmail<%s]>", sub.pk)
         async_task(process_submission, str(sub.pk))
