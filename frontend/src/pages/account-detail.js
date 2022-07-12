@@ -18,7 +18,10 @@ const App = () => {
       menuItem: "Paralegal cases",
       render: () => (
         <Tab.Pane>
-          <CaseListTable issues={account.issue_set} fields={TABLE_FIELDS} />
+          <CaseListTable
+            issues={account.issue_set}
+            fields={PARALEGAL_TABLE_FIELDS}
+          />
         </Tab.Pane>
       ),
     },
@@ -26,17 +29,10 @@ const App = () => {
       menuItem: "Lawyer cases",
       render: () => (
         <Tab.Pane>
-          <CaseListTable issues={account.lawyer_issues} fields={TABLE_FIELDS} />
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: "Permissions",
-      render: () => (
-        <Tab.Pane>
-          <ErrorBoundary>
-            <AccountPermissions account={account} />
-          </ErrorBoundary>
+          <CaseListTable
+            issues={account.lawyer_issues}
+            fields={LAWYER_TABLE_FIELDS}
+          />
         </Tab.Pane>
       ),
     },
@@ -51,14 +47,25 @@ const App = () => {
         </Tab.Pane>
       ),
     },
+    {
+      menuItem: "Permissions",
+      render: () => (
+        <Tab.Pane>
+          <ErrorBoundary>
+            <AccountPermissions account={account} setAccount={setAccount} />
+          </ErrorBoundary>
+        </Tab.Pane>
+      ),
+    },
   ];
   // Prioritise lawyer issues if they exist
   if (account.lawyer_issues.length > 0) {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]];
   }
-  // DEBUG
-  tabPanes = [tabPanes[2], tabPanes[1], tabPanes[0], tabPanes[3]];
-
+  if (!account.is_coordinator_or_better) {
+    // Don't show lawyer cases.
+    tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]];
+  }
   return (
     <Container>
       <Header as="h1">
@@ -80,12 +87,21 @@ const App = () => {
   );
 };
 
-const TABLE_FIELDS = [
+const PARALEGAL_TABLE_FIELDS = [
+  "fileref",
+  "topic",
+  "client",
+  "lawyer",
+  "created_at",
+  "stage",
+  "provided_legal_services",
+  "outcome",
+];
+const LAWYER_TABLE_FIELDS = [
   "fileref",
   "topic",
   "client",
   "paralegal",
-  "lawyer",
   "created_at",
   "stage",
   "provided_legal_services",

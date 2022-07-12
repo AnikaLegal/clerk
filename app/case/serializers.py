@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
+from case.middleware import annotate_group_access
 from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
 from emails.models import EmailTemplate, Email, EmailAttachment
@@ -32,6 +33,13 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "groups",
             "url",
+            "is_admin_or_better",
+            "is_coordinator_or_better",
+            "is_paralegal_or_better",
+            "is_admin",
+            "is_coordinator",
+            "is_paralegal",
+            "is_ms_account_set_up",
         )
         read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
 
@@ -39,6 +47,25 @@ class UserSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     groups = serializers.SerializerMethodField()
+    is_admin_or_better = serializers.BooleanField(read_only=True)
+    is_coordinator_or_better = serializers.BooleanField(read_only=True)
+    is_paralegal_or_better = serializers.BooleanField(read_only=True)
+    is_admin = serializers.BooleanField(read_only=True)
+    is_coordinator = serializers.BooleanField(read_only=True)
+    is_paralegal = serializers.BooleanField(read_only=True)
+    is_ms_account_set_up = serializers.SerializerMethodField()
+
+    def __init__(self, instance=None, **kwargs):
+        if instance:
+            annotate_group_access(instance)
+
+        super().__init__(instance=instance, **kwargs)
+
+    def get_is_ms_account_set_up(self, obj):
+        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+        return obj.ms_account_created_at and (
+            obj.ms_account_created_at < fifteen_minutes_ago
+        )
 
     def get_groups(self, obj):
         return list(obj.groups.values_list("name", flat=True))

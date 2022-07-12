@@ -8,8 +8,10 @@ import { GroupLabels } from "comps/group-label";
 
 const { user } = window.REACT_CONTEXT;
 
-export const AccountPermissions = ({ account }) => {
+export const AccountPermissions = ({ account, setAccount }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+
   const [perms, setPerms] = useState(null);
   useEffect(() => {
     api.accounts.getPermissions(account.id).then(({ resp, data }) => {
@@ -22,7 +24,7 @@ export const AccountPermissions = ({ account }) => {
       <Table size="small" definition>
         <Table.Body>
           <Table.Row>
-            <Table.Cell width={3}>Permission grops</Table.Cell>
+            <Table.Cell width={3}>Permission groups</Table.Cell>
             <Table.Cell>
               <GroupLabels
                 groups={account.groups}
@@ -33,9 +35,9 @@ export const AccountPermissions = ({ account }) => {
           <Table.Row>
             <Table.Cell width={3}>Microsoft account</Table.Cell>
             <Table.Cell>
-              {account.ms_account_created_at
+              {account.is_ms_account_set_up
                 ? `Created on ${account.ms_account_created_at}`
-                : "No Sharepoint access - account setup in progress"}
+                : "No Sharepoint access yet - account setup in progress"}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
@@ -43,6 +45,8 @@ export const AccountPermissions = ({ account }) => {
             <Table.Cell>
               {isLoading ? (
                 "Loading..."
+              ) : perms.has_coordinator_perms ? (
+                "Full access"
               ) : (
                 <>
                   {perms.paralegal_perm_issues.map((i) => (
@@ -78,24 +82,149 @@ export const AccountPermissions = ({ account }) => {
           {isLoading && <Button loading>Loading...</Button>}
           {!isLoading && (
             <>
-              {account.groups.includes(GROUPS.COORDINATOR) && (
-                <Button color="red">Demote to paralegal</Button>
-              )}
-              {!account.groups.includes(GROUPS.COORDINATOR) &&
-                account.groups.includes(GROUPS.PARALEGAL) && (
-                  <>
-                    <Button color="green">Promote to coordinator</Button>
-                    <Button color="red">Remove paralegal permissions</Button>
-                  </>
-                )}
-              <Button color="green">Promote to paralegal</Button>
-              <Button>Resync permissions</Button>
+              <PromoteButton
+                account={account}
+                setAccount={setAccount}
+                setPerms={setPerms}
+                isLoading={isButtonLoading}
+                setIsLoading={setIsButtonLoading}
+              />
+              <DemoteButton
+                account={account}
+                setAccount={setAccount}
+                setPerms={setPerms}
+                isLoading={isButtonLoading}
+                setIsLoading={setIsButtonLoading}
+              />
+              <ResyncButton
+                account={account}
+                setAccount={setAccount}
+                setPerms={setPerms}
+                isLoading={isButtonLoading}
+                setIsLoading={setIsButtonLoading}
+              />
             </>
           )}
         </ButtonList>
       )}
     </>
   );
+};
+
+const PromoteButton = ({
+  account,
+  setAccount,
+  setPerms,
+  isLoading,
+  setIsLoading,
+}) => {
+  const onClick = () => {
+    setIsLoading(true);
+    api.accounts.promote(account.id).then(({ resp, data }) => {
+      if (resp.ok) {
+        setAccount(data.account);
+        setPerms(data.perms);
+      }
+      setIsLoading(false);
+    });
+  };
+  if (account.is_paralegal) {
+    return (
+      <Button
+        onClick={onClick}
+        loading={isLoading}
+        disabled={isLoading}
+        color="green"
+      >
+        Promote to coordinator
+      </Button>
+    );
+  } else if (!account.is_paralegal_or_better) {
+    return (
+      <Button
+        onClick={onClick}
+        loading={isLoading}
+        disabled={isLoading}
+        color="green"
+      >
+        Promote to paralegal
+      </Button>
+    );
+  } else {
+    return null;
+  }
+};
+
+const DemoteButton = ({
+  account,
+  setAccount,
+  setPerms,
+  isLoading,
+  setIsLoading,
+}) => {
+  const onClick = () => {
+    setIsLoading(true);
+    api.accounts.demote(account.id).then(({ resp, data }) => {
+      if (resp.ok) {
+        setAccount(data.account);
+        setPerms(data.perms);
+      }
+      setIsLoading(false);
+    });
+  };
+  if (account.is_coordinator) {
+    return (
+      <Button
+        onClick={onClick}
+        loading={isLoading}
+        disabled={isLoading}
+        color="red"
+      >
+        Demote to paralegal
+      </Button>
+    );
+  } else if (account.is_paralegal) {
+    return (
+      <Button
+        onClick={onClick}
+        loading={isLoading}
+        disabled={isLoading}
+        color="red"
+      >
+        Remove paralegal permissions
+      </Button>
+    );
+  } else {
+    return null;
+  }
+};
+
+const ResyncButton = ({
+  account,
+  setAccount,
+  setPerms,
+  isLoading,
+  setIsLoading,
+}) => {
+  const onClick = () => {
+    setIsLoading(true);
+    api.accounts.resync(account.id).then(({ resp, data }) => {
+      if (resp.ok) {
+        setAccount(data.account);
+        setPerms(data.perms);
+      }
+      setIsLoading(false);
+    });
+  };
+  if (account.is_ms_account_set_up) {
+    return (
+      <Button loading={isLoading} disabled={isLoading} onClick={onClick}>
+        Resync permissions
+      </Button>
+    );
+  } else {
+    return null;
+  }
 };
 
 const ButtonList = styled.div`

@@ -1,9 +1,6 @@
 import logging
 
-from django.views.decorators.http import require_http_methods
 from django.http import Http404
-from django.shortcuts import render
-from django.utils import timezone
 from django.contrib.auth.models import Group
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -30,7 +27,7 @@ logger = logging.getLogger(__name__)
 @router.use_route("detail")
 @api_view(["GET", "PATCH"])
 @coordinator_or_better_required
-def account_detail_view(request, pk, form_slug: str = ""):
+def account_detail_view(request, pk):
     try:
         user = (
             User.objects.prefetch_related(
@@ -71,37 +68,13 @@ def account_detail_permissions_view(request, pk):
     except User.DoesNotExist:
         raise Http404()
 
-    fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-    is_ms_account_set_up = user.ms_account_created_at and (
-        user.ms_account_created_at < fifteen_minutes_ago
-    )
-    perms = None
-    try:
-        perms = get_user_permissions(user)
-    except Exception:
-        logger.exception("Failed to load user account permissions from Microsoft")
-
-    data = {
-        "is_ms_account_set_up": is_ms_account_set_up,
-        "is_perms_load_success": bool(perms),
-    }
-    if perms:
-        data["has_coordinator_perms"] = perms["has_coordinator_perms"]
-        data["paralegal_perm_issues"] = perms["paralegal_perm_issues"]
-        data["paralegal_perm_missing_issues"] = IssueListSerializer(
-            perms["paralegal_perm_missing_issues"], many=True
-        ).data
-    else:
-        data["has_coordinator_perms"] = False
-        data["paralegal_perm_issues"] = []
-        data["paralegal_perm_missing_issues"] = []
-
-    return Response(data)
+    perms_data = _load_ms_permissions(user)
+    return Response(perms_data)
 
 
 @router.use_route("perms-resync")
 @coordinator_or_better_required
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def account_detail_perms_resync_view(request, pk):
     try:
         user = User.objects.prefetch_related("groups").get(pk=pk)
@@ -109,12 +82,13 @@ def account_detail_perms_resync_view(request, pk):
         raise Http404()
 
     refresh_ms_permissions(user)
-    return account_detail_permissions_view(request, pk)
+    perms_data = _load_ms_permissions(user)
+    return Response({"account": UserDetailSerializer(user).data, "perms": perms_data})
 
 
 @router.use_route("perms-promote")
 @admin_or_better_required
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def account_detail_perms_promote_view(request, pk):
     try:
         user = User.objects.prefetch_related("groups").get(pk=pk)
@@ -130,12 +104,13 @@ def account_detail_perms_promote_view(request, pk):
         user.groups.add(group)
         refresh_ms_permissions(user)
 
-    return account_detail_permissions_view(request, pk)
+    perms_data = _load_ms_permissions(user)
+    return Response({"account": UserDetailSerializer(user).data, "perms": perms_data})
 
 
 @router.use_route("perms-demote")
 @admin_or_better_required
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def account_detail_perms_demote_view(request, pk):
     try:
         user = User.objects.prefetch_related("groups").get(pk=pk)
@@ -154,4 +129,29 @@ def account_detail_perms_demote_view(request, pk):
         group = Group.objects.get(name=group_name)
         user.groups.remove(group)
 
-    return account_detail_permissions_view(request, pk)
+    perms_data = _load_ms_permissions(user)
+    return Response({"account": UserDetailSerializer(user).data, "perms": perms_data})
+
+
+def _load_ms_permissions(user):
+    perms = None
+    try:
+        perms = get_user_permissions(user)
+    except Exception:
+        logger.exception("Failed to load user account permissions from Microsoft")
+
+    data = {
+        "is_perms_load_success": bool(perms),
+    }
+    if perms:
+        data["has_coordinator_perms"] = perms["has_coordinator_perms"]
+        data["paralegal_perm_issues"] = perms["paralegal_perm_issues"]
+        data["paralegal_perm_missing_issues"] = IssueListSerializer(
+            perms["paralegal_perm_missing_issues"], many=True
+        ).data
+    else:
+        data["has_coordinator_perms"] = False
+        data["paralegal_perm_issues"] = []
+        data["paralegal_perm_missing_issues"] = []
+
+    return data
