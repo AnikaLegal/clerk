@@ -1,20 +1,50 @@
 import React, { useState } from "react";
-import { Container, Header, Button, Table } from "semantic-ui-react";
-import { Formik } from "formik";
-import { markdownToHtml } from "utils";
-
+import { Container, Header, Button } from "semantic-ui-react";
 import * as Yup from "yup";
 
+import { TableForm } from "comps/table-form";
+import { getFormSchema, FIELD_TYPES } from "comps/auto-form";
 import { CaseListTable } from "comps/case-table";
-import {
-  AutoForm,
-  getModelChoices,
-  getModelInitialValues,
-  getFormSchema,
-  FIELD_TYPES,
-} from "comps/auto-form";
 import { mount } from "utils";
 import { api } from "api";
+
+const App = () => {
+  const [client, setClient] = useState(window.REACT_CONTEXT.client);
+  return (
+    <Container>
+      <Header as="h1">{client.full_name} (Client)</Header>
+      <Header as="h3">Personal details</Header>
+      <TableForm
+        fields={PERSONAL_FIELDS}
+        schema={PERSONAL_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Contact details</Header>
+      <TableForm
+        fields={CONTACT_FIELDS}
+        schema={CONTACT_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Other Information</Header>
+      <TableForm
+        fields={OTHER_FIELDS}
+        schema={OTHER_SCHEMA}
+        model={client}
+        setModel={setClient}
+        modelName="client"
+        onUpdate={api.client.update}
+      />
+      <Header as="h3">Cases</Header>
+      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
+    </Container>
+  );
+};
 
 const TABLE_FIELDS = [
   "fileref",
@@ -136,7 +166,7 @@ const OTHER_FIELDS = [
   {
     label: "Number of dependents",
     name: "number_of_dependents",
-    schema: Yup.number().integer().positive(),
+    schema: Yup.number().integer(),
     type: FIELD_TYPES.TEXT,
   },
   {
@@ -149,116 +179,5 @@ const OTHER_FIELDS = [
 const PERSONAL_SCHEMA = getFormSchema(PERSONAL_FIELDS);
 const CONTACT_SCHEMA = getFormSchema(CONTACT_FIELDS);
 const OTHER_SCHEMA = getFormSchema(OTHER_FIELDS);
-
-const App = () => {
-  const [client, setClient] = useState(window.REACT_CONTEXT.client);
-  return (
-    <Container>
-      <Header as="h1">{client.full_name} (Client)</Header>
-      <Header as="h3">Personal details</Header>
-      <ClientDetailsForm
-        fields={PERSONAL_FIELDS}
-        schema={PERSONAL_SCHEMA}
-        client={client}
-        setClient={setClient}
-      />
-      <Header as="h3">Contact details</Header>
-      <ClientDetailsForm
-        fields={CONTACT_FIELDS}
-        schema={CONTACT_SCHEMA}
-        client={client}
-        setClient={setClient}
-      />
-      <Header as="h3">Other Information</Header>
-      <ClientDetailsForm
-        fields={OTHER_FIELDS}
-        schema={OTHER_SCHEMA}
-        client={client}
-        setClient={setClient}
-      />
-      <Header as="h3">Cases</Header>
-      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
-    </Container>
-  );
-};
-
-const ClientDetailsForm = ({ fields, schema, client, setClient }) => {
-  const [isEditMode, setEditMode] = useState(false);
-  const toggleEditMode = () => setEditMode(!isEditMode);
-  if (!isEditMode) {
-    return (
-      <>
-        <FieldTable fields={fields} client={client} />
-        <Button onClick={toggleEditMode}>Edit</Button>
-      </>
-    );
-  }
-  return (
-    <Formik
-      initialValues={getModelInitialValues(fields, client)}
-      validationSchema={schema}
-      onSubmit={(values, { setSubmitting, setErrors }) => {
-        api.client.update(client.id, values).then(({ resp, data }) => {
-          if (resp.status === 400) {
-            setErrors(data);
-          } else if (resp.ok) {
-            setClient(data.client);
-            toggleEditMode();
-          }
-          setSubmitting(false);
-        });
-      }}
-    >
-      {(formik) => (
-        <AutoForm
-          fields={fields}
-          choices={getModelChoices(fields, client)}
-          formik={formik}
-          onCancel={toggleEditMode}
-          submitText="Update"
-        />
-      )}
-    </Formik>
-  );
-};
-
-const FieldTable = ({ fields, client }) => (
-  <Table size="small" definition>
-    <Table.Body>
-      {fields.map(({ label, name, type }) => (
-        <Table.Row key={label}>
-          <Table.Cell width={3}>{label}</Table.Cell>
-          {type === "TEXTAREA" ? (
-            <td
-              dangerouslySetInnerHTML={{
-                __html: client[name] ? markdownToHtml(client[name]) : "-",
-              }}
-            />
-          ) : (
-            <Table.Cell>{getValueDisplay(client[name])}</Table.Cell>
-          )}
-        </Table.Row>
-      ))}
-    </Table.Body>
-  </Table>
-);
-
-const getValueDisplay = (val) => {
-  console.log(val);
-  const t = typeof val;
-  if (t === "undefined" || val === null || val === "") {
-    return "-";
-  }
-  if (t === "object" && val.choices) {
-    return val.display || "-";
-  }
-  if (val === false) {
-    return "No";
-  }
-  if (val === true) {
-    return "Yes";
-  }
-  return val;
-};
 
 mount(App);

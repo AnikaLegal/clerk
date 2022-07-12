@@ -130,12 +130,6 @@ class TenancyDynamicForm(DynamicTableForm):
     is_on_lease = SingleChoiceField(field_name="is_on_lease", model=Tenancy)
 
 
-class UserDetailsDynamicForm(DynamicTableForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "is_intern", "case_capacity"]
-
-
 class ParalegalSearchForm(forms.Form):
 
     name = forms.CharField(required=False, label="Name or email")

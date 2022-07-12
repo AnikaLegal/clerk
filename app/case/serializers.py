@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
+from case.middleware import annotate_group_access
 from core.models import Issue, Tenancy, IssueNote, Person, Client
 from accounts.models import User
 from emails.models import EmailTemplate, Email, EmailAttachment
@@ -26,11 +27,19 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "full_name",
             "email",
+            "case_capacity",
             "is_intern",
             "is_superuser",
             "created_at",
             "groups",
             "url",
+            "is_admin_or_better",
+            "is_coordinator_or_better",
+            "is_paralegal_or_better",
+            "is_admin",
+            "is_coordinator",
+            "is_paralegal",
+            "is_ms_account_set_up",
         )
         read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
 
@@ -38,9 +47,28 @@ class UserSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     groups = serializers.SerializerMethodField()
+    is_admin_or_better = serializers.BooleanField(read_only=True)
+    is_coordinator_or_better = serializers.BooleanField(read_only=True)
+    is_paralegal_or_better = serializers.BooleanField(read_only=True)
+    is_admin = serializers.BooleanField(read_only=True)
+    is_coordinator = serializers.BooleanField(read_only=True)
+    is_paralegal = serializers.BooleanField(read_only=True)
+    is_ms_account_set_up = serializers.SerializerMethodField()
+
+    def __init__(self, instance=None, **kwargs):
+        if instance:
+            annotate_group_access(instance)
+
+        super().__init__(instance=instance, **kwargs)
+
+    def get_is_ms_account_set_up(self, obj):
+        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+        return obj.ms_account_created_at and (
+            obj.ms_account_created_at < fifteen_minutes_ago
+        )
 
     def get_groups(self, obj):
-        return [g.name for g in obj.groups.all()]
+        return list(obj.groups.values_list("name", flat=True))
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()
@@ -272,6 +300,30 @@ class TextChoiceListField(serializers.ListField):
             "value": [v for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
+
+
+class UserDetailSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = (
+            *UserSerializer.Meta.fields,
+            "issue_set",
+            "lawyer_issues",
+            "performance_notes",
+            "ms_account_created_at",
+        )
+
+    lawyer_issues = IssueDetailSerializer(read_only=True, many=True)
+    issue_set = IssueDetailSerializer(read_only=True, many=True)
+    performance_notes = serializers.SerializerMethodField()
+    ms_account_created_at = serializers.SerializerMethodField()
+
+    def get_ms_account_created_at(self, obj):
+        return obj.ms_account_created_at.strftime("%d/%m/%Y")
+
+    def get_performance_notes(self, user):
+        qs = user.issue_notes.all()
+        return IssueNoteSerializer(qs, many=True).data
 
 
 class ClientDetailSerializer(ClientSerializer):

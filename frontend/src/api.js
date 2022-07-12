@@ -128,9 +128,29 @@ export const api = {
     },
   },
   accounts: {
+    update: (accountId, account) => {
+      const url = `/clerk/accounts/user/${accountId}/`;
+      return http.patch(url, account);
+    },
+    getPermissions: (accountId) => {
+      const url = `/clerk/accounts/user/${accountId}/perms/`;
+      return http.get(url);
+    },
     search: (query) => {
       const url = "/clerk/accounts/";
       return http.get(URLS.ACCOUNTS.SEARCH, query);
+    },
+    promote: (accountId) => {
+      const url = `/clerk/accounts/user/${accountId}/perms/promote/`;
+      return http.post(url);
+    },
+    demote: (accountId) => {
+      const url = `/clerk/accounts/user/${accountId}/perms/demote/`;
+      return http.post(url);
+    },
+    resync: (accountId) => {
+      const url = `/clerk/accounts/user/${accountId}/perms/resync/`;
+      return http.post(url);
     },
   },
   templates: {

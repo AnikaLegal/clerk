@@ -32,3 +32,10 @@ export const CASE_TYPES = {
   BONDS: "Bonds",
   EVICTION: "Eviction",
 };
+
+export const GROUPS = {
+  PARALEGAL: "Paralegal",
+  ADMIN: "Admin",
+  COORDINATOR: "Coordinator",
+  LAWYER: "Lawyer",
+};
