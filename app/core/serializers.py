@@ -22,6 +22,5 @@ class NoEmailAdminSerializer(serializers.ModelSerializer):
         model = NoEmailAdmin
         fields = (
             "id",
-            "name",
-            "phone_number",
+            "answers",
         )

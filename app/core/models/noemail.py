@@ -12,8 +12,9 @@ class NoEmailAdmin(TimestampedModel):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.JSONField(encoder=DjangoJSONEncoder)
-    phone_number = models.JSONField(encoder=DjangoJSONEncoder)
+    answers = models.JSONField(encoder=DjangoJSONEncoder)
+    # Whether this submission was completed by the client.
+    is_complete = models.BooleanField(default=False)
     # Whether we successfully processed this submission.
     is_processed = models.BooleanField(default=False)
     # Tracks whether MailChimp reminder email has been successfully sent.
