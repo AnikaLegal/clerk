@@ -8,7 +8,7 @@ from case.views.auth import login_required
 
 
 from .models import BlogListPage, DashboardItem
-from .forms import ContactForm, ContentFeebackForm, NoEmailForm
+from .forms import ContactForm, ContentFeebackForm
 
 
 @require_http_methods(["GET"])

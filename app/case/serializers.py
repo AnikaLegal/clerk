@@ -248,8 +248,3 @@ class NoEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoEmail
         fields = ("id", "name", "phone_number", "created_at")
-
-    created_at = serializers.SerializerMethodField()
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y")

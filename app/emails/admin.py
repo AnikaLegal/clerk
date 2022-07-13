@@ -2,7 +2,8 @@ from django.contrib import admin
 from django_q.tasks import async_task
 from django.contrib.messages import constants as messages
 
-from .models import Email, EmailAttachment, EmailTemplate, NoEmail
+from .models import Email, EmailAttachment, EmailTemplate
+from core.models import NoEmailAdmin as NoEmailAdminModel
 from .service.receive import receive_email_task
 
 
@@ -47,11 +48,9 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         "created_at",
     )
 
-@admin.register(NoEmail)
+@admin.register(NoEmailAdminModel)
 class NoEmailAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "name",
-        "phone_number",
-        "created_at",
+        "answers",
     )
