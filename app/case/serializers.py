@@ -18,6 +18,30 @@ from core.models.client import (
 )
 
 
+class DateField(serializers.ReadOnlyField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        else:
+            return value.strftime("%d/%m/%y")
+
+
+class LocalDateField(serializers.ReadOnlyField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        else:
+            return timezone.localtime(value).strftime("%d/%m/%y")
+
+
+class LocalTimeField(serializers.ReadOnlyField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        else:
+            return timezone.localtime(value).strftime("%d/%m/%y at %-I%p")
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -40,11 +64,12 @@ class UserSerializer(serializers.ModelSerializer):
             "is_coordinator",
             "is_paralegal",
             "is_ms_account_set_up",
+            "created_at",
         )
         read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
 
     url = serializers.SerializerMethodField()
-    created_at = serializers.SerializerMethodField()
+    created_at = LocalDateField(source="date_joined")
     full_name = serializers.SerializerMethodField()
     groups = serializers.SerializerMethodField()
     is_admin_or_better = serializers.BooleanField(read_only=True)
@@ -72,9 +97,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()
-
-    def get_created_at(self, obj):
-        return obj.date_joined.strftime("%d/%m/%Y")
 
     def get_url(self, obj):
         return reverse("account-user-detail", args=(obj.pk,))
@@ -108,14 +130,8 @@ class TenancySerializer(serializers.ModelSerializer):
     landlord = PersonSerializer(read_only=True)
     agent = PersonSerializer(read_only=True)
     url = serializers.SerializerMethodField()
-    started = serializers.SerializerMethodField()
     is_on_lease = serializers.CharField(source="get_is_on_lease_display")
-
-    def get_started(self, obj):
-        if obj.started:
-            return obj.started.strftime("%d/%m/%Y")
-        else:
-            return None
+    started = DateField()
 
     def get_url(self, obj):
         return reverse("tenancy-detail", args=(obj.pk,))
@@ -154,18 +170,13 @@ class IssueNoteSerializer(serializers.ModelSerializer):
         source="get_note_type_display", read_only=True
     )
     created_at = serializers.SerializerMethodField()
-    event = serializers.SerializerMethodField()
     reviewee = serializers.SerializerMethodField()
+    event = DateField()
+    created_at = LocalTimeField()
 
     def get_reviewee(self, obj):
         if obj.note_type == "PERFORMANCE":
             return UserSerializer(obj.content_object).data
-
-    def get_event(self, obj):
-        return obj.event.strftime("%d/%m/%Y") if obj.event else None
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y")
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -245,14 +256,11 @@ class BaseIssueSerializer(serializers.ModelSerializer):
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
-    created_at = serializers.SerializerMethodField()
+    created_at = LocalDateField()
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
         return reverse("case-detail-view", args=(obj.pk,))
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y")
 
 
 class IssueListSerializer(BaseIssueSerializer):
@@ -316,18 +324,13 @@ class ParalegalSerializer(UserSerializer):
             "capacity",
         )
 
-    latest_issue_created_at = serializers.SerializerMethodField()
+    latest_issue_created_at = LocalDateField()
     total_cases = serializers.IntegerField(read_only=True)
     open_cases = serializers.IntegerField(read_only=True)
     open_repairs = serializers.IntegerField(read_only=True)
     open_bonds = serializers.IntegerField(read_only=True)
     open_eviction = serializers.IntegerField(read_only=True)
     capacity = serializers.IntegerField(read_only=True)
-
-    def get_latest_issue_created_at(self, obj):
-        return obj.latest_issue_created_at and obj.latest_issue_created_at.strftime(
-            "%d/%m/%y"
-        )
 
 
 class UserDetailSerializer(UserSerializer):
@@ -344,10 +347,7 @@ class UserDetailSerializer(UserSerializer):
     lawyer_issues = IssueDetailSerializer(read_only=True, many=True)
     issue_set = IssueDetailSerializer(read_only=True, many=True)
     performance_notes = serializers.SerializerMethodField()
-    ms_account_created_at = serializers.SerializerMethodField()
-
-    def get_ms_account_created_at(self, obj):
-        return obj.ms_account_created_at.strftime("%d/%m/%Y")
+    ms_account_created_at = LocalDateField()
 
     def get_performance_notes(self, user):
         qs = user.issue_notes.all()
@@ -403,13 +403,10 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_at", "url")
 
     url = serializers.SerializerMethodField()
-    created_at = serializers.SerializerMethodField()
+    created_at = LocalDateField()
 
     def get_url(self, obj):
         return reverse("template-email-detail", args=(obj.pk,))
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y")
 
 
 class EmailAttachmentSerializer(serializers.ModelSerializer):
@@ -452,7 +449,7 @@ class EmailSerializer(serializers.ModelSerializer):
     )
     edit_url = serializers.SerializerMethodField()
     reply_url = serializers.SerializerMethodField()
-    created_at = serializers.SerializerMethodField()
+    created_at = LocalTimeField()
 
     def get_edit_url(self, obj):
         return reverse("case-email-edit", args=(obj.issue.pk, obj.pk))
@@ -463,6 +460,3 @@ class EmailSerializer(serializers.ModelSerializer):
             + "?"
             + urlencode({"parent": obj.pk})
         )
-
-    def get_created_at(self, obj):
-        return obj.created_at.strftime("%d/%m/%Y at %H:%M:%S")

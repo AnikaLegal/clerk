@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, Header, Button, Tab } from "semantic-ui-react";
+import moment from "moment";
 import * as Yup from "yup";
 
 import { TimelineNote } from "comps/timeline-item";
@@ -11,6 +12,10 @@ import { api } from "api";
 import { AccountPermissions } from "comps/account-permissions";
 import { ErrorBoundary } from "comps/error-boundary";
 
+const creationSort = (a, b) =>
+  moment(b.created_at, "DD/MM/YY").unix() -
+  moment(a.created_at, "DD/MM/YY").unix();
+
 const App = () => {
   const [account, setAccount] = useState(window.REACT_CONTEXT.account);
   let tabPanes = [
@@ -19,7 +24,7 @@ const App = () => {
       render: () => (
         <Tab.Pane>
           <CaseListTable
-            issues={account.issue_set}
+            issues={account.issue_set.sort(creationSort)}
             fields={PARALEGAL_TABLE_FIELDS}
           />
         </Tab.Pane>
@@ -30,7 +35,7 @@ const App = () => {
       render: () => (
         <Tab.Pane>
           <CaseListTable
-            issues={account.lawyer_issues}
+            issues={account.lawyer_issues.sort(creationSort)}
             fields={LAWYER_TABLE_FIELDS}
           />
         </Tab.Pane>
