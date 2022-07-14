@@ -1,5 +1,5 @@
-# Initialise this script by dot sourcing it 
-#    
+# Initialise this script by dot sourcing it
+#
 #    . tasks.ps1
 #
 # See tasks.py for notes on each task.
@@ -20,6 +20,7 @@ function build {
 }
 
 function dev {
+    powershell -new_console:s
     Invoke-Expression "$COMPOSE up web"
 }
 
@@ -51,12 +52,12 @@ function logs {
 }
 
 function reset {
-    run -cmd "/app/scripts/tasks/dev-reset.sh" 
+    run -cmd "/app/scripts/tasks/dev-reset.sh"
 }
 
 
 function restore {
-    run -cmd "/app/scripts/tasks/dev-restore.sh" 
+    run -cmd "/app/scripts/tasks/dev-restore.sh"
 }
 
 function setup-ngrok {
@@ -78,11 +79,11 @@ function bash {
 }
 
 function shell {
-    run -cmd "./manage.py shell_plus" 
+    run -cmd "./manage.py shell_plus"
 }
 
 function psql {
-    run -cmd "psql" 
+    run -cmd "psql"
 }
 
 function run {
@@ -91,4 +92,15 @@ function run {
         [string]$service="web"
     )
     Invoke-Expression "$COMPOSE run --rm $service $cmd"
+}
+
+function devintake {
+    powershell -new_console:s
+    cd ..\intake\
+    yarn dev
+}
+
+function codeintake {
+    cd ..\intake\
+    code .
 }
