@@ -461,8 +461,8 @@ sanitizer = Sanitizer(
         "attributes": {
             "a": ("href", "name", "target", "title", "id", "rel", "src", "style")
         },
-        "empty": {"hr", "a", "br"},
-        "separate": {"a", "p", "li"},
+        "empty": {"hr", "a", "br", "div"},
+        "separate": {"a", "p", "li", "div"},
         "whitespace": {"br"},
         "keep_typographic_whitespace": False,
         "add_nofollow": False,

@@ -48,68 +48,78 @@ const App = () => {
       </Header>
       <EmailList>
         {emails.map((email) => (
-          <Email key={email.id} received={email.state == "INGESTED"}>
-            <EmailHeader received={email.state == "INGESTED"}>
-              <p>
-                <strong>To:</strong>&nbsp;
-                {email.to_address}
-              </p>
-              <p>
-                <strong>From:</strong>&nbsp;
-                {email.from_address}
-              </p>
-              {email.cc_addresses.length > 0 && (
-                <p>
-                  <strong>CC:</strong>&nbsp;
-                  {email.cc_addresses.join(", ")}
-                </p>
-              )}
-              {email.state == "DRAFT" && <div className="label">Draft</div>}
-              {email.state == "SENT" && (
-                <div className="label">
-                  Sent on {email.created_at}{" "}
-                  {email.sender ? `by ${email.sender.full_name}` : null}
-                </div>
-              )}
-              {email.state == "INGESTED" && (
-                <div className="label">Received on {email.created_at}</div>
-              )}
-              {email.state == "READY_TO_SEND" && (
-                <div className="label">Sending...</div>
-              )}
-            </EmailHeader>
-            <EmailBody dangerouslySetInnerHTML={{ __html: email.html }} />
-            <EmailControls>
-              {email.state == "DRAFT" ? (
-                <a href={email.edit_url} className="header" target="_blank">
-                  <button className="ui button primary">Edit Draft</button>
-                </a>
-              ) : (
-                <a href={email.reply_url} className="header" target="_blank">
-                  <button className="ui button">Reply</button>
-                </a>
-              )}
-            </EmailControls>
-            {email.attachments.length > 0 && (
-              <EmailAttachmentBlock received={email.state == "INGESTED"}>
-                <h5>Attached files</h5>
-                <EmailAttachmentList>
-                  {email.attachments.map((a) => (
-                    <Attachment
-                      isUploadEnabled={issue.is_sharepoint_set_up}
-                      onUpload={onEmailAttachUpload}
-                      emailId={email.id}
-                      {...a}
-                      key={a.id}
-                    />
-                  ))}
-                </EmailAttachmentList>
-              </EmailAttachmentBlock>
-            )}
-          </Email>
+          <EmailItem
+            email={email}
+            key={email.id}
+            onEmailAttachUpload={onEmailAttachUpload}
+          />
         ))}
       </EmailList>
     </Container>
+  );
+};
+
+const EmailItem = ({ email, onEmailAttachUpload }) => {
+  return (
+    <Email key={email.id} received={email.state == "INGESTED"}>
+      <EmailHeader received={email.state == "INGESTED"}>
+        <p>
+          <strong>To:</strong>&nbsp;
+          {email.to_address}
+        </p>
+        <p>
+          <strong>From:</strong>&nbsp;
+          {email.from_address}
+        </p>
+        {email.cc_addresses.length > 0 && (
+          <p>
+            <strong>CC:</strong>&nbsp;
+            {email.cc_addresses.join(", ")}
+          </p>
+        )}
+        {email.state == "DRAFT" && <div className="label">Draft</div>}
+        {email.state == "SENT" && (
+          <div className="label">
+            Sent on {email.created_at}{" "}
+            {email.sender ? `by ${email.sender.full_name}` : null}
+          </div>
+        )}
+        {email.state == "INGESTED" && (
+          <div className="label">Received on {email.created_at}</div>
+        )}
+        {email.state == "READY_TO_SEND" && (
+          <div className="label">Sending...</div>
+        )}
+      </EmailHeader>
+      <EmailBody dangerouslySetInnerHTML={{ __html: email.html }} />
+      <EmailControls>
+        {email.state == "DRAFT" ? (
+          <a href={email.edit_url} className="header" target="_blank">
+            <button className="ui button primary">Edit Draft</button>
+          </a>
+        ) : (
+          <a href={email.reply_url} className="header" target="_blank">
+            <button className="ui button">Reply</button>
+          </a>
+        )}
+      </EmailControls>
+      {email.attachments.length > 0 && (
+        <EmailAttachmentBlock received={email.state == "INGESTED"}>
+          <h5>Attached files</h5>
+          <EmailAttachmentList>
+            {email.attachments.map((a) => (
+              <Attachment
+                isUploadEnabled={issue.is_sharepoint_set_up}
+                onUpload={onEmailAttachUpload}
+                emailId={email.id}
+                {...a}
+                key={a.id}
+              />
+            ))}
+          </EmailAttachmentList>
+        </EmailAttachmentBlock>
+      )}
+    </Email>
   );
 };
 
@@ -159,7 +169,8 @@ const EmailBody = styled.div`
   h3,
   h4,
   h5,
-  p {
+  p,
+  div {
     font-size: 1rem !important;
     margin: 0 0 1em;
   }
