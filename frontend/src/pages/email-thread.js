@@ -38,7 +38,8 @@ const App = () => {
   return (
     <Container>
       <Header as="h1">
-        {subject}
+        {subject}{" "}
+        <span style={{ color: "var(--grey-2)" }}>({issue.fileref})</span>
         <Header.Subheader>
           Most recent emails are at the top
           <br />

@@ -47,7 +47,6 @@ const NOTE_TYPES = {
       title="Case Update"
       detail={note.created_at}
       content={note.text_display}
-      color="primary"
     />
   ),
   ELIGIBILITY_CHECK_SUCCESS: (note) => (
