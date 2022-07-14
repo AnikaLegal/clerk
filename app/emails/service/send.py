@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 EMAIL_SEND_RULES = (
-    (lambda e: bool(e.issue), "no related Issue."),
     (lambda e: e.state == EmailState.READY_TO_SEND, "not ready to send."),
 )
 
@@ -35,12 +34,14 @@ def send_email_task(email_pk: int):
             logger.error(f"Cannot sent Email[{email_pk}]: {msg}")
             return
 
-    from_addr = build_clerk_address(email.issue)
+    from_addr = email.from_address
     attachments = []
-    for att in email.emailattachment_set.all():
-        file_name = os.path.basename(att.file.name)
-        file_bytes = att.file.read()
-        attachments.append((file_name, file_bytes, att.content_type))
+    if email.issue:
+        from_addr = build_clerk_address(email.issue)
+        for att in email.emailattachment_set.all():
+            file_name = os.path.basename(att.file.name)
+            file_bytes = att.file.read()
+            attachments.append((file_name, file_bytes, att.content_type))
 
     send_email(
         from_addr,
@@ -51,15 +52,16 @@ def send_email_task(email_pk: int):
         attachments,
         html=email.html,
     )
-    IssueNote.objects.create(
-        issue=email.issue,
-        note_type=NoteType.EMAIL,
-        content_object=email,
-        text=email.get_sent_note_text(),
-    )
     Email.objects.filter(pk=email_pk).update(
         state=EmailState.SENT, processed_at=timezone.now()
     )
+    if email.issue:
+        IssueNote.objects.create(
+            issue=email.issue,
+            note_type=NoteType.EMAIL,
+            content_object=email,
+            text=email.get_sent_note_text(),
+        )
 
 
 def send_email(
