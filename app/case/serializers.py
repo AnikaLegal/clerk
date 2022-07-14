@@ -55,11 +55,11 @@ class UserSerializer(serializers.ModelSerializer):
     is_paralegal = serializers.BooleanField(read_only=True)
     is_ms_account_set_up = serializers.SerializerMethodField()
 
-    def __init__(self, instance=None, **kwargs):
+    def to_representation(self, instance):
         if instance:
             annotate_group_access(instance)
 
-        super().__init__(instance=instance, **kwargs)
+        return super().to_representation(instance)
 
     def get_is_ms_account_set_up(self, obj):
         fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
@@ -68,7 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def get_groups(self, obj):
-        return list(obj.groups.values_list("name", flat=True))
+        return [g.name for g in obj.groups.all()]
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()
@@ -300,6 +300,34 @@ class TextChoiceListField(serializers.ListField):
             "value": [v for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
+
+
+class ParalegalSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = (
+            *UserSerializer.Meta.fields,
+            "latest_issue_created_at",
+            "total_cases",
+            "open_cases",
+            "open_repairs",
+            "open_bonds",
+            "open_eviction",
+            "capacity",
+        )
+
+    latest_issue_created_at = serializers.SerializerMethodField()
+    total_cases = serializers.IntegerField(read_only=True)
+    open_cases = serializers.IntegerField(read_only=True)
+    open_repairs = serializers.IntegerField(read_only=True)
+    open_bonds = serializers.IntegerField(read_only=True)
+    open_eviction = serializers.IntegerField(read_only=True)
+    capacity = serializers.IntegerField(read_only=True)
+
+    def get_latest_issue_created_at(self, obj):
+        return obj.latest_issue_created_at and obj.latest_issue_created_at.strftime(
+            "%d/%m/%y"
+        )
 
 
 class UserDetailSerializer(UserSerializer):

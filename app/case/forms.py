@@ -1,16 +1,15 @@
 from django import forms
 from django.forms.fields import BooleanField
 from django.db import transaction
-from django.db.models import Q, TextChoices
+from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.utils import timezone
 
 from accounts.models import User
-from core.models import Issue, IssueNote, Client, Tenancy, Person
-from core.models.issue import CaseStage, CaseTopic
+from core.models import Issue, Tenancy, Person
+from core.models.issue import CaseTopic
 from emails.models import Email, EmailAttachment
-from case.utils import DynamicTableForm, MultiChoiceField, SingleChoiceField
+from case.utils import DynamicTableForm, SingleChoiceField
 from microsoft.endpoints import MSGraphAPI
 
 
@@ -128,43 +127,6 @@ class TenancyDynamicForm(DynamicTableForm):
         ]
 
     is_on_lease = SingleChoiceField(field_name="is_on_lease", model=Tenancy)
-
-
-class ParalegalSearchForm(forms.Form):
-
-    name = forms.CharField(required=False, label="Name or email")
-    is_intern = forms.ChoiceField(
-        choices=[
-            ("", "-"),
-            ("True", "Intern"),
-            ("False", "Volunteer"),
-        ],
-        required=False,
-    )
-
-    def search_queryset(self, paralegal_qs):
-        is_intern = self.data.get("is_intern")
-        if is_intern:
-            paralegal_qs = paralegal_qs.filter(is_intern=is_intern == "True")
-
-        name = self.data.get("name")
-        if name:
-            search_parts = name.split(" ")
-            search_query = None
-            for search_part in search_parts:
-                part_query = (
-                    Q(first_name__icontains=search_part)
-                    | Q(last_name__icontains=search_part)
-                    | Q(email__icontains=search_part)
-                )
-                if search_query:
-                    search_query |= part_query
-                else:
-                    search_query = part_query
-
-            paralegal_qs = paralegal_qs.filter(search_query)
-
-        return paralegal_qs
 
 
 class IssueSearchForm(forms.ModelForm):

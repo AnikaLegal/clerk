@@ -10,7 +10,7 @@ PARALEGAL_GROUPS = [CaseGroups.ADMIN, CaseGroups.COORDINATOR, CaseGroups.PARALEG
 
 def annotate_group_access(user):
     _is_superuser = user.is_superuser
-    group_names = user.groups.values_list("name", flat=True)
+    group_names = [g.name for g in user.groups.all()]
     _is_admin_or_better = any([g in ADMIN_GROUPS for g in group_names])
     _is_coordinator_or_better = any([g in COORDINATOR_GROUPS for g in group_names])
     _is_paralegal_or_better = any([g in PARALEGAL_GROUPS for g in group_names])

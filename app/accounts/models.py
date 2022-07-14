@@ -10,6 +10,8 @@ class CaseGroups:
     COORDINATOR = "Coordinator"
     # Can see assigned cases
     PARALEGAL = "Paralegal"
+    # No special permissions
+    LAWYER = "Lawyer"
 
     GROUPS = [ADMIN, COORDINATOR, PARALEGAL]
 
