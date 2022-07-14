@@ -34,3 +34,11 @@ class JotformSubmission(TimestampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     form_name = models.CharField(max_length=128)
     answers = models.JSONField(encoder=DjangoJSONEncoder)
+
+class NoEmailSubmission(TimestampedModel):
+    """
+    A no email submission
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    answers = models.JSONField(encoder=DjangoJSONEncoder)

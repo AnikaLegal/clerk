@@ -54,7 +54,6 @@ class SubmissionAdmin(admin.ModelAdmin):
         "is_reminder_sent",
     )
 
-
 @admin.register(FileUpload)
 class FileUploadAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)

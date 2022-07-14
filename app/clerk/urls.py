@@ -10,7 +10,7 @@ from emails import urls as email_urls
 from actionstep.views import end_oauth_view, start_oauth_view
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
-from webhooks.views import jotform_form_view, webflow_form_view
+from webhooks.views import jotform_form_view, webflow_form_view, noemailsubmission_form_view
 
 
 router = routers.SimpleRouter()
@@ -30,6 +30,7 @@ urlpatterns = [
     # TODO: Move to webhooks
     path("api/webhooks/webflow-form/", webflow_form_view, name="webflow-form"),
     path("api/webhooks/jotform-form/", jotform_form_view, name="jotform-form"),
+    path("api/webhooks/noemailsubmission-form/", noemailsubmission_form_view, name="noemailsubmission-form"),
     # TODO: Move router to core
     path("api/", include(router.urls)),
     path("clerk/", include("case.urls")),

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from utils.admin import dict_to_json_html
 
-from .models import JotformSubmission, WebflowContact
+from .models import JotformSubmission, WebflowContact, NoEmailSubmission
 
 
 @admin.register(WebflowContact)
@@ -33,3 +33,11 @@ class JotformSubmissionAdmin(admin.ModelAdmin):
 
     def answers_json(self, instance):
         return dict_to_json_html(instance.answers)
+
+@admin.register(NoEmailSubmission)
+class NoEmailSubmissionAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "answers",
+    )

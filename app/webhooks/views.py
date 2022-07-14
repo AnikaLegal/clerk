@@ -5,7 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .models import JotformSubmission, WebflowContact
+from .models import JotformSubmission, WebflowContact, NoEmailSubmission
+from .serializers import NoEmailSubmissionSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -56,3 +57,13 @@ def jotform_form_view(request):
 
     JotformSubmission.objects.create(**model_kwargs)
     return Response({"message": "Received Jotform submission."}, status=201)
+
+@api_view(["POST"])
+def noemailsubmission_form_view(request):
+    """
+    Save no email submission data from a POST request
+    """
+    serializer = NoEmailSubmissionSerializer(data=request.POST)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=201)
