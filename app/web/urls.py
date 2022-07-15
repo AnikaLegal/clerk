@@ -22,8 +22,6 @@ def template(name):
 
 
 urlpatterns = [
-    # TEMPORARY: Closed contact page
-    path("closed-contact/", views.closed_contact_view, name="closed-contact"),
     # About
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),

@@ -73,7 +73,7 @@ const PERSONAL_FIELDS = [
   {
     label: "Gender",
     name: "gender",
-    type: FIELD_TYPES.SINGLE_CHOICE,
+    type: FIELD_TYPES.TEXT,
     schema: Yup.string().required("Required"),
   },
   {
@@ -108,37 +108,15 @@ const CONTACT_FIELDS = [
 ];
 const OTHER_FIELDS = [
   {
-    label: "Referrer",
-    name: "referrer",
-    type: FIELD_TYPES.TEXT,
-    schema: Yup.string(),
-  },
-  {
-    label: "Referrer type",
-    type: FIELD_TYPES.SINGLE_CHOICE,
-    name: "referrer_type",
-  },
-  {
-    label: "Special circumstances",
-    type: FIELD_TYPES.MULTI_CHOICE,
-    name: "special_circumstances",
-  },
-  {
-    label: "Primary language",
-    name: "primary_language",
+    label: "Eligibility notes",
+    name: "eligibility_notes",
     schema: Yup.string(),
     type: FIELD_TYPES.TEXT,
   },
   {
-    label: "Is Aboriginal or Torres Strait Islander",
-    name: "is_aboriginal_or_torres_strait_islander",
-    schema: Yup.bool(),
-    type: FIELD_TYPES.BOOL,
-  },
-  {
-    label: "Legal access difficulties",
+    label: "Eligibility circumstances",
     type: FIELD_TYPES.MULTI_CHOICE,
-    name: "legal_access_difficulties",
+    name: "eligibility_circumstances",
   },
   {
     label: "Rental circumstances",
@@ -158,10 +136,10 @@ const OTHER_FIELDS = [
     type: FIELD_TYPES.TEXT,
   },
   {
-    label: "Weekly rent",
-    name: "weekly_rent",
-    schema: Yup.number().integer().positive(),
-    type: FIELD_TYPES.TEXT,
+    label: "Is on Centrelink",
+    name: "centrelink_support",
+    schema: Yup.bool(),
+    type: FIELD_TYPES.BOOL,
   },
   {
     label: "Number of dependents",
@@ -170,10 +148,33 @@ const OTHER_FIELDS = [
     type: FIELD_TYPES.TEXT,
   },
   {
-    label: "Is in a multi income household",
-    name: "is_multi_income_household",
+    label: "Primary language",
+    name: "primary_language",
+    schema: Yup.string(),
+    type: FIELD_TYPES.TEXT,
+  },
+  {
+    label: "Requires an interpreter",
+    name: "requires_interpreter",
     schema: Yup.bool(),
     type: FIELD_TYPES.BOOL,
+  },
+  {
+    label: "Is Aboriginal or Torres Strait Islander",
+    name: "is_aboriginal_or_torres_strait_islander",
+    schema: Yup.bool(),
+    type: FIELD_TYPES.BOOL,
+  },
+  {
+    label: "Referrer",
+    name: "referrer",
+    type: FIELD_TYPES.TEXT,
+    schema: Yup.string(),
+  },
+  {
+    label: "Referrer type",
+    type: FIELD_TYPES.SINGLE_CHOICE,
+    name: "referrer_type",
   },
 ];
 const PERSONAL_SCHEMA = getFormSchema(PERSONAL_FIELDS);

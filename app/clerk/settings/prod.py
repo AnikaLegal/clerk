@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
 EMAIL_PREFIX = None
 WEBMASTER_EMAIL = "webmaster@anikalegal.com"
 SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
+INTAKE_NOEMAIL_EMAIL = "coordinators@anikalegal.com"
 
 SESSION_COOKIE_DOMAIN = ".anikalegal.com"
 SESSION_SAVE_EVERY_REQUEST = True

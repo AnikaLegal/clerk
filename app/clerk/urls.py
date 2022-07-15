@@ -9,7 +9,7 @@ from web import urls as web_urls
 from emails import urls as email_urls
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
-from webhooks.views import jotform_form_view, webflow_form_view
+from webhooks.views import jotform_form_view, webflow_form_view, intake_no_email_view
 
 
 router = routers.SimpleRouter()
@@ -26,6 +26,7 @@ urlpatterns = [
     # TODO: Move to webhooks
     path("api/webhooks/webflow-form/", webflow_form_view, name="webflow-form"),
     path("api/webhooks/jotform-form/", jotform_form_view, name="jotform-form"),
+    path("api/webhooks/intake-noemail/", intake_no_email_view, name="intake-noemail"),
     # TODO: Move router to core
     path("api/", include(router.urls)),
     path("clerk/", include("case.urls")),
