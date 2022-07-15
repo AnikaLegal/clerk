@@ -80,6 +80,10 @@ export const api = {
     },
   },
   case: {
+    docs: (caseId) => {
+      const url = `/clerk/cases/${caseId}/docs/sharepoint/`;
+      return http.get(url);
+    },
     search: (query) => {
       const url = `/clerk/cases/`;
       return http.get(url, query);

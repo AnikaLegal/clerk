@@ -456,3 +456,14 @@ class EmailSerializer(serializers.ModelSerializer):
             + "?"
             + urlencode({"parent": obj.pk})
         )
+
+
+class EmailThreadSerializer(serializers.Serializer):
+    emails = EmailSerializer(many=True)
+    subject = serializers.CharField(read_only=True)
+    slug = serializers.CharField(read_only=True)
+    most_recent = LocalTimeField()
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("case-email-thread", args=(obj.issue.pk, obj.slug))
