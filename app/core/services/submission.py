@@ -132,8 +132,8 @@ def process_client(answers):
             "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
             "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
             "primary_language": get_as_string(answers, "FIRST_LANGUAGE"),
-            "requires_interpreter": answers.get("INTERPRETER", False),
-            "centrelink_support": answers.get("CENTRELINK_SUPPORT", False),
+            "requires_interpreter": get_as_bool(answers, "INTERPRETER"),
+            "centrelink_support": get_as_bool(answers, "CENTRELINK_SUPPORT"),
             "eligibility_notes": get_as_string(answers, "ELIGIBILITY_NOTES"),
         },
     )
@@ -190,6 +190,10 @@ def get_as_list(answers, key):
         return []
     else:
         return [val]
+
+
+def get_as_bool(answers, key):
+    return answers.get(key, False) or False
 
 
 def get_as_string(answers, key):
