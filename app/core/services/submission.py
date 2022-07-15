@@ -130,7 +130,7 @@ def process_client(answers):
                 answers, "ELIGIBILITY_CIRCUMSTANCES"
             ),
             "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
-            "number_of_dependents": answers["NUMBER_OF_DEPENDENTS"],
+            "number_of_dependents": answers.get("NUMBER_OF_DEPENDENTS"),
             "primary_language": get_as_string(answers, "FIRST_LANGUAGE"),
             "requires_interpreter": get_as_bool(answers, "INTERPRETER"),
             "centrelink_support": get_as_bool(answers, "CENTRELINK_SUPPORT"),
