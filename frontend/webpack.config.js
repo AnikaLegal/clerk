@@ -64,7 +64,7 @@ module.exports = (env, argv) => {
     ];
   } else {
     config.devtool = "source-map";
-    config.optimisation = {
+    config.optimization = {
       splitChunks: {
         chunks: "all",
       },
