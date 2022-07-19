@@ -85,7 +85,7 @@ const getValueDisplay = (val) => {
   if (t === "undefined" || val === null || val === "") {
     return "-";
   }
-  if (t === "object" && val.choices) {
+  if (t === "object" && val && val.choices) {
     return val.display || "-";
   }
   if (val === false) {
