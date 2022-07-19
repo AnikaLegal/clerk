@@ -132,8 +132,8 @@ const OTHER_FIELDS = [
   {
     label: "Weekly income",
     name: "weekly_income",
-    schema: Yup.number().integer().positive(),
-    type: FIELD_TYPES.TEXT,
+    schema: Yup.number().integer().positive().nullable(true),
+    type: FIELD_TYPES.NUMBER,
   },
   {
     label: "Is on Centrelink",
@@ -144,8 +144,8 @@ const OTHER_FIELDS = [
   {
     label: "Number of dependents",
     name: "number_of_dependents",
-    schema: Yup.number().integer(),
-    type: FIELD_TYPES.TEXT,
+    schema: Yup.number().integer().positive().nullable(true),
+    type: FIELD_TYPES.NUMBER,
   },
   {
     label: "Primary language",

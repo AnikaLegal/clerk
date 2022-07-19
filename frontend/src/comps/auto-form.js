@@ -8,6 +8,7 @@ import * as Yup from "yup";
 
 export const FIELD_TYPES = {
   TEXT: "TEXT",
+  NUMBER: "NUMBER",
   EMAIL: "EMAIL",
   TEXTAREA: "TEXTAREA",
   DATE: "DATE",
@@ -148,6 +149,28 @@ const TextField = ({
   />
 );
 
+const NumberField = ({
+  name,
+  placeholder,
+  value,
+  setFieldValue,
+  isSubmitting,
+  type,
+}) => {
+  return (
+    <Input
+      placeholder={placeholder}
+      value={value || ""}
+      name={name}
+      onChange={(e, { name, value }) =>
+        setFieldValue(name, value === "" ? null : value, false)
+      }
+      disabled={isSubmitting}
+      type="text"
+    />
+  );
+};
+
 const DateField = ({
   name,
   placeholder,
@@ -235,6 +258,7 @@ const TextAreaField = ({
 
 const FIELD_COMPONENTS = {
   TEXT: (props) => <TextField {...props} type="text" />,
+  NUMBER: (props) => <NumberField {...props} />,
   EMAIL: (props) => <TextField {...props} type="email" />,
   TEXTAREA: TextAreaField,
   DATE: DateField,
