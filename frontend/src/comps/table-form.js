@@ -82,7 +82,7 @@ const FieldTable = ({ fields, model }) => (
 
 const getValueDisplay = (val) => {
   const t = typeof val;
-  if (t === "undefined" || t === null || val === "") {
+  if (t === "undefined" || val === null || val === "") {
     return "-";
   }
   if (t === "object" && val.choices) {
