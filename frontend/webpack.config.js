@@ -62,6 +62,13 @@ module.exports = (env, argv) => {
       new webpack.HotModuleReplacementPlugin(),
       new ReactRefreshWebpackPlugin(),
     ];
+  } else {
+    config.devtool = "source-map";
+    config.optimisation = {
+      splitChunks: {
+        chunks: "all",
+      },
+    };
   }
   return config;
 };
