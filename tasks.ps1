@@ -47,7 +47,7 @@ function logs {
     Param(
         [string]$service
     )
-    Invoke-Expression "$COMPOSE logs $service"
+    Invoke-Expression "$COMPOSE logs -f --tail 200 $service"
 }
 
 function reset {
