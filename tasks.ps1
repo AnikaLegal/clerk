@@ -1,5 +1,5 @@
-# Initialise this script by dot sourcing it 
-#    
+# Initialise this script by dot sourcing it
+#
 #    . tasks.ps1
 #
 # See tasks.py for notes on each task.
@@ -47,16 +47,16 @@ function logs {
     Param(
         [string]$service
     )
-    Invoke-Expression "$COMPOSE logs $service"
+    Invoke-Expression "$COMPOSE logs -f --tail 200 $service"
 }
 
 function reset {
-    run -cmd "/app/scripts/tasks/dev-reset.sh" 
+    run -cmd "/app/scripts/tasks/dev-reset.sh"
 }
 
 
 function restore {
-    run -cmd "/app/scripts/tasks/dev-restore.sh" 
+    run -cmd "/app/scripts/tasks/dev-restore.sh"
 }
 
 function setup-ngrok {
@@ -78,11 +78,11 @@ function bash {
 }
 
 function shell {
-    run -cmd "./manage.py shell_plus" 
+    run -cmd "./manage.py shell_plus"
 }
 
 function psql {
-    run -cmd "psql" 
+    run -cmd "psql"
 }
 
 function run {

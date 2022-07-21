@@ -54,7 +54,7 @@ module.exports = (env, argv) => {
       headers: { "Access-Control-Allow-Origin": "*" },
     };
     config.output = {
-      publicPath: "http://0.0.0.0:3000/build/",
+      publicPath: "http://localhost:3000/build/",
     };
     // Add React refresh plugin.
     config.plugins = [
