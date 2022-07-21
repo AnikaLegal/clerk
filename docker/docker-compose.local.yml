@@ -51,7 +51,6 @@ services:
       - ../frontend/webpack.config.js:/frontend/webpack.config.js
       - ../frontend/babel.config.js:/frontend/babel.config.js
       - ../frontend/package.json:/frontend/package.json
-      - ../frontend/node_modules:/frontend/node_modules
       - build:/build
 
   # For testing.
