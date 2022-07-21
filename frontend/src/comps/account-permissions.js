@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Table, Label, Button } from "semantic-ui-react";
-import styled from "styled-components";
+import React, { useState, useEffect } from 'react'
+import { Table, Label, Button } from 'semantic-ui-react'
+import styled from 'styled-components'
 
-import { api } from "api";
-import { GROUPS } from "consts";
-import { GroupLabels } from "comps/group-label";
+import { api } from 'api'
+import { GROUPS } from 'consts'
+import { GroupLabels } from 'comps/group-label'
 
-const { user } = window.REACT_CONTEXT;
+const { user } = window.REACT_CONTEXT
 
 export const AccountPermissions = ({ account, setAccount }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+  const [isButtonLoading, setIsButtonLoading] = useState(false)
 
-  const [perms, setPerms] = useState(null);
+  const [perms, setPerms] = useState(null)
   useEffect(() => {
     api.accounts.getPermissions(account.id).then(({ resp, data }) => {
-      setPerms(data);
-      setIsLoading(false);
-    });
-  }, []);
+      setPerms(data)
+      setIsLoading(false)
+    })
+  }, [])
   return (
     <>
       <Table size="small" definition>
@@ -37,16 +37,16 @@ export const AccountPermissions = ({ account, setAccount }) => {
             <Table.Cell>
               {account.is_ms_account_set_up
                 ? `Created on ${account.ms_account_created_at}`
-                : "No Sharepoint access yet - account setup in progress"}
+                : 'No Sharepoint access yet - account setup in progress'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell width={3}>Sharepoint access</Table.Cell>
             <Table.Cell>
               {isLoading ? (
-                "Loading..."
+                'Loading...'
               ) : perms.has_coordinator_perms ? (
-                "Full access"
+                'Full access'
               ) : (
                 <>
                   {perms.paralegal_perm_issues.map((i) => (
@@ -108,8 +108,8 @@ export const AccountPermissions = ({ account, setAccount }) => {
         </ButtonList>
       )}
     </>
-  );
-};
+  )
+}
 
 const PromoteButton = ({
   account,
@@ -119,15 +119,15 @@ const PromoteButton = ({
   setIsLoading,
 }) => {
   const onClick = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     api.accounts.promote(account.id).then(({ resp, data }) => {
       if (resp.ok) {
-        setAccount(data.account);
-        setPerms(data.perms);
+        setAccount(data.account)
+        setPerms(data.perms)
       }
-      setIsLoading(false);
-    });
-  };
+      setIsLoading(false)
+    })
+  }
   if (account.is_paralegal) {
     return (
       <Button
@@ -138,7 +138,7 @@ const PromoteButton = ({
       >
         Promote to coordinator
       </Button>
-    );
+    )
   } else if (!account.is_paralegal_or_better) {
     return (
       <Button
@@ -149,11 +149,11 @@ const PromoteButton = ({
       >
         Promote to paralegal
       </Button>
-    );
+    )
   } else {
-    return null;
+    return null
   }
-};
+}
 
 const DemoteButton = ({
   account,
@@ -163,15 +163,15 @@ const DemoteButton = ({
   setIsLoading,
 }) => {
   const onClick = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     api.accounts.demote(account.id).then(({ resp, data }) => {
       if (resp.ok) {
-        setAccount(data.account);
-        setPerms(data.perms);
+        setAccount(data.account)
+        setPerms(data.perms)
       }
-      setIsLoading(false);
-    });
-  };
+      setIsLoading(false)
+    })
+  }
   if (account.is_coordinator) {
     return (
       <Button
@@ -182,7 +182,7 @@ const DemoteButton = ({
       >
         Demote to paralegal
       </Button>
-    );
+    )
   } else if (account.is_paralegal) {
     return (
       <Button
@@ -193,11 +193,11 @@ const DemoteButton = ({
       >
         Remove paralegal permissions
       </Button>
-    );
+    )
   } else {
-    return null;
+    return null
   }
-};
+}
 
 const ResyncButton = ({
   account,
@@ -207,29 +207,29 @@ const ResyncButton = ({
   setIsLoading,
 }) => {
   const onClick = () => {
-    setIsLoading(true);
+    setIsLoading(true)
     api.accounts.resync(account.id).then(({ resp, data }) => {
       if (resp.ok) {
-        setAccount(data.account);
-        setPerms(data.perms);
+        setAccount(data.account)
+        setPerms(data.perms)
       }
-      setIsLoading(false);
-    });
-  };
+      setIsLoading(false)
+    })
+  }
   if (account.is_ms_account_set_up) {
     return (
       <Button loading={isLoading} disabled={isLoading} onClick={onClick}>
         Resync permissions
       </Button>
-    );
+    )
   } else {
-    return null;
+    return null
   }
-};
+}
 
 const ButtonList = styled.div`
   display: flex;
   gap: 0.5em;
   flex-wrap: wrap;
   margin-bottom: 0.5em;
-`;
+`

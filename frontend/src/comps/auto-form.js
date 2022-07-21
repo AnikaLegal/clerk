@@ -1,21 +1,21 @@
 // Form framework
-import React from "react";
-import { DateInput } from "semantic-ui-calendar-react";
-import { Button, Input, Form, Dropdown, TextArea } from "semantic-ui-react";
-import { MarkdownTextArea } from "comps/markdown-editor";
+import React from 'react'
+import { DateInput } from 'semantic-ui-calendar-react'
+import { Button, Input, Form, Dropdown, TextArea } from 'semantic-ui-react'
+import { MarkdownTextArea } from 'comps/markdown-editor'
 
-import * as Yup from "yup";
+import * as Yup from 'yup'
 
 export const FIELD_TYPES = {
-  TEXT: "TEXT",
-  NUMBER: "NUMBER",
-  EMAIL: "EMAIL",
-  TEXTAREA: "TEXTAREA",
-  DATE: "DATE",
-  SINGLE_CHOICE: "SINGLE_CHOICE",
-  MULTI_CHOICE: "MULTI_CHOICE",
-  BOOL: "BOOL",
-};
+  TEXT: 'TEXT',
+  NUMBER: 'NUMBER',
+  EMAIL: 'EMAIL',
+  TEXTAREA: 'TEXTAREA',
+  DATE: 'DATE',
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+  MULTI_CHOICE: 'MULTI_CHOICE',
+  BOOL: 'BOOL',
+}
 
 export const getFormSchema = (formFields) =>
   Yup.object().shape(
@@ -29,29 +29,29 @@ export const getFormSchema = (formFields) =>
           : acc,
       {}
     )
-  );
+  )
 
 export const getModelChoices = (formFields, model) =>
   formFields.reduce((acc, field) => {
-    const fieldVal = model[field.name];
+    const fieldVal = model[field.name]
     if (fieldVal && fieldVal.choices) {
-      return { ...acc, [field.name]: fieldVal.choices };
+      return { ...acc, [field.name]: fieldVal.choices }
     } else {
-      return acc;
+      return acc
     }
-  }, {});
+  }, {})
 
 export const getModelInitialValues = (formFields, model) =>
   formFields.reduce((acc, field) => {
-    const fieldVal = model[field.name];
-    let value;
+    const fieldVal = model[field.name]
+    let value
     if (fieldVal === null) {
-      value = null;
+      value = null
     } else {
-      value = fieldVal.value ? fieldVal.value : fieldVal;
+      value = fieldVal.value ? fieldVal.value : fieldVal
     }
-    return { ...acc, [field.name]: value };
-  }, {});
+    return { ...acc, [field.name]: value }
+  }, {})
 
 const FieldSchema = Yup.array().of(
   Yup.object().shape({
@@ -61,7 +61,7 @@ const FieldSchema = Yup.array().of(
     placeholder: Yup.string(),
     schema: Yup.object(),
   })
-);
+)
 
 export const AutoForm = ({
   fields,
@@ -76,15 +76,15 @@ export const AutoForm = ({
     setFieldValue,
   },
   onCancel = null,
-  submitText = "Submit",
-  cancelText = "Cancel",
+  submitText = 'Submit',
+  cancelText = 'Cancel',
 }) => {
-  FieldSchema.validateSync(fields);
-  const labels = fields.reduce((acc, f) => ({ ...acc, [f.name]: f.label }), {});
+  FieldSchema.validateSync(fields)
+  const labels = fields.reduce((acc, f) => ({ ...acc, [f.name]: f.label }), {})
   return (
     <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
       {fields.map((f) => {
-        const FieldComponent = FIELD_COMPONENTS[f.type];
+        const FieldComponent = FIELD_COMPONENTS[f.type]
         return (
           <Form.Field key={f.name} error={touched[f.name] && !!errors[f.name]}>
             <label>{f.label}</label>
@@ -97,7 +97,7 @@ export const AutoForm = ({
               choices={choices[f.name]}
             />
           </Form.Field>
-        );
+        )
       })}
       {Object.entries(errors).map(
         ([k, v]) =>
@@ -120,16 +120,16 @@ export const AutoForm = ({
         <Button
           disabled={isSubmitting}
           onClick={(e) => {
-            e.preventDefault();
-            onCancel();
+            e.preventDefault()
+            onCancel()
           }}
         >
           {cancelText}
         </Button>
       )}
     </Form>
-  );
-};
+  )
+}
 
 const TextField = ({
   name,
@@ -147,7 +147,7 @@ const TextField = ({
     disabled={isSubmitting}
     type={type}
   />
-);
+)
 
 const NumberField = ({
   name,
@@ -160,16 +160,16 @@ const NumberField = ({
   return (
     <Input
       placeholder={placeholder}
-      value={value || ""}
+      value={value || ''}
       name={name}
       onChange={(e, { name, value }) =>
-        setFieldValue(name, value === "" ? null : value, false)
+        setFieldValue(name, value === '' ? null : value, false)
       }
       disabled={isSubmitting}
       type="text"
     />
-  );
-};
+  )
+}
 
 const DateField = ({
   name,
@@ -187,7 +187,7 @@ const DateField = ({
     autoComplete="off"
     onChange={(e, { name, value }) => setFieldValue(name, value, false)}
   />
-);
+)
 
 const ChoiceField =
   (multiple) =>
@@ -198,7 +198,7 @@ const ChoiceField =
         selection
         multiple={multiple}
         value={value}
-        style={{ margin: "1em 0" }}
+        style={{ margin: '1em 0' }}
         placeholder={placeholder}
         disabled={isSubmitting}
         options={choices.map(([value, label]) => ({
@@ -208,7 +208,7 @@ const ChoiceField =
         }))}
         onChange={(e, { value }) => setFieldValue(name, value, true)}
       />
-    );
+    )
 
 const BoolField = ({
   name,
@@ -221,24 +221,24 @@ const BoolField = ({
     fluid
     selection
     value={value}
-    style={{ margin: "1em 0" }}
+    style={{ margin: '1em 0' }}
     loading={isSubmitting}
     placeholder={placeholder}
     options={[
       {
-        key: "Yes",
-        text: "Yes",
+        key: 'Yes',
+        text: 'Yes',
         value: true,
       },
       {
-        key: "No",
-        text: "No",
+        key: 'No',
+        text: 'No',
         value: false,
       },
     ]}
     onChange={(e, { value }) => setFieldValue(name, value, false)}
   />
-);
+)
 
 const TextAreaField = ({
   name,
@@ -254,7 +254,7 @@ const TextAreaField = ({
     onChange={handleChange}
     disabled={isSubmitting}
   />
-);
+)
 
 const FIELD_COMPONENTS = {
   TEXT: (props) => <TextField {...props} type="text" />,
@@ -265,4 +265,4 @@ const FIELD_COMPONENTS = {
   BOOL: BoolField,
   SINGLE_CHOICE: ChoiceField(false),
   MULTI_CHOICE: ChoiceField(true),
-};
+}

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
 import {
   Header,
   Form,
@@ -8,27 +8,27 @@ import {
   Segment,
   Dropdown,
   Checkbox,
-} from "semantic-ui-react";
-import * as Yup from "yup";
+} from 'semantic-ui-react'
+import * as Yup from 'yup'
 
-import { submitCaseUpdate } from "./case-progress";
-import { OUTCOMES } from "consts";
-import { TextArea } from "comps/textarea";
+import { submitCaseUpdate } from './case-progress'
+import { OUTCOMES } from 'consts'
+import { TextArea } from 'comps/textarea'
 
 const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   key: k,
   value: k,
   text: v,
-}));
+}))
 
 const FormSchema = Yup.object().shape({
-  outcome: Yup.string().nullable().required("Required"),
-  outcome_notes: Yup.string().required("Required"),
+  outcome: Yup.string().nullable().required('Required'),
+  outcome_notes: Yup.string().required('Required'),
   provided_legal_services: Yup.bool(),
-});
+})
 
 export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Edit case outcome.</Header>
@@ -63,29 +63,29 @@ export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
               selection
               search
               value={values.outcome}
-              style={{ margin: "1em 0" }}
+              style={{ margin: '1em 0' }}
               loading={isSubmitting}
               placeholder="Select a case outcome"
               options={OUTCOME_OPTIONS}
               onChange={(e, { value }) =>
-                setFieldValue("outcome", value, false)
+                setFieldValue('outcome', value, false)
               }
             />
             <TextArea
-              onChange={(e) => setFieldValue("outcome_notes", e.target.value)}
+              onChange={(e) => setFieldValue('outcome_notes', e.target.value)}
               disabled={isSubmitting}
               rows={3}
               value={values.outcome_notes}
-              style={{ marginBottom: "1em" }}
+              style={{ marginBottom: '1em' }}
               placeholder="Write outcome notes here"
             />
-            <div style={{ margin: "0 0 1em 0" }}>
+            <div style={{ margin: '0 0 1em 0' }}>
               <Checkbox
                 label="Provided legal services"
                 checked={values.provided_legal_services}
                 onChange={(e, { checked }) =>
                   setFieldValue(
-                    "provided_legal_services",
+                    'provided_legal_services',
                     Boolean(checked),
                     false
                   )
@@ -115,5 +115,5 @@ export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

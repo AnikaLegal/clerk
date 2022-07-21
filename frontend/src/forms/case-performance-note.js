@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
-import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
-import { DateInput } from "semantic-ui-calendar-react";
-import moment from "moment";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
+import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
+import { DateInput } from 'semantic-ui-calendar-react'
+import moment from 'moment'
 
-import { TimelineNote } from "comps/timeline-item";
-import { MarkdownExplainer } from "comps/markdown-editor";
-import { submitNote } from "./case-file-note";
+import { TimelineNote } from 'comps/timeline-item'
+import { MarkdownExplainer } from 'comps/markdown-editor'
+import { submitNote } from './case-file-note'
 
 export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header> Add a paralegal performance review</Header>
       <p>
-        Leave a paralegal performance review note for{" "}
+        Leave a paralegal performance review note for{' '}
         {issue.paralegal.full_name}. This note is not visible to paralegals.
       </p>
       <Formik
-        initialValues={{ text: "", note_type: "PERFORMANCE" }}
+        initialValues={{ text: '', note_type: 'PERFORMANCE' }}
         validate={({ text }) =>
-          text ? null : { "File note text": "File note cannot be empty" }
+          text ? null : { 'File note text': 'File note cannot be empty' }
         }
         onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
@@ -38,12 +38,12 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
             error={Object.keys(errors).length > 0}
           >
             <textarea
-              onChange={(e) => setFieldValue("text", e.target.value)}
+              onChange={(e) => setFieldValue('text', e.target.value)}
               disabled={isSubmitting}
               rows={3}
               value={values.text}
               placeholder="Write your review here (this is not a filenote, paralegals cannot see this)"
-              style={{ marginBottom: "1em" }}
+              style={{ marginBottom: '1em' }}
             />
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
@@ -67,10 +67,10 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
             <TimelineNote
               note={{
                 note_type: values.note_type,
-                created_at: "Now",
-                text_display: values.text || "start typing...",
+                created_at: 'Now',
+                text_display: values.text || 'start typing...',
                 creator: {
-                  full_name: "You",
+                  full_name: 'You',
                 },
                 reviewee: issue.paralegal,
               }}
@@ -79,5 +79,5 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

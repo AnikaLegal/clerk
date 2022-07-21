@@ -53,9 +53,7 @@
       "version": 201,
       "versionNonce": 1237058947,
       "isDeleted": false,
-      "boundElementIds": [
-        "NRkg8QJMtWIbz_X0XbjUI"
-      ]
+      "boundElementIds": ["NRkg8QJMtWIbz_X0XbjUI"]
     },
     {
       "id": "XoJNTzgO9ryH2atJgb4X6",
@@ -164,9 +162,7 @@
       "version": 407,
       "versionNonce": 2112143555,
       "isDeleted": false,
-      "boundElementIds": [
-        "pnHfoSj6Si7DRw987E2hF"
-      ]
+      "boundElementIds": ["pnHfoSj6Si7DRw987E2hF"]
     },
     {
       "id": "502pQS1DKwgWZr9UmwSGo",
@@ -218,10 +214,7 @@
       "version": 275,
       "versionNonce": 766881891,
       "isDeleted": false,
-      "boundElementIds": [
-        "wduf0vQHTsUm4kRLTgwmv",
-        "pnHfoSj6Si7DRw987E2hF"
-      ]
+      "boundElementIds": ["wduf0vQHTsUm4kRLTgwmv", "pnHfoSj6Si7DRw987E2hF"]
     },
     {
       "id": "NV4mJAY8a9MgyaYtIM8-_",
@@ -325,9 +318,7 @@
       "version": 134,
       "versionNonce": 1678512771,
       "isDeleted": false,
-      "boundElementIds": [
-        "wduf0vQHTsUm4kRLTgwmv"
-      ],
+      "boundElementIds": ["wduf0vQHTsUm4kRLTgwmv"],
       "text": "A person who we are helping",
       "fontSize": 16,
       "fontFamily": 1,
@@ -356,9 +347,7 @@
       "version": 216,
       "versionNonce": 353803661,
       "isDeleted": false,
-      "boundElementIds": [
-        "arKMiicXwusuNYamhTVrA"
-      ],
+      "boundElementIds": ["arKMiicXwusuNYamhTVrA"],
       "text": "A client's specific issue.",
       "fontSize": 16,
       "fontFamily": 1,
@@ -389,14 +378,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          432.97483408326957,
-          0
-        ]
+        [0, 0],
+        [432.97483408326957, 0]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
@@ -491,9 +474,7 @@
       "version": 370,
       "versionNonce": 130833997,
       "isDeleted": false,
-      "boundElementIds": [
-        "NRkg8QJMtWIbz_X0XbjUI"
-      ]
+      "boundElementIds": ["NRkg8QJMtWIbz_X0XbjUI"]
     },
     {
       "id": "rZq12YQD1vS-D8rbPngyn",
@@ -574,10 +555,7 @@
       "version": 301,
       "versionNonce": 723054349,
       "isDeleted": false,
-      "boundElementIds": [
-        "VfKqxBG8TajqYsqHI7FfU",
-        "JWWYd4rQVrjQ9G3F84e1z"
-      ],
+      "boundElementIds": ["VfKqxBG8TajqYsqHI7FfU", "JWWYd4rQVrjQ9G3F84e1z"],
       "text": "User uploaded file",
       "fontSize": 16,
       "fontFamily": 1,
@@ -666,14 +644,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          81.0789016962051
-        ]
+        [0, 0],
+        [0, 81.0789016962051]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
@@ -741,14 +713,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          215.33830213882027,
-          0
-        ]
+        [0, 0],
+        [215.33830213882027, 0]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
@@ -897,14 +863,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -150.80212398866877,
-          -90.03434595657042
-        ]
+        [0, 0],
+        [-150.80212398866877, -90.03434595657042]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
@@ -1453,14 +1413,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          79.99999999999997
-        ]
+        [0, 0],
+        [0, 79.99999999999997]
       ],
       "lastCommittedPoint": null,
       "startBinding": null,
@@ -1524,14 +1478,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          195.71428571428578,
-          -208.57142857142856
-        ]
+        [0, 0],
+        [195.71428571428578, -208.57142857142856]
       ],
       "lastCommittedPoint": null,
       "startBinding": null,
@@ -1562,14 +1510,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          191.42857142857156,
-          -81.42857142857144
-        ]
+        [0, 0],
+        [191.42857142857156, -81.42857142857144]
       ],
       "lastCommittedPoint": null,
       "startBinding": null,
@@ -1604,14 +1546,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          185.71428571428555,
-          87.14285714285714
-        ]
+        [0, 0],
+        [185.71428571428555, 87.14285714285714]
       ],
       "lastCommittedPoint": null,
       "startBinding": {
@@ -1650,14 +1586,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          177.1428571428571,
-          222.85714285714286
-        ]
+        [0, 0],
+        [177.1428571428571, 222.85714285714286]
       ],
       "lastCommittedPoint": null,
       "startBinding": null,
@@ -1808,14 +1738,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          361.4285714285715
-        ]
+        [0, 0],
+        [0, 361.4285714285715]
       ],
       "lastCommittedPoint": null,
       "startBinding": {

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Form, Segment } from "semantic-ui-react";
+import React, { useEffect, useState } from 'react'
+import { Form, Segment } from 'semantic-ui-react'
 
-import { TextArea } from "comps/textarea";
-import { markdownToHtml } from "utils";
+import { TextArea } from 'comps/textarea'
+import { markdownToHtml } from 'utils'
 
 export const MarkdownExplainer = () => (
   <Segment secondary>
@@ -16,7 +16,7 @@ export const MarkdownExplainer = () => (
     </a>
     &nbsp;for a basic reference.
   </Segment>
-);
+)
 
 export const MarkdownEditor = ({
   text,
@@ -27,23 +27,23 @@ export const MarkdownEditor = ({
 }) => {
   useEffect(() => {
     if (text) {
-      onChangeHtml(markdownToHtml(text));
+      onChangeHtml(markdownToHtml(text))
     }
-  }, []);
+  }, [])
 
   const onTextAreaChange = (e) => {
-    onChangeText(e.target.value);
-    onChangeHtml(markdownToHtml(e.target.value));
-  };
+    onChangeText(e.target.value)
+    onChangeHtml(markdownToHtml(e.target.value))
+  }
   return (
-    <div style={{ padding: "1em 0" }}>
+    <div style={{ padding: '1em 0' }}>
       <MarkdownExplainer />
       <div
         style={{
-          display: "grid",
-          gap: "2em",
-          paddingTop: "1em",
-          gridTemplateColumns: "1fr 1fr",
+          display: 'grid',
+          gap: '2em',
+          paddingTop: '1em',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
         <TextArea
@@ -58,18 +58,18 @@ export const MarkdownEditor = ({
         </Form.Field>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const MarkdownTextArea = ({ value, ...props }) => {
-  const [html, setHtml] = useState("");
+  const [html, setHtml] = useState('')
   useEffect(() => {
     if (value) {
-      setHtml(markdownToHtml(value));
+      setHtml(markdownToHtml(value))
     } else {
-      setHtml("");
+      setHtml('')
     }
-  }, [value]);
+  }, [value])
   return (
     <>
       <Segment secondary>
@@ -86,15 +86,15 @@ export const MarkdownTextArea = ({ value, ...props }) => {
       <TextArea value={value} {...props} />
       <div
         style={{
-          margin: "1em 0",
-          padding: "1em",
-          border: "1px solid rgba(34,36,38,.15)",
-          borderRadius: "0.28571429rem",
+          margin: '1em 0',
+          padding: '1em',
+          border: '1px solid rgba(34,36,38,.15)',
+          borderRadius: '0.28571429rem',
         }}
         dangerouslySetInnerHTML={{
           __html: html || "<span style='opacity: 0.5'>Start typing...</span>",
         }}
       />
     </>
-  );
-};
+  )
+}

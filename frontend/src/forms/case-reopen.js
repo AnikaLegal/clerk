@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
 import {
   Header,
   Form,
@@ -7,33 +7,33 @@ import {
   Message,
   Segment,
   Dropdown,
-} from "semantic-ui-react";
-import * as Yup from "yup";
+} from 'semantic-ui-react'
+import * as Yup from 'yup'
 
-import { submitCaseUpdate } from "./case-progress";
-import { STAGES } from "consts";
+import { submitCaseUpdate } from './case-progress'
+import { STAGES } from 'consts'
 
 const STAGE_OPTIONS = Object.entries(STAGES)
-  .filter(([k, v]) => k !== "CLOSED")
+  .filter(([k, v]) => k !== 'CLOSED')
   .map(([k, v]) => ({
     key: k,
     value: k,
     text: v,
-  }));
+  }))
 
 const FormSchema = Yup.object().shape({
-  stage: Yup.string().required("Required"),
-});
+  stage: Yup.string().required('Required'),
+})
 
 export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Re-open the case.</Header>
       <Formik
         initialValues={{
           is_open: true,
-          stage: "",
+          stage: '',
         }}
         validationSchema={FormSchema}
         onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
@@ -56,11 +56,11 @@ export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
               selection
               search
               value={values.stage}
-              style={{ margin: "1em 0" }}
+              style={{ margin: '1em 0' }}
               loading={isSubmitting}
               placeholder="Select a case stage"
               options={STAGE_OPTIONS}
-              onChange={(e, { value }) => setFieldValue("stage", value, false)}
+              onChange={(e, { value }) => setFieldValue('stage', value, false)}
             />
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
@@ -84,5 +84,5 @@ export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

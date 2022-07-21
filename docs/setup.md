@@ -14,8 +14,8 @@ You will need:
 If you are using Windows ensure that git is setup to use LF not CLRF
 
 ```
-git config core.autocrlf false 
-git rm --cached -r . 
+git config core.autocrlf false
+git rm --cached -r .
 git reset --hard
 ```
 

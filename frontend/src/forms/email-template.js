@@ -1,14 +1,14 @@
-import React from "react";
-import { Button, Input, Dropdown, Form } from "semantic-ui-react";
+import React from 'react'
+import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
-import { MarkdownEditor } from "comps/markdown-editor";
+import { MarkdownEditor } from 'comps/markdown-editor'
 
 const TOPIC_OPTIONS = [
-  { key: "GENERAL", value: "GENERAL", text: "General" },
-  { key: "REPAIRS", value: "REPAIRS", text: "Repairs" },
-  { key: "BONDS", value: "BONDS", text: "Bonds" },
-  { key: "EVICTION", value: "EVICTION", text: "Eviction" },
-];
+  { key: 'GENERAL', value: 'GENERAL', text: 'General' },
+  { key: 'REPAIRS', value: 'REPAIRS', text: 'Repairs' },
+  { key: 'BONDS', value: 'BONDS', text: 'Bonds' },
+  { key: 'EVICTION', value: 'EVICTION', text: 'Eviction' },
+]
 
 // Formik form component
 export const EmailTemplateForm = ({
@@ -24,19 +24,19 @@ export const EmailTemplateForm = ({
   },
 }) => (
   <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
-    <div className={`field ${errors.topic && "error"}`}>
+    <div className={`field ${errors.topic && 'error'}`}>
       <label>Case Type</label>
       <Dropdown
         fluid
         selection
         placeholder="Select a case type"
         options={TOPIC_OPTIONS}
-        onChange={(e, { value }) => setFieldValue("topic", value)}
+        onChange={(e, { value }) => setFieldValue('topic', value)}
         value={values.topic}
         disabled={!editable}
       />
     </div>
-    <div className={`field ${errors.name && "error"}`}>
+    <div className={`field ${errors.name && 'error'}`}>
       <label>Name</label>
       <Input
         placeholder="Template name"
@@ -46,7 +46,7 @@ export const EmailTemplateForm = ({
         disabled={!editable}
       />
     </div>
-    <div className={`field ${errors.subject && "error"}`}>
+    <div className={`field ${errors.subject && 'error'}`}>
       <label>Subject</label>
       <Input
         placeholder="Template subject"
@@ -59,8 +59,8 @@ export const EmailTemplateForm = ({
     <MarkdownEditor
       text={values.text}
       html={values.html}
-      onChangeText={(text) => setFieldValue("text", text)}
-      onChangeHtml={(html) => setFieldValue("html", html)}
+      onChangeText={(text) => setFieldValue('text', text)}
+      onChangeHtml={(html) => setFieldValue('html', html)}
       disabled={!editable}
     />
     {Object.entries(errors).map(([k, v]) => (
@@ -76,8 +76,8 @@ export const EmailTemplateForm = ({
         disabled={isSubmitting}
         loading={isSubmitting}
       >
-        {create ? "Create email template" : "Update email template"}
+        {create ? 'Create email template' : 'Update email template'}
       </Button>
     ) : null}
   </Form>
-);
+)

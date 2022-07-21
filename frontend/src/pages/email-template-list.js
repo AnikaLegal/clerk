@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -6,38 +6,38 @@ import {
   Table,
   Input,
   Dropdown,
-} from "semantic-ui-react";
+} from 'semantic-ui-react'
 
-import { mount, debounce, useEffectLazy } from "utils";
-import { api } from "api";
-import { FadeTransition } from "comps/transitions";
+import { mount, debounce, useEffectLazy } from 'utils'
+import { api } from 'api'
+import { FadeTransition } from 'comps/transitions'
 
-const CONTEXT = window.REACT_CONTEXT;
+const CONTEXT = window.REACT_CONTEXT
 const TOPIC_OPTIONS = [
-  { key: "REPAIRS", value: "REPAIRS", text: "Repairs" },
-  { key: "BONDS", value: "BONDS", text: "Bonds" },
-  { key: "EVICTION", value: "EVICTION", text: "Eviction" },
-  { key: "GENERAL", value: "GENERAL", text: "General" },
-];
+  { key: 'REPAIRS', value: 'REPAIRS', text: 'Repairs' },
+  { key: 'BONDS', value: 'BONDS', text: 'Bonds' },
+  { key: 'EVICTION', value: 'EVICTION', text: 'Eviction' },
+  { key: 'GENERAL', value: 'GENERAL', text: 'General' },
+]
 
-const debouncer = debounce(300);
+const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [templates, setTemplates] = useState(CONTEXT.templates);
-  const [name, setName] = useState("");
-  const [topic, setTopic] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
+  const [templates, setTemplates] = useState(CONTEXT.templates)
+  const [name, setName] = useState('')
+  const [topic, setTopic] = useState('')
   const search = debouncer(() => {
-    setIsLoading(true);
+    setIsLoading(true)
     api.templates.email
       .search({ name, topic })
       .then(({ data }) => {
-        setTemplates(data);
-        setIsLoading(false);
+        setTemplates(data)
+        setIsLoading(false)
       })
-      .catch(() => setIsLoading(false));
-  });
-  useEffectLazy(() => search(), [name, topic]);
+      .catch(() => setIsLoading(false))
+  })
+  useEffectLazy(() => search(), [name, topic])
   return (
     <Container>
       <Header as="h1">Email Templates</Header>
@@ -46,10 +46,10 @@ const App = () => {
       </a>
       <div
         style={{
-          margin: "1rem 0",
-          display: "grid",
-          gap: "1rem",
-          gridTemplateColumns: "1fr 1fr",
+          margin: '1rem 0',
+          display: 'grid',
+          gap: '1rem',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
         <Input
@@ -97,7 +97,7 @@ const App = () => {
         </Table>
       </FadeTransition>
     </Container>
-  );
-};
+  )
+}
 
-mount(App);
+mount(App)

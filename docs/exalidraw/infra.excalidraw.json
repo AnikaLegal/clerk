@@ -24,9 +24,7 @@
       "seed": 1924306125,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "UkkRGjJmUCooFdX-mEeLn"
-      ]
+      "boundElementIds": ["UkkRGjJmUCooFdX-mEeLn"]
     },
     {
       "type": "text",
@@ -105,10 +103,7 @@
       "seed": 1230876771,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "Y1rSq7hr-IIB73iQloGyC",
-        "E-ZRiwr2upcc-vMZZLstN"
-      ]
+      "boundElementIds": ["Y1rSq7hr-IIB73iQloGyC", "E-ZRiwr2upcc-vMZZLstN"]
     },
     {
       "type": "rectangle",
@@ -359,9 +354,7 @@
       "seed": 412678307,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "nvzn4118b-opXH6LvFGKS"
-      ]
+      "boundElementIds": ["nvzn4118b-opXH6LvFGKS"]
     },
     {
       "type": "rectangle",
@@ -384,9 +377,7 @@
       "seed": 1955450029,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "WwMRi7gFDJ8dLQiNxdtmj"
-      ]
+      "boundElementIds": ["WwMRi7gFDJ8dLQiNxdtmj"]
     },
     {
       "type": "text",
@@ -409,9 +400,7 @@
       "seed": 232602275,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "f4wl5BE7d49e3eMuDbiDQ"
-      ],
+      "boundElementIds": ["f4wl5BE7d49e3eMuDbiDQ"],
       "fontSize": 20,
       "fontFamily": 1,
       "text": "Django\nweb",
@@ -481,14 +470,8 @@
         "gap": 15.24804127907612
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          119.60352942790394,
-          -125.78923650122448
-        ]
+        [0, 0],
+        [119.60352942790394, -125.78923650122448]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -527,14 +510,8 @@
         "gap": 11.283297264378916
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          117.3124876175159,
-          101.5285068837295
-        ]
+        [0, 0],
+        [117.3124876175159, 101.5285068837295]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -561,9 +538,7 @@
       "seed": 1031875021,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "Y1rSq7hr-IIB73iQloGyC"
-      ]
+      "boundElementIds": ["Y1rSq7hr-IIB73iQloGyC"]
     },
     {
       "type": "rectangle",
@@ -586,9 +561,7 @@
       "seed": 1555327021,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "jU32oqSFfgpA_rSp-mccv"
-      ]
+      "boundElementIds": ["jU32oqSFfgpA_rSp-mccv"]
     },
     {
       "type": "text",
@@ -611,10 +584,7 @@
       "seed": 1162296611,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "f4wl5BE7d49e3eMuDbiDQ",
-        "qpMhR-yr4OBGJ6H9YCJOd"
-      ],
+      "boundElementIds": ["f4wl5BE7d49e3eMuDbiDQ", "qpMhR-yr4OBGJ6H9YCJOd"],
       "fontSize": 20,
       "fontFamily": 1,
       "text": "Django\nweb",
@@ -684,14 +654,8 @@
         "gap": 9.5
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          107,
-          124
-        ]
+        [0, 0],
+        [107, 124]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -730,14 +694,8 @@
         "gap": 12.323879834636955
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          264.17612016536305,
-          138.8904089032771
-        ]
+        [0, 0],
+        [264.17612016536305, 138.8904089032771]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -776,14 +734,8 @@
         "gap": 11.56882637860258
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          271.3199617069831,
-          -51.67140223260094
-        ]
+        [0, 0],
+        [271.3199617069831, -51.67140223260094]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -822,14 +774,8 @@
         "gap": 7.5
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          103.5,
-          -56.238909362600225
-        ]
+        [0, 0],
+        [103.5, -56.238909362600225]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -864,14 +810,8 @@
       },
       "endBinding": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          421.1504749050833,
-          -71.04073844218362
-        ]
+        [0, 0],
+        [421.1504749050833, -71.04073844218362]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -957,10 +897,7 @@
       "seed": 793069,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "qpMhR-yr4OBGJ6H9YCJOd",
-        "f4wl5BE7d49e3eMuDbiDQ"
-      ]
+      "boundElementIds": ["qpMhR-yr4OBGJ6H9YCJOd", "f4wl5BE7d49e3eMuDbiDQ"]
     },
     {
       "type": "text",
@@ -1012,10 +949,7 @@
       "seed": 396812461,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "UkkRGjJmUCooFdX-mEeLn",
-        "E-ZRiwr2upcc-vMZZLstN"
-      ]
+      "boundElementIds": ["UkkRGjJmUCooFdX-mEeLn", "E-ZRiwr2upcc-vMZZLstN"]
     },
     {
       "type": "text",
@@ -1079,14 +1013,8 @@
         "gap": 1
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          397.93180114827186,
-          384.421391159608
-        ]
+        [0, 0],
+        [397.93180114827186, 384.421391159608]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -1125,14 +1053,8 @@
         "gap": 1.7342363616829743
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          509.3930085709836,
-          -402.5963971307855
-        ]
+        [0, 0],
+        [509.3930085709836, -402.5963971307855]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -1186,9 +1108,7 @@
       "seed": 162241027,
       "groupIds": [],
       "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "kcAkefL0TzfSWFiNakvrj"
-      ],
+      "boundElementIds": ["kcAkefL0TzfSWFiNakvrj"],
       "fontSize": 20,
       "fontFamily": 1,
       "text": "Intake\nStatic\nSite",
@@ -1285,14 +1205,8 @@
         "gap": 11.101366208307638
       },
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          53.52036396047009,
-          -215.88328872707007
-        ]
+        [0, 0],
+        [53.52036396047009, -215.88328872707007]
       ],
       "lastCommittedPoint": null,
       "startArrowhead": null,
@@ -1321,14 +1235,8 @@
       "isDeleted": false,
       "boundElementIds": null,
       "points": [
-        [
-          0,
-          0
-        ],
-        [
-          304.28571428571433,
-          195.71428571428567
-        ]
+        [0, 0],
+        [304.28571428571433, 195.71428571428567]
       ],
       "lastCommittedPoint": null,
       "startBinding": {

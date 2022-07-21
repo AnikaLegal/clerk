@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Formik } from "formik";
+import React, { useState, useEffect } from 'react'
+import { Formik } from 'formik'
 import {
   Container,
   Header,
@@ -11,12 +11,12 @@ import {
   Segment,
   List,
   Feed,
-} from "semantic-ui-react";
+} from 'semantic-ui-react'
 
-import { TimelineNote } from "comps/timeline-item";
-import { mount, MarkdownAsHtmlDisplay } from "utils";
-import { api } from "api";
-import { URLS } from "consts";
+import { TimelineNote } from 'comps/timeline-item'
+import { mount, MarkdownAsHtmlDisplay } from 'utils'
+import { api } from 'api'
+import { URLS } from 'consts'
 import {
   FilenoteForm,
   ReviewForm,
@@ -28,39 +28,39 @@ import {
   OutcomeForm,
   ProgressForm,
   ConflictForm,
-} from "forms";
+} from 'forms'
 
-const { details, urls, actionstep_url, permissions } = window.REACT_CONTEXT;
+const { details, urls, actionstep_url, permissions } = window.REACT_CONTEXT
 
 const App = () => {
-  const [issue, setIssue] = useState(window.REACT_CONTEXT.issue);
-  const [notes, setNotes] = useState(window.REACT_CONTEXT.notes);
-  const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy);
-  const [activeFormId, setActiveFormId] = useState(null);
+  const [issue, setIssue] = useState(window.REACT_CONTEXT.issue)
+  const [notes, setNotes] = useState(window.REACT_CONTEXT.notes)
+  const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy)
+  const [activeFormId, setActiveFormId] = useState(null)
   const onRemoveLandlord = () => {
-    if (confirm("Remove the landlord for this case?")) {
-      api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data));
+    if (confirm('Remove the landlord for this case?')) {
+      api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data))
     }
-  };
+  }
   const onRemoveAgent = () => {
-    if (confirm("Remove the agent for this case?")) {
-      api.case.agent.remove(issue.id).then(({ data }) => setTenancy(data));
+    if (confirm('Remove the agent for this case?')) {
+      api.case.agent.remove(issue.id).then(({ data }) => setTenancy(data))
     }
-  };
+  }
   const onAddAgent = (agentId) => {
-    api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data));
-  };
+    api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data))
+  }
   const onAddLandlord = (landlordId) => {
     api.case.landlord
       .add(issue.id, landlordId)
-      .then(({ data }) => setTenancy(data));
-  };
-  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null;
+      .then(({ data }) => setTenancy(data))
+  }
+  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
   return (
     <Container>
       <CaseHeader issue={issue} actionstep_url={actionstep_url} />
       <CaseTabMenu />
-      <div className="ui two column grid" style={{ marginTop: "1rem" }}>
+      <div className="ui two column grid" style={{ marginTop: '1rem' }}>
         <div className="column">
           <Segment>
             <List divided verticalAlign="middle" selection>
@@ -119,10 +119,10 @@ const App = () => {
                 title="Tenancy"
                 url={tenancy.url}
                 tableData={{
-                  ["Street Address"]: tenancy.address,
+                  ['Street Address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ["Client on lease"]: tenancy.is_on_lease,
+                  ['Client on lease']: tenancy.is_on_lease,
                 }}
               />
               {tenancy.landlord ? (
@@ -169,24 +169,24 @@ const App = () => {
         </div>
       </div>
     </Container>
-  );
-};
+  )
+}
 
 const PersonSearchCard = ({ title, createUrl, onSelect }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [people, setPeople] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
+  const [people, setPeople] = useState([])
   useEffect(() => {
     api.person.list().then(({ data }) => {
-      setPeople(data);
-      setIsLoading(false);
-    });
-  }, []);
+      setPeople(data)
+      setIsLoading(false)
+    })
+  }, [])
   return (
     <div className="ui card fluid">
       <div className="content">
         <h2 className="header">
           {title}
-          <a style={{ fontWeight: "normal", float: "right" }} href={createUrl}>
+          <a style={{ fontWeight: 'normal', float: 'right' }} href={createUrl}>
             create
           </a>
         </h2>
@@ -205,8 +205,8 @@ const PersonSearchCard = ({ title, createUrl, onSelect }) => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
 const EntityCard = ({ title, url, onRemove, tableData }) => (
   <div className="ui card fluid">
@@ -215,7 +215,7 @@ const EntityCard = ({ title, url, onRemove, tableData }) => (
         {url ? <a href={url}>{title}</a> : title}
         {onRemove && (
           <a
-            style={{ fontWeight: "normal", float: "right" }}
+            style={{ fontWeight: 'normal', float: 'right' }}
             onClick={onRemove}
           >
             remove
@@ -234,7 +234,7 @@ const EntityCard = ({ title, url, onRemove, tableData }) => (
       </table>
     </div>
   </div>
-);
+)
 
 const CaseTabMenu = () => (
   <div className="ui top attached tabular menu">
@@ -251,7 +251,7 @@ const CaseTabMenu = () => (
       Documents
     </a>
   </div>
-);
+)
 
 const CaseHeader = ({ issue, actionstep_url }) => (
   <>
@@ -267,7 +267,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
             &nbsp;
           </span>
         ) : (
-          "Not assigned, "
+          'Not assigned, '
         )}
         {issue.lawyer ? (
           <span>
@@ -275,7 +275,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
             <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>&nbsp;
           </span>
         ) : (
-          "not supervised "
+          'not supervised '
         )}
         {actionstep_url && <a href="{actionstep_url}">view in Actionstep</a>}
       </div>
@@ -323,7 +323,7 @@ const CaseHeader = ({ issue, actionstep_url }) => (
       )}
     </span>
   </>
-);
+)
 
 const CASE_FORMS = {
   filenote: FilenoteForm,
@@ -336,69 +336,69 @@ const CASE_FORMS = {
   close: CloseForm,
   reopen: ReopenForm,
   outcome: OutcomeForm,
-};
+}
 
 const CASE_FORM_OPTIONS = [
   {
-    id: "filenote",
-    icon: "clipboard outline",
-    text: "Add a file note",
+    id: 'filenote',
+    icon: 'clipboard outline',
+    text: 'Add a file note',
     when: (perms, issue) => perms.is_paralegal_or_better,
   },
   {
-    id: "review",
-    icon: "clipboard outline",
-    text: "Add a coordinator case review note",
+    id: 'review',
+    icon: 'clipboard outline',
+    text: 'Add a coordinator case review note',
     when: (perms, issue) => perms.is_coordinator_or_better,
   },
   {
-    id: "performance",
-    icon: "clipboard outline",
-    text: "Add a paralegal performance review note",
+    id: 'performance',
+    icon: 'clipboard outline',
+    text: 'Add a paralegal performance review note',
     when: (perms, issue) => perms.is_coordinator_or_better && issue.paralegal,
   },
   {
-    id: "conflict",
-    icon: "search",
-    text: "Record a conflict check",
+    id: 'conflict',
+    icon: 'search',
+    text: 'Record a conflict check',
     when: (perms, issue) => perms.is_paralegal_or_better,
   },
   {
-    id: "eligibility",
-    icon: "search",
-    text: "Record an eligibility check",
+    id: 'eligibility',
+    icon: 'search',
+    text: 'Record an eligibility check',
     when: (perms, issue) => perms.is_paralegal_or_better,
   },
   {
-    id: "assign",
-    icon: "graduation cap",
-    text: "Assign a paralegal to the case",
+    id: 'assign',
+    icon: 'graduation cap',
+    text: 'Assign a paralegal to the case',
     when: (perms, issue) => perms.is_coordinator_or_better,
   },
   {
-    id: "progress",
-    icon: "chart line",
-    text: "Progress the case status",
+    id: 'progress',
+    icon: 'chart line',
+    text: 'Progress the case status',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
   },
   {
-    id: "close",
-    icon: "times circle outline",
-    text: "Close the case",
+    id: 'close',
+    icon: 'times circle outline',
+    text: 'Close the case',
     when: (perms, issue) => perms.is_coordinator_or_better && issue.is_open,
   },
   {
-    id: "reopen",
-    icon: "check",
-    text: "Re-open the case",
+    id: 'reopen',
+    icon: 'check',
+    text: 'Re-open the case',
     when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
   },
   {
-    id: "outcome",
-    icon: "undo",
-    text: "Edit case outcome",
+    id: 'outcome',
+    icon: 'undo',
+    text: 'Edit case outcome',
     when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
   },
-];
+]
 
-mount(App);
+mount(App)

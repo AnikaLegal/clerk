@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { Button, Table } from "semantic-ui-react";
-import { Formik } from "formik";
+import React, { useState } from 'react'
+import { Button, Table } from 'semantic-ui-react'
+import { Formik } from 'formik'
 
-import { markdownToHtml } from "utils";
-import { CaseListTable } from "comps/case-table";
+import { markdownToHtml } from 'utils'
+import { CaseListTable } from 'comps/case-table'
 import {
   AutoForm,
   getModelChoices,
   getModelInitialValues,
   FIELD_TYPES,
-} from "comps/auto-form";
+} from 'comps/auto-form'
 
 // Wrapper around AutoForm for updating a model or displating a table.
 export const TableForm = ({
@@ -20,15 +20,15 @@ export const TableForm = ({
   modelName,
   onUpdate,
 }) => {
-  const [isEditMode, setEditMode] = useState(false);
-  const toggleEditMode = () => setEditMode(!isEditMode);
+  const [isEditMode, setEditMode] = useState(false)
+  const toggleEditMode = () => setEditMode(!isEditMode)
   if (!isEditMode) {
     return (
       <>
         <FieldTable fields={fields} model={model} />
         <Button onClick={toggleEditMode}>Edit</Button>
       </>
-    );
+    )
   }
   return (
     <Formik
@@ -37,13 +37,13 @@ export const TableForm = ({
       onSubmit={(values, { setSubmitting, setErrors }) => {
         onUpdate(model.id, values).then(({ resp, data }) => {
           if (resp.status === 400) {
-            setErrors(data);
+            setErrors(data)
           } else if (resp.ok) {
-            setModel(data[modelName]);
-            toggleEditMode();
+            setModel(data[modelName])
+            toggleEditMode()
           }
-          setSubmitting(false);
-        });
+          setSubmitting(false)
+        })
       }}
     >
       {(formik) => (
@@ -56,8 +56,8 @@ export const TableForm = ({
         />
       )}
     </Formik>
-  );
-};
+  )
+}
 
 const FieldTable = ({ fields, model }) => (
   <Table size="small" definition>
@@ -68,7 +68,7 @@ const FieldTable = ({ fields, model }) => (
           {type === FIELD_TYPES.TEXTAREA ? (
             <td
               dangerouslySetInnerHTML={{
-                __html: model[name] ? markdownToHtml(model[name]) : "-",
+                __html: model[name] ? markdownToHtml(model[name]) : '-',
               }}
             />
           ) : (
@@ -78,21 +78,21 @@ const FieldTable = ({ fields, model }) => (
       ))}
     </Table.Body>
   </Table>
-);
+)
 
 const getValueDisplay = (val) => {
-  const t = typeof val;
-  if (t === "undefined" || val === null || val === "") {
-    return "-";
+  const t = typeof val
+  if (t === 'undefined' || val === null || val === '') {
+    return '-'
   }
-  if (t === "object" && val && val.choices) {
-    return val.display || "-";
+  if (t === 'object' && val && val.choices) {
+    return val.display || '-'
   }
   if (val === false) {
-    return "No";
+    return 'No'
   }
   if (val === true) {
-    return "Yes";
+    return 'Yes'
   }
-  return val;
-};
+  return val
+}
