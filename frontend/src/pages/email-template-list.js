@@ -37,12 +37,23 @@ const App = () => {
       })
       .catch(() => setIsLoading(false))
   })
+  const onDelete = (id) => () => {
+    const template = templates.filter((t) => t.id === id).pop()
+    if (template && window.confirm(`Delete file ${template.name}?`)) {
+      api.templates.email.delete(id).then(() => {
+        setTemplates(templates.filter((t) => t.id !== id))
+      })
+    }
+  }
   useEffectLazy(() => search(), [name, topic])
   return (
     <Container>
       <Header as="h1">Email Templates</Header>
       <a href={CONTEXT.create_url}>
         <Button primary>Create a new email template</Button>
+      </a>
+      <a href={CONTEXT.create_url}>
+        <Button primary>Delete a template</Button>
       </a>
       <div
         style={{
@@ -75,6 +86,7 @@ const App = () => {
               <Table.HeaderCell>Topic</Table.HeaderCell>
               <Table.HeaderCell>Subject</Table.HeaderCell>
               <Table.HeaderCell>Created At</Table.HeaderCell>
+              <Table.HeaderCell>Actions</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -83,7 +95,7 @@ const App = () => {
                 <td>No templates found</td>
               </Table.Row>
             )}
-            {templates.map((t) => (
+            {templates.map((t, index) => (
               <Table.Row key={t.url}>
                 <Table.Cell>
                   <a href={t.url}>{t.name}</a>
@@ -91,6 +103,11 @@ const App = () => {
                 <Table.Cell>{t.topic}</Table.Cell>
                 <Table.Cell>{t.subject}</Table.Cell>
                 <Table.Cell>{t.created_at}</Table.Cell>
+                <Table.Cell>
+                  <Button negative basic onClick={onDelete(t.id)}>
+                    Delete
+                  </Button>
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

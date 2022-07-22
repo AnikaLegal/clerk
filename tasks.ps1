@@ -20,6 +20,7 @@ function build {
 }
 
 function dev {
+    powershell -new_console:s
     Invoke-Expression "$COMPOSE up web"
 }
 
@@ -91,4 +92,15 @@ function run {
         [string]$service="web"
     )
     Invoke-Expression "$COMPOSE run --rm $service $cmd"
+}
+
+function devintake {
+    powershell -new_console:s
+    cd ..\intake\
+    yarn dev
+}
+
+function codeintake {
+    cd ..\intake\
+    code .
 }
