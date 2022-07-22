@@ -146,9 +146,9 @@ def process_tenancy(answers, client):
     if answers.get("AGENT_NAME"):
         agent = Person.objects.create(
             full_name=answers["AGENT_NAME"].title(),
-            address=answers["AGENT_ADDRESS"],
-            email=answers["AGENT_EMAIL"],
-            phone_number=answers["AGENT_PHONE"],
+            address=answers.get("AGENT_ADDRESS"),
+            email=answers.get("AGENT_EMAIL"),
+            phone_number=answers.get("AGENT_PHONE"),
         )
 
     if answers.get("LANDLORD_NAME"):
