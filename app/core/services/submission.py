@@ -146,17 +146,17 @@ def process_tenancy(answers, client):
     if answers.get("AGENT_NAME"):
         agent = Person.objects.create(
             full_name=answers["AGENT_NAME"].title(),
-            address=answers.get("AGENT_ADDRESS"),
-            email=answers.get("AGENT_EMAIL"),
-            phone_number=answers.get("AGENT_PHONE"),
+            address=get_as_string(answers,"AGENT_ADDRESS"),
+            email=get_as_string(answers,"AGENT_EMAIL"),
+            phone_number=get_as_string(answers,"AGENT_PHONE"),
         )
 
     if answers.get("LANDLORD_NAME"):
         landlord = Person.objects.create(
             full_name=answers["LANDLORD_NAME"].title(),
-            address=answers.get("LANDLORD_ADDRESS") or "",
-            email=answers.get("LANDLORD_EMAIL") or "",
-            phone_number=answers.get("LANDLORD_PHONE") or "",
+            address=get_as_string(answers, "LANDLORD_ADDRESS") or "",
+            email=get_as_string(answers, "LANDLORD_EMAIL") or "",
+            phone_number=get_as_string(answers, "LANDLORD_PHONE") or "",
         )
 
     tenancy, _ = Tenancy.objects.get_or_create(
