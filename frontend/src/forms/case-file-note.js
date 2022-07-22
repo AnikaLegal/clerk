@@ -1,40 +1,40 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
-import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
-import moment from "moment";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
+import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
+import moment from 'moment'
 
-import { api } from "api";
-import { TextArea } from "comps/textarea";
-import { TimelineNote } from "comps/timeline-item";
-import { MarkdownExplainer } from "comps/markdown-editor";
+import { api } from 'api'
+import { TextArea } from 'comps/textarea'
+import { TimelineNote } from 'comps/timeline-item'
+import { MarkdownExplainer } from 'comps/markdown-editor'
 
 export const submitNote =
   (issue, setIssue, setNotes, setSuccess) =>
   (values, { setSubmitting, setErrors }) => {
-    const note = { ...values };
+    const note = { ...values }
     note.event = note.event
-      ? moment.utc(values.event, "DD/MM/YYYY").format()
-      : note.event;
+      ? moment.utc(values.event, 'DD/MM/YYYY').format()
+      : note.event
 
     api.case.note.add(issue.id, note).then(({ resp, data }) => {
       if (resp.status === 400) {
-        setErrors(data);
+        setErrors(data)
       } else if (resp.ok) {
-        setIssue(data.issue);
-        setNotes(data.notes);
-        setSuccess(true);
+        setIssue(data.issue)
+        setNotes(data.notes)
+        setSuccess(true)
       } else {
         setErrors({
-          "Submission failure":
-            "We could not perform this action because something went wrong.",
-        });
+          'Submission failure':
+            'We could not perform this action because something went wrong.',
+        })
       }
-      setSubmitting(false);
-    });
-  };
+      setSubmitting(false)
+    })
+  }
 
 export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Add a file note</Header>
@@ -43,9 +43,9 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
         note is visible to everybody who has access to the case.
       </p>
       <Formik
-        initialValues={{ text: "", note_type: "PARALEGAL" }}
+        initialValues={{ text: '', note_type: 'PARALEGAL' }}
         validate={({ text }) =>
-          text ? null : { "File note text": "File note cannot be empty" }
+          text ? null : { 'File note text': 'File note cannot be empty' }
         }
         onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
@@ -63,12 +63,12 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
             error={Object.keys(errors).length > 0}
           >
             <TextArea
-              onChange={(e) => setFieldValue("text", e.target.value)}
+              onChange={(e) => setFieldValue('text', e.target.value)}
               disabled={isSubmitting}
               rows={3}
               placeholder="Write case details here"
               value={values.text}
-              style={{ marginBottom: "1em" }}
+              style={{ marginBottom: '1em' }}
             />
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
@@ -92,10 +92,10 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
             <TimelineNote
               note={{
                 note_type: values.note_type,
-                created_at: "Now",
-                text_display: values.text || "start typing...",
+                created_at: 'Now',
+                text_display: values.text || 'start typing...',
                 creator: {
-                  full_name: "You",
+                  full_name: 'You',
                 },
               }}
             />
@@ -103,5 +103,5 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

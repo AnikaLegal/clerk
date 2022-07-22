@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -7,38 +7,38 @@ import {
   Input,
   Label,
   Dropdown,
-} from "semantic-ui-react";
+} from 'semantic-ui-react'
 
-import { mount, debounce, useEffectLazy } from "utils";
-import { api } from "api";
-import { FadeTransition } from "comps/transitions";
-import { GroupLabels } from "comps/group-label";
-const CONTEXT = window.REACT_CONTEXT;
+import { mount, debounce, useEffectLazy } from 'utils'
+import { api } from 'api'
+import { FadeTransition } from 'comps/transitions'
+import { GroupLabels } from 'comps/group-label'
+const CONTEXT = window.REACT_CONTEXT
 const GROUP_OPTIONS = [
-  { key: "", value: "", text: "All groups" },
-  { key: "Paralegal", value: "Paralegal", text: "Paralegal" },
-  { key: "Coordinator", value: "Coordinator", text: "Coordinator" },
-  { key: "Admin", value: "Admin", text: "Admin" },
-];
+  { key: '', value: '', text: 'All groups' },
+  { key: 'Paralegal', value: 'Paralegal', text: 'Paralegal' },
+  { key: 'Coordinator', value: 'Coordinator', text: 'Coordinator' },
+  { key: 'Admin', value: 'Admin', text: 'Admin' },
+]
 
-const debouncer = debounce(300);
+const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [users, setUsers] = useState(CONTEXT.users);
-  const [name, setName] = useState("");
-  const [group, setGroups] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
+  const [users, setUsers] = useState(CONTEXT.users)
+  const [name, setName] = useState('')
+  const [group, setGroups] = useState('')
   const search = debouncer(() => {
-    setIsLoading(true);
+    setIsLoading(true)
     api.accounts
       .search({ name, group })
       .then(({ data }) => {
-        setUsers(data);
-        setIsLoading(false);
+        setUsers(data)
+        setIsLoading(false)
       })
-      .catch(() => setIsLoading(false));
-  });
-  useEffectLazy(() => search(), [name, group]);
+      .catch(() => setIsLoading(false))
+  })
+  useEffectLazy(() => search(), [name, group])
   return (
     <Container>
       <Header as="h1">Accounts</Header>
@@ -47,10 +47,10 @@ const App = () => {
       </a>
       <div
         style={{
-          margin: "1rem 0",
-          display: "grid",
-          gap: "1rem",
-          gridTemplateColumns: "1fr 1fr",
+          margin: '1rem 0',
+          display: 'grid',
+          gap: '1rem',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
         <Input
@@ -90,7 +90,7 @@ const App = () => {
                 <Table.Cell>
                   <a href={u.url}>{u.full_name}</a>
                 </Table.Cell>
-                <Table.Cell>{u.is_intern ? "Intern" : "Staff"}</Table.Cell>
+                <Table.Cell>{u.is_intern ? 'Intern' : 'Staff'}</Table.Cell>
                 <Table.Cell>{u.email}</Table.Cell>
                 <Table.Cell>{u.created_at}</Table.Cell>
                 <Table.Cell>
@@ -102,7 +102,7 @@ const App = () => {
         </Table>
       </FadeTransition>
     </Container>
-  );
-};
+  )
+}
 
-mount(App);
+mount(App)

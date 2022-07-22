@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Formik } from "formik";
+import React, { useState, useEffect } from 'react'
+import { Formik } from 'formik'
 import {
   Header,
   Form,
@@ -7,25 +7,25 @@ import {
   Message,
   Segment,
   Dropdown,
-} from "semantic-ui-react";
-import { DateInput } from "semantic-ui-calendar-react";
-import moment from "moment";
+} from 'semantic-ui-react'
+import { DateInput } from 'semantic-ui-calendar-react'
+import moment from 'moment'
 
-import { api } from "api";
+import { api } from 'api'
 
 export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [paralegals, setParalegals] = useState([]);
-  const [lawyers, setLawyers] = useState([]);
+  const [isSuccess, setSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [paralegals, setParalegals] = useState([])
+  const [lawyers, setLawyers] = useState([])
   useEffect(() => {
     api.accounts
-      .search({ group: "Paralegal" })
+      .search({ group: 'Paralegal' })
       .then(({ resp, data }) => setParalegals(data))
-      .then(() => api.accounts.search({ group: "Lawyer" }))
+      .then(() => api.accounts.search({ group: 'Lawyer' }))
       .then(({ resp, data }) => setLawyers(data))
-      .then(() => setIsLoading(false));
-  }, []);
+      .then(() => setIsLoading(false))
+  }, [])
   return (
     <Segment>
       <Header>Assign a paralegal to this case.</Header>
@@ -35,27 +35,27 @@ export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
           lawyer: issue.lawyer ? issue.lawyer.id : null,
         }}
         validate={({ paralegal, lawyer }) => {
-          const errors = {};
+          const errors = {}
           if (paralegal && !lawyer)
             errors.lawyer =
-              "A lawyer must be selected if a paralegal is assigned";
-          return errors;
+              'A lawyer must be selected if a paralegal is assigned'
+          return errors
         }}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           api.case.assign(issue.id, values).then(({ resp, data }) => {
             if (resp.status === 400) {
-              setErrors(data);
+              setErrors(data)
             } else if (resp.ok) {
-              setIssue(data.issue);
-              setSuccess(true);
+              setIssue(data.issue)
+              setSuccess(true)
             } else {
               setErrors({
-                "Submission failure":
-                  "We could not perform this action because something went wrong.",
-              });
+                'Submission failure':
+                  'We could not perform this action because something went wrong.',
+              })
             }
-            setSubmitting(false);
-          });
+            setSubmitting(false)
+          })
         }}
       >
         {({
@@ -76,16 +76,16 @@ export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
               selection
               search
               value={values.paralegal}
-              style={{ margin: "1em 0" }}
+              style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a paralegal"
-              options={[{ id: null, email: "-" }, ...paralegals].map((u) => ({
+              options={[{ id: null, email: '-' }, ...paralegals].map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,
               }))}
               onChange={(e, { value }) =>
-                setFieldValue("paralegal", value, false)
+                setFieldValue('paralegal', value, false)
               }
             />
             <Dropdown
@@ -93,15 +93,15 @@ export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
               selection
               search
               value={values.lawyer}
-              style={{ margin: "1em 0" }}
+              style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a lawyer"
-              options={[{ id: null, email: "-" }, ...lawyers].map((u) => ({
+              options={[{ id: null, email: '-' }, ...lawyers].map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,
               }))}
-              onChange={(e, { value }) => setFieldValue("lawyer", value, false)}
+              onChange={(e, { value }) => setFieldValue('lawyer', value, false)}
             />
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
@@ -125,5 +125,5 @@ export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

@@ -1,13 +1,18 @@
-import React, { useState } from "react";
-import { Container, Header, Label } from "semantic-ui-react";
-import xss from "xss";
-import styled from "styled-components";
+import React, { useState } from 'react'
+import { Container, Header, Label } from 'semantic-ui-react'
+import xss from 'xss'
+import styled from 'styled-components'
 
-import { mount } from "utils";
-import { api } from "api";
+import { mount } from 'utils'
+import { api } from 'api'
 
+<<<<<<< HEAD
 const { issue, subject, case_email_address, case_email_list_url, user } =
   window.REACT_CONTEXT;
+=======
+const { issue, subject, case_email_address, case_email_list_url } =
+  window.REACT_CONTEXT
+>>>>>>> Updated formatting & Webpack URL path
 
 const setAttachmentState = (emails, emailId, attachId, newState) =>
   emails.map((e) =>
@@ -19,27 +24,27 @@ const setAttachmentState = (emails, emailId, attachId, newState) =>
           ),
         }
       : e
-  );
+  )
 
 const App = () => {
-  const [emails, setEmails] = useState(window.REACT_CONTEXT.emails);
+  const [emails, setEmails] = useState(window.REACT_CONTEXT.emails)
   const onEmailAttachUpload = (emailId, attachId) => () => {
-    setEmails(setAttachmentState(emails, emailId, attachId, "UPLOADING"));
+    setEmails(setAttachmentState(emails, emailId, attachId, 'UPLOADING'))
 
     api.email
       .uploadAttachment(issue.id, emailId, attachId)
       .then(({ resp, data }) => {
         setEmails(
           setAttachmentState(emails, emailId, attachId, data.sharepoint_state)
-        );
-      });
-  };
+        )
+      })
+  }
 
   return (
     <Container>
       <Header as="h1">
-        {subject}{" "}
-        <span style={{ color: "var(--grey-2)" }}>({issue.fileref})</span>
+        {subject}{' '}
+        <span style={{ color: 'var(--grey-2)' }}>({issue.fileref})</span>
         <Header.Subheader>
           Most recent emails are at the top
           <br />
@@ -56,8 +61,8 @@ const App = () => {
         ))}
       </EmailList>
     </Container>
-  );
-};
+  )
+}
 
 const EmailItem = ({ email, onEmailAttachUpload }) => {
   return (
@@ -79,11 +84,11 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
         {email.cc_addresses.length > 0 && (
           <p>
             <strong>CC:</strong>&nbsp;
-            {email.cc_addresses.join(", ")}
+            {email.cc_addresses.join(', ')}
           </p>
         )}
-        {email.state == "DRAFT" && <div className="label">Draft</div>}
-        {email.state == "SENT" && (
+        {email.state == 'DRAFT' && <div className="label">Draft</div>}
+        {email.state == 'SENT' && (
           <div className="label">
             Sent on {email.processed_at}{" "}
             {email.sender ? `by ${email.sender.full_name}` : null}
@@ -104,13 +109,13 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
         {email.state == "INGESTED" && (
           <div className="label">Received on {email.created_at}</div>
         )}
-        {email.state == "READY_TO_SEND" && (
+        {email.state == 'READY_TO_SEND' && (
           <div className="label">Sending...</div>
         )}
       </EmailHeader>
       <EmailBody dangerouslySetInnerHTML={{ __html: email.html }} />
       <EmailControls>
-        {email.state == "DRAFT" ? (
+        {email.state == 'DRAFT' ? (
           <a href={email.edit_url} className="header" target="_blank">
             <button className="ui button primary">Edit Draft</button>
           </a>
@@ -121,7 +126,7 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
         )}
       </EmailControls>
       {email.attachments.length > 0 && (
-        <EmailAttachmentBlock received={email.state == "INGESTED"}>
+        <EmailAttachmentBlock received={email.state == 'INGESTED'}>
           <h5>Attached files</h5>
           <EmailAttachmentList>
             {email.attachments.map((a) => (
@@ -137,15 +142,15 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
         </EmailAttachmentBlock>
       )}
     </Email>
-  );
-};
+  )
+}
 
 const EmailList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   margin-top: 1.5rem;
-`;
+`
 
 const Email = styled.div`
   border: 6px solid var(--grey);
@@ -186,7 +191,7 @@ const EmailHeader = styled.div`
     bottom: 0;
     padding: 1rem;
   }
-`;
+`
 const EmailBody = styled.div`
   padding: 1rem;
   h1,
@@ -204,10 +209,10 @@ const EmailBody = styled.div`
     border-left: solid 4px var(--grey);
     padding-left: 1em;
   }
-`;
+`
 const EmailControls = styled.div`
   padding: 0 1rem 1rem 1rem;
-`;
+`
 const EmailAttachmentBlock = styled.div`
   padding: 1rem;
   background-color: var(--grey);
@@ -216,12 +221,12 @@ const EmailAttachmentBlock = styled.div`
     `
     background-color: var(--gold-light);
   `}
-`;
+`
 const EmailAttachmentList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-`;
+`
 
 const AttachmentEl = styled.div`
   justify-content: space-between;
@@ -232,7 +237,7 @@ const AttachmentEl = styled.div`
   .ui.label {
     cursor: pointer;
   }
-`;
+`
 
 const Attachment = ({
   id,
@@ -243,27 +248,27 @@ const Attachment = ({
   isUploadEnabled,
   emailId,
 }) => {
-  const filename = name.split("/").pop();
+  const filename = name.split('/').pop()
   return (
     <AttachmentEl>
-      <a href={url}>{filename}</a>{" "}
+      <a href={url}>{filename}</a>{' '}
       {isUploadEnabled && (
         <>
-          {sharepoint_state === "NOT_UPLOADED" && (
+          {sharepoint_state === 'NOT_UPLOADED' && (
             <Label onClick={onUpload(emailId, id)}>save to sharepoint</Label>
           )}
-          {sharepoint_state === "UPLOADING" && (
+          {sharepoint_state === 'UPLOADING' && (
             <Label color="yellow" onClick={onUpload(emailId, id)}>
               saving...
             </Label>
           )}
-          {sharepoint_state === "UPLOADED" && (
+          {sharepoint_state === 'UPLOADED' && (
             <Label color="teal">saved to sharepoint</Label>
           )}
         </>
       )}
     </AttachmentEl>
-  );
-};
+  )
+}
 
-mount(App);
+mount(App)

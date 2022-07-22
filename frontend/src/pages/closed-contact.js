@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -6,12 +6,12 @@ import {
   Table,
   Input,
   Dropdown,
-} from "semantic-ui-react";
-import { Formik } from "formik";
-import * as Yup from "yup";
+} from 'semantic-ui-react'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 
-import { mount } from "utils";
-import { api } from "api";
+import { mount } from 'utils'
+import { api } from 'api'
 
 import {
   AutoForm,
@@ -19,40 +19,40 @@ import {
   getModelInitialValues,
   getFormSchema,
   FIELD_TYPES,
-} from "comps/auto-form";
+} from 'comps/auto-form'
 
 const FIELDS = [
   {
-    label: "Name",
-    schema: Yup.string().required("Required"),
+    label: 'Name',
+    schema: Yup.string().required('Required'),
     type: FIELD_TYPES.TEXT,
-    name: "name",
+    name: 'name',
   },
   {
-    label: "Email",
+    label: 'Email',
     type: FIELD_TYPES.EMAIL,
-    name: "email",
-    schema: Yup.string().email().required("Required"),
+    name: 'email',
+    schema: Yup.string().email().required('Required'),
   },
   {
-    label: "Rental problem",
+    label: 'Rental problem',
     type: FIELD_TYPES.SINGLE_CHOICE,
-    name: "topic",
-    schema: Yup.string().required("Required"),
+    name: 'topic',
+    schema: Yup.string().required('Required'),
   },
-];
-const SCHEMA = getFormSchema(FIELDS);
+]
+const SCHEMA = getFormSchema(FIELDS)
 const MODEL = {
   topic: {
     choices: [
-      ["REPAIRS", "Repairs"],
-      ["BONDS", "Bonds"],
+      ['REPAIRS', 'Repairs'],
+      ['BONDS', 'Bonds'],
     ],
   },
-};
+}
 
 const App = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false)
   return (
     <Container>
       <h1>Anika Legal is not currently taking new cases.</h1>
@@ -71,21 +71,21 @@ const App = () => {
       {!isSuccess && (
         <Formik
           initialValues={{
-            name: "",
-            email: "",
-            topic: "",
+            name: '',
+            email: '',
+            topic: '',
           }}
           validationSchema={SCHEMA}
           onSubmit={(values, { setSubmitting, setErrors }) => {
             api.contact.create(values).then(({ resp, data }) => {
               if (resp.status === 400) {
-                setErrors(data);
-                setSubmitting(false);
+                setErrors(data)
+                setSubmitting(false)
               } else if (resp.ok) {
-                setSubmitting(false);
-                setIsSuccess(true);
+                setSubmitting(false)
+                setIsSuccess(true)
               }
-            });
+            })
           }}
         >
           {(formik) => (
@@ -98,7 +98,7 @@ const App = () => {
         </Formik>
       )}
     </Container>
-  );
-};
+  )
+}
 
-mount(App);
+mount(App)
