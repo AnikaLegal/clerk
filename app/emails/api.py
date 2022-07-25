@@ -1,11 +1,3 @@
-"""
-Retrieve email events.
-
-%load_ext autoreload
-%autoreload 2
-from emails.service import *
-match_suppressions()
-"""
 import time
 import requests
 from django.conf import settings
@@ -14,9 +6,7 @@ from django.conf import settings
 BASE_URL = "https://api.sendgrid.com"
 HEADERS = {"Authorization": f"Bearer {settings.SENDGRID_API_KEY}"}
 DEV_EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
-
 EMAIL_DOMAIN = settings.EMAIL_DOMAIN
-EMAIL_DOMAIN = "em9037.mail.anikalegal.com"
 
 
 def set_inbound_parse_url(base_url):
@@ -62,15 +52,6 @@ def fetch_bounces():
     return resp.json()
 
 
-def _wait_for_rate_limit(resp):
-    rate_limit_remaining = int(resp.headers["x-ratelimit-remaining"])
-    rate_limit_reset = int(resp.headers["x-ratelimit-reset"])
-    if rate_limit_remaining < 3:
-        wait = rate_limit_reset + 10
-        print(f"Waiting {wait}s for ratelimit reset...")
-        time.sleep(wait)
-
-
 def fetch_messages():
     """
     Fetch all emails from Sendgrid.
@@ -94,3 +75,11 @@ def fetch_message(msg_id):
     _wait_for_rate_limit(resp)
     resp.raise_for_status()
     return resp.json()
+
+
+def _wait_for_rate_limit(resp):
+    rate_limit_remaining = int(resp.headers["x-ratelimit-remaining"])
+    if rate_limit_remaining < 3:
+        wait = 70  # Don't trust their numbers.
+        print(f"Waiting {wait}s for ratelimit reset...")
+        time.sleep(wait)
