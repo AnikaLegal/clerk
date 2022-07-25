@@ -426,6 +426,7 @@ class EmailSerializer(serializers.ModelSerializer):
             "id",
             "cc_addresses",
             "created_at",
+            "processed_at",
             "from_address",
             "html",
             "text",
@@ -446,6 +447,7 @@ class EmailSerializer(serializers.ModelSerializer):
     edit_url = serializers.SerializerMethodField()
     reply_url = serializers.SerializerMethodField()
     created_at = LocalTimeField()
+    processed_at = LocalTimeField()
 
     def get_edit_url(self, obj):
         return reverse("case-email-edit", args=(obj.issue.pk, obj.pk))
@@ -456,3 +458,14 @@ class EmailSerializer(serializers.ModelSerializer):
             + "?"
             + urlencode({"parent": obj.pk})
         )
+
+
+class EmailThreadSerializer(serializers.Serializer):
+    emails = EmailSerializer(many=True)
+    subject = serializers.CharField(read_only=True)
+    slug = serializers.CharField(read_only=True)
+    most_recent = LocalTimeField()
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("case-email-thread", args=(obj.issue.pk, obj.slug))

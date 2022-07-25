@@ -44,17 +44,21 @@ def case_detail_view(request, pk):
         "notes": IssueNoteSerializer(notes, many=True).data,
         "details": _get_submitted_details(issue),
         "actionstep_url": _get_actionstep_url(issue),
-        "urls": {
-            "detail": reverse("case-detail-view", args=(pk,)),
-            "email": reverse("case-email-list", args=(pk,)),
-            "docs": reverse("case-docs", args=(pk,)),
-        },
+        "urls": get_detail_urls(issue),
         "permissions": {
             "is_paralegal_or_better": request.user.is_paralegal_or_better,
             "is_coordinator_or_better": request.user.is_coordinator_or_better,
         },
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
+
+
+def get_detail_urls(issue):
+    return {
+        "detail": reverse("case-detail-view", args=(issue.pk,)),
+        "email": reverse("case-email-list", args=(issue.pk,)),
+        "docs": reverse("case-docs", args=(issue.pk,)),
+    }
 
 
 @router.use_route("agent")

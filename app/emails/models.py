@@ -12,6 +12,8 @@ class EmailState:
     DRAFT = "DRAFT"
     READY_TO_SEND = "READY_TO_SEND"
     SENT = "SENT"
+    DELIVERED = "DELIVERED"
+    DELIVERY_FAILURE = "DELIVERY_FAILURE"
     RECEIVED = "RECEIVED"
     INGESTED = "INGESTED"
     INGEST_FAILURE = "INGEST_FAILURE"
@@ -21,6 +23,8 @@ STATE_CHOICES = (
     (EmailState.DRAFT, "Draft"),
     (EmailState.READY_TO_SEND, "Ready to send"),
     (EmailState.SENT, "Sent"),
+    (EmailState.DELIVERED, "Delivered"),
+    (EmailState.DELIVERY_FAILURE, "Delivery failed"),
     (EmailState.RECEIVED, "Received"),
     (EmailState.INGESTED, "Ingested"),
     (EmailState.INGEST_FAILURE, "Ingest failed"),
@@ -43,6 +47,9 @@ class Email(models.Model):
         User, blank=True, null=True, on_delete=models.PROTECT, related_name="sent_email"
     )
     received_data = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)
+
+    # Sendgrid Email ID
+    sendgrid_id = models.CharField(max_length=128, blank=True, default="")
 
     # Tracks whether an alert has been successfully sent.
     is_alert_sent = models.BooleanField(default=False)

@@ -7,9 +7,13 @@ Emails are sent using the [Django email API](https://docs.djangoproject.com/en/3
 Emails are received via SendGrid's [inbound parse webhook](https://docs.sendgrid.com/for-developers/parsing-email/setting-up-the-inbound-parse-webhook#default-parameters),
 where they send us a POST request to an endpoint of ours (`/email/receive/`) whenever we get an email.
 
+We also receive delivery status notifications to a [events webhook](https://docs.sendgrid.com/for-developers/tracking-events/event) where they POST updates to `/email/events/`.
+
 Each environment (dev/test/prod) has its own email subdomain.
 
 ## Development setup
+
+The events webhook needs to be configured manually and is difficult to test because we only get one webhook (which we use for production).
 
 To listen for inbound emails in your development environment run [ngrok](https://ngrok.com/). This will print the public endpoint, e.g "https://90c8-194-193-130-131.ngrok.io".
 

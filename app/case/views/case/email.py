@@ -38,7 +38,9 @@ from case.serializers import (
     IssueDetailSerializer,
     EmailSerializer,
     EmailAttachmentSerializer,
+    EmailThreadSerializer,
 )
+from case.views.case.detail import get_detail_urls
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
@@ -70,11 +72,13 @@ def email_list_view(request, pk):
     case_email_address = build_clerk_address(issue)
     email_threads = _get_email_threads(issue)
     context = {
-        "issue": issue,
-        "email_threads": email_threads,
+        "issue": IssueDetailSerializer(issue).data,
+        "email_threads": EmailThreadSerializer(email_threads, many=True).data,
         "case_email_address": case_email_address,
+        "urls": get_detail_urls(issue),
+        "draft_url": reverse("case-email-draft", args=(issue.pk,)),
     }
-    return render(request, "case/case/email/list.html", context)
+    return render_react_page(request, f"Case {issue.fileref}", "email-list", context)
 
 
 @router.use_route("thread")
@@ -102,6 +106,7 @@ def email_thread_view(request, pk, slug):
 class EmailThread:
     def __init__(self, email: Email):
         self.emails = [email]
+        self.issue = email.issue
         self.subject = email.subject or "No Subject"
         self.slug = self.slugify_subject(self.subject)
         self.most_recent = email.created_at
@@ -111,18 +116,6 @@ class EmailThread:
         sub = subject or "No Subject"
         sub_cleaned = re.sub(r"re\s*:\s*", "", sub, flags=re.IGNORECASE)
         return slugify(sub_cleaned)
-
-    def count_drafts(self):
-        return self._get_count(EmailState.DRAFT)
-
-    def count_sent(self):
-        return self._get_count(EmailState.SENT)
-
-    def count_received(self):
-        return self._get_count(EmailState.INGESTED)
-
-    def _get_count(self, state):
-        return len([e for e in self.emails if e.state == state])
 
     def is_email_in_thread(self, email: Email) -> bool:
         return self.slug == self.slugify_subject(email.subject)
@@ -140,7 +133,13 @@ class EmailThread:
         return f"EmailThread<{self.subject}>"
 
 
-DISPLAY_EMAIL_STATES = [EmailState.DRAFT, EmailState.SENT, EmailState.INGESTED]
+DISPLAY_EMAIL_STATES = [
+    EmailState.DRAFT,
+    EmailState.SENT,
+    EmailState.INGESTED,
+    EmailState.DELIVERED,
+    EmailState.DELIVERY_FAILURE,
+]
 
 
 def _get_email_threads(issue) -> List[EmailThread]:
