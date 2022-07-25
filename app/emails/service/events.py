@@ -1,23 +1,20 @@
-import logging
-
 from django.utils import timezone
 from django.conf import settings
 
 from emails.models import Email
 from emails import api
 
-logger = logging.getLogger(__name__)
 
 EMAIL_DOMAIN = settings.EMAIL_DOMAIN
 
 
 def match_attempt():
-    logger.info("Fetching messages...")
+    print("Fetching messages...")
     msgs = api.fetch_messages()
     bounces = api.fetch_bounces()
     blocks = api.fetch_blocks()
 
-    logger.info("Matching failures...")
+    print("Matching failures...")
     for failure_list in [bounces, blocks]:
         for failure in failure_list:
             event_at = timezone.datetime.fromtimestamp(
@@ -38,13 +35,13 @@ def match_attempt():
             if email:
                 Email.objects.filter(id=email.id).update(state="DELIVERY_FAILURE")
 
-    logger.info("Matching all messages...")
+    print("Matching all messages...")
     found, missing, multiple = 0, 0, 0
     count = len(msgs)
     for idx, msg in enumerate(msgs):
-        logger.info(f"Email {idx} / {count}... ", end="")
+        print(f"Email {idx} / {count}... ", end="")
         if not msg["from_email"].endswith(EMAIL_DOMAIN):
-            logger.info("skipping.")
+            print("skipping.")
             continue
 
         email = None
@@ -105,11 +102,11 @@ def match_attempt():
             elif msg["status"] == "not_delivered":
                 state = "DELIVERY_FAILURE"
 
-            logger.info("updating email... ", end="")
+            print("updating email... ", end="")
             Email.objects.filter(id=email.id).update(
                 sendgrid_id=msg["msg_id"], state=state
             )
         else:
-            logger.info("not found... ", end="")
+            print("not found... ", end="")
 
-        logger.info(f"found {found} missing {missing} multiple {multiple}")
+        print(f"found {found} missing {missing} multiple {multiple}")
