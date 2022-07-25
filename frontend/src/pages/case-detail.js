@@ -15,7 +15,7 @@ import {
 
 import { TimelineNote } from "comps/timeline-item";
 import { CaseHeader, CASE_TABS } from "comps/case-header";
-import { mount, MarkdownAsHtmlDisplay } from "utils";
+import { mount } from "utils";
 import { api } from "api";
 import { URLS } from "consts";
 import {

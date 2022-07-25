@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import { Header, Segment, Tab } from "semantic-ui-react";
 
+import { MarkdownAsHtmlDisplay } from "utils";
+
 export const CASE_TABS = {
   DETAIL: "DETAIL",
   EMAIL: "EMAIL",
