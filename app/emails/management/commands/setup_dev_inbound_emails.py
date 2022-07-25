@@ -1,11 +1,6 @@
-import os
 from django.core.management.base import BaseCommand
-from django.conf import settings
 
-import requests
-
-HEADERS = {"Authorization": f"Bearer {settings.SENDGRID_API_KEY}"}
-DEV_PARSE_URL = "https://api.sendgrid.com/v3/user/webhooks/parse/settings/em9463.dev-mail.anikalegal.com"
+from emails.api import set_inbound_parse_url
 
 
 class Command(BaseCommand):
@@ -19,16 +14,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **kwargs):
-        """
-        https://app.sendgrid.com/settings/parse
-        https://sendgrid.api-docs.io/v3.0/settings-inbound-parse/update-a-parse-setting
-        """
         url = kwargs["url"]
-        data = {
-            "url": url.rstrip("/") + "/email/receive/",
-            "spam_check": False,
-            "send_raw": False,
-        }
-        resp = requests.patch(DEV_PARSE_URL, json=data, headers=HEADERS)
-        resp.raise_for_status()
-        print("Update success: ", resp.json())
+        resp_data = set_inbound_parse_url(url)
+        print("Update success: ", resp_data)

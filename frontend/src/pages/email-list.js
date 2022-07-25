@@ -58,10 +58,22 @@ const App = () => {
                     {countEmailType(t.emails, "DRAFT")} drafts
                   </Label>
                 )}
+                {countEmailType(t.emails, "DELIVERED") > 0 && (
+                  <Label>
+                    <Icon name="mail" />
+                    {countEmailType(t.emails, "DELIVERED")} sent
+                  </Label>
+                )}
+                {countEmailType(t.emails, "DELIVERY_FAILURE") > 0 && (
+                  <Label color="red">
+                    <Icon name="mail" />
+                    {countEmailType(t.emails, "DELIVERY_FAILURE")} failed
+                  </Label>
+                )}
                 {countEmailType(t.emails, "SENT") > 0 && (
                   <Label>
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "SENT")} sent
+                    {countEmailType(t.emails, "SENT")} sending
                   </Label>
                 )}
                 {countEmailType(t.emails, "INGESTED") > 0 && (

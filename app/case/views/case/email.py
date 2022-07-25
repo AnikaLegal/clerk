@@ -133,7 +133,13 @@ class EmailThread:
         return f"EmailThread<{self.subject}>"
 
 
-DISPLAY_EMAIL_STATES = [EmailState.DRAFT, EmailState.SENT, EmailState.INGESTED]
+DISPLAY_EMAIL_STATES = [
+    EmailState.DRAFT,
+    EmailState.SENT,
+    EmailState.INGESTED,
+    EmailState.DELIVERED,
+    EmailState.DELIVERY_FAILURE,
+]
 
 
 def _get_email_threads(issue) -> List[EmailThread]:
