@@ -3,6 +3,7 @@ import logging
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import api_view
 
 from emails.service import save_inbound_email
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
-@api_view(["POST"])
+@require_http_methods(["POST"])
 def receive_email_view(request):
     """
     Receive an inbound email from SendGrid, parse and save to database.
@@ -20,7 +21,7 @@ def receive_email_view(request):
 
     See docs/emails.md for more details.
     """
-    save_inbound_email(request.data, request.FILES)
+    save_inbound_email(request.POST, request.FILES)
     return HttpResponse(200)
 
 
