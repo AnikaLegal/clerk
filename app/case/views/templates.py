@@ -24,6 +24,7 @@ router.create_route("email-list").path("email")
 router.create_route("email-detail").path("email").pk("pk")
 router.create_route("email-create").path("email").path("create")
 router.create_route("email-search").path("email").path("search")
+router.create_route("email-delete").path("email").pk("pk").path("delete")
 router.create_route("doc-list").path("doc")
 router.create_route("doc-create").path("doc").path("create")
 router.create_route("doc-search").path("doc").path("search")
@@ -65,6 +66,14 @@ def template_email_search_view(request):
         templates = templates.filter(topic=topic)
 
     return Response(data=EmailTemplateSerializer(templates, many=True).data)
+
+@router.use_route("email-delete")
+@coordinator_or_better_required
+@require_http_methods(["DELETE"])
+def template_email_delete_view(request, pk):
+    template = EmailTemplate.objects.get(pk=pk)
+    template.delete()
+    return render_react_page(request, "Email Templates", "email-template-list", {})
 
 
 @router.use_route("email-create")

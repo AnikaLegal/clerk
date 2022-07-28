@@ -27,6 +27,14 @@ const App = () => {
   const [templates, setTemplates] = useState(CONTEXT.templates)
   const [name, setName] = useState('')
   const [topic, setTopic] = useState('')
+  const onDelete = (id) => () => {
+    const template = templates.filter((t) => t.id === id).pop()
+    if (template && window.confirm(`Delete template ${template.name}?`)) {
+      api.templates.email.delete(id).then(() => {
+        setTemplates(templates.filter((t) => t.id !== id))
+      })
+    }
+  }
   const search = debouncer(() => {
     setIsLoading(true)
     api.templates.email
@@ -37,23 +45,12 @@ const App = () => {
       })
       .catch(() => setIsLoading(false))
   })
-  const onDelete = (id) => () => {
-    const template = templates.filter((t) => t.id === id).pop()
-    if (template && window.confirm(`Delete file ${template.name}?`)) {
-      api.templates.email.delete(id).then(() => {
-        setTemplates(templates.filter((t) => t.id !== id))
-      })
-    }
-  }
   useEffectLazy(() => search(), [name, topic])
   return (
     <Container>
       <Header as="h1">Email Templates</Header>
       <a href={CONTEXT.create_url}>
         <Button primary>Create a new email template</Button>
-      </a>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Delete a template</Button>
       </a>
       <div
         style={{
