@@ -14,7 +14,6 @@ services:
 
   # Django webserver.
   web:
-    container_name: web
     command: bash /app/scripts/web/local.sh
     image: clerk:local
     ports:
@@ -31,7 +30,6 @@ services:
 
   # Django-q worker.
   worker:
-    container_name: worker
     command: bash /app/scripts/worker/local.sh
     image: clerk:local
     volumes:
@@ -55,7 +53,6 @@ services:
 
   # For testing.
   test:
-    container_name: test
     image: clerk:local
     volumes:
       - ../app:/app

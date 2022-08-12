@@ -49,7 +49,7 @@ def account_detail_view(request, pk):
     if request.method == "GET":
         name = user.get_full_name()
         context = {"account": UserDetailSerializer(user).data}
-        return render_react_page(request, f"Client {name}", "account-detail", context)
+        return render_react_page(request, f"User {name}", "account-detail", context)
     elif request.method == "PATCH":
         serializer = UserDetailSerializer(
             instance=user, data=request.data, partial=True
@@ -145,7 +145,9 @@ def _load_ms_permissions(user):
     }
     if perms:
         data["has_coordinator_perms"] = perms["has_coordinator_perms"]
-        data["paralegal_perm_issues"] = perms["paralegal_perm_issues"]
+        data["paralegal_perm_issues"] = IssueListSerializer(
+            perms["paralegal_perm_issues"], many=True
+        ).data
         data["paralegal_perm_missing_issues"] = IssueListSerializer(
             perms["paralegal_perm_missing_issues"], many=True
         ).data
