@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
 import {
   Header,
   Form,
@@ -8,42 +8,42 @@ import {
   Segment,
   Checkbox,
   Dropdown,
-} from "semantic-ui-react";
-import { DateInput } from "semantic-ui-calendar-react";
-import moment from "moment";
+} from 'semantic-ui-react'
+import { DateInput } from 'semantic-ui-calendar-react'
+import moment from 'moment'
 
-import { api } from "api";
-import { STAGES } from "consts";
+import { api } from 'api'
+import { STAGES } from 'consts'
 
 const STAGE_OPTIONS = Object.entries(STAGES)
-  .filter(([k, v]) => k !== "CLOSED")
+  .filter(([k, v]) => k !== 'CLOSED')
   .map(([k, v]) => ({
     key: k,
     value: k,
     text: v,
-  }));
+  }))
 
 export const submitCaseUpdate =
   (issue, setIssue, setSuccess) =>
   (values, { setSubmitting, setErrors }) => {
     api.case.update(issue.id, values).then(({ resp, data }) => {
       if (resp.status === 400) {
-        setErrors(data);
+        setErrors(data)
       } else if (resp.ok) {
-        setIssue(data.issue);
-        setSuccess(true);
+        setIssue(data.issue)
+        setSuccess(true)
       } else {
         setErrors({
-          "Submission failure":
-            "We could not perform this action because something went wrong.",
-        });
+          'Submission failure':
+            'We could not perform this action because something went wrong.',
+        })
       }
-      setSubmitting(false);
-    });
-  };
+      setSubmitting(false)
+    })
+  }
 
 export const ProgressForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Update the stage of the case.</Header>
@@ -73,19 +73,19 @@ export const ProgressForm = ({ issue, setIssue, setNotes, onCancel }) => {
               selection
               search
               value={values.stage}
-              style={{ margin: "1em 0" }}
+              style={{ margin: '1em 0' }}
               loading={isSubmitting}
               placeholder="Select a case stage"
               options={STAGE_OPTIONS}
-              onChange={(e, { value }) => setFieldValue("stage", value, false)}
+              onChange={(e, { value }) => setFieldValue('stage', value, false)}
             />
-            <div style={{ margin: "1em 0" }}>
+            <div style={{ margin: '1em 0' }}>
               <Checkbox
                 label="Provided legal services"
                 checked={values.provided_legal_services}
                 onChange={(e, { checked }) =>
                   setFieldValue(
-                    "provided_legal_services",
+                    'provided_legal_services',
                     Boolean(checked),
                     false
                   )
@@ -115,5 +115,5 @@ export const ProgressForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

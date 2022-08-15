@@ -1,12 +1,12 @@
-import React from "react";
-import { Label } from "semantic-ui-react";
+import React from 'react'
+import { Label } from 'semantic-ui-react'
 
 const GROUP_COLORS = {
-  Admin: "green",
-  Lawyer: "orange",
-  Coordinator: "teal",
-  Paralegal: "blue",
-};
+  Admin: 'green',
+  Lawyer: 'orange',
+  Coordinator: 'teal',
+  Paralegal: 'blue',
+}
 
 export const GroupLabels = ({ groups, isSuperUser }) => (
   <>
@@ -17,4 +17,4 @@ export const GroupLabels = ({ groups, isSuperUser }) => (
     ))}
     {isSuperUser && <Label color="black">Superuser 😎</Label>}
   </>
-);
+)

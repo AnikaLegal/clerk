@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import { Container, Header, Button, Tab } from "semantic-ui-react";
-import moment from "moment";
-import * as Yup from "yup";
+import React, { useState } from 'react'
+import { Container, Header, Button, Tab } from 'semantic-ui-react'
+import moment from 'moment'
+import * as Yup from 'yup'
 
-import { TimelineNote } from "comps/timeline-item";
-import { TableForm } from "comps/table-form";
-import { getFormSchema, FIELD_TYPES } from "comps/auto-form";
-import { CaseListTable } from "comps/case-table";
-import { mount } from "utils";
-import { api } from "api";
-import { AccountPermissions } from "comps/account-permissions";
-import { ErrorBoundary } from "comps/error-boundary";
+import { TimelineNote } from 'comps/timeline-item'
+import { TableForm } from 'comps/table-form'
+import { getFormSchema, FIELD_TYPES } from 'comps/auto-form'
+import { CaseListTable } from 'comps/case-table'
+import { mount } from 'utils'
+import { api } from 'api'
+import { AccountPermissions } from 'comps/account-permissions'
+import { ErrorBoundary } from 'comps/error-boundary'
 
 const creationSort = (a, b) =>
-  moment(b.created_at, "DD/MM/YY").unix() -
-  moment(a.created_at, "DD/MM/YY").unix();
+  moment(b.created_at, 'DD/MM/YY').unix() -
+  moment(a.created_at, 'DD/MM/YY').unix()
 
 const App = () => {
-  const [account, setAccount] = useState(window.REACT_CONTEXT.account);
+  const [account, setAccount] = useState(window.REACT_CONTEXT.account)
   let tabPanes = [
     {
-      menuItem: "Paralegal cases",
+      menuItem: 'Paralegal cases',
       render: () => (
         <Tab.Pane>
           <CaseListTable
@@ -31,7 +31,7 @@ const App = () => {
       ),
     },
     {
-      menuItem: "Lawyer cases",
+      menuItem: 'Lawyer cases',
       render: () => (
         <Tab.Pane>
           <CaseListTable
@@ -42,10 +42,10 @@ const App = () => {
       ),
     },
     {
-      menuItem: "Performance notes",
+      menuItem: 'Performance notes',
       render: () => (
         <Tab.Pane>
-          {account.performance_notes.length < 1 && "No notes yet"}
+          {account.performance_notes.length < 1 && 'No notes yet'}
           {account.performance_notes.map((note) => (
             <TimelineNote note={note} key={note.id} />
           ))}
@@ -53,7 +53,7 @@ const App = () => {
       ),
     },
     {
-      menuItem: "Permissions",
+      menuItem: 'Permissions',
       render: () => (
         <Tab.Pane>
           <ErrorBoundary>
@@ -62,14 +62,14 @@ const App = () => {
         </Tab.Pane>
       ),
     },
-  ];
+  ]
   // Prioritise lawyer issues if they exist
   if (account.lawyer_issues.length > 0) {
-    tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]];
+    tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
   }
   if (!account.is_coordinator_or_better) {
     // Don't show lawyer cases.
-    tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]];
+    tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
   }
   return (
     <Container>
@@ -87,58 +87,58 @@ const App = () => {
         onUpdate={api.accounts.update}
       />
 
-      <Tab style={{ marginTop: "2em" }} panes={tabPanes} />
+      <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
     </Container>
-  );
-};
+  )
+}
 
 const PARALEGAL_TABLE_FIELDS = [
-  "fileref",
-  "topic",
-  "client",
-  "lawyer",
-  "created_at",
-  "stage",
-  "provided_legal_services",
-  "outcome",
-];
+  'fileref',
+  'topic',
+  'client',
+  'lawyer',
+  'created_at',
+  'stage',
+  'provided_legal_services',
+  'outcome',
+]
 const LAWYER_TABLE_FIELDS = [
-  "fileref",
-  "topic",
-  "client",
-  "paralegal",
-  "created_at",
-  "stage",
-  "provided_legal_services",
-  "outcome",
-];
+  'fileref',
+  'topic',
+  'client',
+  'paralegal',
+  'created_at',
+  'stage',
+  'provided_legal_services',
+  'outcome',
+]
 
 const FIELDS = [
   {
-    label: "First name",
-    schema: Yup.string().required("Required"),
+    label: 'First name',
+    schema: Yup.string().required('Required'),
     type: FIELD_TYPES.TEXT,
-    name: "first_name",
+    name: 'first_name',
   },
   {
-    label: "Last name",
-    schema: Yup.string().required("Required"),
+    label: 'Last name',
+    schema: Yup.string().required('Required'),
     type: FIELD_TYPES.TEXT,
-    name: "last_name",
+    name: 'last_name',
   },
   {
-    label: "Is Intern",
-    name: "is_intern",
+    label: 'Is Intern',
+    name: 'is_intern',
     type: FIELD_TYPES.BOOL,
-    schema: Yup.string().required("Required"),
+    schema: Yup.string().required('Required'),
   },
   {
-    label: "Case capacity",
+    label: 'Case capacity',
     type: FIELD_TYPES.TEXT,
-    name: "case_capacity",
+    name: 'case_capacity',
     schema: Yup.number().integer().min(0),
   },
-];
-const SCHEMA = getFormSchema(FIELDS);
+]
+const SCHEMA = getFormSchema(FIELDS)
 
-mount(App);
+mount(App)

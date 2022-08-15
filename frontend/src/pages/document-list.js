@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   Container,
@@ -9,31 +9,31 @@ import {
   Dropdown,
   Label,
   Icon,
-} from "semantic-ui-react";
-import { mount } from "utils";
-import { CaseHeader, CASE_TABS } from "comps/case-header";
-import { api } from "api";
+} from 'semantic-ui-react'
+import { mount } from 'utils'
+import { CaseHeader, CASE_TABS } from 'comps/case-header'
+import { api } from 'api'
 
-const { issue, load_sharepoint_url, urls } = window.REACT_CONTEXT;
+const { issue, load_sharepoint_url, urls } = window.REACT_CONTEXT
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true)
   const [sharepointInfo, setSharepointInfo] = useState({
     sharepointUrl: null,
     documents: [],
-  });
-  const { sharepointUrl, documents } = sharepointInfo;
+  })
+  const { sharepointUrl, documents } = sharepointInfo
   useEffect(() => {
     api.case.docs(issue.id).then(({ resp, data }) => {
       if (resp.ok) {
         setSharepointInfo({
           sharepointUrl: data.sharepoint_url,
           documents: data.documents,
-        });
+        })
       }
-      setIsLoading(false);
-    });
-  }, []);
+      setIsLoading(false)
+    })
+  }, [])
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.DOCUMENTS} urls={urls} />
@@ -61,7 +61,7 @@ const App = () => {
           </li>
         ))}
     </Container>
-  );
-};
+  )
+}
 
-mount(App);
+mount(App)

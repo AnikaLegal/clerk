@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
-import { Header, Form, Button, Message, Segment } from "semantic-ui-react";
-import { DateInput } from "semantic-ui-calendar-react";
-import moment from "moment";
+import React, { useState } from 'react'
+import { Formik } from 'formik'
+import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
+import { DateInput } from 'semantic-ui-calendar-react'
+import moment from 'moment'
 
-import { submitNote } from "./case-file-note";
-import { TimelineNote } from "comps/timeline-item";
-import { MarkdownExplainer } from "comps/markdown-editor";
-import { TextArea } from "comps/textarea";
+import { submitNote } from './case-file-note'
+import { TimelineNote } from 'comps/timeline-item'
+import { MarkdownExplainer } from 'comps/markdown-editor'
+import { TextArea } from 'comps/textarea'
 
 export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false);
+  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header> Add a coordinator case review note</Header>
@@ -19,12 +19,12 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
         not visible to paralegals.
       </p>
       <Formik
-        initialValues={{ text: "", event: "", note_type: "REVIEW" }}
+        initialValues={{ text: '', event: '', note_type: 'REVIEW' }}
         validate={({ text, event }) => {
-          const errors = {};
-          if (!text) errors.text = "File note cannot be empty";
-          if (!event) errors.event = "Next review date is required";
-          return errors;
+          const errors = {}
+          if (!text) errors.text = 'File note cannot be empty'
+          if (!event) errors.event = 'Next review date is required'
+          return errors
         }}
         onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
       >
@@ -44,11 +44,11 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
             error={Object.keys(errors).length > 0}
           >
             <TextArea
-              onChange={(e) => setFieldValue("text", e.target.value, false)}
+              onChange={(e) => setFieldValue('text', e.target.value, false)}
               disabled={isSubmitting}
               rows={3}
               value={values.text}
-              style={{ marginBottom: "1em" }}
+              style={{ marginBottom: '1em' }}
               placeholder="Write your review here (this is not a filenote, paralegals cannot see this)"
             />
 
@@ -87,11 +87,11 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
             <TimelineNote
               note={{
                 note_type: values.note_type,
-                created_at: "Now",
+                created_at: 'Now',
                 event: values.event,
-                text_display: values.text || "start typing...",
+                text_display: values.text || 'start typing...',
                 creator: {
-                  full_name: "You",
+                  full_name: 'You',
                 },
               }}
             />
@@ -99,5 +99,5 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
         )}
       </Formik>
     </Segment>
-  );
-};
+  )
+}

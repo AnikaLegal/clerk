@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react'
 
-import { markdownToHtml } from "utils";
+import { markdownToHtml } from 'utils'
 
 export const TimelineItem = ({
   title,
@@ -16,7 +16,7 @@ export const TimelineItem = ({
       <div className="detail">{detail}</div>
     </div>
     <div
-      style={{ marginBottom: bottomLabel ? "1rem" : 0 }}
+      style={{ marginBottom: bottomLabel ? '1rem' : 0 }}
       dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
     />
     {label && (
@@ -26,11 +26,11 @@ export const TimelineItem = ({
       <div className="ui bottom right attached label">{bottomLabel}</div>
     )}
   </div>
-);
+)
 
 export const TimelineNote = ({ note }) => {
-  return NOTE_TYPES[note.note_type](note);
-};
+  return NOTE_TYPES[note.note_type](note)
+}
 
 const NOTE_TYPES = {
   PARALEGAL: (note) => (
@@ -64,7 +64,7 @@ const NOTE_TYPES = {
     <TimelineItem
       title={
         <span>
-          Eligibility check <strong>not cleared</strong> by{" "}
+          Eligibility check <strong>not cleared</strong> by{' '}
           {note.creator.full_name}
         </span>
       }
@@ -87,7 +87,7 @@ const NOTE_TYPES = {
     <TimelineItem
       title={
         <span>
-          Conflict check <strong>not cleared</strong> by{" "}
+          Conflict check <strong>not cleared</strong> by{' '}
           {note.creator.full_name}
         </span>
       }
@@ -121,4 +121,4 @@ const NOTE_TYPES = {
     />
   ),
   EMAIL: (note) => null,
-};
+}

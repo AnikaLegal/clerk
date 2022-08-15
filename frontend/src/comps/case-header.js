@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Formik } from "formik";
-import { Header, Segment, Tab } from "semantic-ui-react";
+import React, { useState, useEffect } from 'react'
+import { Formik } from 'formik'
+import { Header, Segment, Tab } from 'semantic-ui-react'
 
-import { MarkdownAsHtmlDisplay } from "utils";
+import { MarkdownAsHtmlDisplay } from 'utils'
 
 export const CASE_TABS = {
-  DETAIL: "DETAIL",
-  EMAIL: "EMAIL",
-  DOCUMENTS: "DOCUMENTS",
-};
+  DETAIL: 'DETAIL',
+  EMAIL: 'EMAIL',
+  DOCUMENTS: 'DOCUMENTS',
+}
 
 export const CaseHeader = ({ issue, actionstepUrl, activeTab, urls }) => (
   <>
@@ -24,7 +24,7 @@ export const CaseHeader = ({ issue, actionstepUrl, activeTab, urls }) => (
             &nbsp;
           </span>
         ) : (
-          "Not assigned, "
+          'Not assigned, '
         )}
         {issue.lawyer ? (
           <span>
@@ -32,7 +32,7 @@ export const CaseHeader = ({ issue, actionstepUrl, activeTab, urls }) => (
             <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>&nbsp;
           </span>
         ) : (
-          "not supervised "
+          'not supervised '
         )}
         {actionstepUrl && <a href={actionstepUrl}>view in Actionstep</a>}
       </div>
@@ -82,25 +82,25 @@ export const CaseHeader = ({ issue, actionstepUrl, activeTab, urls }) => (
     <div className="ui top attached tabular menu">
       <a
         href={urls.detail}
-        className={`item ${activeTab === CASE_TABS.DETAIL ? "active" : ""}`}
+        className={`item ${activeTab === CASE_TABS.DETAIL ? 'active' : ''}`}
       >
         <i className="clipboard outline icon"></i>
         Details
       </a>
       <a
         href={urls.email}
-        className={`item ${activeTab === CASE_TABS.EMAIL ? "active" : ""}`}
+        className={`item ${activeTab === CASE_TABS.EMAIL ? 'active' : ''}`}
       >
         <i className="envelope outline icon"></i>
         Email
       </a>
       <a
         href={urls.docs}
-        className={`item ${activeTab === CASE_TABS.DOCUMENTS ? "active" : ""}`}
+        className={`item ${activeTab === CASE_TABS.DOCUMENTS ? 'active' : ''}`}
       >
         <i className="folder open outline icon"></i>
         Documents
       </a>
     </div>
   </>
-);
+)

@@ -1,30 +1,30 @@
-const glob = require("glob");
-const path = require("path");
-const webpack = require("webpack");
-const BundleTracker = require("webpack-bundle-tracker");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const glob = require('glob')
+const path = require('path')
+const webpack = require('webpack')
+const BundleTracker = require('webpack-bundle-tracker')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const entry = glob
-  .sync("./src/pages/*.js")
-  .map((s) => [s.split("/").pop().split(".")[0], s])
-  .reduce((acc, val) => ({ ...acc, [val[0]]: val[1] }), {});
+  .sync('./src/pages/*.js')
+  .map((s) => [s.split('/').pop().split('.')[0], s])
+  .reduce((acc, val) => ({ ...acc, [val[0]]: val[1] }), {})
 const config = {
   entry,
   output: {
-    path: "/build/bundles",
-    filename: "[name].[chunkhash].js",
+    path: '/build/bundles',
+    filename: '[name].[chunkhash].js',
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin(),
-    new BundleTracker({ filename: "/build/webpack-stats.json" }),
+    new BundleTracker({ filename: '/build/webpack-stats.json' }),
   ],
   resolve: {
-    extensions: ["*", ".js", ".jsx"],
+    extensions: ['*', '.js', '.jsx'],
     modules: [
-      path.resolve(__dirname, "src"),
-      path.resolve(__dirname, "node_modules"),
+      path.resolve(__dirname, 'src'),
+      path.resolve(__dirname, 'node_modules'),
     ],
   },
   module: {
@@ -32,43 +32,43 @@ const config = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ["babel-loader"],
+        use: ['babel-loader'],
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, 'style-loader', 'css-loader'],
       },
     ],
   },
-};
+}
 
 module.exports = (env, argv) => {
-  const isDeveopment = argv.mode === "development";
+  const isDeveopment = argv.mode === 'development'
   if (isDeveopment) {
     // Setup dev server for hot reload
-    config.devtool = "inline-source-map";
+    config.devtool = 'inline-source-map'
     config.devServer = {
       port: 3000,
-      host: "0.0.0.0",
+      host: '0.0.0.0',
       hot: true,
-      headers: { "Access-Control-Allow-Origin": "*" },
-    };
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    }
     config.output = {
-      publicPath: "http://0.0.0.0:3000/build/",
-    };
+      publicPath: 'http://localhost:3000/build/',
+    }
     // Add React refresh plugin.
     config.plugins = [
       ...config.plugins,
       new webpack.HotModuleReplacementPlugin(),
       new ReactRefreshWebpackPlugin(),
-    ];
+    ]
   } else {
-    config.devtool = "source-map";
+    config.devtool = 'source-map'
     config.optimization = {
       splitChunks: {
-        chunks: "all",
+        chunks: 'all',
       },
-    };
+    }
   }
-  return config;
-};
+  return config
+}

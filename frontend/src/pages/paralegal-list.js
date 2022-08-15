@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -7,39 +7,39 @@ import {
   Input,
   Label,
   Dropdown,
-} from "semantic-ui-react";
+} from 'semantic-ui-react'
 
-import { mount, debounce, useEffectLazy } from "utils";
-import { api } from "api";
-import { FadeTransition } from "comps/transitions";
-import { GroupLabels } from "comps/group-label";
+import { mount, debounce, useEffectLazy } from 'utils'
+import { api } from 'api'
+import { FadeTransition } from 'comps/transitions'
+import { GroupLabels } from 'comps/group-label'
 
-const { lawyers, paralegals } = window.REACT_CONTEXT;
+const { lawyers, paralegals } = window.REACT_CONTEXT
 
-const SEARCH_FIELDS = ["full_name", "email"];
+const SEARCH_FIELDS = ['full_name', 'email']
 const INTERN_OPTIONS = [
-  { key: "Intern", value: "INTERN", text: "Intern" },
-  { key: "Volunteer", value: "VOLUNTEER", text: "Volunteer" },
-];
+  { key: 'Intern', value: 'INTERN', text: 'Intern' },
+  { key: 'Volunteer', value: 'VOLUNTEER', text: 'Volunteer' },
+]
 
 const searchFilter = (searchQuery) => (paralegal) =>
   SEARCH_FIELDS.some((fieldName) =>
     paralegal[fieldName].toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  )
 
 const internFilter = (internQuery) => (paralegal) => {
-  if (internQuery === "INTERN") return paralegal.is_intern;
-  if (internQuery === "VOLUNTEER") return !paralegal.is_intern;
-  return true;
-};
+  if (internQuery === 'INTERN') return paralegal.is_intern
+  if (internQuery === 'VOLUNTEER') return !paralegal.is_intern
+  return true
+}
 
 const App = () => {
-  const [search, setSearch] = useState("");
-  const [intern, setIntern] = useState("");
+  const [search, setSearch] = useState('')
+  const [intern, setIntern] = useState('')
   const paralegalResults =
     search || intern
       ? paralegals.filter(searchFilter(search)).filter(internFilter(intern))
-      : paralegals;
+      : paralegals
   return (
     <Container>
       <Header as="h1">
@@ -56,10 +56,10 @@ const App = () => {
       </Header>
       <div
         style={{
-          margin: "1rem 0",
-          display: "grid",
-          gap: "1rem",
-          gridTemplateColumns: "1fr 1fr",
+          margin: '1rem 0',
+          display: 'grid',
+          gap: '1rem',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
         <Input
@@ -81,8 +81,8 @@ const App = () => {
 
       <ParalegalTable accounts={paralegalResults} />
     </Container>
-  );
-};
+  )
+}
 
 const ParalegalTable = ({ accounts }) => (
   <Table celled>
@@ -125,7 +125,7 @@ const ParalegalTable = ({ accounts }) => (
           <Table.Cell>
             <a href={u.url}>
               {u.full_name}
-              {u.is_intern && " (intern)"}
+              {u.is_intern && ' (intern)'}
             </a>
           </Table.Cell>
           <Table.Cell textAlign="center">
@@ -135,7 +135,7 @@ const ParalegalTable = ({ accounts }) => (
             textAlign="center"
             className={getCapacityColor(u.capacity)}
           >
-            {u.capacity < 0 ? "No capacity" : u.capacity}
+            {u.capacity < 0 ? 'No capacity' : u.capacity}
           </Table.Cell>
           <Table.Cell textAlign="center">{u.open_cases}</Table.Cell>
           <Table.Cell textAlign="center">{u.open_repairs}</Table.Cell>
@@ -146,15 +146,15 @@ const ParalegalTable = ({ accounts }) => (
       ))}
     </Table.Body>
   </Table>
-);
+)
 
 const getCapacityColor = (capacity) => {
-  if (capacity < 0) return "blue";
-  if (capacity === 0) return "";
-  if (capacity < 50) return "green";
-  if (capacity < 75) return "yellow";
-  if (capacity < 100) return "orange";
-  return "red";
-};
+  if (capacity < 0) return 'blue'
+  if (capacity === 0) return ''
+  if (capacity < 50) return 'green'
+  if (capacity < 75) return 'yellow'
+  if (capacity < 100) return 'orange'
+  return 'red'
+}
 
-mount(App);
+mount(App)

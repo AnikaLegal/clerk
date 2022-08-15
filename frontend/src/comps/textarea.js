@@ -1,26 +1,26 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from 'react'
 
 export const TextArea = (props) => {
-  const textAreaRef = useRef(null);
+  const textAreaRef = useRef(null)
   const setScrollHeight = () => {
-    const el = textAreaRef.current;
+    const el = textAreaRef.current
     if (el && !props.value) {
-      el.style.height = "";
+      el.style.height = ''
     } else if (el && el.scrollHeight > el.clientHeight) {
-      el.style.height = el.scrollHeight + 8;
+      el.style.height = el.scrollHeight + 8
     }
-  };
+  }
   useEffect(() => {
-    setScrollHeight();
-  }, [props.value]);
+    setScrollHeight()
+  }, [props.value])
   return (
     <textarea
       ref={textAreaRef}
       style={{
-        overflow: "hidden",
-        resize: "none !important",
+        overflow: 'hidden',
+        resize: 'none !important',
       }}
       {...props}
     />
-  );
-};
+  )
+}

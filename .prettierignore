@@ -1,1 +1,5 @@
 *.html
+*.yml
+*.min.js
+*.min.css
+*.json

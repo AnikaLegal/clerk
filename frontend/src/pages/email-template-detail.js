@@ -1,12 +1,12 @@
-import React from "react";
-import { Formik } from "formik";
-import { Container, Header } from "semantic-ui-react";
+import React from 'react'
+import { Formik } from 'formik'
+import { Container, Header } from 'semantic-ui-react'
 
-import { mount } from "utils";
-import { api } from "api";
-import { EmailTemplateForm } from "forms/email-template";
+import { mount } from 'utils'
+import { api } from 'api'
+import { EmailTemplateForm } from 'forms/email-template'
 
-const CONTEXT = window.REACT_CONTEXT;
+const CONTEXT = window.REACT_CONTEXT
 
 const App = () => (
   <Container>
@@ -17,7 +17,7 @@ const App = () => (
         name: CONTEXT.template.name,
         subject: CONTEXT.template.subject,
         text: CONTEXT.template.text,
-        html: "",
+        html: '',
       }}
       validate={(values) => {}}
       onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -25,10 +25,10 @@ const App = () => (
           .update(CONTEXT.template.id, values)
           .then(({ resp, data }) => {
             if (resp.status === 400) {
-              setErrors(data);
+              setErrors(data)
             }
-            setSubmitting(false);
-          });
+            setSubmitting(false)
+          })
       }}
     >
       {(formik) => (
@@ -40,6 +40,6 @@ const App = () => (
       )}
     </Formik>
   </Container>
-);
+)
 
-mount(App);
+mount(App)
