@@ -6,13 +6,8 @@ import styled from 'styled-components'
 import { mount } from 'utils'
 import { api } from 'api'
 
-<<<<<<< HEAD
 const { issue, subject, case_email_address, case_email_list_url, user } =
-  window.REACT_CONTEXT;
-=======
-const { issue, subject, case_email_address, case_email_list_url } =
   window.REACT_CONTEXT
->>>>>>> Updated formatting & Webpack URL path
 
 const setAttachmentState = (emails, emailId, attachId, newState) =>
   emails.map((e) =>
@@ -90,23 +85,23 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
         {email.state == 'DRAFT' && <div className="label">Draft</div>}
         {email.state == 'SENT' && (
           <div className="label">
-            Sent on {email.processed_at}{" "}
+            Sent on {email.processed_at}{' '}
             {email.sender ? `by ${email.sender.full_name}` : null}
           </div>
         )}
-        {email.state == "DELIVERED" && (
+        {email.state == 'DELIVERED' && (
           <div className="label">
             Delivered after {email.processed_at}
             {email.sender ? `, sent by ${email.sender.full_name}` : null}
           </div>
         )}
-        {email.state == "DELIVERY_FAILURE" && (
+        {email.state == 'DELIVERY_FAILURE' && (
           <div className="label">
             Deilivery failed after {email.processed_at}
             {email.sender ? `, sent by ${email.sender.full_name}` : null}
           </div>
         )}
-        {email.state == "INGESTED" && (
+        {email.state == 'INGESTED' && (
           <div className="label">Received on {email.created_at}</div>
         )}
         {email.state == 'READY_TO_SEND' && (
@@ -157,28 +152,28 @@ const Email = styled.div`
   box-shadow: 1px 1px 5px -2px #999;
 
   ${({ state }) => {
-    if (state === "INGESTED") {
-      return `border-color: var(--gold-light);`;
-    } else if (state === "DELIVERY_FAILURE") {
-      return `border-color: var(--peach);`;
+    if (state === 'INGESTED') {
+      return `border-color: var(--gold-light);`
+    } else if (state === 'DELIVERY_FAILURE') {
+      return `border-color: var(--peach);`
     }
   }}
-`;
+`
 const EmailHeader = styled.div`
   padding: 1rem;
   background-color: var(--grey);
   border-bottom: solid 1px var(--grey);
   ${({ state }) => {
-    if (state === "INGESTED") {
+    if (state === 'INGESTED') {
       return `
     background-color: var(--gold-light);
     border-color: var(--gold-light);
-  `;
-    } else if (state === "DELIVERY_FAILURE") {
+  `
+    } else if (state === 'DELIVERY_FAILURE') {
       return `
     background-color: var(--peach);
     border-color: var(--peach);
-  `;
+  `
     }
   }}
   p {

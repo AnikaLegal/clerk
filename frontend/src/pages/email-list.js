@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   Container,
@@ -8,12 +8,12 @@ import {
   Dropdown,
   Label,
   Icon,
-} from "semantic-ui-react";
-import { mount } from "utils";
-import { CaseHeader, CASE_TABS } from "comps/case-header";
+} from 'semantic-ui-react'
+import { mount } from 'utils'
+import { CaseHeader, CASE_TABS } from 'comps/case-header'
 
 const { issue, email_threads, case_email_address, urls, draft_url } =
-  window.REACT_CONTEXT;
+  window.REACT_CONTEXT
 
 const App = () => {
   return (
@@ -52,34 +52,34 @@ const App = () => {
               </Table.Cell>
               <Table.Cell>{t.most_recent}</Table.Cell>
               <Table.Cell>
-                {countEmailType(t.emails, "DRAFT") > 0 && (
+                {countEmailType(t.emails, 'DRAFT') > 0 && (
                   <Label color="blue">
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "DRAFT")} drafts
+                    {countEmailType(t.emails, 'DRAFT')} drafts
                   </Label>
                 )}
-                {countEmailType(t.emails, "DELIVERED") > 0 && (
+                {countEmailType(t.emails, 'DELIVERED') > 0 && (
                   <Label>
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "DELIVERED")} sent
+                    {countEmailType(t.emails, 'DELIVERED')} sent
                   </Label>
                 )}
-                {countEmailType(t.emails, "DELIVERY_FAILURE") > 0 && (
+                {countEmailType(t.emails, 'DELIVERY_FAILURE') > 0 && (
                   <Label color="red">
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "DELIVERY_FAILURE")} failed
+                    {countEmailType(t.emails, 'DELIVERY_FAILURE')} failed
                   </Label>
                 )}
-                {countEmailType(t.emails, "SENT") > 0 && (
+                {countEmailType(t.emails, 'SENT') > 0 && (
                   <Label>
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "SENT")} sending
+                    {countEmailType(t.emails, 'SENT')} sending
                   </Label>
                 )}
-                {countEmailType(t.emails, "INGESTED") > 0 && (
+                {countEmailType(t.emails, 'INGESTED') > 0 && (
                   <Label>
                     <Icon name="mail" />
-                    {countEmailType(t.emails, "INGESTED")} received
+                    {countEmailType(t.emails, 'INGESTED')} received
                   </Label>
                 )}
               </Table.Cell>
@@ -88,10 +88,10 @@ const App = () => {
         </Table.Body>
       </Table>
     </Container>
-  );
-};
+  )
+}
 
 const countEmailType = (emails, state) =>
-  emails.filter((e) => e.state === state).length;
+  emails.filter((e) => e.state === state).length
 
-mount(App);
+mount(App)
