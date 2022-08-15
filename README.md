@@ -24,7 +24,7 @@ This Django project has several apps:
 
 ## Documentation
 
-See here for documentation:
+See here for more detailed documentation:
 
 - [Getting started](docs/setup.md)
 - [Testing and linting](docs/tests.md)
