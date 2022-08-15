@@ -136,7 +136,7 @@ const FIELDS = [
     label: "Case capacity",
     type: FIELD_TYPES.TEXT,
     name: "case_capacity",
-    schema: Yup.number().integer().positive(),
+    schema: Yup.number().integer().min(0),
   },
 ];
 const SCHEMA = getFormSchema(FIELDS);
