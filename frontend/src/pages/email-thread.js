@@ -25,9 +25,7 @@ const App = () => {
   const [emails, setEmails] = useState(window.REACT_CONTEXT.emails)
   const onEmailAttachUpload = (emailId, attachId) => () => {
     setEmails(setAttachmentState(emails, emailId, attachId, 'UPLOADING'))
-
-    api.email
-      .uploadAttachment(issue.id, emailId, attachId)
+    api.email.attachment.upload(issue.id, emailId, attachId)
       .then(({ resp, data }) => {
         setEmails(
           setAttachmentState(emails, emailId, attachId, data.sharepoint_state)

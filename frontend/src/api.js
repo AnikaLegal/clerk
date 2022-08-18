@@ -129,10 +129,28 @@ export const api = {
       const url = `/clerk/cases/email/${issueId}/draft/`
       return http.post(url, email)
     },
-    // Upload email attachment to sharepoint
-    uploadAttachment: (issuePk, emailPk, attachmentPk) => {
-      const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachmentPk}/`
+    update: (issueId, emailId, data) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/`
+      return http.patch(url, data)
+    },
+    send: (issueId, emailId) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/send/`
       return http.post(url, {})
+    },
+    delete: (issueId, emailId) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/`
+      return http.delete(url)
+    },
+    attachment: {
+      // TODO: Implement this.
+      create: () => {},
+      // TODO: Implement this.
+      delete: () => {},
+      // Upload email attachment to sharepoint
+      upload: (issuePk, emailPk, attachmentPk) => {
+        const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachmentPk}/`
+        return http.post(url, {})
+      },
     },
   },
   accounts: {

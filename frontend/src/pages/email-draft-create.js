@@ -13,22 +13,27 @@ import {
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
 
-import { mount, MarkdownAsHtmlDisplay } from 'utils'
+import { mount, MarkdownAsHtmlDisplay, markdownToHtml } from 'utils'
 import { api } from 'api'
-import { EmailTemplateForm } from 'forms/email-template'
 
 const { templates, issue, parent_email, case_email_url } = window.REACT_CONTEXT
 
 const App = () => {
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     setSubmitting(true)
-    api.email.create(issue.id, values).then(({ resp, data }) => {
+    const requestData = {
+      ...values,
+      html: markdownToHtml(values.text),
+    }
+    api.email.create(issue.id, requestData).then(({ resp, data }) => {
       if (resp.status === 400) {
         setErrors(data)
+        setSubmitting(false)
       } else if (resp.ok) {
         window.location.href = data.edit_url
+      } else {
+        setSubmitting(false)
       }
-      setSubmitting(false)
     })
   }
   const panes = [
@@ -59,7 +64,7 @@ const App = () => {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
         }}
       >
         <Header as="h1">
@@ -133,6 +138,7 @@ const TemplateForm = ({ templates, onSubmit, parent_email }) => {
                 <Input
                   value={values.to_address}
                   name="to_address"
+                  placeholder="jane@example.com"
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
@@ -142,6 +148,7 @@ const TemplateForm = ({ templates, onSubmit, parent_email }) => {
                 <Input
                   value={values.subject}
                   name="subject"
+                  placeholder="A very important email"
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
@@ -202,6 +209,7 @@ const CustomDraftForm = ({ onSubmit, parent_email }) => {
             <Input
               value={values.to_address}
               name="to_address"
+              placeholder="jane@example.com"
               onChange={handleChange}
               disabled={isSubmitting}
             />
@@ -211,6 +219,7 @@ const CustomDraftForm = ({ onSubmit, parent_email }) => {
             <Input
               value={values.subject}
               name="subject"
+              placeholder="A very important email"
               onChange={handleChange}
               disabled={isSubmitting}
             />

@@ -219,7 +219,7 @@ def email_draft_create_view(request, pk):
 
 @router.use_route("edit")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST", "DELETE"])
+@api_view(["GET", "PATCH", "DELETE"])
 def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -228,42 +228,30 @@ def email_draft_edit_view(request, pk, email_pk):
 
     case_email_address = build_clerk_address(issue, email_only=True)
     case_emails = get_case_emails(issue)
-    if request.method == "POST":
-        default_data = {
-            "from_address": case_email_address,
-            "state": EmailState.DRAFT,
-            "issue": issue,
-            "sender": request.user,
-        }
-        data = merge_form_data(request.POST, default_data)
-        form = EmailForm(data, instance=email, files=request.FILES)
-        if form.is_valid():
-            messages.success(request, "Draft saved.")
-            email = form.save()
+    if request.method == "PATCH":
+        serializer = EmailSerializer(email, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
     elif request.method == "DELETE":
         email.delete()
-        messages.success(request, "Draft deleted")
-        return HttpResponse(
-            headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
-        )
+        return Response({})
     else:
-        form = EmailForm(instance=email)
-
-    api = MSGraphAPI()
-    sharepoint_docs = api.folder.get_all_files(f"cases/{issue.id}")
-    sharepoint_options = [
-        {"name": doc["name"], "value": doc["id"]} for doc in sharepoint_docs
-    ]
-    context = {
-        "issue": issue,
-        "form": form,
-        "case_emails": case_emails,
-        "email": email,
-        "case_email_address": case_email_address,
-        "is_disabled": email.state != EmailState.DRAFT,
-        "sharepoint_options": sharepoint_options,
-    }
-    return render(request, "case/case/email/draft_edit.html", context)
+        # GET request.
+        api = MSGraphAPI()
+        sharepoint_docs = api.folder.get_all_files(f"cases/{issue.id}")
+        context = {
+            "email_preview_url": reverse(
+                "case-email-preview", args=(issue.pk, email.pk)
+            ),
+            "case_email_url": reverse("case-email-list", args=(issue.pk,)),
+            "issue": IssueDetailSerializer(issue).data,
+            "email": EmailSerializer(email).data,
+            "sharepoint_docs": sharepoint_docs,
+        }
+        return render_react_page(
+            request, f"Case {issue.fileref}", "email-draft-edit", context
+        )
 
 
 @router.use_route("preview")
