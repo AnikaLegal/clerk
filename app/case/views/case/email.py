@@ -38,6 +38,7 @@ from case.serializers import (
     IssueDetailSerializer,
     EmailSerializer,
     EmailAttachmentSerializer,
+    EmailTemplateSerializer,
     EmailThreadSerializer,
 )
 from case.views.case.detail import get_detail_urls
@@ -179,70 +180,41 @@ def _process_email_for_display(email: Email):
 
 @router.use_route("draft")
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET", "POST"])
 def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
-    case_email_address = build_clerk_address(issue, email_only=True)
-    case_emails = get_case_emails(issue)
-    templates = EmailTemplate.objects.filter(
-        Q(topic=issue.topic) | Q(topic="GENERAL")
-    ).order_by("-created_at")
-    for template in templates:
-        # Annotate with url
-        qs = request.GET.copy()
-        qs["template"] = template.pk
-        template.url = "?" + qs.urlencode()
-
-    parent_email = None
     if request.method == "POST":
-        default_data = {
-            "from_address": case_email_address,
+        data = {
+            "from_address": build_clerk_address(issue, email_only=True),
             "state": EmailState.DRAFT,
-            "issue": issue,
             "sender": request.user,
+            **request.data,
         }
-        data = merge_form_data(request.POST, default_data)
-        form = EmailForm(data, files=request.FILES)
-        if form.is_valid():
-            email = form.save()
-            messages.success(request, "Draft created")
-            return redirect("case-email-edit", issue.pk, email.pk)
+        serializer = EmailSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(issue=issue)
+        return Response(serializer.data)
     else:
-        # It's a GET request.
+        templates = EmailTemplate.objects.filter(
+            Q(topic=issue.topic) | Q(topic="GENERAL")
+        ).order_by("created_at")
         parent_id = request.GET.get("parent")
-        template_id = request.GET.get("template")
-        initial = {}
+        parent_email = None
         if parent_id:
             try:
-                parent_email = Email.objects.get(id=parent_id)
-                _process_email_for_display(parent_email)
-                initial["subject"] = parent_email.subject
-                if parent_email.state == EmailState.INGESTED:
-                    initial["to_address"] = parent_email.from_address
-                else:
-                    initial["to_address"] = parent_email.to_address
+                parent_email = EmailSerializer(Email.objects.get(pk=parent_id)).data
             except Email.DoesNotExist:
                 raise Http404()
-        if template_id:
-            try:
-                template = EmailTemplate.objects.get(id=template_id)
-                initial["text"] = template.text
-                initial["subject"] = template.subject
-            except EmailTemplate.DoesNotExist:
-                raise Http404()
 
-        form = EmailForm(initial=initial)
-
-    context = {
-        "issue": issue,
-        "parent_email": parent_email,
-        "form": form,
-        "case_emails": case_emails,
-        "case_email_address": case_email_address,
-        "templates": templates,
-        "is_disabled": False,
-    }
-    return render(request, "case/case/email/draft_create.html", context)
+        context = {
+            "case_email_url": reverse("case-email-list", args=(issue.pk,)),
+            "parent_email": parent_email,
+            "issue": IssueDetailSerializer(issue).data,
+            "templates": EmailTemplateSerializer(templates, many=True).data,
+        }
+        return render_react_page(
+            request, f"Case {issue.fileref}", "email-draft-create", context
+        )
 
 
 @router.use_route("edit")

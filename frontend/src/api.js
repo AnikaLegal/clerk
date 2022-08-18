@@ -125,6 +125,10 @@ export const api = {
     },
   },
   email: {
+    create: (issueId, email) => {
+      const url = `/clerk/cases/email/${issueId}/draft/`
+      return http.post(url, email)
+    },
     // Upload email attachment to sharepoint
     uploadAttachment: (issuePk, emailPk, attachmentPk) => {
       const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachmentPk}/`

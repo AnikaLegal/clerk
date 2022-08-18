@@ -18,6 +18,7 @@ services:
     image: clerk:local
     ports:
       - 8000:8000
+      - 8123:8123 # Debug
     volumes:
       - ../app:/app
       - build:/build
