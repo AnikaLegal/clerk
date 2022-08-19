@@ -4,8 +4,7 @@ from typing import List
 from django.utils.text import slugify
 
 from django.http import Http404, HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
 from django.utils.html import strip_tags
 from html_sanitizer import Sanitizer
@@ -13,6 +12,8 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.db.models import Q
+from django.db import transaction
+from django.core.files.base import ContentFile
 from bs4 import BeautifulSoup
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -28,8 +29,6 @@ from emails.models import (
     EmailAttachment,
     SharepointState,
 )
-from case.forms import EmailForm
-from case.utils import merge_form_data
 from case.utils.router import Router
 from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
@@ -225,16 +224,15 @@ def email_draft_edit_view(request, pk, email_pk):
     email = _get_email_for_issue(issue, email_pk)
     if not email.state in DRAFT_EMAIL_STATES:
         return redirect("case-email-list", issue.pk)
-
-    case_email_address = build_clerk_address(issue, email_only=True)
-    case_emails = get_case_emails(issue)
     if request.method == "PATCH":
         serializer = EmailSerializer(email, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
     elif request.method == "DELETE":
-        email.delete()
+        with transaction.atomic():
+            email.emailattachment_set.all().delete()
+            email.delete()
         return Response({})
     else:
         # GET request.
@@ -252,6 +250,22 @@ def email_draft_edit_view(request, pk, email_pk):
         return render_react_page(
             request, f"Case {issue.fileref}", "email-draft-edit", context
         )
+
+
+@router.use_route("send")
+@paralegal_or_better_required
+@api_view(["POST"])
+def email_draft_send_view(request, pk, email_pk):
+    issue = _get_issue_for_emails(request, pk)
+    email = _get_email_for_issue(issue, email_pk)
+    if email.state == EmailState.DRAFT:
+        email.state = EmailState.READY_TO_SEND
+        email.html = _render_email_template(email.html)
+        email.save()
+    else:
+        raise Http404()
+
+    return Response(status=200)
 
 
 @router.use_route("preview")
@@ -279,41 +293,12 @@ def _render_email_template(html):
         context = {"html": mark_safe(soup.body.decode_contents())}
     else:
         context = {"html": ""}
-    return render_to_string("case/case/email/preview.html", context)
-
-
-@router.use_route("send")
-@paralegal_or_better_required
-@require_http_methods(["POST"])
-def email_draft_send_view(request, pk, email_pk):
-    issue = _get_issue_for_emails(request, pk)
-    email = _get_email_for_issue(issue, email_pk)
-    if email.state == EmailState.DRAFT:
-        email.state = EmailState.READY_TO_SEND
-        email.html = _render_email_template(email.html)
-        email.save()
-    elif email.state == EmailState.SENT:
-        # Redirect to list view
-        messages.success(request, "Email sent")
-        return HttpResponse(
-            headers={"HX-Redirect": reverse("case-email-list", args=(pk,))}
-        )
-    elif email.state != EmailState.READY_TO_SEND:
-        raise Http404()
-
-    form = EmailForm(instance=email)
-    context = {
-        "issue": issue,
-        "form": form,
-        "email": email,
-        "is_disabled": True,
-    }
-    return render(request, "case/case/email/_email_form.html", context)
+    return render_to_string("case/case/email_preview.html", context)
 
 
 @router.use_route("attach")
 @paralegal_or_better_required
-@require_http_methods(["DELETE"])
+@require_http_methods(["POST", "DELETE"])
 def email_attachment_view(request, pk, email_pk, attach_pk):
     """Delete the email attachment, return HTML fragment for htmx."""
     issue = _get_issue_for_emails(request, pk)
@@ -321,9 +306,36 @@ def email_attachment_view(request, pk, email_pk, attach_pk):
     if not email.state == EmailState.DRAFT:
         raise Http404()
 
-    email.emailattachment_set.filter(id=attach_pk).delete()
-    context = {"issue": issue, "email": email}
-    return render(request, "case/case/email/_draft_attachments.html", context)
+    if request.method == "DELETE":
+        email.emailattachment_set.filter(id=attach_pk).delete()
+    else:
+        # POST request.
+        if "sharepoint_id" in request.data:
+            # Download attachment from SharePoint.
+            sharepoint_id = request.data["sharepoint_id"]
+            api = MSGraphAPI()
+            filename, mimetype, file_bytes = api.folder.download_file(sharepoint_id)
+            # Save as email attachment
+            f = ContentFile(file_bytes, name=filename)
+            # TODO: Reject file if too large > 30MB
+            attach = EmailAttachment.objects.create(
+                email=email,
+                file=f,
+                content_type=mimetype,
+            )
+        elif "attachment" in request.data:
+            pass
+            # TODO: Reject file if too large > 30MB
+            # attach = EmailAttachment.objects.create(
+            #     email=email,
+            #     file=f,
+            #     content_type=mimetype,
+            # )
+        else:
+            return Response(status=400)
+
+        serializer = EmailAttachmentSerializer(attach)
+        return Response(serializer.data)
 
 
 @router.use_route("attach-upload")

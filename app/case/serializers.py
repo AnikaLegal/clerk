@@ -413,10 +413,13 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
             "url",
             "name",
             "sharepoint_state",
+            "content_type",
+            "file",
         )
 
-    url = serializers.URLField(source="file.url")
-    name = serializers.CharField(source="file.name")
+    file = serializers.FileField(write_only=True)
+    url = serializers.URLField(source="file.url", read_only=True)
+    name = serializers.CharField(source="file.name", read_only=True)
 
 
 class EmailSerializer(serializers.ModelSerializer):
