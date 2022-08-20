@@ -42,57 +42,6 @@ class InviteParalegalForm(forms.ModelForm):
         return user
 
 
-class EmailForm(forms.ModelForm):
-    class Meta:
-        model = Email
-        fields = [
-            "from_address",
-            "to_address",
-            "cc_addresses",
-            "subject",
-            "state",
-            "text",
-            "issue",
-            "sender",
-            "sharepoint_attachments",
-            "html",
-        ]
-
-    sharepoint_attachments = forms.CharField(required=False)
-    subject = forms.CharField()
-    to_address = forms.EmailField()
-    attachments = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}), required=False
-    )
-
-    @transaction.atomic
-    def save(self):
-        email = super().save()
-        sharepoint_ids = [
-            s for s in self.data.get("sharepoint_attachments", "").split(",") if s
-        ]
-        for sharepoint_id in sharepoint_ids:
-            # Download attachment
-            api = MSGraphAPI()
-            filename, mimetype, file_bytes = api.folder.download_file(sharepoint_id)
-
-            # Save as email attachment
-            f = ContentFile(file_bytes, name=filename)
-            EmailAttachment.objects.create(
-                email=email,
-                file=f,
-                content_type=mimetype,
-            )
-
-        for f in self.files.getlist("attachments"):
-            EmailAttachment.objects.create(
-                email=email,
-                file=f,
-                content_type=f.content_type,
-            )
-        return email
-
-
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person

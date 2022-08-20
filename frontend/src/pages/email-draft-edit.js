@@ -14,6 +14,7 @@ import {
   Label,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
+import styled from 'styled-components'
 
 import { FormErrors } from 'comps/auto-form'
 import { mount } from 'utils'
@@ -45,7 +46,7 @@ const App = () => {
         return { resp, data }
       })
   }
-  const onDeleteAttachment = (attachId) => {
+  const onDeleteAttachment = (attachId) => () => {
     const confirmed = confirm('Delete this attachment?')
     if (!confirmed) return new Promise()
     return api.email.attachment
@@ -217,6 +218,17 @@ const App = () => {
       <Tab
         panes={[
           {
+            menuItem: 'Attach from SharePoint',
+            render: () => (
+              <Tab.Pane>
+                <SharepoinAttachForm
+                  onAttachSharepoint={onAttachSharepoint}
+                  sharePointDocs={sharepoint_docs}
+                />
+              </Tab.Pane>
+            ),
+          },
+          {
             menuItem: 'Upload attachment',
             render: () => (
               <Tab.Pane>
@@ -224,25 +236,28 @@ const App = () => {
               </Tab.Pane>
             ),
           },
-          {
-            menuItem: 'Attach from SharePoint',
-            render: () => (
-              <Tab.Pane>
-                <SharepoinAttachForm onAttachSharepoint={onAttachSharepoint} />
-              </Tab.Pane>
-            ),
-          },
         ]}
       />
       <List celled>
         {attachments.map((a) => (
-          <List.Item>
-            <List.Header as="a">{a.name}</List.Header>
-            {a.content_type}
-          </List.Item>
+          <Attachment key={a.id} attachment={a} onDelete={onDeleteAttachment} />
         ))}
       </List>
     </Container>
+  )
+}
+
+const Attachment = ({ attachment, onDelete }) => {
+  return (
+    <List.Item>
+      <List.Content floated="right">
+        <Button onClick={onDelete(attachment.id)}>Delete</Button>
+      </List.Content>
+      <List.Header as="a" href={attachment.url}>
+        {attachment.name.split('/').slice(-1)}
+      </List.Header>
+      <List.Description>{attachment.content_type}</List.Description>
+    </List.Item>
   )
 }
 
@@ -258,8 +273,7 @@ const FileUploadAttachForm = ({ onUploadAttachment }) => (
     })}
     onSubmit={(values, { setSubmitting, setErrors }) => {
       setSubmitting(true)
-      const attachment = { file: values.file, content_type: values.file.type }
-      onUploadAttachment({ attachment }).then(({ resp, data }) => {
+      onUploadAttachment(values).then(({ resp, data }) => {
         if (resp.status === 400) {
           setErrors(data)
         }
@@ -277,7 +291,7 @@ const FileUploadAttachForm = ({ onUploadAttachment }) => (
       setSubmitting,
     }) => (
       <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
-        <Form.Group inline>
+        <AttachFormGroup>
           <Form.Field error={touched.file && !!errors.file}>
             <Input
               type="file"
@@ -298,19 +312,104 @@ const FileUploadAttachForm = ({ onUploadAttachment }) => (
             <Icon name="attach" />
             Attach file
           </Button>
-        </Form.Group>
+        </AttachFormGroup>
         <FormErrors errors={errors} touched={touched} />
       </Form>
     )}
   </Formik>
 )
 
-const SharepoinAttachForm = ({ onAttachSharepoint }) => {
+const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
   const [isLoading, setIsLoading] = useState(false)
-  const onChange = (e) => {
-    debugger
-    onUploadAttachment
-  }
-  return <Input type="file" disabled={isLoading} onChange={onChange} />
+  const options = sharePointDocs.map((doc) => ({
+    key: doc.id,
+    value: doc.id,
+    description: `${(doc.size / 1024 / 1024).toFixed(2)} MB`,
+    text: doc.name,
+  }))
+  return (
+    <Formik
+      initialValues={{ sharepointId: '' }}
+      validationSchema={Yup.object().shape({
+        sharepointId: Yup.string()
+          .test('file-required', 'Please select a document', (sharepointId) =>
+            Boolean(sharepointId)
+          )
+          .test(
+            'file-size',
+            'File size must be no greater than 30MB',
+            (sharepointId) => {
+              const doc = sharePointDocs.find((d) => d.id === sharepointId)
+              if (!doc) {
+                return true
+              } else {
+                return doc.size / 1024 / 1024 <= 30
+              }
+            }
+          ),
+      })}
+      onSubmit={(values, { setSubmitting, setErrors }) => {
+        setSubmitting(true)
+        onAttachSharepoint(values.sharepointId).then(({ resp, data }) => {
+          if (resp.status === 400) {
+            setErrors(data)
+          }
+          setSubmitting(false)
+        })
+      }}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleSubmit,
+        isSubmitting,
+        setFieldValue,
+        setSubmitting,
+      }) => (
+        <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+          <AttachFormGroup>
+            <Form.Field error={touched.sharepointId && !!errors.sharepointId}>
+              <Dropdown
+                search
+                fluid
+                selection
+                disabled={isSubmitting}
+                placeholder="Select a document"
+                options={options}
+                onChange={(e, { value }) =>
+                  setFieldValue('sharepointId', value, false)
+                }
+                value={values.sharepointId}
+              />
+            </Form.Field>
+            <Button
+              icon
+              labelPosition="left"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              type="submit"
+            >
+              <Icon name="attach" />
+              Attach file
+            </Button>
+          </AttachFormGroup>
+          <FormErrors errors={errors} touched={touched} />
+        </Form>
+      )}
+    </Formik>
+  )
 }
+
+const AttachFormGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  .field {
+    flex-grow: 1;
+    margin: 0 !important;
+  }
+`
+
 mount(App)

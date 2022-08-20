@@ -54,9 +54,9 @@ const sendData = async (url, data, method, headers = {}) => {
 }
 
 const http = {
-  post: (url, data) => sendData(url, data, 'POST'),
-  patch: (url, data) => sendData(url, data, 'PATCH'),
-  put: (url, data) => sendData(url, data, 'PUT'),
+  post: (url, data, headers = {}) => sendData(url, data, 'POST', headers),
+  patch: (url, data, headers = {}) => sendData(url, data, 'PATCH', headers),
+  put: (url, data, headers = {}) => sendData(url, data, 'PUT', headers),
   get: async (url, query) => {
     let finalURL = url
     if (query) {
@@ -155,13 +155,11 @@ export const api = {
       return http.delete(url)
     },
     attachment: {
-      create: (issueId, emailId, email) => {
+      create: (issueId, emailId, attachment) => {
         const url = `/clerk/cases/email/${issueId}/draft/${emailId}/attachment/`
-        return http.post(
-          url,
-          { email },
-          { 'Content-Type': 'multipart/form-data' }
-        )
+        return http.post(url, attachment, {
+          'Content-Type': 'multipart/form-data',
+        })
       },
       createFromSharepoint: (issueId, emailId, sharepointId) => {
         const url = `/clerk/cases/email/${issueId}/draft/${emailId}/attachment/`

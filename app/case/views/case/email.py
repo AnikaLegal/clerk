@@ -17,7 +17,7 @@ from django.core.files.base import ContentFile
 from bs4 import BeautifulSoup
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from rest_framework.exceptions import ValidationError
 
 from core.models import Issue
 from case.views.auth import paralegal_or_better_required
@@ -298,8 +298,8 @@ def _render_email_template(html):
 
 @router.use_route("attach")
 @paralegal_or_better_required
-@require_http_methods(["POST", "DELETE"])
-def email_attachment_view(request, pk, email_pk, attach_pk):
+@api_view(["POST", "DELETE"])
+def email_attachment_view(request, pk, email_pk, attach_pk=None):
     """Delete the email attachment, return HTML fragment for htmx."""
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -308,32 +308,32 @@ def email_attachment_view(request, pk, email_pk, attach_pk):
 
     if request.method == "DELETE":
         email.emailattachment_set.filter(id=attach_pk).delete()
+        return Response(status=200)
+
     else:
         # POST request.
         if "sharepoint_id" in request.data:
             # Download attachment from SharePoint.
             sharepoint_id = request.data["sharepoint_id"]
             api = MSGraphAPI()
-            filename, mimetype, file_bytes = api.folder.download_file(sharepoint_id)
+            filename, content_type, file_bytes = api.folder.download_file(sharepoint_id)
             # Save as email attachment
             f = ContentFile(file_bytes, name=filename)
-            # TODO: Reject file if too large > 30MB
-            attach = EmailAttachment.objects.create(
-                email=email,
-                file=f,
-                content_type=mimetype,
-            )
-        elif "attachment" in request.data:
-            pass
-            # TODO: Reject file if too large > 30MB
-            # attach = EmailAttachment.objects.create(
-            #     email=email,
-            #     file=f,
-            #     content_type=mimetype,
-            # )
+        elif "file" in request.data:
+            f = request.data["file"]
+            content_type = f.content_type
         else:
-            return Response(status=400)
+            msg = "Could not find and uploaded file or SharePoint document."
+            raise ValidationError(msg)
 
+        if f.size / 1024 / 1024 > 30:
+            raise ValidationError({"file": "File must be <30MB."})
+
+        attach = EmailAttachment.objects.create(
+            email=email,
+            file=f,
+            content_type=content_type,
+        )
         serializer = EmailAttachmentSerializer(attach)
         return Response(serializer.data)
 
