@@ -38,6 +38,7 @@ ipython
 django-extensions
 django-browser-reload
 django-debug-toolbar
+debugpy
 
 # Development
 watchdog[watchmedo]

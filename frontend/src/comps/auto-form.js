@@ -63,6 +63,17 @@ const FieldSchema = Yup.array().of(
   })
 )
 
+export const FormErrors = ({ errors, touched, labels }) =>
+  Object.entries(errors).map(
+    ([k, v]) =>
+      touched[k] && (
+        <div key={k} className="ui error message">
+          <div className="header">{labels ? labels[k] : k}</div>
+          <p>{v}</p>
+        </div>
+      )
+  )
+
 export const AutoForm = ({
   fields,
   choices,
@@ -99,15 +110,7 @@ export const AutoForm = ({
           </Form.Field>
         )
       })}
-      {Object.entries(errors).map(
-        ([k, v]) =>
-          touched[k] && (
-            <div key={k} className="ui error message">
-              <div className="header">{labels[k]}</div>
-              <p>{v}</p>
-            </div>
-          )
-      )}
+      <FormErrors errors={errors} labels={labels} touched={touched} />
       <Button
         primary
         type="submit"

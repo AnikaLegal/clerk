@@ -30,20 +30,33 @@ const handleResponse = async (resp) => {
   return { resp, data }
 }
 
-const sendData = async (url, data, method) => {
+const sendData = async (url, data, method, headers = {}) => {
   const config = {
     ...BASE_CONFIG,
+    headers: { ...BASE_CONFIG.headers, ...headers },
     method: method,
-    body: JSON.stringify(data),
+  }
+  if (config.headers['Content-Type'] === 'application/json') {
+    config.body = JSON.stringify(data)
+  } else if (config.headers['Content-Type'] === 'multipart/form-data') {
+    config.body = new FormData()
+    for (let [k, v] of Object.entries(data)) {
+      if (Array.isArray(v) && v.length === 0) {
+        continue
+      } else {
+        config.body.append(k, v)
+      }
+    }
+    delete config.headers['Content-Type']
   }
   const resp = await fetch(url, config)
   return handleResponse(resp)
 }
 
 const http = {
-  post: (url, data) => sendData(url, data, 'POST'),
-  patch: (url, data) => sendData(url, data, 'PATCH'),
-  put: (url, data) => sendData(url, data, 'PUT'),
+  post: (url, data, headers = {}) => sendData(url, data, 'POST', headers),
+  patch: (url, data, headers = {}) => sendData(url, data, 'PATCH', headers),
+  put: (url, data, headers = {}) => sendData(url, data, 'PUT', headers),
   get: async (url, query) => {
     let finalURL = url
     if (query) {
@@ -125,10 +138,42 @@ export const api = {
     },
   },
   email: {
-    // Upload email attachment to sharepoint
-    uploadAttachment: (issuePk, emailPk, attachmentPk) => {
-      const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachmentPk}/`
+    create: (issueId, email) => {
+      const url = `/clerk/cases/email/${issueId}/draft/`
+      return http.post(url, email)
+    },
+    update: (issueId, emailId, data) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/`
+      return http.patch(url, data)
+    },
+    send: (issueId, emailId) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/send/`
       return http.post(url, {})
+    },
+    delete: (issueId, emailId) => {
+      const url = `/clerk/cases/email/${issueId}/draft/${emailId}/`
+      return http.delete(url)
+    },
+    attachment: {
+      create: (issueId, emailId, attachment) => {
+        const url = `/clerk/cases/email/${issueId}/draft/${emailId}/attachment/`
+        return http.post(url, attachment, {
+          'Content-Type': 'multipart/form-data',
+        })
+      },
+      createFromSharepoint: (issueId, emailId, sharepointId) => {
+        const url = `/clerk/cases/email/${issueId}/draft/${emailId}/attachment/`
+        return http.post(url, { sharepoint_id: sharepointId })
+      },
+      delete: (issueId, emailId, attachId) => {
+        const url = `/clerk/cases/email/${issueId}/draft/${emailId}/attachment/${attachId}/`
+        return http.delete(url)
+      },
+      // Upload email attachment to sharepoint
+      upload: (issuePk, emailPk, attachId) => {
+        const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachId}/`
+        return http.post(url, {})
+      },
     },
   },
   accounts: {

@@ -5,7 +5,7 @@ __target__
 
 # IDE
 .idea/
-.vscode/
+.vscode/settings.json
 
 # Python
 *.pyc
