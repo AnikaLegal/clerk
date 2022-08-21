@@ -50,5 +50,8 @@ ssh -o StrictHostKeyChecking=no -i deploy.key root@$HOST /bin/bash << EOF
     cd $DEPLOY_DIR
     echo -e "\n>>> Deploying $PROJECT to Docker Swarm cluster from $DEPLOY_DIR"
     docker stack deploy --compose-file docker-compose.${COMPOSE_SUFFIX}.yml $PROJECT
+    echo -e "\n>>> Removing unused Docker objects (containers, images, volumes, networks, build cache)"
+    docker system prune --volumes -f
 EOF
+
 echo -e "\n>>> Deployment finished for $PROJECT"
