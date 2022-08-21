@@ -307,6 +307,7 @@ MS_AUTHORITY_URL = (
 # Set per-environment
 MS_GRAPH_GROUP_ID = None
 MS_GRAPH_DRIVE_ID = None
+MS_REMOVE_OFFICE_LICENCES = False
 
 
 SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN")

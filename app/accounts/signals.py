@@ -1,7 +1,7 @@
 # User / Group / Permission signals go here
 # set_up_coordinator / tear_down_coordinator
 from django.contrib.auth.models import Group
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 
 from core.models import Issue
@@ -11,13 +11,32 @@ from microsoft.service import (
     remove_user_from_case,
     set_up_coordinator,
     tear_down_coordinator,
+    remove_office_licence,
+    add_office_licence,
 )
 
 
 POST_ADD = "post_add"
 POST_REMOVE = "post_remove"
 
-# https://docs.djangoproject.com/en/3.2/ref/signals/#m2m-changed
+
+@receiver(pre_save, sender=User)
+def pre_save_user(sender, instance, **kwargs):
+    user = instance
+    if not user.pk:
+        return
+
+    try:
+        prev_user = User.objects.get(pk=user.pk)
+    except User.DoesNotExist:
+        return
+
+    if prev_user.is_active and not user.is_active:
+        remove_office_licence(user)
+    elif (not prev_user.is_active) and user.is_active:
+        add_office_licence(user)
+
+
 @receiver(m2m_changed, sender=User.groups.through)
 def post_save_group(sender, instance, action, **kwargs):
     if kwargs.get("reverse"):

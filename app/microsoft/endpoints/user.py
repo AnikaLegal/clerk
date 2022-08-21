@@ -45,14 +45,23 @@ class UserEndpoint(BaseEndpoint):
     def assign_license(self, userPrincipalName):
         """
         Assign Office 365 E1 license to User.
-        Returns User object or None if User doesn't exist.
         """
         data = {
             # Do not remove fields or POST request might fail.
             "addLicenses": [{"skuId": OFFICE_E1_LICENSE_SKU_ID}],
             "removeLicenses": [],
         }
+        return super().post(f"users/{userPrincipalName}/assignLicense", data)
 
+    def remove_license(self, userPrincipalName):
+        """
+        Removes Office 365 E1 license from User.
+        """
+        data = {
+            # Do not remove fields or POST request might fail.
+            "addLicenses": [],
+            "removeLicenses": [OFFICE_E1_LICENSE_SKU_ID],
+        }
         return super().post(f"users/{userPrincipalName}/assignLicense", data)
 
     def get_license(self, userPrincipalName):

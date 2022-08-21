@@ -4,6 +4,7 @@ import {
   Container,
   Header,
   Table,
+  Icon,
   Input,
   Label,
   Dropdown,
@@ -77,6 +78,7 @@ const App = () => {
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Permissions</Table.HeaderCell>
+              <Table.HeaderCell>Active</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -95,6 +97,13 @@ const App = () => {
                 <Table.Cell>{u.created_at}</Table.Cell>
                 <Table.Cell>
                   <GroupLabels groups={u.groups} isSuperUser={u.is_superuser} />
+                </Table.Cell>
+                <Table.Cell>
+                  {u.is_active ? (
+                    <Icon name="check" color="green" />
+                  ) : (
+                    <Icon name="times" color="grey" />
+                  )}
                 </Table.Cell>
               </Table.Row>
             ))}

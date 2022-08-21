@@ -73,8 +73,8 @@ const App = () => {
   }
   return (
     <Container>
-      <Header as="h1">
-        {account.full_name}
+      <Header as="h1" disabled={!account.is_active}>
+        {account.full_name} {!account.is_active && ' (inactive)'}
         <Header.Subheader>{account.email}</Header.Subheader>
       </Header>
       <Header as="h3">User details</Header>
@@ -137,6 +137,12 @@ const FIELDS = [
     type: FIELD_TYPES.TEXT,
     name: 'case_capacity',
     schema: Yup.number().integer().min(0),
+  },
+  {
+    label: 'Active',
+    type: FIELD_TYPES.BOOL,
+    name: 'is_active',
+    schema: Yup.boolean(),
   },
 ]
 const SCHEMA = getFormSchema(FIELDS)

@@ -66,6 +66,28 @@ def set_up_new_user(user):
         return password
 
 
+def add_office_licence(user):
+    """
+    Adds MS account to a user.
+    """
+    api = MSGraphAPI()
+    ms_account = api.user.get(user.email)
+    if ms_account:
+        api.user.assign_license(user.email)
+
+
+def remove_office_licence(user):
+    """
+    Removes MS account from a user.
+    """
+    api = MSGraphAPI()
+    ms_account = api.user.get(user.email)
+    if ms_account and settings.MS_REMOVE_OFFICE_LICENCES:
+        api.user.remove_license(user.email)
+    elif ms_account:
+        logger.info("Did not remove Office 365 licence for %s", user.email)
+
+
 def set_up_new_case(issue: Issue):
     """
     Make a copy of the relevant templates folder with the name of the new case.

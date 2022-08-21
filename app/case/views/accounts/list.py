@@ -16,12 +16,7 @@ list_route = Route("list")
 @api_view(["GET"])
 @coordinator_or_better_required
 def account_list_view(request):
-    users = (
-        User.objects.prefetch_related("groups")
-        .order_by("-date_joined")
-        .filter(is_active=True)
-        .all()
-    )
+    users = User.objects.prefetch_related("groups").order_by("-date_joined").all()
     if "name" in request.GET or "group" in request.GET:
         name, group = request.GET.get("name"), request.GET.get("group")
         query = None
