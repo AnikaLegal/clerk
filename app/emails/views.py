@@ -40,7 +40,7 @@ def events_email_view(request):
     for event in events:
         to_email = event["email"]
         timestamp = event["timestamp"]
-        sendgrid_id = event["sg_message_id"]
+        sendgrid_id = event.get("sg_message_id")
         event_type = event["event"]
         if event_type not in EMAIL_EVENTS:
             logger.info(
@@ -80,10 +80,11 @@ def events_email_view(request):
 
 def find_email(to_email, timestamp, sendgrid_id):
     email = None
-    try:
-        email = Email.objects.get(sendgrid_id=sendgrid_id)
-    except Email.DoesNotExist:
-        logger.info("Could not find email with sendgrid ID %s", sendgrid_id)
+    if sendgrid_id:
+        try:
+            email = Email.objects.get(sendgrid_id=sendgrid_id)
+        except Email.DoesNotExist:
+            logger.info("Could not find email with sendgrid ID %s", sendgrid_id)
 
     if not email:
         event_at = timezone.datetime.fromtimestamp(timestamp, tz=timezone.utc)
