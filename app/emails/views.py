@@ -38,10 +38,13 @@ def events_email_view(request):
     """
     events = request.data
     for event in events:
-        to_email = event["email"]
         timestamp = event["timestamp"]
-        sendgrid_id = event.get("sg_message_id")
         event_type = event["event"]
+        sg_message_id = event.get("sg_message_id")
+        sendgrid_id = None
+        if sg_message_id:
+            sendgrid_id = sg_message_id.split(".")[0]
+
         if event_type not in EMAIL_EVENTS:
             logger.info(
                 "Skipping email event %s for email with sendgrid ID %s",
@@ -50,7 +53,14 @@ def events_email_view(request):
             )
             continue
 
-        email = find_email(to_email, timestamp, sendgrid_id)
+        # Try find the email based on the sendgrid message ID.
+        email = None
+        if sendgrid_id:
+            try:
+                email = Email.objects.get(sendgrid_id=sendgrid_id)
+            except Email.DoesNotExist:
+                pass
+
         if not email:
             logger.info(
                 "Could not find email email for event %s at %s with sendgrid ID %s",
@@ -76,37 +86,3 @@ def events_email_view(request):
             email.save()
 
     return HttpResponse(200)
-
-
-def find_email(to_email, timestamp, sendgrid_id):
-    email = None
-    if sendgrid_id:
-        try:
-            email = Email.objects.get(sendgrid_id=sendgrid_id)
-        except Email.DoesNotExist:
-            logger.info("Could not find email with sendgrid ID %s", sendgrid_id)
-
-    if not email:
-        event_at = timezone.datetime.fromtimestamp(timestamp, tz=timezone.utc)
-        before = event_at - timezone.timedelta(seconds=30)
-        after = event_at + timezone.timedelta(seconds=30)
-        try:
-            email = Email.objects.get(
-                to_address=to_email, processed_at__gte=before, processed_at__lte=after
-            )
-        except Email.DoesNotExist:
-            logger.error(
-                "Could not find email to %s at %s for sendgrid ID %s",
-                to_email,
-                timestamp,
-                sendgrid_id,
-            )
-        except Email.MultipleObjectsReturned:
-            logger.error(
-                "Found multiple emails to %s at %s for sendgrid ID %s",
-                to_email,
-                timestamp,
-                sendgrid_id,
-            )
-
-    return email

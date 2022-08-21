@@ -1,12 +1,65 @@
 import time
+import base64
+from typing import List, Tuple
+
 import requests
 from django.conf import settings
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import (
+    Mail,
+    To,
+    Cc,
+    Subject,
+    From,
+    Content,
+    Attachment,
+    FileContent,
+    FileName,
+    FileType,
+    Disposition,
+)
 
 
 BASE_URL = "https://api.sendgrid.com"
 HEADERS = {"Authorization": f"Bearer {settings.SENDGRID_API_KEY}"}
 DEV_EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
 EMAIL_DOMAIN = settings.EMAIL_DOMAIN
+
+
+def send_email(
+    from_addr: str,
+    to_addr: str,
+    cc_addrs: List[str],
+    subject: str,
+    body: str,
+    attachments: List[Tuple[str, bytes, str]] = None,
+    html: str = None,
+):
+    sendgrid_client = SendGridAPIClient(settings.SENDGRID_API_KEY)
+    message = Mail()
+    message.to = [To(email=to_addr)]
+    message.cc = [Cc(email=email) for email in cc_addrs]
+    message.subject = Subject(subject)
+    message.from_email = From(email=from_addr, name="Anika Legal")
+    content = [Content(mime_type="text/plain", content=body)]
+    if html:
+        content.append(Content(mime_type="text/html", content=html))
+
+    message.content = content
+    if attachments:
+        message.attachment = [
+            Attachment(
+                file_content=FileContent(base64.b64encode(file_bytes).decode()),
+                file_name=FileName(file_name),
+                file_type=FileType(content_type),
+                disposition=Disposition("attachment"),
+            )
+            for file_name, file_bytes, content_type in attachments
+        ]
+    response = sendgrid_client.send(message)
+    message_id = response.headers["X-Message-Id"]
+    return message_id
 
 
 def set_inbound_parse_url(base_url):

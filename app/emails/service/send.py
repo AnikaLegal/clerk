@@ -1,7 +1,5 @@
 import os
 import logging
-from typing import List, Tuple
-from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.utils import timezone
 
@@ -9,7 +7,7 @@ from core.models import IssueNote
 from core.models.issue_note import NoteType
 from emails.models import Email, EmailState
 from utils.sentry import sentry_task
-
+from emails.api import send_email
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +35,14 @@ def send_email_task(email_pk: int):
     from_addr = email.from_address
     attachments = []
     if email.issue:
-        from_addr = build_clerk_address(email.issue)
+        from_addr = build_clerk_address(email.issue, email_only=True)
         for att in email.emailattachment_set.all():
             file_name = os.path.basename(att.file.name)
             file_bytes = att.file.read()
             attachments.append((file_name, file_bytes, att.content_type))
 
-    send_email(
+    logger.info("Sending email to %s from %s", email.to_address, from_addr)
+    message_id = send_email(
         from_addr,
         email.to_address,
         email.cc_addresses,
@@ -53,7 +52,9 @@ def send_email_task(email_pk: int):
         html=email.html,
     )
     Email.objects.filter(pk=email_pk).update(
-        state=EmailState.SENT, processed_at=timezone.now()
+        state=EmailState.SENT,
+        processed_at=timezone.now(),
+        sendgrid_id=message_id,
     )
     if email.issue:
         IssueNote.objects.create(
@@ -62,35 +63,6 @@ def send_email_task(email_pk: int):
             content_object=email,
             text=email.get_sent_note_text(),
         )
-
-
-def send_email(
-    from_addr: str,
-    to_addr: str,
-    cc_addrs: List[str],
-    subject: str,
-    body: str,
-    attachments: List[Tuple[str, bytes, str]] = None,
-    html: str = None,
-):
-    """
-    Send an email.
-    https://docs.djangoproject.com/en/3.2/topics/email/#django.core.mail.EmailMessage
-    https://docs.djangoproject.com/en/3.2/topics/email/#sending-alternative-content-types
-    """
-    logger.info("Sending email to %s from %s", to_addr, from_addr)
-    email = EmailMultiAlternatives(
-        subject=subject,
-        body=body,
-        from_email=from_addr,
-        to=[to_addr],
-        cc=cc_addrs,
-        attachments=attachments,
-    )
-    if html:
-        email.attach_alternative(html, "text/html")
-
-    email.send(fail_silently=False)
 
 
 def build_clerk_address(issue, email_only=False):

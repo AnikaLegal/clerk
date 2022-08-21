@@ -58,20 +58,22 @@ const App = () => {
         return { resp, data }
       })
   }
-  const onSend = () => {
+  const onSend = (setSubmitting) => {
     const confirmed = confirm(
       'Send this email? Remember to save any changes before sending.'
     )
     if (!confirmed) return
+    setSubmitting(true)
     api.email.send(issue.id, email.id).then(({ resp, data }) => {
       if (resp.ok) {
         window.location = case_email_url
       }
     })
   }
-  const onDelete = () => {
+  const onDelete = (setSubmitting) => {
     const confirmed = confirm('Delete this draft email?')
     if (!confirmed) return
+    setSubmitting(true)
     api.email.delete(issue.id, email.id).then(({ resp, data }) => {
       if (resp.ok) {
         window.location = case_email_url
@@ -184,7 +186,7 @@ const App = () => {
               labelPosition="left"
               disabled={isSubmitting}
               loading={isSubmitting}
-              onClick={() => setSubmitting(true) || onSend()}
+              onClick={() => onSend(setSubmitting)}
             >
               <Icon name="mail" />
               Send email
@@ -208,7 +210,7 @@ const App = () => {
               color="red"
               disabled={isSubmitting}
               loading={isSubmitting}
-              onClick={() => setSubmitting(true) || onDelete()}
+              onClick={() => onDelete(setSubmitting)}
             >
               Delete
             </Button>
