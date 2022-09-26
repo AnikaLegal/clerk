@@ -8,6 +8,7 @@ import {
   Button,
   Input,
   Dropdown,
+  Checkbox,
   Icon,
   List,
   Message,
@@ -58,17 +59,35 @@ const App = () => {
         return { resp, data }
       })
   }
-  const onSend = (setSubmitting) => {
-    const confirmed = confirm(
-      'Send this email? Remember to save any changes before sending.'
-    )
-    if (!confirmed) return
+  const onSubmit = async (values, { setSubmitting, setErrors }) => {
     setSubmitting(true)
-    api.email.send(issue.id, email.id).then(({ resp, data }) => {
-      if (resp.ok) {
+    const ccAddresses = values.cc_addresses
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s)
+    const requestData = { ...values, cc_addresses: ccAddresses }
+    delete requestData.send
+    const { resp, data } = await api.email.update(
+      issue.id,
+      email.id,
+      requestData
+    )
+    if (resp.status === 400) {
+      setErrors(data)
+    }
+    if (resp.ok && values.send) {
+      // Send email
+      const confirmed = confirm('Send this email?')
+      if (!confirmed) return
+      const { resp: sendResp, data: sendData } = await api.email.send(
+        issue.id,
+        email.id
+      )
+      if (sendResp.ok) {
         window.location = case_email_url
       }
-    })
+    }
+    setSubmitting(false)
   }
   const onDelete = (setSubmitting) => {
     const confirmed = confirm('Delete this draft email?')
@@ -106,6 +125,7 @@ const App = () => {
           cc_addresses: email ? email.cc_addresses.join(', ') : '',
           text: email ? email.text : '',
           html: email ? email.html : '',
+          send: false, // True when sending vs saving draft.
         }}
         validationSchema={Yup.object().shape({
           to_address: Yup.string().email().required('Required'),
@@ -114,22 +134,7 @@ const App = () => {
           text: Yup.string().required('Required'),
           html: Yup.string(),
         })}
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          setSubmitting(true)
-          const ccAddresses = values.cc_addresses
-            .split(',')
-            .map((s) => s.trim())
-            .filter((s) => s)
-          const requestData = { ...values, cc_addresses: ccAddresses }
-          api.email
-            .update(issue.id, email.id, requestData)
-            .then(({ resp, data }) => {
-              if (resp.status === 400) {
-                setErrors(data)
-              }
-              setSubmitting(false)
-            })
-        }}
+        onSubmit={onSubmit}
       >
         {({
           values,
@@ -179,25 +184,41 @@ const App = () => {
               onChangeHtml={(html) => setFieldValue('html', html)}
               disabled={isSubmitting}
             />
+            <Form.Field>
+              <Checkbox
+                toggle
+                label="Ready to send"
+                onChange={(e, data) => setFieldValue('send', data.checked)}
+                checked={values.send}
+              />
+            </Form.Field>
             <FormErrors errors={errors} touched={touched} />
-            <Button
-              primary
-              icon
-              labelPosition="left"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              onClick={() => onSend(setSubmitting)}
-            >
-              <Icon name="mail" />
-              Send email
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Save draft
-            </Button>
+            {values.send && (
+              <Button
+                primary
+                icon
+                labelPosition="left"
+                type="submit"
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                <Icon name="mail" />
+                Send
+              </Button>
+            )}
+            {!values.send && (
+              <Button
+                icon
+                labelPosition="left"
+                type="submit"
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                <Icon name="save" />
+                Save
+              </Button>
+            )}
+
             <Button
               disabled={isSubmitting}
               loading={isSubmitting}
