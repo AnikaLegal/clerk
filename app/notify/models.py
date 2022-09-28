@@ -1,5 +1,11 @@
 from django.db import models
 from core.models.timestamped import TimestampedModel
+from core.models.issue import CaseTopic
+
+NOTIFY_TOPIC_CHOICES = [
+    ("GENERAL", "General"),
+    *CaseTopic.ACTIVE_CHOICES,
+]
 
 
 class NotifyEvent(models.TextChoices):
@@ -45,7 +51,9 @@ class Notification(TimestampedModel):
     sending text to a target user via a channel
     """
 
-    event = models.CharField(max_length=32, choices=NotifyEvent.CHOICES)
-    channel = models.CharField(max_length=32, choices=NotifyChannel.CHOICES)
-    target = models.CharField(max_length=32, choices=NotifyTarget.CHOICES)
+    name = models.CharField(max_length=64)
+    topic = models.CharField(max_length=32, choices=NOTIFY_TOPIC_CHOICES)
+    event = models.CharField(max_length=32, choices=NotifyEvent.choices)
+    channel = models.CharField(max_length=32, choices=NotifyChannel.choices)
+    target = models.CharField(max_length=32, choices=NotifyTarget.choices)
     text = models.TextField()

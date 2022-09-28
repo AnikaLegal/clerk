@@ -203,6 +203,24 @@ export const api = {
     },
   },
   templates: {
+    notify: {
+      search: (query) => {
+        const url = '/clerk/templates/notify/search/'
+        return http.get(url, query)
+      },
+      create: (data) => {
+        const url = '/clerk/templates/notify/create/'
+        return http.post(url, data)
+      },
+      update: (pk, data) => {
+        const url = `/clerk/templates/notify/${pk}/`
+        return http.put(url, data)
+      },
+      delete: (pk) => {
+        const url = `/clerk/templates/notify/${pk}/delete/`
+        return http.delete(url)
+      },
+    },
     doc: {
       search: (query) => {
         const url = '/clerk/templates/doc/search/'

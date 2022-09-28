@@ -8,26 +8,37 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from emails.models import EmailTemplate
 from case.utils.router import Router
-from core.models.issue import CaseTopic
 from case.forms import DocumentTemplateForm
-from microsoft.service import list_templates, upload_template, delete_template
 from case.utils.react import render_react_page
-from case.serializers import EmailTemplateSerializer
+from case.serializers import EmailTemplateSerializer, NotificationSerializer
+from emails.models import EmailTemplate
+from core.models.issue import CaseTopic
+from notify.models import Notification
+from microsoft.service import list_templates, upload_template, delete_template
 
 from .auth import coordinator_or_better_required, paralegal_or_better_required
 
 router = Router("template")
 router.create_route("list")
+
+# Emails
 router.create_route("email-list").path("email")
 router.create_route("email-detail").path("email").pk("pk")
 router.create_route("email-create").path("email").path("create")
 router.create_route("email-search").path("email").path("search")
+
+# Documents
 router.create_route("doc-list").path("doc")
 router.create_route("doc-create").path("doc").path("create")
 router.create_route("doc-search").path("doc").path("search")
 router.create_route("doc-delete").path("doc").slug("file_id").path("delete")
+
+# Notifications
+router.create_route("notify-list").path("notify")
+router.create_route("notify-create").path("notify").path("create")
+router.create_route("notify-search").path("notify").path("search")
+router.create_route("notify-delete").path("notify").pk("pk").path("delete")
 
 
 @router.use_route("list")
@@ -160,3 +171,38 @@ def template_doc_create_view(request):
 
     context = {"form": form}
     return render(request, "case/templates/doc/create.html", context)
+
+
+@router.use_route("notify-list")
+@coordinator_or_better_required
+@require_http_methods(["GET"])
+def template_notify_list_view(request):
+    notifications = Notification.objects.order_by("-created_at").all()
+    context = {
+        "create_url": reverse("template-notify-create"),
+        "notifications": NotificationSerializer(notifications, many=True).data,
+    }
+    return render_react_page(
+        request, "Notification Templates", "notify-template-list", context
+    )
+
+
+@router.use_route("notify-search")
+@coordinator_or_better_required
+@api_view(["GET"])
+def template_notify_search_view(request):
+    pass
+
+
+@router.use_route("notify-delete")
+@coordinator_or_better_required
+@require_http_methods(["DELETE"])
+def template_notify_delete_view(request, pk):
+    pass
+
+
+@router.use_route("notify-create")
+@coordinator_or_better_required
+@require_http_methods(["GET", "POST"])
+def template_notify_create_view(request):
+    pass
