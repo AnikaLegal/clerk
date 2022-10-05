@@ -261,11 +261,22 @@ const App = () => {
           },
         ]}
       />
-      <List celled>
-        {attachments.map((a) => (
-          <Attachment key={a.id} attachment={a} onDelete={onDeleteAttachment} />
-        ))}
-      </List>
+      {attachments.length === 0 && (
+        <p style={{ opacity: 0.7 }}>
+          No files are currently attached to this email
+        </p>
+      )}
+      {attachments.length > 0 && (
+        <List celled>
+          {attachments.map((a) => (
+            <Attachment
+              key={a.id}
+              attachment={a}
+              onDelete={onDeleteAttachment}
+            />
+          ))}
+        </List>
+      )}
     </Container>
   )
 }
