@@ -109,6 +109,7 @@ const TemplateForm = ({ templates, onSubmit, parent_email }) => {
       />
       {template && (
         <Formik
+          key={templateId}
           initialValues={{
             to_address: parent_email ? parent_email.from_address : '',
             subject: parent_email ? parent_email.subject : template.subject,
