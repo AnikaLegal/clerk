@@ -482,15 +482,21 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "created_at",
-            "modified_at",
             "name",
             "topic",
             "event",
+            "event_stage",
             "channel",
             "target",
             "text",
+            "url",
         )
 
     event = TextChoiceField(NotifyEvent)
     channel = TextChoiceField(NotifyChannel)
     target = TextChoiceField(NotifyTarget)
+    url = serializers.SerializerMethodField()
+    created_at = LocalDateField()
+
+    def get_url(self, obj):
+        return reverse("template-notify-detail", args=(obj.pk,))

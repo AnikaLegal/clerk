@@ -91,9 +91,9 @@ const App = () => {
                   <a href={t.url}>{t.name}</a>
                 </Table.Cell>
                 <Table.Cell>{t.topic}</Table.Cell>
-                <Table.Cell>{t.event}</Table.Cell>
-                <Table.Cell>{t.channel}</Table.Cell>
-                <Table.Cell>{t.target}</Table.Cell>
+                <Table.Cell>{t.event.display}</Table.Cell>
+                <Table.Cell>{t.channel.display}</Table.Cell>
+                <Table.Cell>{t.target.display}</Table.Cell>
                 <Table.Cell>{t.created_at}</Table.Cell>
               </Table.Row>
             ))}

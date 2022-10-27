@@ -1,6 +1,6 @@
 from django.db import models
 from core.models.timestamped import TimestampedModel
-from core.models.issue import CaseTopic
+from core.models.issue import CaseTopic, CaseStage
 
 NOTIFY_TOPIC_CHOICES = [
     ("GENERAL", "General"),
@@ -57,3 +57,8 @@ class Notification(TimestampedModel):
     channel = models.CharField(max_length=32, choices=NotifyChannel.choices)
     target = models.CharField(max_length=32, choices=NotifyTarget.choices)
     text = models.TextField()
+
+    # Only relevant when event is STAGE_CHANGED
+    event_stage = models.CharField(
+        max_length=32, choices=CaseStage.CHOICES, blank=True, default=""
+    )

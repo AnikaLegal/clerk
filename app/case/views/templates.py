@@ -38,6 +38,7 @@ router.create_route("doc-delete").path("doc").slug("file_id").path("delete")
 router.create_route("notify-list").path("notify")
 router.create_route("notify-create").path("notify").path("create")
 router.create_route("notify-search").path("notify").path("search")
+router.create_route("notify-detail").path("notify").pk("pk")
 router.create_route("notify-delete").path("notify").pk("pk").path("delete")
 
 
@@ -175,7 +176,7 @@ def template_doc_create_view(request):
 
 @router.use_route("notify-list")
 @coordinator_or_better_required
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def template_notify_list_view(request):
     notifications = Notification.objects.order_by("-created_at").all()
     context = {
@@ -196,13 +197,44 @@ def template_notify_search_view(request):
 
 @router.use_route("notify-delete")
 @coordinator_or_better_required
-@require_http_methods(["DELETE"])
+@api_view(["DELETE"])
 def template_notify_delete_view(request, pk):
     pass
 
 
 @router.use_route("notify-create")
 @coordinator_or_better_required
-@require_http_methods(["GET", "POST"])
+@api_view(["GET", "POST"])
 def template_notify_create_view(request):
-    pass
+    if request.method == "POST":
+        serializer = NotificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return render_react_page(
+        request, "Notification Templates", "notify-template-create", {}
+    )
+
+
+@router.use_route("notify-detail")
+@coordinator_or_better_required
+@api_view(["GET", "PUT"])
+def template_notify_detail_view(request, pk):
+    try:
+        template = Notification.objects.get(pk=pk)
+    except Notification.DoesNotExist:
+        raise Http404()
+
+    if request.method == "PUT":
+        serializer = NotificationSerializer(instance=template, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    context = {
+        "template": NotificationSerializer(template).data,
+    }
+    return render_react_page(
+        request, "Notification Templates", "notify-template-edit", context
+    )
