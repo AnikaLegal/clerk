@@ -234,6 +234,7 @@ def template_notify_detail_view(request, pk):
 
     context = {
         "template": NotificationSerializer(template).data,
+        "notify_template_url": reverse("template-notify-list"),
     }
     return render_react_page(
         request, "Notification Templates", "notify-template-edit", context
