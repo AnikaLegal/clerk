@@ -14,6 +14,7 @@ from core.models.client import (
     EligibilityCircumstanceType,
     EmploymentType,
 )
+from notify.models import Notification, NotifyEvent, NotifyChannel, NotifyTarget
 
 
 class DateField(serializers.ReadOnlyField):
@@ -473,3 +474,29 @@ class EmailThreadSerializer(serializers.Serializer):
 
     def get_url(self, obj):
         return reverse("case-email-thread", args=(obj.issue.pk, obj.slug))
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = (
+            "id",
+            "created_at",
+            "name",
+            "topic",
+            "event",
+            "event_stage",
+            "channel",
+            "target",
+            "text",
+            "url",
+        )
+
+    event = TextChoiceField(NotifyEvent)
+    channel = TextChoiceField(NotifyChannel)
+    target = TextChoiceField(NotifyTarget)
+    url = serializers.SerializerMethodField()
+    created_at = LocalDateField()
+
+    def get_url(self, obj):
+        return reverse("template-notify-detail", args=(obj.pk,))
