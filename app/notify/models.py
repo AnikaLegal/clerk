@@ -1,6 +1,7 @@
 from django.db import models
 from core.models.timestamped import TimestampedModel
 from core.models.issue import CaseTopic, CaseStage
+from core.models import Issue
 
 NOTIFY_TOPIC_CHOICES = [
     ("GENERAL", "General"),
@@ -29,7 +30,7 @@ class NotifyChannel(models.TextChoices):
 
     Future considerations may be:
     - email
-    - in-app notification system
+    - in-app notification systems
     """
 
     SLACK = "SLACK", "Send a Slack message"
