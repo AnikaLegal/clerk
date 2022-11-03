@@ -4,7 +4,7 @@
 # Run this from the project root
 #
 set -e
-HOST='3.106.55.74'
+HOST='13.55.250.149'
 
 if [[ -z "$COMPOSE_SUFFIX" ]]
 then

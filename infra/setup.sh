@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-HOST='3.106.55.74'
+HOST='13.55.250.149'
 
 echo -e "\n>>> Importing prod envars"
 export $(grep -v '^#' env/prod.env | xargs)

@@ -1,7 +1,7 @@
 from invoke import task
 
 APP_NAME = "clerk"
-HOST = "3.106.55.74"
+HOST = "13.55.250.149"
 COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
 
 

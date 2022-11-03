@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-HOST='3.106.55.74'
+HOST='13.55.250.149'
 PROJECT='staging'
 
 echo -e "\n>>> Copying staging compose file to clerk at $HOST"
