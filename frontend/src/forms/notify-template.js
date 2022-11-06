@@ -1,8 +1,8 @@
 import React from 'react'
 import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
-import { TextArea } from 'comps/textarea'
 import { STAGES } from 'consts'
+import { SlackyMarkdownEditor } from 'comps/markdown-editor'
 
 const TOPIC_OPTIONS = [
   { key: 'GENERAL', value: 'GENERAL', text: 'General' },
@@ -34,7 +34,7 @@ const TARGET_OPTIONS = [
 
 export const NotifyTemplateForm = ({
   create,
-  editable,
+  onDelete,
   formik: {
     values,
     errors,
@@ -52,7 +52,7 @@ export const NotifyTemplateForm = ({
         value={values.name}
         name="name"
         onChange={handleChange}
-        disabled={!editable}
+        disabled={isSubmitting}
       />
     </div>
     <div className={`field ${errors.topic && 'error'}`}>
@@ -64,7 +64,7 @@ export const NotifyTemplateForm = ({
         options={TOPIC_OPTIONS}
         onChange={(e, { value }) => setFieldValue('topic', value)}
         value={values.topic}
-        disabled={!editable}
+        disabled={isSubmitting}
       />
     </div>
     <div className={`field ${errors.event && 'error'}`}>
@@ -76,7 +76,7 @@ export const NotifyTemplateForm = ({
         options={EVENT_OPTIONS}
         onChange={(e, { value }) => setFieldValue('event', value)}
         value={values.event}
-        disabled={!editable}
+        disabled={isSubmitting}
       />
     </div>
     {values.event == 'STAGE_CHANGE' && (
@@ -89,7 +89,7 @@ export const NotifyTemplateForm = ({
           options={STAGE_OPTIONS}
           onChange={(e, { value }) => setFieldValue('event_stage', value)}
           value={values.event_stage}
-          disabled={!editable}
+          disabled={isSubmitting}
         />
       </div>
     )}
@@ -102,7 +102,7 @@ export const NotifyTemplateForm = ({
         options={CHANNEL_OPTIONS}
         onChange={(e, { value }) => setFieldValue('channel', value)}
         value={values.channel}
-        disabled={!editable}
+        disabled={isSubmitting}
       />
     </div>
     <div className={`field ${errors.target && 'error'}`}>
@@ -114,38 +114,44 @@ export const NotifyTemplateForm = ({
         options={TARGET_OPTIONS}
         onChange={(e, { value }) => setFieldValue('target', value)}
         value={values.target}
-        disabled={!editable}
+        disabled={isSubmitting}
       />
     </div>
     <div className={`field ${errors.target && 'error'}`}>
       <label>Message text</label>
-
-      <TextArea
-        onChange={(e) => setFieldValue('text', e.target.value, false)}
+      <SlackyMarkdownEditor
+        text={values.raw_text}
         disabled={isSubmitting}
         placeholder="The message text."
-        rows={5}
-        value={values.text}
+        onChangeText={(text) => setFieldValue('raw_text', text)}
+        onChangeSlackyMarkdown={(markdown) =>
+          setFieldValue('message_text', markdown)
+        }
       />
     </div>
-
     {Object.entries(errors).map(([k, v]) => (
       <div key={k} className="ui error message">
         <div className="header">{k}</div>
         <p>{v}</p>
       </div>
     ))}
-    {editable ? (
+    <Button
+      primary
+      type="submit"
+      disabled={isSubmitting}
+      loading={isSubmitting}
+    >
+      {create ? 'Create notification template' : 'Update notification template'}
+    </Button>
+    {!create && onDelete && (
       <Button
-        primary
-        type="submit"
+        color="red"
         disabled={isSubmitting}
         loading={isSubmitting}
+        onClick={onDelete}
       >
-        {create
-          ? 'Create notification template'
-          : 'Update notification template'}
+        Delete
       </Button>
-    ) : null}
+    )}
   </Form>
 )

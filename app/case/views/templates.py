@@ -192,14 +192,29 @@ def template_notify_list_view(request):
 @coordinator_or_better_required
 @api_view(["GET"])
 def template_notify_search_view(request):
-    pass
+    notifications = Notification.objects.order_by("-created_at").all()
+    name = request.GET.get("name")
+    if name:
+        notifications = notifications.filter(name__icontains=name)
+
+    topic = request.GET.get("topic")
+    if topic:
+        notifications = notifications.filter(topic=topic)
+
+    return Response(NotificationSerializer(notifications, many=True).data)
 
 
 @router.use_route("notify-delete")
 @coordinator_or_better_required
 @api_view(["DELETE"])
 def template_notify_delete_view(request, pk):
-    pass
+    try:
+        template = Notification.objects.get(pk=pk)
+    except Notification.DoesNotExist:
+        raise Http404()
+
+    template.delete()
+    return Response({})
 
 
 @router.use_route("notify-create")

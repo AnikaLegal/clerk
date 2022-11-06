@@ -18,7 +18,8 @@ const App = () => (
         event_stage: '',
         channel: 'SLACK',
         target: '',
-        text: '',
+        raw_text: '',
+        message_text: '',
       }}
       validate={(values) => {}}
       onSubmit={(values, { setSubmitting, setErrors }) => {

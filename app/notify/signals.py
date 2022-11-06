@@ -75,4 +75,4 @@ def on_issue_stage_change(issue_pk, old_stage: str, new_stage: str):
             )
             continue
 
-        send_slack_direct_message(notification.text, slack_user["id"])
+        send_slack_direct_message(notification.message_text, slack_user["id"])

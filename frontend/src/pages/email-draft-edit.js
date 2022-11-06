@@ -183,6 +183,7 @@ const App = () => {
               onChangeText={(text) => setFieldValue('text', text)}
               onChangeHtml={(html) => setFieldValue('html', html)}
               disabled={isSubmitting}
+              placeholder="Dear Ms Example..."
             />
             <Form.Field>
               <Checkbox

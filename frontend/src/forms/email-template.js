@@ -62,6 +62,7 @@ export const EmailTemplateForm = ({
       onChangeText={(text) => setFieldValue('text', text)}
       onChangeHtml={(html) => setFieldValue('html', html)}
       disabled={!editable}
+      placeholder="Dear Ms Example..."
     />
     {Object.entries(errors).map(([k, v]) => (
       <div key={k} className="ui error message">

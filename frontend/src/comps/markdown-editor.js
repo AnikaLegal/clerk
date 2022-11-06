@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Form, Segment } from 'semantic-ui-react'
 
 import { TextArea } from 'comps/textarea'
-import { markdownToHtml } from 'utils'
+import { markdownToHtml, markdownToSlackyMarkdown } from 'utils'
 
 export const MarkdownExplainer = () => (
   <Segment secondary>
@@ -18,12 +18,59 @@ export const MarkdownExplainer = () => (
   </Segment>
 )
 
+export const SlackyMarkdownEditor = ({
+  text,
+  onChangeText,
+  onChangeSlackyMarkdown,
+  disabled,
+  placeholder,
+}) => {
+  const [html, setHtml] = useState(markdownToHtml(text))
+  useEffect(() => {
+    if (text) {
+      setHtml(markdownToHtml(text))
+      onChangeSlackyMarkdown(markdownToSlackyMarkdown(text))
+    }
+  }, [])
+
+  const onTextAreaChange = (e) => {
+    onChangeText(e.target.value)
+    onChangeSlackyMarkdown(markdownToSlackyMarkdown(e.target.value))
+    setHtml(markdownToHtml(e.target.value))
+  }
+  return (
+    <div style={{ padding: '1em 0' }}>
+      <MarkdownExplainer />
+      <div
+        style={{
+          display: 'grid',
+          gap: '2em',
+          paddingTop: '1em',
+          gridTemplateColumns: '1fr 1fr',
+        }}
+      >
+        <TextArea
+          placeholder={placeholder}
+          onChange={onTextAreaChange}
+          disabled={disabled}
+          rows={12}
+          value={text}
+        />
+        <Form.Field>
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </Form.Field>
+      </div>
+    </div>
+  )
+}
+
 export const MarkdownEditor = ({
   text,
   html,
   onChangeText,
   onChangeHtml,
   disabled,
+  placeholder,
 }) => {
   useEffect(() => {
     if (text) {
@@ -47,7 +94,7 @@ export const MarkdownEditor = ({
         }}
       >
         <TextArea
-          placeholder="Dear Ms Example..."
+          placeholder={placeholder}
           onChange={onTextAreaChange}
           disabled={disabled}
           rows={12}

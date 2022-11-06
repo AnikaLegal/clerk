@@ -61,6 +61,7 @@ const App = () => {
         <Dropdown
           fluid
           selection
+          clearable
           placeholder="Select a case type"
           options={TOPIC_OPTIONS}
           onChange={(e, { value }) => setTopic(value)}

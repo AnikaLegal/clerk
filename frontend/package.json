@@ -24,6 +24,7 @@
     "semantic-ui-calendar-react": "^0.15.3",
     "semantic-ui-react": "^2.1.2",
     "showdown": "^2.0.3",
+    "slackify-markdown": "^4.3.1",
     "styled-components": "^5.3.5",
     "webpack": "^5.68.0",
     "webpack-bundle-tracker": "^1.4.0",

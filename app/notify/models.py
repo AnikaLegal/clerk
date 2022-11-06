@@ -57,7 +57,8 @@ class Notification(TimestampedModel):
     event = models.CharField(max_length=32, choices=NotifyEvent.choices)
     channel = models.CharField(max_length=32, choices=NotifyChannel.choices)
     target = models.CharField(max_length=32, choices=NotifyTarget.choices)
-    text = models.TextField()
+    raw_text = models.TextField()
+    message_text = models.TextField()
 
     # Only relevant when event is STAGE_CHANGED
     event_stage = models.CharField(

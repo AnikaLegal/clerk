@@ -29,7 +29,7 @@ const App = () => {
   const [topic, setTopic] = useState('')
   const search = debouncer(() => {
     setIsLoading(true)
-    api.templates.email
+    api.templates.notify
       .search({ name, topic })
       .then(({ data }) => {
         setNotifications(data)
@@ -61,6 +61,7 @@ const App = () => {
         <Dropdown
           fluid
           selection
+          clearable
           placeholder="Select a case type"
           options={TOPIC_OPTIONS}
           onChange={(e, { value }) => setTopic(value)}

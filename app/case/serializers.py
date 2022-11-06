@@ -488,7 +488,8 @@ class NotificationSerializer(serializers.ModelSerializer):
             "event_stage",
             "channel",
             "target",
-            "text",
+            "raw_text",
+            "message_text",
             "url",
         )
 

@@ -3,6 +3,7 @@ import { hydrate, render } from 'react-dom'
 import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
 import styled from 'styled-components'
+import slackifyMarkdown from 'slackify-markdown'
 
 import { ErrorBoundary } from 'comps/error-boundary'
 
@@ -15,6 +16,13 @@ export const MarkdownAsHtmlDisplay = ({ markdown, ...props }) => (
     {...props}
   />
 )
+
+export const markdownToSlackyMarkdown = (markdownText) => {
+  const slackyMarkdown = slackifyMarkdown(markdownText)
+  // Sanitise HTML removing <script> tags and the like.
+  // return xss(slackyMarkdown)
+  return slackyMarkdown
+}
 
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText)
