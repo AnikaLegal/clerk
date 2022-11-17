@@ -7,7 +7,6 @@ from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from .models import (
     ResourceListPage,
-    BlogListPage,
     JobListPage,
     NewsListPage,
     VolunteerListPage,
@@ -92,10 +91,10 @@ urlpatterns = [
     # Wagtail entry points.
     path("dash/", views.dashboard_view, name="dashboard"),
     ResourceListPage.as_path("resources"),
-    BlogListPage.as_path("blog"),
     JobListPage.as_path("jobs"),
     NewsListPage.as_path("news"),
     VolunteerListPage.as_path("volunteers"),
+    # See clerk.urls for internationalized paths.
     # Robots.txt
     path("robots.txt", views.robots_view),
     # Sitemap

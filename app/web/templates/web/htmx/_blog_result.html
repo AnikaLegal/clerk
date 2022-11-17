@@ -1,7 +1,12 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 <a href="{% pageurl blog.specific %}">
     <div class="blog card">
-        {% image blog.specific.main_image width-400 class="round-small top-right bottom-left" %}
+        {% if blog.specific.main_image %}
+            {% image blog.specific.main_image width-400 class="round-small top-right bottom-left" %}
+        {% else %}
+            <img src={% static 'brand/logo-icon-color.png' %} style="object-fit: none;" class="round-small top-right bottom-left">
+        {% endif %}
+        
         <p class="header" style="margin-top: 0; text-align: left;">{{ blog.title }}</p>
     </div>
 </a>

@@ -1,7 +1,10 @@
 # Backend
 requests==2.27.1
 Django>=4
+
+# Content management system
 wagtail==2.16.1
+wagtail-localize
 
 # Cleans html
 html-sanitizer==1.9.3

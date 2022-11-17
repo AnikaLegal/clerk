@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail.core",
+    "wagtail_localize",
+    "wagtail_localize.locales",
     "modelcluster",
     "taggit",
     "webpack_loader",
@@ -173,6 +175,21 @@ TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+WAGTAIL_I18N_ENABLED = True
+WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
+    ("en", "English"),
+    ("ar", "Arabic"),
+    ("hi", "Hindi"),
+    ("id", "Indonesian"),
+    ("ko", "Korean"),
+    ("es", "Spanish"),
+    ("vi", "Vietnamese"),
+    ("th", "Thai"),
+    ("ta", "Tamil"),
+    ("zh-hans", "Chinese (Simplified)"),
+    ("zh-hant", "Chinese (Traditional)"),
+]
+
 
 # Enable iPython for shell_plus
 SHELL_PLUS = "ipython"

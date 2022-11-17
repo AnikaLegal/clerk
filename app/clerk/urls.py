@@ -1,4 +1,5 @@
 from django.conf.urls import include
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
@@ -11,6 +12,7 @@ from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
 from webhooks.views import jotform_form_view, webflow_form_view, intake_no_email_view
 
+from web.models import BlogListPage
 
 router = routers.SimpleRouter()
 router.register("upload", core_views.UploadViewSet, basename="upload")
@@ -41,3 +43,9 @@ if settings.DEBUG:
         path("__reload__/", include("django_browser_reload.urls")),
         path("__debug__/", include("debug_toolbar.urls")),
     ]
+
+    # Internationalized urls
+    urlpatterns += i18n_patterns(
+        BlogListPage.as_path("blog"),
+        prefix_default_language=False,
+    )
