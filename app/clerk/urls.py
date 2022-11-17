@@ -38,14 +38,14 @@ urlpatterns = [
     path("", include(web_urls)),
 ]
 
+# Internationalized urls
+urlpatterns += i18n_patterns(
+    BlogListPage.as_path("blog"),
+    prefix_default_language=False,
+)
+
 if settings.DEBUG:
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
         path("__debug__/", include("debug_toolbar.urls")),
     ]
-
-    # Internationalized urls
-    urlpatterns += i18n_patterns(
-        BlogListPage.as_path("blog"),
-        prefix_default_language=False,
-    )
