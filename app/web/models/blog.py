@@ -11,6 +11,8 @@ from wagtail.admin.edit_handlers import (
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
+from django.utils import translation
+
 
 from .mixins import RICH_TEXT_FEATURES, MultiRootPageMixin
 
@@ -81,3 +83,10 @@ class BlogPage(BlogRootMixin, Page):
         ),
         StreamFieldPanel("body"),
     ]
+
+    def get_context(self, request, *args, **kwargs):
+        """Ensure language is set correctly"""
+        context = super().get_context(request, *args, **kwargs)
+        page = context["page"]
+        translation.activate(page.locale.language_code)
+        return context
