@@ -58,7 +58,7 @@ def test_job_urls(client):
     job_list_page.save_revision().publish()
 
     # Job list page works
-    response = client.get("/about/join-our-team/")
+    response = client.get("/jobs/")
     assert response.status_code == 200
 
     # Job page works
@@ -71,7 +71,7 @@ def test_job_urls(client):
     job_list_page.add_child(instance=job_page)
     job_page.save_revision().publish()
 
-    response = client.get("/about/join-our-team/job-post/")
+    response = client.get("/jobs/job-post/")
     assert response.status_code == 200
 
 
