@@ -5,22 +5,16 @@ from wagtail.core.fields import StreamField
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     StreamFieldPanel,
-    MultiFieldPanel,
     PrivacyModalPanel,
 )
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
 
 from web.blocks import AttributedQuoteBlock
-from .mixins import RICH_TEXT_FEATURES, MultiRootPageMixin
+from .mixins import RICH_TEXT_FEATURES
 
 
-class VolunteerRootMixin(MultiRootPageMixin):
-    wagtail_slug = "volunteers"
-    public_path = "/about/team/volunteers/"
-
-
-class VolunteerListPage(VolunteerRootMixin, Page):
+class VolunteerListPage(Page):
     template = "web/volunteers/volunteer-list.html"
     subpage_types = ["web.VolunteerPage"]
     parent_page_types = ["web.RootPage"]
@@ -38,7 +32,7 @@ class VolunteerListPage(VolunteerRootMixin, Page):
         return context
 
 
-class VolunteerPage(VolunteerRootMixin, Page):
+class VolunteerPage(Page):
     template = "web/volunteers/volunteer-details.html"
     parent_page_types = ["web.VolunteerListPage"]
     subpage_types = []

@@ -80,6 +80,7 @@ MIDDLEWARE = [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "web.middleware.RedirectMiddleware",
     "case.middleware.annotate_group_access_middleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "clerk.urls"
@@ -170,7 +171,7 @@ EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
 
 # Internationalization
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
 USE_L10N = True

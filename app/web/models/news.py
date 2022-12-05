@@ -11,15 +11,10 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 
 from wagtail.images.blocks import ImageChooserBlock
 
-from .mixins import MultiRootPageMixin, RICH_TEXT_FEATURES
+from .mixins import RICH_TEXT_FEATURES
 
 
-class NewsRootMixin(MultiRootPageMixin):
-    wagtail_slug = "news"
-    public_path = "/news/"
-
-
-class NewsListPage(NewsRootMixin, Page):
+class NewsListPage(Page):
     template = "web/news/news-list.html"
     subpage_types = ["web.NewsPage"]
     parent_page_types = ["web.RootPage"]
@@ -39,7 +34,7 @@ class NewsListPage(NewsRootMixin, Page):
         return context
 
 
-class NewsPage(NewsRootMixin, Page):
+class NewsPage(Page):
     template = "web/news/news-details.html"
     parent_page_types = ["web.NewsListPage"]
     subpage_types = []

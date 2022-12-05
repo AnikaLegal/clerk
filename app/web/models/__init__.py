@@ -1,5 +1,5 @@
 from .blog import BlogListPage, BlogPage
-from .jobs import JobListPage, JobPage, JobsRootMixin
+from .jobs import JobListPage, JobPage
 from .volunteers import VolunteerListPage, VolunteerPage
 from .resources import ResourceListPage, ResourcePage
 from .root import RootPage

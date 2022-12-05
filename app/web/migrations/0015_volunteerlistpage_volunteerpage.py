@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(web.models.volunteers.VolunteerRootMixin, "wagtailcore.page"),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
             name="VolunteerPage",
@@ -93,6 +93,6 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(web.models.volunteers.VolunteerRootMixin, "wagtailcore.page"),
+            bases=("wagtailcore.page",),
         ),
     ]

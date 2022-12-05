@@ -12,17 +12,13 @@ from wagtail.admin.edit_handlers import (
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
 from django.utils import translation
+from django.template.response import TemplateResponse
 
 
-from .mixins import RICH_TEXT_FEATURES, MultiRootPageMixin
+from .mixins import RICH_TEXT_FEATURES
 
 
-class BlogRootMixin(MultiRootPageMixin):
-    wagtail_slug = "blog"
-    public_path = "/blog/"
-
-
-class BlogListPage(BlogRootMixin, Page):
+class BlogListPage(Page):
     template = "web/blog/blog-list.html"
     subpage_types = ["web.BlogPage"]
     parent_page_types = ["web.RootPage"]
@@ -49,7 +45,7 @@ class BlogListPage(BlogRootMixin, Page):
         return context
 
 
-class BlogPage(BlogRootMixin, Page):
+class BlogPage(Page):
     template = "web/blog/blog-details.html"
     parent_page_types = ["web.BlogListPage"]
     subpage_types = []
@@ -84,9 +80,11 @@ class BlogPage(BlogRootMixin, Page):
         StreamFieldPanel("body"),
     ]
 
-    def get_context(self, request, *args, **kwargs):
-        """Ensure language is set correctly"""
-        context = super().get_context(request, *args, **kwargs)
-        page = context["page"]
-        translation.activate(page.locale.language_code)
-        return context
+    def serve(self, request, *args, **kwargs):
+        """Ensure links are translated as well."""
+        resp = super().serve(request, *args, **kwargs)
+        page = resp.context_data["page"]
+        with translation.override(page.locale.language_code):
+            resp.render()
+
+        return resp

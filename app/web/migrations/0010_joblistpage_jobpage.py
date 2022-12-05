@@ -11,31 +11,111 @@ import web.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0062_comment_models_and_pagesubscription'),
-        ('web', '0009_alter_webredirect_unique_together'),
+        ("wagtailcore", "0062_comment_models_and_pagesubscription"),
+        ("web", "0009_alter_webredirect_unique_together"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='JobListPage',
+            name="JobListPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=(web.models.JobsRootMixin, 'wagtailcore.page'),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='JobPage',
+            name="JobPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('icon', models.CharField(choices=[('web/img/icons/personal-growth.svg', 'personal-growth'), ('web/img/icons/reports.svg', 'reports'), ('web/img/icons/impact.svg', 'impact'), ('web/img/icons/email.svg', 'email'), ('web/img/icons/clients.svg', 'clients'), ('web/img/icons/dial.svg', 'dial'), ('web/img/icons/house.svg', 'house'), ('web/img/icons/cash.svg', 'cash'), ('web/img/icons/crowd.svg', 'crowd'), ('web/img/icons/law.svg', 'law'), ('web/img/icons/network.svg', 'network'), ('web/img/icons/students.svg', 'students'), ('web/img/icons/document.svg', 'document'), ('web/img/icons/love-hand.svg', 'love-hand'), ('web/img/icons/social', 'social'), ('web/img/icons/questionnaire.svg', 'questionnaire'), ('web/img/icons/star.svg', 'star'), ('web/img/icons/phone.svg', 'phone'), ('web/img/icons/tree.svg', 'tree'), ('web/img/icons/fast.svg', 'fast'), ('web/img/icons/team.svg', 'team'), ('web/img/icons/change.svg', 'change'), ('web/img/icons/wrench.svg', 'wrench'), ('web/img/icons/partners.svg', 'partners'), ('web/img/icons/universities.svg', 'universities'), ('web/img/icons/lawyer.svg', 'lawyer'), ('web/img/icons/valet.svg', 'valet')], max_length=64)),
-                ('body', wagtail.core.fields.StreamField([('heading', wagtail.core.blocks.CharBlock(form_classname='full title')), ('paragraph', wagtail.core.blocks.RichTextBlock(features=['h2', 'bold', 'italic', 'ol', 'ul', 'link'])), ('image', wagtail.images.blocks.ImageChooserBlock())])),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "icon",
+                    models.CharField(
+                        choices=[
+                            ("web/img/icons/personal-growth.svg", "personal-growth"),
+                            ("web/img/icons/reports.svg", "reports"),
+                            ("web/img/icons/impact.svg", "impact"),
+                            ("web/img/icons/email.svg", "email"),
+                            ("web/img/icons/clients.svg", "clients"),
+                            ("web/img/icons/dial.svg", "dial"),
+                            ("web/img/icons/house.svg", "house"),
+                            ("web/img/icons/cash.svg", "cash"),
+                            ("web/img/icons/crowd.svg", "crowd"),
+                            ("web/img/icons/law.svg", "law"),
+                            ("web/img/icons/network.svg", "network"),
+                            ("web/img/icons/students.svg", "students"),
+                            ("web/img/icons/document.svg", "document"),
+                            ("web/img/icons/love-hand.svg", "love-hand"),
+                            ("web/img/icons/social", "social"),
+                            ("web/img/icons/questionnaire.svg", "questionnaire"),
+                            ("web/img/icons/star.svg", "star"),
+                            ("web/img/icons/phone.svg", "phone"),
+                            ("web/img/icons/tree.svg", "tree"),
+                            ("web/img/icons/fast.svg", "fast"),
+                            ("web/img/icons/team.svg", "team"),
+                            ("web/img/icons/change.svg", "change"),
+                            ("web/img/icons/wrench.svg", "wrench"),
+                            ("web/img/icons/partners.svg", "partners"),
+                            ("web/img/icons/universities.svg", "universities"),
+                            ("web/img/icons/lawyer.svg", "lawyer"),
+                            ("web/img/icons/valet.svg", "valet"),
+                        ],
+                        max_length=64,
+                    ),
+                ),
+                (
+                    "body",
+                    wagtail.core.fields.StreamField(
+                        [
+                            (
+                                "heading",
+                                wagtail.core.blocks.CharBlock(
+                                    form_classname="full title"
+                                ),
+                            ),
+                            (
+                                "paragraph",
+                                wagtail.core.blocks.RichTextBlock(
+                                    features=[
+                                        "h2",
+                                        "bold",
+                                        "italic",
+                                        "ol",
+                                        "ul",
+                                        "link",
+                                    ]
+                                ),
+                            ),
+                            ("image", wagtail.images.blocks.ImageChooserBlock()),
+                        ]
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=(web.models.JobsRootMixin, 'wagtailcore.page'),
+            bases=("wagtailcore.page",),
         ),
     ]

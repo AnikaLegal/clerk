@@ -12,7 +12,7 @@ from wagtail.admin.edit_handlers import (
 )
 from wagtail.images.blocks import ImageChooserBlock
 
-from .mixins import MultiRootPageMixin, RICH_TEXT_FEATURES
+from .mixins import RICH_TEXT_FEATURES
 
 
 ICONS_DIR = os.path.join(
@@ -28,12 +28,7 @@ ICON_CHOICES = (
 )
 
 
-class JobsRootMixin(MultiRootPageMixin):
-    wagtail_slug = "jobs"
-    public_path = "/about/join-our-team/"
-
-
-class JobListPage(JobsRootMixin, Page):
+class JobListPage(Page):
     template = "web/jobs/job-list.html"
     subpage_types = ["web.JobPage"]
     parent_page_types = ["web.RootPage"]
@@ -51,7 +46,7 @@ class JobListPage(JobsRootMixin, Page):
         return context
 
 
-class JobPage(JobsRootMixin, Page):
+class JobPage(Page):
     template = "web/jobs/job-details.html"
     parent_page_types = ["web.JobListPage"]
     subpage_types = []
