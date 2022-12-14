@@ -852,6 +852,7 @@ before the final footer.
   letter-spacing: normal;
 }
 
+
 .article .block-paragraph,
 .article .block-paragraph p {
   color: var(--dark-0) i !important;
@@ -860,6 +861,7 @@ before the final footer.
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
   letter-spacing: normal;
+
 }
 .article .block-paragraph p + ul {
   margin-top: -0.5rem;
@@ -869,8 +871,24 @@ before the final footer.
 .article .block-paragraph p:empty {
   display: none;
 }
-.article .block-paragraph p:last-child() {
+.article .block-paragraph p:last-child {
   margin: 0 !important;
+}
+
+
+
+.article.arabic .block-paragraph,
+.article.arabic .block-paragraph li,
+.article.arabic .block-paragraph p,
+.article.arabic .block-paragraph p + ul,
+.article.arabic .block-paragraph p:empty,
+.article.arabic .block-paragraph p:last-child,
+.article.arabic .block-paragraph h2,
+.article.arabic .block-paragraph h3,
+.article.arabic .block-heading {
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-align: right;
 }
 
 .article .block-heading,
