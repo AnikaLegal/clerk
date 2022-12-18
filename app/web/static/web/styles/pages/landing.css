@@ -42,7 +42,9 @@ Landing page only styles.
 @media (max-width: 600px) {
   :root {
     --hero-curve-height: 46px;
-    --hero-padding-top: 0;
+    /* FIXME: CHRISTMAS */
+    --hero-padding-top: -72px; 
+
     --hero-padding-bottom: 0;
     --hero-small-image-height: 275px;
   }
