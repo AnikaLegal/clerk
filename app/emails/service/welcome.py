@@ -39,7 +39,55 @@ def send_welcome_email(issue_pk: str):
     Issue.objects.filter(pk=issue_pk).update(is_welcome_email_sent=True)
 
 
-EMAIL_HTML = """
+CHRISTMAS_EMAIL_HTML = """
+<p>
+Hi {name},
+</p>
+<p>
+Thanks for submitting a case enquiry to Anika Legal. 
+Anika Legal is closed for the end of year break from 20 December 2022, and we will reopen on 9 January 2023. 
+<br/>
+Your case number is {fileref}.
+</p>
+<p>
+Once we return from the break, we will review your case to determine eligibility. 
+We are operated by volunteers and appreciate your patience, as we find capacity to assign your matter.
+</p>
+<p>
+Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
+</p>
+<p>
+If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at the following address:
+</p>
+<p>
+{case_email}
+</p>
+<p>
+We will attend to your email when we return. 
+We wish you a safe and happy holiday period,
+</p>
+"""
+
+
+CHRISTMAS_EMAIL_TEXT = """Hi {name},
+
+Thanks for submitting a case enquiry to Anika Legal. Anika Legal is closed for the end of year break from 20 December 2022, and we will reopen on 9 January 2023. 
+Your case number is {fileref}.
+
+Once we return from the break, we will review your case to determine eligibility.  We are operated by volunteers and appreciate your patience, as we find capacity to assign your matter.
+
+Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
+
+If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at {case_email}
+
+We will attend to your email when we return. 
+
+We wish you a safe and happy holiday period,
+Anika Legal
+"""
+
+
+NORMAL_EMAIL_HTML = """
 <p>
 Hi {name},
 </p>
@@ -66,7 +114,7 @@ Kind regards,
 """
 
 
-EMAIL_TEXT = """Hi {name},
+NORMAL_EMAIL_TEXT = """Hi {name},
 
 Thanks for submitting a case enquiry to Anika Legal.
 Your case number is {fileref}.
@@ -80,3 +128,7 @@ If you have any questions in the meantime, or decide you no longer wish to proce
 Kind regards,
 Anika Legal
 """
+
+
+EMAIL_HTML = CHRISTMAS_EMAIL_HTML
+EMAIL_TEXT = CHRISTMAS_EMAIL_TEXT
