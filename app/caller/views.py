@@ -10,6 +10,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from twilio.twiml.voice_response import Gather, VoiceResponse
 
 from core.models.issue import CaseTopic
+from caller.messages import sms, voice
 
 from .models import Call
 
@@ -26,55 +27,6 @@ OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
 CALL_TIMEOUT_AUDIO = "call-timeout.wav"
 
-# The SMS message we send to people who send us SMS's.
-# We don't do inbound SMS communications so we ask them to send us an email instead.
-INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
-
-
-# The SMS message we send to people who are enquiring about repairs.
-REPAIRS_SMS_MESSAGE = """
-Thank you for enquiring about Anika's rental repairs service.
-
-To get help, please fill in this form: https://intake.anikalegal.com
-
-For more info on Anika's services, please visit https://www.anikalegal.com/services/
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
-# The SMS message we send to people who are enquiring about evictions.
-EVICTIONS_SMS_MESSAGE = """
-Thank you for enquiring about Anika's evictions service.
-
-To get help, please fill in this form: https://intake.anikalegal.com
-
-For more info on Anika's services, please visit https://www.anikalegal.com/services/
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
-
-# The SMS message we send to people who are enquiring about bonds.
-BONDS_SMS_MESSAGE = """
-Thank you for enquiring about Anika's bonds service.
-
-To get help, please fill in this form: https://intake.anikalegal.com
-
-For more info on Anika's services, please visit https://www.anikalegal.com/services/
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
-
-# The SMS message we send to people who want a callback about another issue.
-CALLBACK_SMS_MESSAGE = """
-Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
-
-In the meantime, for more info on Anika's services, please visit https://www.anikalegal.com/services/
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
 
 TOPIC_MAPPING = {
     "1": CaseTopic.REPAIRS,
@@ -85,7 +37,15 @@ TOPIC_MAPPING = {
 
 
 @require_http_methods(["GET"])
-def answer_view(request):
+def answer_view(request):  # Used for christmas
+    """Respond to phone call from user"""
+    response = VoiceResponse()
+    voice.say_christmas_message(response)
+    return TwimlResponse(response)
+
+
+@require_http_methods(["GET"])
+def normal_answer_view(request):  # Unused
     """Respond to phone call from user"""
     response = VoiceResponse()
 
@@ -119,18 +79,18 @@ def collect_view(request):
     if choice == "1":
         # Repairs option.
         audio_url = _get_audio_url(OPTION_REPAIRS_AUDIO)
-        message_text = REPAIRS_SMS_MESSAGE
+        message_text = sms.REPAIRS_SMS_MESSAGE
     elif choice == "2":
         # Bonds option.
         audio_url = _get_audio_url(OPTION_BONDS_AUDIO)
-        message_text = BONDS_SMS_MESSAGE
+        message_text = sms.BONDS_SMS_MESSAGE
     elif choice == "3":
         # Evictions option.
         audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
-        message_text = EVICTIONS_SMS_MESSAGE
+        message_text = sms.EVICTIONS_SMS_MESSAGE
     elif choice == "4":
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
-        message_text = CALLBACK_SMS_MESSAGE
+        message_text = sms.CALLBACK_SMS_MESSAGE
     else:
         response.redirect = response.redirect(reverse("caller-answer"), method="GET")
         return TwimlResponse(response)
@@ -160,7 +120,7 @@ def collect_view(request):
 def message_view(request):
     """Respond to SMS from user"""
     response = MessagingResponse()
-    response.message(INBOUND_SMS_REPLY_MESSAGE)
+    response.message(sms.INBOUND_SMS_REPLY_MESSAGE)
     return TwimlResponse(response)
 
 
