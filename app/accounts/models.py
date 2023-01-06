@@ -24,7 +24,7 @@ class User(AbstractUser):
     is_intern = models.BooleanField(default=False)
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)
-    ms_account_created_at = models.DateTimeField(null=True)
+    ms_account_created_at = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Ensure email always lowercase
