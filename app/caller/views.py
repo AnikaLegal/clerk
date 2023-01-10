@@ -37,7 +37,7 @@ TOPIC_MAPPING = {
 
 
 @require_http_methods(["GET"])
-def answer_view(request):  # Used for christmas
+def christmas_answer_view(request):  # Used for christmas
     """Respond to phone call from user"""
     response = VoiceResponse()
     voice.say_christmas_message(response)
@@ -45,7 +45,7 @@ def answer_view(request):  # Used for christmas
 
 
 @require_http_methods(["GET"])
-def normal_answer_view(request):  # Unused
+def answer_view(request):  # Normal view
     """Respond to phone call from user"""
     response = VoiceResponse()
 

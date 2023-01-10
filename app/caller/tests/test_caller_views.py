@@ -23,7 +23,6 @@ def test_message_view(mock_MR, client):
 @mock.patch("caller.views.Gather")
 @mock.patch("caller.views.VoiceResponse")
 @pytest.mark.django_db
-@pytest.mark.skip
 def test_answer_view(mock_VR, mock_G, client):
     """
     User can call Twilio number.
@@ -47,7 +46,6 @@ def test_answer_view(mock_VR, mock_G, client):
 @mock.patch("caller.views.Gather")
 @mock.patch("caller.views.VoiceResponse")
 @pytest.mark.django_db
-@pytest.mark.skip
 def test_collect_view(mock_VR, mock_G, mock_C, client):
     """
     User can select choice.
