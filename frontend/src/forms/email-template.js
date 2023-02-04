@@ -14,6 +14,7 @@ const TOPIC_OPTIONS = [
 export const EmailTemplateForm = ({
   create,
   editable,
+  handleDelete,
   formik: {
     values,
     errors,
@@ -80,5 +81,18 @@ export const EmailTemplateForm = ({
         {create ? 'Create email template' : 'Update email template'}
       </Button>
     ) : null}
+    {!create && editable ? (
+      <Button
+        primary
+        color="red"
+        disabled={isSubmitting}
+        loading={isSubmitting}
+        onClick={handleDelete}
+      >
+        Delete
+      </Button>
+    ) : null}
+
+
   </Form>
 )

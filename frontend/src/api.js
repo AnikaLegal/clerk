@@ -244,6 +244,10 @@ export const api = {
         const url = `/clerk/templates/email/${pk}/`
         return http.put(url, data)
       },
+      delete: (pk) => {
+        const url = `/clerk/templates/email/${pk}/`
+        return http.delete(url)
+      },
     },
   },
 }

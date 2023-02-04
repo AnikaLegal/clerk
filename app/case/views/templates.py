@@ -94,12 +94,19 @@ def template_email_create_view(request):
 
 @router.use_route("email-detail")
 @paralegal_or_better_required
-@api_view(["GET", "PUT"])
+@api_view(["GET", "PUT", "DELETE"])
 def template_email_detail_view(request, pk):
     try:
         template = EmailTemplate.objects.get(pk=pk)
     except EmailTemplate.DoesNotExist:
         raise Http404()
+
+    if request.method == "DELETE":
+        if request.user.is_coordinator_or_better:
+            template.delete()
+            return Response({})
+        else:
+            raise Http404()
 
     if request.method == "PUT":
         if request.user.is_coordinator_or_better:
@@ -111,6 +118,7 @@ def template_email_detail_view(request, pk):
             raise Http404()
 
     context = {
+        "template_list_url": reverse("template-email-list"),
         "template": EmailTemplateSerializer(template).data,
         "editable": request.user.is_coordinator_or_better,
     }

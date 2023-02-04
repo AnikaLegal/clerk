@@ -8,8 +8,17 @@ import { EmailTemplateForm } from 'forms/email-template'
 
 const CONTEXT = window.REACT_CONTEXT
 
-const App = () => (
-  <Container>
+const App = () => {
+  const handleDelete = e => {
+    e.preventDefault()
+    if (window.confirm('Are you sure you want to delete this template?')) {
+      api.templates.email.delete(CONTEXT.template.id).then(() => {
+        window.location.href = CONTEXT.template_list_url 
+      })
+    }
+  }
+  return (
+  <Container>  
     <Header as="h1">Email template</Header>
     <Formik
       initialValues={{
@@ -36,10 +45,12 @@ const App = () => (
           formik={formik}
           create={false}
           editable={CONTEXT.editable}
+          handleDelete={handleDelete}
         />
       )}
     </Formik>
   </Container>
 )
+}
 
 mount(App)
