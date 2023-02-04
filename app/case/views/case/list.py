@@ -120,7 +120,6 @@ def _get_review_issue_qs():
         Issue.objects.select_related("client", "paralegal", "lawyer")
         .prefetch_related("issuenote_set")
         .filter(is_open=True)
-        .exclude(paralegal__isnull=True)
         .annotate(next_review=Max("issuenote__event"))
         .order_by("next_review")
     )
