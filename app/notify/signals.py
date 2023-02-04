@@ -75,4 +75,5 @@ def on_issue_stage_change(issue_pk, old_stage: str, new_stage: str):
             )
             continue
 
-        send_slack_direct_message(notification.message_text, slack_user["id"])
+        message_text = f"*Notification for case <{issue.url}|{issue.fileref}>*\n{notification.message_text}"
+        send_slack_direct_message(message_text, slack_user["id"])

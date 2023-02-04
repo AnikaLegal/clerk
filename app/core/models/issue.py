@@ -2,6 +2,8 @@ import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.urls import reverse
+from django.conf import settings
 
 from accounts.models import User
 
@@ -183,3 +185,10 @@ class Issue(TimestampedModel):
 
     def __str__(self):
         return f"{self.id} {self.fileref}"
+
+    @property
+    def url(self):
+        if self.pk:
+            return settings.CLERK_BASE_URL + reverse(
+                "case-detail-view", args=(self.pk,)
+            )

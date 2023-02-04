@@ -21,7 +21,7 @@ def send_welcome_email(issue_pk: str):
     name = client.get_full_name()
     text = EMAIL_TEXT.format(name=name, fileref=issue.fileref, case_email=case_email)
     html = EMAIL_HTML.format(name=name, fileref=issue.fileref, case_email=case_email)
-    if not settings.IS_PROD and not client.email.endswith("@anikalegal.com"):
+    if (not settings.IS_PROD) and (not client.email.endswith("@anikalegal.com")):
         msg = "Not sending welcome email for Issue<%s> - only Anika emails allowed in non-prod environments"
         logging.error(msg, issue_pk)
     else:

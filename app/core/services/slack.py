@@ -30,7 +30,7 @@ def send_submission_failure_slack(sub_pk: str):
 
 def send_case_assignment_slack(issue: str):
     """
-    Notify assigned paralegak of new case assignment.
+    Notify assigned paralegal of new case assignment.
     """
     assert issue.paralegal, f"Assigned paralegal not found for Issue<{issue.pk}>"
     assert issue.lawyer, f"Assigned lawyer not found for Issue<{issue.pk}>"
