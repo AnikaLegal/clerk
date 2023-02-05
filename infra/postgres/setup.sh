@@ -3,7 +3,7 @@ echo -e "\n>>> Installing Postgres"
 apt-get install --yes postgresql postgresql-contrib
 
 echo -e "\n>>> Copying Postgres config"
-cp /srv/infra/postgres/pg_hba.conf /etc/postgresql/10/main/pg_hba.conf
+cp /srv/infra/postgres/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
 
 echo -e "\n>>> Restarting Postgres"
 service postgresql restart
