@@ -1,0 +1,12 @@
+name: Backup Postgres
+on: [workflow_dispatch]
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run backup script
+      run: ./infra/backup.sh
+      shell: bash
+      env:
+        CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
