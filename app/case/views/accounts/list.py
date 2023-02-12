@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from accounts.models import User
 from case.serializers import UserSerializer
-from case.views.auth import coordinator_or_better_required
+from case.views.auth import paralegal_or_better_required
 from case.utils.router import Route
 from case.utils.react import render_react_page, is_react_api_call
 
@@ -14,7 +14,7 @@ list_route = Route("list")
 
 @list_route
 @api_view(["GET"])
-@coordinator_or_better_required
+@paralegal_or_better_required
 def account_list_view(request):
     users = User.objects.prefetch_related("groups").order_by("-date_joined").all()
     if "name" in request.GET or "group" in request.GET:
