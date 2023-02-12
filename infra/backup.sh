@@ -9,7 +9,7 @@ TIME=$(date "+%s")
 DATABASE_NAME=clerk
 S3_BUCKET=s3://anika-database-backups
 BACKUP_FILE="postgres_${DATABASE_NAME}_${TIME}.sql.gz"
-BACKUP_S3="$S3_BUCKET/$BACKUP_FILE"
+S3_PATH="$S3_BUCKET/$BACKUP_FILE"
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]
 then
@@ -20,26 +20,26 @@ fi
 echo -e "\n>>> Backing up Postgres DB on Clerk EC2 instance at $HOST."
 
 echo -e "\n>>> Setting up private key."
-echo -e "$CLERK_PRIVATE_SSH_KEY" > deploy.key
-chmod 600 deploy.key
+echo -e "$CLERK_PRIVATE_SSH_KEY" > private.key
+chmod 600 private.key
 
 echo -e "\n>>> SSHing into Clerk EC2 instance at $HOST."
-ssh -o StrictHostKeyChecking=no -i deploy.key root@$HOST /bin/bash << EOF
+ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
     set -e
     cd /srv/backups
     . env/bin/activate
     touch clerk.log
 
-    echo "$TIME Creating local database dump $BACKUP_FILE" >> clerk.log
     pg_dump --format=custom | gzip > $BACKUP_FILE
+    echo "$TIME Created local database dump: $BACKUP_FILE" >> clerk.log
 
-    echo "$TIME Copying local database dump to S3 - $BACKUP_S3" >> clerk.log
-    aws s3 cp $BACKUP_FILE $BACKUP_S3
+    aws s3 cp $BACKUP_FILE $S3_PATH
+    echo "$TIME Copied local database dump to S3 - $S3_PATH" >> clerk.log
 
-    BACKUP_RESULT=$(aws s3 ls $S3_BUCKET | sort | grep clerk | tail -n 1)
-    echo "$TIME Latest S3 backup: $BACKUP_RESULT" >> clerk.log
+    LATEST_BACKUP=$(aws s3 ls $S3_BUCKET | sort | grep $DATABASE_NAME | tail -n 1)
+    echo "$TIME Latest S3 backup: $LATEST_BACKUP" >> clerk.log
     
     rm $BACKUP_FILE
 EOF
 
-echo -e "\n>>> Finished backing up Postgres on Clerk EC2 instance at $HOST."
+echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST."
