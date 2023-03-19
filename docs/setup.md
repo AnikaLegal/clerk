@@ -1,6 +1,6 @@
 ## Prerequisites for Local Development
 
-This repository should work on Linux, Mac and maybe WSL. It is unlikely to work with Windows machines.
+This repository should work on Linux and Mac.
 
 You will need:
 
