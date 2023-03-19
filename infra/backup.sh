@@ -23,21 +23,19 @@ echo -e "\n>>> Setting up private key."
 echo -e "$CLERK_PRIVATE_SSH_KEY" > private.key
 chmod 600 private.key
 
-echo -e "\n>>> SSHing into Clerk EC2 instance at $HOST."
+echo -e "\n>>> SSH into Clerk EC2 instance at $HOST."
 ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
     set -e
     cd /srv/backups
-    . env/bin/activate
-    touch clerk.log
 
     pg_dump --format=custom | gzip > $BACKUP_FILE
-    echo "$TIME Created local database dump: $BACKUP_FILE" >> clerk.log
+    echo "$TIME Created local database dump: $BACKUP_FILE"
 
     aws s3 cp $BACKUP_FILE $S3_PATH
-    echo "$TIME Copied local database dump to S3 - $S3_PATH" >> clerk.log
+    echo "$TIME Copied local database dump to S3 - $S3_PATH"
 
     LATEST_BACKUP=$(aws s3 ls $S3_BUCKET | sort | grep $DATABASE_NAME | tail -n 1)
-    echo "$TIME Latest S3 backup: $LATEST_BACKUP" >> clerk.log
+    echo "$TIME Latest S3 backup: $LATEST_BACKUP"
     
     rm $BACKUP_FILE
 EOF
