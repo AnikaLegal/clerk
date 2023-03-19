@@ -81,10 +81,11 @@ def remove_office_licence(user):
     Removes MS account from a user.
     """
     api = MSGraphAPI()
-    ms_account = api.user.get(user.email)
-    if ms_account and settings.MS_REMOVE_OFFICE_LICENCES:
+    ms_license = api.user.get_license(user.email)
+    has_license = ms_license is not None and ms_license.get("value")
+    if has_license and settings.MS_REMOVE_OFFICE_LICENCES:
         api.user.remove_license(user.email)
-    elif ms_account:
+    elif has_license:
         logger.info("Did not remove Office 365 licence for %s", user.email)
 
 
