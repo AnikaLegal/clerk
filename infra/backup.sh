@@ -33,9 +33,6 @@ ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
 
     aws s3 cp $BACKUP_FILE $S3_PATH
     echo "$TIME Copied local database dump to S3 - $S3_PATH"
-
-    LATEST_BACKUP=$(aws s3 ls $S3_BUCKET | sort | grep $DATABASE_NAME | tail -n 1)
-    echo "$TIME Latest S3 backup: $LATEST_BACKUP"
     
     rm $BACKUP_FILE
 EOF
