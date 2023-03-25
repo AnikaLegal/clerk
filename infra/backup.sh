@@ -32,12 +32,10 @@ ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
     echo "$TIME Created local database dump: $BACKUP_FILE"
 
     aws s3 cp $BACKUP_FILE $S3_PATH
-    echo "$TIME Copied local database dump to S3 - $S3_PATH"
-
-    LATEST_BACKUP=$(aws s3 ls $S3_BUCKET | sort | grep $DATABASE_NAME | tail -n 1)
-    echo "$TIME Latest S3 backup: $LATEST_BACKUP"
+    echo "$TIME Copied local database dump to S3: $S3_PATH"
     
     rm $BACKUP_FILE
+    echo "$TIME Removed local database dump to prevent clutter"
 EOF
 
 echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST."

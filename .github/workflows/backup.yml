@@ -1,5 +1,9 @@
-name: Backup Postgres
-on: [workflow_dispatch]
+name: Backup
+on:
+  workflow_dispatch:
+  schedule:
+    # Backup our Postgres DB nightly at 2AM AEST (4PM UTC)
+    - cron: "0 16 * * *"
 jobs:
   backup:
     runs-on: ubuntu-latest
