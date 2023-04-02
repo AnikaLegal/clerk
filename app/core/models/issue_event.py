@@ -11,6 +11,8 @@ from .timestamped import TimestampedModel
 
 
 class EventType:
+    # A supervising lawyer has been assigned.
+    LAWYER = "LAWYER"
     # A paralegal has been assigned.
     PARALEGAL = "PARALEGAL"
     # The case stage has changed
@@ -30,6 +32,11 @@ class IssueEvent(TimestampedModel):
         assert issue.pk == prev_issue.pk
         create_kwargs = {}
         event_types = []
+        if issue.lawyer != prev_issue.lawyer:
+            # Lawyer changed
+            create_kwargs["prev_user"] = prev_issue.lawyer
+            create_kwargs["next_user"] = issue.lawyer
+            event_types.append(EventType.LAWYER)
 
         if issue.paralegal != prev_issue.paralegal:
             # Paralegal changed
@@ -64,31 +71,39 @@ class IssueEvent(TimestampedModel):
         is_user_changed = self.prev_user is not None or self.next_user is not None
         is_stage_changed = self.prev_stage is not None or self.next_stage is not None
         is_open_changed = self.prev_is_open is not None or self.next_is_open is not None
-        if is_user_changed:
-            text += "Assigned paralegal changed"
-            if self.prev_user:
-                text += " from " + self.prev_user.get_full_name()
-            if self.next_user:
-                text += " to " + self.next_user.get_full_name() + "."
-        if is_stage_changed:
-            fmt_stage = lambda s: s.lower().replace("_", " ").capitalize() if s else s
-            text += f" Stage changed"
-            if self.prev_stage:
-                prev_stage = fmt_stage(self.prev_stage)
-                text += f" from {prev_stage}"
+        for event_type in self.event_types:
+            if is_user_changed:
+                if event_type == EventType.LAWYER:
+                    text += "Assigned lawyer changed"
+                elif event_type == EventType.PARALEGAL:
+                    text += "Assigned paralegal changed"
 
-            next_stage = fmt_stage(self.next_stage)
-            text += f" to {next_stage}."
+                if self.prev_user:
+                    text += " from " + self.prev_user.get_full_name()
+                if self.next_user:
+                    text += " to " + self.next_user.get_full_name() + "."
+            if is_stage_changed:
+                fmt_stage = (
+                    lambda s: s.lower().replace("_", " ").capitalize() if s else s
+                )
+                text += f" Stage changed"
+                if self.prev_stage:
+                    prev_stage = fmt_stage(self.prev_stage)
+                    text += f" from {prev_stage}"
 
-        if is_open_changed:
-            if self.prev_is_open:
-                text += " Case closed."
-            else:
-                text += " Case re-opened."
+                next_stage = fmt_stage(self.next_stage)
+                text += f" to {next_stage}."
+
+            if is_open_changed:
+                if self.prev_is_open:
+                    text += " Case closed."
+                else:
+                    text += " Case re-opened."
 
         return text
 
     EVENT_CHOICES = (
+        (EventType.LAWYER, "Lawyer assigned"),
         (EventType.PARALEGAL, "Paralegal assigned"),
         (EventType.STAGE, "Stage change"),
         (EventType.OPEN, "Open change"),
@@ -113,7 +128,8 @@ class IssueEvent(TimestampedModel):
     # Any notes created for this event (usually just one)
     issue_notes = GenericRelation(IssueNote)
 
-    # What kind of evet this is.
+    # What kind of event this is.
+    # FIXME: This is dumb why do we have multiple events types per event.
     event_types = ArrayField(
         models.CharField(max_length=32, choices=EVENT_CHOICES),
         default=list,
