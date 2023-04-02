@@ -64,15 +64,14 @@ const FieldSchema = Yup.array().of(
 )
 
 export const FormErrors = ({ errors, touched, labels }) =>
-  Object.entries(errors).map(
-    ([k, v]) =>
-      touched[k] && (
-        <div key={k} className="ui error message">
-          <div className="header">{labels ? labels[k] : k}</div>
-          <p>{v}</p>
-        </div>
-      )
-  )
+  Object.entries(errors)
+    .filter(([k, v]) => touched[k])
+    .map(([k, v]) => (
+      <div key={k} className="ui error message">
+        <div className="header">{labels ? labels[k] : k}</div>
+        <p>{typeof v === 'object' ? Object.values(v) : v}</p>
+      </div>
+    ))
 
 export const AutoForm = ({
   fields,

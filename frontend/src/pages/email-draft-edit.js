@@ -11,7 +11,6 @@ import {
   Checkbox,
   Icon,
   List,
-  Message,
   Label,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
@@ -79,7 +78,7 @@ const App = () => {
       // Send email
       const confirmed = confirm('Send this email?')
       if (!confirmed) return
-      const { resp: sendResp, data: sendData } = await api.email.send(
+      const { resp: sendResp } = await api.email.send(
         issue.id,
         email.id
       )
