@@ -15,11 +15,11 @@ router.create_route("list")
 @coordinator_or_better_required
 def paralegal_list_view(request):
     paralegals = User.objects.filter(
-        groups__name__in=[CaseGroups.PARALEGAL, CaseGroups.COORDINATOR]
+        is_active=True, groups__name__in=[CaseGroups.PARALEGAL, CaseGroups.COORDINATOR]
     ).prefetch_related("issue_set", "groups")
-    lawyers = User.objects.filter(groups__name=CaseGroups.LAWYER).prefetch_related(
-        "issue_set", "groups"
-    )
+    lawyers = User.objects.filter(
+        is_active=True, groups__name=CaseGroups.LAWYER
+    ).prefetch_related("issue_set", "groups")
     paralegals = _calculate_user_capacity(paralegals, "issue")
     lawyers = _calculate_user_capacity(lawyers, "lawyer_issue")
     context = {
