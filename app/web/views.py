@@ -160,16 +160,16 @@ BOARD = [
 
 
 ADVISORS = [
-    # {
-    #     "image": "web/img/photos/advisors/david-mandel.png",
-    #     "name": "David Mandel",
-    #     "title": "Non-executive director",
-    #     "brags": [
-    #         "David is a non-executive director for both ASX listed and not-for-profit organisations with a portfolio across the healthcare, "
-    #         "technology, e-commerce and sport sectors. With a total of 15 years NED experience, "
-    #         "David makes valuable contributions to Anika both in terms of commercial acumen, vision and to the cultural aspirations of the organisation.",
-    #     ],
-    # },
+    {
+        "image": "web/img/photos/advisors/david-mandel.png",
+        "name": "David Mandel",
+        "title": "Non-executive director",
+        "brags": [
+            "David is a non-executive director for both ASX listed and not-for-profit organisations with a portfolio across the healthcare, "
+            "technology, e-commerce and sport sectors.",
+            "With a total of 15 years NED experience, David makes valuable contributions to Anika both in terms of commercial acumen, vision and to the cultural aspirations of the organisation.",
+        ],
+    },
     {
         "image": "web/img/photos/advisors/brendan-lacota.png",
         "name": "Brendan Lacota",
