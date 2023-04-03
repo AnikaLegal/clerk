@@ -106,71 +106,86 @@ def shuffle(l):
 
 BOARD = [
     {
-        "image": "web/img/photos/board/dennis.jpeg",
-        "name": "Denis Nelthorpe",
+        "image": "web/img/photos/board/denis.png",
+        "name": "Denis Nelthorpe AM",
         "title": "President",
         "brags": [
-            "Denis joined the Board of Anika Legal in June 2021 and is the organisation’s newly appointed President. He brings a wealth of experience from over 40 years in the legal assistance sector including as the CEO of WEstjustice and other leadership roles. He is currently also the Chair of St Kilda Legal Service and the Deputy Chair of the National Consumer Advisory Committee at the Insurance Council of Australia.",
+            "Denis joined the Board of Anika Legal in June 2021 and is the organisation’s President. "
+            "He brings a wealth of experience from over 40 years in the legal assistance sector including as the CEO of WEstjustice and other leadership roles. "
+            "He is currently also the Chair of Southside Justice and the Deputy Chair of the National Consumer Advisory Committee at the Insurance Council of Australia.",
         ],
     },
     {
-        "image": "web/img/photos/board/marcia.jpeg",
+        "image": "web/img/photos/board/marcia.png",
         "name": "Marcia Pinskier FAICD",
         "title": "Chair",
         "brags": [
-            "Marcia joined the Board of Anika Legal in June 2021 and is the organisation’s newly appointed Chair.  Marcia is an expert on good governance in the not-for-profit sector. She is a Fellow of the Australian Institute of Company Directors and has chaired numerous not-for-profit boards. Marcia is currently a Doctoral Candidate at Monash University, researching Leadership and Institutional Child Sexual Abuse.",
+            "Marcia joined the Board of Anika Legal in June 2021 and is the organisation’s newly appointed Chair.  "
+            "Marcia is an expert on good governance in the not-for-profit sector. "
+            "She is a Fellow of the Australian Institute of Company Directors and has chaired numerous not-for-profit boards. "
+            "Marcia is currently a Doctoral Candidate at Monash University, researching Leadership and Institutional Child Sexual Abuse.",
         ],
     },
     {
-        "image": "web/img/photos/team/tessa.jpeg",
+        "image": "web/img/photos/team/tessa.png",
         "name": "Tessa Ramanlal",
         "title": "Board Member & Co-founder",
         "brags": [
-            "Tessa has over four years of experience in legal and technology sectors. She has practiced as a Corporate lawyer / Innovation lawyer at Herbert Smith Freehills and is currently an Enterprise Partnerships Associate at DoorDash. She is also a co-founder of Anika Legal.",
+            "Tessa has over five years of experience in legal and technology sectors. "
+            "She has practiced as a Corporate lawyer / Innovation lawyer at Herbert Smith Freehills and is currently an Enterprise Partnerships Manager at DoorDash. "
+            "She is also a co-founder of Anika Legal.",
         ],
     },
     {
-        "image": "web/img/photos/team/noel.jpeg",
-        "name": "Noel Lim",
-        "title": "Board Member & CEO",
-        "brags": [
-            "Noel is the Chief Executive Officer and co-founder of Anika Legal, and has led the founding team to become an organisation of 62 volunteers, and to receive successive AFR Client Choice Awards for Startup of the Year (2019, 2020).",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/michael.jpeg",
+        "image": "web/img/photos/team/mike.png",
         "name": "Michael Choong",
         "title": "Board Member",
         "brags": [
-            "Michael has over five years of experience across the technology, retail, and not-for-profit sectors. He is currently a Strategy Manager at SEEK, responsible for supporting their Latin American businesses. He joined Anika Legal’s leadership team in January 2020.",
+            "Michael has over six years of experience across the technology, retail, and not-for-profit sectors. "
+            "He is currently a Senior Strategy Manager at SEEK, responsible for supporting their Latin American businesses. "
+            "He joined Anika Legal’s leadership team in January 2020.",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/noel.png",
+        "name": "Noel Lim",
+        "title": "Board Member & CEO",
+        "brags": [
+            "Noel is the Chief Executive Officer and co-founder of Anika Legal, and has led the founding team to become an organisation of 62 volunteers, "
+            "and to receive successive AFR Client Choice Awards for Startup of the Year (2019, 2020). "
+            "He was recently recognised as a 2023 Victorian Young Australian of the Year nominee.",
         ],
     },
 ]
 
 
 ADVISORS = [
+    # {
+    #     "image": "web/img/photos/advisors/david-mandel.png",
+    #     "name": "David Mandel",
+    #     "title": "Non-executive director",
+    #     "brags": [
+    #         "David is a non-executive director for both ASX listed and not-for-profit organisations with a portfolio across the healthcare, "
+    #         "technology, e-commerce and sport sectors. With a total of 15 years NED experience, "
+    #         "David makes valuable contributions to Anika both in terms of commercial acumen, vision and to the cultural aspirations of the organisation.",
+    #     ],
+    # },
     {
-        "image": "web/img/photos/advisors/jane-prior.jpeg",
-        "name": "Jane Prior",
-        "title": "General Manager at WT Partnership",
-        "brags": [
-            "Jane has significant leadership experience in higher education and operations across strategy, marketing, IT, HR and finance. She serves as a non-executive director in the not-for-profit sector",
-            "Jane has been a mentor to the Anika leadership team since the business idea was created",
-        ],
-    },
-    {
-        "image": "web/img/photos/advisors/brendan-lacota.jpeg",
+        "image": "web/img/photos/advisors/brendan-lacota.png",
         "name": "Brendan Lacota",
-        "title": "Not-for-profit and for-purpose consultant",
+        "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
         "brags": [
-            "Brendan is an emerging leader in designing innovative ways to provide community legal services",
-            "Brendan was the Head of Community Programs at Justice Connect and the 2020 President Elect of the Law Institute of Victoria",
+            "Brendan is a leader in designing innovative ways to provide community services. "
+            "With over a decade's experience in both the community and private sectors, Brendan advises on the intersection of service design, evaluation, "
+            "project governance, stakeholder engagement, and technology. ",
+            "Brendan currently leads ANZ's flagship social impact programs throughout Australia, Pacific, and New Zealand as well as providing independent "
+            "consulting services for not-for-profit and for-purpose entities.",
         ],
     },
     {
-        "image": "web/img/photos/advisors/clyde-fernandez.jpeg",
+        "image": "web/img/photos/advisors/clyde-fernandez.png",
         "name": "Clyde Fernandez",
-        "title": "Regional Vice President, Platform & Revenue Cloud at Salesforce",
+        "title": "GM & Regional Vice President at Salesforce",
         "brags": [
             "Clyde is a career technologist who has spent time working in many sectors in Australia, Asia & the UK",
             "Clyde also likes to share his perspectives on 'The future of the work', 'How to succeed in a constantly growing VUCA world' and 'Why Equity & Ethics matter, now more than ever'",
@@ -181,7 +196,7 @@ ADVISORS = [
 
 TEAM_MEMBERS = [
     {
-        "image": "web/img/photos/team/noel.jpeg",
+        "image": "web/img/photos/team/noel.png",
         "name": "Noel Lim",
         "title": "Chief Executive Officer",
         "brags": [
@@ -190,7 +205,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/zoe.jpeg",
+        "image": "web/img/photos/team/zoe.png",
         "name": "Zoe Chan",
         "title": "Principal Lawyer",
         "brags": [
@@ -199,65 +214,41 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/lucy.jpeg",
+        "image": "web/img/photos/team/lucy.png",
         "name": "Lucy Majstorovic",
         "title": "Head of Partnerships & Philanthropy",
         "brags": [
-            "Lucy is our full-time Head of Partnerships & Philanthropy, working with our trusted partners to maximise Anika’s impact.",
+            "Lucy is our Head of Partnerships & Philanthropy, working with our trusted partners to maximise Anika’s impact.",
+            "Lucy previously worked in consumer goods, where she gained experience in relationship management, marketing and analytics.",
         ],
     },
     {
-        "image": "web/img/photos/team/dan.jpeg",
-        "name": "Dan Poole",
-        "title": "Head of Finance",
-        "brags": [
-            "Dan leads our Finance portfolio, ensuring Anika’s finances are well managed",
-            "Dan is also a pro-bono lawyer at Hall & Wilcox and Co-founder of Society Melbourne ",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/gwylim.jpeg",
-        "name": "Gwilym Temple",
+        "image": "web/img/photos/team/jacqui.png",
+        "name": "Jacqui Siebel",
         "title": "Head of Operations",
         "brags": [
-            "Gwilym leads our Operations portfolio, which keeps the engine of our legal practice running",
-            "Gwilym has experience in workforce management, analysis and process optimisation at Uber",
+            "Jacqui leads Anika’s operations portfolio, keeping the engine of our legal practice running.",
+            "Jacqui was previously a Project, Data & Engagement Lead at Justice Connect and has considerable community legal sector experience in project management, "
+            "innovation, monitoring and evaluation.",
         ],
     },
     {
-        "image": "web/img/photos/team/edward.jpeg",
-        "name": "Edward Sinclair",
-        "title": "Head of Strategy",
+        "image": "web/img/photos/team/kawshi.png",
+        "name": "Kawshala Maniseguran",
+        "title": "Lawyer and Clinical Programs Lead",
         "brags": [
-            "Edward leads our Strategy portfolio, which keeps us focused on success",
-            "Edward runs international expansion strategy for the Minderoo Foundation. Before this, he was a management consultant at McKinsey & Company.",
+            "Kawshalya is a lawyer, supporting our paralegals to deliver much needed legal services to Victorian renters.",
+            "Kawshalya has considerable experience as a lawyer, specialising in transport infrastructure projects. "
+            "She previously worked at PwC in their Infrastructure team, and at MinterEllison in their Projects, Infrastructure and Construction team.",
         ],
     },
     {
-        "image": "web/img/photos/team/jess.jpeg",
-        "name": "Jess Nashed",
-        "title": "Head of Product",
-        "brags": [
-            "Jess leads our Product portfolio which builds the processes and materials used by our clients and students",
-            "Jess is a solicitor at Herbert Smith Freehills",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/matt.jpeg",
+        "image": "web/img/photos/team/matt.png",
         "name": "Matthew Segal",
         "title": "Head of Technology",
         "brags": [
-            "Matt leads our Technology portfolio and is responsible for our technical infrastructure",
-            "Matt is a full-stack software developer with experience in eCommerce, fintech and online media",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/george.jpeg",
-        "name": "George Hamilton",
-        "title": "Head of People & Culture",
-        "brags": [
-            "George leads our People & Culture portfolio, which supports Anika’s functions to build aligned, effective and engaged teams",
-            "George is a Senior Analyst (Strategy) at Coles Group",
+            "Matt leads our Technology portfolio and is responsible for our web platform and cloud infrastructure",
+            "Matt is a full-stack software developer with experience in eCommerce, disease modelling, fintech and online media",
         ],
     },
 ]
