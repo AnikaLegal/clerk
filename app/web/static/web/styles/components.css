@@ -260,7 +260,7 @@ Each image/icon can have some descriptive test below it.
   max-height: unset;
 }
 .card-grid .card img.headshot.grey {
-  filter: grayscale(0.6);
+  filter: grayscale(0.4);
 }
 
 .card-grid .card .metric {

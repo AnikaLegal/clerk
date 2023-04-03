@@ -36,7 +36,7 @@
             {% for member in board %}
                 <div class="card profile blue round-small bottom-right  top-right">
                     <img 
-                        class="round-small top-right bottom-left headshot grey"
+                        class="round-small top-right bottom-left headshot"
                         src="{% static member.image %}"
                     >
                     <div class="content">
@@ -60,7 +60,7 @@
         <div class="card-grid tight">
             {% for member in members %}
                 <div class="card profile blue round-small bottom-right top-right">
-                    <img class="round-small top-right bottom-left headshot grey" src="{% static member.image %}">
+                    <img class="round-small top-right bottom-left headshot" src="{% static member.image %}">
                     <div class="content">
                         <p class="name">{{member.name}}</p>
                         <p class="title">{{member.title}}</p>
@@ -81,7 +81,7 @@
             {% for member in advisors %}
                 <div class="card profile round-small bottom-right top-right">
                     <img 
-                        class="round-small top-right bottom-left headshot grey"
+                        class="round-small top-right bottom-left headshot"
                         src="{% static member.image %}"
                     >
                     <div class="content">
