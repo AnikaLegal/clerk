@@ -234,7 +234,7 @@ TEAM_MEMBERS = [
     },
     {
         "image": "web/img/photos/team/kawshi.png",
-        "name": "Kawshala Maniseguran",
+        "name": "Kawshalya Manisegaran",
         "title": "Lawyer and Clinical Programs Lead",
         "brags": [
             "Kawshalya is a lawyer, supporting our paralegals to deliver much needed legal services to Victorian renters.",
