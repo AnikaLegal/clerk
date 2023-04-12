@@ -272,12 +272,10 @@ class IssueListSerializer(BaseIssueSerializer):
 class IssueDetailSerializer(BaseIssueSerializer):
     class Meta:
         model = Issue
-        fields = (
-            *BaseIssueSerializer.Meta.fields,
-            "client",
-        )
+        fields = (*BaseIssueSerializer.Meta.fields, "client", "support_worker")
 
     client = ClientSerializer(read_only=True)
+    support_worker = PersonSerializer(read_only=True)
 
 
 class TextChoiceField(serializers.CharField):

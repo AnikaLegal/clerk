@@ -15,6 +15,7 @@ from case.serializers import (
     IssueNoteSerializer,
     IssueNoteCreateSerializer,
     IssueAssignmentSerializer,
+    PersonSerializer,
 )
 
 router = Router("detail")
@@ -26,6 +27,9 @@ router.create_route("landlord").uuid("pk").path("landlord").pk(
     "person_pk", optional=True
 )
 router.create_route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
+router.create_route("support-worker").uuid("pk").path("support-worker").pk(
+    "person_pk", optional=True
+)
 
 
 @router.use_route("view")
@@ -64,7 +68,7 @@ def get_detail_urls(issue):
 @router.use_route("agent")
 @paralegal_or_better_required
 @api_view(["POST", "DELETE"])
-def agent_selet_view(request, pk):
+def agent_select_view(request, pk):
     """
     User can add or remove an agent for a given case.
     """
@@ -74,7 +78,7 @@ def agent_selet_view(request, pk):
 @router.use_route("landlord")
 @paralegal_or_better_required
 @api_view(["POST", "DELETE"])
-def landlord_selet_view(request, pk):
+def landlord_select_view(request, pk):
     """
     User can add or remove a landlord for a given case.
     """
@@ -99,6 +103,31 @@ def _person_select_view(request, pk, person_type):
         tenancy.save()
 
     return Response(TenancySerializer(tenancy).data)
+
+
+@router.use_route("support-worker")
+@paralegal_or_better_required
+@api_view(["POST", "DELETE"])
+def support_worker_select_view(request, pk):
+    """
+    User can add or remove a support worker for a given case.
+    """
+    issue = _get_issue(request, pk)
+    if request.method == "DELETE":
+        # User is deleting the person from the tenancy.
+        issue.support_worker = None
+        issue.save()
+        return Response(status=200)
+    elif request.method == "POST":
+        # User is adding a person from the tenancy.
+        person_pk = request.data.get("person_id")
+        if person_pk is None:
+            return HttpResponseBadRequest()
+
+        person = Person.objects.get(pk=int(person_pk))
+        issue.support_worker = person
+        issue.save()
+        return Response(PersonSerializer(person).data)
 
 
 @router.use_route("note")
@@ -134,7 +163,9 @@ def case_detail_update_view(request, pk):
     Form where you update the case status.
     """
     issue = _get_issue(request, pk)
-    serializer = IssueDetailSerializer(data=request.data, instance=issue, partial=True)
+    serializer = IssueDetailSerializer(
+        data=request.data, instanc_get_issuee=issue, partial=True
+    )
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response({"issue": IssueDetailSerializer(issue).data})

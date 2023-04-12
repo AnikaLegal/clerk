@@ -3,11 +3,7 @@ import { Formik } from 'formik'
 import {
   Container,
   Header,
-  Divider,
-  Form,
-  Button,
   Dropdown,
-  Message,
   Segment,
   List,
   Feed,
@@ -38,6 +34,9 @@ const App = () => {
   const [notes, setNotes] = useState(window.REACT_CONTEXT.notes)
   const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy)
   const [activeFormId, setActiveFormId] = useState(null)
+
+  const setSupportWorker = supportWorker => setIssue({ ...issue, support_worker: supportWorker })
+
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
       api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data))
@@ -48,14 +47,24 @@ const App = () => {
       api.case.agent.remove(issue.id).then(({ data }) => setTenancy(data))
     }
   }
+  const onRemoveSupportWorker = () => {
+    if (confirm('Remove the support worker for this case?')) {
+      api.case.supportWorker.remove(issue.id).then(() => setSupportWorker(null))
+    }
+  }
+
   const onAddAgent = (agentId) => {
     api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data))
-  }
+  }  
   const onAddLandlord = (landlordId) => {
     api.case.landlord
-      .add(issue.id, landlordId)
-      .then(({ data }) => setTenancy(data))
+    .add(issue.id, landlordId)
+    .then(({ data }) => setTenancy(data))
   }
+  const onAddSupportWorker = (supportWorkerId) => {
+    api.case.supportWorker.add(issue.id, supportWorkerId).then(({ data }) => setSupportWorker(data))
+  }
+
   const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
   return (
     <Container>
@@ -166,6 +175,25 @@ const App = () => {
                   title="Add an agent"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddAgent}
+                />
+              )}
+              {issue.support_worker ? (
+                <EntityCard
+                  title="Support Worker"
+                  onRemove={onRemoveSupportWorker}
+                  url={issue.support_worker.url}
+                  tableData={{
+                    Name: issue.support_worker.full_name,
+                    Address: issue.support_worker.address,
+                    Email: issue.support_worker.email,
+                    Phone: issue.support_worker.phone,
+                  }}
+                />
+              ) : (
+                <PersonSearchCard
+                  title="Add a support worker"
+                  createUrl={URLS.PERSON.CREATE}
+                  onSelect={onAddSupportWorker}
                 />
               )}
               <EntityCard title="Other submitted data" tableData={details} />

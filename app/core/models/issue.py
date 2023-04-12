@@ -7,6 +7,7 @@ from django.conf import settings
 
 from accounts.models import User
 
+from .person import Person
 from .client import Client
 from .timestamped import TimestampedModel
 
@@ -140,6 +141,10 @@ class Issue(TimestampedModel):
         on_delete=models.SET_NULL,
         related_name="lawyer_issues",
         related_query_name="lawyer_issue",
+    )
+    # Person managing clients case from a 3rd party institution (eg. Launch Housing)
+    support_worker = models.ForeignKey(
+        Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
     )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)

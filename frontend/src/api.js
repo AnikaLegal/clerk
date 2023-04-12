@@ -116,6 +116,16 @@ export const api = {
         return http.post(url, note)
       },
     },
+    supportWorker: {
+      add: (caseId, supportWorkerId) => {
+        const url = `/clerk/cases/detail/${caseId}/support-worker/`
+        return http.post(url, { person_id: supportWorkerId })
+      },
+      remove: (caseId) => {
+        const url = `/clerk/cases/detail/${caseId}/support-worker/`
+        return http.delete(url)
+      },
+    },
     agent: {
       add: (caseId, agentId) => {
         const url = `/clerk/cases/detail/${caseId}/agent/`
