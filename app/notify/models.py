@@ -1,7 +1,6 @@
 from django.db import models
 from core.models.timestamped import TimestampedModel
 from core.models.issue import CaseTopic, CaseStage
-from core.models import Issue
 
 NOTIFY_TOPIC_CHOICES = [
     ("GENERAL", "General"),
