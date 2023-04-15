@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Container, Header, Button, Tab } from 'semantic-ui-react'
+import { Container, Header, Tab } from 'semantic-ui-react'
 import moment from 'moment'
 import * as Yup from 'yup'
 
@@ -16,8 +16,10 @@ const creationSort = (a, b) =>
   moment(b.created_at, 'DD/MM/YY').unix() -
   moment(a.created_at, 'DD/MM/YY').unix()
 
+const REACT_CONTEXT = (window as any).REACT_CONTEXT
+
 const App = () => {
-  const [account, setAccount] = useState(window.REACT_CONTEXT.account)
+  const [account, setAccount] = useState(REACT_CONTEXT.account)
   let tabPanes = [
     {
       menuItem: 'Paralegal cases',

@@ -6,7 +6,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const entry = glob
-  .sync('./src/pages/*.js')
+  .sync('./src/pages/*.{js,jsx,ts,tsx}')
   .map((s) => [s.split('/').pop().split('.')[0], s])
   .reduce((acc, val) => ({ ...acc, [val[0]]: val[1] }), {})
 const config = {
@@ -21,7 +21,7 @@ const config = {
     new BundleTracker({ filename: '/build/webpack-stats.json' }),
   ],
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: ['*', '.js', '.jsx', '.ts', 'tsx'],
     modules: [
       path.resolve(__dirname, 'src'),
       path.resolve(__dirname, 'node_modules'),
@@ -30,7 +30,7 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: ['babel-loader'],
       },

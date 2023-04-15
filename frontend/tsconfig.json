@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "lib": ["es5", "es6", "dom"],
+    "jsx": "react",
+    "target": "es6",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "declaration": false,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "baseUrl": "src"
+
+  },
+  "include": ["src/**/*"],
+}

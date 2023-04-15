@@ -1,4 +1,4 @@
-const presets = ['@babel/preset-react']
+const presets = ['@babel/preset-react', "@babel/preset-typescript"]
 const plugins = ['@babel/transform-runtime', 'babel-plugin-styled-components']
 
 module.exports = (api) => {
