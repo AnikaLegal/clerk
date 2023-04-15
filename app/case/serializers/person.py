@@ -9,10 +9,20 @@ from .fields import TextChoiceField
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ("id", "full_name", "email", "address", "phone_number", "url")
+        fields = (
+            "id",
+            "full_name",
+            "email",
+            "address",
+            "phone_number",
+            "url",
+            "support_contact_preferences",
+        )
 
     url = serializers.SerializerMethodField()
-    support_contact_preferences = TextChoiceField(SupportContactPreferences)
+    support_contact_preferences = TextChoiceField(
+        SupportContactPreferences, allow_blank=True
+    )
 
     def get_url(self, obj):
         return reverse("person-detail", args=(obj.pk,))

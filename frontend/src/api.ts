@@ -1,4 +1,4 @@
-import { URLS } from 'consts'
+import { Person, CreatePerson } from 'types'
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`
@@ -18,23 +18,45 @@ const BASE_CONFIG = {
   },
 }
 
-const handleResponse = async (resp) => {
-  let data = {}
-  if (resp.status !== 204) {
+interface HandledResponse<T> {
+  resp: Response
+  data: T | null
+  errors: { [key: string]: any } | null
+}
+
+const handleResponse = async <T>(
+  resp: Response
+): Promise<HandledResponse<T>> => {
+  let data = null
+  let errors = null
+  if (resp.ok && resp.status !== 204) {
     try {
       data = await resp.json()
     } catch {
       console.error('Could not parse response JSON.')
     }
   }
-  return { resp, data }
+  if (!resp.ok) {
+    try {
+      errors = await resp.json()
+    } catch {
+      console.error('Could not parse response JSON.')
+    }
+  }
+  return { resp, data, errors }
 }
 
-const sendData = async (url, data, method, headers = {}) => {
+const sendData = async <T>(
+  url: string,
+  data: any,
+  method: string,
+  headers = {}
+): Promise<HandledResponse<T>> => {
   const config = {
     ...BASE_CONFIG,
     headers: { ...BASE_CONFIG.headers, ...headers },
     method: method,
+    body: undefined,
   }
   if (config.headers['Content-Type'] === 'application/json') {
     config.body = JSON.stringify(data)
@@ -49,27 +71,30 @@ const sendData = async (url, data, method, headers = {}) => {
     }
     delete config.headers['Content-Type']
   }
-  const resp = await fetch(url, config)
-  return handleResponse(resp)
+  const resp = await fetch(url, config as any)
+  return handleResponse<T>(resp)
 }
 
 const http = {
-  post: (url, data, headers = {}) => sendData(url, data, 'POST', headers),
-  patch: (url, data, headers = {}) => sendData(url, data, 'PATCH', headers),
-  put: (url, data, headers = {}) => sendData(url, data, 'PUT', headers),
-  get: async (url, query) => {
+  post: <T>(url, data = {}, headers = {}): Promise<HandledResponse<T>> =>
+    sendData(url, data, 'POST', headers),
+  patch: <T>(url, data, headers = {}): Promise<HandledResponse<T>> =>
+    sendData(url, data, 'PATCH', headers),
+  put: <T>(url, data, headers = {}): Promise<HandledResponse<T>> =>
+    sendData(url, data, 'PUT', headers),
+  get: async <T>(url, query?): Promise<HandledResponse<T>> => {
     let finalURL = url
     if (query) {
       const qs = new URLSearchParams(query).toString()
       finalURL = `${url}?${qs}`
     }
     const config = { ...BASE_CONFIG, method: 'GET' }
-    const resp = await fetch(finalURL, config)
+    const resp = await fetch(finalURL, config as any)
     return handleResponse(resp)
   },
-  delete: async (url) => {
+  delete: async <T>(url): Promise<HandledResponse<T>> => {
     const config = { ...BASE_CONFIG, method: 'DELETE' }
-    const resp = await fetch(url, config)
+    const resp = await fetch(url, config as any)
     return handleResponse(resp)
   },
 }
@@ -83,7 +108,24 @@ export const api = {
   },
   person: {
     list: () => {
-      return http.get(URLS.PERSON.LIST)
+      const url = '/clerk/parties/'
+      return http.get<Person[]>(url)
+    },
+    search: (query: any) => {
+      const url = '/clerk/parties/search/'
+      return http.get<Person[]>(url, query)
+    },
+    create: (data: CreatePerson) => {
+      const url = '/clerk/parties/create/'
+      return http.post<Person>(url, data)
+    },
+    update: (pk: number, data: Partial<CreatePerson>) => {
+      const url = `/clerk/parties/${pk}/`
+      return http.put<Person>(url, data)
+    },
+    delete: (pk: number) => {
+      const url = `/clerk/parties/${pk}/`
+      return http.delete<{}>(url)
     },
   },
   client: {
@@ -197,7 +239,7 @@ export const api = {
     },
     search: (query) => {
       const url = '/clerk/accounts/'
-      return http.get(URLS.ACCOUNTS.SEARCH, query)
+      return http.get(url, query)
     },
     promote: (accountId) => {
       const url = `/clerk/accounts/user/${accountId}/perms/promote/`

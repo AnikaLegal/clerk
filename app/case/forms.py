@@ -42,28 +42,6 @@ class InviteParalegalForm(forms.ModelForm):
         return user
 
 
-class PersonForm(forms.ModelForm):
-    class Meta:
-        model = Person
-        fields = [
-            "full_name",
-            "email",
-            "address",
-            "phone_number",
-        ]
-
-
-class PersonDynamicForm(DynamicTableForm):
-    class Meta:
-        model = Person
-        fields = [
-            "full_name",
-            "email",
-            "address",
-            "phone_number",
-        ]
-
-
 class TenancyDynamicForm(DynamicTableForm):
     class Meta:
         model = Tenancy
