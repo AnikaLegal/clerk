@@ -21,7 +21,7 @@ const config = {
     new BundleTracker({ filename: '/build/webpack-stats.json' }),
   ],
   resolve: {
-    extensions: ['*', '.js', '.jsx', '.ts', 'tsx'],
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
       path.resolve(__dirname, 'src'),
       path.resolve(__dirname, 'node_modules'),

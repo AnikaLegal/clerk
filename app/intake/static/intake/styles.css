@@ -1,0 +1,56 @@
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/static/intake/fonts/DMSans-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/static/intake/fonts/DMSans-BoldItalic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: url('/static/intake/fonts/DMSans-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 500;
+  src: url('/static/intake/fonts/DMSans-MediumItalic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/static/intake/fonts/DMSans-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/static/intake/fonts/DMSans-Italic.ttf') format('truetype');
+}
+
+html,
+body {
+  height: 100%;
+  box-sizing: border-box;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  line-height: 1.3333333;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  font-family: 'DM Sans', sans-serif;
+}
+
+#app {
+  box-sizing: border-box;
+  min-height: 100vh;
+}
