@@ -3,11 +3,11 @@ import styled from 'styled-components'
 
 import { theme } from './theme'
 
-type Props = {
+interface Props {
   current: number
-  steps: Array<string>
+  steps: string[]
 }
-export const StepProgress = ({ current, steps }: Props) => {
+export const StepProgress: React.FC<Props> = ({ current, steps }) => {
   const length = steps.length
   return (
     <StepProgressEl>

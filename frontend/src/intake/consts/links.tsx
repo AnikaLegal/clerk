@@ -1,6 +1,5 @@
 //@flow
 export const LINKS = {
-  START_FORM: '#',
   NOTICE_TO_VACATE_PDF: '/static/notice-to-vacate-example.pdf',
   SERVICES: '/services/',
   HOME: '/',

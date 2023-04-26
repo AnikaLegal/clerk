@@ -6,29 +6,19 @@ import { Icon } from './icons'
 import { theme } from './theme'
 import { StepProgress } from './progress'
 
-type Props = {
-  onClose?: () => void
-  onBack?: () => void
-  progress?: {
-    current: number
-    steps: Array<string>
-  }
+interface Props {
+  current?: number
+  steps?: Array<string>
 }
 
-export const Navbar = ({ onClose, onBack, progress }: Props) => {
-  return (
-    <NavbarEl>
-      <div>{onBack && <Icon.Back onClick={onBack} />}</div>
-      <div>
-        <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
-        {progress && (
-          <StepProgress current={progress.current} steps={progress.steps} />
-        )}
-      </div>
-      <div>{onClose && <Icon.Close onClick={onClose} />}</div>
-    </NavbarEl>
-  )
-}
+export const Navbar: React.FC<Props> = ({ current, steps }) => (
+  <NavbarEl>
+    <div>
+      <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
+      {steps && <StepProgress current={current} steps={steps} />}
+    </div>
+  </NavbarEl>
+)
 
 const NavbarEl = styled.div`
   /* Default to small mobile screen */

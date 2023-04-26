@@ -1,13 +1,14 @@
 // Client intake for Housing Health Check
 import React from 'react'
 import styled from 'styled-components'
-
-import { mount } from 'utils'
+import { Link } from 'react-router-dom'
 
 import { Splash, Text, theme } from 'intake/design'
-import { IMAGES, LINKS } from 'intake/consts'
+import { IMAGES, LINKS, ROUTES } from 'intake/consts'
+import { useScrollTop } from 'intake/utils'
 
-export const App = () => {
+export const LandingView = () => {
+  useScrollTop()
   return (
     <Splash.Container>
       <Splash.Content>
@@ -39,28 +40,15 @@ export const App = () => {
         </Text.Body>
         <Text.Header splash></Text.Header>
         <Splash.ButtonGroup>
-          <a href={LINKS.START_FORM}>
+          <Link to={ROUTES.ELIGBILITY_FORM}>
             <Splash.Button primary>Let’s get started</Splash.Button>
-          </a>
+          </Link>
         </Splash.ButtonGroup>
       </Splash.Content>
       <Splash.Image src={IMAGES.HEROES.PHONE_LADY} />
     </Splash.Container>
   )
 }
-
-// Used for warning messages for stuff like Christmas closures.
-const WarningBody = styled(Text.Body)`
-  background-color: ${theme.color.marigold};
-  color: ${theme.color.grey.dark};
-  font-size: 14px;
-  line-height: 1.4;
-  padding: 1rem;
-  border-radius: 10px;
-  & > strong {
-    color: #d72207;
-  }
-`
 
 const LogoEl = styled.img`
   height: 122px;
@@ -69,5 +57,3 @@ const LogoEl = styled.img`
     display: none;
   }
 `
-
-mount(App)

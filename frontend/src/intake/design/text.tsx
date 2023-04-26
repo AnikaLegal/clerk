@@ -75,4 +75,17 @@ const Body = styled.p`
   }
 `
 
-export const Text = { Header, Body }
+// Used for warning messages for stuff like Christmas closures.
+const WarningBody = styled(Body)`
+  background-color: ${theme.color.marigold};
+  color: ${theme.color.grey.dark};
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 1rem;
+  border-radius: 10px;
+  & > strong {
+    color: #d72207;
+  }
+`
+
+export const Text = { Header, Body, WarningBody }

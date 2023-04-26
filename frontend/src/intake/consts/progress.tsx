@@ -1,10 +1,7 @@
-export const PROGRESS = {
-  INTAKE: [
-    'About you',
-    'Your eligibility',
-    'Your problem',
-    'Your home',
-    'Your landlord',
-    'More about you',
-  ],
-}
+export const PROGRESS = [
+  'Eligibility',
+  'Personal details',
+  'The problem',
+  'Landlord',
+  'More about you',
+]
