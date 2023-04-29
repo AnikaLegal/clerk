@@ -9,12 +9,17 @@ import { StepProgress } from './progress'
 interface Props {
   current?: number
   steps?: Array<string>
+  onBack: () => void
 }
 
-export const Navbar: React.FC<Props> = ({ current, steps }) => (
+export const Navbar: React.FC<Props> = ({ current, steps, onBack }) => (
   <NavbarEl>
-    <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
-    {steps && <StepProgress current={current} steps={steps} />}
+    <Icon.Back onClick={onBack} />
+    <div>
+      <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
+      {steps && <StepProgress current={current} steps={steps} />}
+    </div>
+    <div />
   </NavbarEl>
 )
 

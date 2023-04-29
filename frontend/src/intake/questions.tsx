@@ -101,10 +101,11 @@ export const QUESTIONS: Field[] = [
     type: FIELD_TYPES.DISPLAY,
     Prompt: (
       <span>
-        If your client is eligible for your help, they will fall within our
-        means test. However, if you have time, we'd appreciate if you could tell
-        us a bit more about your client's circumstances. Feel free to skip to
-        the next part if you're pressed for time.
+        If your client is eligible for <strong>your</strong> help, they will
+        fall within <strong>our</strong> means test. However, if you have time,
+        we'd appreciate if you could tell us a bit more about your client's
+        circumstances. Feel free to skip to the next part if you're pressed for
+        time.
       </span>
     ),
     button: { text: 'Continue', Icon: null },
@@ -291,7 +292,7 @@ export const QUESTIONS: Field[] = [
     type: FIELD_TYPES.EMAIL,
     Prompt: (
       <span>
-        What <strong>email address</strong> can we reach your at?
+        What <strong>email address</strong> can we reach you at?
       </span>
     ),
   },
@@ -398,7 +399,7 @@ export const QUESTIONS: Field[] = [
     Prompt: <span>Who is the renter renting with?</span>,
     type: FIELD_TYPES.CHOICE_SINGLE,
     choices: [
-      { label: 'Renting by myself', value: 'SOLO' },
+      { label: 'Renting by themselves', value: 'SOLO' },
       { label: 'Renting with flatmates', value: 'FLATMATES' },
       { label: 'Renting with partner', value: 'PARTNER' },
       { label: 'Renting with family / children', value: 'FAMILY' },

@@ -18,6 +18,15 @@ export const App = () => (
         path={ROUTES.INELIGIBLE.NOT_SOCIAL_WORK_CLIENT}
         Component={IneligibleView}
       />
+      <Route
+        path={ROUTES.INELIGIBLE.TENANCY_TOO_LATE}
+        Component={IneligibleView}
+      />
+      <Route
+        path={ROUTES.INELIGIBLE.NO_TENANCY_YET}
+        Component={IneligibleView}
+      />
+
       <Route path={ROUTES.SUBMITTED} Component={SubmittedView} />
       <Route path={ROUTES.FORM} Component={FormView} />
       <Route path="*" Component={NotFoundView} />

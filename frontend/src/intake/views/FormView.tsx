@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ROUTES } from 'intake/consts'
-import { Text, FadeInOut, ANIMATION_TIME } from 'intake/design'
+import { Text, FadeInOut, ANIMATION_TIME, Navbar } from 'intake/design'
 import {
   useScrollTop,
   waitSeconds,
@@ -11,7 +11,7 @@ import {
   storeFormData,
 } from 'intake/utils'
 import type { Field, Data } from 'intake/types'
-import { QUESTIONS } from 'intake/questions'
+import { QUESTIONS, STAGES } from 'intake/questions'
 import { FORM_FIELDS } from 'intake/components/fields'
 import { api } from 'api'
 
@@ -45,6 +45,7 @@ export const FormView = () => {
 
   return (
     <FormEl>
+      <Navbar current={question.stage} onBack={onBack} steps={STAGES} />
       <FadeInOut visible={isFormVisible}>
         <FormField
           key={question.name}
