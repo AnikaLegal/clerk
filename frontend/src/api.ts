@@ -1,4 +1,5 @@
 import { Person, CreatePerson } from 'types'
+import { Upload, Submission } from 'intake/types'
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`
@@ -299,6 +300,44 @@ export const api = {
       delete: (pk) => {
         const url = `/clerk/templates/email/${pk}/`
         return http.delete(url)
+      },
+    },
+  },
+  // Client intake form
+  intake: {
+    // Upload a new file upload to a submission.
+    upload: async (file: File): Promise<Upload> => {
+      const url = '/api/upload/'
+      const form = new FormData()
+      form.append('file', file)
+      const request = { method: 'POST', body: form }
+      const resp = await fetch(url, request)
+      // Handle case where user tries to upload corrupt image,
+      // or renames their PDF to mydoc.png and tries to upload that.
+      if (resp.status == 400) {
+        throw 400
+      }
+      const data = await resp.json()
+      return data
+    },
+    submission: {
+      // Create a new submission.
+      get: async (id: string) => {
+        const url = `/api/submission/${id}/`
+        return await http.get<Submission>(url)
+      },
+      // Create a new submission.
+      create: async (answers: Object) => {
+        const url = '/api/submission/'
+        return await http.post<Submission>(url, { answers })
+      }, // Create a new submission.
+      update: async (id: string, answers: Object) => {
+        const url = `/api/submission/${id}/`
+        return await http.patch<Submission>(url, { answers })
+      }, // Create a new submission.
+      submit: async (id: string) => {
+        const url = `/api/submission/${id}/submit/`
+        return await http.post<void>(url, {})
       },
     },
   },

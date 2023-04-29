@@ -40,7 +40,7 @@ export const LandingView = () => {
         </Text.Body>
         <Text.Header splash></Text.Header>
         <Splash.ButtonGroup>
-          <Link to={ROUTES.ELIGBILITY_FORM}>
+          <Link to={ROUTES.FORM.replace(':qIdx', '0')}>
             <Splash.Button primary>Let’s get started</Splash.Button>
           </Link>
         </Splash.ButtonGroup>

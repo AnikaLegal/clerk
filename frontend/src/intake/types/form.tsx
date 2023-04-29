@@ -1,5 +1,4 @@
-//@flow
-import * as React from 'react'
+import React from 'react'
 import type { Data } from './core'
 
 export type FieldType =

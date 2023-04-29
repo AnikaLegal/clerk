@@ -23,6 +23,11 @@ export type Upload = {
   file: string
 }
 
+export type Submission = {
+  id: string
+  answers: Object
+}
+
 export type Topic = 'REPAIRS' | 'RENT_REDUCTION' | 'OTHER'
 
 export type Issue = {

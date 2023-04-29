@@ -13,10 +13,8 @@ interface Props {
 
 export const Navbar: React.FC<Props> = ({ current, steps }) => (
   <NavbarEl>
-    <div>
-      <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
-      {steps && <StepProgress current={current} steps={steps} />}
-    </div>
+    <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
+    {steps && <StepProgress current={current} steps={steps} />}
   </NavbarEl>
 )
 
@@ -24,7 +22,7 @@ const NavbarEl = styled.div`
   /* Default to small mobile screen */
   position: absolute;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   top: 21.3px;
   left: 16px;

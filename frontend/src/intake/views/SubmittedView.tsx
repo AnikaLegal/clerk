@@ -5,7 +5,7 @@ import { IMAGES } from 'intake/consts'
 import { Splash, Text } from 'intake/design'
 import { useScrollTop } from 'intake/utils'
 
-export const LandlordFormView = () => {
+export const SubmittedView = () => {
   useScrollTop()
   const navigate = useNavigate()
   return (

@@ -1,5 +1,4 @@
 export * from './field-types'
 export * from './images'
 export * from './links'
-export * from './progress'
 export * from './routes'

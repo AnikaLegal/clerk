@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import { IMAGES } from 'intake/consts'
 import { theme } from '../../theme'
-import { Navbar } from '../../navbar'
 import { BigButton } from '../../inputs'
 import { FadeFooter } from '../../footer'
 
@@ -112,7 +111,6 @@ const SplashContainer = ({ children, left }: SplashProps) => (
         />
       </>
     )}
-    <Navbar />
     <SplashInnerEl left={left}>{children}</SplashInnerEl>
     <FadeFooter />
   </SplashOuterEl>

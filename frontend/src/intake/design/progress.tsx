@@ -18,7 +18,7 @@ export const StepProgress: React.FC<Props> = ({ current, steps }) => {
           <React.Fragment key={label}>
             <StepOuterEl active={isCurrent}>
               <StepInnerEl />
-              {isCurrent && <StepLabelEl>{label}</StepLabelEl>}
+              <StepLabelEl>{label}</StepLabelEl>
             </StepOuterEl>
             {hasNext && <StepBarEl />}
           </React.Fragment>
