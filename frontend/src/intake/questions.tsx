@@ -308,6 +308,7 @@ export const QUESTIONS: Field[] = [
     name: 'SUPPORT_WORKER_CONTACT_PREFERENCE',
     stage: 2,
     required: true,
+    askCondition: updateSupportWorker,
     type: FIELD_TYPES.CHOICE_SINGLE,
     choices: [
       {
