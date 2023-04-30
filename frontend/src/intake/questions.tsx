@@ -1,8 +1,11 @@
 import React from 'react'
+import moment from 'moment'
 
 import { Field, Data } from 'intake/types'
-import { FIELD_TYPES, ROUTES } from 'intake/consts'
-import moment from 'moment'
+import { FIELD_TYPES, ROUTES, LINKS } from 'intake/consts'
+import { storeFormData } from 'intake/utils'
+import { Icon } from 'intake/design'
+import { api } from 'api'
 
 const isManagerAgent = (data: Data) => data.PROPERTY_MANAGER_IS_AGENT
 const isManagerLandlord = (data: Data) => !data.PROPERTY_MANAGER_IS_AGENT
@@ -484,7 +487,7 @@ export const QUESTIONS: Field[] = [
     name: 'AGENT_NAME',
     stage: 4,
     askCondition: isManagerAgent,
-    required: false,
+    required: true,
     type: FIELD_TYPES.TEXT,
     Prompt: <span>What is the landlord's agent's full name?</span>,
   },
@@ -515,7 +518,8 @@ export const QUESTIONS: Field[] = [
   {
     stage: 4,
     name: 'LANDLORD_NAME',
-    required: false,
+    askCondition: isManagerLandlord,
+    required: true,
     type: FIELD_TYPES.TEXT,
     Prompt: <span>What is the landlord's full name?</span>,
   },
@@ -675,5 +679,50 @@ export const QUESTIONS: Field[] = [
       { label: 'Not looking for work', value: 'NOT_LOOKING_FOR_WORK' },
       { label: 'None of the above', value: null },
     ],
+  },
+  {
+    name: 'SUBMIT',
+    required: true,
+    stage: 5,
+    type: FIELD_TYPES.DISPLAY,
+    Prompt: <span>That's it! You can now submit this case to Anika.</span>,
+    Help: (
+      <span>
+        By submitting this form, you are agreeing to our{' '}
+        <a href={LINKS.PRIVACY_POLICY}>Privacy Policy</a>,{' '}
+        <a href={LINKS.COLLECTIONS_STATEMENT}>Collections Statement</a> and
+        website <a href={LINKS.TERMS_OF_USE}>Terms of Use</a>.
+      </span>
+    ),
+    button: {
+      text: 'Confirm',
+      Icon: Icon.Tick,
+    },
+    effect: async (data: Data) => {
+      const finalData = { ...data }
+      // Set all unasked questions to null.
+      for (let q of QUESTIONS) {
+        const isUndef = typeof data[q.name] === 'undefined'
+        const isFailCondition = q.askCondition && !q.askCondition(data)
+        if (isUndef || isFailCondition) {
+          finalData[q.name] = null
+        }
+      }
+      console.log('Submitting data:', finalData)
+      const subId = data['id']
+      let sub
+      // http://localhost:8000/launch/form/40
+      // if (subId) {
+      //   // We have already created this submission
+      //   sub = await api.intake.submission.update(subId, finalData)
+      // } else {
+      //   // This is a new submission
+      //   sub = await api.intake.submission.create(finalData)
+      // }
+      // await api.intake.submission.submit(sub.id)
+      // // Wipe stored data.
+      // storeFormData('')
+      return ROUTES.SUBMITTED
+    },
   },
 ]

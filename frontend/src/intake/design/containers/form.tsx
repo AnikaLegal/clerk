@@ -7,17 +7,17 @@ const FormOuter = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 120px 0 200px 0;
+  padding: 130px 0 200px 0;
   box-sizing: border-box;
   @media (max-height: 900px) {
-    padding: 120px 0 0 0;
+    padding: 130px 0 0 0;
   }
 
   @media (max-width: ${theme.screen.mobile}) {
     display: grid;
     padding: 0 16px 0 16px;
     grid-template-columns: auto;
-    grid-template-rows: minmax(100px, min-content) 1fr min-content;
+    grid-template-rows: minmax(110px, min-content) 1fr min-content;
     grid-template-areas:
       '.'
       'main'

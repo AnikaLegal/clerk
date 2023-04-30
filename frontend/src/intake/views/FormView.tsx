@@ -3,7 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ROUTES } from 'intake/consts'
-import { Text, FadeInOut, ANIMATION_TIME, Navbar } from 'intake/design'
+import {
+  FadeFooter,
+  Text,
+  FadeInOut,
+  ANIMATION_TIME,
+  Navbar,
+} from 'intake/design'
 import {
   useScrollTop,
   waitSeconds,
@@ -44,24 +50,27 @@ export const FormView = () => {
   const onUpload = (file: File) => api.intake.upload(file)
 
   return (
-    <FormEl>
-      <Navbar current={question.stage} onBack={onBack} steps={STAGES} />
-      <FadeInOut visible={isFormVisible}>
-        <FormField
-          key={question.name}
-          onNext={onNext}
-          onSkip={onSkip}
-          field={question}
-          data={data}
-          value={value}
-          onChange={onChange}
-          onUpload={onUpload}
-        >
-          <Text.Header>{question.Prompt}</Text.Header>
-          {question.Help && <Text.Body>{question.Help}</Text.Body>}
-        </FormField>
-      </FadeInOut>
-    </FormEl>
+    <>
+      <FormEl>
+        <Navbar current={question.stage} onBack={onBack} steps={STAGES} />
+        <FadeInOut visible={isFormVisible}>
+          <FormField
+            key={question.name}
+            onNext={onNext}
+            onSkip={onSkip}
+            field={question}
+            data={data}
+            value={value}
+            onChange={onChange}
+            onUpload={onUpload}
+          >
+            <Text.Header>{question.Prompt}</Text.Header>
+            {question.Help && <Text.Body>{question.Help}</Text.Body>}
+          </FormField>
+        </FadeInOut>
+      </FormEl>
+      {isFormVisible && <FadeFooter />}
+    </>
   )
 }
 
