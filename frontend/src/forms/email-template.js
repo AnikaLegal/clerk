@@ -3,17 +3,12 @@ import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
 import { MarkdownEditor } from 'comps/markdown-editor'
 
-const TOPIC_OPTIONS = [
-  { key: 'GENERAL', value: 'GENERAL', text: 'General' },
-  { key: 'REPAIRS', value: 'REPAIRS', text: 'Repairs' },
-  { key: 'BONDS', value: 'BONDS', text: 'Bonds' },
-  { key: 'EVICTION', value: 'EVICTION', text: 'Eviction' },
-]
 
 // Formik form component
 export const EmailTemplateForm = ({
   create,
   editable,
+  topicOptions,
   handleDelete,
   formik: {
     values,
@@ -31,7 +26,7 @@ export const EmailTemplateForm = ({
         fluid
         selection
         placeholder="Select a case type"
-        options={TOPIC_OPTIONS}
+        options={topicOptions}
         onChange={(e, { value }) => setFieldValue('topic', value)}
         value={values.topic}
         disabled={!editable}

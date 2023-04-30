@@ -41,6 +41,10 @@ router.create_route("notify-search").path("notify").path("search")
 router.create_route("notify-detail").path("notify").pk("pk")
 router.create_route("notify-delete").path("notify").pk("pk").path("delete")
 
+topic_options = [{"key": "GENERAL", "value": "GENERAL", "text": "General"},] + [
+    {"key": key, "value": key, "text": label} for key, label in CaseTopic.ACTIVE_CHOICES
+]
+
 
 @router.use_route("list")
 @coordinator_or_better_required
@@ -55,6 +59,7 @@ def template_list_view(request):
 def template_email_list_view(request):
     templates = EmailTemplate.objects.order_by("-created_at").all()
     context = {
+        "topic_options": topic_options,
         "templates": EmailTemplateSerializer(templates, many=True).data,
         "create_url": reverse("template-email-create"),
     }
@@ -89,7 +94,14 @@ def template_email_create_view(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    return render_react_page(request, "Email Templates", "email-template-create", {})
+    return render_react_page(
+        request,
+        "Email Templates",
+        "email-template-create",
+        {
+            "topic_options": topic_options,
+        },
+    )
 
 
 @router.use_route("email-detail")
@@ -118,6 +130,7 @@ def template_email_detail_view(request, pk):
             raise Http404()
 
     context = {
+        "topic_options": topic_options,
         "template_list_url": reverse("template-email-list"),
         "template": EmailTemplateSerializer(template).data,
         "editable": request.user.is_coordinator_or_better,
@@ -132,6 +145,7 @@ def template_email_detail_view(request, pk):
 @require_http_methods(["GET"])
 def template_doc_list_view(request):
     context = {
+        "topic_options": [t for t in topic_options if t["key"] != "GENERAL"],
         "topic": CaseTopic.REPAIRS,
         "create_url": reverse("template-doc-create"),
     }
@@ -188,6 +202,7 @@ def template_doc_create_view(request):
 def template_notify_list_view(request):
     notifications = Notification.objects.order_by("-created_at").all()
     context = {
+        "topic_options": topic_options,
         "create_url": reverse("template-notify-create"),
         "notifications": NotificationSerializer(notifications, many=True).data,
     }
@@ -236,7 +251,12 @@ def template_notify_create_view(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return render_react_page(
-        request, "Notification Templates", "notify-template-create", {}
+        request,
+        "Notification Templates",
+        "notify-template-create",
+        {
+            "topic_options": topic_options,
+        },
     )
 
 
@@ -256,6 +276,7 @@ def template_notify_detail_view(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     context = {
+        "topic_options": topic_options,
         "template": NotificationSerializer(template).data,
         "notify_template_url": reverse("template-notify-list"),
     }

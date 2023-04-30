@@ -4,12 +4,6 @@ import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 import { STAGES } from 'consts'
 import { SlackyMarkdownEditor } from 'comps/markdown-editor'
 
-const TOPIC_OPTIONS = [
-  { key: 'GENERAL', value: 'GENERAL', text: 'General' },
-  { key: 'REPAIRS', value: 'REPAIRS', text: 'Repairs' },
-  { key: 'BONDS', value: 'BONDS', text: 'Bonds' },
-  { key: 'EVICTION', value: 'EVICTION', text: 'Eviction' },
-]
 
 const STAGE_OPTIONS = Object.entries(STAGES)
   .filter(([k, v]) => k !== 'UNSTARTED')
@@ -35,6 +29,7 @@ const TARGET_OPTIONS = [
 export const NotifyTemplateForm = ({
   create,
   onDelete,
+  topicOptions,
   formik: {
     values,
     errors,
@@ -61,7 +56,7 @@ export const NotifyTemplateForm = ({
         fluid
         selection
         placeholder="Select a case type"
-        options={TOPIC_OPTIONS}
+        options={topicOptions}
         onChange={(e, { value }) => setFieldValue('topic', value)}
         value={values.topic}
         disabled={isSubmitting}

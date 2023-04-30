@@ -7,6 +7,8 @@ import { api } from 'api'
 
 import { NotifyTemplateForm } from 'forms/notify-template'
 
+const CONTEXT = window.REACT_CONTEXT
+
 const App = () => (
   <Container>
     <Header as="h1">Create a new notification template</Header>
@@ -37,7 +39,14 @@ const App = () => (
         })
       }}
     >
-      {(formik) => <NotifyTemplateForm formik={formik} create editable />}
+      {(formik) => (
+        <NotifyTemplateForm
+          formik={formik}
+          topicOptions={CONTEXT.topic_options}
+          create
+          editable
+        />
+      )}
     </Formik>
   </Container>
 )

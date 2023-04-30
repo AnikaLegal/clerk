@@ -21,17 +21,17 @@ class CaseTopic:
     HEALTH_CHECK = "HEALTH_CHECK"
 
     ACTIVE_CHOICES = [
-        (HEALTH_CHECK, "Housing Health Check"),
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
         (EVICTION, "Eviction"),
+        (HEALTH_CHECK, "Housing Health Check"),
     ]
     CHOICES = (
-        (HEALTH_CHECK, "Housing Health Check"),
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
-        (RENT_REDUCTION, "Rent reduction"),
         (EVICTION, "Eviction"),
+        (HEALTH_CHECK, "Housing Health Check"),
+        (RENT_REDUCTION, "Rent reduction"),
         (OTHER, "Other"),
     )
 

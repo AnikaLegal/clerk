@@ -31,7 +31,14 @@ const App = () => (
         })
       }}
     >
-      {(formik) => <EmailTemplateForm formik={formik} create editable />}
+      {(formik) => (
+        <EmailTemplateForm
+          formik={formik}
+          topicOptions={CONTEXT.topic_options}
+          create
+          editable
+        />
+      )}
     </Formik>
   </Container>
 )

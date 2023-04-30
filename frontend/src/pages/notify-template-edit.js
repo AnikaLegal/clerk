@@ -7,7 +7,7 @@ import { api } from 'api'
 
 import { NotifyTemplateForm } from 'forms/notify-template'
 
-const { template, notify_template_url } = window.REACT_CONTEXT
+const { template, topic_options, notify_template_url } = window.REACT_CONTEXT
 
 const App = () => {
   const onDelete = (e) => {
@@ -48,7 +48,13 @@ const App = () => {
             })
         }}
       >
-        {(formik) => <NotifyTemplateForm formik={formik} onDelete={onDelete} />}
+        {(formik) => (
+          <NotifyTemplateForm
+            formik={formik}
+            topicOptions={topic_options}
+            onDelete={onDelete}
+          />
+        )}
       </Formik>
     </Container>
   )

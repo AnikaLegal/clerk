@@ -13,11 +13,6 @@ import { api } from 'api'
 import { FadeTransition } from 'comps/transitions'
 
 const CONTEXT = window.REACT_CONTEXT
-const TOPIC_OPTIONS = [
-  { key: 'REPAIRS', value: 'REPAIRS', text: 'Repairs' },
-  { key: 'BONDS', value: 'BONDS', text: 'Bonds' },
-  { key: 'EVICTION', value: 'EVICTION', text: 'Eviction' },
-]
 
 const debouncer = debounce(300)
 
@@ -69,7 +64,7 @@ const App = () => {
           fluid
           selection
           placeholder="Select a case type"
-          options={TOPIC_OPTIONS}
+          options={CONTEXT.topic_options}
           onChange={(e, { value }) => setTopic(value)}
           value={topic}
         />
