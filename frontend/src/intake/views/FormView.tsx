@@ -21,9 +21,14 @@ import { QUESTIONS, STAGES } from 'intake/questions'
 import { FORM_FIELDS } from 'intake/components/fields'
 import { api } from 'api'
 
+const INITIAL_DATA = {
+  ISSUES: 'HEALTH_CHECK', // Always health check type case.
+  IS_ON_LEASE: true, // Always assumed to be true for health check cases.
+}
+
 export const FormView = () => {
   useScrollTop()
-  const [data, setData] = React.useState<Data>(loadFormData() || {})
+  const [data, setData] = React.useState<Data>(loadFormData() || INITIAL_DATA)
   const [question, qIdx] = useQuestion(data)
   const { onBack, onNext, onSkip, isFormVisible } = useFormNavigation(
     question,

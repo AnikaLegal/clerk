@@ -18,12 +18,16 @@ class CaseTopic:
     EVICTION = "EVICTION"
     BONDS = "BONDS"
     OTHER = "OTHER"
+    HEALTH_CHECK = "HEALTH_CHECK"
+
     ACTIVE_CHOICES = [
+        (HEALTH_CHECK, "Housing Health Check"),
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
         (EVICTION, "Eviction"),
     ]
     CHOICES = (
+        (HEALTH_CHECK, "Housing Health Check"),
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
         (RENT_REDUCTION, "Rent reduction"),

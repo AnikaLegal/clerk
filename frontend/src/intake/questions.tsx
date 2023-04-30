@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 
-import { Field, Data } from 'intake/types'
+import { Field, Data, Submission } from 'intake/types'
 import { FIELD_TYPES, ROUTES, LINKS } from 'intake/consts'
 import { storeFormData } from 'intake/utils'
 import { Icon } from 'intake/design'
@@ -23,19 +23,6 @@ export const STAGES = [
 export const QUESTIONS: Field[] = [
   // Eligibility stage
   {
-    name: 'ELIGIBILITY_INTRO',
-    stage: 0,
-    required: true,
-    type: FIELD_TYPES.DISPLAY,
-    Prompt: (
-      <span>
-        We know you're pressed for time! Before we ask you questions about your
-        client's matter, we need to check they're eligible for our service.
-      </span>
-    ),
-    button: { text: 'Continue', Icon: null },
-  },
-  {
     name: 'EXPECTATION_MANAGEMENT',
     stage: 0,
     required: true,
@@ -54,9 +41,26 @@ export const QUESTIONS: Field[] = [
         Our Service focuses on helping renters under their rights and duties as
         they enter new tenancy arrangements. If the renter does not end up
         signing the rental agreement, we will not be able to assist.
+      </span>
+    ),
+    Help: (
+      <span>
         <strong>Would you like to continue? </strong>
       </span>
     ),
+  },
+  {
+    name: 'ELIGIBILITY_INTRO',
+    stage: 0,
+    required: true,
+    type: FIELD_TYPES.DISPLAY,
+    Prompt: (
+      <span>
+        We know you're pressed for time! Before we ask you questions about your
+        client's matter, we need to check they're eligible for our service.
+      </span>
+    ),
+    button: { text: 'Continue', Icon: null },
   },
   {
     name: 'CLIENT_RELATIONSHIP',
@@ -249,25 +253,14 @@ export const QUESTIONS: Field[] = [
   },
   // SUPPORT WORKER PAGE
   {
-    name: 'SUPPORT_WORKER_FIRST_NAME',
+    name: 'SUPPORT_WORKER_NAME',
     stage: 2,
     required: true,
     type: FIELD_TYPES.TEXT,
 
     Prompt: (
       <span>
-        What's your <strong>first name?</strong>
-      </span>
-    ),
-  },
-  {
-    name: 'SUPPORT_WORKER_LAST_NAME',
-    stage: 2,
-    required: true,
-    type: FIELD_TYPES.TEXT,
-    Prompt: (
-      <span>
-        And your <strong>last name?</strong>
+        What's your <strong>full name?</strong>
       </span>
     ),
   },
@@ -710,18 +703,19 @@ export const QUESTIONS: Field[] = [
       }
       console.log('Submitting data:', finalData)
       const subId = data['id']
-      let sub
-      // http://localhost:8000/launch/form/40
-      // if (subId) {
-      //   // We have already created this submission
-      //   sub = await api.intake.submission.update(subId, finalData)
-      // } else {
-      //   // This is a new submission
-      //   sub = await api.intake.submission.create(finalData)
-      // }
-      // await api.intake.submission.submit(sub.id)
-      // // Wipe stored data.
-      // storeFormData('')
+      let sub: Submission | undefined
+      if (subId) {
+        // We have already created this submission
+        const resp = await api.intake.submission.update(subId, finalData)
+        sub = resp.data
+      } else {
+        // This is a new submission
+        const resp = await api.intake.submission.create(finalData)
+        sub = resp.data
+      }
+      await api.intake.submission.submit(sub.id)
+      // Wipe stored data.
+      storeFormData('')
       return ROUTES.SUBMITTED
     },
   },

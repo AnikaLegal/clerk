@@ -1,16 +1,12 @@
 from django import forms
 from django.forms.fields import BooleanField
-from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 
 from accounts.models import User
-from core.models import Issue, Tenancy, Person
+from core.models import Issue, Tenancy
 from core.models.issue import CaseTopic
-from emails.models import Email, EmailAttachment
 from case.utils import DynamicTableForm, SingleChoiceField
-from microsoft.endpoints import MSGraphAPI
 
 
 class DocumentTemplateForm(forms.Form):

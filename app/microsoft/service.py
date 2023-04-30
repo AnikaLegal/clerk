@@ -16,6 +16,7 @@ TEMPLATE_PATHS = {
     CaseTopic.BONDS: "templates/bonds",
     CaseTopic.REPAIRS: "templates/repairs",
     CaseTopic.EVICTION: "templates/evictions",
+    CaseTopic.HEALTH_CHECK: "templates/health-check",
 }
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"

@@ -19,7 +19,7 @@ def process_submission(sub_pk: str):
         - Client: the client
         - Issue: the client's issues
         - FileUpload: files associated with an issue
-        - Person: landlords and agents
+        - Person: support workers, landlords and agents
         - Tenancy: the client's home
 
     """
@@ -76,10 +76,24 @@ def process_issue(answers, client):
     for k in upload_answers:
         issue_upload_ids += [f["id"] for f in (answers.get(k) or [])]
 
+    support_worker = None
+    if answers.get("SUPPORT_WORKER_NAME"):
+        support_worker = Person.objects.create(
+            full_name=answers["SUPPORT_WORKER_NAME"].title(),
+            address=get_as_string(answers, "SUPPORT_WORKER_ADDRESS") or "",
+            email=get_as_string(answers, "SUPPORT_WORKER_EMAIL") or "",
+            phone_number=get_as_string(answers, "SUPPORT_WORKER_PHONE") or "",
+            support_contact_preferences=get_as_string(
+                answers, "SUPPORT_WORKER_CONTACT_PREFERENCE"
+            )
+            or "",
+        )
+
     issue = Issue.objects.create(
         topic=topic,
         answers=issue_answers,
         client=client,
+        support_worker=support_worker,
     )
     FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
     return issue
@@ -99,6 +113,10 @@ UPLOAD_ANSWERS = {
         "BONDS_DAMAGE_QUOTE_UPLOAD",
         "BONDS_CLEANING_DOCUMENT_UPLOADS",
         "BONDS_LOCKS_CHANGE_QUOTE",
+    ],
+    "HEALTH_CHECK": [
+        "SUPPORT_WORKER_AUTHORITY_UPLOAD",
+        "TENANCY_DOCUMENTS_UPLOAD",
     ],
 }
 
@@ -146,9 +164,9 @@ def process_tenancy(answers, client):
     if answers.get("AGENT_NAME"):
         agent = Person.objects.create(
             full_name=answers["AGENT_NAME"].title(),
-            address=get_as_string(answers,"AGENT_ADDRESS"),
-            email=get_as_string(answers,"AGENT_EMAIL"),
-            phone_number=get_as_string(answers,"AGENT_PHONE"),
+            address=get_as_string(answers, "AGENT_ADDRESS"),
+            email=get_as_string(answers, "AGENT_EMAIL"),
+            phone_number=get_as_string(answers, "AGENT_PHONE"),
         )
 
     if answers.get("LANDLORD_NAME"):
