@@ -16,6 +16,13 @@ class CaseGroups:
     GROUPS = [ADMIN, COORDINATOR, PARALEGAL]
 
 
+class University(models.Model):
+    """
+    The university/tertiary institution that a paralegal is associated with.
+    """
+    name = models.CharField(max_length=255, unique=True)
+
+
 class User(AbstractUser):
     class Meta:
         db_table = "auth_user"
@@ -25,6 +32,7 @@ class User(AbstractUser):
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)
     ms_account_created_at = models.DateTimeField(blank=True, null=True)
+    university = models.ForeignKey(University, blank=True, null=True, on_delete=models.PROTECT)
 
     def save(self, *args, **kwargs):
         # Ensure email always lowercase
