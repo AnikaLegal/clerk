@@ -42,9 +42,9 @@ const INELIGIBLE_REASONS: { [key: string]: React.ReactElement } = {
     <Splash.Content>
       <Text.Header splash>Ineligible case</Text.Header>
       <Text.Body splash>
-        Our Service focuses on helping renters under their rights and duties as
-        they enter new tenancy arrangements. If a new rental has not yet been
-        found, the service will not yet be able to assist.
+        Our Service focuses on helping renters understand their rights and
+        duties as they enter new tenancy arrangements. If a new rental has not
+        yet been found, the service will not yet be able to assist.
       </Text.Body>
     </Splash.Content>
   ),
