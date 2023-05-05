@@ -5,16 +5,23 @@ from django.contrib.messages import constants as messages
 
 from microsoft.tasks import set_up_new_user_task
 
-from .models import User
+from .models import University, User
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-
     actions = ["invite"]
     fieldsets = (
         *BaseUserAdmin.fieldsets,
-        (("Other info"), {"fields": ("ms_account_created_at",)}),
+        (
+            ("Other info"),
+            {
+                "fields": (
+                    "university",
+                    "ms_account_created_at",
+                )
+            },
+        ),
     )
 
     def invite(self, request, queryset):
@@ -24,3 +31,8 @@ class UserAdmin(BaseUserAdmin):
         self.message_user(request, "Invite task dispatched.", level=messages.INFO)
 
     invite.short_description = "Invite users as paralegals"
+
+
+@admin.register(University)
+class UniversityAdmin(admin.ModelAdmin):
+    fields = ["name"]
