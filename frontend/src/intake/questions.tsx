@@ -38,9 +38,9 @@ export const QUESTIONS: Field[] = [
     ],
     Prompt: (
       <span>
-        Our Service focuses on helping renters under their rights and duties as
-        they enter new tenancy arrangements. If the renter does not end up
-        signing the rental agreement, we will not be able to assist.
+        Our Service focuses on helping renters understand their rights and
+        duties as they enter new tenancy arrangements. If the renter does not
+        end up signing the rental agreement, we will not be able to assist.
       </span>
     ),
     Help: (
@@ -629,7 +629,7 @@ export const QUESTIONS: Field[] = [
     type: FIELD_TYPES.TEXT,
     Prompt: (
       <span>
-        What is rge renter's <strong>preferred</strong> language other than
+        What is the renter's <strong>preferred</strong> language other than
         English?
       </span>
     ),
