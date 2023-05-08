@@ -163,9 +163,7 @@ def case_detail_update_view(request, pk):
     Form where you update the case status.
     """
     issue = _get_issue(request, pk)
-    serializer = IssueDetailSerializer(
-        data=request.data, instanc_get_issuee=issue, partial=True
-    )
+    serializer = IssueDetailSerializer(data=request.data, instance=issue, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response({"issue": IssueDetailSerializer(issue).data})
