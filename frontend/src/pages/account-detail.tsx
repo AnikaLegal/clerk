@@ -5,21 +5,23 @@ import * as Yup from 'yup'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { TableForm } from 'comps/table-form'
-import { getFormSchema, FIELD_TYPES, FormField } from 'comps/auto-form'
+import { getFormSchema, FormField } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { api } from 'api'
 import { AccountPermissions } from 'comps/account-permissions'
 import { ErrorBoundary } from 'comps/error-boundary'
+import { FIELD_TYPES } from 'comps/field-component'
+import { AccountDetail, IssueDetail } from 'types'
 
-const creationSort = (a, b) =>
+const creationSort = (a: IssueDetail, b: IssueDetail) =>
   moment(b.created_at, 'DD/MM/YY').unix() -
   moment(a.created_at, 'DD/MM/YY').unix()
 
 const REACT_CONTEXT = (window as any).REACT_CONTEXT
 
 const App = () => {
-  const [account, setAccount] = useState(REACT_CONTEXT.account)
+  const [account, setAccount] = useState(REACT_CONTEXT.account as AccountDetail)
   let tabPanes = [
     {
       menuItem: 'Paralegal cases',

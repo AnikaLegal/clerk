@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Button, Table } from 'semantic-ui-react'
 import { Formik } from 'formik'
 
@@ -8,36 +8,34 @@ import {
   AutoForm,
   getModelChoices,
   getModelInitialValues,
-  FIELD_TYPES,
   FormField,
 } from 'comps/auto-form'
+import { FIELD_TYPES } from './field-component'
 
 import * as Yup from 'yup'
 import { HandledResponse } from 'api'
 
-interface TableFormProps {
+interface TableFormProps<ModelType extends { id: string | number }> {
   fields: FormField[]
   schema: Yup.AnySchema
-  model: {
-    id: string | number
-  }
-  setModel: (model: unknown) => void
+  model: ModelType
+  setModel: Dispatch<SetStateAction<ModelType>>
   modelName: string
   onUpdate: (
     id: string | number,
-    model: unknown
+    values: { [fieldName: string]: unknown }
   ) => Promise<HandledResponse<unknown>>
 }
 
 // Wrapper around AutoForm for updating a model or displating a table.
-export const TableForm = ({
+export const TableForm = <ModelType extends { id: string | number }>({
   fields,
   schema,
   model,
   setModel,
   modelName,
   onUpdate,
-}: TableFormProps) => {
+}: TableFormProps<ModelType>) => {
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
   if (!isEditMode) {
@@ -52,7 +50,10 @@ export const TableForm = ({
     <Formik
       initialValues={getModelInitialValues(fields, model)}
       validationSchema={schema}
-      onSubmit={(values, { setSubmitting, setErrors }) => {
+      onSubmit={(
+        values: { [fieldName: string]: unknown },
+        { setSubmitting, setErrors }: any
+      ) => {
         onUpdate(model.id, values).then(({ resp, data, errors }) => {
           if (resp.status === 400) {
             setErrors(errors)
