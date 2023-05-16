@@ -9,14 +9,14 @@ import {
   getModelChoices,
   getModelInitialValues,
   FIELD_TYPES,
-  FormFields,
+  FormField,
 } from 'comps/auto-form'
 
 import * as Yup from 'yup'
 import { HandledResponse } from 'api'
 
 interface TableFormProps {
-  fields: FormFields
+  fields: FormField[]
   schema: Yup.AnySchema
   model: {
     id: string | number

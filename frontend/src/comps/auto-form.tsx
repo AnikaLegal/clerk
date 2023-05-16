@@ -24,13 +24,13 @@ export const FIELD_TYPES = {
   BOOL: 'BOOL',
 } as const
 
-export type FormFields = {
+export type FormField = {
   label: string
   name: string
   type: (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES]
   placeholder?: string
   schema?: Yup.AnySchema
-}[]
+}
 
 const FieldSchema = Yup.array().of(
   Yup.object().shape({
@@ -42,7 +42,7 @@ const FieldSchema = Yup.array().of(
   })
 )
 
-export const getFormSchema = (formFields: FormFields) =>
+export const getFormSchema = (formFields: FormField[]) =>
   Yup.object().shape(
     formFields.reduce(
       (acc, val) =>
@@ -64,7 +64,7 @@ type Choices = {
   [fieldName: string]: [string, string][]
 }
 
-export const getModelChoices = (formFields: FormFields, model: Model) =>
+export const getModelChoices = (formFields: FormField[], model: Model) =>
   formFields.reduce<Choices>((acc, field) => {
     const fieldVal = model[field.name]
     if (fieldVal && fieldVal.choices) {
@@ -74,7 +74,7 @@ export const getModelChoices = (formFields: FormFields, model: Model) =>
     }
   }, {})
 
-export const getModelInitialValues = (formFields: FormFields, model: Model) =>
+export const getModelInitialValues = (formFields: FormField[], model: Model) =>
   formFields.reduce<{
     [fieldName: string]: string
   }>((acc, field) => {
@@ -97,7 +97,7 @@ export const FormErrors = ({ errors, touched, labels }) => (
 )
 
 interface AutoFormProps {
-  fields: FormFields
+  fields: FormField[]
   choices: Choices
   formik: FormikProps<{
     [fieldName: string]: string
