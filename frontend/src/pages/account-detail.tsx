@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { TableForm } from 'comps/table-form'
-import { getFormSchema, FIELD_TYPES } from 'comps/auto-form'
+import { getFormSchema, FIELD_TYPES, FormFields } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { api } from 'api'
@@ -115,7 +115,7 @@ const LAWYER_TABLE_FIELDS = [
   'outcome',
 ]
 
-const FIELDS = [
+const FIELDS: FormFields = [
   {
     label: 'First name',
     schema: Yup.string().required('Required'),
@@ -145,6 +145,12 @@ const FIELDS = [
     type: FIELD_TYPES.BOOL,
     name: 'is_active',
     schema: Yup.boolean(),
+  },
+  {
+    label: 'University',
+    type: FIELD_TYPES.SINGLE_CHOICE,
+    name: 'university',
+    schema: Yup.string().optional(),
   },
 ]
 const SCHEMA = getFormSchema(FIELDS)

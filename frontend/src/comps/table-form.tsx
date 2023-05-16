@@ -3,13 +3,31 @@ import { Button, Table } from 'semantic-ui-react'
 import { Formik } from 'formik'
 
 import { markdownToHtml } from 'utils'
-import { CaseListTable } from 'comps/case-table'
+
 import {
   AutoForm,
   getModelChoices,
   getModelInitialValues,
   FIELD_TYPES,
+  FormFields,
 } from 'comps/auto-form'
+
+import * as Yup from 'yup'
+import { HandledResponse } from 'api'
+
+interface TableFormProps {
+  fields: FormFields
+  schema: Yup.AnySchema
+  model: {
+    id: string | number
+  }
+  setModel: (model: unknown) => void
+  modelName: string
+  onUpdate: (
+    id: string | number,
+    model: unknown
+  ) => Promise<HandledResponse<unknown>>
+}
 
 // Wrapper around AutoForm for updating a model or displating a table.
 export const TableForm = ({
@@ -19,7 +37,7 @@ export const TableForm = ({
   setModel,
   modelName,
   onUpdate,
-}) => {
+}: TableFormProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
   if (!isEditMode) {
@@ -35,9 +53,9 @@ export const TableForm = ({
       initialValues={getModelInitialValues(fields, model)}
       validationSchema={schema}
       onSubmit={(values, { setSubmitting, setErrors }) => {
-        onUpdate(model.id, values).then(({ resp, data }) => {
+        onUpdate(model.id, values).then(({ resp, data, errors }) => {
           if (resp.status === 400) {
-            setErrors(data)
+            setErrors(errors)
           } else if (resp.ok) {
             setModel(data[modelName])
             toggleEditMode()
@@ -80,7 +98,7 @@ const FieldTable = ({ fields, model }) => (
   </Table>
 )
 
-const getValueDisplay = (val) => {
+const getValueDisplay = (val: any): React.ReactNode => {
   const t = typeof val
   if (t === 'undefined' || val === null || val === '') {
     return '-'

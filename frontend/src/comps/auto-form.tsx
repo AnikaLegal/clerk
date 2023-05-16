@@ -1,10 +1,17 @@
 // Form framework
 import React from 'react'
 import { DateInput } from 'semantic-ui-calendar-react'
-import { Button, Input, Form, Dropdown, TextArea } from 'semantic-ui-react'
+import {
+  Button,
+  Input,
+  Form,
+  Dropdown,
+  InputOnChangeData,
+} from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
 
 import * as Yup from 'yup'
+import { FormikProps } from 'formik'
 
 export const FIELD_TYPES = {
   TEXT: 'TEXT',
@@ -15,9 +22,27 @@ export const FIELD_TYPES = {
   SINGLE_CHOICE: 'SINGLE_CHOICE',
   MULTI_CHOICE: 'MULTI_CHOICE',
   BOOL: 'BOOL',
-}
+} as const
 
-export const getFormSchema = (formFields) =>
+export type FormFields = {
+  label: string
+  name: string
+  type: (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES]
+  placeholder?: string
+  schema?: Yup.AnySchema
+}[]
+
+const FieldSchema = Yup.array().of(
+  Yup.object().shape({
+    label: Yup.string().required(),
+    name: Yup.string().required(),
+    type: Yup.string().oneOf(Object.values(FIELD_TYPES)).required(),
+    placeholder: Yup.string(),
+    schema: Yup.object(),
+  })
+)
+
+export const getFormSchema = (formFields: FormFields) =>
   Yup.object().shape(
     formFields.reduce(
       (acc, val) =>
@@ -31,8 +56,16 @@ export const getFormSchema = (formFields) =>
     )
   )
 
-export const getModelChoices = (formFields, model) =>
-  formFields.reduce((acc, field) => {
+type Model = {
+  [fieldName: string]: any
+}
+
+type Choices = {
+  [fieldName: string]: [string, string][]
+}
+
+export const getModelChoices = (formFields: FormFields, model: Model) =>
+  formFields.reduce<Choices>((acc, field) => {
     const fieldVal = model[field.name]
     if (fieldVal && fieldVal.choices) {
       return { ...acc, [field.name]: fieldVal.choices }
@@ -41,37 +74,38 @@ export const getModelChoices = (formFields, model) =>
     }
   }, {})
 
-export const getModelInitialValues = (formFields, model) =>
-  formFields.reduce((acc, field) => {
+export const getModelInitialValues = (formFields: FormFields, model: Model) =>
+  formFields.reduce<{
+    [fieldName: string]: string
+  }>((acc, field) => {
     const fieldVal = model[field.name]
-    let value
-    if (fieldVal === null) {
-      value = null
-    } else {
-      value = fieldVal.value ? fieldVal.value : fieldVal
-    }
+    const value = fieldVal?.value ?? fieldVal ?? null
     return { ...acc, [field.name]: value }
   }, {})
 
-const FieldSchema = Yup.array().of(
-  Yup.object().shape({
-    label: Yup.string().required(),
-    name: Yup.string().required(),
-    type: Yup.string().oneOf(Object.values(FIELD_TYPES)).required(),
-    placeholder: Yup.string(),
-    schema: Yup.object(),
-  })
+export const FormErrors = ({ errors, touched, labels }) => (
+  <>
+    {Object.entries(errors)
+      .filter(([k, v]) => touched[k])
+      .map(([k, v]) => (
+        <div key={k} className="ui error message">
+          <div className="header">{labels ? labels[k] : k}</div>
+          <p>{typeof v === 'object' ? Object.values(v) : v}</p>
+        </div>
+      ))}
+  </>
 )
 
-export const FormErrors = ({ errors, touched, labels }) =>
-  Object.entries(errors)
-    .filter(([k, v]) => touched[k])
-    .map(([k, v]) => (
-      <div key={k} className="ui error message">
-        <div className="header">{labels ? labels[k] : k}</div>
-        <p>{typeof v === 'object' ? Object.values(v) : v}</p>
-      </div>
-    ))
+interface AutoFormProps {
+  fields: FormFields
+  choices: Choices
+  formik: FormikProps<{
+    [fieldName: string]: string
+  }>
+  onCancel: any
+  submitText?: string
+  cancelText?: string
+}
 
 export const AutoForm = ({
   fields,
@@ -88,7 +122,7 @@ export const AutoForm = ({
   onCancel = null,
   submitText = 'Submit',
   cancelText = 'Cancel',
-}) => {
+}: AutoFormProps) => {
   FieldSchema.validateSync(fields)
   const labels = fields.reduce((acc, f) => ({ ...acc, [f.name]: f.label }), {})
   return (
@@ -133,6 +167,18 @@ export const AutoForm = ({
   )
 }
 
+interface FieldComponentProps {
+  name: string
+  placeholder?: string
+  value: string
+  handleChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    data: InputOnChangeData
+  ) => void
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void
+  isSubmitting: boolean
+}
+
 const TextField = ({
   name,
   placeholder,
@@ -140,7 +186,7 @@ const TextField = ({
   handleChange,
   isSubmitting,
   type,
-}) => (
+}: FieldComponentProps & { type: string }) => (
   <Input
     placeholder={placeholder}
     value={value}
@@ -157,8 +203,7 @@ const NumberField = ({
   value,
   setFieldValue,
   isSubmitting,
-  type,
-}) => {
+}: FieldComponentProps) => {
   return (
     <Input
       placeholder={placeholder}
@@ -179,7 +224,7 @@ const DateField = ({
   value,
   setFieldValue,
   isSubmitting,
-}) => (
+}: FieldComponentProps) => (
   <DateInput
     placeholder={placeholder}
     value={value}
@@ -192,8 +237,15 @@ const DateField = ({
 )
 
 const ChoiceField =
-  (multiple) =>
-  ({ name, placeholder, value, choices, setFieldValue, isSubmitting }) =>
+  (multiple: boolean) =>
+  ({
+    name,
+    placeholder,
+    value,
+    choices,
+    setFieldValue,
+    isSubmitting,
+  }: FieldComponentProps & { choices: [string, string][] }) =>
     (
       <Dropdown
         fluid
@@ -218,7 +270,7 @@ const BoolField = ({
   value,
   setFieldValue,
   isSubmitting,
-}) => (
+}: FieldComponentProps) => (
   <Dropdown
     fluid
     selection
@@ -248,7 +300,7 @@ const TextAreaField = ({
   value,
   handleChange,
   isSubmitting,
-}) => (
+}: FieldComponentProps) => (
   <MarkdownTextArea
     name={name}
     value={value}
@@ -259,9 +311,9 @@ const TextAreaField = ({
 )
 
 const FIELD_COMPONENTS = {
-  TEXT: (props) => <TextField {...props} type="text" />,
-  NUMBER: (props) => <NumberField {...props} />,
-  EMAIL: (props) => <TextField {...props} type="email" />,
+  TEXT: (props: FieldComponentProps) => <TextField {...props} type="text" />,
+  NUMBER: (props: FieldComponentProps) => <NumberField {...props} />,
+  EMAIL: (props: FieldComponentProps) => <TextField {...props} type="email" />,
   TEXTAREA: TextAreaField,
   DATE: DateField,
   BOOL: BoolField,
