@@ -19,7 +19,7 @@ const BASE_CONFIG = {
   },
 }
 
-interface HandledResponse<T> {
+export interface HandledResponse<T> {
   resp: Response
   data: T | null
   errors: { [key: string]: any } | null

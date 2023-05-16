@@ -1,15 +1,19 @@
 import React, { useState } from 'react'
-import { Container, Header, Button } from 'semantic-ui-react'
+import { Container, Header } from 'semantic-ui-react'
 import * as Yup from 'yup'
 
 import { TableForm } from 'comps/table-form'
-import { getFormSchema, FIELD_TYPES } from 'comps/auto-form'
+import { getFormSchema } from 'comps/auto-form'
+import { FIELD_TYPES } from 'comps/field-component'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { api } from 'api'
+import { ClientDetail } from 'types'
 
 const App = () => {
-  const [client, setClient] = useState(window.REACT_CONTEXT.client)
+  const [client, setClient] = useState(
+    (window as any).REACT_CONTEXT.client as ClientDetail
+  )
   return (
     <Container>
       <Header as="h1">{client.full_name} (Client)</Header>

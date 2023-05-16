@@ -1,25 +1,41 @@
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Button, Table } from 'semantic-ui-react'
 import { Formik } from 'formik'
 
 import { markdownToHtml } from 'utils'
-import { CaseListTable } from 'comps/case-table'
+
 import {
   AutoForm,
   getModelChoices,
   getModelInitialValues,
-  FIELD_TYPES,
+  FormField,
 } from 'comps/auto-form'
+import { FIELD_TYPES } from './field-component'
+
+import * as Yup from 'yup'
+import { HandledResponse } from 'api'
+
+interface TableFormProps<ModelType extends { id: string | number }> {
+  fields: FormField[]
+  schema: Yup.AnySchema
+  model: ModelType
+  setModel: Dispatch<SetStateAction<ModelType>>
+  modelName: string
+  onUpdate: (
+    id: string | number,
+    values: { [fieldName: string]: unknown }
+  ) => Promise<HandledResponse<unknown>>
+}
 
 // Wrapper around AutoForm for updating a model or displating a table.
-export const TableForm = ({
+export const TableForm = <ModelType extends { id: string | number }>({
   fields,
   schema,
   model,
   setModel,
   modelName,
   onUpdate,
-}) => {
+}: TableFormProps<ModelType>) => {
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
   if (!isEditMode) {
@@ -34,10 +50,13 @@ export const TableForm = ({
     <Formik
       initialValues={getModelInitialValues(fields, model)}
       validationSchema={schema}
-      onSubmit={(values, { setSubmitting, setErrors }) => {
-        onUpdate(model.id, values).then(({ resp, data }) => {
+      onSubmit={(
+        values: { [fieldName: string]: unknown },
+        { setSubmitting, setErrors }: any
+      ) => {
+        onUpdate(model.id, values).then(({ resp, data, errors }) => {
           if (resp.status === 400) {
-            setErrors(data)
+            setErrors(errors)
           } else if (resp.ok) {
             setModel(data[modelName])
             toggleEditMode()
@@ -80,7 +99,7 @@ const FieldTable = ({ fields, model }) => (
   </Table>
 )
 
-const getValueDisplay = (val) => {
+const getValueDisplay = (val: any): React.ReactNode => {
   const t = typeof val
   if (t === 'undefined' || val === null || val === '') {
     return '-'

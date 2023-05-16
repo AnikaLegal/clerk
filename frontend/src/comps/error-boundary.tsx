@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Header } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 
-const SENTRY_JS_DSN = window && window.SENTRY_JS_DSN
+const SENTRY_JS_DSN = window && (window as any).SENTRY_JS_DSN
 
 if (SENTRY_JS_DSN) {
   // Initialize Sentry, if it is enabled.
@@ -21,7 +21,10 @@ export const logException = (error) => {
   }
 }
 
-export class ErrorBoundary extends React.Component {
+export class ErrorBoundary extends React.Component<
+  { noRender?: boolean },
+  { hasError: boolean }
+> {
   constructor(props) {
     super(props)
     this.state = { hasError: false }

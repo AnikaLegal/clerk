@@ -31,7 +31,7 @@ export const markdownToHtml = (markdownText) => {
 }
 
 // Skips first update
-export const useEffectLazy = (func, vars) => {
+export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
   const isFirstUpdate = useRef(true)
   useEffect(() => {
     if (isFirstUpdate.current) {
@@ -42,7 +42,7 @@ export const useEffectLazy = (func, vars) => {
   }, vars)
 }
 
-export const mount = (App) => {
+export const mount = (App: React.ComponentType) => {
   const root = document.getElementById('app')
   const rootComponent = (
     <ErrorBoundary>
@@ -93,8 +93,8 @@ export const debouncePromise = (delay) => {
 }
 
 // Wait n seconds
-export const waitSeconds = (delay) =>
-  new Promise((resolve) => setTimeout(() => resolve(), delay * 1000))
+export const waitSeconds = (delay: number) =>
+  new Promise((resolve) => setTimeout(() => resolve(null), delay * 1000))
 
 export const useOutsideClick = (ref, onClickOutside) => {
   useEffect(() => {

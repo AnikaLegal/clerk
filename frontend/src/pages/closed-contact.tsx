@@ -1,25 +1,13 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  Container,
-  Header,
-  Table,
-  Input,
-  Dropdown,
-} from 'semantic-ui-react'
+import { Container } from 'semantic-ui-react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 
 import { mount } from 'utils'
 import { api } from 'api'
 
-import {
-  AutoForm,
-  getModelChoices,
-  getModelInitialValues,
-  getFormSchema,
-  FIELD_TYPES,
-} from 'comps/auto-form'
+import { AutoForm, getModelChoices, getFormSchema } from 'comps/auto-form'
+import { FIELD_TYPES } from 'comps/field-component'
 
 const FIELDS = [
   {
