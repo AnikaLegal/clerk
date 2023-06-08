@@ -72,7 +72,7 @@ def kill(c):
 
 
 @task
-def clean(c):
+def clean(c, volumes=False, images=False):
     """Clean Docker environment"""
 
     result = c.run("docker ps -q").stdout.strip().replace("\n", " ")
@@ -81,12 +81,16 @@ def clean(c):
     result = c.run("docker ps -a -q").stdout.strip().replace("\n", " ")
     if result:
         c.run(f"docker rm {result}")
-    result = c.run("docker images -q").stdout.strip().replace("\n", " ")
-    if result:
-        c.run(f"docker rmi {result}")
-    result = c.run("docker volume ls -q").stdout.strip().replace("\n", " ")
-    if result:
-        c.run(f"docker volume rm {result}")
+
+    if images:
+        result = c.run("docker images -q").stdout.strip().replace("\n", " ")
+        if result:
+            c.run(f"docker rmi {result}")
+
+    if volumes:
+        result = c.run("docker volume ls -q").stdout.strip().replace("\n", " ")
+        if result:
+            c.run(f"docker volume rm {result}")
 
 
 @task

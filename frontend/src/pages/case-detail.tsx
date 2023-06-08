@@ -27,15 +27,37 @@ import {
   ConflictForm,
 } from 'forms'
 
-const { details, urls, actionstep_url, permissions } = window.REACT_CONTEXT
+import { IssueDetail, IssueNote, Tenancy } from 'types'
+
+interface ReactContext {
+  issue: IssueDetail
+  notes: IssueNote[]
+  tenancy: Tenancy
+  details: { [title: string]: string }
+  actionstep_url: string
+  urls: {
+    detail: string
+    email: string
+    docs: string
+  }
+  permissions: {
+    is_paralegal_or_better: boolean
+    is_coordinator_or_better: boolean
+  }
+}
+
+const REACT_CONTEXT = (window as any).REACT_CONTEXT as ReactContext
+
+const { details, urls, actionstep_url, permissions } = REACT_CONTEXT
 
 const App = () => {
-  const [issue, setIssue] = useState(window.REACT_CONTEXT.issue)
-  const [notes, setNotes] = useState(window.REACT_CONTEXT.notes)
-  const [tenancy, setTenancy] = useState(window.REACT_CONTEXT.tenancy)
+  const [issue, setIssue] = useState(REACT_CONTEXT.issue)
+  const [notes, setNotes] = useState(REACT_CONTEXT.notes)
+  const [tenancy, setTenancy] = useState(REACT_CONTEXT.tenancy)
   const [activeFormId, setActiveFormId] = useState(null)
 
-  const setSupportWorker = supportWorker => setIssue({ ...issue, support_worker: supportWorker })
+  const setSupportWorker = (supportWorker) =>
+    setIssue({ ...issue, support_worker: supportWorker })
 
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
@@ -55,14 +77,16 @@ const App = () => {
 
   const onAddAgent = (agentId) => {
     api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data))
-  }  
+  }
   const onAddLandlord = (landlordId) => {
     api.case.landlord
-    .add(issue.id, landlordId)
-    .then(({ data }) => setTenancy(data))
+      .add(issue.id, landlordId)
+      .then(({ data }) => setTenancy(data))
   }
   const onAddSupportWorker = (supportWorkerId) => {
-    api.case.supportWorker.add(issue.id, supportWorkerId).then(({ data }) => setSupportWorker(data))
+    api.case.supportWorker
+      .add(issue.id, supportWorkerId)
+      .then(({ data }) => setSupportWorker(data))
   }
 
   const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
@@ -167,7 +191,7 @@ const App = () => {
                     Name: tenancy.agent.full_name,
                     Address: tenancy.agent.address,
                     Email: tenancy.agent.email,
-                    Phone: tenancy.agent.phone,
+                    Phone: tenancy.agent.phone_number,
                   }}
                 />
               ) : (
@@ -186,7 +210,7 @@ const App = () => {
                     Name: issue.support_worker.full_name,
                     Address: issue.support_worker.address,
                     Email: issue.support_worker.email,
-                    Phone: issue.support_worker.phone,
+                    Phone: issue.support_worker.phone_number,
                   }}
                 />
               ) : (
@@ -241,7 +265,19 @@ const PersonSearchCard = ({ title, createUrl, onSelect }) => {
   )
 }
 
-const EntityCard = ({ title, url, onRemove, tableData }) => (
+interface EntityCardProps {
+  title: string
+  tableData: any
+  url?: string
+  onRemove?: () => void
+}
+
+const EntityCard: React.FC<EntityCardProps> = ({
+  title,
+  url,
+  onRemove,
+  tableData,
+}) => (
   <div className="ui card fluid">
     <div className="content">
       <h2 className="header">

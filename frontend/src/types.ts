@@ -1,3 +1,6 @@
+export type IssueNote = any
+export type Tenancy = any
+
 export type TextChoiceField = {
   display: string
   value: string
@@ -110,5 +113,5 @@ export type Issue = {
 
 export type IssueDetail = Issue & {
   client: ClientDetail
-  support_worker: Person
+  support_worker: Person | null
 }
