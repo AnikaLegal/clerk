@@ -9,8 +9,6 @@ import {
   Dropdown,
   Checkbox,
 } from 'semantic-ui-react'
-import { DateInput } from 'semantic-ui-calendar-react'
-import moment from 'moment'
 import * as Yup from 'yup'
 
 import { TextArea } from 'comps/textarea'

@@ -65,9 +65,9 @@ const App = () => {
           }}
           validationSchema={SCHEMA}
           onSubmit={(values, { setSubmitting, setErrors }) => {
-            api.contact.create(values).then(({ resp, data }) => {
+            api.contact.create(values).then(({ resp, errors }) => {
               if (resp.status === 400) {
-                setErrors(data)
+                setErrors(errors)
                 setSubmitting(false)
               } else if (resp.ok) {
                 setSubmitting(false)

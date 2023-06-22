@@ -67,9 +67,9 @@ const App = () => {
   useEffect(() => {
     api.accounts
       .search({ group: 'Paralegal' })
-      .then(({ resp, data }) => setParalegals(data))
+      .then(({ data }) => setParalegals(data))
       .then(() => api.accounts.search({ group: 'Lawyer' }))
-      .then(({ resp, data }) => setLawyers(data))
+      .then(({ data }) => setLawyers(data))
       .then(() => setIsLoadingSelections(false))
   }, [])
   return (

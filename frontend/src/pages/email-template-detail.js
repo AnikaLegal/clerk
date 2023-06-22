@@ -32,9 +32,9 @@ const App = () => {
         onSubmit={(values, { setSubmitting, setErrors }) => {
           api.templates.email
             .update(CONTEXT.template.id, values)
-            .then(({ resp, data }) => {
+            .then(({ resp, errors }) => {
               if (resp.status === 400) {
-                setErrors(data)
+                setErrors(errors)
               }
               setSubmitting(false)
             })

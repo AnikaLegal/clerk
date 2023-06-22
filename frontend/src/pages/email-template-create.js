@@ -21,9 +21,9 @@ const App = () => (
       }}
       validate={(values) => {}}
       onSubmit={(values, { setSubmitting, setErrors }) => {
-        api.templates.email.create(values).then(({ resp, data }) => {
+        api.templates.email.create(values).then(({ resp, data, errors }) => {
           if (resp.status === 400) {
-            setErrors(data)
+            setErrors(errors)
           } else if (resp.ok) {
             window.location.href = data.url
           }

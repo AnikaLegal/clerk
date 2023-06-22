@@ -1,4 +1,4 @@
-import { Person, CreatePerson } from 'types'
+import { Issue, Person, CreatePerson, User } from 'types'
 import { Upload, Submission } from 'intake/types'
 
 const getCookie = (name) => {
@@ -146,12 +146,12 @@ export const api = {
     },
     update: (caseId, issue) => {
       const url = `/clerk/cases/detail/${caseId}/update/`
-      return http.post(url, issue)
+      return http.post<{ issue: Issue }>(url, issue)
     },
     // Assign a paralegal + lawyer
     assign: (caseId, issue) => {
       const url = `/clerk/cases/detail/${caseId}/assign/`
-      return http.post(url, issue)
+      return http.post<{ issue: Issue }>(url, issue)
     },
     note: {
       add: (caseId, note) => {
@@ -240,7 +240,7 @@ export const api = {
     },
     search: (query) => {
       const url = '/clerk/accounts/'
-      return http.get(url, query)
+      return http.get<User[]>(url, query)
     },
     promote: (accountId) => {
       const url = `/clerk/accounts/user/${accountId}/perms/promote/`

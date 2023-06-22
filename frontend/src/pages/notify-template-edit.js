@@ -38,9 +38,9 @@ const App = () => {
           }
           api.templates.notify
             .update(template.id, update_data)
-            .then(({ resp, data }) => {
+            .then(({ resp, data, errors }) => {
               if (resp.status === 400) {
-                setErrors(data)
+                setErrors(errors)
               } else if (resp.ok) {
                 resetForm({ values: getTemplateValues(data) })
               }

@@ -66,13 +66,13 @@ const App = () => {
       .filter((s) => s)
     const requestData = { ...values, cc_addresses: ccAddresses }
     delete requestData.send
-    const { resp, data } = await api.email.update(
+    const { resp, errors } = await api.email.update(
       issue.id,
       email.id,
       requestData
     )
     if (resp.status === 400) {
-      setErrors(data)
+      setErrors(errors)
     }
     if (resp.ok && values.send) {
       // Send email
@@ -92,7 +92,7 @@ const App = () => {
     const confirmed = confirm('Delete this draft email?')
     if (!confirmed) return
     setSubmitting(true)
-    api.email.delete(issue.id, email.id).then(({ resp, data }) => {
+    api.email.delete(issue.id, email.id).then(({ resp }) => {
       if (resp.ok) {
         window.location = case_email_url
       }
@@ -307,9 +307,9 @@ const FileUploadAttachForm = ({ onUploadAttachment }) => (
     })}
     onSubmit={(values, { setSubmitting, setErrors }) => {
       setSubmitting(true)
-      onUploadAttachment(values).then(({ resp, data }) => {
+      onUploadAttachment(values).then(({ resp, errors }) => {
         if (resp.status === 400) {
-          setErrors(data)
+          setErrors(errors)
         }
         setSubmitting(false)
       })
@@ -384,9 +384,9 @@ const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {
         setSubmitting(true)
-        onAttachSharepoint(values.sharepointId).then(({ resp, data }) => {
+        onAttachSharepoint(values.sharepointId).then(({ resp, errors }) => {
           if (resp.status === 400) {
-            setErrors(data)
+            setErrors(errors)
           }
           setSubmitting(false)
         })

@@ -25,9 +25,9 @@ const App = () => {
       ...values,
       html: markdownToHtml(values.text),
     }
-    api.email.create(issue.id, requestData).then(({ resp, data }) => {
+    api.email.create(issue.id, requestData).then(({ resp, data, errors }) => {
       if (resp.status === 400) {
-        setErrors(data)
+        setErrors(errors)
         setSubmitting(false)
       } else if (resp.ok) {
         window.location.href = data.edit_url

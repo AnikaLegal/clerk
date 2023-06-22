@@ -14,7 +14,7 @@ export const AccountPermissions = ({ account, setAccount }) => {
 
   const [perms, setPerms] = useState(null)
   useEffect(() => {
-    api.accounts.getPermissions(account.id).then(({ resp, data }) => {
+    api.accounts.getPermissions(account.id).then(({ data }) => {
       setPerms(data)
       setIsLoading(false)
     })

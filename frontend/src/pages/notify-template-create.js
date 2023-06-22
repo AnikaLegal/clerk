@@ -29,9 +29,9 @@ const App = () => (
         if (!values.event) {
           create_data = { ...values, event_stage: '' }
         }
-        api.templates.notify.create(create_data).then(({ resp, data }) => {
+        api.templates.notify.create(create_data).then(({ resp, data, errors }) => {
           if (resp.status === 400) {
-            setErrors(data)
+            setErrors(errors)
           } else if (resp.ok) {
             window.location.href = data.url
           }

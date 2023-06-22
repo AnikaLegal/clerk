@@ -8,22 +8,21 @@ import {
   Segment,
   Dropdown,
 } from 'semantic-ui-react'
-import { DateInput } from 'semantic-ui-calendar-react'
-import moment from 'moment'
 
+import { User } from 'types'
 import { api } from 'api'
 
-export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const AssignForm = ({ issue, setIssue, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [paralegals, setParalegals] = useState([])
-  const [lawyers, setLawyers] = useState([])
+  const [paralegals, setParalegals] = useState<User[]>([])
+  const [lawyers, setLawyers] = useState<User[]>([])
   useEffect(() => {
     api.accounts
       .search({ group: 'Paralegal' })
-      .then(({ resp, data }) => setParalegals(data))
+      .then(({ data }) => setParalegals(data))
       .then(() => api.accounts.search({ group: 'Lawyer' }))
-      .then(({ resp, data }) => setLawyers(data))
+      .then(({ data }) => setLawyers(data))
       .then(() => setIsLoading(false))
   }, [])
   return (
@@ -35,21 +34,22 @@ export const AssignForm = ({ issue, setIssue, setNotes, onCancel }) => {
           lawyer: issue.lawyer ? issue.lawyer.id : null,
         }}
         validate={({ paralegal, lawyer }) => {
-          const errors = {}
+          const errors: any = {}
           if (paralegal && !lawyer)
             errors.lawyer =
               'A lawyer must be selected if a paralegal is assigned'
           return errors
         }}
         onSubmit={(values, { setSubmitting, setErrors }) => {
-          api.case.assign(issue.id, values).then(({ resp, data }) => {
+          api.case.assign(issue.id, values).then(({ resp, data, errors }) => {
             if (resp.status === 400) {
-              setErrors(data)
+              setErrors(errors)
             } else if (resp.ok) {
               setIssue(data.issue)
               setSuccess(true)
             } else {
               setErrors({
+                // @ts-ignore
                 'Submission failure':
                   'We could not perform this action because something went wrong.',
               })

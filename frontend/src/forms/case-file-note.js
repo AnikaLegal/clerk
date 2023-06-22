@@ -16,9 +16,9 @@ export const submitNote =
       ? moment.utc(values.event, 'DD/MM/YYYY').format()
       : note.event
 
-    api.case.note.add(issue.id, note).then(({ resp, data }) => {
+    api.case.note.add(issue.id, note).then(({ resp, data, errors }) => {
       if (resp.status === 400) {
-        setErrors(data)
+        setErrors(errors)
       } else if (resp.ok) {
         setIssue(data.issue)
         setNotes(data.notes)

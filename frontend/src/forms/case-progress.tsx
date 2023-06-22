@@ -9,8 +9,6 @@ import {
   Checkbox,
   Dropdown,
 } from 'semantic-ui-react'
-import { DateInput } from 'semantic-ui-calendar-react'
-import moment from 'moment'
 
 import { api } from 'api'
 import { STAGES } from 'consts'
@@ -26,9 +24,9 @@ const STAGE_OPTIONS = Object.entries(STAGES)
 export const submitCaseUpdate =
   (issue, setIssue, setSuccess) =>
   (values, { setSubmitting, setErrors }) => {
-    api.case.update(issue.id, values).then(({ resp, data }) => {
+    api.case.update(issue.id, values).then(({ resp, data, errors }) => {
       if (resp.status === 400) {
-        setErrors(data)
+        setErrors(errors)
       } else if (resp.ok) {
         setIssue(data.issue)
         setSuccess(true)
