@@ -1,4 +1,3 @@
-export type IssueNote = any
 export type Tenancy = any
 
 export type TextChoiceField = {
@@ -114,4 +113,26 @@ export type Issue = {
 export type IssueDetail = Issue & {
   client: ClientDetail
   support_worker: Person | null
+}
+
+type NoteType =
+  | 'PARALEGAL'
+  | 'EVENT'
+  | 'ELIGIBILITY_CHECK_SUCCESS'
+  | 'ELIGIBILITY_CHECK_FAILURE'
+  | 'CONFLICT_CHECK_SUCCESS'
+  | 'CONFLICT_CHECK_FAILURE'
+  | 'REVIEW'
+  | 'PERFORMANCE'
+  | 'EMAIL'
+
+export type IssueNote = {
+  id: number
+  creator: User
+  note_type: NoteType
+  text: string
+  text_display: string
+  created_at: any
+  event: any
+  reviewee: User | void
 }

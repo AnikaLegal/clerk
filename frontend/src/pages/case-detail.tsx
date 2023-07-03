@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Formik } from 'formik'
 import {
   Container,
   Header,
@@ -7,6 +6,7 @@ import {
   Segment,
   List,
   Feed,
+  Checkbox,
 } from 'semantic-ui-react'
 
 import { TimelineNote } from 'comps/timeline-item'
@@ -55,6 +55,11 @@ const App = () => {
   const [notes, setNotes] = useState(REACT_CONTEXT.notes)
   const [tenancy, setTenancy] = useState(REACT_CONTEXT.tenancy)
   const [activeFormId, setActiveFormId] = useState(null)
+  const [showSystemNotes, setShowSystemNotes] = useState(true)
+
+  const filteredNotes = notes
+    .filter((note) => note.note_type !== 'EMAIL')
+    .filter((note) => showSystemNotes || note.note_type !== 'EVENT')
 
   const setSupportWorker = (supportWorker) =>
     setIssue({ ...issue, support_worker: supportWorker })
@@ -125,9 +130,26 @@ const App = () => {
             </List>
           </Segment>
 
-          <Header as="h2">Timeline</Header>
-          {notes.length < 1 && <Feed>No notes yet</Feed>}
-          {notes.map((note) => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              margin: '1.5em 0 1em 0',
+            }}
+          >
+            <Header as="h2" style={{ margin: 0 }}>
+              Timeline
+            </Header>
+            <Checkbox
+              label="Show system notes"
+              checked={showSystemNotes}
+              onChange={(e, { checked }) => setShowSystemNotes(checked)}
+            />
+          </div>
+
+          {filteredNotes.length < 1 && <Feed>No notes yet</Feed>}
+          {filteredNotes.map((note) => (
             <TimelineNote note={note} key={note.id} />
           ))}
         </div>

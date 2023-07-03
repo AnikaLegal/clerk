@@ -30,7 +30,6 @@ class IssueNoteSerializer(serializers.ModelSerializer):
             "id",
             "creator",
             "note_type",
-            "note_type_display",
             "text",
             "text_display",
             "created_at",
@@ -40,10 +39,6 @@ class IssueNoteSerializer(serializers.ModelSerializer):
 
     creator = UserSerializer(read_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
-    note_type_display = serializers.CharField(
-        source="get_note_type_display", read_only=True
-    )
-    created_at = serializers.SerializerMethodField()
     reviewee = serializers.SerializerMethodField()
     event = DateField()
     created_at = LocalTimeField()

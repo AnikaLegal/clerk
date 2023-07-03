@@ -23,7 +23,7 @@ class IssueEventAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "created_at",
-        "event_types",
+        "event_type",
         "issue_id",
     )
 
