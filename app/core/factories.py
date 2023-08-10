@@ -10,6 +10,14 @@ from django.utils import timezone
 from accounts.models import User
 from emails.models import Email, EmailState, EmailAttachment
 from core.models import Client, FileUpload, Issue, Person, Tenancy
+from core.models.issue import CaseStage
+from notify.models import (
+    Notification,
+    NOTIFY_TOPIC_CHOICES,
+    NotifyEvent,
+    NotifyChannel,
+    NotifyTarget,
+)
 
 TINY_PNG = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\tpHYs\x00\x00\x0e\xc4\x00\x00\x0e\xc4\x01\x95+\x0e\x1b\x00\x00\x00\x19tEXtSoftware\x00gnome-screenshot\xef\x03\xbf>\x00\x00\x00\rIDAT\x08\x99c```\xf8\x0f\x00\x01\x04\x01\x00}\xb2\xc8\xdf\x00\x00\x00\x00IEND\xaeB`\x82"
 
@@ -35,7 +43,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class TimestampedModelFactory(factory.django.DjangoModelFactory):
-
     modified_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1m", end_date="now"
     )
@@ -158,3 +165,28 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
 def get_dummy_file(name):
     f = io.BytesIO(TINY_PNG)
     return InMemoryUploadedFile(f, None, name, "image/png", len(TINY_PNG), None)
+
+
+@factory.django.mute_signals(post_save)
+class NotificationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Notification
+
+    name = factory.Faker("color_name")
+    topic = factory.Faker(
+        "random_element", elements=[c[0] for c in NOTIFY_TOPIC_CHOICES]
+    )
+    event = factory.Faker(
+        "random_element", elements=[c[0] for c in NotifyEvent.choices]
+    )
+    channel = factory.Faker(
+        "random_element", elements=[c[0] for c in NotifyChannel.choices]
+    )
+    target = factory.Faker(
+        "random_element", elements=[c[0] for c in NotifyTarget.choices]
+    )
+    event_stage = factory.Faker(
+        "random_element", elements=[c[0] for c in CaseStage.CHOICES]
+    )
+    raw_text = factory.Faker("sentence")
+    message_text = factory.Faker("sentence")
