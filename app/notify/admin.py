@@ -4,7 +4,7 @@ from .models import Notification
 
 
 @admin.register(Notification)
-class EmailTemplateAdmin(admin.ModelAdmin):
+class NotificationAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",

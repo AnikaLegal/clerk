@@ -41,6 +41,9 @@ def on_issue_stage_change(issue_pk, old_stage: str, new_stage: str):
         event=NotifyEvent.STAGE_CHANGE, event_stage=new_stage
     )
     for notification in notifications:
+        if notification.topic not in (issue.topic, "GENERAL"):
+            continue
+
         if not notification.channel == NotifyChannel.SLACK:
             logger.error("Notification[%s] has unsupported channel", notification)
             continue
@@ -75,5 +78,9 @@ def on_issue_stage_change(issue_pk, old_stage: str, new_stage: str):
             )
             continue
 
-        message_text = f"*Notification for case <{issue.url}|{issue.fileref}>*\n{notification.message_text}"
+        message_text = get_notification_message_text(issue, notification)
         send_slack_direct_message(message_text, slack_user["id"])
+
+
+def get_notification_message_text(issue: Issue, notification: Notification):
+    return f"*Notification for case <{issue.url}|{issue.fileref}>*\n{notification.message_text}"

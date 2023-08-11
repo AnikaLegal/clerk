@@ -4,3 +4,4 @@ filterwarnings = [
     "ignore::django.utils.deprecation.RemovedInDjango50Warning",
     "ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
 ]
+addopts = "--reuse-db --ds=clerk.settings.test"
