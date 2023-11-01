@@ -145,7 +145,7 @@ def reset(c):
 
 @task
 def restore(c):
-    """Reset local database"""
+    """Restore local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
 
 
