@@ -10,5 +10,5 @@ To run specific tests
 
 ```
 docker-compose -f docker/docker-compose.local.yml run --rm test bash
-pytest case/tests/test_urls.py -vv
+pytest path/to/test.py -vv
 ```
