@@ -37,7 +37,7 @@ OrmQ.objects.all().delete();\
 "
 ./manage.py shell_plus -c "$SHELL_CMD"
 
-echo -e "\nObsfucating all personally identifiable information."
- ./manage.py obsfucate_data
+echo -e "\nObfuscating all personally identifiable information."
+./manage.py obfuscate_data
 
 echo -e "\nDatabase restore finished."

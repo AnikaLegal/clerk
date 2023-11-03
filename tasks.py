@@ -145,7 +145,7 @@ def reset(c):
 
 @task
 def restore(c):
-    """Reset local database"""
+    """Restore local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
 
 
@@ -172,9 +172,9 @@ def sync_s3(c):
 
 
 @task
-def obsfucate(c):
-    """Obsfucate personally identifiable info from prod"""
-    run(c, "./manage.py obsfucate_data")
+def obfuscate(c):
+    """Obfuscate personally identifiable info from prod"""
+    run(c, "./manage.py obfuscate_data")
 
 
 def run(c, cmd: str, service="web"):
