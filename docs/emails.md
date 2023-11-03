@@ -15,7 +15,7 @@ Each environment (dev/test/prod) has its own email subdomain.
 
 The events webhook needs to be configured manually and is difficult to test because we only get one webhook (which we use for production).
 
-To listen for inbound emails in your development environment run [ngrok](https://ngrok.com/). This will print the public endpoint, e.g "https://90c8-194-193-130-131.ngrok.io".
+To listen for inbound emails in your development environment run [ngrok](https://ngrok.com/). This will print the public endpoint, e.g. "https://90c8-194-193-130-131.ngrok.io".
 
 ```bash
 # Start ngrok (https://ngrok.com/) and take note of the address

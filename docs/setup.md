@@ -9,6 +9,12 @@ You will need:
 - `transcrypt` ([install](https://github.com/elasticdog/transcrypt#usage))
 - `inv` ([install](https://www.pyinvoke.org/installing.html))
 
+## Optional for Local Development
+
+- `ngrok` ([install](https://docs.docker.com/install/#supported-platforms))
+
+  For testing inbound emails.
+
 ## Getting Started
 
 If you are using Windows ensure that git is setup to use LF not CLRF
