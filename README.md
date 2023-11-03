@@ -29,7 +29,7 @@ See here for documentation:
 
 - [Changelog](docs/changelog.md)
 - [Getting started](docs/setup.md)
-- [Testing and linting](docs/tests.md)
+- [Testing](docs/tests.md)
 - [Infra and deployment](docs/infra.md)
 - [Email integration](docs/emails.md)
 - [Twilio integration](docs/twilio.md)

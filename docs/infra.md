@@ -40,6 +40,6 @@ Infra config can be found in the [infra](https://github.com/AnikaLegal/infra) re
 
 ## Logging and Error Reporting
 
-- All application logs are logged to [Papertrail](https://papertrailapp.com/systems/Clerk/events).
+- All application logs are logged to [Sumo Logic](https://service.au.sumologic.com/ui/).
 - Errors are reported to [Sentry](https://sentry.io/organizations/anika-legal/projects/).
 - Application uptime is tracked by [StatusCake](https://app.statuscake.com/YourStatus.php).
