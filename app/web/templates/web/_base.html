@@ -3,24 +3,25 @@
 {% load wagtailcore_tags %}
 {% load wagtail_clerk %}
 <html lang="en">
+
 <head>
     <title>
         {% block supertitle %}
-            {% block title %}{% endblock %} | Anika Legal
+        {% block title %}{% endblock %} | Anika Legal
         {% endblock %}
     </title>
     <!-- Meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {% block social_meta %}
-        {% include 'web/snippets/_social_meta.html' with title="Anika Legal" description="Get free, ongoing legal support for rental issues" %}
+    {% include 'web/snippets/_social_meta.html' with title="Anika Legal" description="Get free, ongoing legal support for rental issues" %}
     {% endblock %}
     {% block social_meta_card %}
-        <meta property="og:image" content="https://{{ request.get_host }}{% static 'web/brand/social-card.png' %}" />
-        <meta property="og:image:width" content="873" />
-        <meta property="og:image:height" content="515" />
-        <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'web/brand/social-card.png' %}" />
-        <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:image" content="https://{{ request.get_host }}{% static 'web/brand/social-card.png' %}" />
+    <meta property="og:image:width" content="873" />
+    <meta property="og:image:height" content="515" />
+    <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'web/brand/social-card.png' %}" />
+    <meta name="twitter:card" content="summary_large_image" />
     {% endblock %}
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}">
@@ -36,6 +37,7 @@
     {% block styles %}{% endblock %}
 
 </head>
+
 <body>
     <header>
         <a href="{% url 'landing' %}">
@@ -45,7 +47,7 @@
             {% include 'web/snippets/_header_menu.html' %}
         </nav>
         <nav class="small">
-            <img src="{% static 'web/img/hamburger.svg' %}"/>
+            <img src="{% static 'web/img/hamburger.svg' %}" />
             <div class="menu">
                 {% include 'web/snippets/_header_menu.html' %}
             </div>
@@ -54,7 +56,7 @@
             // Mobile menu toggle
             const hambugerEl = document.querySelector("nav.small img")
             const menuEl = document.querySelector("nav.small .menu")
-            
+
             const toggleMenu = () => {
                 const isMenuActive = menuEl.classList.contains("active")
                 if (isMenuActive) {
@@ -64,7 +66,7 @@
                 }
             }
             hambugerEl.addEventListener("click", toggleMenu)
-            
+
             // Mobile menu dropdown toggle
             const dropdownTitleEls = document.querySelectorAll("nav.small .menu .dropdown .title")
             const toggleDropdown = (e) => {
@@ -82,30 +84,33 @@
             for (let el of dropdownTitleEls) {
                 el.addEventListener("click", toggleDropdown)
             }
-            </script>
+        </script>
     </header>
     {% block content %}{% endblock %}
     <footer>
         <div class=inner>
             <div class=column>
                 <h3>
-                    <img style="margin-right: 20px;" src="{% static 'web/brand/logo-footer.svg' %}"/>
+                    <img style="margin-right: 20px;" src="{% static 'web/brand/logo-footer.svg' %}" />
                     <a href="https://www.acnc.gov.au/charity/3acdc07aacf256d03811dc298a2d5aea">
-                        <img
-                            src="{% static 'web/brand/acnc-charity.png' %}"
-                            style="height:33px"
-                        />
+                        <img src="{% static 'web/brand/acnc-charity.png' %}" style="height:33px" />
                     </a>
                 </h3>
                 <p>
-                    Anika Legal is a <strong style="text-decoration: underline"><a href="https://www.acnc.gov.au/charity/3acdc07aacf256d03811dc298a2d5aea">registered</a></strong> charity with the
+                    Anika Legal is a <strong style="text-decoration: underline"><a
+                            href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">registered</a></strong>
+                    charity with the
                     Australian Charities and Not-for-profits Commission.
                 </p>
                 <div id='social-media'>
-                   <a href="https://au.linkedin.com/company/anikalegal"><img src="{% static 'web/img/icons/social/linkedin.svg' %}"/></a><span></span>
-                   <a href="https://www.facebook.com/anikalegal/"><img src="{% static 'web/img/icons/social/facebook.svg' %}"/></a><span></span>
-                   <a href="https://www.instagram.com/anikalegal/"><img src="{% static 'web/img/icons/social/instagram.svg' %}"/></a><span></span>
-                   <a href="https://twitter.com/anikalegal"><img src="{% static 'web/img/icons/social/twitter.svg' %}"/></a><span></span>
+                    <a href="https://au.linkedin.com/company/anikalegal"><img
+                            src="{% static 'web/img/icons/social/linkedin.svg' %}" /></a><span></span>
+                    <a href="https://www.facebook.com/anikalegal/"><img
+                            src="{% static 'web/img/icons/social/facebook.svg' %}" /></a><span></span>
+                    <a href="https://www.instagram.com/anikalegal/"><img
+                            src="{% static 'web/img/icons/social/instagram.svg' %}" /></a><span></span>
+                    <a href="https://twitter.com/anikalegal"><img
+                            src="{% static 'web/img/icons/social/twitter.svg' %}" /></a><span></span>
                 </div>
             </div>
             <div class='column'>
@@ -123,7 +128,6 @@
             </div>
             <div class='column'>
                 <h3>Services</h3>
-                <p><a href="{% url 'evictions' %}">Eviction support</a></p>
                 <p><a href="{% url 'repairs' %}">Rental repairs</a></p>
                 <p><a href="{% url 'bonds' %}">Bond recovery</a></p>
                 <h3 style="margin-top: 27px">Privacy</h3>
@@ -132,26 +136,19 @@
             </div>
             <div class='column'>
                 <h3>Reach Us</h3>
-                    <p class="icon">
-                        <img src="{% static 'web/img/email.svg' %}" />
-                        <a href="mailto:press@anikalegal.com"
-                            >Press enquiries</a
-                        >
-                    </p>
-                    <p class="icon">
-                        <img src="{% static 'web/img/email.svg' %}" />
-                        <a href="mailto:partnerships@anikalegal.com"
-                            >Partnerships enquiries</a
-                        >
-                    </p>
                 <p class="icon">
-                    <img src="{% static 'web/img/phone.svg' %}"/>
-                    <a href="tel:+61480016398">0480 016 398</a>
+                    <img src="{% static 'web/img/email.svg' %}" />
+                    <a href="mailto:press@anikalegal.com">Press enquiries</a>
                 </p>
                 <p class="icon">
-                    <img src="{% static 'web/img/location.svg' %}"/>
-                    <a href="https://www.google.com/maps/place/Anika+Legal/@-36.4855915,140.9778489,6z/data=!3m1!4b1!4m5!3m4!1s0x6ad65d3d2a341b35:0x7ae39915a6711ae9!8m2!3d-36.5698705!4d145.4690852">
-                        Offices in Melbourne CBD, Glen Eira, Port Phillip and Moreland
+                    <img src="{% static 'web/img/email.svg' %}" />
+                    <a href="mailto:partnerships@anikalegal.com">Partnerships enquiries</a>
+                </p>
+                <p class="icon">
+                    <img src="{% static 'web/img/location.svg' %}" />
+                    <a
+                        href="https://www.google.com/maps/place/Anika+Legal/@-36.4855915,140.9778489,6z/data=!3m1!4b1!4m5!3m4!1s0x6ad65d3d2a341b35:0x7ae39915a6711ae9!8m2!3d-36.5698705!4d145.4690852">
+                        Offices in Melbourne CBD on the land of the Wurundjeri People of the Kulin Nation
                     </a>
                 </p>
             </div>
@@ -160,10 +157,11 @@
     {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
     <script>
-      document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-      })
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        })
     </script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>
