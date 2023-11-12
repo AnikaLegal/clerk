@@ -25,7 +25,6 @@ URLS_TO_TEST_BY_NAME = [
     ("impact", 200),
     ("services", 200),
     ("repairs", 200),
-    ("evictions", 200),
     ("bonds", 200),
     ("refer", 200),
     ("landing", 200),

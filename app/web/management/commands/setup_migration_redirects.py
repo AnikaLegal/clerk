@@ -35,7 +35,6 @@ class Command(BaseCommand):
 # src, dest - all hard / 301
 NON_WAGTAIL_REDIRECTS = [
     ("rental-repairs-support", "services/rental-repairs"),
-    ("eviction-support", "services/eviction-support"),
     ("covid-19-rent-reduction-support", "services"),
     ("faq/the-service", "services"),
     ("eligibility-criteria", "resources/eligibility-criteria"),

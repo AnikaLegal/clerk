@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Services{% endblock %} 
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="Evictions Support" description="Getting evicted? Know your rights before you panic!" %}            
+{% include 'web/snippets/_social_meta.html' with title="What can Anika help with?" description="Anika provides free legal advice and ongoing casework to vulnerable renters who need repairs performed in their rental or need assistance in getting their bond returned." %}            
 {% endblock %}
 {% block content %}
 <div class="segment">
@@ -11,7 +11,7 @@
             <div class="content">
                 <h1>What can Anika help with?</h1>
                 <p>
-                    Anika provides free legal advice and ongoing casework to vulnerable renters who are being <strong>evicted</strong> for rental arrears, need <strong>repairs</strong> performed in their rental, or need assistance in getting their <strong>bond</strong> returned.
+		    Anika provides free legal advice and ongoing casework to vulnerable renters who need <strong>repairs</strong> performed in their rental or need assistance in getting their <strong>bond</strong> returned.
                 </p>
                 <a href="https://intake.anikalegal.com/">
                     <button>Get free help</button>
@@ -29,16 +29,6 @@
         </h2>
         <div class="divider"></div>
         <div class="link-list two">
-            <div class="card short">
-                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
-                <h2>Eviction for rental arrears</h2>
-                <p>
-                    We can help Victorian renters who have received a notice to vacate for rental arrears, and a possession order has not yet been granted.
-                </p>
-                <a href="{% url 'evictions' %}">
-                    <button>Learn more</button>
-                </a>
-            </div>
             <div class="card short">
                 <img class="icon" src="{% static 'web/img/icons/wrench.svg' %}">
                 <h2>Repairs</h2>
