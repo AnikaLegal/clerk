@@ -14,18 +14,6 @@ For more info on Anika's services, please visit https://www.anikalegal.com/servi
 If you have any other enquiries you can email us at contact@anikalegal.com
 """
 
-# The SMS message we send to people who are enquiring about evictions.
-EVICTIONS_SMS_MESSAGE = """
-Thank you for enquiring about Anika's evictions service.
-
-To get help, please fill in this form: https://intake.anikalegal.com
-
-For more info on Anika's services, please visit https://www.anikalegal.com/services/
-
-If you have any other enquiries you can email us at contact@anikalegal.com
-"""
-
-
 # The SMS message we send to people who are enquiring about bonds.
 BONDS_SMS_MESSAGE = """
 Thank you for enquiring about Anika's bonds service.

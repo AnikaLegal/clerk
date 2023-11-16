@@ -10,6 +10,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from twilio.twiml.voice_response import Gather, VoiceResponse
 
 from core.models.issue import CaseTopic
+from caller.choices import Choice
 from caller.messages import sms, voice
 
 from .models import Call
@@ -18,23 +19,18 @@ from .models import Call
 CALL_INTRO_AUDIO = "call-intro.wav"
 # Response when user selects repairs option.
 OPTION_REPAIRS_AUDIO = "option-repairs.wav"
-# Response when user selects evictions option.
-OPTION_EVICTIONS_AUDIO = "option-evictions.wav"
-# Response when user selects evictions option.
+# Response when user selects bonds option.
 OPTION_BONDS_AUDIO = "option-bonds.wav"
 # Response when user selects callback option.
 OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
 CALL_TIMEOUT_AUDIO = "call-timeout.wav"
 
-
 TOPIC_MAPPING = {
-    "1": CaseTopic.REPAIRS,
-    "2": CaseTopic.BONDS,
-    "3": CaseTopic.EVICTION,
-    "4": CaseTopic.OTHER,
+    Choice.REPAIRS: CaseTopic.REPAIRS,
+    Choice.BONDS: CaseTopic.BONDS,
+    Choice.CALLBACK: CaseTopic.OTHER,
 }
-
 
 @require_http_methods(["GET"])
 def christmas_answer_view(request):  # Used for christmas
@@ -76,22 +72,16 @@ def collect_view(request):
     choice = request.GET.get("Digits")
 
     # Generate message depending on user choice.
-    if choice == "1":
-        # Repairs option.
+    if choice == Choice.REPAIRS:
         audio_url = _get_audio_url(OPTION_REPAIRS_AUDIO)
         message_text = sms.REPAIRS_SMS_MESSAGE
-    elif choice == "2":
-        # Bonds option.
+    elif choice == Choice.BONDS:
         audio_url = _get_audio_url(OPTION_BONDS_AUDIO)
         message_text = sms.BONDS_SMS_MESSAGE
-    elif choice == "3":
-        # Evictions option.
-        audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
-        message_text = sms.EVICTIONS_SMS_MESSAGE
-    elif choice == "4":
+    elif choice == Choice.CALLBACK:
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = sms.CALLBACK_SMS_MESSAGE
-    else:
+    else: # Repeat options.
         response.redirect = response.redirect(reverse("caller-answer"), method="GET")
         return TwimlResponse(response)
 
@@ -110,7 +100,7 @@ def collect_view(request):
     # Retrieve and update corresponding entry for valid choices.
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
     call.topic = TOPIC_MAPPING[choice]
-    call.requires_callback = choice == "4"
+    call.requires_callback = choice == Choice.CALLBACK
     call.save()
 
     return TwimlResponse(response)
