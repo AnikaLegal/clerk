@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 
 from caller.models import Call
-
+from caller.choices import Choice
 
 @mock.patch("caller.views.MessagingResponse")
 def test_message_view(mock_MR, client):
@@ -57,7 +57,7 @@ def test_collect_view(mock_VR, mock_G, mock_C, client):
     mock_client = mock.Mock()
     mock_C.return_value = mock_client
     from_number = "+61456654377"
-    choice = "4"
+    choice = Choice.CALLBACK
 
     client.get(reverse("caller-answer"), {"From": from_number})
     resp = client.get(
