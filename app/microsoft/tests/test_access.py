@@ -10,6 +10,7 @@ from accounts.models import CaseGroups
 from core.factories import UserFactory, IssueFactory
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
@@ -24,6 +25,7 @@ def test_add_coordinator(
     set_up_coordinator.assert_called_once_with(user)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
@@ -39,6 +41,7 @@ def test_remove_coordinator(
     tear_down_coordinator.assert_called_once_with(user)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
@@ -51,6 +54,7 @@ def test_add_admin(tear_down_coordinator, set_up_coordinator, remove_user_from_c
     set_up_coordinator.assert_called_once_with(user)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
@@ -64,6 +68,7 @@ def test_remove_admin(tear_down_coordinator, set_up_coordinator, remove_user_fro
     tear_down_coordinator.assert_called_once_with(user)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
@@ -81,6 +86,7 @@ def test_admin_to_coordinator(
     tear_down_coordinator.assert_not_called()
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("core.signals.issue.remove_user_from_case")
 @patch("core.signals.issue.add_user_to_case")
@@ -94,6 +100,7 @@ def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
     add_user_to_case.assert_called_once_with(user, issue)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("core.signals.issue.remove_user_from_case")
 @patch("core.signals.issue.add_user_to_case")
@@ -106,6 +113,7 @@ def test_remove_paralegal_from_case(add_user_to_case, remove_user_from_case):
     remove_user_from_case.assert_called_once_with(user, issue)
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")

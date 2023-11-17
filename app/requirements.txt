@@ -65,6 +65,8 @@ pytest-factoryboy
 # pytest-sugar
 responses
 freezegun
+openapi-spec-validator
+drf-openapi-tester
 
 # Admin
 pygments  # Pretty print JSON in admin

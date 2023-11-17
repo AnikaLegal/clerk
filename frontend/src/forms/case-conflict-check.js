@@ -8,8 +8,6 @@ import {
   Segment,
   Dropdown,
 } from 'semantic-ui-react'
-import { DateInput } from 'semantic-ui-calendar-react'
-import moment from 'moment'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'

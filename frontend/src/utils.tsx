@@ -4,8 +4,12 @@ import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
 import styled from 'styled-components'
 import slackifyMarkdown from 'slackify-markdown'
+import { Provider } from 'react-redux'
+import { SnackbarProvider } from 'notistack'
 
 import { ErrorBoundary } from 'comps/error-boundary'
+import { store } from 'apiNew/store'
+import { Error as ErrorType } from 'apiNew'
 
 const converter = new Converter()
 setFlavor('github')
@@ -45,12 +49,17 @@ export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
 export const mount = (App: React.ComponentType) => {
   const root = document.getElementById('app')
   const rootComponent = (
-    <ErrorBoundary>
-      <FadeInOnLoad>
-        <App />
-      </FadeInOnLoad>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <SnackbarProvider maxSnack={3}>
+        <ErrorBoundary>
+          <FadeInOnLoad>
+            <App />
+          </FadeInOnLoad>
+        </ErrorBoundary>
+      </SnackbarProvider>
+    </Provider>
   )
+
   if (root.hasChildNodes()) {
     hydrate(rootComponent, root)
   } else {
@@ -108,4 +117,51 @@ export const useOutsideClick = (ref, onClickOutside) => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [ref])
+}
+
+export interface ErrorResult {
+  data?: ErrorType
+  status?: number
+}
+
+// Read API error message for display in a notification.
+export const getAPIErrorMessage = (
+  err: ErrorResult,
+  baseMessage: string
+): string => {
+  if ('originalStatus' in err && err.originalStatus === 500) {
+    return `${baseMessage}: something went very wrong`
+  }
+
+  if (!err.data) return baseMessage
+  const formattedMessages = []
+  for (let errorMessages of Object.values(err.data)) {
+    if (Array.isArray(errorMessages)) {
+      formattedMessages.push(errorMessages.join(', '))
+    } else {
+      formattedMessages.push(errorMessages)
+    }
+  }
+  if (formattedMessages.length > 0) {
+    return `${baseMessage}: ${formattedMessages.join(', ')}`
+  } else {
+    return baseMessage
+  }
+}
+
+interface FormErrors {
+  [key: string]: string
+}
+
+// Read API errors for display in a form.
+export const getAPIFormErrors = (err: ErrorResult): FormErrors | null => {
+  let statusNumber = null
+  if (err && 'status' in err && typeof err.status === 'number') {
+    statusNumber = err.status
+  }
+  let requestErrors: { [key: string]: string } | null = null
+  if (statusNumber == 400 && 'data' in err) {
+    requestErrors = err.data as { [key: string]: string }
+  }
+  return requestErrors
 }

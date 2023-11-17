@@ -1,0 +1,13 @@
+openapi: 3.0.1
+info:
+  title: Clerk API
+  description: API that the Django backend will provide.
+  version: 0.1.0
+
+paths:
+  /clerk/api/person/:
+    $ref: paths/person-list.yaml
+  /clerk/api/person/search/:
+    $ref: paths/person-search.yaml
+  /clerk/api/person/{id}/:
+    $ref: paths/person-detail.yaml

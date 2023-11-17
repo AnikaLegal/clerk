@@ -6,6 +6,10 @@ from core.models.person import SupportContactPreferences
 from .fields import TextChoiceField
 
 
+class PersonSearchRequestSerializer(serializers.Serializer):
+    query = serializers.CharField(max_length=256)
+
+
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person

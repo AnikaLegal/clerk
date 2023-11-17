@@ -29,6 +29,7 @@ def restore_signals():
     """
     signals = list(RESTORE.keys())
     for signal in signals:
+        signal.sender_receivers_cache.clear()
         signal.receivers = RESTORE[signal]
         del RESTORE[signal]
 
