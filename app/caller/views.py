@@ -36,7 +36,7 @@ TOPIC_MAPPING = {
 def christmas_answer_view(request):  # Used for christmas
     """Respond to phone call from user"""
     response = VoiceResponse()
-    voice.say_christmas_message(response)
+    response.play(_get_audio_url("christmas-office-closed.wav"))
     return TwimlResponse(response)
 
 
