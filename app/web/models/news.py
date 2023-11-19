@@ -72,3 +72,6 @@ class ExternalNews(models.Model):
         FieldPanel("url"),
         ImageChooserPanel("brand_image"),
     ]
+
+    class Meta:
+        verbose_name_plural = "External News"
