@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='externalnews',
-            options={'verbose_name_plural': 'External News'},
+            options={'verbose_name_plural': 'external news'},
         ),
     ]

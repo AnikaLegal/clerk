@@ -74,4 +74,4 @@ class ExternalNews(models.Model):
     ]
 
     class Meta:
-        verbose_name_plural = "External News"
+        verbose_name_plural = "external news"
