@@ -18,7 +18,7 @@ from .mixins import RICH_TEXT_FEATURES
 ICONS_DIR = os.path.join(
     settings.BASE_DIR, "..", "web", "static", "web", "img", "icons"
 )
-ICONS = [os.path.join("web", "img", "icons", i) for i in os.listdir(ICONS_DIR)]
+ICONS = [os.path.join("web", "img", "icons", i) for i in sorted(os.listdir(ICONS_DIR))]
 ICON_CHOICES = (
     (
         i,
