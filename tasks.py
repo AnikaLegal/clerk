@@ -108,7 +108,7 @@ def shell(c):
 
 @task
 def psql(c):
-    """Get a Django shell in a Docker container"""
+    """Get a PostgreSQL shell in a Docker container"""
     run(c, "psql")
 
 
