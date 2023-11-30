@@ -116,16 +116,9 @@ def psql(c):
 def test(c, recreate=False, interactive=False):
     """Run pytest"""
     if interactive:
-        c.run(
-            f"{COMPOSE} run --rm test bash",
-            pty=True,
-            env={
-                "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
-            },
-        )
-
-    if recreate:
-        cmd = "pytest -vv"
+        cmd = "bash"
+    elif recreate:
+        cmd = "pytest -vv --create-db"
     else:
         cmd = "pytest -vv --reuse-db"
     c.run(
