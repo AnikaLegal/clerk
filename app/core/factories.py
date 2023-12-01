@@ -109,6 +109,8 @@ class IssueFactory(TimestampedModelFactory):
 class FileUploadFactory(TimestampedModelFactory):
     class Meta:
         model = FileUpload
+        # Suppress test warning.
+        skip_postgeneration_save = True
 
     id = factory.LazyAttribute(lambda x: uuid4())
     issue = factory.SubFactory(IssueFactory)
