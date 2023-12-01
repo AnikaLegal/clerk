@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "microsoft.apps.MicrosoftConfig",
     "notify.apps.NotifyConfig",
     "intake.apps.IntakeConfig",
+    "office.apps.OfficeConfig",
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
