@@ -30,8 +30,7 @@ Screen sizes to consider (https://screensiz.es/):
   --grey-2: #d9dbe1;
   --white: #fff;
   /* Sizes */
-  /* FIXME: CHRISTMAS */
-  --header-message-height: 0px;
+  --header-message-height: 120px;
   --header-height: 63px;
   --header-offset-top: calc(60px + var(--header-message-height));
   --header-height-total: calc(var(--header-height) + var(--header-offset-top));
@@ -70,11 +69,16 @@ Screen sizes to consider (https://screensiz.es/):
   }
 }
 
+@media (min-width: 768px) {
+  #shutdown-notice {
+    position: fixed;
+  }
+}
+
 /* Responsive variables (phone) */
 @media (max-width: 600px) {
   :root {
-    /* FIXME: CHRISTMAS */
-    --header-message-height: 0px;
+    --header-message-height: 160px;
     --header-height: 46px;
     --header-offset-top: calc(28px + var(--header-message-height));
     --header-height-total: calc(var(--header-height) + var(--header-offset-top));
