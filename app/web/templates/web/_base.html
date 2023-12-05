@@ -39,6 +39,11 @@
 </head>
 
 <body>
+    {% if office_shutdown %}
+    <div id="shutdown-notice" class="header-message">
+        {{ office_shutdown.notice_html }}
+    </div>
+    {% endif %}
     <header>
         <a href="{% url 'landing' %}">
             <img src="{% static 'web/brand/logo-color.svg' %}">
