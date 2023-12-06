@@ -107,28 +107,6 @@ export const api = {
       return http.post(url, contact)
     },
   },
-  person: {
-    list: () => {
-      const url = '/clerk/parties/'
-      return http.get<Person[]>(url)
-    },
-    search: (query: any) => {
-      const url = '/clerk/parties/search/'
-      return http.get<Person[]>(url, query)
-    },
-    create: (data: CreatePerson) => {
-      const url = '/clerk/parties/create/'
-      return http.post<Person>(url, data)
-    },
-    update: (pk: number, data: Partial<CreatePerson>) => {
-      const url = `/clerk/parties/${pk}/`
-      return http.put<Person>(url, data)
-    },
-    delete: (pk: number) => {
-      const url = `/clerk/parties/${pk}/`
-      return http.delete<{}>(url)
-    },
-  },
   client: {
     update: (clientId, client) => {
       const url = `/clerk/client/${clientId}/`

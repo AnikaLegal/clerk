@@ -12,6 +12,7 @@ def mock_get_slack_user_by_email(email: str):
     return {"id": f"slack-{email}"}
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
@@ -40,6 +41,7 @@ def test_send_notifcation__with_same_issue_topic(mock_send_message):
     )
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
@@ -59,6 +61,7 @@ def test_send_notifcation__with_different_issue_topic(mock_send_message):
     assert mock_send_message.call_count == 0
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
@@ -87,6 +90,7 @@ def test_send_notifcation__with_general_issue_topic(mock_send_message):
     )
 
 
+@pytest.mark.enable_signals
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")

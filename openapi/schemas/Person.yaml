@@ -1,0 +1,29 @@
+allOf:
+  - $ref: ./PersonBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+      support_contact_preferences:
+        type: object
+        properties:
+          display:
+            type: string
+          value:
+            type: string
+          choices:
+            type: array
+            items:
+              type: array
+              items:
+                type: string
+        required:
+          - display
+          - value
+          - choices
+    required:
+      - id
+      - url
+      - support_contact_preferences

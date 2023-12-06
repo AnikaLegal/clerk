@@ -9,6 +9,7 @@ import {
   Checkbox,
 } from 'semantic-ui-react'
 
+import { useGetPeopleQuery } from 'apiNew'
 import { TimelineNote } from 'comps/timeline-item'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
 import { mount } from 'utils'
@@ -252,14 +253,8 @@ const App = () => {
 }
 
 const PersonSearchCard = ({ title, createUrl, onSelect }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [people, setPeople] = useState([])
-  useEffect(() => {
-    api.person.list().then(({ data }) => {
-      setPeople(data)
-      setIsLoading(false)
-    })
-  }, [])
+  const { data, isFetching } = useGetPeopleQuery()
+  const people = data || []
   return (
     <div className="ui card fluid">
       <div className="content">
@@ -273,7 +268,7 @@ const PersonSearchCard = ({ title, createUrl, onSelect }) => {
           fluid
           search
           selection
-          loading={isLoading}
+          loading={isFetching}
           placeholder="Select a person"
           options={people.map((p) => ({
             key: p.id,
