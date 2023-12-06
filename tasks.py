@@ -6,6 +6,12 @@ COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
 
 
 @task
+def schema(c):
+    """Regenerate Open API schema and JavaScript API client"""
+    c.run("cd frontend && npm run schema")
+
+
+@task
 def build(c, webpack=False):
     """Build Docker environment locally"""
     if webpack:

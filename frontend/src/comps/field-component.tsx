@@ -1,5 +1,5 @@
 import React from 'react'
-import { DateInput } from 'semantic-ui-calendar-react'
+import DateInput from 'comps/date-input'
 import { Input, Dropdown, InputOnChangeData } from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
 

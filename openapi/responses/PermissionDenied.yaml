@@ -1,0 +1,5 @@
+description: Permission Denied
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Error.yaml

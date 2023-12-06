@@ -1,0 +1,8 @@
+allOf:
+  - $ref: ./PersonBase.yaml
+  - type: object
+    properties:
+      support_contact_preferences:
+        type: string
+    required:
+      - support_contact_preferences

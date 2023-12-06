@@ -1,0 +1,17 @@
+description: The schema for an error response
+type: object
+properties:
+  detail:
+    oneOf:
+      - type: string
+      - type: object
+      - type: array
+        items:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+  nonFieldErrors:
+    type: array
+    items:
+      type: string

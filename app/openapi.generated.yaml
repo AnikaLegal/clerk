@@ -1,0 +1,205 @@
+openapi: 3.0.1
+info:
+  title: Clerk API
+  description: API that the Django backend will provide.
+  version: 0.1.0
+paths:
+  /clerk/api/person/:
+    get:
+      operationId: getPeople
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+    post:
+      operationId: createPerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/person/search/:
+    get:
+      operationId: searchPeople
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+  /clerk/api/person/{id}/:
+    get:
+      operationId: getPerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+    put:
+      operationId: updatePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deletePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+components:
+  schemas:
+    PersonBase:
+      type: object
+      properties:
+        full_name:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - full_name
+        - email
+        - address
+        - phone_number
+    Person:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            support_contact_preferences:
+              type: object
+              properties:
+                display:
+                  type: string
+                value:
+                  type: string
+                choices:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: string
+              required:
+                - display
+                - value
+                - choices
+          required:
+            - id
+            - url
+            - support_contact_preferences
+    PersonCreate:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            support_contact_preferences:
+              type: string
+          required:
+            - support_contact_preferences
+    Error:
+      description: The schema for an error response
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: object
+                  - type: array
+        nonFieldErrors:
+          type: array
+          items:
+            type: string
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    PermissionDenied:
+      description: Permission Denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NoContent:
+      description: The specific resource was deleted successfully
