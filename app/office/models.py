@@ -1,10 +1,11 @@
 from django.db import models
 from django.apps import apps
 from django.utils import timezone, dateformat
+
 from pathlib import Path
 
 PATH = apps.get_app_config("office").path
-DATE_FORMAT = "l jS F Y" # e.g. Sunday 31st December 2023
+DATE_FORMAT = "l jS F Y"  # e.g. Sunday 31st December 2023
 
 
 class ShutdownTemplate(models.Model):
@@ -29,6 +30,7 @@ class Shutdown(models.Model):
             ShutdownTemplate.objects.create().save()
         return ShutdownTemplate.objects.latest("created_at").pk
 
+    created_at = models.DateTimeField(default=timezone.now)
     start_date = models.DateField(blank=False)
     end_date = models.DateField(blank=False)
     template = models.OneToOneField(
