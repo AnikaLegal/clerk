@@ -1,5 +1,6 @@
 {% load static %}
 {% load analytics %}
+{% load notice %}
 {% load wagtailcore_tags %}
 {% load wagtail_clerk %}
 <html lang="en">
@@ -39,11 +40,7 @@
 </head>
 
 <body>
-    {% if office_shutdown.is_active %}
-    <div id="shutdown-notice" class="header-message">
-        {{ office_shutdown.notice }}
-    </div>
-    {% endif %}
+    {% notice %}
     <header>
         <a href="{% url 'landing' %}">
             <img src="{% static 'web/brand/logo-color.svg' %}">
