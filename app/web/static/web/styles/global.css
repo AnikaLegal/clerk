@@ -30,9 +30,10 @@ Screen sizes to consider (https://screensiz.es/):
   --grey-2: #d9dbe1;
   --white: #fff;
   /* Sizes */
-  --header-message-height: 120px;
   --header-height: 63px;
-  --header-offset-top: calc(60px + var(--header-message-height));
+  --header-padding-top: 60px;
+
+  --header-offset-top: 60px;
   --header-height-total: calc(var(--header-height) + var(--header-offset-top));
   --container-max-width: 1240px;
   --container-article-max-width: 950px;
@@ -71,18 +72,15 @@ Screen sizes to consider (https://screensiz.es/):
 
 @media (min-width: 768px) {
   #shutdown-notice {
-    position: fixed;
+    position: sticky;
   }
 }
 
 /* Responsive variables (phone) */
 @media (max-width: 600px) {
   :root {
-    --header-message-height: 160px;
     --header-height: 46px;
-    --header-offset-top: calc(28px + var(--header-message-height));
-    --header-height-total: calc(var(--header-height) + var(--header-offset-top));
-
+    --header-padding-top: 30px;
     --hero-external-radius: 124px;
     --header-font-size: 26px;
     --header-line-height: 32px;
@@ -110,10 +108,6 @@ body {
   color: var(--dark-0);
 }
 
-body {
-  padding-top: var(--header-height-total);
-}
-
 a {
   text-decoration: none;
 }
@@ -121,22 +115,22 @@ a {
 /* Page header */
 .header-message {
   text-align: center;
-  height: var(--header-message-height);
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--blue-dark);
   color: var(--white) !important;
-  line-height: 100%; 
-  width: 100%;
-  position: absolute;
+  line-height: 100%;
+  position: relative;
   top: 0;
   z-index: 2;
+  padding: 30px;
 }
+
 header {
-  position: absolute;
+  position: relative;
   z-index: 1;
-  top: var(--header-offset-top);
   max-width: 1240px;
   width: calc(100vw - 2 * var(--container-wide-padding));
   height: var(--header-height);
@@ -144,23 +138,28 @@ header {
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
+  padding-top: var(--header-padding-top);
 }
 
 header img {
   height: var(--header-height);
 }
+
 header nav.large {
   display: flex;
   align-items: center;
   gap: calc(33px - 24px);
 }
+
 header nav.small,
 header nav.small .menu {
   display: none;
 }
+
 header nav.small img {
   height: 20px;
 }
+
 header nav.small .menu.active {
   display: unset;
   position: absolute;
@@ -174,6 +173,7 @@ header nav.small .menu.active {
   padding: 16px 16px 44px 16px;
   top: var(--header-height-total);
 }
+
 header nav.small .menu.active::before {
   content: "";
   position: absolute;
@@ -185,11 +185,13 @@ header nav.small .menu.active::before {
   background: var(--white);
   z-index: -1;
 }
+
 @media (max-width: 1300px) {
   header nav.small {
     display: flex;
     align-items: center;
   }
+
   header nav.large {
     display: none;
   }
@@ -204,16 +206,19 @@ header nav .dropdown {
   color: var(--dark-1);
   text-decoration: none;
 }
+
 header nav .dropdown {
   position: relative;
   padding: 12px;
   display: block;
 }
+
 header nav .dropdown .title {
   position: relative;
   padding-right: 19px;
   cursor: pointer;
 }
+
 header nav .dropdown .title:after {
   position: absolute;
   background: var(--url-chevron-down-svg) no-repeat;
@@ -228,11 +233,12 @@ header nav .dropdown .title:after {
 header nav.small .dropdown .options {
   display: none;
 }
+
 header nav.small .dropdown {
   margin-bottom: 4px;
 }
 
-header nav.small .dropdown.active > .options {
+header nav.small .dropdown.active>.options {
   display: flex;
   flex-direction: column;
   padding: 0 12px 0 18px;
@@ -252,6 +258,7 @@ header nav.large .dropdown .options {
 header nav .dropdown .options a {
   font-weight: 500;
 }
+
 header nav.small .dropdown .options a {
   margin: 18px 0 0 0;
 }
@@ -262,8 +269,8 @@ header nav.large .dropdown:hover {
   border-radius: 0 12px 0 0;
 }
 
-header nav.large .dropdown:hover > .options,
-header nav.large .dropdown:focus-within > .options,
+header nav.large .dropdown:hover>.options,
+header nav.large .dropdown:focus-within>.options,
 header nav.large .dropdown .options:hover {
   visibility: visible;
   opacity: 1;
@@ -280,6 +287,7 @@ header nav .dropdown .options a {
   width: 100%;
   cursor: pointer;
 }
+
 header nav .dropdown .options a:hover {
   text-decoration: underline;
 }
@@ -289,6 +297,7 @@ header nav a button#donate {
   background: var(--blue-mid);
   padding: 8px 36px 7px 36px;
 }
+
 header nav.small a button#donate {
   margin: 38px 0 0 0;
   width: unset;
@@ -306,6 +315,7 @@ footer {
   display: flex;
   justify-content: center;
 }
+
 footer .inner {
   display: grid;
   grid-template-columns: repeat(4, 25%);
@@ -314,10 +324,12 @@ footer .inner {
   justify-content: center;
   max-width: 1080px;
 }
+
 @media (max-width: 1300px) {
   footer {
     padding: 55px 0 75px 0;
   }
+
   footer .inner {
     grid-template-columns: 270px;
   }
@@ -331,16 +343,19 @@ footer h3 {
   margin-bottom: 24px;
   margin-top: 0;
 }
+
 footer p {
   font-size: 14px;
   color: var(--grey-2);
   line-height: 24px;
   margin-bottom: 12px;
 }
+
 footer a {
   color: var(--grey-2);
   text-decoration: none;
 }
+
 footer a:visited {
   color: var(--grey-2);
 }
@@ -349,15 +364,18 @@ footer .column {
   display: flex;
   flex-direction: column;
 }
+
 #social-media {
   width: 146;
   display: grid;
   grid-template-columns: repeat(4, 24px 16px);
 }
+
 footer p.icon {
   padding-left: 35px;
   position: relative;
 }
+
 footer p.icon img {
   height: 25px;
   position: absolute;
@@ -373,24 +391,29 @@ Optional call to action section thar sits just above the footer.
   background-repeat: no-repeat;
   background-position: calc(50% + 300px) 100%;
 }
+
 #footer-cta .content {
   padding: 80px 0;
   max-width: 540px;
 }
+
 #footer-cta .content h2 {
   color: var(--dark-1);
   font-size: 48px;
 }
+
 #footer-cta .content p {
   color: var(--dark-5);
   font-size: 18px;
   line-height: 32px;
 }
+
 @media (max-width: 1300px) {
   #footer-cta {
     background-image: none;
     padding-top: 80px;
   }
+
   #footer-cta:before {
     height: 80px;
     border-radius: 0 0 0 75%/ 0 0 0 100%;
@@ -403,6 +426,7 @@ Optional call to action section thar sits just above the footer.
   #footer-cta .content h2 {
     font-size: 26px;
   }
+
   #footer-cta .content p {
     font-size: 16px;
     line-height: 26px;
