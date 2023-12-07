@@ -39,9 +39,9 @@
 </head>
 
 <body>
-    {% if office_shutdown %}
+    {% if office_shutdown.is_active %}
     <div id="shutdown-notice" class="header-message">
-        {{ office_shutdown.notice_html }}
+        {{ office_shutdown.notice }}
     </div>
     {% endif %}
     <header>
