@@ -1,0 +1,8 @@
+allOf:
+  - $ref: ./TenancyBase.yaml
+  - type: object
+    properties:
+      is_on_lease:
+        type: string
+    required:
+      - is_on_lease

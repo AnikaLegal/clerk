@@ -1,0 +1,18 @@
+type: object
+properties:
+  address:
+    type: string
+  suburb:
+    type: string
+    nullable: true
+  postcode:
+    type: string
+    nullable: true
+  started:
+    type: string
+    nullable: true
+required:
+  - address
+  - suburb
+  - postcode
+  - started

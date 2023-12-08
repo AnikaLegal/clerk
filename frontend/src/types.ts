@@ -1,5 +1,3 @@
-export type Tenancy = any
-
 export type TextChoiceField = {
   display: string
   value: string

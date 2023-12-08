@@ -8,7 +8,9 @@ import { AssignForm } from './case-assign'
 import { OutcomeForm } from './case-outcome'
 import { ProgressForm } from './case-progress'
 import { ConflictForm } from './case-conflict-check'
+import { TenancyForm } from './tenancy'
 export {
+  TenancyForm,
   FilenoteForm,
   ReviewForm,
   ReopenForm,

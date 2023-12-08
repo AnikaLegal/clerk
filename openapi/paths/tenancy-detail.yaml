@@ -1,0 +1,44 @@
+get:
+  operationId: getTenancy
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Tenancy.yaml
+
+put:
+  operationId: updateTenancy
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/TenancyCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Tenancy.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

@@ -11,3 +11,5 @@ paths:
     $ref: paths/person-search.yaml
   /clerk/api/person/{id}/:
     $ref: paths/person-detail.yaml
+  /clerk/api/tenancy/{id}/:
+    $ref: paths/tenancy-detail.yaml

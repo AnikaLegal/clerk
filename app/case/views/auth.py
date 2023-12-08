@@ -7,8 +7,6 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 
-WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"]
-
 
 def paralegal_or_better_required(view):
     """
@@ -84,7 +82,19 @@ class CoordinatorOrBetterCanWritePermission(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.method in WRITE_METHODS:
-            return request.user.is_coordinator_or_better
-        else:
+        if request.method in permissions.SAFE_METHODS:
             return request.user.is_paralegal_or_better
+        else:
+            return request.user.is_coordinator_or_better
+
+    def has_object_permission(self, request, view, obj):
+        """
+        By convention models with special permissions will provide a
+        custom `check_permission` method, which takes an annotated user.
+        """
+        if request.user.is_coordinator_or_better:
+            return True
+        elif hasattr(obj, "check_permission"):
+            return obj.check_permission(request.user)
+        else:
+            return True

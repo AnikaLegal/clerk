@@ -1,7 +1,6 @@
 from django.utils.datastructures import MultiValueDict
 
 from .fields import MultiChoiceField, SingleChoiceField
-from .dynamic_table_form import DynamicTableForm
 from .pagination import get_page
 
 

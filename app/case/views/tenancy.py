@@ -1,45 +1,32 @@
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
 from django.http import Http404
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import UpdateModelMixin, RetrieveModelMixin
+
+from case.utils.react import render_react_page
+from case.serializers import TenancySerializer
+from core.models import Tenancy
+from .auth import paralegal_or_better_required, CoordinatorOrBetterCanWritePermission
 
 
-from case.forms import DynamicTableForm, TenancyDynamicForm
-from core.models import Tenancy, Issue
-from .auth import paralegal_or_better_required
-from case.utils.router import Router
-
-TENANCY_DETAIL_FORMS = {
-    "form": TenancyDynamicForm,
-}
-
-
-router = Router("tenancy")
-router.create_route("detail").pk("pk").slug("form_slug", optional=True)
-
-
-@router.use_route("detail")
+@api_view(["GET"])
 @paralegal_or_better_required
-@require_http_methods(["GET", "POST"])
-def tenancy_detail_view(request, pk, form_slug: str = ""):
+def tenancy_detail_page_view(request, pk):
     try:
         tenancy = Tenancy.objects.get(pk=pk)
-        if request.user.is_paralegal:
-            is_assigned = Issue.objects.filter(
-                client=tenancy.client, paralegal=request.user
-            ).exists()
-            if not is_assigned:
-                # Not allowed
-                raise Http404()
-
     except Tenancy.DoesNotExist:
         raise Http404()
 
-    forms = DynamicTableForm.build_forms(
-        request, form_slug, tenancy, TENANCY_DETAIL_FORMS
-    )
-    context = {"tenancy": tenancy, "forms": forms}
-    form_resp = DynamicTableForm.get_response(request, form_slug, forms, context)
-    if form_resp:
-        return form_resp
-    else:
-        return render(request, "case/tenancy_detail.html", context)
+    has_object_permission = tenancy.check_permission(request.user)
+    if not (has_object_permission or request.user.is_coordinator_or_better):
+        raise PermissionDenied()
+
+    context = {"tenancy": TenancySerializer(instance=tenancy).data}
+    return render_react_page(request, "Tenancy", "tenancy-detail", context)
+
+
+class TenancyApiViewset(GenericViewSet, RetrieveModelMixin, UpdateModelMixin):
+    queryset = Tenancy.objects.all()
+    serializer_class = TenancySerializer
+    permission_classes = [CoordinatorOrBetterCanWritePermission]

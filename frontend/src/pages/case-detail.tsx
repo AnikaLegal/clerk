@@ -9,7 +9,7 @@ import {
   Checkbox,
 } from 'semantic-ui-react'
 
-import { useGetPeopleQuery } from 'apiNew'
+import { useGetPeopleQuery, Tenancy } from 'apiNew'
 import { TimelineNote } from 'comps/timeline-item'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
 import { mount } from 'utils'
@@ -28,7 +28,7 @@ import {
   ConflictForm,
 } from 'forms'
 
-import { IssueDetail, IssueNote, Tenancy } from 'types'
+import { IssueDetail, IssueNote } from 'types'
 
 interface ReactContext {
   issue: IssueDetail
@@ -67,12 +67,16 @@ const App = () => {
 
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
-      api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data))
+      api.case.landlord
+        .remove(issue.id)
+        .then(({ data }) => setTenancy(data as Tenancy))
     }
   }
   const onRemoveAgent = () => {
     if (confirm('Remove the agent for this case?')) {
-      api.case.agent.remove(issue.id).then(({ data }) => setTenancy(data))
+      api.case.agent
+        .remove(issue.id)
+        .then(({ data }) => setTenancy(data as Tenancy))
     }
   }
   const onRemoveSupportWorker = () => {
@@ -82,12 +86,14 @@ const App = () => {
   }
 
   const onAddAgent = (agentId) => {
-    api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data))
+    api.case.agent
+      .add(issue.id, agentId)
+      .then(({ data }) => setTenancy(data as Tenancy))
   }
   const onAddLandlord = (landlordId) => {
     api.case.landlord
       .add(issue.id, landlordId)
-      .then(({ data }) => setTenancy(data))
+      .then(({ data }) => setTenancy(data as Tenancy))
   }
   const onAddSupportWorker = (supportWorkerId) => {
     api.case.supportWorker
@@ -183,7 +189,7 @@ const App = () => {
                   ['Street Address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease']: tenancy.is_on_lease,
+                  ['Client on lease']: tenancy.is_on_lease.display,
                 }}
               />
               {tenancy.landlord ? (
@@ -195,7 +201,7 @@ const App = () => {
                     Name: tenancy.landlord.full_name,
                     Address: tenancy.landlord.address,
                     Email: tenancy.landlord.email,
-                    Phone: tenancy.landlord.phone,
+                    Phone: tenancy.landlord.phone_number,
                   }}
                 />
               ) : (
