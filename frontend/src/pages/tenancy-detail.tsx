@@ -24,7 +24,7 @@ const App = () => {
     Address: tenancy.address,
     Suburb: tenancy.suburb,
     Postcode: tenancy.postcode,
-    started: tenancy.started,
+    Started: tenancy.started,
     'Is on lease': tenancy.is_on_lease.display,
   }
   return (
