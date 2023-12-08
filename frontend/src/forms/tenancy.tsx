@@ -65,7 +65,7 @@ export const TenancyForm: React.FC<TenancyFormProps> = ({
     </div>
 
     <div className={`field ${errors.is_on_lease && 'error'}`}>
-      <label>Is client on lease</label>
+      <label>Is Client On Lease</label>
       <Dropdown
         fluid
         selection
