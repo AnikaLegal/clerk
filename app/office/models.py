@@ -6,15 +6,15 @@ from pathlib import Path
 PATH = apps.get_app_config("office").path
 
 
-class ShutdownTemplate(models.Model):
+class ClosureTemplate(models.Model):
     def _get_call_default():
-        return Path(PATH + "/shutdown/templates/call_template.txt").read_text()
+        return Path(PATH + "/closure/templates/call_template.txt").read_text()
 
     def _get_email_default():
-        return Path(PATH + "/shutdown/templates/email_template.html").read_text()
+        return Path(PATH + "/closure/templates/email_template.html").read_text()
 
     def _get_notice_default():
-        return Path(PATH + "/shutdown/templates/notice_template.html").read_text()
+        return Path(PATH + "/closure/templates/notice_template.html").read_text()
 
     created_at = models.DateTimeField(default=timezone.now)
     call_text = models.TextField(default=_get_call_default, blank=False)
@@ -22,17 +22,17 @@ class ShutdownTemplate(models.Model):
     notice_html = models.TextField(default=_get_notice_default, blank=False)
 
 
-class Shutdown(models.Model):
+class Closure(models.Model):
     def _get_template_default():
-        if not ShutdownTemplate.objects.exists():
-            ShutdownTemplate.objects.create().save()
-        return ShutdownTemplate.objects.latest("created_at").pk
+        if not ClosureTemplate.objects.exists():
+            ClosureTemplate.objects.create().save()
+        return ClosureTemplate.objects.latest("created_at").pk
 
     created_at = models.DateTimeField(default=timezone.now)
     start_date = models.DateField(blank=False)
     end_date = models.DateField(blank=False)
     template = models.OneToOneField(
-        ShutdownTemplate,
+        ClosureTemplate,
         blank=False,
         default=_get_template_default,
         on_delete=models.CASCADE,

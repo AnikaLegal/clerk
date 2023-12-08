@@ -71,7 +71,7 @@ Screen sizes to consider (https://screensiz.es/):
 }
 
 @media (min-width: 768px) {
-  #shutdown-notice {
+  #closure-notice {
     position: sticky;
   }
 }

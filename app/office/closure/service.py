@@ -1,4 +1,4 @@
-from office.models import Shutdown
+from office.models import Closure
 from django.utils import timezone, dateformat
 import datetime
 
@@ -11,19 +11,19 @@ def _format(start_date: datetime.date, end_date: datetime.date, value: str):
     return value.format(start_date=start, end_date=end)
 
 
-def get_shutdown():
+def get_closure():
     date = timezone.localdate()
     return (
-        Shutdown.objects.filter(start_date__lte=date, end_date__gte=date)
+        Closure.objects.filter(start_date__lte=date, end_date__gte=date)
         .order_by("created_at")
         .last()
     )
 
 
-def get_shutdown_notice():
-    shutdown = get_shutdown()
-    if shutdown:
+def get_closure_notice():
+    closure = get_closure()
+    if closure:
         return _format(
-            shutdown.start_date, shutdown.end_date, shutdown.template.notice_html
+            closure.start_date, closure.end_date, closure.template.notice_html
         )
     return None

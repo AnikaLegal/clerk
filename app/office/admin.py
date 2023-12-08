@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Shutdown, ShutdownTemplate
+from .models import Closure, ClosureTemplate
 
 
-@admin.register(Shutdown)
-class ShutdownAdmin(admin.ModelAdmin):
+@admin.register(Closure)
+class ClosureAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "start_date",
@@ -12,8 +12,8 @@ class ShutdownAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(ShutdownTemplate)
-class ShutdownAdmin(admin.ModelAdmin):
+@admin.register(ClosureTemplate)
+class ClosureAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "created_at",
