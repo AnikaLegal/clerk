@@ -4,9 +4,8 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from accounts.models import User
-from core.models import Issue, Tenancy
+from core.models import Issue
 from core.models.issue import CaseTopic
-from case.utils import DynamicTableForm, SingleChoiceField
 
 
 class DocumentTemplateForm(forms.Form):
@@ -36,20 +35,6 @@ class InviteParalegalForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         user = super().save(*args, **kwargs)
         return user
-
-
-class TenancyDynamicForm(DynamicTableForm):
-    class Meta:
-        model = Tenancy
-        fields = [
-            "address",
-            "suburb",
-            "postcode",
-            "started",
-            "is_on_lease",
-        ]
-
-    is_on_lease = SingleChoiceField(field_name="is_on_lease", model=Tenancy)
 
 
 class IssueSearchForm(forms.ModelForm):
@@ -121,7 +106,6 @@ class IssueSearchForm(forms.ModelForm):
 
 
 class LawyerFilterForm(forms.Form):
-
     lawyer = forms.ModelChoiceField(
         queryset=User.objects.filter(groups__name="Lawyer"), empty_label="All lawyers"
     )

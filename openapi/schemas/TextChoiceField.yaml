@@ -1,0 +1,16 @@
+type: object
+properties:
+  display:
+    type: string
+  value:
+    type: string
+  choices:
+    type: array
+    items:
+      type: array
+      items:
+        type: string
+required:
+  - display
+  - value
+  - choices

@@ -89,7 +89,7 @@ class TenancyFactory(TimestampedModelFactory):
     started = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1y", end_date="-2y"
     )
-    is_on_lease = True
+    is_on_lease = "YES"
 
 
 @factory.django.mute_signals(post_save)

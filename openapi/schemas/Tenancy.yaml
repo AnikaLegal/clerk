@@ -1,0 +1,23 @@
+allOf:
+  - $ref: ./TenancyBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+      is_on_lease:
+        $ref: ./TextChoiceField.yaml
+      landlord:
+        $ref: ./Person.yaml
+      agent:
+        $ref: ./Person.yaml
+      client:
+        $ref: ./Client.yaml
+    required:
+      - id
+      - url
+      - is_on_lease
+      - landlord
+      - agent
+      - client

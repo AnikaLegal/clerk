@@ -113,6 +113,50 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/tenancy/{id}/:
+    get:
+      operationId: getTenancy
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+    put:
+      operationId: updateTenancy
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenancyCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
     PersonBase:
@@ -131,6 +175,23 @@ components:
         - email
         - address
         - phone_number
+    TextChoiceField:
+      type: object
+      properties:
+        display:
+          type: string
+        value:
+          type: string
+        choices:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      required:
+        - display
+        - value
+        - choices
     Person:
       allOf:
         - $ref: "#/components/schemas/PersonBase"
@@ -141,22 +202,7 @@ components:
             url:
               type: string
             support_contact_preferences:
-              type: object
-              properties:
-                display:
-                  type: string
-                value:
-                  type: string
-                choices:
-                  type: array
-                  items:
-                    type: array
-                    items:
-                      type: string
-              required:
-                - display
-                - value
-                - choices
+              $ref: "#/components/schemas/TextChoiceField"
           required:
             - id
             - url
@@ -188,6 +234,150 @@ components:
           type: array
           items:
             type: string
+    TenancyBase:
+      type: object
+      properties:
+        address:
+          type: string
+        suburb:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        started:
+          type: string
+          nullable: true
+      required:
+        - address
+        - suburb
+        - postcode
+        - started
+    ClientBase:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        phone_number:
+          type: string
+        weekly_income:
+          type: number
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        requires_interpreter:
+          type: boolean
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        is_aboriginal_or_torres_strait_islander:
+          type: boolean
+        number_of_dependents:
+          type: number
+          nullable: true
+        referrer:
+          type: string
+        notes:
+          type: string
+        employment_status:
+          type: array
+          items:
+            type: string
+        rental_circumstances:
+          type: string
+        eligibility_circumstances:
+          type: array
+          items:
+            type: string
+        referrer_type:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+      required:
+        - first_name
+        - last_name
+        - email
+        - phone_number
+        - employment_status
+        - weekly_income
+        - gender
+        - centrelink_support
+        - eligibility_notes
+        - requires_interpreter
+        - primary_language_non_english
+        - primary_language
+        - is_aboriginal_or_torres_strait_islander
+        - rental_circumstances
+        - number_of_dependents
+        - eligibility_circumstances
+        - referrer_type
+        - referrer
+        - notes
+        - date_of_birth
+    Client:
+      allOf:
+        - $ref: "#/components/schemas/ClientBase"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            url:
+              type: string
+            age:
+              type: integer
+            full_name:
+              type: string
+          required:
+            - id
+            - url
+            - age
+            - full_name
+            - date_of_birth
+    Tenancy:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            is_on_lease:
+              $ref: "#/components/schemas/TextChoiceField"
+            landlord:
+              $ref: "#/components/schemas/Person"
+            agent:
+              $ref: "#/components/schemas/Person"
+            client:
+              $ref: "#/components/schemas/Client"
+          required:
+            - id
+            - url
+            - is_on_lease
+            - landlord
+            - agent
+            - client
+    TenancyCreate:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            is_on_lease:
+              type: string
+          required:
+            - is_on_lease
   responses:
     BadRequest:
       description: Bad request

@@ -33,6 +33,19 @@ const injectedRtkApi = api.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    getTenancy: build.query<GetTenancyApiResponse, GetTenancyApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/tenancy/${queryArg.id}/` }),
+    }),
+    updateTenancy: build.mutation<
+      UpdateTenancyApiResponse,
+      UpdateTenancyApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/tenancy/${queryArg.id}/`,
+        method: 'PUT',
+        body: queryArg.tenancyCreate,
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -69,20 +82,35 @@ export type DeletePersonApiArg = {
   /** Entity ID */
   id: number
 }
+export type GetTenancyApiResponse =
+  /** status 200 Successful response. */ Tenancy
+export type GetTenancyApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type UpdateTenancyApiResponse =
+  /** status 201 Successful response. */ Tenancy
+export type UpdateTenancyApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  tenancyCreate: TenancyCreate
+}
 export type PersonBase = {
   full_name: string
   email: string
   address: string
   phone_number: string
 }
+export type TextChoiceField = {
+  display: string
+  value: string
+  choices: string[][]
+}
 export type Person = PersonBase & {
   id: number
   url: string
-  support_contact_preferences: {
-    display: string
-    value: string
-    choices: string[][]
-  }
+  support_contact_preferences: TextChoiceField
 }
 export type Error = {
   detail?: string | object | (string | object | any)[]
@@ -91,6 +119,51 @@ export type Error = {
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string
 }
+export type TenancyBase = {
+  address: string
+  suburb: string | null
+  postcode: string | null
+  started: string | null
+}
+export type ClientBase = {
+  first_name: string
+  last_name: string
+  email: string
+  phone_number: string
+  weekly_income: number | null
+  gender: string | null
+  centrelink_support: boolean
+  eligibility_notes: string
+  requires_interpreter: boolean
+  primary_language_non_english: boolean
+  primary_language: string
+  is_aboriginal_or_torres_strait_islander: boolean
+  number_of_dependents: number | null
+  referrer: string
+  notes: string
+  employment_status: string[]
+  rental_circumstances: string
+  eligibility_circumstances: string[]
+  referrer_type: string
+  date_of_birth: string | null
+}
+export type Client = ClientBase & {
+  id: string
+  url: string
+  age: number
+  full_name: string
+}
+export type Tenancy = TenancyBase & {
+  id: number
+  url: string
+  is_on_lease: TextChoiceField
+  landlord: Person
+  agent: Person
+  client: Client
+}
+export type TenancyCreate = TenancyBase & {
+  is_on_lease: string
+}
 export const {
   useGetPeopleQuery,
   useCreatePersonMutation,
@@ -98,4 +171,6 @@ export const {
   useGetPersonQuery,
   useUpdatePersonMutation,
   useDeletePersonMutation,
+  useGetTenancyQuery,
+  useUpdateTenancyMutation,
 } = injectedRtkApi
