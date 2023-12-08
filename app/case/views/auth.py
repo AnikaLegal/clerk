@@ -90,7 +90,7 @@ class CoordinatorOrBetterCanWritePermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         """
         By convention models with special permissions will provide a
-        custom `check_oermission` method, which takes an annotated user.
+        custom `check_permission` method, which takes an annotated user.
         """
         if request.user.is_coordinator_or_better:
             return True
