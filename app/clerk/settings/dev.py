@@ -36,6 +36,7 @@ INTAKE_NOEMAIL_EMAIL = "matt@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
 TWILIO_AUDIO_BASE_URL = (
     "https://anika-twilio-audio-test.s3-ap-southeast-2.amazonaws.com"
 )

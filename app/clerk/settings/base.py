@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "webpack_loader",
+    "django_cleanup.apps.CleanupSelectedConfig",
 ]
 
 MIDDLEWARE = [
