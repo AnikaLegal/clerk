@@ -56,7 +56,7 @@ class Closure(models.Model):
         storage=_get_storage,
         upload_to=_get_file_name,
     )
-    template = models.OneToOneField(
+    template = models.ForeignKey(
         ClosureTemplate,
         blank=False,
         default=_get_template_default,
