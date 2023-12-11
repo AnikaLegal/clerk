@@ -1,6 +1,6 @@
 Thank you for calling Anika Legal.
 
-We are closed for the holiday season from {start_date}, and reopening on {end_date}.
+We are closed for the holiday season from {close_date}, and reopening on {reopen_date}.
 
 If you require urgent legal assistance, please contact Victoria Legal Aid on 1 3 0 0 7 9 2 3 8 7.
 

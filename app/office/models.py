@@ -48,8 +48,8 @@ class Closure(models.Model):
         )
 
     created_at = models.DateTimeField(default=timezone.now)
-    start_date = models.DateField(blank=False)
-    end_date = models.DateField(blank=False)
+    close_date = models.DateField(blank=False)
+    reopen_date = models.DateField(blank=False)
     call_audio = models.FileField(
         blank=True,
         null=True,

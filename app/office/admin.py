@@ -7,8 +7,8 @@ class ClosureAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "template",
-        "start_date",
-        "end_date",
+        "close_date",
+        "reopen_date",
         "call_audio",
         "created_at",
     )

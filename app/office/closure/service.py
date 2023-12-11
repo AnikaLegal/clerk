@@ -13,15 +13,15 @@ class Call:
 
 
 def _format(closure: Closure, text: str) -> str:
-    start = dateformat.format(closure.start_date, DATE_FORMAT)
-    end = dateformat.format(closure.end_date, DATE_FORMAT)
-    return text.format(start_date=start, end_date=end)
+    close = dateformat.format(closure.close_date, DATE_FORMAT)
+    reopen = dateformat.format(closure.reopen_date, DATE_FORMAT)
+    return text.format(close_date=close, reopen_date=reopen)
 
 
 def get_closure() -> Closure | None:
     date = timezone.localdate()
     return (
-        Closure.objects.filter(start_date__lte=date, end_date__gte=date)
+        Closure.objects.filter(close_date__lte=date, reopen_date__gte=date)
         .order_by("created_at")
         .last()
     )
