@@ -7,7 +7,7 @@ DATE_FORMAT = "l jS F Y"  # e.g. Sunday 31st December 2023
 
 
 @dataclass(frozen=True)
-class Call:
+class CallInfo:
     audio: str
     text: str
 
@@ -27,10 +27,10 @@ def get_closure() -> Closure | None:
     )
 
 
-def get_closure_call() -> Call | None:
+def get_closure_call() -> CallInfo | None:
     closure = get_closure()
     if closure:
-        return Call(
+        return CallInfo(
             audio=closure.call_audio.name,
             text=_format(closure, closure.template.call_text),
         )
