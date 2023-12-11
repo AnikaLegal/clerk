@@ -35,10 +35,10 @@ class Closure(models.Model):
         return ClosureTemplate.objects.latest("created_at").pk
 
     def _get_file_name(instance, name):
-        start = instance.start_date.isoformat()
-        end = instance.end_date.isoformat()
-        return "office_closure_call_audio_{start}_to_{end}{ext}".format(
-            start=start, end=end, ext=Path(name).suffix
+        close = instance.close_date.isoformat()
+        open = instance.reopen_date.isoformat()
+        return "office_closure_call_audio_{close}_to_{open}{ext}".format(
+            close=close, open=open, ext=Path(name).suffix
         )
 
     def _get_storage():
