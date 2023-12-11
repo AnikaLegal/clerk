@@ -21,7 +21,7 @@ def _format(closure: Closure, text: str) -> str:
 def get_closure() -> Closure | None:
     date = timezone.localdate()
     return (
-        Closure.objects.filter(close_date__lte=date, reopen_date__gte=date)
+        Closure.objects.filter(close_date__lte=date, reopen_date__gt=date)
         .order_by("created_at")
         .last()
     )
