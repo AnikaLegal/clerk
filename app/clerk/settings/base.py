@@ -299,7 +299,7 @@ ADMIN_PREFIX = None
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = None  # Overwrite me
-TWILIO_AUDIO_BASE_URL = None  # Overwrite me
+TWILIO_AUDIO_BUCKET_NAME = None  # Overwrite me
 
 
 # Transactional emails via SendGrid

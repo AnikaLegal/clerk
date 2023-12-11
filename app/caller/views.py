@@ -128,4 +128,7 @@ class TwimlResponse(HttpResponse):
 
 
 def _get_audio_url(filename: str):
-    return urljoin(settings.TWILIO_AUDIO_BASE_URL, filename)
+    url = "https://{bucket}.s3-{region}.amazonaws.com".format(
+        bucket=settings.TWILIO_AUDIO_BUCKET_NAME, region=settings.AWS_REGION_NAME
+    )
+    return urljoin(url, filename)
