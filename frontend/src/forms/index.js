@@ -9,7 +9,9 @@ import { OutcomeForm } from './case-outcome'
 import { ProgressForm } from './case-progress'
 import { ConflictForm } from './case-conflict-check'
 import { TenancyForm } from './tenancy'
+import { AccountForm} from "./account"
 export {
+  AccountForm,
   TenancyForm,
   FilenoteForm,
   ReviewForm,

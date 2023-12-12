@@ -48,7 +48,7 @@ class IssueNoteSerializer(serializers.ModelSerializer):
             return UserSerializer(obj.content_object).data
 
 
-class BaseIssueSerializer(serializers.ModelSerializer):
+class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = (
@@ -64,6 +64,8 @@ class BaseIssueSerializer(serializers.ModelSerializer):
             "fileref",
             "paralegal",
             "lawyer",
+            "client",
+            "support_worker",
             "is_open",
             "is_sharepoint_set_up",
             "actionstep_id",
@@ -74,6 +76,8 @@ class BaseIssueSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True)
     lawyer = UserSerializer(read_only=True)
     paralegal = UserSerializer(read_only=True)
+    client = ClientSerializer(read_only=True)
+    support_worker = PersonSerializer(read_only=True)
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
@@ -82,21 +86,6 @@ class BaseIssueSerializer(serializers.ModelSerializer):
 
     def get_url(self, obj):
         return reverse("case-detail-view", args=(obj.pk,))
-
-
-class IssueListSerializer(BaseIssueSerializer):
-    class Meta:
-        model = Issue
-        fields = (*BaseIssueSerializer.Meta.fields,)
-
-
-class IssueDetailSerializer(BaseIssueSerializer):
-    class Meta:
-        model = Issue
-        fields = (*BaseIssueSerializer.Meta.fields, "client", "support_worker")
-
-    client = ClientSerializer(read_only=True)
-    support_worker = PersonSerializer(read_only=True)
 
 
 class IssueAssignmentSerializer(serializers.ModelSerializer):

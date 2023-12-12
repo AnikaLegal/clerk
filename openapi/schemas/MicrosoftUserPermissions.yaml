@@ -1,0 +1,16 @@
+type: object
+properties:
+  has_coordinator_perms:
+    type: boolean
+  paralegal_perm_issues:
+    type: array
+    items:
+      $ref: ./Issue.yaml
+  paralegal_perm_missing_issues:
+    type: array
+    items:
+      $ref: ./Issue.yaml
+required:
+  - has_coordinator_perms
+  - paralegal_perm_issues
+  - paralegal_perm_missing_issues

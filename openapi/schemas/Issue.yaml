@@ -1,0 +1,68 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  topic:
+    type: string
+  topic_display:
+    type: string
+  stage_display:
+    type: string
+  stage:
+    type: string
+  outcome:
+    type: string
+    nullable: true
+  outcome_display:
+    type: string
+    nullable: true
+  outcome_notes:
+    type: string
+  provided_legal_services:
+    type: boolean
+  fileref:
+    type: string
+  paralegal:
+    $ref: ./User.yaml
+    nullable: true
+  lawyer:
+    $ref: ./User.yaml
+    nullable: true
+  client:
+    $ref: ./Client.yaml
+  support_worker:
+    $ref: ./Person.yaml
+    nullable: true
+  is_open:
+    type: boolean
+  is_sharepoint_set_up:
+    type: boolean
+  actionstep_id:
+    type: integer
+    nullable: true
+  created_at:
+    type: string
+  url:
+    type: string
+
+required:
+  - id
+  - topic
+  - topic_display
+  - stage_display
+  - stage
+  - outcome
+  - outcome_display
+  - outcome_notes
+  - provided_legal_services
+  - fileref
+  - paralegal
+  - lawyer
+  - client
+  - support_worker
+  - is_open
+  - is_sharepoint_set_up
+  - actionstep_id
+  - created_at
+  - url

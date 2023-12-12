@@ -1,22 +1,5 @@
-get:
-  operationId: getTenancy
-  parameters:
-    - description: Entity ID
-      in: path
-      name: id
-      required: true
-      schema:
-        type: integer
-  responses:
-    "200":
-      description: Successful response.
-      content:
-        application/json:
-          schema:
-            $ref: ../schemas/Tenancy.yaml
-
-put:
-  operationId: updateTenancy
+patch:
+  operationId: updateUser
   parameters:
     - description: Entity ID
       in: path
@@ -30,14 +13,14 @@ put:
     content:
       application/json:
         schema:
-          $ref: ../schemas/TenancyCreate.yaml
+          $ref: ../schemas/UserCreate.yaml
   responses:
     "200":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/Tenancy.yaml
+            $ref: ../schemas/User.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

@@ -9,7 +9,7 @@ from core.models import Person, Issue
 from case.utils.react import render_react_page
 from case.serializers import (
     PersonSerializer,
-    IssueDetailSerializer,
+    IssueSerializer,
     PersonSearchRequestSerializer,
 )
 from .auth import paralegal_or_better_required, CoordinatorOrBetterCanWritePermission
@@ -40,7 +40,7 @@ def person_detail_page_view(request, pk):
     issues = Issue.objects.filter(q_filter).order_by("-created_at").all()
 
     context = {
-        "issues": IssueDetailSerializer(issues, many=True).data,
+        "issues": IssueSerializer(issues, many=True).data,
         "person": PersonSerializer(instance=person).data,
         "is_editable": request.user.is_coordinator_or_better,
         "list_url": reverse("person-list"),

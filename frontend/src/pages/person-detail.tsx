@@ -83,7 +83,7 @@ const App = () => {
             })
             .catch((err) => {
               enqueueSnackbar(
-                getAPIErrorMessage(err, 'Failed to create a new person'),
+                getAPIErrorMessage(err, 'Failed to update this person'),
                 {
                   variant: 'error',
                 }

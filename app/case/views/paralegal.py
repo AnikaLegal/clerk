@@ -1,19 +1,16 @@
 from django.db.models import Count, Max, Q, F, Case, When
+from rest_framework.decorators import api_view
 
 from accounts.models import User
 from .auth import coordinator_or_better_required
-from case.utils.router import Router
 from case.utils.react import render_react_page
 from case.serializers import ParalegalSerializer
 from accounts.models import CaseGroups
 
-router = Router("paralegal")
-router.create_route("list")
 
-
-@router.use_route("list")
+@api_view(["GET"])
 @coordinator_or_better_required
-def paralegal_list_view(request):
+def paralegal_list_page_view(request):
     paralegals = User.objects.filter(
         is_active=True, groups__name__in=[CaseGroups.PARALEGAL, CaseGroups.COORDINATOR]
     ).prefetch_related("issue_set", "groups")

@@ -1,11 +1,36 @@
 from rest_framework import serializers
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from case.middleware import annotate_group_access
 from accounts.models import User
 
 from .fields import LocalDateField
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "username", "url")
+
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("account-detail", args=(obj.pk,))
+
+    def validate_email(self, value: str):
+        if not value.endswith("@anikalegal.com"):
+            raise ValidationError(
+                f"Can only invite users with an anikalegal.com email."
+            )
+
+        return value
+
+    def validate(self, data):
+        if data["email"] != data["username"]:
+            raise ValidationError("Username must be the same as email.")
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,12 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
-            "full_name",
-            "is_active",
             "email",
+            "username",
             "case_capacity",
             "is_intern",
+            "is_active",
             "is_superuser",
+            # Read only stuff
+            "full_name",
             "created_at",
             "groups",
             "url",
@@ -31,6 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_coordinator",
             "is_paralegal",
             "is_ms_account_set_up",
+            "ms_account_created_at",
         )
         read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
 
@@ -45,6 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
     is_coordinator = serializers.BooleanField(read_only=True)
     is_paralegal = serializers.BooleanField(read_only=True)
     is_ms_account_set_up = serializers.SerializerMethodField()
+    ms_account_created_at = LocalDateField()
 
     def to_representation(self, instance):
         if instance:
@@ -54,9 +83,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_ms_account_set_up(self, obj):
         fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-        return obj.ms_account_created_at and (
+        is_set_up = obj.ms_account_created_at and (
             obj.ms_account_created_at < fifteen_minutes_ago
         )
+        return bool(is_set_up)
 
     def get_groups(self, obj):
         return [g.name for g in obj.groups.all()]
@@ -65,7 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_full_name().title()
 
     def get_url(self, obj):
-        return reverse("account-user-detail", args=(obj.pk,))
+        return reverse("account-detail", args=(obj.pk,))
 
 
 class ParalegalSerializer(UserSerializer):

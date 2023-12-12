@@ -87,7 +87,7 @@ paths:
             schema:
               $ref: "#/components/schemas/PersonCreate"
       responses:
-        "201":
+        "200":
           description: Successful response.
           content:
             application/json:
@@ -147,12 +147,215 @@ paths:
             schema:
               $ref: "#/components/schemas/TenancyCreate"
       responses:
-        "201":
+        "200":
           description: Successful response.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tenancy"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/client/{id}/:
+    patch:
+      operationId: updateClient
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/:
+    get:
+      operationId: getUsers
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: group
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/:
+    patch:
+      operationId: updateUser
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms/:
+    get:
+      operationId: getUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MicrosoftUserPermissions"
+  /clerk/api/account/{id}/perms-resync/:
+    post:
+      operationId: resyncUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms-promote/:
+    post:
+      operationId: promoteUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms-demote/:
+    post:
+      operationId: demoteUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -289,18 +492,6 @@ components:
           type: string
         notes:
           type: string
-        employment_status:
-          type: array
-          items:
-            type: string
-        rental_circumstances:
-          type: string
-        eligibility_circumstances:
-          type: array
-          items:
-            type: string
-        referrer_type:
-          type: string
         date_of_birth:
           type: string
           nullable: true
@@ -309,7 +500,6 @@ components:
         - last_name
         - email
         - phone_number
-        - employment_status
         - weekly_income
         - gender
         - centrelink_support
@@ -318,13 +508,29 @@ components:
         - primary_language_non_english
         - primary_language
         - is_aboriginal_or_torres_strait_islander
-        - rental_circumstances
         - number_of_dependents
-        - eligibility_circumstances
-        - referrer_type
         - referrer
         - notes
         - date_of_birth
+    TextChoiceListField:
+      type: object
+      properties:
+        display:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+        choices:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      required:
+        - display
+        - value
+        - choices
     Client:
       allOf:
         - $ref: "#/components/schemas/ClientBase"
@@ -339,12 +545,27 @@ components:
               type: integer
             full_name:
               type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            call_times:
+              $ref: "#/components/schemas/TextChoiceListField"
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            eligibility_circumstances:
+              $ref: "#/components/schemas/TextChoiceListField"
+            rental_circumstances:
+              $ref: "#/components/schemas/TextChoiceField"
           required:
             - id
             - url
             - age
             - full_name
             - date_of_birth
+            - referrer_type
+            - call_times
+            - employment_status
+            - eligibility_circumstances
+            - rental_circumstances
     Tenancy:
       allOf:
         - $ref: "#/components/schemas/TenancyBase"
@@ -378,6 +599,196 @@ components:
               type: string
           required:
             - is_on_lease
+    ClientCreate:
+      allOf:
+        - $ref: "#/components/schemas/ClientBase"
+        - type: object
+          properties:
+            referrer_type:
+              type: string
+            call_times:
+              type: array
+              items:
+                type: string
+            employment_status:
+              type: array
+              items:
+                type: string
+            eligibility_circumstances:
+              type: array
+              items:
+                type: string
+            rental_circumstances:
+              type: string
+          required:
+            - referrer_type
+            - call_times
+            - employment_status
+            - eligibility_circumstances
+            - rental_circumstances
+    UserCreate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          format: email
+      required:
+        - first_name
+        - last_name
+        - email
+        - username
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserCreate"
+        - type: object
+          properties:
+            id:
+              type: integer
+            case_capacity:
+              type: integer
+            is_intern:
+              type: boolean
+            is_active:
+              type: boolean
+            is_superuser:
+              type: boolean
+            full_name:
+              type: string
+            created_at:
+              type: string
+            groups:
+              type: array
+              items:
+                type: string
+            url:
+              type: string
+            is_admin_or_better:
+              type: boolean
+            is_coordinator_or_better:
+              type: boolean
+            is_paralegal_or_better:
+              type: boolean
+            is_admin:
+              type: boolean
+            is_coordinator:
+              type: boolean
+            is_paralegal:
+              type: boolean
+            is_ms_account_set_up:
+              type: boolean
+            ms_account_created_at:
+              type: string
+              nullable: true
+          required:
+            - id
+            - case_capacity
+            - is_intern
+            - is_active
+            - is_superuser
+            - full_name
+            - created_at
+            - groups
+            - url
+            - is_admin_or_better
+            - is_coordinator_or_better
+            - is_paralegal_or_better
+            - is_admin
+            - is_coordinator
+            - is_paralegal
+            - is_ms_account_set_up
+            - ms_account_created_at
+    Issue:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        topic:
+          type: string
+        topic_display:
+          type: string
+        stage_display:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_display:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        fileref:
+          type: string
+        paralegal:
+          $ref: "#/components/schemas/User"
+          nullable: true
+        lawyer:
+          $ref: "#/components/schemas/User"
+          nullable: true
+        client:
+          $ref: "#/components/schemas/Client"
+        support_worker:
+          $ref: "#/components/schemas/Person"
+          nullable: true
+        is_open:
+          type: boolean
+        is_sharepoint_set_up:
+          type: boolean
+        actionstep_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+        url:
+          type: string
+      required:
+        - id
+        - topic
+        - topic_display
+        - stage_display
+        - stage
+        - outcome
+        - outcome_display
+        - outcome_notes
+        - provided_legal_services
+        - fileref
+        - paralegal
+        - lawyer
+        - client
+        - support_worker
+        - is_open
+        - is_sharepoint_set_up
+        - actionstep_id
+        - created_at
+        - url
+    MicrosoftUserPermissions:
+      type: object
+      properties:
+        has_coordinator_perms:
+          type: boolean
+        paralegal_perm_issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+        paralegal_perm_missing_issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+      required:
+        - has_coordinator_perms
+        - paralegal_perm_issues
+        - paralegal_perm_missing_issues
   responses:
     BadRequest:
       description: Bad request

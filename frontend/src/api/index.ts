@@ -107,12 +107,6 @@ export const api = {
       return http.post(url, contact)
     },
   },
-  client: {
-    update: (clientId, client) => {
-      const url = `/clerk/client/${clientId}/`
-      return http.patch(url, client)
-    },
-  },
   case: {
     docs: (caseId) => {
       const url = `/clerk/cases/${caseId}/docs/sharepoint/`
@@ -120,7 +114,7 @@ export const api = {
     },
     search: (query) => {
       const url = `/clerk/cases/`
-      return http.get(url, query)
+      return http.get<any>(url, query)
     },
     update: (caseId, issue) => {
       const url = `/clerk/cases/detail/${caseId}/update/`
@@ -205,32 +199,6 @@ export const api = {
         const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachId}/`
         return http.post(url, {})
       },
-    },
-  },
-  accounts: {
-    update: (accountId, account) => {
-      const url = `/clerk/accounts/user/${accountId}/`
-      return http.patch(url, account)
-    },
-    getPermissions: (accountId) => {
-      const url = `/clerk/accounts/user/${accountId}/perms/`
-      return http.get(url)
-    },
-    search: (query) => {
-      const url = '/clerk/accounts/'
-      return http.get<User[]>(url, query)
-    },
-    promote: (accountId) => {
-      const url = `/clerk/accounts/user/${accountId}/perms/promote/`
-      return http.post(url)
-    },
-    demote: (accountId) => {
-      const url = `/clerk/accounts/user/${accountId}/perms/demote/`
-      return http.post(url)
-    },
-    resync: (accountId) => {
-      const url = `/clerk/accounts/user/${accountId}/perms/resync/`
-      return http.post(url)
     },
   },
   templates: {

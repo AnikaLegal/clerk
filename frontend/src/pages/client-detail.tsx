@@ -7,13 +7,25 @@ import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { api } from 'api'
-import { ClientDetail } from 'types'
+import { Client, ClientCreate, useUpdateClientMutation } from 'apiNew'
+
+interface DjangoContext {
+  client: Client
+  issues: any[]
+}
+
+const { client: initialClient, issues } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [client, setClient] = useState(
-    (window as any).REACT_CONTEXT.client as ClientDetail
-  )
+  const [client, setClient] = useState<Client>(initialClient)
+  const [updateClient] = useUpdateClientMutation()
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateClient({
+      id: client.id,
+      clientCreate: values as ClientCreate,
+    }).unwrap()
+
   return (
     <Container>
       <Header as="h1">{client.full_name} (Client)</Header>
@@ -24,7 +36,7 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Contact details</Header>
       <TableForm
@@ -33,7 +45,7 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Other Information</Header>
       <TableForm
@@ -42,10 +54,10 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Cases</Header>
-      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
+      <CaseListTable issues={issues} fields={TABLE_FIELDS} />
     </Container>
   )
 }
@@ -136,7 +148,7 @@ const OTHER_FIELDS = [
   {
     label: 'Weekly income',
     name: 'weekly_income',
-    schema: Yup.number().integer().positive().nullable(true),
+    schema: Yup.number().integer().min(0).nullable(true),
     type: FIELD_TYPES.NUMBER,
   },
   {
@@ -148,7 +160,7 @@ const OTHER_FIELDS = [
   {
     label: 'Number of dependents',
     name: 'number_of_dependents',
-    schema: Yup.number().integer().positive().nullable(true),
+    schema: Yup.number().integer().min(0).nullable(true),
     type: FIELD_TYPES.NUMBER,
   },
   {

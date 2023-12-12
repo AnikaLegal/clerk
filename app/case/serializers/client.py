@@ -2,6 +2,14 @@ from rest_framework import serializers
 from django.urls import reverse
 
 from core.models import Client
+from core.models.client import (
+    CallTime,
+    ReferrerType,
+    RentalType,
+    EligibilityCircumstanceType,
+    EmploymentType,
+)
+from .fields import TextChoiceField, TextChoiceListField
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -31,6 +39,7 @@ class ClientSerializer(serializers.ModelSerializer):
             "age",
             "full_name",
             "notes",
+            "call_times",
             "url",
         )
 
@@ -41,6 +50,11 @@ class ClientSerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateTimeField(
         format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
     )
+    referrer_type = TextChoiceField(ReferrerType)
+    call_times = TextChoiceListField(CallTime)
+    employment_status = TextChoiceListField(EmploymentType)
+    eligibility_circumstances = TextChoiceListField(EligibilityCircumstanceType)
+    rental_circumstances = TextChoiceField(RentalType)
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))

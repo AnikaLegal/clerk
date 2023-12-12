@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  Button,
   Container,
   Header,
-  Table,
   Input,
   Form,
   Pagination,
@@ -12,12 +10,28 @@ import {
   Dropdown,
 } from 'semantic-ui-react'
 
+import { api } from 'api'
 import { CaseListTable } from 'comps/case-table'
 import { mount, debounce, useEffectLazy } from 'utils'
-import { api } from 'api'
 import { FadeTransition } from 'comps/transitions'
+import { Issue, useGetUsersQuery } from 'apiNew'
 
-const CONTEXT = window.REACT_CONTEXT
+interface DjangoContext {
+  issues: Issue[]
+  next_page: number
+  total_pages: number
+  total_count: number
+  prev_page: number
+  choices: {
+    stage: string[][]
+    topic: string[][]
+    outcome: string[][]
+    is_open: string[][]
+  }
+}
+
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
 const TABLE_FIELDS = [
   'fileref',
   'topic',
@@ -34,13 +48,10 @@ const debouncer = debounce(300)
 const App = () => {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingSelections, setIsLoadingSelections] = useState(true)
   const [issues, setIssues] = useState(CONTEXT.issues)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalIssues, setTotalIssues] = useState(CONTEXT.total_count)
   const [totalPages, setTotalPages] = useState(CONTEXT.total_pages)
-  const [paralegals, setParalegals] = useState([])
-  const [lawyers, setLawyers] = useState([])
   const [query, setQuery] = useState({
     search: '',
     topic: '',
@@ -64,14 +75,11 @@ const App = () => {
       .catch(() => setIsLoading(false))
   })
   useEffectLazy(() => search(), [query, currentPage])
-  useEffect(() => {
-    api.accounts
-      .search({ group: 'Paralegal' })
-      .then(({ data }) => setParalegals(data))
-      .then(() => api.accounts.search({ group: 'Lawyer' }))
-      .then(({ data }) => setLawyers(data))
-      .then(() => setIsLoadingSelections(false))
-  }, [])
+
+  const paralegalResults = useGetUsersQuery({ group: 'Paralegal' })
+  const lawyerResults = useGetUsersQuery({ group: 'Lawyer' })
+  const isLoadingSelections =
+    paralegalResults.isFetching || lawyerResults.isFetching
   return (
     <Container>
       <Header as="h1">
@@ -121,7 +129,7 @@ const App = () => {
                   placeholder="Is case open?"
                   options={choiceToOptions(CONTEXT.choices.is_open)}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, is_open: value })
+                    setQuery({ ...query, is_open: value as string })
                   }
                 />
               </Form.Field>
@@ -134,7 +142,7 @@ const App = () => {
                   placeholder="Case stage"
                   options={choiceToOptions(CONTEXT.choices.stage)}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, stage: value })
+                    setQuery({ ...query, stage: value as string })
                   }
                 />
               </Form.Field>
@@ -149,7 +157,7 @@ const App = () => {
                   placeholder="Case outcome"
                   options={choiceToOptions(CONTEXT.choices.outcome)}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, outcome: value })
+                    setQuery({ ...query, outcome: value as string })
                   }
                 />
               </Form.Field>
@@ -162,7 +170,7 @@ const App = () => {
                   placeholder="Case topic"
                   options={choiceToOptions(CONTEXT.choices.topic)}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, topic: value })
+                    setQuery({ ...query, topic: value as string })
                   }
                 />
               </Form.Field>
@@ -177,13 +185,13 @@ const App = () => {
                   value={query.paralegal}
                   loading={isLoadingSelections}
                   placeholder="Select a paralegal"
-                  options={paralegals.map((u) => ({
+                  options={paralegalResults.data?.map((u) => ({
                     key: u.id,
                     value: u.id,
                     text: u.email,
                   }))}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, paralegal: value })
+                    setQuery({ ...query, paralegal: value as string })
                   }
                 />
               </Form.Field>
@@ -196,13 +204,13 @@ const App = () => {
                   value={query.lawyer}
                   loading={isLoadingSelections}
                   placeholder="Select a lawyer"
-                  options={lawyers.map((u) => ({
+                  options={lawyerResults.data?.map((u) => ({
                     key: u.id,
                     value: u.id,
                     text: u.email,
                   }))}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, lawyer: value })
+                    setQuery({ ...query, lawyer: value as string })
                   }
                 />
               </Form.Field>
@@ -215,7 +223,7 @@ const App = () => {
       </FadeTransition>
       <Pagination
         activePage={currentPage}
-        onPageChange={onPageChange}
+        onPageChange={onPageChange as any}
         totalPages={totalPages}
         style={{ marginTop: '1em' }}
         ellipsisItem={{

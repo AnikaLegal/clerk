@@ -15,7 +15,7 @@ from case.utils.react import render_react_page, is_react_api_call
 from case.views.auth import coordinator_or_better_required
 from case.utils.router import Route
 
-from case.serializers import IssueDetailSerializer
+from case.serializers import IssueSerializer
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
@@ -40,7 +40,7 @@ def case_list_view(request):
         request, issue_qs, per_page=14, return_qs=False
     )
     context = {
-        "issues": IssueDetailSerializer(page.object_list, many=True).data,
+        "issues": IssueSerializer(page.object_list, many=True).data,
         "next_page": next_page,
         "total_pages": page.paginator.num_pages,
         "total_count": page.paginator.count,

@@ -1,23 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Label, Button } from 'semantic-ui-react'
 import styled from 'styled-components'
+import { useSnackbar } from 'notistack'
 
-import { api } from 'api'
-import { GROUPS } from 'consts'
 import { GroupLabels } from 'comps/group-label'
+import api, {
+  User,
+  MicrosoftUserPermissions,
+  useResyncUserAccountPermissionsMutation,
+  usePromoteUserAccountPermissionsMutation,
+  useDemoteUserAccountPermissionsMutation,
+} from 'apiNew'
+import { getAPIErrorMessage } from 'utils'
 
-const { user } = window.REACT_CONTEXT
+interface DjangoContext {
+  user: User
+}
 
-export const AccountPermissions = ({ account, setAccount }) => {
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
+interface AccountPermissionsProps {
+  account: User
+  setAccount: (account: User) => void
+}
+
+export const AccountPermissions: React.FC<AccountPermissionsProps> = ({
+  account,
+  setAccount,
+}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isButtonLoading, setIsButtonLoading] = useState(false)
-
-  const [perms, setPerms] = useState(null)
+  const [getPermissions] = api.useLazyGetUserAccountPermissionsQuery()
+  const [perms, setPerms] = useState<MicrosoftUserPermissions | null>(null)
   useEffect(() => {
-    api.accounts.getPermissions(account.id).then(({ data }) => {
-      setPerms(data)
-      setIsLoading(false)
-    })
+    getPermissions({ id: account.id })
+      .unwrap()
+      .then((perms) => {
+        setPerms(perms)
+        setIsLoading(false)
+      })
   }, [])
   return (
     <>
@@ -43,7 +64,7 @@ export const AccountPermissions = ({ account, setAccount }) => {
           <Table.Row>
             <Table.Cell width={3}>Sharepoint access</Table.Cell>
             <Table.Cell>
-              {isLoading ? (
+              {isLoading || !perms ? (
                 'Loading...'
               ) : perms.has_coordinator_perms ? (
                 'Full access'
@@ -77,7 +98,7 @@ export const AccountPermissions = ({ account, setAccount }) => {
           </Table.Row>
         </Table.Body>
       </Table>
-      {user.is_admin_or_better && (
+      {CONTEXT.user.is_admin_or_better && (
         <ButtonList>
           {isLoading && <Button loading>Loading...</Button>}
           {!isLoading && (
@@ -118,15 +139,28 @@ const PromoteButton = ({
   isLoading,
   setIsLoading,
 }) => {
+  const [promote] = usePromoteUserAccountPermissionsMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
   const onClick = () => {
     setIsLoading(true)
-    api.accounts.promote(account.id).then(({ resp, data }) => {
-      if (resp.ok) {
-        setAccount(data.account)
-        setPerms(data.perms)
-      }
-      setIsLoading(false)
-    })
+    promote({ id: account.id })
+      .unwrap()
+      .then(({ account, permissions }) => {
+        setAccount(account)
+        setPerms(permissions)
+        setIsLoading(false)
+        enqueueSnackbar('User promoted', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to promote this user'),
+          {
+            variant: 'error',
+          }
+        )
+        setIsLoading(false)
+      })
   }
   if (account.is_paralegal) {
     return (
@@ -162,15 +196,25 @@ const DemoteButton = ({
   isLoading,
   setIsLoading,
 }) => {
+  const [demote] = useDemoteUserAccountPermissionsMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
   const onClick = () => {
     setIsLoading(true)
-    api.accounts.demote(account.id).then(({ resp, data }) => {
-      if (resp.ok) {
-        setAccount(data.account)
-        setPerms(data.perms)
-      }
-      setIsLoading(false)
-    })
+    demote({ id: account.id })
+      .unwrap()
+      .then(({ account, permissions }) => {
+        setAccount(account)
+        setPerms(permissions)
+        setIsLoading(false)
+        enqueueSnackbar('User demoted', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to demote this user'), {
+          variant: 'error',
+        })
+        setIsLoading(false)
+      })
   }
   if (account.is_coordinator) {
     return (
@@ -206,15 +250,25 @@ const ResyncButton = ({
   isLoading,
   setIsLoading,
 }) => {
+  const [resync] = useResyncUserAccountPermissionsMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
   const onClick = () => {
     setIsLoading(true)
-    api.accounts.resync(account.id).then(({ resp, data }) => {
-      if (resp.ok) {
-        setAccount(data.account)
-        setPerms(data.perms)
-      }
-      setIsLoading(false)
-    })
+    resync({ id: account.id })
+      .unwrap()
+      .then(({ account, permissions }) => {
+        setAccount(account)
+        setPerms(permissions)
+        setIsLoading(false)
+        enqueueSnackbar('Resync successful', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to resync this user'), {
+          variant: 'error',
+        })
+        setIsLoading(false)
+      })
   }
   if (account.is_ms_account_set_up) {
     return (
