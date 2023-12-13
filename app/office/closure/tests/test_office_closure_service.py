@@ -1,10 +1,9 @@
-from unittest import mock
-
 import pytest
+from django.core.files.base import File
 from django.utils import timezone, dateformat
+from override_storage import override_storage
+from tempfile import NamedTemporaryFile
 
-
-from office.models import Closure, ClosureTemplate
 from office.closure.service import (
     get_closure,
     get_closure_call,
@@ -13,9 +12,9 @@ from office.closure.service import (
     DATE_FORMAT,
 )
 from office.factories import ClosureFactory, ClosureTemplateFactory
+from office.models import Closure
 
 
-# Sample dates for testing
 YESTERDAY = timezone.now() - timezone.timedelta(days=1)
 TODAY = timezone.now()
 TOMORROW = timezone.now() + timezone.timedelta(days=1)
@@ -25,7 +24,10 @@ The following placeholders should be replaced with the
 corresponding dates from the closure: {close_date} {reopen_date}
 """
 
-# @mock.patch('storages.backends.s3boto.S3BotoStorage', FileSystemStorage)
+
+def _get_file(suffix):
+    file = NamedTemporaryFile(suffix=suffix)
+    return File(file, name=file.name)
 
 
 def _format(closure: Closure, text: str) -> str:
@@ -61,9 +63,10 @@ def test_do_not_get_closure_on_reopen_date():
     assert get_closure() == None
 
 
+@override_storage()
 @pytest.mark.django_db
 def test_get_closure_call():
-    expected = ClosureFactory()
+    expected = ClosureFactory(call_audio=_get_file(".wav"))
     call_info = get_closure_call()
     assert expected.call_audio.name == call_info.audio
     assert expected.template.call_text == call_info.text
