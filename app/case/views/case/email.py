@@ -34,7 +34,7 @@ from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
 from case.utils.react import render_react_page
 from case.serializers import (
-    IssueDetailSerializer,
+    IssueSerializer,
     EmailSerializer,
     EmailAttachmentSerializer,
     EmailTemplateSerializer,
@@ -72,7 +72,7 @@ def email_list_view(request, pk):
     case_email_address = build_clerk_address(issue)
     email_threads = _get_email_threads(issue)
     context = {
-        "issue": IssueDetailSerializer(issue).data,
+        "issue": IssueSerializer(issue).data,
         "email_threads": EmailThreadSerializer(email_threads, many=True).data,
         "case_email_address": case_email_address,
         "urls": get_detail_urls(issue),
@@ -94,7 +94,7 @@ def email_thread_view(request, pk, slug):
     else:
         raise Http404()
     context = {
-        "issue": IssueDetailSerializer(issue).data,
+        "issue": IssueSerializer(issue).data,
         "subject": email_thread.subject,
         "emails": EmailSerializer(email_thread.emails, many=True).data,
         "case_email_address": case_email_address,
@@ -209,7 +209,7 @@ def email_draft_create_view(request, pk):
         context = {
             "case_email_url": reverse("case-email-list", args=(issue.pk,)),
             "parent_email": parent_email,
-            "issue": IssueDetailSerializer(issue).data,
+            "issue": IssueSerializer(issue).data,
             "templates": EmailTemplateSerializer(templates, many=True).data,
         }
         return render_react_page(
@@ -244,7 +244,7 @@ def email_draft_edit_view(request, pk, email_pk):
                 "case-email-preview", args=(issue.pk, email.pk)
             ),
             "case_email_url": reverse("case-email-list", args=(issue.pk,)),
-            "issue": IssueDetailSerializer(issue).data,
+            "issue": IssueSerializer(issue).data,
             "email": EmailSerializer(email).data,
             "sharepoint_docs": sharepoint_docs,
         }

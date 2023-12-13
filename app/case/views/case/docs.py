@@ -6,7 +6,7 @@ from case.utils.router import Route
 from core.models import Issue
 from case.utils.react import render_react_page
 from case.views.case.detail import get_detail_urls
-from case.serializers import IssueDetailSerializer
+from case.serializers import IssueSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -32,7 +32,7 @@ def case_detail_documents_view(request, pk):
         raise Http404()
 
     context = {
-        "issue": IssueDetailSerializer(issue).data,
+        "issue": IssueSerializer(issue).data,
         "urls": get_detail_urls(issue),
     }
     return render_react_page(request, f"Case {issue.fileref}", "document-list", context)

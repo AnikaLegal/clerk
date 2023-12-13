@@ -1,20 +1,27 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  Container,
-  Header,
-  Table,
-  Input,
-  Label,
-  Dropdown,
-} from 'semantic-ui-react'
+import { Container, Header, Table, Input, Dropdown } from 'semantic-ui-react'
 
-import { mount, debounce, useEffectLazy } from 'utils'
-import { api } from 'api'
-import { FadeTransition } from 'comps/transitions'
-import { GroupLabels } from 'comps/group-label'
+import { mount } from 'utils'
+import { User } from 'apiNew'
 
-const { lawyers, paralegals } = window.REACT_CONTEXT
+interface AnnotatedUser extends User {
+  latest_issue_created_at: string
+  capacity: number
+  open_cases: number
+  open_repairs: number
+  open_bonds: number
+  open_eviction: number
+  total_cases: number
+}
+
+interface DjangoContext {
+  lawyers: AnnotatedUser[]
+  paralegals: AnnotatedUser[]
+}
+
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
+const { lawyers, paralegals } = CONTEXT
 
 const SEARCH_FIELDS = ['full_name', 'email']
 const INTERN_OPTIONS = [
@@ -74,7 +81,7 @@ const App = () => {
           clearable
           placeholder="Filter by intern status"
           options={INTERN_OPTIONS}
-          onChange={(e, { value }) => setIntern(value)}
+          onChange={(e, { value }) => setIntern(value as string)}
           value={intern}
         />
       </div>
@@ -84,7 +91,11 @@ const App = () => {
   )
 }
 
-const ParalegalTable = ({ accounts }) => (
+interface ParalegalTableProps {
+  accounts: AnnotatedUser[]
+}
+
+const ParalegalTable: React.FC<ParalegalTableProps> = ({ accounts }) => (
   <Table celled>
     <Table.Header>
       <Table.Row>

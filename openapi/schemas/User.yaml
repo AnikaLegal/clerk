@@ -1,0 +1,59 @@
+allOf:
+  - $ref: ./UserCreate.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      case_capacity:
+        type: integer
+      is_intern:
+        type: boolean
+      is_active:
+        type: boolean
+      is_superuser:
+        type: boolean
+      full_name:
+        type: string
+      created_at:
+        type: string
+      groups:
+        type: array
+        items:
+          type: string
+      url:
+        type: string
+      is_admin_or_better:
+        type: boolean
+      is_coordinator_or_better:
+        type: boolean
+      is_paralegal_or_better:
+        type: boolean
+      is_admin:
+        type: boolean
+      is_coordinator:
+        type: boolean
+      is_paralegal:
+        type: boolean
+      is_ms_account_set_up:
+        type: boolean
+      ms_account_created_at:
+        type: string
+        nullable: true
+    required:
+      - id
+      - case_capacity
+      - is_intern
+      - is_active
+      - is_superuser
+      - full_name
+      - created_at
+      - groups
+      - url
+      - is_admin_or_better
+      - is_coordinator_or_better
+      - is_paralegal_or_better
+      - is_admin
+      - is_coordinator
+      - is_paralegal
+      - is_ms_account_set_up
+      - ms_account_created_at

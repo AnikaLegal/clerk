@@ -13,3 +13,17 @@ paths:
     $ref: paths/person-detail.yaml
   /clerk/api/tenancy/{id}/:
     $ref: paths/tenancy-detail.yaml
+  /clerk/api/client/{id}/:
+    $ref: paths/client-detail.yaml
+  /clerk/api/account/:
+    $ref: paths/account-list.yaml
+  /clerk/api/account/{id}/:
+    $ref: paths/account-detail.yaml
+  /clerk/api/account/{id}/perms/:
+    $ref: paths/account-perms.yaml
+  /clerk/api/account/{id}/perms-resync/:
+    $ref: paths/account-perms-resync.yaml
+  /clerk/api/account/{id}/perms-promote/:
+    $ref: paths/account-perms-promote.yaml
+  /clerk/api/account/{id}/perms-demote/:
+    $ref: paths/account-perms-demote.yaml

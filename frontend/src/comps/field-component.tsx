@@ -57,7 +57,7 @@ const NumberField = ({
   return (
     <Input
       placeholder={placeholder}
-      value={value || ''}
+      value={!value && value !== 0 ? '' : value}
       name={name}
       onChange={(e, { name, value }) =>
         setFieldValue(name, value === '' ? null : value, false)

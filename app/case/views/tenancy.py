@@ -7,7 +7,11 @@ from rest_framework.mixins import UpdateModelMixin, RetrieveModelMixin
 from case.utils.react import render_react_page
 from case.serializers import TenancySerializer
 from core.models import Tenancy
-from .auth import paralegal_or_better_required, CoordinatorOrBetterCanWritePermission
+from .auth import (
+    paralegal_or_better_required,
+    CoordinatorOrBetterPermission,
+    ParalegalOrBetterObjectPermission,
+)
 
 
 @api_view(["GET"])
@@ -29,4 +33,6 @@ def tenancy_detail_page_view(request, pk):
 class TenancyApiViewset(GenericViewSet, RetrieveModelMixin, UpdateModelMixin):
     queryset = Tenancy.objects.all()
     serializer_class = TenancySerializer
-    permission_classes = [CoordinatorOrBetterCanWritePermission]
+    permission_classes = [
+        CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
+    ]

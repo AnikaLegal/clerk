@@ -33,18 +33,6 @@ properties:
     type: string
   notes:
     type: string
-  employment_status:
-    type: array
-    items:
-      type: string
-  rental_circumstances:
-    type: string
-  eligibility_circumstances:
-    type: array
-    items:
-      type: string
-  referrer_type:
-    type: string
   date_of_birth:
     type: string
     nullable: true
@@ -53,7 +41,6 @@ required:
   - last_name
   - email
   - phone_number
-  - employment_status
   - weekly_income
   - gender
   - centrelink_support
@@ -62,10 +49,7 @@ required:
   - primary_language_non_english
   - primary_language
   - is_aboriginal_or_torres_strait_islander
-  - rental_circumstances
   - number_of_dependents
-  - eligibility_circumstances
-  - referrer_type
   - referrer
   - notes
   - date_of_birth

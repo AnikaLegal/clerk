@@ -1,5 +1,4 @@
 from .client import ClientSerializer
-from .client_detail import ClientDetailSerializer
 from .email import (
     EmailTemplateSerializer,
     EmailAttachmentSerializer,
@@ -9,14 +8,11 @@ from .email import (
 from .issue import (
     IssueNoteCreateSerializer,
     IssueNoteSerializer,
-    BaseIssueSerializer,
-    IssueListSerializer,
-    IssueDetailSerializer,
+    IssueSerializer,
     IssueAssignmentSerializer,
 )
 
 from .notification import NotificationSerializer
 from .person import PersonSerializer, PersonSearchRequestSerializer
 from .tenancy import TenancySerializer
-from .user_detail import UserDetailSerializer
-from .user import UserSerializer, ParalegalSerializer
+from .user import UserSerializer, UserCreateSerializer, ParalegalSerializer

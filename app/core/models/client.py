@@ -4,6 +4,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
+from accounts.models import User
+
 from .timestamped import TimestampedModel
 
 
@@ -180,3 +182,9 @@ class Client(TimestampedModel):
     def __str__(self) -> str:
         name = self.get_full_name()
         return f"{name} ({self.id})"
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return self.issue_set.filter(paralegal=user).exists()

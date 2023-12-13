@@ -1,0 +1,42 @@
+get:
+  operationId: getUsers
+  parameters:
+    - name: name
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: group
+      in: query
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/User.yaml
+
+post:
+  operationId: createUser
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/UserCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/User.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

@@ -6,19 +6,26 @@ import {
   Table,
   Icon,
   Input,
-  Label,
   Dropdown,
 } from 'semantic-ui-react'
 
 import { mount, debounce, useEffectLazy } from 'utils'
-import { api } from 'api'
 import { FadeTransition } from 'comps/transitions'
 import { GroupLabels } from 'comps/group-label'
-const CONTEXT = window.REACT_CONTEXT
+import api, { User } from 'apiNew'
+
+interface DjangoContext {
+  users: User[]
+  create_url: string
+}
+
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
 const GROUP_OPTIONS = [
   { key: '', value: '', text: 'All groups' },
   { key: 'Paralegal', value: 'Paralegal', text: 'Paralegal' },
   { key: 'Coordinator', value: 'Coordinator', text: 'Coordinator' },
+  { key: 'Lawyer', value: 'Lawyer', text: 'Lawyer' },
   { key: 'Admin', value: 'Admin', text: 'Admin' },
 ]
 
@@ -26,15 +33,17 @@ const debouncer = debounce(300)
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [users, setUsers] = useState(CONTEXT.users)
-  const [name, setName] = useState('')
-  const [group, setGroups] = useState('')
+  const [users, setUsers] = useState<User[]>(CONTEXT.users)
+  const [name, setName] = useState<string>('')
+  const [group, setGroups] = useState<string>('')
+  const [getUsers] = api.useLazyGetUsersQuery()
+
   const search = debouncer(() => {
     setIsLoading(true)
-    api.accounts
-      .search({ name, group })
-      .then(({ data }) => {
-        setUsers(data)
+    getUsers({ name, group })
+      .unwrap()
+      .then((users) => {
+        setUsers(users)
         setIsLoading(false)
       })
       .catch(() => setIsLoading(false))
@@ -65,7 +74,7 @@ const App = () => {
           selection
           placeholder="Filter groups"
           options={GROUP_OPTIONS}
-          onChange={(e, { value }) => setGroups(value)}
+          onChange={(e, { value }) => setGroups(String(value))}
           value={group}
         />
       </div>

@@ -30,6 +30,8 @@ def test_generic_list_view_schema(
     Ensure that a given view's API list view matches the schema.
     """
     # Create an instance of the model
+    Model = test_case.factory._meta.model
+    instance_count = Model.objects.count()
     instance = test_case.factory.create()
 
     # Try view a list of instances
@@ -39,11 +41,13 @@ def test_generic_list_view_schema(
 
     # Check results
     assert response.status_code == 200, response.json()
-    assert len(response.json()) == 1
+    assert len(response.json()) == instance_count + 1
+    ids = [o["id"] for o in response.json()]
+
     if isinstance(instance.id, uuid.UUID):
-        assert response.json()[0]["id"] == str(instance.id)
+        assert str(instance.id) in ids
     else:
-        assert response.json()[0]["id"] == instance.id
+        assert instance.id in ids
     schema_tester.validate_response(response=response)
 
 
@@ -91,10 +95,12 @@ def test_generic_delete_view_schema(
     Ensure that a given view's API delete view matches the schema.
     """
     Model = test_case.factory._meta.model
+    instance_count = Model.objects.count()
 
     # Create an instance of the model
     instance = test_case.factory.create()
-    assert Model.objects.count() == 1
+    new_instance_count = Model.objects.count()
+    assert new_instance_count == instance_count + 1
 
     # Try view a single instance
     detail_view_name = f"{test_case.base_view_name}-detail"
@@ -103,5 +109,5 @@ def test_generic_delete_view_schema(
 
     # Check results
     assert response.status_code == 204, response.json()
-    assert Model.objects.count() == 0
+    assert Model.objects.count() == instance_count
     schema_tester.validate_response(response=response)

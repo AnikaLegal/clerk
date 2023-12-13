@@ -11,6 +11,16 @@ allOf:
         type: integer
       full_name:
         type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
+      call_times:
+        $ref: ./TextChoiceListField.yaml
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      eligibility_circumstances:
+        $ref: ./TextChoiceListField.yaml
+      rental_circumstances:
+        $ref: ./TextChoiceField.yaml
 
     required:
       - id
@@ -18,3 +28,9 @@ allOf:
       - age
       - full_name
       - date_of_birth
+      # Choice fields
+      - referrer_type
+      - call_times
+      - employment_status
+      - eligibility_circumstances
+      - rental_circumstances

@@ -1,7 +1,10 @@
+"""
+Django forms
+TODO: Remove these, replace with DRF serializers
+"""
 from django import forms
 from django.forms.fields import BooleanField
 from django.db.models import Q
-from django.core.exceptions import ValidationError
 
 from accounts.models import User
 from core.models import Issue
@@ -11,30 +14,6 @@ from core.models.issue import CaseTopic
 class DocumentTemplateForm(forms.Form):
     topic = forms.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES)
     files = forms.FileField()
-
-
-class InviteParalegalForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "email", "username"]
-
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        if not email.endswith("@anikalegal.com"):
-            raise ValidationError(
-                f"Can only invite users with an anikalegal.com email."
-            )
-
-        return email
-
-    def save(self, *args, **kwargs):
-        user = super().save(*args, **kwargs)
-        return user
 
 
 class IssueSearchForm(forms.ModelForm):
