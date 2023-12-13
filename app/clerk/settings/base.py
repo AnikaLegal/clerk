@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "webpack_loader",
+    # django_cleanup must be last.
     "django_cleanup.apps.CleanupSelectedConfig",
 ]
 
