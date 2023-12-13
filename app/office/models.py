@@ -1,8 +1,6 @@
 from django.apps import apps
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.utils import timezone
 from django_cleanup import cleanup
 from pathlib import Path
@@ -31,7 +29,7 @@ class ClosureTemplate(models.Model):
 class Closure(models.Model):
     def _get_template_default():
         if not ClosureTemplate.objects.exists():
-            ClosureTemplate.objects.create().save()
+            ClosureTemplate.objects.create()
         return ClosureTemplate.objects.latest("created_at").pk
 
     def _get_file_name(instance, name):
