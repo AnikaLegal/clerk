@@ -7,11 +7,13 @@ from django.views.decorators.http import require_http_methods
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from twilio.twiml.messaging_response import MessagingResponse
-from twilio.twiml.voice_response import Gather, VoiceResponse
+from twilio.twiml.voice_response import Gather, VoiceResponse, Say
+
 
 from core.models.issue import CaseTopic
 from caller.choices import Choice
-from caller.messages import sms, voice
+from caller.messages import sms
+from office.closure.service import get_closure_call
 
 from .models import Call
 
@@ -32,18 +34,21 @@ TOPIC_MAPPING = {
     Choice.CALLBACK: CaseTopic.OTHER,
 }
 
-@require_http_methods(["GET"])
-def christmas_answer_view(request):  # Used for christmas
-    """Respond to phone call from user"""
-    response = VoiceResponse()
-    response.play(_get_audio_url("christmas-office-closed.wav"))
-    return TwimlResponse(response)
-
 
 @require_http_methods(["GET"])
 def answer_view(request):  # Normal view
     """Respond to phone call from user"""
     response = VoiceResponse()
+
+    # Handle calls when the office is closed.
+    closed = get_closure_call()
+    if closed:
+        if closed.audio:
+            response.play(_get_audio_url(closed.audio))
+        else:
+            say = Say(closed.text, voice="Polly.Nicole")
+            response.append(say)
+        return TwimlResponse(response)
 
     # Create an entry for this new call.
     number = request.GET.get("From")
@@ -81,7 +86,7 @@ def collect_view(request):
     elif choice == Choice.CALLBACK:
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = sms.CALLBACK_SMS_MESSAGE
-    else: # Repeat options.
+    else:  # Repeat options.
         response.redirect = response.redirect(reverse("caller-answer"), method="GET")
         return TwimlResponse(response)
 
@@ -123,4 +128,7 @@ class TwimlResponse(HttpResponse):
 
 
 def _get_audio_url(filename: str):
-    return urljoin(settings.TWILIO_AUDIO_BASE_URL, filename)
+    url = "https://{bucket}.s3-{region}.amazonaws.com".format(
+        bucket=settings.TWILIO_AUDIO_BUCKET_NAME, region=settings.AWS_REGION_NAME
+    )
+    return urljoin(url, filename)
