@@ -50,7 +50,9 @@ watchdog[watchmedo]
 # File storage
 boto3
 django-storages
+django-cleanup
 Pillow
+
 
 # Linting
 isort
@@ -67,6 +69,7 @@ responses
 freezegun
 openapi-spec-validator
 drf-openapi-tester
+django-override-storage
 
 # Admin
 pygments  # Pretty print JSON in admin

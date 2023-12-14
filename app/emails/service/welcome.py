@@ -2,11 +2,13 @@ import logging
 from utils.sentry import sentry_task
 from django.db import transaction
 from django.conf import settings
+from bs4 import BeautifulSoup
 
 from core.models import Issue
 from case.views.case.email import _render_email_template
 from emails.models import Email, EmailState
 from emails.service.send import build_clerk_address
+from office.closure.service import get_closure_email
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +21,10 @@ def send_welcome_email(issue_pk: str):
     client = issue.client
     case_email = build_clerk_address(issue, email_only=True)
     name = client.get_full_name()
-    text = EMAIL_TEXT.format(name=name, fileref=issue.fileref, case_email=case_email)
-    html = EMAIL_HTML.format(name=name, fileref=issue.fileref, case_email=case_email)
+
+    html = get_email_html(name, issue.fileref, case_email)
+    text = get_email_text(html)
+
     if (not settings.IS_PROD) and (not client.email.endswith("@anikalegal.com")):
         msg = "Not sending welcome email for Issue<%s> - only Anika emails allowed in non-prod environments"
         logging.error(msg, issue_pk)
@@ -34,60 +38,27 @@ def send_welcome_email(issue_pk: str):
             text=text,
             html=_render_email_template(html),
         )
-
     # Mark request as sent
     Issue.objects.filter(pk=issue_pk).update(is_welcome_email_sent=True)
 
 
-CHRISTMAS_EMAIL_HTML = """
-<p>
-Hi {name},
-</p>
-<p>
-Thanks for submitting a case enquiry to Anika Legal. 
-Anika Legal is closed for the end of year break from 20 December 2022, and we will reopen on 9 January 2023. 
-<br/>
-Your case number is {fileref}.
-</p>
-<p>
-Once we return from the break, we will review your case to determine eligibility. 
-We are operated by volunteers and appreciate your patience, as we find capacity to assign your matter.
-</p>
-<p>
-Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
-</p>
-<p>
-If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at the following address:
-</p>
-<p>
-{case_email}
-</p>
-<p>
-We will attend to your email when we return. 
-We wish you a safe and happy holiday period,
-</p>
-"""
+def get_email_html(name, fileref, case_email):
+    html = get_closure_email()
+    if not html:
+        html = EMAIL_HTML
+    return html.format(name=name, fileref=fileref, case_email=case_email)
 
 
-CHRISTMAS_EMAIL_TEXT = """Hi {name},
-
-Thanks for submitting a case enquiry to Anika Legal. Anika Legal is closed for the end of year break from 20 December 2022, and we will reopen on 9 January 2023. 
-Your case number is {fileref}.
-
-Once we return from the break, we will review your case to determine eligibility.  We are operated by volunteers and appreciate your patience, as we find capacity to assign your matter.
-
-Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
-
-If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at {case_email}
-
-We will attend to your email when we return. 
-
-We wish you a safe and happy holiday period,
-Anika Legal
-"""
+def get_email_text(html):
+    soup = BeautifulSoup(html, parser="lxml", features="lxml")
+    text = soup.get_text("\n\n", strip=True)
+    # The HTML version of the email uses an image as the sign-off name.
+    # For the text version we just add a text sign-off.
+    text += "\nAnika Legal"
+    return text
 
 
-NORMAL_EMAIL_HTML = """
+EMAIL_HTML = """
 <p>
 Hi {name},
 </p>
@@ -112,23 +83,3 @@ If you have any questions in the meantime, or decide you no longer wish to proce
 Kind regards,
 </p>
 """
-
-
-NORMAL_EMAIL_TEXT = """Hi {name},
-
-Thanks for submitting a case enquiry to Anika Legal.
-Your case number is {fileref}.
-
-We’re reviewing your case and will aim to be in touch within the next week. We are operated by volunteers and appreciate your patience, as we find capacity to assign your matter.
-
-Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
-
-If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at {case_email}
-
-Kind regards,
-Anika Legal
-"""
-
-
-EMAIL_HTML = NORMAL_EMAIL_HTML
-EMAIL_TEXT = NORMAL_EMAIL_TEXT
