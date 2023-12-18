@@ -10,7 +10,9 @@ import { ProgressForm } from './case-progress'
 import { ConflictForm } from './case-conflict-check'
 import { TenancyForm } from './tenancy'
 import { AccountForm} from "./account"
+import { DocumentTemplateForm} from "./doc-template"
 export {
+  DocumentTemplateForm,
   AccountForm,
   TenancyForm,
   FilenoteForm,

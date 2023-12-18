@@ -1,0 +1,14 @@
+allOf:
+  - $ref: ./EmailTemplateCreate.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+      created_at:
+        type: string
+    required:
+      - id
+      - url
+      - created_at

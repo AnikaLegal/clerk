@@ -7,7 +7,7 @@ from django.db.models import Q
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.mixins import UpdateModelMixin, ListModelMixin
 from django.urls import reverse
 from django_q.tasks import async_task
 from django.core.exceptions import PermissionDenied
@@ -82,29 +82,30 @@ def account_create_page_view(request):
     return render_react_page(request, "Invite paralegal", "account-create", {})
 
 
-class AccountApiViewset(GenericViewSet, UpdateModelMixin):
-    queryset = User.objects.prefetch_related("groups").order_by("-date_joined").all()
+class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     serializer_class = UserSerializer
     permission_classes = [CoordinatorOrBetterPermission]
 
-    def list(self, request):
-        users = self.filter_queryset(self.get_queryset())
-        # FIXME: Move to DRF filters.
-        if "name" in request.GET or "group" in request.GET:
-            name, group = request.GET.get("name"), request.GET.get("group")
-            query = None
-            if name:
-                query = Q(first_name__icontains=name) | Q(last_name__icontains=name)
+    def get_queryset(self):
+        """Filter by query params"""
+        queryset = (
+            User.objects.prefetch_related("groups").order_by("-date_joined").all()
+        )
+        name = self.request.query_params.get("name")
+        group = self.request.query_params.get("group")
 
-            if group:
-                group_query = Q(groups__name=group)
-                query = (query & group_query) if query else group_query
+        query = None
+        if name:
+            query = Q(first_name__icontains=name) | Q(last_name__icontains=name)
 
-            if query:
-                users = users.filter(query)
+        if group:
+            group_query = Q(groups__name=group)
+            query = (query & group_query) if query else group_query
 
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+        if query:
+            queryset = queryset.filter(query)
+
+        return queryset
 
     def create(self, request, *args, **kwargs):
         """Invite a paralegal to join the platform"""

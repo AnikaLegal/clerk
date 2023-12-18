@@ -8,12 +8,6 @@ from django.db.models import Q
 
 from accounts.models import User
 from core.models import Issue
-from core.models.issue import CaseTopic
-
-
-class DocumentTemplateForm(forms.Form):
-    topic = forms.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES)
-    files = forms.FileField()
 
 
 class IssueSearchForm(forms.ModelForm):

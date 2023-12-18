@@ -3,7 +3,6 @@ import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
 import { MarkdownEditor } from 'comps/markdown-editor'
 
-
 // Formik form component
 export const EmailTemplateForm = ({
   create,
@@ -87,7 +86,5 @@ export const EmailTemplateForm = ({
         Delete
       </Button>
     ) : null}
-
-
   </Form>
 )

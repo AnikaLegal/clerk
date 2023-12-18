@@ -360,6 +360,265 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-email/:
+    get:
+      operationId: getEmailTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailTemplate"
+    post:
+      operationId: createEmailTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-email/{id}/:
+    get:
+      operationId: getEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+    patch:
+      operationId: updateEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-notify/:
+    get:
+      operationId: getNotificationTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationTemplate"
+    post:
+      operationId: createNotificationTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationTemplateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-notify/{id}/:
+    get:
+      operationId: getNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+    patch:
+      operationId: updateNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationTemplateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-doc/:
+    get:
+      operationId: getDocumentTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentTemplate"
+    post:
+      operationId: createDocumentTemplate
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DocumentTemplateCreate"
+      responses:
+        "201":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-doc/{id}/:
+    delete:
+      operationId: deleteDocumentTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
     PersonBase:
@@ -789,6 +1048,130 @@ components:
         - has_coordinator_perms
         - paralegal_perm_issues
         - paralegal_perm_missing_issues
+    EmailTemplateCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        subject:
+          type: string
+        text:
+          type: string
+      required:
+        - name
+        - topic
+        - subject
+        - text
+    EmailTemplate:
+      allOf:
+        - $ref: "#/components/schemas/EmailTemplateCreate"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            created_at:
+              type: string
+          required:
+            - id
+            - url
+            - created_at
+    NotificationTemplateBase:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        event_stage:
+          type: string
+        raw_text:
+          type: string
+        message_text:
+          type: string
+      required:
+        - name
+        - topic
+        - event_stage
+        - raw_text
+        - message_text
+    NotificationTemplate:
+      allOf:
+        - $ref: "#/components/schemas/NotificationTemplateBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            created_at:
+              type: string
+            event:
+              $ref: "#/components/schemas/TextChoiceField"
+            channel:
+              $ref: "#/components/schemas/TextChoiceField"
+            target:
+              $ref: "#/components/schemas/TextChoiceField"
+          required:
+            - id
+            - url
+            - created_at
+            - event
+            - channel
+            - target
+    NotificationTemplateCreate:
+      allOf:
+        - $ref: "#/components/schemas/NotificationTemplateBase"
+        - type: object
+          properties:
+            event:
+              type: string
+            channel:
+              type: string
+            target:
+              type: string
+          required:
+            - event
+            - channel
+            - target
+    DocumentTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        topic:
+          type: string
+        url:
+          type: string
+        created_at:
+          type: string
+        modified_at:
+          type: string
+      required:
+        - id
+        - name
+        - topic
+        - url
+        - created_at
+        - modified_at
+    DocumentTemplateCreate:
+      type: object
+      properties:
+        topic:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - topic
+        - files
   responses:
     BadRequest:
       description: Bad request

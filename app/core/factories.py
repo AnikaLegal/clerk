@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 
 from accounts.models import User
-from emails.models import Email, EmailState, EmailAttachment
+from emails.models import Email, EmailTemplate, EmailAttachment
 from core.models import Client, FileUpload, Issue, Person, Tenancy
 from core.models.issue import CaseStage
 from notify.models import (
@@ -140,6 +140,17 @@ class EmailFactory(factory.django.DjangoModelFactory):
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
     )
+
+
+@factory.django.mute_signals(post_save)
+class EmailTemplateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailTemplate
+
+    name = factory.Faker("sentence")
+    topic = "GENERAL"
+    text = factory.Faker("sentence")
+    subject = factory.Faker("sentence")
 
 
 @factory.django.mute_signals(post_save)

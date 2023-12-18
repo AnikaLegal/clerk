@@ -11,7 +11,7 @@ from .issue import (
     IssueSerializer,
     IssueAssignmentSerializer,
 )
-
+from .documents import DocumentTemplateSerializer
 from .notification import NotificationSerializer
 from .person import PersonSerializer, PersonSearchRequestSerializer
 from .tenancy import TenancySerializer

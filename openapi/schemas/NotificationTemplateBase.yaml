@@ -1,0 +1,19 @@
+type: object
+properties:
+  name:
+    type: string
+  topic:
+    type: string
+  event_stage:
+    type: string
+  raw_text:
+    type: string
+  message_text:
+    type: string
+
+required:
+  - name
+  - topic
+  - event_stage
+  - raw_text
+  - message_text

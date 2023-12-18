@@ -1,3 +1,4 @@
+import { FormikProps } from 'formik'
 import React from 'react'
 import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
@@ -35,8 +36,15 @@ const CONTACT_OPTIONS = [
   },
 ]
 
+interface PersonFormProps {
+  create?: boolean
+  editable?: boolean
+  handleDelete?: (e: any) => void
+  formik: FormikProps<any>
+}
+
 // Formik form component
-export const PersonForm = ({
+export const PersonForm: React.FC<PersonFormProps> = ({
   create,
   editable,
   handleDelete,

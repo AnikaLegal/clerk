@@ -1,0 +1,15 @@
+allOf:
+  - $ref: ./NotificationTemplateBase.yaml
+  - type: object
+    properties:
+      event:
+        type: string
+      channel:
+        type: string
+      target:
+        type: string
+
+    required:
+      - event
+      - channel
+      - target

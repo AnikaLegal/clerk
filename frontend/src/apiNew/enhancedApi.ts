@@ -1,3 +1,4 @@
+import { FetchArgs } from '@reduxjs/toolkit/query'
 import { generatedApi } from './api.generated'
 
 const ENTITY_TYPES = ['Thing'] as const
