@@ -20,10 +20,6 @@ class PageTestCase:
     factory: Optional[DjangoModelFactory]
 
 
-BuildEmailTemplate = lambda: EmailTemplate.objects.create(
-    name="Test", topic="GENERAL", text="Hello", subject="World"
-)
-
 PAGE_TEST_CASE = [
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
@@ -40,13 +36,19 @@ PAGE_TEST_CASE = [
     PageTestCase(name="paralegal-list", factory=factories.UserFactory, is_detail=False),
     PageTestCase(name="template-list", factory=None, is_detail=False),
     PageTestCase(
-        name="template-email-list", factory=BuildEmailTemplate, is_detail=False
+        name="template-email-list",
+        factory=factories.EmailTemplateFactory,
+        is_detail=False,
     ),
     PageTestCase(
-        name="template-email-create", factory=BuildEmailTemplate, is_detail=False
+        name="template-email-create",
+        factory=factories.EmailTemplateFactory,
+        is_detail=False,
     ),
     PageTestCase(
-        name="template-email-detail", factory=BuildEmailTemplate, is_detail=True
+        name="template-email-detail",
+        factory=factories.EmailTemplateFactory,
+        is_detail=True,
     ),
     PageTestCase(
         name="template-notify-list",
