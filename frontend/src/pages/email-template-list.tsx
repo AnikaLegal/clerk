@@ -7,37 +7,50 @@ import {
   Input,
   Dropdown,
 } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { mount, debounce, useEffectLazy } from 'utils'
-import { api } from 'api'
+import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
 import { FadeTransition } from 'comps/transitions'
+import api, { EmailTemplate } from 'apiNew'
 
-const CONTEXT = window.REACT_CONTEXT
+interface DjangoContext {
+  topic_options: { key: string; value: string; text: string }[]
+  templates: EmailTemplate[]
+  create_url: string
+}
 
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [notifications, setNotifications] = useState(CONTEXT.notifications)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [templates, setTemplates] = useState<EmailTemplate[]>(CONTEXT.templates)
   const [name, setName] = useState('')
   const [topic, setTopic] = useState('')
+  const [searchTemplates] = api.useLazyGetEmailTemplatesQuery()
+  const { enqueueSnackbar } = useSnackbar()
   const search = debouncer(() => {
     setIsLoading(true)
-    api.templates.notify
-      .search({ name, topic })
-      .then(({ data }) => {
-        setNotifications(data)
+    searchTemplates({ name, topic })
+      .unwrap()
+      .then((templates) => {
+        setTemplates(templates)
         setIsLoading(false)
       })
-      .catch(() => setIsLoading(false))
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
+          variant: 'error',
+        })
+        setIsLoading(false)
+      })
   })
   useEffectLazy(() => search(), [name, topic])
   return (
     <Container>
-      <Header as="h1">Notification Templates</Header>
+      <Header as="h1">Email Templates</Header>
       <a href={CONTEXT.create_url}>
-        <Button primary>Create a new notification template</Button>
+        <Button primary>Create a new email template</Button>
       </a>
       <div
         style={{
@@ -59,7 +72,7 @@ const App = () => {
           clearable
           placeholder="Select a case type"
           options={CONTEXT.topic_options}
-          onChange={(e, { value }) => setTopic(value)}
+          onChange={(e, { value }) => setTopic(value as string)}
           value={topic}
         />
       </div>
@@ -69,27 +82,23 @@ const App = () => {
             <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
               <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Event</Table.HeaderCell>
-              <Table.HeaderCell>Channel</Table.HeaderCell>
-              <Table.HeaderCell>Target</Table.HeaderCell>
+              <Table.HeaderCell>Subject</Table.HeaderCell>
               <Table.HeaderCell>Created At</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {notifications.length < 1 && (
+            {templates.length < 1 && (
               <Table.Row>
-                <td>No notifications found</td>
+                <td>No templates found</td>
               </Table.Row>
             )}
-            {notifications.map((t) => (
+            {templates.map((t) => (
               <Table.Row key={t.url}>
                 <Table.Cell>
                   <a href={t.url}>{t.name}</a>
                 </Table.Cell>
                 <Table.Cell>{t.topic}</Table.Cell>
-                <Table.Cell>{t.event.display}</Table.Cell>
-                <Table.Cell>{t.channel.display}</Table.Cell>
-                <Table.Cell>{t.target.display}</Table.Cell>
+                <Table.Cell>{t.subject}</Table.Cell>
                 <Table.Cell>{t.created_at}</Table.Cell>
               </Table.Row>
             ))}

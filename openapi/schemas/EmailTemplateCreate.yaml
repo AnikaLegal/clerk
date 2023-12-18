@@ -1,0 +1,16 @@
+type: object
+properties:
+  name:
+    type: string
+  topic:
+    type: string
+  subject:
+    type: string
+  text:
+    type: string
+
+required:
+  - name
+  - topic
+  - subject
+  - text

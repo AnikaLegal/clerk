@@ -161,7 +161,24 @@ export const getAPIFormErrors = (err: ErrorResult): FormErrors | null => {
   }
   let requestErrors: { [key: string]: string } | null = null
   if (statusNumber == 400 && 'data' in err) {
-    requestErrors = err.data as { [key: string]: string }
+    requestErrors = Object.entries(err.data).reduce(
+      (obj, [k, v]) => ({ ...obj, [k]: parseError(v) }),
+      {}
+    ) as { [key: string]: string }
   }
   return requestErrors
+}
+
+const parseError = (error: any) => {
+  const isArray = Array.isArray(error)
+  const isObject = typeof error === 'object'
+  if (isArray) {
+    return error.map((e) => String(e)).join(', ')
+  } else if (isObject) {
+    return Object.entries(error)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', ')
+  } else {
+    return String(error)
+  }
 }

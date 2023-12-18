@@ -1,9 +1,9 @@
 import React from 'react'
+import { FormikProps } from 'formik'
 import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
 import { STAGES } from 'consts'
 import { SlackyMarkdownEditor } from 'comps/markdown-editor'
-
 
 const STAGE_OPTIONS = Object.entries(STAGES)
   .filter(([k, v]) => k !== 'UNSTARTED')
@@ -26,7 +26,14 @@ const TARGET_OPTIONS = [
   { key: 'LAWYER', value: 'LAWYER', text: 'Assigned lawyer' },
 ]
 
-export const NotifyTemplateForm = ({
+interface NotifyTemplateFormProps {
+  create?: boolean
+  onDelete?: (e: any) => void
+  topicOptions: any[]
+  formik: FormikProps<any>
+}
+
+export const NotifyTemplateForm: React.FC<NotifyTemplateFormProps> = ({
   create,
   onDelete,
   topicOptions,

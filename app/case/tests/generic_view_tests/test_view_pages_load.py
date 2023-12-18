@@ -1,20 +1,23 @@
 """
-Smoke tests for HTML pages.
+Smoke tests for pages that render HTML or React apps.
+ie. not JSON API endpoints
 """
 from dataclasses import dataclass
+from typing import Optional
 
 import pytest
 from django.urls import reverse
 from factory.django import DjangoModelFactory
 
 from core import factories
+from emails.models import EmailTemplate
 
 
 @dataclass
 class PageTestCase:
     name: str
     is_detail: bool
-    factory: DjangoModelFactory
+    factory: Optional[DjangoModelFactory]
 
 
 PAGE_TEST_CASE = [
@@ -28,9 +31,42 @@ PAGE_TEST_CASE = [
     ),
     PageTestCase(name="client-detail", factory=factories.ClientFactory, is_detail=True),
     PageTestCase(name="account-list", factory=factories.UserFactory, is_detail=False),
-    PageTestCase(name="account-create", factory=factories.UserFactory, is_detail=False),
+    PageTestCase(name="account-create", factory=None, is_detail=False),
     PageTestCase(name="account-detail", factory=factories.UserFactory, is_detail=True),
     PageTestCase(name="paralegal-list", factory=factories.UserFactory, is_detail=False),
+    PageTestCase(name="template-list", factory=None, is_detail=False),
+    PageTestCase(
+        name="template-email-list",
+        factory=factories.EmailTemplateFactory,
+        is_detail=False,
+    ),
+    PageTestCase(
+        name="template-email-create",
+        factory=factories.EmailTemplateFactory,
+        is_detail=False,
+    ),
+    PageTestCase(
+        name="template-email-detail",
+        factory=factories.EmailTemplateFactory,
+        is_detail=True,
+    ),
+    PageTestCase(
+        name="template-notify-list",
+        factory=factories.NotificationFactory,
+        is_detail=False,
+    ),
+    PageTestCase(
+        name="template-notify-create",
+        factory=factories.NotificationFactory,
+        is_detail=False,
+    ),
+    PageTestCase(
+        name="template-notify-detail",
+        factory=factories.NotificationFactory,
+        is_detail=True,
+    ),
+    PageTestCase(name="template-doc-list", factory=None, is_detail=False),
+    PageTestCase(name="template-doc-create", factory=None, is_detail=False),
 ]
 
 TEST_NAMES = [tc.name for tc in PAGE_TEST_CASE]
@@ -42,8 +78,9 @@ def test_case_page_status_code(superuser_client, test_case):
     """
     Ensure URLs return the correct status code.
     """
-    instance = test_case.factory()
+    instance = test_case.factory() if test_case.factory else None
     if test_case.is_detail:
+        assert instance, "A factory is required"
         url = reverse(test_case.name, args=(instance.pk,))
     else:
         url = reverse(test_case.name)

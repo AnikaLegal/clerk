@@ -1,0 +1,12 @@
+type: object
+properties:
+  topic:
+    type: string
+  files:
+    type: array
+    items:
+      type: string
+      format: binary
+required:
+  - topic
+  - files

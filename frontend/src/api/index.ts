@@ -1,4 +1,4 @@
-import { Issue, Person, CreatePerson, User } from 'types'
+import { Issue } from 'types'
 import { Upload, Submission } from 'intake/types'
 
 const getCookie = (name) => {
@@ -198,54 +198,6 @@ export const api = {
       upload: (issuePk, emailPk, attachId) => {
         const url = `/clerk/cases/email/${issuePk}/${emailPk}/${attachId}/`
         return http.post(url, {})
-      },
-    },
-  },
-  templates: {
-    notify: {
-      search: (query) => {
-        const url = '/clerk/templates/notify/search/'
-        return http.get(url, query)
-      },
-      create: (data) => {
-        const url = '/clerk/templates/notify/create/'
-        return http.post(url, data)
-      },
-      update: (pk, data) => {
-        const url = `/clerk/templates/notify/${pk}/`
-        return http.put(url, data)
-      },
-      delete: (pk) => {
-        const url = `/clerk/templates/notify/${pk}/delete/`
-        return http.delete(url)
-      },
-    },
-    doc: {
-      search: (query) => {
-        const url = '/clerk/templates/doc/search/'
-        return http.get(url, query)
-      },
-      delete: (pk) => {
-        const url = `/clerk/templates/doc/${pk}/delete/`
-        return http.delete(url)
-      },
-    },
-    email: {
-      search: (query) => {
-        const url = '/clerk/templates/email/search/'
-        return http.get(url, query)
-      },
-      create: (data) => {
-        const url = '/clerk/templates/email/create/'
-        return http.post(url, data)
-      },
-      update: (pk, data) => {
-        const url = `/clerk/templates/email/${pk}/`
-        return http.put(url, data)
-      },
-      delete: (pk) => {
-        const url = `/clerk/templates/email/${pk}/`
-        return http.delete(url)
       },
     },
   },

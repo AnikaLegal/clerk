@@ -27,3 +27,15 @@ paths:
     $ref: paths/account-perms-promote.yaml
   /clerk/api/account/{id}/perms-demote/:
     $ref: paths/account-perms-demote.yaml
+  /clerk/api/template-email/:
+    $ref: paths/template-email-list.yaml
+  /clerk/api/template-email/{id}/:
+    $ref: paths/template-email-detail.yaml
+  /clerk/api/template-notify/:
+    $ref: paths/template-notify-list.yaml
+  /clerk/api/template-notify/{id}/:
+    $ref: paths/template-notify-detail.yaml
+  /clerk/api/template-doc/:
+    $ref: paths/template-doc-list.yaml
+  /clerk/api/template-doc/{id}/:
+    $ref: paths/template-doc-detail.yaml

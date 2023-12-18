@@ -108,6 +108,126 @@ const injectedRtkApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
+    getEmailTemplates: build.query<
+      GetEmailTemplatesApiResponse,
+      GetEmailTemplatesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-email/`,
+        params: { name: queryArg.name, topic: queryArg.topic },
+      }),
+    }),
+    createEmailTemplate: build.mutation<
+      CreateEmailTemplateApiResponse,
+      CreateEmailTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-email/`,
+        method: 'POST',
+        body: queryArg.emailTemplateCreate,
+      }),
+    }),
+    getEmailTemplate: build.query<
+      GetEmailTemplateApiResponse,
+      GetEmailTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-email/${queryArg.id}/`,
+      }),
+    }),
+    updateEmailTemplate: build.mutation<
+      UpdateEmailTemplateApiResponse,
+      UpdateEmailTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-email/${queryArg.id}/`,
+        method: 'PATCH',
+        body: queryArg.emailTemplateCreate,
+      }),
+    }),
+    deleteEmailTemplate: build.mutation<
+      DeleteEmailTemplateApiResponse,
+      DeleteEmailTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-email/${queryArg.id}/`,
+        method: 'DELETE',
+      }),
+    }),
+    getNotificationTemplates: build.query<
+      GetNotificationTemplatesApiResponse,
+      GetNotificationTemplatesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-notify/`,
+        params: { name: queryArg.name, topic: queryArg.topic },
+      }),
+    }),
+    createNotificationTemplate: build.mutation<
+      CreateNotificationTemplateApiResponse,
+      CreateNotificationTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-notify/`,
+        method: 'POST',
+        body: queryArg.notificationTemplateCreate,
+      }),
+    }),
+    getNotificationTemplate: build.query<
+      GetNotificationTemplateApiResponse,
+      GetNotificationTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-notify/${queryArg.id}/`,
+      }),
+    }),
+    updateNotificationTemplate: build.mutation<
+      UpdateNotificationTemplateApiResponse,
+      UpdateNotificationTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-notify/${queryArg.id}/`,
+        method: 'PATCH',
+        body: queryArg.notificationTemplateCreate,
+      }),
+    }),
+    deleteNotificationTemplate: build.mutation<
+      DeleteNotificationTemplateApiResponse,
+      DeleteNotificationTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-notify/${queryArg.id}/`,
+        method: 'DELETE',
+      }),
+    }),
+    getDocumentTemplates: build.query<
+      GetDocumentTemplatesApiResponse,
+      GetDocumentTemplatesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-doc/`,
+        params: { name: queryArg.name, topic: queryArg.topic },
+      }),
+    }),
+    createDocumentTemplate: build.mutation<
+      CreateDocumentTemplateApiResponse,
+      CreateDocumentTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-doc/`,
+        method: 'POST',
+        body: queryArg.documentTemplateCreate,
+      }),
+    }),
+    deleteDocumentTemplate: build.mutation<
+      DeleteDocumentTemplateApiResponse,
+      DeleteDocumentTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-doc/${queryArg.id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -212,6 +332,85 @@ export type DemoteUserAccountPermissionsApiResponse =
     permissions: MicrosoftUserPermissions
   }
 export type DemoteUserAccountPermissionsApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type GetEmailTemplatesApiResponse =
+  /** status 200 Successful response. */ EmailTemplate[]
+export type GetEmailTemplatesApiArg = {
+  name?: string
+  topic?: string
+}
+export type CreateEmailTemplateApiResponse =
+  /** status 201 Successful response. */ EmailTemplate
+export type CreateEmailTemplateApiArg = {
+  emailTemplateCreate: EmailTemplateCreate
+}
+export type GetEmailTemplateApiResponse =
+  /** status 200 Successful response. */ EmailTemplate
+export type GetEmailTemplateApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type UpdateEmailTemplateApiResponse =
+  /** status 200 Successful response. */ EmailTemplate
+export type UpdateEmailTemplateApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  emailTemplateCreate: EmailTemplateCreate
+}
+export type DeleteEmailTemplateApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteEmailTemplateApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type GetNotificationTemplatesApiResponse =
+  /** status 200 Successful response. */ NotificationTemplate[]
+export type GetNotificationTemplatesApiArg = {
+  name?: string
+  topic?: string
+}
+export type CreateNotificationTemplateApiResponse =
+  /** status 201 Successful response. */ NotificationTemplate
+export type CreateNotificationTemplateApiArg = {
+  notificationTemplateCreate: NotificationTemplateCreate
+}
+export type GetNotificationTemplateApiResponse =
+  /** status 200 Successful response. */ NotificationTemplate
+export type GetNotificationTemplateApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type UpdateNotificationTemplateApiResponse =
+  /** status 200 Successful response. */ NotificationTemplate
+export type UpdateNotificationTemplateApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  notificationTemplateCreate: NotificationTemplateCreate
+}
+export type DeleteNotificationTemplateApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteNotificationTemplateApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type GetDocumentTemplatesApiResponse =
+  /** status 200 Successful response. */ DocumentTemplate[]
+export type GetDocumentTemplatesApiArg = {
+  name?: string
+  topic?: string
+}
+export type CreateDocumentTemplateApiResponse =
+  /** status 201 The specific resource was deleted successfully */ void
+export type CreateDocumentTemplateApiArg = {
+  documentTemplateCreate: DocumentTemplateCreate
+}
+export type DeleteDocumentTemplateApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number
 }
@@ -347,6 +546,49 @@ export type MicrosoftUserPermissions = {
   paralegal_perm_issues: Issue[]
   paralegal_perm_missing_issues: Issue[]
 }
+export type EmailTemplateCreate = {
+  name: string
+  topic: string
+  subject: string
+  text: string
+}
+export type EmailTemplate = EmailTemplateCreate & {
+  id: number
+  url: string
+  created_at: string
+}
+export type NotificationTemplateBase = {
+  name: string
+  topic: string
+  event_stage: string
+  raw_text: string
+  message_text: string
+}
+export type NotificationTemplate = NotificationTemplateBase & {
+  id: number
+  url: string
+  created_at: string
+  event: TextChoiceField
+  channel: TextChoiceField
+  target: TextChoiceField
+}
+export type NotificationTemplateCreate = NotificationTemplateBase & {
+  event: string
+  channel: string
+  target: string
+}
+export type DocumentTemplate = {
+  id: string
+  name: string
+  topic: string
+  url: string
+  created_at: string
+  modified_at: string
+}
+export type DocumentTemplateCreate = {
+  topic: string
+  files: Blob[]
+}
 export const {
   useGetPeopleQuery,
   useCreatePersonMutation,
@@ -364,4 +606,17 @@ export const {
   useResyncUserAccountPermissionsMutation,
   usePromoteUserAccountPermissionsMutation,
   useDemoteUserAccountPermissionsMutation,
+  useGetEmailTemplatesQuery,
+  useCreateEmailTemplateMutation,
+  useGetEmailTemplateQuery,
+  useUpdateEmailTemplateMutation,
+  useDeleteEmailTemplateMutation,
+  useGetNotificationTemplatesQuery,
+  useCreateNotificationTemplateMutation,
+  useGetNotificationTemplateQuery,
+  useUpdateNotificationTemplateMutation,
+  useDeleteNotificationTemplateMutation,
+  useGetDocumentTemplatesQuery,
+  useCreateDocumentTemplateMutation,
+  useDeleteDocumentTemplateMutation,
 } = injectedRtkApi

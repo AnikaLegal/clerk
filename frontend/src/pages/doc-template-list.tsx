@@ -7,37 +7,67 @@ import {
   Input,
   Dropdown,
 } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { mount, debounce } from 'utils'
-import { api } from 'api'
+import { mount, debounce, getAPIErrorMessage } from 'utils'
 import { FadeTransition } from 'comps/transitions'
+import api, {
+  useDeleteDocumentTemplateMutation,
+  DocumentTemplate,
+} from 'apiNew'
 
-const CONTEXT = window.REACT_CONTEXT
+interface DjangoContext {
+  topic_options: { key: string; value: string; text: string }[]
+  topic: string
+  create_url: string
+}
+
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [templates, setTemplates] = useState([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [name, setName] = useState('')
   const [topic, setTopic] = useState(CONTEXT.topic)
+  const [searchTemplates] = api.useLazyGetDocumentTemplatesQuery()
+  const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
+
+  const { enqueueSnackbar } = useSnackbar()
+
   const onDelete = (id) => () => {
     const template = templates.filter((t) => t.id === id).pop()
     if (template && window.confirm(`Delete file ${template.name}?`)) {
-      api.templates.doc.delete(id).then(() => {
-        setTemplates(templates.filter((t) => t.id !== id))
-      })
+      deleteDocumentTemplate({ id })
+        .unwrap()
+        .then(() => {
+          setTemplates(templates.filter((t) => t.id !== id))
+        })
+        .catch((err) => {
+          enqueueSnackbar(
+            getAPIErrorMessage(err, 'Failed to delete this document template'),
+            {
+              variant: 'error',
+            }
+          )
+        })
     }
   }
   const search = debouncer(() => {
     setIsLoading(true)
-    api.templates.doc
-      .search({ name, topic })
-      .then(({ data }) => {
-        setTemplates(data)
+    searchTemplates({ name, topic })
+      .unwrap()
+      .then((templates) => {
+        setTemplates(templates)
         setIsLoading(false)
       })
-      .catch(() => setIsLoading(false))
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
+          variant: 'error',
+        })
+        setIsLoading(false)
+      })
   })
   useEffect(() => search(), [name, topic])
   return (
@@ -65,7 +95,7 @@ const App = () => {
           selection
           placeholder="Select a case type"
           options={CONTEXT.topic_options}
-          onChange={(e, { value }) => setTopic(value)}
+          onChange={(e, { value }) => setTopic(value as string)}
           value={topic}
         />
       </div>

@@ -4,7 +4,14 @@ from dataclasses import dataclass
 from factory.django import DjangoModelFactory
 
 from accounts.models import User
-from core.factories import PersonFactory, TenancyFactory, ClientFactory, UserFactory
+from core.factories import (
+    PersonFactory,
+    TenancyFactory,
+    ClientFactory,
+    UserFactory,
+    NotificationFactory,
+    EmailTemplateFactory,
+)
 
 
 class Action:
@@ -28,8 +35,7 @@ class APIViewTestCase:
     test_read_permission: Callable[[User], bool]
     # Returns true if user should have write permissions
     test_write_permissions: Callable[[User], bool]
-    # Note: neither of these check for object-level permissions
-    # TODO: Check for object level permissions.
+    # Note: neither of these flags check for object-level permissions
 
 
 GENERIC_API_TEST_CASES = [
@@ -60,5 +66,19 @@ GENERIC_API_TEST_CASES = [
         test_read_permission=lambda user: user.is_coordinator_or_better,
         test_write_permissions=lambda user: user.is_coordinator_or_better,
         actions=[Action.LIST, Action.UPDATE],  # Create tested elsewhere.
+    ),
+    APIViewTestCase(
+        factory=EmailTemplateFactory,
+        base_view_name="template-email-api",
+        test_read_permission=lambda user: user.is_paralegal_or_better,
+        test_write_permissions=lambda user: user.is_coordinator_or_better,
+        actions=Action.ALL,
+    ),
+    APIViewTestCase(
+        factory=NotificationFactory,
+        base_view_name="template-notify-api",
+        test_read_permission=lambda user: user.is_coordinator_or_better,
+        test_write_permissions=lambda user: user.is_coordinator_or_better,
+        actions=Action.ALL,
     ),
 ]
