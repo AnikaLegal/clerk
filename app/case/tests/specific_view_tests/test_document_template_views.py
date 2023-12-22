@@ -10,7 +10,7 @@ from conftest import schema_tester
 
 
 @pytest.mark.django_db
-@patch("case.views.templates.document_templates.list_templates")
+@patch("case.views.document_templates.list_templates")
 def test_document_template_list_api_view(
     mock_list_templates, superuser_client: APIClient
 ):
@@ -53,7 +53,7 @@ def test_document_template_list_api_view(
 
 
 @pytest.mark.django_db
-@patch("case.views.templates.document_templates.upload_template")
+@patch("case.views.document_templates.upload_template")
 def test_document_template_create_api_view(
     mock_upload_template, superuser_client: APIClient
 ):
@@ -88,7 +88,7 @@ def test_document_template_create_api_view(
 
 
 @pytest.mark.django_db
-@patch("case.views.templates.document_templates.delete_template")
+@patch("case.views.document_templates.delete_template")
 def test_document_template_destroy_api_view(
     mock_delete_template, superuser_client: APIClient
 ):

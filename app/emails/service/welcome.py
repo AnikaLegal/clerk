@@ -5,7 +5,7 @@ from django.conf import settings
 from bs4 import BeautifulSoup
 
 from core.models import Issue
-from case.views.case.email import _render_email_template
+from case.views.case_email import _render_email_template
 from emails.models import Email, EmailState
 from emails.service.send import build_clerk_address
 from office.closure.service import get_closure_email

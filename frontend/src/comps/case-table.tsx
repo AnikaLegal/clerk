@@ -1,7 +1,17 @@
 import React from 'react'
 import { Icon, Table } from 'semantic-ui-react'
+import { Issue } from 'apiNew'
+import moment from 'moment'
 
-export const CaseListTable = ({ issues, fields }) => {
+interface CaseListTableProps {
+  issues: Issue[]
+  fields: string[]
+}
+
+export const CaseListTable: React.FC<CaseListTableProps> = ({
+  issues,
+  fields,
+}) => {
   const selectedFields = FIELDS.filter((f) => fields.includes(f.name))
   return (
     <Table celled={true}>
@@ -17,7 +27,10 @@ export const CaseListTable = ({ issues, fields }) => {
           issues.map((issue) => (
             <Table.Row key={issue.id}>
               {selectedFields.map((f) => (
-                <Table.Cell key={`${issue.id}-${f.name}`}>
+                <Table.Cell
+                  key={`${issue.id}-${f.name}`}
+                  className={f.getColor ? f.getColor(issue) : ''}
+                >
                   {f.getValue(issue)}
                 </Table.Cell>
               ))}
@@ -32,7 +45,33 @@ export const CaseListTable = ({ issues, fields }) => {
     </Table>
   )
 }
-const FIELDS = [
+
+const getNextReviewColor = (issue: Issue): string => {
+  const now = moment()
+  if (!issue.next_review) return ''
+  const nextReviewMoment = moment(issue.next_review, 'DD/MM/YY')
+  const days = nextReviewMoment.diff(now, 'days')
+  if (days >= 7) {
+    return ''
+  } else if (days >= 3) {
+    return 'green'
+  } else if (days >= 2) {
+    return 'yellow'
+  } else if (days >= 0) {
+    return 'orange'
+  } else {
+    return 'red'
+  }
+}
+
+interface TableField {
+  name: string
+  label: string
+  getValue: (issue: Issue) => any
+  getColor?: (issue: Issue) => string
+}
+
+const FIELDS: TableField[] = [
   {
     name: 'fileref',
     label: 'File Ref',
@@ -68,6 +107,12 @@ const FIELDS = [
       ),
   },
   {
+    name: 'next_review',
+    label: 'Next Review Due',
+    getValue: (issue) => issue.next_review || '-',
+    getColor: getNextReviewColor,
+  },
+  {
     name: 'created_at',
     label: 'Created',
     getValue: (issue) => issue.created_at,
@@ -91,5 +136,25 @@ const FIELDS = [
     name: 'outcome',
     label: 'Outcome',
     getValue: (issue) => issue.outcome_display || '-',
+  },
+  {
+    name: 'is_conflict_check',
+    label: 'Conflict Check Performed',
+    getValue: (issue) =>
+      issue.is_conflict_check ? (
+        <Icon name="check" color="green" />
+      ) : (
+        <Icon name="close" color="yellow" />
+      ),
+  },
+  {
+    name: 'is_eligibility_check',
+    label: 'Eligibility Check Performed',
+    getValue: (issue) =>
+      issue.is_eligibility_check ? (
+        <Icon name="check" color="green" />
+      ) : (
+        <Icon name="close" color="yellow" />
+      ),
   },
 ]

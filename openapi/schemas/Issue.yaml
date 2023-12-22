@@ -45,6 +45,16 @@ properties:
     type: string
   url:
     type: string
+  # Case review fields
+  is_conflict_check:
+    type: boolean
+    nullable: true
+  is_eligibility_check:
+    type: boolean
+    nullable: true
+  next_review:
+    type: string
+    nullable: true
 
 required:
   - id
@@ -66,3 +76,6 @@ required:
   - actionstep_id
   - created_at
   - url
+  - is_conflict_check
+  - is_eligibility_check
+  - next_review

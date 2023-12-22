@@ -1,6 +1,21 @@
 import { baseApi as api } from './baseApi'
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
+    getCases: build.query<GetCasesApiResponse, GetCasesApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/`,
+        params: {
+          page: queryArg.page,
+          search: queryArg.search,
+          topic: queryArg.topic,
+          stage: queryArg.stage,
+          outcome: queryArg.outcome,
+          is_open: queryArg.isOpen,
+          paralegal: queryArg.paralegal,
+          lawyer: queryArg.lawyer,
+        },
+      }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -232,6 +247,24 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 })
 export { injectedRtkApi as generatedApi }
+export type GetCasesApiResponse = /** status 200 Successful response. */ {
+  current: number
+  next: number | null
+  prev: number | null
+  page_count: number
+  item_count: number
+  results: Issue[]
+}
+export type GetCasesApiArg = {
+  page?: number
+  search?: string
+  topic?: string
+  stage?: string
+  outcome?: string
+  isOpen?: string
+  paralegal?: string
+  lawyer?: string
+}
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[]
 export type GetPeopleApiArg = void
@@ -414,87 +447,6 @@ export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number
 }
-export type PersonBase = {
-  full_name: string
-  email: string
-  address: string
-  phone_number: string
-}
-export type TextChoiceField = {
-  display: string
-  value: string
-  choices: string[][]
-}
-export type Person = PersonBase & {
-  id: number
-  url: string
-  support_contact_preferences: TextChoiceField
-}
-export type Error = {
-  detail?: string | object | (string | object | any)[]
-  nonFieldErrors?: string[]
-}
-export type PersonCreate = PersonBase & {
-  support_contact_preferences: string
-}
-export type TenancyBase = {
-  address: string
-  suburb: string | null
-  postcode: string | null
-  started: string | null
-}
-export type ClientBase = {
-  first_name: string
-  last_name: string
-  email: string
-  phone_number: string
-  weekly_income: number | null
-  gender: string | null
-  centrelink_support: boolean
-  eligibility_notes: string
-  requires_interpreter: boolean
-  primary_language_non_english: boolean
-  primary_language: string
-  is_aboriginal_or_torres_strait_islander: boolean
-  number_of_dependents: number | null
-  referrer: string
-  notes: string
-  date_of_birth: string | null
-}
-export type TextChoiceListField = {
-  display: string
-  value: string[]
-  choices: string[][]
-}
-export type Client = ClientBase & {
-  id: string
-  url: string
-  age: number
-  full_name: string
-  referrer_type: TextChoiceField
-  call_times: TextChoiceListField
-  employment_status: TextChoiceListField
-  eligibility_circumstances: TextChoiceListField
-  rental_circumstances: TextChoiceField
-}
-export type Tenancy = TenancyBase & {
-  id: number
-  url: string
-  is_on_lease: TextChoiceField
-  landlord: Person
-  agent: Person
-  client: Client
-}
-export type TenancyCreate = TenancyBase & {
-  is_on_lease: string
-}
-export type ClientCreate = ClientBase & {
-  referrer_type: string
-  call_times: string[]
-  employment_status: string[]
-  eligibility_circumstances: string[]
-  rental_circumstances: string
-}
 export type UserCreate = {
   first_name: string
   last_name: string
@@ -520,6 +472,56 @@ export type User = UserCreate & {
   is_ms_account_set_up: boolean
   ms_account_created_at: string | null
 }
+export type ClientBase = {
+  first_name: string
+  last_name: string
+  email: string
+  phone_number: string
+  weekly_income: number | null
+  gender: string | null
+  centrelink_support: boolean
+  eligibility_notes: string
+  requires_interpreter: boolean
+  primary_language_non_english: boolean
+  primary_language: string
+  is_aboriginal_or_torres_strait_islander: boolean
+  number_of_dependents: number | null
+  referrer: string
+  notes: string
+  date_of_birth: string | null
+}
+export type TextChoiceField = {
+  display: string
+  value: string
+  choices: string[][]
+}
+export type TextChoiceListField = {
+  display: string
+  value: string[]
+  choices: string[][]
+}
+export type Client = ClientBase & {
+  id: string
+  url: string
+  age: number
+  full_name: string
+  referrer_type: TextChoiceField
+  call_times: TextChoiceListField
+  employment_status: TextChoiceListField
+  eligibility_circumstances: TextChoiceListField
+  rental_circumstances: TextChoiceField
+}
+export type PersonBase = {
+  full_name: string
+  email: string
+  address: string
+  phone_number: string
+}
+export type Person = PersonBase & {
+  id: number
+  url: string
+  support_contact_preferences: TextChoiceField
+}
 export type Issue = {
   id: string
   topic: string
@@ -540,6 +542,40 @@ export type Issue = {
   actionstep_id: number | null
   created_at: string
   url: string
+  is_conflict_check: boolean | null
+  is_eligibility_check: boolean | null
+  next_review: string | null
+}
+export type Error = {
+  detail?: string | object | (string | object | any)[]
+  nonFieldErrors?: string[]
+}
+export type PersonCreate = PersonBase & {
+  support_contact_preferences: string
+}
+export type TenancyBase = {
+  address: string
+  suburb: string | null
+  postcode: string | null
+  started: string | null
+}
+export type Tenancy = TenancyBase & {
+  id: number
+  url: string
+  is_on_lease: TextChoiceField
+  landlord: Person
+  agent: Person
+  client: Client
+}
+export type TenancyCreate = TenancyBase & {
+  is_on_lease: string
+}
+export type ClientCreate = ClientBase & {
+  referrer_type: string
+  call_times: string[]
+  employment_status: string[]
+  eligibility_circumstances: string[]
+  rental_circumstances: string
 }
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean
@@ -590,6 +626,7 @@ export type DocumentTemplateCreate = {
   files: Blob[]
 }
 export const {
+  useGetCasesQuery,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,

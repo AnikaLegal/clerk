@@ -5,6 +5,8 @@ info:
   version: 0.1.0
 
 paths:
+  /clerk/api/case/:
+    $ref: paths/case-list.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:

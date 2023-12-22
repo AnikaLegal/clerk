@@ -2,24 +2,16 @@ from django.http import Http404
 
 from microsoft.service import get_case_folder_info
 from case.views.auth import paralegal_or_better_required
-from case.utils.router import Route
 from core.models import Issue
 from case.utils.react import render_react_page
-from case.views.case.detail import get_detail_urls
+from case.views.case_detail import get_detail_urls
 from case.serializers import IssueSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-docs_route = Route("docs").uuid("pk").path("docs")
-docs_sharepoint_route = (
-    Route("docs-sharepoint").uuid("pk").path("docs").path("sharepoint")
-)
-
-
-@docs_route
-@paralegal_or_better_required
 @api_view(["GET"])
+@paralegal_or_better_required
 def case_detail_documents_view(request, pk):
     """
     The documents of a given case.
@@ -38,9 +30,8 @@ def case_detail_documents_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "document-list", context)
 
 
-@docs_sharepoint_route
-@paralegal_or_better_required
 @api_view(["GET"])
+@paralegal_or_better_required
 def sharepoint_docs_view(request, pk):
     try:
         issue = (

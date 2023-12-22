@@ -71,6 +71,10 @@ class IssueSerializer(serializers.ModelSerializer):
             "actionstep_id",
             "created_at",
             "url",
+            # Case review fields.
+            "is_conflict_check",
+            "is_eligibility_check",
+            "next_review",
         )
 
     id = serializers.CharField(read_only=True)
@@ -83,9 +87,23 @@ class IssueSerializer(serializers.ModelSerializer):
     stage_display = serializers.CharField(source="get_stage_display")
     created_at = LocalDateField()
     url = serializers.SerializerMethodField()
+    # Case review fields.
+    is_conflict_check = serializers.SerializerMethodField()
+    is_eligibility_check = serializers.SerializerMethodField()
+    next_review = serializers.SerializerMethodField()
 
     def get_url(self, obj):
         return reverse("case-detail-view", args=(obj.pk,))
+
+    def get_is_conflict_check(self, obj):
+        return getattr(obj, "is_conflict_check", None)
+
+    def get_is_eligibility_check(self, obj):
+        return getattr(obj, "is_eligibility_check", None)
+
+    def get_next_review(self, obj):
+        next_review = getattr(obj, "next_review", None)
+        return next_review.strftime("%d/%m/%y") if next_review else None
 
 
 class IssueAssignmentSerializer(serializers.ModelSerializer):
@@ -108,3 +126,20 @@ class IssueAssignmentSerializer(serializers.ModelSerializer):
     lawyer = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(groups__name="Lawyer"), allow_null=True
     )
+
+
+class IssueSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = (
+            "topic",
+            "stage",
+            "outcome",
+            "is_open",
+            "lawyer",
+            "paralegal",
+            "search",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}
+
+    search = serializers.CharField(required=False)

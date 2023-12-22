@@ -1,11 +1,9 @@
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.datastructures import MultiValueDict
 from django.urls import reverse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from case.utils.router import Router
 from case.views.auth import paralegal_or_better_required, coordinator_or_better_required
 from core.models import Issue, IssueNote, Person
 from case.utils.react import render_react_page
@@ -18,23 +16,9 @@ from case.serializers import (
     PersonSerializer,
 )
 
-router = Router("detail")
-router.create_route("view").uuid("pk")
-router.create_route("note").uuid("pk").path("note")
-router.create_route("update").uuid("pk").path("update")
-router.create_route("assign").uuid("pk").path("assign")
-router.create_route("landlord").uuid("pk").path("landlord").pk(
-    "person_pk", optional=True
-)
-router.create_route("agent").uuid("pk").path("agent").pk("person_pk", optional=True)
-router.create_route("support-worker").uuid("pk").path("support-worker").pk(
-    "person_pk", optional=True
-)
 
-
-@router.use_route("view")
-@paralegal_or_better_required
 @api_view(["GET"])
+@paralegal_or_better_required
 def case_detail_view(request, pk):
     """
     The details of a given case.
@@ -65,9 +49,8 @@ def get_detail_urls(issue):
     }
 
 
-@router.use_route("agent")
-@paralegal_or_better_required
 @api_view(["POST", "DELETE"])
+@paralegal_or_better_required
 def agent_select_view(request, pk):
     """
     User can add or remove an agent for a given case.
@@ -75,9 +58,8 @@ def agent_select_view(request, pk):
     return _person_select_view(request, pk, "agent")
 
 
-@router.use_route("landlord")
-@paralegal_or_better_required
 @api_view(["POST", "DELETE"])
+@paralegal_or_better_required
 def landlord_select_view(request, pk):
     """
     User can add or remove a landlord for a given case.
@@ -105,9 +87,8 @@ def _person_select_view(request, pk, person_type):
     return Response(TenancySerializer(tenancy).data)
 
 
-@router.use_route("support-worker")
-@paralegal_or_better_required
 @api_view(["POST", "DELETE"])
+@paralegal_or_better_required
 def support_worker_select_view(request, pk):
     """
     User can add or remove a support worker for a given case.
@@ -130,9 +111,8 @@ def support_worker_select_view(request, pk):
         return Response(PersonSerializer(person).data)
 
 
-@router.use_route("note")
-@paralegal_or_better_required
 @api_view(["POST"])
+@paralegal_or_better_required
 def case_detail_note_view(request, pk):
     """
     Form where paralegals can leave notes about case progress.
@@ -155,9 +135,8 @@ def case_detail_note_view(request, pk):
     )
 
 
-@router.use_route("update")
-@paralegal_or_better_required
 @api_view(["POST"])
+@paralegal_or_better_required
 def case_detail_update_view(request, pk):
     """
     Form where you update the case status.
@@ -169,9 +148,8 @@ def case_detail_update_view(request, pk):
     return Response({"issue": IssueSerializer(issue).data})
 
 
-@router.use_route("assign")
-@coordinator_or_better_required
 @api_view(["POST"])
+@coordinator_or_better_required
 def case_detail_assign_view(request, pk):
     """
     Form where coordinators can assign a paralegal to a case
@@ -242,7 +220,3 @@ def _get_issue_notes(request, pk):
 def _get_actionstep_url(issue):
     if issue.actionstep_id:
         return f"https://ap-southeast-2.actionstep.com/mym/asfw/workflow/action/overview/action_id/{issue.actionstep_id}"
-
-
-def _add_form_data(form_data, extra_data):
-    return MultiValueDict({**{k: [v] for k, v in extra_data.items()}, **form_data})

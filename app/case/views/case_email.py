@@ -29,7 +29,6 @@ from emails.models import (
     EmailAttachment,
     SharepointState,
 )
-from case.utils.router import Router
 from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
 from case.utils.react import render_react_page
@@ -40,33 +39,15 @@ from case.serializers import (
     EmailTemplateSerializer,
     EmailThreadSerializer,
 )
-from case.views.case.detail import get_detail_urls
+from case.views.case_detail import get_detail_urls
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]
 DRAFT_EMAIL_STATES = [EmailState.READY_TO_SEND, EmailState.DRAFT]
 
-router = Router("email")
-router.create_route("list").uuid("pk")
-router.create_route("thread").uuid("pk").path("thread").slug("slug")
-router.create_route("draft").uuid("pk").path("draft")
-router.create_route("edit").uuid("pk").path("draft").pk("email_pk")
-router.create_route("send").uuid("pk").path("draft").pk("email_pk").path("send")
-router.create_route("preview").uuid("pk").path("draft").pk("email_pk").path("preview")
-(
-    router.create_route("attach")
-    .uuid("pk")
-    .path("draft")
-    .pk("email_pk")
-    .path("attachment")
-    .pk("attach_pk", optional=True)
-)
-router.create_route("attach-upload").uuid("pk").pk("email_pk").pk("attach_pk")
 
-
-@router.use_route("list")
-@paralegal_or_better_required
 @require_http_methods(["GET"])
+@paralegal_or_better_required
 def email_list_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
@@ -81,9 +62,8 @@ def email_list_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "email-list", context)
 
 
-@router.use_route("thread")
-@paralegal_or_better_required
 @require_http_methods(["GET"])
+@paralegal_or_better_required
 def email_thread_view(request, pk, slug):
     issue = _get_issue_for_emails(request, pk)
     case_email_address = build_clerk_address(issue)
@@ -178,9 +158,8 @@ def _process_email_for_display(email: Email):
         attachment.file.display_name = os.path.basename(attachment.file.name)
 
 
-@router.use_route("draft")
-@paralegal_or_better_required
 @api_view(["GET", "POST"])
+@paralegal_or_better_required
 def email_draft_create_view(request, pk):
     issue = _get_issue_for_emails(request, pk)
     if request.method == "POST":
@@ -217,9 +196,8 @@ def email_draft_create_view(request, pk):
         )
 
 
-@router.use_route("edit")
-@paralegal_or_better_required
 @api_view(["GET", "PATCH", "DELETE"])
+@paralegal_or_better_required
 def email_draft_edit_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -253,9 +231,8 @@ def email_draft_edit_view(request, pk, email_pk):
         )
 
 
-@router.use_route("send")
-@paralegal_or_better_required
 @api_view(["POST"])
+@paralegal_or_better_required
 def email_draft_send_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -269,9 +246,8 @@ def email_draft_send_view(request, pk, email_pk):
     return Response(status=200)
 
 
-@router.use_route("preview")
-@paralegal_or_better_required
 @require_http_methods(["GET"])
+@paralegal_or_better_required
 def email_draft_preview_view(request, pk, email_pk):
     issue = _get_issue_for_emails(request, pk)
     email = _get_email_for_issue(issue, email_pk)
@@ -294,12 +270,11 @@ def _render_email_template(html):
         context = {"html": mark_safe(soup.body.decode_contents())}
     else:
         context = {"html": ""}
-    return render_to_string("case/case/email_preview.html", context)
+    return render_to_string("case/email_preview.html", context)
 
 
-@router.use_route("attach")
-@paralegal_or_better_required
 @api_view(["POST", "DELETE"])
+@paralegal_or_better_required
 def email_attachment_view(request, pk, email_pk, attach_pk=None):
     """Delete the email attachment, return HTML fragment for htmx."""
     issue = _get_issue_for_emails(request, pk)
@@ -339,9 +314,8 @@ def email_attachment_view(request, pk, email_pk, attach_pk=None):
         return Response(serializer.data)
 
 
-@router.use_route("attach-upload")
-@paralegal_or_better_required
 @api_view(["POST"])
+@paralegal_or_better_required
 def email_attachment_upload_view(request, pk, email_pk, attach_pk):
     """Save the attachment to Sharepoint"""
     issue = _get_issue_for_emails(request, pk)

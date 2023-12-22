@@ -5,7 +5,7 @@ from datetime import datetime
 from core.factories import IssueFactory, EmailFactory
 from emails.models import EmailState
 
-from case.views.case.email import _get_email_threads, EmailThread
+from case.views.case_email import _get_email_threads, EmailThread
 
 
 def dt(day):

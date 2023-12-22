@@ -10,7 +10,6 @@ from django.urls import reverse
 from factory.django import DjangoModelFactory
 
 from core import factories
-from emails.models import EmailTemplate
 
 
 @dataclass
@@ -21,6 +20,8 @@ class PageTestCase:
 
 
 PAGE_TEST_CASE = [
+    PageTestCase(name="case-review", factory=factories.IssueFactory, is_detail=False),
+    PageTestCase(name="case-inbox", factory=factories.IssueFactory, is_detail=False),
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
         name="person-create", factory=factories.PersonFactory, is_detail=False

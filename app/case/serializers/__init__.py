@@ -10,6 +10,7 @@ from .issue import (
     IssueNoteSerializer,
     IssueSerializer,
     IssueAssignmentSerializer,
+    IssueSearchSerializer,
 )
 from .documents import DocumentTemplateSerializer
 from .notification import NotificationSerializer
