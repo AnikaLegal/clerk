@@ -189,7 +189,7 @@ const App = () => {
                   ['Street Address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease']: tenancy.is_on_lease.display,
+                  ['Client on lease']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
                 }}
               />
               {tenancy.landlord ? (
