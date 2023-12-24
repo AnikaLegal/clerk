@@ -79,6 +79,94 @@ paths:
                   - page_count
                   - item_count
                   - results
+  /clerk/api/case/{id}/:
+    get:
+      operationId: getCase
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issue:
+                    $ref: "#/components/schemas/Issue"
+                  tenancy:
+                    $ref: "#/components/schemas/Tenancy"
+                  notes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IssueNote"
+                required:
+                  - issue
+                  - tenancy
+                  - notes
+    patch:
+      operationId: updateCase
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/case/{id}/note/:
+    post:
+      operationId: createCaseNote
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueNoteCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueNote"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/person/:
     get:
       operationId: getPeople
@@ -205,7 +293,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tenancy"
-    put:
+    patch:
       operationId: updateTenancy
       parameters:
         - description: Entity ID
@@ -696,6 +784,29 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    IssueBase:
+      type: object
+      properties:
+        topic:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        is_open:
+          type: boolean
+      required:
+        - topic
+        - stage
+        - outcome
+        - outcome_notes
+        - provided_legal_services
+        - is_open
     UserCreate:
       type: object
       properties:
@@ -933,112 +1044,73 @@ components:
             - url
             - support_contact_preferences
     Issue:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        topic:
-          type: string
-        topic_display:
-          type: string
-        stage_display:
-          type: string
-        stage:
-          type: string
-        outcome:
-          type: string
-          nullable: true
-        outcome_display:
-          type: string
-          nullable: true
-        outcome_notes:
-          type: string
-        provided_legal_services:
-          type: boolean
-        fileref:
-          type: string
-        paralegal:
-          $ref: "#/components/schemas/User"
-          nullable: true
-        lawyer:
-          $ref: "#/components/schemas/User"
-          nullable: true
-        client:
-          $ref: "#/components/schemas/Client"
-        support_worker:
-          $ref: "#/components/schemas/Person"
-          nullable: true
-        is_open:
-          type: boolean
-        is_sharepoint_set_up:
-          type: boolean
-        actionstep_id:
-          type: integer
-          nullable: true
-        created_at:
-          type: string
-        url:
-          type: string
-        is_conflict_check:
-          type: boolean
-          nullable: true
-        is_eligibility_check:
-          type: boolean
-          nullable: true
-        next_review:
-          type: string
-          nullable: true
-      required:
-        - id
-        - topic
-        - topic_display
-        - stage_display
-        - stage
-        - outcome
-        - outcome_display
-        - outcome_notes
-        - provided_legal_services
-        - fileref
-        - paralegal
-        - lawyer
-        - client
-        - support_worker
-        - is_open
-        - is_sharepoint_set_up
-        - actionstep_id
-        - created_at
-        - url
-        - is_conflict_check
-        - is_eligibility_check
-        - next_review
-    PersonCreate:
       allOf:
-        - $ref: "#/components/schemas/PersonBase"
+        - $ref: "#/components/schemas/IssueBase"
         - type: object
           properties:
-            support_contact_preferences:
+            id:
               type: string
+              format: uuid
+            topic_display:
+              type: string
+            stage_display:
+              type: string
+            outcome_display:
+              type: string
+              nullable: true
+            fileref:
+              type: string
+            is_sharepoint_set_up:
+              type: boolean
+            paralegal:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            client:
+              $ref: "#/components/schemas/Client"
+            support_worker:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+            actionstep_id:
+              type: integer
+              nullable: true
+            created_at:
+              type: string
+            url:
+              type: string
+            answers:
+              type: object
+              additionalProperties:
+                type: string
+            is_conflict_check:
+              type: boolean
+              nullable: true
+            is_eligibility_check:
+              type: boolean
+              nullable: true
+            next_review:
+              type: string
+              nullable: true
           required:
-            - support_contact_preferences
-    Error:
-      description: The schema for an error response
-      type: object
-      properties:
-        detail:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
-              items:
-                oneOf:
-                  - type: string
-                  - type: object
-                  - type: array
-        nonFieldErrors:
-          type: array
-          items:
-            type: string
+            - id
+            - topic_display
+            - stage_display
+            - outcome_display
+            - fileref
+            - paralegal
+            - lawyer
+            - client
+            - support_worker
+            - is_sharepoint_set_up
+            - actionstep_id
+            - created_at
+            - url
+            - answers
+            - is_conflict_check
+            - is_eligibility_check
+            - next_review
     TenancyBase:
       type: object
       properties:
@@ -1082,6 +1154,100 @@ components:
             - landlord
             - agent
             - client
+    IssueNoteBase:
+      type: object
+      properties:
+        note_type:
+          type: string
+        text:
+          type: string
+        issue:
+          type: string
+          format: uuid
+        event:
+          type: string
+          nullable: true
+      required:
+        - note_type
+        - text
+        - issue
+        - event
+    IssueNote:
+      allOf:
+        - $ref: "#/components/schemas/IssueNoteBase"
+        - type: object
+          properties:
+            id:
+              type: number
+            creator:
+              $ref: "#/components/schemas/User"
+            text_display:
+              type: string
+            created_at:
+              type: string
+            reviewee:
+              $ref: "#/components/schemas/User"
+              nullable: true
+          required:
+            - id
+            - creator
+            - text_display
+            - created_at
+            - reviewee
+    IssueUpdate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            paralegal_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            support_worker_id:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+          required:
+            - paralegal_id
+            - lawyer_id
+            - support_worker_id
+    Error:
+      description: The schema for an error response
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: object
+                  - type: array
+        nonFieldErrors:
+          type: array
+          items:
+            type: string
+    IssueNoteCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueNoteBase"
+        - type: object
+          properties:
+            creator_id:
+              type: number
+          required:
+            - creator_id
+    PersonCreate:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            support_contact_preferences:
+              type: string
+          required:
+            - support_contact_preferences
     TenancyCreate:
       allOf:
         - $ref: "#/components/schemas/TenancyBase"
@@ -1089,6 +1255,12 @@ components:
           properties:
             is_on_lease:
               type: string
+            landlord_id:
+              type: number
+              nullable: true
+            agent_id:
+              type: number
+              nullable: true
           required:
             - is_on_lease
     ClientCreate:

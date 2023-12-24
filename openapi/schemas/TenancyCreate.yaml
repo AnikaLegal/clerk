@@ -4,5 +4,11 @@ allOf:
     properties:
       is_on_lease:
         type: string
+      landlord_id:
+        type: number
+        nullable: true
+      agent_id:
+        type: number
+        nullable: true
     required:
       - is_on_lease

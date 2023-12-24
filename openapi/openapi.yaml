@@ -7,6 +7,10 @@ info:
 paths:
   /clerk/api/case/:
     $ref: paths/case-list.yaml
+  /clerk/api/case/{id}/:
+    $ref: paths/case-detail.yaml
+  /clerk/api/case/{id}/note/:
+    $ref: paths/case-note.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:

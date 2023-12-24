@@ -95,23 +95,10 @@ class CaseOutcome:
     }
 
 
-class IssueManager(models.Manager):
-    def check_permissions(self, request):
-        if request.user.is_paralegal:
-            # Paralegals can only see cases that they are assigned to
-            return self.filter(paralegal=request.user)
-        elif request.user.is_coordinator_or_better:
-            return self
-        else:
-            return self.none()
-
-
 class Issue(TimestampedModel):
     """
     A client's specific issue.
     """
-
-    objects = IssueManager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # What kind of case it is.
@@ -198,6 +185,10 @@ class Issue(TimestampedModel):
     @property
     def url(self):
         if self.pk:
-            return settings.CLERK_BASE_URL + reverse(
-                "case-detail-view", args=(self.pk,)
-            )
+            return settings.CLERK_BASE_URL + reverse("case-detail", args=(self.pk,))
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return self.paralegal == user

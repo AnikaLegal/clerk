@@ -16,6 +16,26 @@ const injectedRtkApi = api.injectEndpoints({
         },
       }),
     }),
+    getCase: build.query<GetCaseApiResponse, GetCaseApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/` }),
+    }),
+    updateCase: build.mutation<UpdateCaseApiResponse, UpdateCaseApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/`,
+        method: 'PATCH',
+        body: queryArg.issueUpdate,
+      }),
+    }),
+    createCaseNote: build.mutation<
+      CreateCaseNoteApiResponse,
+      CreateCaseNoteApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/note/`,
+        method: 'POST',
+        body: queryArg.issueNoteCreate,
+      }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -57,7 +77,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/clerk/api/tenancy/${queryArg.id}/`,
-        method: 'PUT',
+        method: 'PATCH',
         body: queryArg.tenancyCreate,
       }),
     }),
@@ -265,6 +285,30 @@ export type GetCasesApiArg = {
   paralegal?: string
   lawyer?: string
 }
+export type GetCaseApiResponse = /** status 200 Successful response. */ {
+  issue: Issue
+  tenancy: Tenancy
+  notes: IssueNote[]
+}
+export type GetCaseApiArg = {
+  /** Entity ID */
+  id: string
+}
+export type UpdateCaseApiResponse = /** status 200 Successful response. */ Issue
+export type UpdateCaseApiArg = {
+  /** Entity ID */
+  id: string
+  /** Successful response. */
+  issueUpdate: IssueUpdate
+}
+export type CreateCaseNoteApiResponse =
+  /** status 200 Successful response. */ IssueNote
+export type CreateCaseNoteApiArg = {
+  /** Entity ID */
+  id: string
+  /** Successful response. */
+  issueNoteCreate: IssueNoteCreate
+}
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[]
 export type GetPeopleApiArg = void
@@ -447,6 +491,14 @@ export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number
 }
+export type IssueBase = {
+  topic: string
+  stage: string
+  outcome: string | null
+  outcome_notes: string
+  provided_legal_services: boolean
+  is_open: boolean
+}
 export type UserCreate = {
   first_name: string
   last_name: string
@@ -522,36 +574,26 @@ export type Person = PersonBase & {
   url: string
   support_contact_preferences: TextChoiceField
 }
-export type Issue = {
+export type Issue = IssueBase & {
   id: string
-  topic: string
   topic_display: string
   stage_display: string
-  stage: string
-  outcome: string | null
   outcome_display: string | null
-  outcome_notes: string
-  provided_legal_services: boolean
   fileref: string
+  is_sharepoint_set_up: boolean
   paralegal: User
   lawyer: User
   client: Client
   support_worker: Person
-  is_open: boolean
-  is_sharepoint_set_up: boolean
   actionstep_id: number | null
   created_at: string
   url: string
+  answers: {
+    [key: string]: string
+  }
   is_conflict_check: boolean | null
   is_eligibility_check: boolean | null
   next_review: string | null
-}
-export type Error = {
-  detail?: string | object | (string | object | any)[]
-  nonFieldErrors?: string[]
-}
-export type PersonCreate = PersonBase & {
-  support_contact_preferences: string
 }
 export type TenancyBase = {
   address: string
@@ -567,8 +609,38 @@ export type Tenancy = TenancyBase & {
   agent: Person
   client: Client
 }
+export type IssueNoteBase = {
+  note_type: string
+  text: string
+  issue: string
+  event: string | null
+}
+export type IssueNote = IssueNoteBase & {
+  id: number
+  creator: User
+  text_display: string
+  created_at: string
+  reviewee: User
+}
+export type Error = {
+  detail?: string | object | (string | object | any)[]
+  nonFieldErrors?: string[]
+}
+export type IssueUpdate = IssueBase & {
+  paralegal_id: User
+  lawyer_id: User
+  support_worker_id: Person
+}
+export type IssueNoteCreate = IssueNoteBase & {
+  creator_id: number
+}
+export type PersonCreate = PersonBase & {
+  support_contact_preferences: string
+}
 export type TenancyCreate = TenancyBase & {
   is_on_lease: string
+  landlord_id?: number | null
+  agent_id?: number | null
 }
 export type ClientCreate = ClientBase & {
   referrer_type: string
@@ -627,6 +699,9 @@ export type DocumentTemplateCreate = {
 }
 export const {
   useGetCasesQuery,
+  useGetCaseQuery,
+  useUpdateCaseMutation,
+  useCreateCaseNoteMutation,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,

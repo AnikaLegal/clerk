@@ -4,10 +4,10 @@ import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
-import { submitNote } from './case-file-note'
 
 export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false)
+  const submitNote = (values, { setSubmitting, setErrors }) => null
   return (
     <Segment>
       <Header> Add a paralegal performance review</Header>
@@ -20,7 +20,7 @@ export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
         validate={({ text }) =>
           text ? null : { 'File note text': 'File note cannot be empty' }
         }
-        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
+        onSubmit={submitNote}
       >
         {({
           values,

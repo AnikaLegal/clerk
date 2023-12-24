@@ -4,13 +4,13 @@ import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 import DateInput from 'comps/date-input'
 import moment from 'moment'
 
-import { submitNote } from './case-file-note'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
 
 export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false)
+  const submitNote = (values, { setSubmitting, setErrors }) => null
   return (
     <Segment>
       <Header> Add a coordinator case review note</Header>
@@ -26,7 +26,7 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
           if (!event) errors.event = 'Next review date is required'
           return errors
         }}
-        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
+        onSubmit={submitNote}
       >
         {({
           values,

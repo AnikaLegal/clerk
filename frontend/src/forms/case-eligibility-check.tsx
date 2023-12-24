@@ -12,16 +12,16 @@ import {
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
-import { submitNote } from './case-file-note'
 
-export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const EligibilityForm = ({ issue, setIssue, setNotes, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false)
+  const submitNote = (values, { setSubmitting, setErrors }) => null
   return (
     <Segment>
-      <Header>Log a conflict check</Header>
+      <Header>Log an eligibility check</Header>
       <p>
-        Leave a note to record that you have performed a conflict check for this
-        case.
+        Leave a note to record that you have performed an eligibility check for
+        this case.
       </p>
       <Formik
         initialValues={{ text: '', note_type: '' }}
@@ -31,7 +31,7 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
           if (!note_type) errors.note_type = 'Outcome is required'
           return errors
         }}
-        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
+        onSubmit={submitNote}
       >
         {({
           values,
@@ -53,13 +53,13 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
               placeholder="Select an outcome"
               options={[
                 {
-                  key: 'CONFLICT_CHECK_SUCCESS',
-                  value: 'CONFLICT_CHECK_SUCCESS',
+                  key: 'ELIGIBILITY_CHECK_SUCCESS',
+                  value: 'ELIGIBILITY_CHECK_SUCCESS',
                   text: 'Cleared',
                 },
                 {
-                  key: 'CONFLICT_CHECK_FAILURE',
-                  value: 'CONFLICT_CHECK_FAILURE',
+                  key: 'ELIGIBILITY_CHECK_FAILURE',
+                  value: 'ELIGIBILITY_CHECK_FAILURE',
                   text: 'Not cleared',
                 },
               ]}
@@ -76,6 +76,7 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
               value={values.text}
               style={{ margin: '1em 0' }}
             />
+
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
                 <div className="header">{k}</div>
@@ -93,11 +94,11 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
             <Button disabled={isSubmitting} onClick={onCancel}>
               Close
             </Button>
-            <Message success>Conflict check created</Message>
+            <Message success>Eligibility check created</Message>
             <MarkdownExplainer />
             <TimelineNote
               note={{
-                note_type: values.note_type || 'CONFLICT_CHECK_SUCCESS',
+                note_type: values.note_type || 'ELIGIBILITY_CHECK_SUCCESS',
                 created_at: 'Now',
                 text_display: values.text || 'start typing...',
                 creator: {

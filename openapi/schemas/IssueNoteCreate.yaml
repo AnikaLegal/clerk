@@ -1,0 +1,8 @@
+allOf:
+  - $ref: ./IssueNoteBase.yaml
+  - type: object
+    properties:
+      creator_id:
+        type: number
+    required:
+      - creator_id

@@ -1,0 +1,18 @@
+type: object
+properties:
+  note_type:
+    type: string
+  text:
+    type: string
+  issue:
+    type: string
+    format: uuid
+  event:
+    type: string
+    nullable: true
+
+required:
+  - note_type
+  - text
+  - issue
+  - event

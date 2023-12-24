@@ -11,33 +11,24 @@ from .person import PersonSerializer
 from .fields import DateField, LocalTimeField, LocalDateField
 
 
-class IssueNoteCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IssueNote
-        fields = (
-            "creator",
-            "note_type",
-            "text",
-            "issue",
-            "event",
-        )
-
-
 class IssueNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssueNote
         fields = (
             "id",
             "creator",
+            "creator_id",
             "note_type",
             "text",
             "text_display",
             "created_at",
+            "issue",
             "event",
             "reviewee",
         )
 
     creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(write_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
     reviewee = serializers.SerializerMethodField()
     event = DateField()
@@ -62,10 +53,14 @@ class IssueSerializer(serializers.ModelSerializer):
             "outcome_notes",
             "provided_legal_services",
             "fileref",
+            "answers",
             "paralegal",
+            "paralegal_id",
             "lawyer",
+            "lawyer_id",
             "client",
             "support_worker",
+            "support_worker_id",
             "is_open",
             "is_sharepoint_set_up",
             "actionstep_id",
@@ -82,6 +77,9 @@ class IssueSerializer(serializers.ModelSerializer):
     paralegal = UserSerializer(read_only=True)
     client = ClientSerializer(read_only=True)
     support_worker = PersonSerializer(read_only=True)
+    support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
+    lawyer_id = serializers.IntegerField(write_only=True, allow_null=True)
+    paralegal_id = serializers.IntegerField(write_only=True, allow_null=True)
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
@@ -93,7 +91,7 @@ class IssueSerializer(serializers.ModelSerializer):
     next_review = serializers.SerializerMethodField()
 
     def get_url(self, obj):
-        return reverse("case-detail-view", args=(obj.pk,))
+        return reverse("case-detail", args=(obj.pk,))
 
     def get_is_conflict_check(self, obj):
         return getattr(obj, "is_conflict_check", None)

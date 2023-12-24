@@ -2,39 +2,49 @@ import React, { useState } from 'react'
 import { Formik } from 'formik'
 import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 import moment from 'moment'
+import { useSnackbar } from 'notistack'
 
-import { api } from 'api'
+import { useCreateCaseNoteMutation } from 'apiNew'
 import { TextArea } from 'comps/textarea'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
-export const submitNote =
-  (issue, setIssue, setNotes, setSuccess) =>
-  (values, { setSubmitting, setErrors }) => {
+export const FilenoteForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
+  const [isSuccess, setSuccess] = useState(false)
+  const [createCaseNote] = useCreateCaseNoteMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const submitNote = (values, { setSubmitting, setErrors }) => {
     const note = { ...values }
     note.event = note.event
       ? moment.utc(values.event, 'DD/MM/YYYY').format()
       : note.event
-
-    api.case.note.add(issue.id, note).then(({ resp, data, errors }) => {
-      if (resp.status === 400) {
-        setErrors(errors)
-      } else if (resp.ok) {
-        setIssue(data.issue)
-        setNotes(data.notes)
+    createCaseNote({ id: issue.id, issueNoteCreate: note })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
         setSuccess(true)
-      } else {
-        setErrors({
-          'Submission failure':
-            'We could not perform this action because something went wrong.',
-        })
-      }
-      setSubmitting(false)
-    })
+        enqueueSnackbar('File note created', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to create a file note'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
   }
-
-export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Add a file note</Header>
@@ -47,16 +57,9 @@ export const FilenoteForm = ({ issue, setIssue, setNotes, onCancel }) => {
         validate={({ text }) =>
           text ? null : { 'File note text': 'File note cannot be empty' }
         }
-        onSubmit={submitNote(issue, setIssue, setNotes, setSuccess)}
+        onSubmit={submitNote}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}

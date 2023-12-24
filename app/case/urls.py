@@ -13,7 +13,7 @@ from .views import (
     document_templates,
     case_review,
     case_inbox,
-    case_list,
+    case,
     case_docs,
     case_email,
     case_detail,
@@ -29,7 +29,7 @@ UUID_PK = "(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA
 SLUG = "(?P<slug>[\-\w]+)"
 
 router = DefaultRouter()
-router.register("case", case_list.CaseApiViewset, basename="case-api")
+router.register("case", case.CaseApiViewset, basename="case-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
@@ -55,7 +55,7 @@ urlpatterns = [
     # API routes
     path("api/", include(router.urls)),
     # Case
-    path("cases/", case_list.case_list_page_view, name="case-list"),
+    path("cases/", case.case_list_page_view, name="case-list"),
     path("cases/review/", case_review.case_review_page_view, name="case-review"),
     path("cases/inbox/", case_inbox.case_inbox_page_view, name="case-inbox"),
     re_path(
@@ -68,11 +68,11 @@ urlpatterns = [
         case_docs.sharepoint_docs_view,
         name="case-docs-sharepoint",
     ),
-    # Case detail"
+    # Case detail
     re_path(
         f"^cases/detail/{UUID_PK}/$",
-        case_detail.case_detail_view,
-        name="case-detail-view",
+        case.case_detail_page_view,
+        name="case-detail",
     ),
     re_path(
         f"^cases/detail/{UUID_PK}/note/$",
@@ -88,21 +88,6 @@ urlpatterns = [
         f"^cases/detail/{UUID_PK}/assign/$",
         case_detail.case_detail_assign_view,
         name="case-detail-assign",
-    ),
-    re_path(
-        f"^cases/detail/{UUID_PK}/landlord/{INT_PERSON_PK}/$",
-        case_detail.landlord_select_view,
-        name="case-detail-landlord",
-    ),
-    re_path(
-        f"^cases/detail/{UUID_PK}/agent/{INT_PERSON_PK}/$",
-        case_detail.agent_select_view,
-        name="case-detail-agent",
-    ),
-    re_path(
-        f"^cases/detail/{UUID_PK}/support-worker/{INT_PERSON_PK}/$",
-        case_detail.support_worker_select_view,
-        name="case-detail-support-worker",
     ),
     # Email
     re_path(

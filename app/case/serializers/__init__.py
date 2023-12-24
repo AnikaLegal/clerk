@@ -6,7 +6,6 @@ from .email import (
     EmailThreadSerializer,
 )
 from .issue import (
-    IssueNoteCreateSerializer,
     IssueNoteSerializer,
     IssueSerializer,
     IssueAssignmentSerializer,

@@ -1,43 +1,57 @@
 get:
-  operationId: getTenancy
+  operationId: getCase
   parameters:
     - description: Entity ID
       in: path
       name: id
       required: true
       schema:
-        type: integer
+        type: string
+        format: uuid
   responses:
     "200":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/Tenancy.yaml
-
+            type: object
+            properties:
+              issue:
+                $ref: ../schemas/Issue.yaml
+              tenancy:
+                $ref: ../schemas/Tenancy.yaml
+              notes:
+                type: array
+                items:
+                  $ref: ../schemas/IssueNote.yaml
+            required:
+              - issue
+              - tenancy
+              - notes
 patch:
-  operationId: updateTenancy
+  operationId: updateCase
   parameters:
     - description: Entity ID
       in: path
       name: id
       required: true
       schema:
-        type: integer
+        type: string
+        format: uuid
   requestBody:
     required: true
     description: Successful response.
     content:
       application/json:
         schema:
-          $ref: ../schemas/TenancyCreate.yaml
+          $ref: ../schemas/IssueUpdate.yaml
   responses:
     "200":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/Tenancy.yaml
+            $ref: ../schemas/Issue.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":
