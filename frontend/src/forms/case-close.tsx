@@ -10,9 +10,12 @@ import {
   Checkbox,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
+import { useSnackbar } from 'notistack'
 
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useUpdateCaseMutation } from 'apiNew'
 import { TextArea } from 'comps/textarea'
-import { submitCaseUpdate } from './case-progress'
 import { OUTCOMES } from 'consts'
 
 const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
@@ -27,8 +30,36 @@ const FormSchema = Yup.object().shape({
   provided_legal_services: Yup.bool(),
 })
 
-export const CloseForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const CloseForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
+  const [updateCase] = useUpdateCaseMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as any,
+    })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('Case close succeess', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Case close failed'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
   return (
     <Segment>
       <Header>Close the case.</Header>
@@ -45,16 +76,9 @@ export const CloseForm = ({ issue, setIssue, setNotes, onCancel }) => {
           provided_legal_services: issue.provided_legal_services,
           outcome_notes: issue.outcome_notes,
         }}
-        onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
+        onSubmit={onSubmit}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}

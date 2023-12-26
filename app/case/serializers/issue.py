@@ -8,7 +8,7 @@ from accounts.models import User
 from .user import UserSerializer
 from .client import ClientSerializer
 from .person import PersonSerializer
-from .fields import DateField, LocalTimeField, LocalDateField
+from .fields import LocalTimeField, LocalDateField
 
 
 class IssueNoteSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class IssueNoteSerializer(serializers.ModelSerializer):
     creator_id = serializers.IntegerField(write_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
     reviewee = serializers.SerializerMethodField()
-    event = DateField()
+    event = serializers.DateTimeField(required=False)
     created_at = LocalTimeField()
 
     def get_reviewee(self, obj):
@@ -78,8 +78,16 @@ class IssueSerializer(serializers.ModelSerializer):
     client = ClientSerializer(read_only=True)
     support_worker = PersonSerializer(read_only=True)
     support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
-    lawyer_id = serializers.IntegerField(write_only=True, allow_null=True)
-    paralegal_id = serializers.IntegerField(write_only=True, allow_null=True)
+    paralegal_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Paralegal"),
+        allow_null=True,
+    )
+    lawyer_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Lawyer"),
+        allow_null=True,
+    )
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
@@ -89,6 +97,21 @@ class IssueSerializer(serializers.ModelSerializer):
     is_conflict_check = serializers.SerializerMethodField()
     is_eligibility_check = serializers.SerializerMethodField()
     next_review = serializers.SerializerMethodField()
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
+        # Wait 15 mins for Sharepoint data sync
+        fields["paralegal_id"].queryset = fields["paralegal_id"].queryset.filter(
+            ms_account_created_at__lte=fifteen_minutes_ago
+        )
+        return fields
+
+    def validate_paralegal_id(self, paralegal: User):
+        return paralegal.id if paralegal else None
+
+    def validate_lawyer_id(self, lawyer: User):
+        return lawyer.id if lawyer else None
 
     def get_url(self, obj):
         return reverse("case-detail", args=(obj.pk,))
@@ -108,22 +131,6 @@ class IssueAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = ("paralegal", "lawyer")
-
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-        # Wait 15 mins for Sharepoint data sync
-        fields["paralegal"].queryset = fields["paralegal"].queryset.filter(
-            ms_account_created_at__lte=fifteen_minutes_ago
-        )
-        return fields
-
-    paralegal = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(groups__name="Paralegal"), allow_null=True
-    )
-    lawyer = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(groups__name="Lawyer"), allow_null=True
-    )
 
 
 class IssueSearchSerializer(serializers.ModelSerializer):

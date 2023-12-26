@@ -4,12 +4,12 @@ import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 import moment from 'moment'
 import { useSnackbar } from 'notistack'
 
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useCreateCaseNoteMutation } from 'apiNew'
 import { TextArea } from 'comps/textarea'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
-import { CaseDetailFormProps } from 'types'
-import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
 export const FilenoteForm: React.FC<CaseDetailFormProps> = ({
   issue,

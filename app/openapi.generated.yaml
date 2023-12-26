@@ -167,6 +167,36 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/case/{id}/docs/:
+    get:
+      operationId: getCaseDocuments
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sharepoint_url:
+                    type: string
+                  documents:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - sharepoint_url
+                  - documents
   /clerk/api/person/:
     get:
       operationId: getPeople

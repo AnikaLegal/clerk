@@ -3,14 +3,49 @@ import { Formik } from 'formik'
 import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 import DateInput from 'comps/date-input'
 import moment from 'moment'
+import { useSnackbar } from 'notistack'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
+import { useCreateCaseNoteMutation } from 'apiNew'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { CaseDetailFormProps } from 'types'
 
-export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const ReviewForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
-  const submitNote = (values, { setSubmitting, setErrors }) => null
+  const [createCaseNote] = useCreateCaseNoteMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const submitNote = (values, { setSubmitting, setErrors }) => {
+    const note = { ...values }
+    note.event = note.event
+      ? moment.utc(values.event, 'DD/MM/YYYY').format()
+      : note.event
+    createCaseNote({ id: issue.id, issueNoteCreate: note })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('File note created', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to create a file note'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
   return (
     <Segment>
       <Header> Add a coordinator case review note</Header>
@@ -22,8 +57,8 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
         initialValues={{ text: '', event: '', note_type: 'REVIEW' }}
         validate={({ text, event }) => {
           const errors = {}
-          if (!text) errors.text = 'File note cannot be empty'
-          if (!event) errors.event = 'Next review date is required'
+          if (!text) errors['text'] = 'File note cannot be empty'
+          if (!event) errors['event'] = 'Next review date is required'
           return errors
         }}
         onSubmit={submitNote}
@@ -31,11 +66,9 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
         {({
           values,
           errors,
-          handleChange,
           handleSubmit,
           isSubmitting,
           setFieldValue,
-          setFieldTouched,
           touched,
         }) => (
           <Form
@@ -88,7 +121,7 @@ export const ReviewForm = ({ issue, setIssue, setNotes, onCancel }) => {
               note={{
                 note_type: values.note_type,
                 created_at: 'Now',
-                event: values.event,
+                event: moment(values.event, 'DD/MM/YYYY').format(),
                 text_display: values.text || 'start typing...',
                 creator: {
                   full_name: 'You',

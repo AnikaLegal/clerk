@@ -11,12 +11,8 @@ from .views import (
     email_templates,
     notification_templates,
     document_templates,
-    case_review,
-    case_inbox,
     case,
-    case_docs,
     case_email,
-    case_detail,
 )
 
 from .views import root
@@ -56,38 +52,17 @@ urlpatterns = [
     path("api/", include(router.urls)),
     # Case
     path("cases/", case.case_list_page_view, name="case-list"),
-    path("cases/review/", case_review.case_review_page_view, name="case-review"),
-    path("cases/inbox/", case_inbox.case_inbox_page_view, name="case-inbox"),
+    path("cases/review/", case.case_review_page_view, name="case-review"),
+    path("cases/inbox/", case.case_inbox_page_view, name="case-inbox"),
     re_path(
-        f"^cases/{UUID_PK}/docs/$",
-        case_docs.case_detail_documents_view,
-        name="case-docs",
-    ),
-    re_path(
-        f"^cases/{UUID_PK}/docs/sharepoint/$",
-        case_docs.sharepoint_docs_view,
-        name="case-docs-sharepoint",
-    ),
-    # Case detail
-    re_path(
-        f"^cases/detail/{UUID_PK}/$",
+        f"^cases/{UUID_PK}/$",
         case.case_detail_page_view,
         name="case-detail",
     ),
     re_path(
-        f"^cases/detail/{UUID_PK}/note/$",
-        case_detail.case_detail_note_view,
-        name="case-detail-note",
-    ),
-    re_path(
-        f"^cases/detail/{UUID_PK}/update/$",
-        case_detail.case_detail_update_view,
-        name="case-detail-update",
-    ),
-    re_path(
-        f"^cases/detail/{UUID_PK}/assign/$",
-        case_detail.case_detail_assign_view,
-        name="case-detail-assign",
+        f"^cases/{UUID_PK}/docs/$",
+        case.case_detail_documents_page_view,
+        name="case-docs",
     ),
     # Email
     re_path(

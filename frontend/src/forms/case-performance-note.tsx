@@ -1,13 +1,50 @@
 import React, { useState } from 'react'
 import { Formik } from 'formik'
 import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
+import moment from 'moment'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
+import { useCreateCaseNoteMutation } from 'apiNew'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
-export const PerformanceForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const PerformanceForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
-  const submitNote = (values, { setSubmitting, setErrors }) => null
+  const [createCaseNote] = useCreateCaseNoteMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const submitNote = (values, { setSubmitting, setErrors }) => {
+    const note = { ...values }
+    note.event = note.event
+      ? moment.utc(values.event, 'DD/MM/YYYY').format()
+      : note.event
+    createCaseNote({ id: issue.id, issueNoteCreate: note })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('File note created', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to create a file note'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
+
   return (
     <Segment>
       <Header> Add a paralegal performance review</Header>

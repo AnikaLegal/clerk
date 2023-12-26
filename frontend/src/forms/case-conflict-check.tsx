@@ -8,15 +8,50 @@ import {
   Segment,
   Dropdown,
 } from 'semantic-ui-react'
+import moment from 'moment'
+import { useSnackbar } from 'notistack'
 
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useCreateCaseNoteMutation } from 'apiNew'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
 
-export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const ConflictForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
-  const submitNote = (values, { setSubmitting, setErrors }) => null
+  const [createCaseNote] = useCreateCaseNoteMutation()
+  const { enqueueSnackbar } = useSnackbar()
 
+  const submitNote = (values, { setSubmitting, setErrors }) => {
+    const note = { ...values }
+    note.event = note.event
+      ? moment.utc(values.event, 'DD/MM/YYYY').format()
+      : note.event
+    createCaseNote({ id: issue.id, issueNoteCreate: note })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('File note created', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to create a file note'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
   return (
     <Segment>
       <Header>Log a conflict check</Header>
@@ -28,8 +63,8 @@ export const ConflictForm = ({ issue, setIssue, setNotes, onCancel }) => {
         initialValues={{ text: '', note_type: '' }}
         validate={({ text, note_type }) => {
           const errors = {}
-          if (!text) errors.text = 'File note cannot be empty'
-          if (!note_type) errors.note_type = 'Outcome is required'
+          if (!text) errors['text'] = 'File note cannot be empty'
+          if (!note_type) errors['note_type'] = 'Outcome is required'
           return errors
         }}
         onSubmit={submitNote}

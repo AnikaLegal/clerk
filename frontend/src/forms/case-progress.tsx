@@ -9,8 +9,11 @@ import {
   Checkbox,
   Dropdown,
 } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { api } from 'api'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useUpdateCaseMutation } from 'apiNew'
 import { STAGES } from 'consts'
 
 const STAGE_OPTIONS = Object.entries(STAGES)
@@ -21,27 +24,37 @@ const STAGE_OPTIONS = Object.entries(STAGES)
     text: v,
   }))
 
-export const submitCaseUpdate =
-  (issue, setIssue, setSuccess) =>
-  (values, { setSubmitting, setErrors }) => {
-    api.case.update(issue.id, values).then(({ resp, data, errors }) => {
-      if (resp.status === 400) {
-        setErrors(errors)
-      } else if (resp.ok) {
-        setIssue(data.issue)
-        setSuccess(true)
-      } else {
-        setErrors({
-          'Submission failure':
-            'We could not perform this action because something went wrong.',
-        })
-      }
-      setSubmitting(false)
+export const ProgressForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
+  const [isSuccess, setSuccess] = useState(false)
+  const [updateCase] = useUpdateCaseMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as any,
     })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('Case update succeess', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Case update failed'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
   }
 
-export const ProgressForm = ({ issue, setIssue, setNotes, onCancel }) => {
-  const [isSuccess, setSuccess] = useState(false)
   return (
     <Segment>
       <Header>Update the stage of the case.</Header>
@@ -51,16 +64,9 @@ export const ProgressForm = ({ issue, setIssue, setNotes, onCancel }) => {
           provided_legal_services: issue.provided_legal_services,
         }}
         validate={() => {}}
-        onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
+        onSubmit={onSubmit}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}

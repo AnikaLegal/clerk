@@ -9,8 +9,11 @@ import {
   Dropdown,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
+import { useSnackbar } from 'notistack'
 
-import { submitCaseUpdate } from './case-progress'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useUpdateCaseMutation } from 'apiNew'
 import { STAGES } from 'consts'
 
 const STAGE_OPTIONS = Object.entries(STAGES)
@@ -25,8 +28,36 @@ const FormSchema = Yup.object().shape({
   stage: Yup.string().required('Required'),
 })
 
-export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const ReopenForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
+  const [updateCase] = useUpdateCaseMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as any,
+    })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('Case re-open succeess', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Case re-open failed'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
   return (
     <Segment>
       <Header>Re-open the case.</Header>
@@ -36,7 +67,7 @@ export const ReopenForm = ({ issue, setIssue, setNotes, onCancel }) => {
           stage: '',
         }}
         validationSchema={FormSchema}
-        onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
+        onSubmit={onSubmit}
       >
         {({
           values,

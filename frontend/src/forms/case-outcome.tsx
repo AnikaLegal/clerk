@@ -10,8 +10,11 @@ import {
   Checkbox,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
+import { useSnackbar } from 'notistack'
 
-import { submitCaseUpdate } from './case-progress'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useUpdateCaseMutation } from 'apiNew'
 import { OUTCOMES } from 'consts'
 import { TextArea } from 'comps/textarea'
 
@@ -27,8 +30,36 @@ const FormSchema = Yup.object().shape({
   provided_legal_services: Yup.bool(),
 })
 
-export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
+export const OutcomeForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
   const [isSuccess, setSuccess] = useState(false)
+  const [updateCase] = useUpdateCaseMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as any,
+    })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('Case update succeess', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Case update failed'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
   return (
     <Segment>
       <Header>Edit case outcome.</Header>
@@ -43,7 +74,7 @@ export const OutcomeForm = ({ issue, setIssue, setNotes, onCancel }) => {
           provided_legal_services: issue.provided_legal_services,
           outcome_notes: issue.outcome_notes,
         }}
-        onSubmit={submitCaseUpdate(issue, setIssue, setSuccess)}
+        onSubmit={onSubmit}
       >
         {({
           values,

@@ -8,23 +8,49 @@ import {
   Segment,
   Dropdown,
 } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { User } from 'types'
-import { api } from 'api'
+import { CaseDetailFormProps } from 'types'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import { useUpdateCaseMutation, useGetUsersQuery } from 'apiNew'
 
-export const AssignForm = ({ issue, setIssue, onCancel }) => {
+export const AssignForm: React.FC<CaseDetailFormProps> = ({
+  issue,
+  onCancel,
+}) => {
+  const [updateCase] = useUpdateCaseMutation()
+  const { enqueueSnackbar } = useSnackbar()
   const [isSuccess, setSuccess] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [paralegals, setParalegals] = useState<User[]>([])
-  const [lawyers, setLawyers] = useState<User[]>([])
-  useEffect(() => {
-    api.accounts
-      .search({ group: 'Paralegal' })
-      .then(({ data }) => setParalegals(data))
-      .then(() => api.accounts.search({ group: 'Lawyer' }))
-      .then(({ data }) => setLawyers(data))
-      .then(() => setIsLoading(false))
-  }, [])
+  const paralegalResults = useGetUsersQuery({ group: 'Paralegal' })
+  const lawyerResults = useGetUsersQuery({ group: 'Lawyer' })
+  const isLoading = paralegalResults.isFetching || lawyerResults.isFetching
+
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
+    updateCase({
+      id: issue.id,
+      issueUpdate: {
+        paralegal_id: values.paralegal,
+        lawyer_id: values.lawyer,
+      } as any,
+    })
+      .unwrap()
+      .then(() => {
+        setSubmitting(false)
+        setSuccess(true)
+        enqueueSnackbar('Assignment succeess', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Assignment failed'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
+  }
+
   return (
     <Segment>
       <Header>Assign a paralegal to this case.</Header>
@@ -40,32 +66,9 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               'A lawyer must be selected if a paralegal is assigned'
           return errors
         }}
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          api.case.assign(issue.id, values).then(({ resp, data, errors }) => {
-            if (resp.status === 400) {
-              setErrors(errors)
-            } else if (resp.ok) {
-              setIssue(data.issue)
-              setSuccess(true)
-            } else {
-              setErrors({
-                // @ts-ignore
-                'Submission failure':
-                  'We could not perform this action because something went wrong.',
-              })
-            }
-            setSubmitting(false)
-          })
-        }}
+        onSubmit={onSubmit}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}
@@ -79,7 +82,10 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a paralegal"
-              options={[{ id: null, email: '-' }, ...paralegals].map((u) => ({
+              options={[
+                { id: null, email: '-' },
+                ...(paralegalResults.data ?? []),
+              ].map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,
@@ -96,7 +102,10 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a lawyer"
-              options={[{ id: null, email: '-' }, ...lawyers].map((u) => ({
+              options={[
+                { id: null, email: '-' },
+                ...(lawyerResults.data ?? []),
+              ].map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,

@@ -4,7 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Q, QuerySet
+from django.db.models import Q, Max, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
@@ -20,9 +20,11 @@ from case.serializers import (
 )
 from case.views.auth import (
     paralegal_or_better_required,
+    coordinator_or_better_required,
     ParalegalOrBetterObjectPermission,
     CoordinatorOrBetterPermission,
 )
+from microsoft.service import get_case_folder_info
 
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
@@ -49,21 +51,67 @@ def case_list_page_view(request):
 
 
 @api_view(["GET"])
+@coordinator_or_better_required
+def case_inbox_page_view(request):
+    """Inbox page where coordinators can see new cases for them to assign"""
+    is_unassigned = Q(paralegal__isnull=True)
+    is_open = Q(is_open=True)
+    is_inbox = is_unassigned & is_open
+    issues = (
+        Issue.objects.select_related("client")
+        .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
+        .filter(is_inbox)
+        .order_by("created_at")
+    )
+    issues = IssueNote.annotate_with_eligibility_checks(issues)
+    context = {"issues": IssueSerializer(issues, many=True).data}
+    return render_react_page(request, "Case Inbox", "case-inbox", context)
+
+
+@api_view(["GET"])
+@coordinator_or_better_required
+def case_review_page_view(request):
+    """Page where coordinators can see existing cases for them to review"""
+    issues = (
+        Issue.objects.select_related("client")
+        .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
+        .filter(is_open=True)
+        .annotate(next_review=Max("issuenote__event"))
+        .order_by("next_review")
+    )
+    issues = IssueNote.annotate_with_eligibility_checks(issues)
+    context = {"issues": IssueSerializer(issues, many=True).data}
+    return render_react_page(request, "Case Review", "case-review", context)
+
+
+@api_view(["GET"])
 @paralegal_or_better_required
 def case_detail_page_view(request, pk):
     """
     The details of a given case.
     """
     issue = get_object_or_404(Issue, pk=pk)
-    context = {
-        "case_pk": pk,
-        "urls": {
-            "detail": reverse("case-detail", args=(pk,)),
-            "email": reverse("case-email-list", args=(pk,)),
-            "docs": reverse("case-docs", args=(pk,)),
-        },
-    }
+    context = {"case_pk": pk, "urls": get_detail_urls(issue)}
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
+def case_detail_documents_page_view(request, pk):
+    """
+    The documents of a given case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {"case_pk": pk, "urls": get_detail_urls(issue)}
+    return render_react_page(request, f"Case {issue.fileref}", "document-list", context)
+
+
+def get_detail_urls(issue: Issue):
+    return {
+        "detail": reverse("case-detail", args=(issue.pk,)),
+        "email": reverse("case-email-list", args=(issue.pk,)),
+        "docs": reverse("case-docs", args=(issue.pk,)),
+    }
 
 
 class CasePaginator(ClerkPaginator):
@@ -190,8 +238,27 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         Add a note to an existing issue.
         """
         issue = self.get_object()  # Checks permissions
-        data = {**request.data, "issue": issue.pk, "creator_id": self.request.user.pk}
+        data = {
+            **request.data,
+            "issue": issue.pk,
+            "creator_id": self.request.user.pk,
+        }
         serializer = IssueNoteSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)
+
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_path="docs",
+        url_name="docs",
+    )
+    def get_documents_view(self, request, pk):
+        """
+        View sharepoint documents for a case.
+        """
+        issue = self.get_object()
+        documents, sharepoint_url = get_case_folder_info(issue)
+        data = {"sharepoint_url": sharepoint_url, "documents": documents}
+        return Response(data)

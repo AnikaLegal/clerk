@@ -11,6 +11,8 @@ paths:
     $ref: paths/case-detail.yaml
   /clerk/api/case/{id}/note/:
     $ref: paths/case-note.yaml
+  /clerk/api/case/{id}/docs/:
+    $ref: paths/case-docs.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:

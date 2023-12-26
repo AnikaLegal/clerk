@@ -39,7 +39,7 @@ from case.serializers import (
     EmailTemplateSerializer,
     EmailThreadSerializer,
 )
-from case.views.case_detail import get_detail_urls
+from case.views.case import get_detail_urls
 
 
 DISPLAY_EMAIL_STATES = [EmailState.SENT, EmailState.INGESTED]

@@ -36,6 +36,12 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.issueNoteCreate,
       }),
     }),
+    getCaseDocuments: build.query<
+      GetCaseDocumentsApiResponse,
+      GetCaseDocumentsApiArg
+    >({
+      query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/docs/` }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -308,6 +314,15 @@ export type CreateCaseNoteApiArg = {
   id: string
   /** Successful response. */
   issueNoteCreate: IssueNoteCreate
+}
+export type GetCaseDocumentsApiResponse =
+  /** status 200 Successful response. */ {
+    sharepoint_url: string
+    documents: string[][]
+  }
+export type GetCaseDocumentsApiArg = {
+  /** Entity ID */
+  id: string
 }
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[]
@@ -702,6 +717,7 @@ export const {
   useGetCaseQuery,
   useUpdateCaseMutation,
   useCreateCaseNoteMutation,
+  useGetCaseDocumentsQuery,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,

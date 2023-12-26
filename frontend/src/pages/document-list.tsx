@@ -10,30 +10,33 @@ import {
   Label,
   Icon,
 } from 'semantic-ui-react'
+
 import { mount } from 'utils'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { api } from 'api'
+import { useGetCaseQuery, useGetCaseDocumentsQuery } from 'apiNew'
 
-const { issue, load_sharepoint_url, urls } = window.REACT_CONTEXT
+interface DjangoContext {
+  case_pk: string
+  urls: {
+    detail: string
+    email: string
+    docs: string
+  }
+}
+
+const { case_pk, urls } = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [sharepointInfo, setSharepointInfo] = useState({
-    sharepointUrl: null,
-    documents: [],
-  })
-  const { sharepointUrl, documents } = sharepointInfo
-  useEffect(() => {
-    api.case.docs(issue.id).then(({ resp, data }) => {
-      if (resp.ok) {
-        setSharepointInfo({
-          sharepointUrl: data.sharepoint_url,
-          documents: data.documents,
-        })
-      }
-      setIsLoading(false)
-    })
-  }, [])
+  const caseResult = useGetCaseQuery({ id: case_pk })
+  const docsResult = useGetCaseDocumentsQuery({ id: case_pk })
+
+  const isInitialLoad = caseResult.isLoading
+  const isLoading = caseResult.isFetching || docsResult.isFetching
+  if (isInitialLoad) return null
+
+  const sharepointUrl = docsResult.data?.sharepoint_url
+  const documents = docsResult.data?.documents
+  const issue = caseResult.data!.issue
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.DOCUMENTS} urls={urls} />
