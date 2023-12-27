@@ -30,6 +30,7 @@ router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
+router.register("email", case_email.EmailApiViewset, basename="email-api")
 router.register(
     "template-email",
     email_templates.EmailTemplateApiViewset,
@@ -66,42 +67,29 @@ urlpatterns = [
     ),
     # Email
     re_path(
-        f"^cases/email/{UUID_PK}/$", case_email.email_list_view, name="case-email-list"
+        f"^cases/email/{UUID_PK}/$",
+        case_email.email_list_page_view,
+        name="case-email-list",
     ),
     re_path(
         f"^cases/email/{UUID_PK}/thread/{SLUG}/$",
-        case_email.email_thread_view,
+        case_email.email_thread_page_view,
         name="case-email-thread",
     ),
     re_path(
         f"^cases/email/{UUID_PK}/draft/$",
-        case_email.email_draft_create_view,
+        case_email.email_draft_create_page_view,
         name="case-email-draft",
     ),
     re_path(
         f"^cases/email/{UUID_PK}/draft/{INT_EMAIL_PK}/$",
-        case_email.email_draft_edit_view,
+        case_email.email_draft_edit_page_view,
         name="case-email-edit",
     ),
     re_path(
-        f"^cases/email/{UUID_PK}/draft/{INT_EMAIL_PK}/send/$",
-        case_email.email_draft_send_view,
-        name="case-email-send",
-    ),
-    re_path(
         f"^cases/email/{UUID_PK}/draft/{INT_EMAIL_PK}/preview/$",
-        case_email.email_draft_preview_view,
+        case_email.email_draft_preview_page_view,
         name="case-email-preview",
-    ),
-    re_path(
-        f"^cases/email/{UUID_PK}/draft/{INT_EMAIL_PK}/attachment/{INT_ATTACHMENT_PK}/$",
-        case_email.email_attachment_view,
-        name="case-email-attach",
-    ),
-    re_path(
-        f"^cases/email/{UUID_PK}/draft/{INT_EMAIL_PK}/attachment/{INT_ATTACHMENT_PK}/upload/$",
-        case_email.email_attachment_upload_view,
-        name="case-email-attach-upload",
     ),
     # Parties
     path("parties/", person.person_list_page_view, name="person-list"),

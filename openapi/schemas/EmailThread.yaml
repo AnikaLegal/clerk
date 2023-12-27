@@ -1,0 +1,20 @@
+type: object
+properties:
+  emails:
+    type: array
+    items:
+      $ref: ./Email.yaml
+  subject:
+    type: string
+  slug:
+    type: string
+  most_recent:
+    type: string
+  url:
+    type: string
+required:
+  - emails
+  - subject
+  - slug
+  - most_recent
+  - url

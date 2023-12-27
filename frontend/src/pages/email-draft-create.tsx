@@ -16,6 +16,17 @@ import * as Yup from 'yup'
 import { mount, MarkdownAsHtmlDisplay, markdownToHtml } from 'utils'
 import { api } from 'api'
 
+interface DjangoContext {
+  case_pk: string
+  draft_url: string
+  case_email_address: string
+  urls: {
+    detail: string
+    email: string
+    docs: string
+  }
+}
+
 const { templates, issue, parent_email, case_email_url } = window.REACT_CONTEXT
 
 const App = () => {

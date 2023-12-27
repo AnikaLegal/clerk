@@ -13,6 +13,18 @@ paths:
     $ref: paths/case-note.yaml
   /clerk/api/case/{id}/docs/:
     $ref: paths/case-docs.yaml
+  /clerk/api/email/{id}/:
+    $ref: paths/email-list.yaml
+  /clerk/api/email/{id}/{emailId}/:
+    $ref: paths/email-detail.yaml
+  /clerk/api/email/{id}/{emailId}/attachment/:
+    $ref: paths/attachment-list.yaml
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/:
+    $ref: paths/attachment-detail.yaml
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/:
+    $ref: paths/attachment-sharepoint-upload.yaml
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/{sharepointId}/:
+    $ref: paths/attachment-sharepoint-download.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:

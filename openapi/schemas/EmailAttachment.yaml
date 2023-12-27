@@ -1,0 +1,18 @@
+type: object
+properties:
+  id:
+    type: number
+  url:
+    type: string
+  name:
+    type: string
+  sharepoint_state:
+    type: string
+  content_type:
+    type: string
+required:
+  - id
+  - url
+  - name
+  - sharepoint_state
+  - content_type

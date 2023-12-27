@@ -42,6 +42,77 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/docs/` }),
     }),
+    getEmailThreads: build.query<
+      GetEmailThreadsApiResponse,
+      GetEmailThreadsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/`,
+        params: { slug: queryArg.slug },
+      }),
+    }),
+    createEmail: build.mutation<CreateEmailApiResponse, CreateEmailApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/`,
+        method: 'POST',
+        body: queryArg.emailCreate,
+      }),
+    }),
+    getEmail: build.query<GetEmailApiResponse, GetEmailApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/`,
+      }),
+    }),
+    updateEmail: build.mutation<UpdateEmailApiResponse, UpdateEmailApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/`,
+        method: 'PATCH',
+        body: queryArg.emailCreate,
+      }),
+    }),
+    deleteEmail: build.mutation<DeleteEmailApiResponse, DeleteEmailApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/`,
+        method: 'DELETE',
+      }),
+    }),
+    createEmailAttachment: build.mutation<
+      CreateEmailAttachmentApiResponse,
+      CreateEmailAttachmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/`,
+        method: 'POST',
+        body: queryArg.emailAttachmentCreate,
+      }),
+    }),
+    deleteEmailAttachment: build.mutation<
+      DeleteEmailAttachmentApiResponse,
+      DeleteEmailAttachmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/${queryArg.attachmentId}/`,
+        method: 'DELETE',
+      }),
+    }),
+    uploadEmailAttachmentToSharepoint: build.mutation<
+      UploadEmailAttachmentToSharepointApiResponse,
+      UploadEmailAttachmentToSharepointApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/${queryArg.attachmentId}/sharepoint/`,
+        method: 'POST',
+      }),
+    }),
+    downloadEmailAttachmentFromSharepoint: build.mutation<
+      DownloadEmailAttachmentFromSharepointApiResponse,
+      DownloadEmailAttachmentFromSharepointApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/${queryArg.attachmentId}/sharepoint/${queryArg.sharepointId}/`,
+        method: 'POST',
+      }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -323,6 +394,86 @@ export type GetCaseDocumentsApiResponse =
 export type GetCaseDocumentsApiArg = {
   /** Entity ID */
   id: string
+}
+export type GetEmailThreadsApiResponse =
+  /** status 200 Successful response. */ EmailThread[]
+export type GetEmailThreadsApiArg = {
+  /** Case ID */
+  id: string
+  slug?: string
+}
+export type CreateEmailApiResponse =
+  /** status 201 Successful response. */ Email
+export type CreateEmailApiArg = {
+  /** Case ID */
+  id: string
+  emailCreate: EmailCreate
+}
+export type GetEmailApiResponse = /** status 200 Successful response. */ Email[]
+export type GetEmailApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+}
+export type UpdateEmailApiResponse =
+  /** status 200 Successful response. */ Email
+export type UpdateEmailApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+  /** Successful response. */
+  emailCreate: EmailCreate
+}
+export type DeleteEmailApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteEmailApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+}
+export type CreateEmailAttachmentApiResponse =
+  /** status 201 Successful response. */ EmailAttachment
+export type CreateEmailAttachmentApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+  emailAttachmentCreate: EmailAttachmentCreate
+}
+export type DeleteEmailAttachmentApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteEmailAttachmentApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+  /** Email Attachment ID */
+  attachmentId: number
+}
+export type UploadEmailAttachmentToSharepointApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type UploadEmailAttachmentToSharepointApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+  /** Email Attachment ID */
+  attachmentId: number
+}
+export type DownloadEmailAttachmentFromSharepointApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DownloadEmailAttachmentFromSharepointApiArg = {
+  /** Case ID */
+  id: string
+  /** Email ID */
+  emailId: number
+  /** Email Attachment ID */
+  attachmentId: number
+  /** Sharepoint ID */
+  sharepointId: string
 }
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[]
@@ -649,6 +800,42 @@ export type IssueUpdate = IssueBase & {
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number
 }
+export type EmailCreate = {
+  issue_id: string
+  to_address: string
+  from_address: string
+  cc_addresses: string[]
+  subject: string
+  text: string
+  html: string
+}
+export type EmailAttachment = {
+  id: number
+  url: string
+  name: string
+  sharepoint_state: string
+  content_type: string
+}
+export type Email = EmailCreate & {
+  id: number
+  created_at: string
+  processed_at: string | null
+  sender: User
+  state: string
+  reply_url: string
+  edit_url: string
+  attachments: EmailAttachment[]
+}
+export type EmailThread = {
+  emails: Email[]
+  subject: string
+  slug: string
+  most_recent: string
+  url: string
+}
+export type EmailAttachmentCreate = {
+  file: Blob
+}
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string
 }
@@ -718,6 +905,15 @@ export const {
   useUpdateCaseMutation,
   useCreateCaseNoteMutation,
   useGetCaseDocumentsQuery,
+  useGetEmailThreadsQuery,
+  useCreateEmailMutation,
+  useGetEmailQuery,
+  useUpdateEmailMutation,
+  useDeleteEmailMutation,
+  useCreateEmailAttachmentMutation,
+  useDeleteEmailAttachmentMutation,
+  useUploadEmailAttachmentToSharepointMutation,
+  useDownloadEmailAttachmentFromSharepointMutation,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,

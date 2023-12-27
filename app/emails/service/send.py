@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 
-from core.models import IssueNote
+from core.models import IssueNote, Issue
 from core.models.issue_note import NoteType
 from emails.models import Email, EmailState
 from utils.sentry import sentry_task
@@ -65,7 +65,7 @@ def send_email_task(email_pk: int):
         )
 
 
-def build_clerk_address(issue, email_only=False):
+def build_clerk_address(issue: Issue, email_only=False):
     """
     FIXME: TEST ME.
     """

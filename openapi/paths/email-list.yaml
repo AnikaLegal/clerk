@@ -1,0 +1,52 @@
+get:
+  operationId: getEmailThreads
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: slug
+      in: query
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/EmailThread.yaml
+
+post:
+  operationId: createEmail
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/EmailCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Email.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

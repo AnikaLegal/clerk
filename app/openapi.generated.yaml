@@ -197,6 +197,271 @@ paths:
                 required:
                   - sharepoint_url
                   - documents
+  /clerk/api/email/{id}/:
+    get:
+      operationId: getEmailThreads
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: slug
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailThread"
+    post:
+      operationId: createEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{emailId}/:
+    get:
+      operationId: getEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Email"
+    patch:
+      operationId: updateEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{emailId}/attachment/:
+    post:
+      operationId: createEmailAttachment
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailAttachmentCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailAttachment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/:
+    delete:
+      operationId: deleteEmailAttachment
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+        - description: Email Attachment ID
+          in: path
+          name: attachmentId
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/:
+    post:
+      operationId: uploadEmailAttachmentToSharepoint
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+        - description: Email Attachment ID
+          in: path
+          name: attachmentId
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/{sharepointId}/:
+    post:
+      operationId: downloadEmailAttachmentFromSharepoint
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: emailId
+          required: true
+          schema:
+            type: number
+        - description: Email Attachment ID
+          in: path
+          name: attachmentId
+          required: true
+          schema:
+            type: number
+        - description: Sharepoint ID
+          in: path
+          name: sharepointId
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/person/:
     get:
       operationId: getPeople
@@ -1269,6 +1534,116 @@ components:
               type: number
           required:
             - creator_id
+    EmailCreate:
+      type: object
+      properties:
+        issue_id:
+          type: string
+          format: uuid
+        to_address:
+          type: string
+        from_address:
+          type: string
+        cc_addresses:
+          array: null
+          items:
+            type: string
+        subject:
+          type: string
+        text:
+          type: string
+        html:
+          type: string
+      required:
+        - issue_id
+        - to_address
+        - from_address
+        - cc_addresses
+        - subject
+        - text
+        - html
+    EmailAttachment:
+      type: object
+      properties:
+        id:
+          type: number
+        url:
+          type: string
+        name:
+          type: string
+        sharepoint_state:
+          type: string
+        content_type:
+          type: string
+      required:
+        - id
+        - url
+        - name
+        - sharepoint_state
+        - content_type
+    Email:
+      allOf:
+        - $ref: "#/components/schemas/EmailCreate"
+        - type: object
+          properties:
+            id:
+              type: number
+            created_at:
+              type: string
+            processed_at:
+              type: string
+              nullable: true
+            sender:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            state:
+              type: string
+            reply_url:
+              type: string
+            edit_url:
+              type: string
+            attachments:
+              type: array
+              items:
+                $ref: "#/components/schemas/EmailAttachment"
+          required:
+            - id
+            - created_at
+            - processed_at
+            - sender
+            - state
+            - reply_url
+            - edit_url
+            - attachments
+    EmailThread:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Email"
+        subject:
+          type: string
+        slug:
+          type: string
+        most_recent:
+          type: string
+        url:
+          type: string
+      required:
+        - emails
+        - subject
+        - slug
+        - most_recent
+        - url
+    EmailAttachmentCreate:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
     PersonCreate:
       allOf:
         - $ref: "#/components/schemas/PersonBase"

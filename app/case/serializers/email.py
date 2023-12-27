@@ -36,6 +36,8 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
     file = serializers.FileField(write_only=True)
     url = serializers.URLField(source="file.url", read_only=True)
     name = serializers.CharField(source="file.name", read_only=True)
+    sharepoint_state = serializers.CharField(read_only=True)
+    content_type = serializers.CharField(read_only=True)
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -48,8 +50,8 @@ class EmailSerializer(serializers.ModelSerializer):
             "processed_at",
             "from_address",
             "html",
+            "issue_id",
             "text",
-            "pk",
             "sender",
             "state",
             "subject",

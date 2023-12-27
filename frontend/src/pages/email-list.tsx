@@ -1,21 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
   Button,
   Container,
   Header,
   Table,
-  Input,
-  Dropdown,
   Label,
   Icon,
 } from 'semantic-ui-react'
+
 import { mount } from 'utils'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
+import { useGetCaseQuery, useGetEmailThreadsQuery } from 'apiNew'
 
-const { issue, email_threads, case_email_address, urls, draft_url } =
-  window.REACT_CONTEXT
+interface DjangoContext {
+  case_pk: string
+  draft_url: string
+  case_email_address: string
+  urls: {
+    detail: string
+    email: string
+    docs: string
+  }
+}
+
+const { case_pk, case_email_address, urls, draft_url } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
+  const caseResult = useGetCaseQuery({ id: case_pk })
+  const threadResult = useGetEmailThreadsQuery({ id: case_pk })
+  const isInitialLoad = caseResult.isLoading || threadResult.isLoading
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const emailThreads = threadResult.data
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.EMAIL} urls={urls} />
@@ -40,12 +58,12 @@ const App = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {email_threads.length < 1 && (
+          {emailThreads.length < 1 && (
             <Table.Row>
               <td>No emails found</td>
             </Table.Row>
           )}
-          {email_threads.map((t) => (
+          {emailThreads.map((t) => (
             <Table.Row key={t.url}>
               <Table.Cell>
                 <a href={t.url}>{t.subject}</a>
