@@ -10,7 +10,7 @@ import {
 
 import { mount } from 'utils'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { useGetCaseQuery, useGetEmailThreadsQuery } from 'apiNew'
+import { useGetCaseQuery, useGetEmailThreadsQuery } from 'api'
 
 interface DjangoContext {
   case_pk: string

@@ -13,7 +13,7 @@ import { useSnackbar } from 'notistack'
 
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation } from 'apiNew'
+import { useUpdateCaseMutation } from 'api'
 import { STAGES } from 'consts'
 
 const STAGE_OPTIONS = Object.entries(STAGES)

@@ -20,9 +20,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../schemas/Email.yaml
+            $ref: ../schemas/Email.yaml
 
 patch:
   operationId: updateEmail

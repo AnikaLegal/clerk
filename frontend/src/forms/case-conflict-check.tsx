@@ -13,7 +13,7 @@ import { useSnackbar } from 'notistack'
 
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useCreateCaseNoteMutation } from 'apiNew'
+import { useCreateCaseNoteMutation } from 'api'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'

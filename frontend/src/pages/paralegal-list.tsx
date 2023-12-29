@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Container, Header, Table, Input, Dropdown } from 'semantic-ui-react'
 
 import { mount } from 'utils'
-import { User } from 'apiNew'
+import { User } from 'api'
 
 interface AnnotatedUser extends User {
   latest_issue_created_at: string

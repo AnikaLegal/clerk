@@ -199,7 +199,16 @@ def get_case_folder_info(issue):
 
     # Get the list of files (name, file URL) for the case folder.
     children = api.folder.get_children(case_path)
-    list_files = [(item["name"], item["webUrl"]) for item in children]
+    list_files = [
+        {
+            "name": item["name"],
+            "url": item["webUrl"],
+            "id": item["id"],
+            "size": item["size"],
+            "is_file": "file" in item,
+        }
+        for item in children
+    ]
 
     # Get the case folder URL.
     folder = api.folder.get(case_path)

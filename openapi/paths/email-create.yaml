@@ -1,5 +1,5 @@
 post:
-  operationId: createEmailAttachment
+  operationId: createEmail
   parameters:
     - description: Case ID
       in: path
@@ -8,26 +8,19 @@ post:
       schema:
         type: string
         format: uuid
-    - description: Email ID
-      in: path
-      name: emailId
-      required: true
-      schema:
-        type: number
-
   requestBody:
     required: true
     content:
-      multipart/form-data:
+      application/json:
         schema:
-          $ref: ../schemas/EmailAttachmentCreate.yaml
+          $ref: ../schemas/EmailCreate.yaml
   responses:
     "201":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/EmailAttachment.yaml
+            $ref: ../schemas/Email.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

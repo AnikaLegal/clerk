@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Formik } from 'formik'
 import {
   Container,
@@ -12,40 +12,72 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
+import { useSnackbar } from 'notistack'
 
-import { mount, MarkdownAsHtmlDisplay, markdownToHtml } from 'utils'
-import { api } from 'api'
+import {
+  mount,
+  MarkdownAsHtmlDisplay,
+  markdownToHtml,
+  getAPIErrorMessage,
+  getAPIFormErrors,
+} from 'utils'
+import api, {
+  EmailTemplate,
+  useCreateEmailMutation,
+  useGetCaseQuery,
+} from 'api'
 
 interface DjangoContext {
   case_pk: string
-  draft_url: string
-  case_email_address: string
-  urls: {
-    detail: string
-    email: string
-    docs: string
-  }
+  parent_email_id: number
+  case_email_url: string
+  templates: EmailTemplate[]
 }
 
-const { templates, issue, parent_email, case_email_url } = window.REACT_CONTEXT
+const { case_pk, parent_email_id, case_email_url, templates } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
+  const caseResult = useGetCaseQuery({ id: case_pk })
+  const [getParentEmail, parentEmailResult] = api.useLazyGetEmailQuery()
+  const [createEmail] = useCreateEmailMutation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  useEffect(() => {
+    if (parent_email_id) {
+      getParentEmail({ id: case_pk, emailId: parent_email_id })
+    }
+  }, [])
+
+  const isInitialLoad =
+    caseResult.isLoading ||
+    (!parentEmailResult.isUninitialized && parentEmailResult.isLoading)
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const parentEmail = parentEmailResult.data ?? null
+
   const onSubmit = (values, { setSubmitting, setErrors }) => {
-    setSubmitting(true)
-    const requestData = {
+    const emailCreate = {
       ...values,
       html: markdownToHtml(values.text),
     }
-    api.email.create(issue.id, requestData).then(({ resp, data, errors }) => {
-      if (resp.status === 400) {
-        setErrors(errors)
+    createEmail({ id: case_pk, emailCreate })
+      .unwrap()
+      .then((email) => {
         setSubmitting(false)
-      } else if (resp.ok) {
-        window.location.href = data.edit_url
-      } else {
+        window.location.href = email.edit_url
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Email note'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
         setSubmitting(false)
-      }
-    })
+      })
   }
   const panes = [
     {
@@ -55,7 +87,7 @@ const App = () => {
           <TemplateForm
             templates={templates}
             onSubmit={onSubmit}
-            parent_email={parent_email}
+            parent_email={parentEmail}
           />
         </Tab.Pane>
       ),
@@ -64,7 +96,7 @@ const App = () => {
       menuItem: 'Custom',
       render: () => (
         <Tab.Pane attached={false}>
-          <CustomDraftForm onSubmit={onSubmit} parent_email={parent_email} />
+          <CustomDraftForm onSubmit={onSubmit} parent_email={parentEmail} />
         </Tab.Pane>
       ),
     },
@@ -88,10 +120,10 @@ const App = () => {
           Client: {issue.client.full_name} at {issue.client.email}
         </Label>
       </div>
-      {parent_email && (
+      {parentEmail && (
         <Segment secondary>
-          Replying to <strong>{parent_email.subject}</strong> from{' '}
-          {parent_email.from_address}
+          Replying to <strong>{parentEmail.subject}</strong> from{' '}
+          {parentEmail.from_address}
         </Segment>
       )}
       <Tab menu={{ pointing: true }} panes={panes} />

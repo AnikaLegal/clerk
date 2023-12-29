@@ -7,7 +7,7 @@ import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { Client, ClientCreate, useUpdateClientMutation } from 'apiNew'
+import { Client, ClientCreate, useUpdateClientMutation } from 'api'
 
 interface DjangoContext {
   client: Client

@@ -1,0 +1,18 @@
+type: object
+properties:
+  name:
+    type: string
+  url:
+    type: string
+  id:
+    type: string
+  size:
+    type: number
+  is_file:
+    type: boolean
+required:
+  - name
+  - url
+  - id
+  - size
+  - is_file

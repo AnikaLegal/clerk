@@ -6,7 +6,7 @@ import moment from 'moment'
 
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
-import { useCreateCaseNoteMutation } from 'apiNew'
+import { useCreateCaseNoteMutation } from 'api'
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 

@@ -11,7 +11,7 @@ import {
 import moment from 'moment'
 import { useSnackbar } from 'notistack'
 
-import { useCreateCaseNoteMutation } from 'apiNew'
+import { useCreateCaseNoteMutation } from 'api'
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { TimelineNote } from 'comps/timeline-item'

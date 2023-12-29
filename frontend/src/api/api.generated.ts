@@ -53,7 +53,7 @@ const injectedRtkApi = api.injectEndpoints({
     }),
     createEmail: build.mutation<CreateEmailApiResponse, CreateEmailApiArg>({
       query: (queryArg) => ({
-        url: `/clerk/api/email/${queryArg.id}/`,
+        url: `/clerk/api/email/${queryArg.id}/create/`,
         method: 'POST',
         body: queryArg.emailCreate,
       }),
@@ -109,7 +109,7 @@ const injectedRtkApi = api.injectEndpoints({
       DownloadEmailAttachmentFromSharepointApiArg
     >({
       query: (queryArg) => ({
-        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/${queryArg.attachmentId}/sharepoint/${queryArg.sharepointId}/`,
+        url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/attachment/sharepoint/${queryArg.sharepointId}/`,
         method: 'POST',
       }),
     }),
@@ -389,7 +389,7 @@ export type CreateCaseNoteApiArg = {
 export type GetCaseDocumentsApiResponse =
   /** status 200 Successful response. */ {
     sharepoint_url: string
-    documents: string[][]
+    documents: SharepointDocument[]
   }
 export type GetCaseDocumentsApiArg = {
   /** Entity ID */
@@ -409,7 +409,7 @@ export type CreateEmailApiArg = {
   id: string
   emailCreate: EmailCreate
 }
-export type GetEmailApiResponse = /** status 200 Successful response. */ Email[]
+export type GetEmailApiResponse = /** status 200 Successful response. */ Email
 export type GetEmailApiArg = {
   /** Case ID */
   id: string
@@ -470,8 +470,6 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   id: string
   /** Email ID */
   emailId: number
-  /** Email Attachment ID */
-  attachmentId: number
   /** Sharepoint ID */
   sharepointId: string
 }
@@ -799,6 +797,13 @@ export type IssueUpdate = IssueBase & {
 }
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number
+}
+export type SharepointDocument = {
+  name: string
+  url: string
+  id: string
+  size: number
+  is_file: boolean
 }
 export type EmailCreate = {
   issue_id: string

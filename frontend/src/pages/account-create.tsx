@@ -4,7 +4,7 @@ import { Container, Header } from 'semantic-ui-react'
 import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useCreateUserMutation } from 'apiNew'
+import { useCreateUserMutation } from 'api'
 import { AccountForm } from 'forms/account'
 
 const App = () => {

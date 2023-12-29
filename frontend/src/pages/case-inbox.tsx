@@ -3,7 +3,7 @@ import { Container, Header } from 'semantic-ui-react'
 
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { Issue } from 'apiNew'
+import { Issue } from 'api'
 
 interface DjangoContext {
   issues: Issue[]

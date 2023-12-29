@@ -11,7 +11,7 @@ import { mount } from 'utils'
 import { AccountPermissions } from 'comps/account-permissions'
 import { ErrorBoundary } from 'comps/error-boundary'
 import { FIELD_TYPES } from 'comps/field-component'
-import { User, UserCreate, useUpdateUserMutation } from 'apiNew'
+import { User, UserCreate, useUpdateUserMutation } from 'api'
 
 interface DjangoContext {
   account: User

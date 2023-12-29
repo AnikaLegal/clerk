@@ -1,42 +1,70 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Container, Header, Label } from 'semantic-ui-react'
-import xss from 'xss'
 import styled from 'styled-components'
+import { useSnackbar } from 'notistack'
 
-import { mount } from 'utils'
-import { api } from 'api'
+import { mount, getAPIErrorMessage } from 'utils'
+import {
+  useGetCaseQuery,
+  useGetEmailThreadsQuery,
+  useUploadEmailAttachmentToSharepointMutation,
+  Email,
+  Issue,
+  EmailAttachment,
+} from 'api'
+import { UserPermission } from 'types'
 
-const { issue, subject, case_email_address, case_email_list_url, user } =
-  window.REACT_CONTEXT
+interface DjangoContext {
+  case_pk: string
+  thread_slug: string
+  case_email_list_url: string
+  user: UserPermission
+}
 
-const setAttachmentState = (emails, emailId, attachId, newState) =>
-  emails.map((e) =>
-    e.id === emailId
-      ? {
-          ...e,
-          attachments: e.attachments.map((a) =>
-            a.id === attachId ? { ...a, sharepoint_state: newState } : a
-          ),
-        }
-      : e
-  )
+const { case_pk, thread_slug, case_email_list_url, user } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [emails, setEmails] = useState(window.REACT_CONTEXT.emails)
-  const onEmailAttachUpload = (emailId, attachId) => () => {
-    setEmails(setAttachmentState(emails, emailId, attachId, 'UPLOADING'))
-    api.email.attachment.upload(issue.id, emailId, attachId)
-      .then(({ resp, data }) => {
-        setEmails(
-          setAttachmentState(emails, emailId, attachId, data.sharepoint_state)
+  const { enqueueSnackbar } = useSnackbar()
+  const [loadingAttachment, setLoadingAttachment] = React.useState<
+    number | null
+  >(null)
+  const [upload] = useUploadEmailAttachmentToSharepointMutation()
+  const caseResult = useGetCaseQuery({ id: case_pk })
+  const threadResult = useGetEmailThreadsQuery({
+    id: case_pk,
+    slug: thread_slug,
+  })
+  const isInitialLoad = caseResult.isLoading || threadResult.isLoading
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const emailThreads = threadResult.data
+  const emailThread = emailThreads[0] // Assume a single result
+  const { emails } = emailThread
+
+  const onEmailAttachUpload = (emailId: number, attachmentId: number) => () => {
+    setLoadingAttachment(attachmentId)
+    upload({ id: case_pk, emailId, attachmentId })
+      .unwrap()
+      .then(() => {
+        setLoadingAttachment(null)
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to upload attachment'),
+          {
+            variant: 'error',
+          }
         )
+        setLoadingAttachment(null)
       })
   }
 
   return (
     <Container>
       <Header as="h1">
-        {subject}{' '}
+        {emailThread.subject}{' '}
         <span style={{ color: 'var(--grey-2)' }}>({issue.fileref})</span>
         <Header.Subheader>
           Most recent emails are at the top
@@ -47,9 +75,11 @@ const App = () => {
       <EmailList>
         {emails.map((email) => (
           <EmailItem
-            email={email}
             key={email.id}
+            email={email}
+            issue={issue}
             onEmailAttachUpload={onEmailAttachUpload}
+            loadingAttachment={loadingAttachment}
           />
         ))}
       </EmailList>
@@ -57,9 +87,21 @@ const App = () => {
   )
 }
 
-const EmailItem = ({ email, onEmailAttachUpload }) => {
+interface EmailItemProps {
+  email: Email
+  issue: Issue
+  onEmailAttachUpload: (emailId: number, attachId: number) => () => void
+  loadingAttachment: number | null
+}
+
+const EmailItem: React.FC<EmailItemProps> = ({
+  email,
+  issue,
+  onEmailAttachUpload,
+  loadingAttachment,
+}) => {
   return (
-    <Email key={email.id} state={email.state}>
+    <EmailContainer key={email.id} state={email.state}>
       <EmailHeader state={email.state}>
         {user.is_admin_or_better && (
           <p>
@@ -127,14 +169,60 @@ const EmailItem = ({ email, onEmailAttachUpload }) => {
                 isUploadEnabled={issue.is_sharepoint_set_up}
                 onUpload={onEmailAttachUpload}
                 emailId={email.id}
-                {...a}
+                attachment={a}
+                loadingAttachment={loadingAttachment}
                 key={a.id}
               />
             ))}
           </EmailAttachmentList>
         </EmailAttachmentBlock>
       )}
-    </Email>
+    </EmailContainer>
+  )
+}
+
+interface AttachmentProps {
+  emailId: number
+  isUploadEnabled: boolean
+  onUpload: (emailId: number, attachId: number) => () => void
+  attachment: EmailAttachment
+  loadingAttachment: number | null
+}
+
+const Attachment: React.FC<AttachmentProps> = ({
+  emailId,
+  onUpload,
+  isUploadEnabled,
+  attachment: { id, url, name, sharepoint_state },
+  loadingAttachment,
+}) => {
+  const filename = name.split('/').pop()
+  const isAnyUploading = !!loadingAttachment
+  const isThisUploading = loadingAttachment === id
+  const isUploaded = sharepoint_state === 'UPLOADED'
+
+  return (
+    <AttachmentEl>
+      <a href={url}>{filename}</a>{' '}
+      {isUploadEnabled && (
+        <>
+          {!isUploaded && !isAnyUploading && (
+            <Label onClick={onUpload(emailId, id)}>save to sharepoint</Label>
+          )}
+          {!isUploaded && isAnyUploading && !isThisUploading && (
+            <Label style={{ cursor: 'not-allowed' }}>save to sharepoint</Label>
+          )}
+          {!isUploaded && isAnyUploading && isThisUploading && (
+            <Label>saving...</Label>
+          )}
+          {isUploaded && (
+            <Label color="teal" style={{ cursor: 'not-allowed' }}>
+              saved to sharepoint
+            </Label>
+          )}
+        </>
+      )}
+    </AttachmentEl>
   )
 }
 
@@ -145,7 +233,7 @@ const EmailList = styled.div`
   margin-top: 1.5rem;
 `
 
-const Email = styled.div`
+const EmailContainer = styled.div`
   border: 6px solid var(--grey);
   box-shadow: 1px 1px 5px -2px #999;
 
@@ -231,37 +319,5 @@ const AttachmentEl = styled.div`
     cursor: pointer;
   }
 `
-
-const Attachment = ({
-  id,
-  url,
-  name,
-  sharepoint_state,
-  onUpload,
-  isUploadEnabled,
-  emailId,
-}) => {
-  const filename = name.split('/').pop()
-  return (
-    <AttachmentEl>
-      <a href={url}>{filename}</a>{' '}
-      {isUploadEnabled && (
-        <>
-          {sharepoint_state === 'NOT_UPLOADED' && (
-            <Label onClick={onUpload(emailId, id)}>save to sharepoint</Label>
-          )}
-          {sharepoint_state === 'UPLOADING' && (
-            <Label color="yellow" onClick={onUpload(emailId, id)}>
-              saving...
-            </Label>
-          )}
-          {sharepoint_state === 'UPLOADED' && (
-            <Label color="teal">saved to sharepoint</Label>
-          )}
-        </>
-      )}
-    </AttachmentEl>
-  )
-}
 
 mount(App)

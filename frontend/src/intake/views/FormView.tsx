@@ -19,7 +19,7 @@ import {
 import type { Field, Data } from 'intake/types'
 import { QUESTIONS, STAGES } from 'intake/questions'
 import { FORM_FIELDS } from 'intake/components/fields'
-import { api } from 'api'
+import { api } from 'intake/api'
 
 const INITIAL_DATA = {
   ISSUES: 'HEALTH_CHECK', // Always health check type case.

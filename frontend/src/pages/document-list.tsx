@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import {
-  Button,
-  Container,
-  Header,
-  Table,
-  Input,
-  Loader,
-  Dropdown,
-  Label,
-  Icon,
-} from 'semantic-ui-react'
+import React from 'react'
+import { Container, Header, Loader } from 'semantic-ui-react'
 
 import { mount } from 'utils'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { useGetCaseQuery, useGetCaseDocumentsQuery } from 'apiNew'
+import { useGetCaseQuery, useGetCaseDocumentsQuery } from 'api'
 
 interface DjangoContext {
   case_pk: string
@@ -58,7 +48,7 @@ const App = () => {
         </p>
       )}
       {!isLoading &&
-        documents.map(([name, url]) => (
+        documents.map(({ name, url }) => (
           <li key={url}>
             <a href={url}>{name}</a>
           </li>

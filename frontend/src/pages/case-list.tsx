@@ -13,7 +13,7 @@ import {
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
-import { useGetUsersQuery, useGetCasesQuery } from 'apiNew'
+import { useGetUsersQuery, useGetCasesQuery } from 'api'
 
 interface DjangoContext {
   choices: {

@@ -191,9 +191,7 @@ paths:
                   documents:
                     type: array
                     items:
-                      type: array
-                      items:
-                        type: string
+                      $ref: "#/components/schemas/SharepointDocument"
                 required:
                   - sharepoint_url
                   - documents
@@ -222,6 +220,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/EmailThread"
+  /clerk/api/email/{id}/create/:
     post:
       operationId: createEmail
       parameters:
@@ -272,9 +271,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Email"
+                $ref: "#/components/schemas/Email"
     patch:
       operationId: updateEmail
       parameters:
@@ -352,7 +349,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: "#/components/schemas/EmailAttachmentCreate"
       responses:
@@ -426,7 +423,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/{sharepointId}/:
+  /clerk/api/email/{id}/{emailId}/attachment/sharepoint/{sharepointId}/:
     post:
       operationId: downloadEmailAttachmentFromSharepoint
       parameters:
@@ -440,12 +437,6 @@ paths:
         - description: Email ID
           in: path
           name: emailId
-          required: true
-          schema:
-            type: number
-        - description: Email Attachment ID
-          in: path
-          name: attachmentId
           required: true
           schema:
             type: number
@@ -1534,6 +1525,25 @@ components:
               type: number
           required:
             - creator_id
+    SharepointDocument:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        id:
+          type: string
+        size:
+          type: number
+        is_file:
+          type: boolean
+      required:
+        - name
+        - url
+        - id
+        - size
+        - is_file
     EmailCreate:
       type: object
       properties:

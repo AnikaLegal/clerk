@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Formik } from 'formik'
 import {
   Container,
@@ -15,47 +15,63 @@ import {
 } from 'semantic-ui-react'
 import * as Yup from 'yup'
 import styled from 'styled-components'
+import { useSnackbar } from 'notistack'
 
 import { FormErrors } from 'comps/auto-form'
-import { mount } from 'utils'
-import { api } from 'api'
+import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { MarkdownEditor } from 'comps/markdown-editor'
+import {
+  useUpdateEmailMutation,
+  useDeleteEmailMutation,
+  useCreateEmailAttachmentMutation,
+  useDownloadEmailAttachmentFromSharepointMutation,
+  useDeleteEmailAttachmentMutation,
+  useGetCaseQuery,
+  useGetCaseDocumentsQuery,
+  useGetEmailQuery,
+  EmailAttachment,
+} from 'api'
 
-const { issue, case_email_url, email, sharepoint_docs, email_preview_url } =
-  window.REACT_CONTEXT
+interface DjangoContext {
+  case_pk: string
+  email_pk: number
+  case_email_url: string
+  email_preview_url: string
+}
+
+const { case_pk, email_pk, case_email_url, email_preview_url } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [attachments, setAttachments] = useState(email.attachments)
-  const onUploadAttachment = (attachment) => {
-    return api.email.attachment
-      .create(issue.id, email.id, attachment)
-      .then(({ resp, data }) => {
-        if (resp.ok) {
-          setAttachments([...attachments, data])
-        }
-        return { resp, data }
-      })
-  }
-  const onAttachSharepoint = (sharepointId) => {
-    return api.email.attachment
-      .createFromSharepoint(issue.id, email.id, sharepointId)
-      .then(({ resp, data }) => {
-        if (resp.ok) {
-          setAttachments([...attachments, data])
-        }
-        return { resp, data }
-      })
-  }
-  const onDeleteAttachment = (attachId) => () => {
+  const { enqueueSnackbar } = useSnackbar()
+  const [updateEmail] = useUpdateEmailMutation()
+  const [deleteEmail] = useDeleteEmailMutation()
+  const [deleteAttachment] = useDeleteEmailAttachmentMutation()
+
+  const caseResult = useGetCaseQuery({ id: case_pk })
+  const emailResult = useGetEmailQuery({ id: case_pk, emailId: email_pk })
+  const isInitialLoad = caseResult.isLoading || emailResult.isLoading
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const email = emailResult.data
+  const { attachments } = email
+
+  const onDeleteAttachment = (attachmentId: number) => () => {
     const confirmed = confirm('Delete this attachment?')
-    if (!confirmed) return new Promise()
-    return api.email.attachment
-      .delete(issue.id, email.id, attachId)
-      .then(({ resp, data }) => {
-        if (resp.ok) {
-          setAttachments(attachments.filter((a) => a.id !== attachId))
-        }
-        return { resp, data }
+    if (!confirmed) return
+    deleteAttachment({ id: case_pk, emailId: email_pk, attachmentId })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Attachment deleted', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to delete attachment'),
+          {
+            variant: 'error',
+          }
+        )
       })
   }
   const onSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -66,37 +82,56 @@ const App = () => {
       .filter((s) => s)
     const requestData = { ...values, cc_addresses: ccAddresses }
     delete requestData.send
-    const { resp, errors } = await api.email.update(
-      issue.id,
-      email.id,
-      requestData
-    )
-    if (resp.status === 400) {
-      setErrors(errors)
-    }
-    if (resp.ok && values.send) {
-      // Send email
+    if (values.send) {
+      // Send the email
       const confirmed = confirm('Send this email?')
       if (!confirmed) return
-      const { resp: sendResp } = await api.email.send(
-        issue.id,
-        email.id
-      )
-      if (sendResp.ok) {
-        window.location = case_email_url
-      }
+      // Mark email for sending.
+      requestData.state = 'READY_TO_SEND'
     }
-    setSubmitting(false)
+    updateEmail({
+      id: case_pk,
+      emailId: email_pk,
+      emailCreate: requestData,
+    })
+      .unwrap()
+      .then((email) => {
+        if (email.state !== 'DRAFT') {
+          window.location.href = case_email_url
+        } else {
+          enqueueSnackbar('Email updated', { variant: 'success' })
+          setSubmitting(false)
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update email'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(err)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+        setSubmitting(false)
+      })
   }
   const onDelete = (setSubmitting) => {
     const confirmed = confirm('Delete this draft email?')
     if (!confirmed) return
     setSubmitting(true)
-    api.email.delete(issue.id, email.id).then(({ resp }) => {
-      if (resp.ok) {
-        window.location = case_email_url
-      }
-    })
+    deleteEmail({ id: case_pk, emailId: email_pk })
+      .unwrap()
+      .then(() => {
+        window.location.href = case_email_url
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to delete this email'),
+          {
+            variant: 'error',
+          }
+        )
+        setSubmitting(false)
+      })
   }
   return (
     <Container>
@@ -244,10 +279,7 @@ const App = () => {
             menuItem: 'Attach from SharePoint',
             render: () => (
               <Tab.Pane>
-                <SharepoinAttachForm
-                  onAttachSharepoint={onAttachSharepoint}
-                  sharePointDocs={sharepoint_docs}
-                />
+                <SharepoinAttachForm />
               </Tab.Pane>
             ),
           },
@@ -255,7 +287,7 @@ const App = () => {
             menuItem: 'Upload attachment',
             render: () => (
               <Tab.Pane>
-                <FileUploadAttachForm onUploadAttachment={onUploadAttachment} />
+                <FileUploadAttachForm />
               </Tab.Pane>
             ),
           },
@@ -281,7 +313,12 @@ const App = () => {
   )
 }
 
-const Attachment = ({ attachment, onDelete }) => {
+interface AttachmentProps {
+  attachment: EmailAttachment
+  onDelete: (attachmentId: number) => () => void
+}
+
+const Attachment: React.FC<AttachmentProps> = ({ attachment, onDelete }) => {
   return (
     <List.Item>
       <List.Content floated="right">
@@ -295,66 +332,92 @@ const Attachment = ({ attachment, onDelete }) => {
   )
 }
 
-const FileUploadAttachForm = ({ onUploadAttachment }) => (
-  <Formik
-    initialValues={{ file: null }}
-    validationSchema={Yup.object().shape({
-      file: Yup.mixed()
-        .test('file-required', 'Please select a file', (file) => Boolean(file))
-        .test('file-size', 'File size must be no greater than 30MB', (file) =>
-          file ? file.size / 1024 / 1024 <= 30 : true
-        ),
-    })}
-    onSubmit={(values, { setSubmitting, setErrors }) => {
-      setSubmitting(true)
-      onUploadAttachment(values).then(({ resp, errors }) => {
-        if (resp.status === 400) {
-          setErrors(errors)
-        }
-        setSubmitting(false)
-      })
-    }}
-  >
-    {({
-      values,
-      errors,
-      touched,
-      handleSubmit,
-      isSubmitting,
-      setFieldValue,
-      setSubmitting,
-    }) => (
-      <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
-        <AttachFormGroup>
-          <Form.Field error={touched.file && !!errors.file}>
-            <Input
-              type="file"
-              name="file"
+const FileUploadAttachForm = () => {
+  const [createAttachment] = useCreateEmailAttachmentMutation()
+  const { enqueueSnackbar } = useSnackbar()
+  return (
+    <Formik
+      initialValues={{ file: null }}
+      validationSchema={Yup.object().shape({
+        file: Yup.mixed()
+          .test('file-required', 'Please select a file', (file) =>
+            Boolean(file)
+          )
+          .test('file-size', 'File size must be no greater than 30MB', (file) =>
+            file ? file.size / 1024 / 1024 <= 30 : true
+          ),
+      })}
+      onSubmit={(values, { setSubmitting, setErrors }) => {
+        setSubmitting(true)
+        const form = new FormData()
+        form.append('file', values.file)
+        createAttachment({
+          id: case_pk,
+          emailId: email_pk,
+          emailAttachmentCreate: form as any,
+        })
+          .unwrap()
+          .then(() => {
+            enqueueSnackbar('Uploaded file', { variant: 'success' })
+            setSubmitting(false)
+          })
+          .catch((err) => {
+            enqueueSnackbar(getAPIErrorMessage(err, 'Failed to upload file'), {
+              variant: 'error',
+            })
+            const requestErrors = getAPIFormErrors(err)
+            if (requestErrors) {
+              setErrors(requestErrors)
+            }
+            setSubmitting(false)
+          })
+      }}
+    >
+      {({ errors, touched, handleSubmit, isSubmitting, setFieldValue }) => (
+        <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+          <AttachFormGroup>
+            <Form.Field error={touched.file && !!errors.file}>
+              <Input
+                type="file"
+                name="file"
+                disabled={isSubmitting}
+                onChange={(event) => {
+                  if (!event.currentTarget.files) return
+                  const files = Object.values(event.currentTarget.files).map(
+                    (file: File) => file
+                  )
+                  setFieldValue('file', files[0], true)
+                }}
+              />
+            </Form.Field>
+            <Button
+              icon
+              labelPosition="left"
               disabled={isSubmitting}
-              onChange={(e, { name, value }) => {
-                setFieldValue('file', e.target.files[0], true)
-              }}
-            />
-          </Form.Field>
-          <Button
-            icon
-            labelPosition="left"
-            disabled={isSubmitting}
-            loading={isSubmitting}
-            type="submit"
-          >
-            <Icon name="attach" />
-            Attach file
-          </Button>
-        </AttachFormGroup>
-        <FormErrors errors={errors} touched={touched} />
-      </Form>
-    )}
-  </Formik>
-)
+              loading={isSubmitting}
+              type="submit"
+            >
+              <Icon name="attach" />
+              Attach file
+            </Button>
+          </AttachFormGroup>
+          <FormErrors errors={errors} touched={touched} />
+        </Form>
+      )}
+    </Formik>
+  )
+}
 
-const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
-  const [isLoading, setIsLoading] = useState(false)
+const SharepoinAttachForm = () => {
+  const { enqueueSnackbar } = useSnackbar()
+  const docsResult = useGetCaseDocumentsQuery({ id: case_pk })
+  const sharePointDocs = (docsResult.data?.documents ?? []).filter(
+    (doc) => doc.is_file
+  )
+
+  const [downloadAttachment] =
+    useDownloadEmailAttachmentFromSharepointMutation()
+
   const options = sharePointDocs.map((doc) => ({
     key: doc.id,
     value: doc.id,
@@ -384,12 +447,26 @@ const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {
         setSubmitting(true)
-        onAttachSharepoint(values.sharepointId).then(({ resp, errors }) => {
-          if (resp.status === 400) {
-            setErrors(errors)
-          }
-          setSubmitting(false)
+        downloadAttachment({
+          id: case_pk,
+          emailId: email_pk,
+          sharepointId: values.sharepointId,
         })
+          .unwrap()
+          .then(() => {
+            enqueueSnackbar('Attached file', { variant: 'success' })
+            setSubmitting(false)
+          })
+          .catch((err) => {
+            enqueueSnackbar(getAPIErrorMessage(err, 'Failed to attach file'), {
+              variant: 'error',
+            })
+            const requestErrors = getAPIFormErrors(err)
+            if (requestErrors) {
+              setErrors(requestErrors)
+            }
+            setSubmitting(false)
+          })
       }}
     >
       {({
@@ -399,7 +476,6 @@ const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
         handleSubmit,
         isSubmitting,
         setFieldValue,
-        setSubmitting,
       }) => (
         <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
           <AttachFormGroup>
@@ -409,6 +485,7 @@ const SharepoinAttachForm = ({ onAttachSharepoint, sharePointDocs }) => {
                 fluid
                 selection
                 disabled={isSubmitting}
+                loading={docsResult.isLoading}
                 placeholder="Select a document"
                 options={options}
                 onChange={(e, { value }) =>

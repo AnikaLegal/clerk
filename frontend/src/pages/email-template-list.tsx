@@ -11,7 +11,7 @@ import { useSnackbar } from 'notistack'
 
 import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
 import { FadeTransition } from 'comps/transitions'
-import api, { EmailTemplate } from 'apiNew'
+import api, { EmailTemplate } from 'api'
 
 interface DjangoContext {
   topic_options: { key: string; value: string; text: string }[]

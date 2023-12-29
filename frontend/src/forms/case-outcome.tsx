@@ -14,7 +14,7 @@ import { useSnackbar } from 'notistack'
 
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation } from 'apiNew'
+import { useUpdateCaseMutation } from 'api'
 import { OUTCOMES } from 'consts'
 import { TextArea } from 'comps/textarea'
 

@@ -69,7 +69,17 @@ export const getModelInitialValues = (formFields: FormField[], model: Model) =>
     return { ...acc, [field.name]: value }
   }, {})
 
-export const FormErrors = ({ errors, touched, labels }) => (
+interface FormErrorsProps {
+  errors: any
+  touched: any
+  labels?: any
+}
+
+export const FormErrors: React.FC<FormErrorsProps> = ({
+  errors,
+  touched,
+  labels,
+}) => (
   <>
     {Object.entries(errors)
       .filter(([k, v]) => touched[k])

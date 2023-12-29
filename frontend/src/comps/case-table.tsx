@@ -1,6 +1,6 @@
 import React from 'react'
 import { Icon, Table } from 'semantic-ui-react'
-import { Issue } from 'apiNew'
+import { Issue } from 'api'
 import moment from 'moment'
 
 interface CaseListTableProps {

@@ -15,6 +15,8 @@ paths:
     $ref: paths/case-docs.yaml
   /clerk/api/email/{id}/:
     $ref: paths/email-list.yaml
+  /clerk/api/email/{id}/create/:
+    $ref: paths/email-create.yaml
   /clerk/api/email/{id}/{emailId}/:
     $ref: paths/email-detail.yaml
   /clerk/api/email/{id}/{emailId}/attachment/:
@@ -23,7 +25,7 @@ paths:
     $ref: paths/attachment-detail.yaml
   /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/:
     $ref: paths/attachment-sharepoint-upload.yaml
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/{sharepointId}/:
+  /clerk/api/email/{id}/{emailId}/attachment/sharepoint/{sharepointId}/:
     $ref: paths/attachment-sharepoint-download.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml

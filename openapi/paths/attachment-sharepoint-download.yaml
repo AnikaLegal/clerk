@@ -14,12 +14,6 @@ post:
       required: true
       schema:
         type: number
-    - description: Email Attachment ID
-      in: path
-      name: attachmentId
-      required: true
-      schema:
-        type: number
     - description: Sharepoint ID
       in: path
       name: sharepointId

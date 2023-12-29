@@ -20,11 +20,8 @@ get:
                 type: string
               documents:
                 type: array
-                # Tuple of name/url
                 items:
-                  type: array
-                  items:
-                    type: string
+                  $ref: ../schemas/SharepointDocument.yaml
             required:
               - sharepoint_url
               - documents

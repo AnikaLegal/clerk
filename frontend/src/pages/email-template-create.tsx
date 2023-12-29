@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { EmailTemplateForm } from 'forms/email-template'
-import { useCreateEmailTemplateMutation } from 'apiNew'
+import { useCreateEmailTemplateMutation } from 'api'
 
 interface DjangoContext {
   topic_options: { key: string; value: string; text: string }[]

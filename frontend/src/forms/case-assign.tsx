@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack'
 
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation, useGetUsersQuery } from 'apiNew'
+import { useUpdateCaseMutation, useGetUsersQuery } from 'api'
 
 export const AssignForm: React.FC<CaseDetailFormProps> = ({
   issue,

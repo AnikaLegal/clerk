@@ -10,7 +10,7 @@ import api, {
   useResyncUserAccountPermissionsMutation,
   usePromoteUserAccountPermissionsMutation,
   useDemoteUserAccountPermissionsMutation,
-} from 'apiNew'
+} from 'api'
 import { getAPIErrorMessage } from 'utils'
 
 interface DjangoContext {

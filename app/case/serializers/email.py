@@ -1,6 +1,7 @@
-from rest_framework import serializers
 from django.urls import reverse
 from django.utils.http import urlencode
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from emails.models import EmailTemplate, Email, EmailAttachment
 
@@ -28,6 +29,7 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
             "id",
             "url",
             "name",
+            "email",
             "sharepoint_state",
             "content_type",
             "file",
@@ -38,6 +40,17 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="file.name", read_only=True)
     sharepoint_state = serializers.CharField(read_only=True)
     content_type = serializers.CharField(read_only=True)
+
+    def create(self, validated_data):
+        file = validated_data["file"]
+        if file.size / 1024 / 1024 > 30:
+            raise ValidationError({"file": "File must be <30MB."})
+
+        data = {
+            **validated_data,
+            "content_type": file.content_type,
+        }
+        return super().create(data)
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -50,7 +63,7 @@ class EmailSerializer(serializers.ModelSerializer):
             "processed_at",
             "from_address",
             "html",
-            "issue_id",
+            "issue",
             "text",
             "sender",
             "state",

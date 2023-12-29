@@ -6,7 +6,7 @@ import { useSnackbar } from 'notistack'
 
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useCreateCaseNoteMutation } from 'apiNew'
+import { useCreateCaseNoteMutation } from 'api'
 import { TextArea } from 'comps/textarea'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'

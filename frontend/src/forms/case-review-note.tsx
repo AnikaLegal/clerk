@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
-import { useCreateCaseNoteMutation } from 'apiNew'
+import { useCreateCaseNoteMutation } from 'api'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { CaseDetailFormProps } from 'types'
 

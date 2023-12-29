@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { TenancyForm } from 'forms'
-import { Tenancy, useUpdateTenancyMutation } from 'apiNew'
+import { Tenancy, useUpdateTenancyMutation } from 'api'
 
 interface DjangoContext {
   tenancy: Tenancy

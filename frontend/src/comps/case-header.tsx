@@ -1,7 +1,7 @@
 import React from 'react'
 import { Header } from 'semantic-ui-react'
 
-import { Issue } from 'apiNew'
+import { Issue } from 'api'
 import { MarkdownAsHtmlDisplay } from 'utils'
 
 export const CASE_TABS = {

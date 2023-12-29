@@ -1,25 +1,19 @@
 import os
 from typing import List
+from io import BytesIO
 
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.db.models import Q
 from django.db import transaction
-from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from bs4 import BeautifulSoup
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import (
-    RetrieveModelMixin,
-    DestroyModelMixin,
-)
-from django.shortcuts import get_object_or_404
 
 from emails.utils.threads import EmailThread
 from emails.utils.html import get_email_html
@@ -41,7 +35,6 @@ from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
 from case.utils.react import render_react_page
 from case.serializers import (
-    IssueSerializer,
     EmailSerializer,
     EmailAttachmentSerializer,
     EmailTemplateSerializer,
@@ -63,7 +56,8 @@ DISPLAY_EMAIL_STATES = [
 @require_http_methods(["GET"])
 @paralegal_or_better_required
 def email_list_page_view(request, pk):
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, pk=pk)
+    issue = viewset.get_object()
     case_email_address = build_clerk_address(issue)
     context = {
         "case_pk": pk,
@@ -77,11 +71,11 @@ def email_list_page_view(request, pk):
 @require_http_methods(["GET"])
 @paralegal_or_better_required
 def email_thread_page_view(request, pk, slug):
-    issue = get_object_or_404(Issue, pk=pk)
-    case_email_address = build_clerk_address(issue)
+    viewset = get_viewset(request=request, pk=pk)
+    issue = viewset.get_object()
     context = {
         "case_pk": pk,
-        "case_email_address": case_email_address,
+        "thread_slug": slug,
         "case_email_list_url": reverse("case-email-list", args=(issue.pk,)),
     }
     return render_react_page(request, f"Case {issue.fileref}", "email-thread", context)
@@ -90,7 +84,8 @@ def email_thread_page_view(request, pk, slug):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_create_page_view(request, pk):
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, pk=pk)
+    issue = viewset.get_object()
     templates = EmailTemplate.objects.filter(
         Q(topic=issue.topic) | Q(topic="GENERAL")
     ).order_by("created_at")
@@ -109,8 +104,11 @@ def email_draft_create_page_view(request, pk):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_edit_page_view(request, pk, email_pk):
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, pk=pk)
+    issue = viewset.get_object()
     context = {
+        "case_pk": pk,
+        "email_pk": email_pk,
         "email_preview_url": reverse("case-email-preview", args=(issue.pk, email_pk)),
         "case_email_url": reverse("case-email-list", args=(issue.pk,)),
     }
@@ -119,20 +117,23 @@ def email_draft_edit_page_view(request, pk, email_pk):
     )
 
 
-# FIXME: IMPLEMENT PROPERLY
 @require_http_methods(["GET"])
 @paralegal_or_better_required
 def email_draft_preview_page_view(request, pk, email_pk):
-    # issue = _get_issue_for_emails(request, pk)
-    # email = _get_email_for_issue(issue, email_pk)
-    if not email.state in DRAFT_EMAIL_STATES:
-        return redirect("case-email-list", issue.pk)
-
+    viewset = get_viewset(request=request, pk=pk)
+    email = viewset.get_email(email_pk=email_pk)
     html = _render_email_template(email.html)
     return HttpResponse(html, "text/html", 200)
 
 
+def get_viewset(request, **kwargs):
+    viewset = EmailApiViewset(request=request, **kwargs)
+    viewset.setup(request, **kwargs)
+    return viewset
+
+
 class EmailApiViewset(GenericViewSet):
+    serializer_class = EmailThreadSerializer
     permission_classes = [
         CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
     ]
@@ -162,75 +163,155 @@ class EmailApiViewset(GenericViewSet):
 
         return Response(EmailThreadSerializer(email_threads, many=True).data)
 
-    def create(self, request, *args, **kwargs):
+    @action(detail=True, methods=["POST"], url_name="create", url_path="create")
+    def create_email(self, request, *args, **kwargs):
         issue = self.get_object()
         data = {
             **request.data,
             "from_address": build_clerk_address(issue, email_only=True),
             "state": EmailState.DRAFT,
             "sender": request.user,
-            "issue_id": issue.ok,
+            "issue": issue.pk,
         }
         serializer = EmailSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)
 
+    def get_email(self, email_pk: int) -> Email:
+        issue = self.get_object()
+        try:
+            email = issue.email_set.prefetch_related("emailattachment_set").get(
+                pk=email_pk
+            )
+        except Email.DoesNotExist:
+            raise Http404()
+
+        return email
+
     @action(
         detail=True,
         methods=["GET"],
-        url_name="media-delete",
-        url_path="delete_media/(?P<media_pk>[^/.]+)",
+        url_name="email-detail",
+        url_path="(?P<email_pk>[0-9]+)",
     )
-    def retrieve_email(self, request, pk=None, media_pk=None):
-        issue = self.get_object()
-        return Response(serializer.data)
+    def email_detail(self, request, pk=None, email_pk=None):
+        email = self.get_email(email_pk)
+        return Response(EmailSerializer(email).data)
 
-    # FIXME: IMPLEMENT PROPERLY
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        issue = self.get_object()
-        # email = self.get_object()
+    @email_detail.mapping.patch
+    def update(self, request, pk=None, email_pk=None, **kwargs):
+        email = self.get_email(email_pk)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
         data = {**request.data}
-        if email.state == EmailState.READY_TO_SEND:
+        if data.get("state") == EmailState.READY_TO_SEND:
             data["html"] = _render_email_template(email.html)
 
-        serializer = self.get_serializer(email, data=request.data, partial=partial)
+        serializer = EmailSerializer(email, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
 
-    # FIXME: IMPLEMENT PROPERLY
-    def destroy(self, request, *args, **kwargs):
-        email = self.get_object()
+    @email_detail.mapping.delete
+    def destroy(self, request, pk=None, email_pk=None):
+        email = self.get_email(email_pk)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
         with transaction.atomic():
             email.emailattachment_set.all().delete()
             email.delete()
 
         return Response(status=204)
 
-    # FIXME: IMPLEMENT PROPERLY
-    def create_attachment(self, request, *args, **kwargs):
-        data = {
-            **request.data,
-            "sharepoint_state": SharepointState.UPLOADING,
-        }
-        serializer = EmailAttachmentSerializer(data=data)
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="attachment-create",
+        url_path="(?P<email_pk>[0-9]+)/attachment",
+    )
+    def create_attachment(self, request, pk=None, email_pk=None):
+        email = self.get_email(email_pk)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
+        request.data["email"] = email_pk
+        serializer = EmailAttachmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)
 
-    # FIXME: IMPLEMENT PROPERLY
-    def delete_attachment(self, request, *args, **kwargs):
-        pass
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="attachment-delete",
+        url_path="(?P<email_pk>[0-9]+)/attachment/(?P<attachment_pk>[0-9]+)",
+    )
+    def delete_attachment(self, request, pk=None, email_pk=None, attachment_pk=None):
+        email = self.get_email(email_pk)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
 
-    # FIXME: IMPLEMENT PROPERLY
-    def upload_attachment_to_sharepoint(self, request, *args, **kwargs):
-        pass
+        email.emailattachment_set.filter(id=attachment_pk).delete()
+        return Response(status=204)
 
-    # FIXME: IMPLEMENT PROPERLY
-    def download_attachment_from_sharepoint(self, request, *args, **kwargs):
-        pass
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="attachment-sharepoint-upload",
+        url_path="(?P<email_pk>[0-9]+)/attachment/(?P<attachment_pk>[0-9]+)/sharepoint",
+    )
+    def upload_attachment_to_sharepoint(
+        self, request, pk=None, email_pk=None, attachment_pk=None
+    ):
+        """Save the attachment to Sharepoint"""
+        email = self.get_email(email_pk)
+        try:
+            attachment = EmailAttachment.objects.get(pk=attachment_pk)
+        except EmailAttachment.DoesNotExist:
+            raise Http404()
+
+        attachment.sharepoint_state = SharepointState.UPLOADING
+        attachment.save()
+        save_email_attachment(email, attachment)
+        attachment.sharepoint_state = SharepointState.UPLOADED
+        attachment.save()
+        return Response(data=EmailAttachmentSerializer(instance=attachment).data)
+
+    @action(
+        detail=True,
+        methods=["POST"],
+        url_name="attachment-sharepoint-download",
+        url_path="(?P<email_pk>[0-9]+)/attachment/sharepoint/(?P<sharepoint_id>[\-\w]+)",
+    )
+    def download_attachment_from_sharepoint(
+        self, request, pk=None, email_pk=None, sharepoint_id=None
+    ):
+        """Add a file from sharepoint as an attachment to an email"""
+        email = self.get_email(email_pk)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
+        # Download attachment from SharePoint.
+        api = MSGraphAPI()
+        filename, content_type, file_bytes = api.folder.download_file(sharepoint_id)
+
+        # Save as email attachment
+        f = InMemoryUploadedFile(
+            BytesIO(file_bytes),
+            name=filename,
+            content_type=content_type,
+            field_name="file",
+            size=len(file_bytes),
+            charset=None,
+        )
+        data = {"file": f, "email": email_pk}
+        serializer = EmailAttachmentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
 
 
 def get_email_threads(issue: Issue) -> List[EmailThread]:
@@ -307,169 +388,3 @@ def get_case_emails(issue: Issue):
         )
 
     return emails
-
-
-# @api_view(["GET", "POST"])
-# @paralegal_or_better_required
-# def email_draft_create_view(request, pk):
-#     issue = _get_issue_for_emails(request, pk)
-#     if request.method == "POST":
-#         data = {
-#             "from_address": build_clerk_address(issue, email_only=True),
-#             "state": EmailState.DRAFT,
-#             "sender": request.user,
-#             **request.data,
-#         }
-#         serializer = EmailSerializer(data=data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save(issue=issue)
-#         return Response(serializer.data)
-#     else:
-#         templates = EmailTemplate.objects.filter(
-#             Q(topic=issue.topic) | Q(topic="GENERAL")
-#         ).order_by("created_at")
-#         parent_id = request.GET.get("parent")
-#         parent_email = None
-#         if parent_id:
-#             try:
-#                 parent_email = EmailSerializer(Email.objects.get(pk=parent_id)).data
-#             except Email.DoesNotExist:
-#                 raise Http404()
-
-#         context = {
-#             "case_email_url": reverse("case-email-list", args=(issue.pk,)),
-#             "parent_email": parent_email,
-#             "issue": IssueSerializer(issue).data,
-#             "templates": EmailTemplateSerializer(templates, many=True).data,
-#         }
-#         return render_react_page(
-#             request, f"Case {issue.fileref}", "email-draft-create", context
-# )
-
-
-# @api_view(["GET", "PATCH", "DELETE"])
-# @paralegal_or_better_required
-# def email_draft_edit_view(request, pk, email_pk):
-#     issue = _get_issue_for_emails(request, pk)
-#     email = _get_email_for_issue(issue, email_pk)
-#     if not email.state in DRAFT_EMAIL_STATES:
-#         return redirect("case-email-list", issue.pk)
-#     if request.method == "PATCH":
-#         serializer = EmailSerializer(email, data=request.data, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data)
-#     elif request.method == "DELETE":
-#         with transaction.atomic():
-#             email.emailattachment_set.all().delete()
-#             email.delete()
-#         return Response({})
-#     else:
-#         # GET request.
-#         api = MSGraphAPI()
-#         sharepoint_docs = api.folder.get_all_files(f"cases/{issue.id}")
-#         context = {
-#             "email_preview_url": reverse(
-#                 "case-email-preview", args=(issue.pk, email.pk)
-#             ),
-#             "case_email_url": reverse("case-email-list", args=(issue.pk,)),
-#             "issue": IssueSerializer(issue).data,
-#             "email": EmailSerializer(email).data,
-#             "sharepoint_docs": sharepoint_docs,
-#         }
-#         return render_react_page(
-#             request, f"Case {issue.fileref}", "email-draft-edit", context
-#         )
-
-
-# @api_view(["POST"])
-# @paralegal_or_better_required
-# def email_draft_send_view(request, pk, email_pk):
-#     issue = _get_issue_for_emails(request, pk)
-#     email = _get_email_for_issue(issue, email_pk)
-#     if email.state == EmailState.DRAFT:
-#         email.state = EmailState.READY_TO_SEND
-#         email.html = _render_email_template(email.html)
-#         email.save()
-#     else:
-#         raise Http404()
-
-#     return Response(status=200)
-
-
-# @api_view(["POST", "DELETE"])
-# @paralegal_or_better_required
-# def email_attachment_view(request, pk, email_pk, attach_pk=None):
-#     """Delete the email attachment, return HTML fragment for htmx."""
-#     issue = _get_issue_for_emails(request, pk)
-#     email = _get_email_for_issue(issue, email_pk)
-#     if not email.state == EmailState.DRAFT:
-#         raise Http404()
-
-#     if request.method == "DELETE":
-#         email.emailattachment_set.filter(id=attach_pk).delete()
-#         return Response(status=200)
-
-#     else:
-#         # POST request.
-#         if "sharepoint_id" in request.data:
-#             # Download attachment from SharePoint.
-#             sharepoint_id = request.data["sharepoint_id"]
-#             api = MSGraphAPI()
-#             filename, content_type, file_bytes = api.folder.download_file(sharepoint_id)
-#             # Save as email attachment
-#             f = ContentFile(file_bytes, name=filename)
-#         elif "file" in request.data:
-#             f = request.data["file"]
-#             content_type = f.content_type
-#         else:
-#             msg = "Could not find and uploaded file or SharePoint document."
-#             raise ValidationError(msg)
-
-#         if f.size / 1024 / 1024 > 30:
-#             raise ValidationError({"file": "File must be <30MB."})
-
-#         attach = EmailAttachment.objects.create(
-#             email=email,
-#             file=f,
-#             content_type=content_type,
-#         )
-#         serializer = EmailAttachmentSerializer(attach)
-#         return Response(serializer.data)
-
-
-# @api_view(["POST"])
-# @paralegal_or_better_required
-# def email_attachment_upload_view(request, pk, email_pk, attach_pk):
-#     """Save the attachment to Sharepoint"""
-#     issue = _get_issue_for_emails(request, pk)
-#     email = _get_email_for_issue(issue, email_pk)
-#     try:
-#         attachment = EmailAttachment.objects.get(pk=attach_pk)
-#     except EmailAttachment.DoesNotExist:
-#         raise Http404()
-
-#     attachment.sharepoint_state = SharepointState.UPLOADING
-#     attachment.save()
-#     save_email_attachment(email, attachment)
-#     attachment.sharepoint_state = SharepointState.UPLOADED
-#     attachment.save()
-#     return Response(data=EmailAttachmentSerializer(instance=attachment).data)
-
-
-# def _get_email_for_issue(issue, email_pk):
-#     try:
-#         return issue.email_set.get(pk=email_pk)
-#     except Email.DoesNotExist:
-#         raise Http404()
-
-
-# def _get_issue_for_emails(request, pk):
-#     try:
-#         return (
-#             Issue.objects.check_permissions(request)
-#             .prefetch_related("email_set__emailattachment_set")
-#             .get(pk=pk)
-#         )
-#     except Issue.DoesNotExist:
-#         raise Http404()

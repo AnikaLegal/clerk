@@ -1,4 +1,4 @@
-import { Issue } from 'apiNew'
+import { Issue } from 'api'
 
 export interface UserPermission {
   is_admin: boolean

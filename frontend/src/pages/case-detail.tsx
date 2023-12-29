@@ -18,7 +18,7 @@ import {
   IssueUpdate,
   TenancyCreate,
   Issue,
-} from 'apiNew'
+} from 'api'
 import { TimelineNote } from 'comps/timeline-item'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
 import { mount, getAPIErrorMessage } from 'utils'

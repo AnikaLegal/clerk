@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { DocumentTemplateForm } from 'forms/doc-template'
-import { useCreateDocumentTemplateMutation } from 'apiNew'
+import { useCreateDocumentTemplateMutation } from 'api'
 
 interface DjangoContext {
   list_url: string

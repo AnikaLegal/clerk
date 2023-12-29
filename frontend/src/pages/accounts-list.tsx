@@ -12,7 +12,7 @@ import {
 import { mount, debounce, useEffectLazy } from 'utils'
 import { FadeTransition } from 'comps/transitions'
 import { GroupLabels } from 'comps/group-label'
-import api, { User } from 'apiNew'
+import api, { User } from 'api'
 
 interface DjangoContext {
   users: User[]

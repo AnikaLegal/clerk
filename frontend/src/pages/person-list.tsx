@@ -10,7 +10,7 @@ import {
 import { useSnackbar } from 'notistack'
 
 import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
-import api, { useGetPeopleQuery } from 'apiNew'
+import api, { useGetPeopleQuery } from 'api'
 
 import { FadeTransition } from 'comps/transitions'
 
