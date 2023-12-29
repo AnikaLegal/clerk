@@ -127,12 +127,6 @@ class IssueSerializer(serializers.ModelSerializer):
         return next_review.strftime("%d/%m/%y") if next_review else None
 
 
-class IssueAssignmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Issue
-        fields = ("paralegal", "lawyer")
-
-
 class IssueSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
