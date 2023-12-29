@@ -5,7 +5,7 @@ from datetime import datetime
 from core.factories import IssueFactory, EmailFactory
 from emails.models import EmailState
 
-from case.views.case_email import _get_email_threads, EmailThread
+from case.views.case_email import get_email_threads, EmailThread
 
 
 def dt(day):
@@ -57,7 +57,7 @@ def test_email_thread_aggregation():
         EmailFactory(issue=issue, state=state, subject=subject, created_at=created_at)
         for state, subject, created_at in THREADED_EMAILS
     ]
-    threads = _get_email_threads(issue)
+    threads = get_email_threads(issue)
     # Thread 2 - r00956-case-closure
     assert threads[2].subject == "R00956 Case Closure"
     assert threads[2].slug == "r00956-case-closure"
