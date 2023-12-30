@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin
@@ -19,6 +18,7 @@ from case.serializers import (
     TenancySerializer,
 )
 from case.views.auth import (
+    login_required,
     paralegal_or_better_required,
     coordinator_or_better_required,
     ParalegalOrBetterObjectPermission,
@@ -30,8 +30,8 @@ from microsoft.service import get_case_folder_info
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
 
-@login_required
 @api_view(["GET"])
+@login_required
 def case_list_page_view(request):
     """
     List of all cases for paralegals and coordinators to view.

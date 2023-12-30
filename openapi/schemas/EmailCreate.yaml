@@ -8,7 +8,7 @@ properties:
   from_address:
     type: string
   cc_addresses:
-    array:
+    type: array
     items:
       type: string
   subject:

@@ -208,9 +208,9 @@ paths:
             format: uuid
         - name: slug
           in: query
+          required: false
           schema:
             type: string
-          required: false
       responses:
         "200":
           description: Successful response.
@@ -1555,7 +1555,7 @@ components:
         from_address:
           type: string
         cc_addresses:
-          array: null
+          type: array
           items:
             type: string
         subject:

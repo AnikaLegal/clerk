@@ -23,7 +23,7 @@ import { api } from 'intake/api'
 
 const INITIAL_DATA = {
   ISSUES: 'HEALTH_CHECK', // Always health check type case.
-  IS_ON_LEASE: true, // Always assumed to be true for health check cases.
+  IS_ON_LEASE: 'YES', // Always assumed to be true for health check cases.
 }
 
 export const FormView = () => {

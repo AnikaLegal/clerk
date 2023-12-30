@@ -10,9 +10,9 @@ get:
         format: uuid
     - name: slug
       in: query
+      required: false
       schema:
         type: string
-      required: false
   responses:
     "200":
       description: Successful response.
