@@ -239,6 +239,17 @@ class EmailApiViewset(GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=201)
 
+    def get_attachment(self, email: Email, attachment_pk: int) -> EmailAttachment:
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
+        try:
+            attachment = email.emailattachment_set.get(pk=attachment_pk)
+        except EmailAttachment.DoesNotExist:
+            raise Http404()
+
+        return attachment
+
     @action(
         detail=True,
         methods=["DELETE"],
@@ -247,10 +258,8 @@ class EmailApiViewset(GenericViewSet):
     )
     def delete_attachment(self, request, pk=None, email_pk=None, attachment_pk=None):
         email = self.get_email(email_pk)
-        if not email.state == EmailState.DRAFT:
-            raise Http404()
-
-        email.emailattachment_set.filter(id=attachment_pk).delete()
+        attachment = self.get_attachment(email, attachment_pk)
+        attachment.delete()
         return Response(status=204)
 
     @action(
@@ -264,11 +273,7 @@ class EmailApiViewset(GenericViewSet):
     ):
         """Save the attachment to Sharepoint"""
         email = self.get_email(email_pk)
-        try:
-            attachment = EmailAttachment.objects.get(pk=attachment_pk)
-        except EmailAttachment.DoesNotExist:
-            raise Http404()
-
+        attachment = self.get_attachment(email, attachment_pk)
         attachment.sharepoint_state = SharepointState.UPLOADING
         attachment.save()
         save_email_attachment(email, attachment)
