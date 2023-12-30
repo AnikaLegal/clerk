@@ -5,7 +5,7 @@ from django.conf import settings
 from bs4 import BeautifulSoup
 
 from core.models import Issue
-from case.views.case_email import _render_email_template
+from emails.utils.html import render_email_template
 from emails.models import Email, EmailState
 from emails.service.send import build_clerk_address
 from office.closure.service import get_closure_email
@@ -36,7 +36,7 @@ def send_welcome_email(issue_pk: str):
             to_address=client.email,
             issue=issue,
             text=text,
-            html=_render_email_template(html),
+            html=render_email_template(html),
         )
     # Mark request as sent
     Issue.objects.filter(pk=issue_pk).update(is_welcome_email_sent=True)

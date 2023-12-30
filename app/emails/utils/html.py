@@ -1,12 +1,30 @@
 import re
 
+from bs4 import BeautifulSoup
 from django.utils.html import strip_tags
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from html_sanitizer import Sanitizer
 
 from emails.models import Email
 
 
-def get_email_html(email: Email) -> str:
+def render_email_template(html: str) -> str:
+    if html:
+        soup = BeautifulSoup(html, parser="lxml", features="lxml")
+        for p_tag in soup.find_all("p"):
+            p_tag["style"] = "margin:0 0 12px 0;"
+
+        for a_tag in soup.find_all("a"):
+            a_tag["style"] = "color:#438fef;text-decoration:underline;"
+
+        context = {"html": mark_safe(soup.body.decode_contents())}
+    else:
+        context = {"html": ""}
+    return render_to_string("case/email_preview.html", context)
+
+
+def parse_email_html(email: Email) -> str:
     if email.html:
         return sanitizer.sanitize(email.html)
     else:

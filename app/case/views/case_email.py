@@ -3,20 +3,16 @@ from typing import List
 from io import BytesIO
 
 from django.http import Http404, HttpResponse
-from django.views.decorators.http import require_http_methods
 from django.urls import reverse
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 from django.db.models import Q
 from django.db import transaction
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from bs4 import BeautifulSoup
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from emails.utils.threads import EmailThread
-from emails.utils.html import get_email_html
+from emails.utils.html import parse_email_html, render_email_template
 from core.models import Issue
 from case.views.auth import (
     paralegal_or_better_required,
@@ -53,7 +49,7 @@ DISPLAY_EMAIL_STATES = [
 ]
 
 
-@require_http_methods(["GET"])
+@api_view(["GET"])
 @paralegal_or_better_required
 def email_list_page_view(request, pk):
     viewset = get_viewset(request=request, pk=pk)
@@ -68,7 +64,7 @@ def email_list_page_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "email-list", context)
 
 
-@require_http_methods(["GET"])
+@api_view(["GET"])
 @paralegal_or_better_required
 def email_thread_page_view(request, pk, slug):
     viewset = get_viewset(request=request, pk=pk)
@@ -117,12 +113,12 @@ def email_draft_edit_page_view(request, pk, email_pk):
     )
 
 
-@require_http_methods(["GET"])
+@api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_preview_page_view(request, pk, email_pk):
     viewset = get_viewset(request=request, pk=pk)
     email = viewset.get_email(email_pk=email_pk)
-    html = _render_email_template(email.html)
+    html = render_email_template(email.html)
     return HttpResponse(html, "text/html", 200)
 
 
@@ -207,9 +203,9 @@ class EmailApiViewset(GenericViewSet):
 
         data = {**request.data}
         if data.get("state") == EmailState.READY_TO_SEND:
-            data["html"] = _render_email_template(email.html)
+            data["html"] = render_email_template(email.html)
 
-        serializer = EmailSerializer(email, data=request.data, partial=True)
+        serializer = EmailSerializer(email, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -341,24 +337,9 @@ def get_email_threads(issue: Issue) -> List[EmailThread]:
 
 
 def process_email_for_display(email: Email):
-    email.html = get_email_html(email)
+    email.html = parse_email_html(email)
     for attachment in email.emailattachment_set.all():
         attachment.file.display_name = os.path.basename(attachment.file.name)
-
-
-def _render_email_template(html):
-    if html:
-        soup = BeautifulSoup(html, parser="lxml", features="lxml")
-        for p_tag in soup.find_all("p"):
-            p_tag["style"] = "margin:0 0 12px 0;"
-
-        for a_tag in soup.find_all("a"):
-            a_tag["style"] = "color:#438fef;text-decoration:underline;"
-
-        context = {"html": mark_safe(soup.body.decode_contents())}
-    else:
-        context = {"html": ""}
-    return render_to_string("case/email_preview.html", context)
 
 
 def get_case_emails(issue: Issue):
