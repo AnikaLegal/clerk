@@ -379,7 +379,7 @@ export type UpdateCaseApiArg = {
   issueUpdate: IssueUpdate
 }
 export type CreateCaseNoteApiResponse =
-  /** status 200 Successful response. */ IssueNote
+  /** status 201 Successful response. */ IssueNote
 export type CreateCaseNoteApiArg = {
   /** Entity ID */
   id: string
@@ -745,10 +745,10 @@ export type Issue = IssueBase & {
   outcome_display: string | null
   fileref: string
   is_sharepoint_set_up: boolean
-  paralegal: User
-  lawyer: User
+  paralegal: User | null
+  lawyer: User | null
   client: Client
-  support_worker: Person
+  support_worker: Person | null
   actionstep_id: number | null
   created_at: string
   url: string
@@ -784,7 +784,7 @@ export type IssueNote = IssueNoteBase & {
   creator: User
   text_display: string
   created_at: string
-  reviewee: User
+  reviewee: User | null
 }
 export type Error = {
   detail?: string | object | (string | object | any)[]

@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from emails.models import Email, EmailTemplate, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy
+from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
 from core.models.issue import CaseStage
 from notify.models import (
     Notification,
@@ -103,6 +103,17 @@ class IssueFactory(TimestampedModelFactory):
     client = factory.SubFactory(ClientFactory)
     stage = "UNSTARTED"
     is_sharepoint_set_up = True
+
+
+@factory.django.mute_signals(post_save)
+class IssueNoteFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueNote
+
+    issue = factory.SubFactory(IssueFactory)
+    creator = factory.SubFactory(UserFactory)
+    note_type = "PARALEGAL"
+    text = factory.Faker("sentence")
 
 
 @factory.django.mute_signals(post_save)

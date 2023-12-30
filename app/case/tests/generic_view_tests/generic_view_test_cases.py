@@ -11,6 +11,7 @@ from core.factories import (
     UserFactory,
     NotificationFactory,
     EmailTemplateFactory,
+    IssueFactory,
 )
 
 

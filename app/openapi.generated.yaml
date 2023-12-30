@@ -157,7 +157,7 @@ paths:
             schema:
               $ref: "#/components/schemas/IssueNoteCreate"
       responses:
-        "200":
+        "201":
           description: Successful response.
           content:
             application/json:
@@ -1349,16 +1349,19 @@ components:
             is_sharepoint_set_up:
               type: boolean
             paralegal:
-              $ref: "#/components/schemas/User"
               nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
             lawyer:
-              $ref: "#/components/schemas/User"
               nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
             client:
               $ref: "#/components/schemas/Client"
             support_worker:
-              $ref: "#/components/schemas/Person"
               nullable: true
+              allOf:
+                - $ref: "#/components/schemas/Person"
             actionstep_id:
               type: integer
               nullable: true
@@ -1472,8 +1475,9 @@ components:
             created_at:
               type: string
             reviewee:
-              $ref: "#/components/schemas/User"
               nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
           required:
             - id
             - creator

@@ -1,3 +1,9 @@
+"""
+test
+- permissions
+- functionality
+- schema
+"""
 import pytest
 import pytz
 from datetime import datetime
@@ -6,6 +12,42 @@ from core.factories import IssueFactory, EmailFactory
 from emails.models import EmailState
 
 from case.views.case_email import get_email_threads, EmailThread
+
+
+def test_case_email_list_view():
+    pass
+
+
+def test_case_email_get_view():
+    pass
+
+
+def test_case_email_create_view():
+    pass
+
+
+def test_case_email_update_view():
+    pass
+
+
+def test_case_email_delete_view():
+    pass
+
+
+def test_case_email_add_attachment_view():
+    pass
+
+
+def test_case_email_delete_attachment_view():
+    pass
+
+
+def test_case_email_upload_attachment_to_sharepoint_view():
+    pass
+
+
+def test_case_email_download_attachment_from_sharepoint_view():
+    pass
 
 
 def dt(day):
