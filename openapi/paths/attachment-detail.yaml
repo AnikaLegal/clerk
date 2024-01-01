@@ -10,13 +10,13 @@ delete:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number
     - description: Email Attachment ID
       in: path
-      name: attachmentId
+      name: attachment_id
       required: true
       schema:
         type: number

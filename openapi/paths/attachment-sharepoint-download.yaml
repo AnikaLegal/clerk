@@ -10,13 +10,13 @@ post:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number
     - description: Sharepoint ID
       in: path
-      name: sharepointId
+      name: sharepoint_id
       required: true
       schema:
         type: string

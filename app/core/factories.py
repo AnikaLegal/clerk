@@ -175,16 +175,6 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
         "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
     )
 
-    @factory.post_generation
-    def file(self, create, extracted, **kwargs):
-        if extracted:
-            file_name, file = extracted
-        else:
-            file_name = "image.png"
-            file = get_dummy_file(file_name)
-
-        self.file.save(file_name, file)
-
 
 def get_dummy_file(name):
     f = io.BytesIO(TINY_PNG)

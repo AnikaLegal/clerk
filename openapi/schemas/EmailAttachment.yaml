@@ -10,9 +10,12 @@ properties:
     type: string
   content_type:
     type: string
+  email:
+    type: number
 required:
   - id
   - url
   - name
   - sharepoint_state
   - content_type
+  - email

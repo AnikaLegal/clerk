@@ -10,7 +10,7 @@ get:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number
@@ -34,7 +34,7 @@ patch:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number
@@ -69,7 +69,7 @@ delete:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number

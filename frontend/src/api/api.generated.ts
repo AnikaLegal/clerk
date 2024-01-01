@@ -806,7 +806,7 @@ export type SharepointDocument = {
   is_file: boolean
 }
 export type EmailCreate = {
-  issue_id: string
+  issue: string
   to_address: string
   from_address: string
   cc_addresses: string[]
@@ -820,6 +820,7 @@ export type EmailAttachment = {
   name: string
   sharepoint_state: string
   content_type: string
+  email: number
 }
 export type Email = EmailCreate & {
   id: number

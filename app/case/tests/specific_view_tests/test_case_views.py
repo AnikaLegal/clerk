@@ -165,7 +165,7 @@ def test_case_update_view(superuser_client: APIClient):
     assert not issue.is_open
 
 
-# TODO: Test permissions, assert note contents
+# TODO: Test permissions
 @pytest.mark.django_db
 def test_case_create_note_view(superuser_client: APIClient, superuser: User):
     issue = factories.IssueFactory()

@@ -248,7 +248,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/:
+  /clerk/api/email/{id}/{email_id}/:
     get:
       operationId: getEmail
       parameters:
@@ -261,7 +261,7 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
@@ -284,7 +284,7 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
@@ -318,7 +318,7 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
@@ -329,7 +329,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/attachment/:
+  /clerk/api/email/{id}/{email_id}/attachment/:
     post:
       operationId: createEmailAttachment
       parameters:
@@ -342,7 +342,7 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
@@ -363,7 +363,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/:
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/:
     delete:
       operationId: deleteEmailAttachment
       parameters:
@@ -376,13 +376,13 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
         - description: Email Attachment ID
           in: path
-          name: attachmentId
+          name: attachment_id
           required: true
           schema:
             type: number
@@ -393,7 +393,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/:
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/sharepoint/:
     post:
       operationId: uploadEmailAttachmentToSharepoint
       parameters:
@@ -406,13 +406,13 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
         - description: Email Attachment ID
           in: path
-          name: attachmentId
+          name: attachment_id
           required: true
           schema:
             type: number
@@ -423,7 +423,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/email/{id}/{emailId}/attachment/sharepoint/{sharepointId}/:
+  /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
     post:
       operationId: downloadEmailAttachmentFromSharepoint
       parameters:
@@ -436,13 +436,13 @@ paths:
             format: uuid
         - description: Email ID
           in: path
-          name: emailId
+          name: email_id
           required: true
           schema:
             type: number
         - description: Sharepoint ID
           in: path
-          name: sharepointId
+          name: sharepoint_id
           required: true
           schema:
             type: string
@@ -1551,7 +1551,7 @@ components:
     EmailCreate:
       type: object
       properties:
-        issue_id:
+        issue:
           type: string
           format: uuid
         to_address:
@@ -1569,7 +1569,7 @@ components:
         html:
           type: string
       required:
-        - issue_id
+        - issue
         - to_address
         - from_address
         - cc_addresses
@@ -1589,12 +1589,15 @@ components:
           type: string
         content_type:
           type: string
+        email:
+          type: number
       required:
         - id
         - url
         - name
         - sharepoint_state
         - content_type
+        - email
     Email:
       allOf:
         - $ref: "#/components/schemas/EmailCreate"

@@ -17,15 +17,15 @@ paths:
     $ref: paths/email-list.yaml
   /clerk/api/email/{id}/create/:
     $ref: paths/email-create.yaml
-  /clerk/api/email/{id}/{emailId}/:
+  /clerk/api/email/{id}/{email_id}/:
     $ref: paths/email-detail.yaml
-  /clerk/api/email/{id}/{emailId}/attachment/:
+  /clerk/api/email/{id}/{email_id}/attachment/:
     $ref: paths/attachment-list.yaml
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/:
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/:
     $ref: paths/attachment-detail.yaml
-  /clerk/api/email/{id}/{emailId}/attachment/{attachmentId}/sharepoint/:
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/sharepoint/:
     $ref: paths/attachment-sharepoint-upload.yaml
-  /clerk/api/email/{id}/{emailId}/attachment/sharepoint/{sharepointId}/:
+  /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
     $ref: paths/attachment-sharepoint-download.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml

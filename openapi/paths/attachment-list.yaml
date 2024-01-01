@@ -10,7 +10,7 @@ post:
         format: uuid
     - description: Email ID
       in: path
-      name: emailId
+      name: email_id
       required: true
       schema:
         type: number
