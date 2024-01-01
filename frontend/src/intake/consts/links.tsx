@@ -13,6 +13,5 @@ export const LINKS = {
   },
   REPAIRS_INFO: '/services/rental-repairs/',
   BONDS_INFO: '/services/bond-recovery/',
-  CLOSED_CONTACT: '/closed-contact/',
   BONDS_RESOURCES: 'https://www.anikalegal.com/blog/bonds-and-bond-recovery/',
 }

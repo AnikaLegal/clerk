@@ -171,6 +171,9 @@ def test_get_case_folder_info_B(mock_api):
         {
             "name": "War and Peace",
             "webUrl": "https://en.wikipedia.org/wiki/War_and_Peace",
+            "id": "12345",
+            "size": 23456,
+            "file": {"content_type": "text/html"},
         }
     ]
     mock_api.folder.get.return_value = {
@@ -181,8 +184,14 @@ def test_get_case_folder_info_B(mock_api):
 
     mock_api.folder.get_children.assert_called_once_with(f"cases/{issue.id}")
     mock_api.folder.get.assert_called_once_with(f"cases/{issue.id}")
-    assert documents[0][0] == "War and Peace"
     assert url == "https://en.wikipedia.org/wiki/Leo_Tolstoy"
+    assert documents[0] == {
+        "name": "War and Peace",
+        "url": "https://en.wikipedia.org/wiki/War_and_Peace",
+        "id": "12345",
+        "size": 23456,
+        "is_file": True,
+    }
 
 
 @pytest.mark.django_db

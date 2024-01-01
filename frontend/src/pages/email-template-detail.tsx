@@ -10,7 +10,7 @@ import {
   EmailTemplate,
   useUpdateEmailTemplateMutation,
   useDeleteEmailTemplateMutation,
-} from 'apiNew'
+} from 'api'
 
 interface DjangoContext {
   topic_options: { key: string; value: string; text: string }[]

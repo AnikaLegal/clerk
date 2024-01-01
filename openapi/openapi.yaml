@@ -5,6 +5,28 @@ info:
   version: 0.1.0
 
 paths:
+  /clerk/api/case/:
+    $ref: paths/case-list.yaml
+  /clerk/api/case/{id}/:
+    $ref: paths/case-detail.yaml
+  /clerk/api/case/{id}/note/:
+    $ref: paths/case-note.yaml
+  /clerk/api/case/{id}/docs/:
+    $ref: paths/case-docs.yaml
+  /clerk/api/email/{id}/:
+    $ref: paths/email-list.yaml
+  /clerk/api/email/{id}/create/:
+    $ref: paths/email-create.yaml
+  /clerk/api/email/{id}/{email_id}/:
+    $ref: paths/email-detail.yaml
+  /clerk/api/email/{id}/{email_id}/attachment/:
+    $ref: paths/attachment-list.yaml
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/:
+    $ref: paths/attachment-detail.yaml
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/sharepoint/:
+    $ref: paths/attachment-sharepoint-upload.yaml
+  /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
+    $ref: paths/attachment-sharepoint-download.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:

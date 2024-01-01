@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { NotifyTemplateForm } from 'forms/notify-template'
-import { useCreateNotificationTemplateMutation } from 'apiNew'
+import { useCreateNotificationTemplateMutation } from 'api'
 
 interface DjangoContext {
   topic_options: { key: string; value: string; text: string }[]

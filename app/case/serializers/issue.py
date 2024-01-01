@@ -8,19 +8,7 @@ from accounts.models import User
 from .user import UserSerializer
 from .client import ClientSerializer
 from .person import PersonSerializer
-from .fields import DateField, LocalTimeField, LocalDateField
-
-
-class IssueNoteCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IssueNote
-        fields = (
-            "creator",
-            "note_type",
-            "text",
-            "issue",
-            "event",
-        )
+from .fields import LocalTimeField, LocalDateField
 
 
 class IssueNoteSerializer(serializers.ModelSerializer):
@@ -29,18 +17,21 @@ class IssueNoteSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "creator",
+            "creator_id",
             "note_type",
             "text",
             "text_display",
             "created_at",
+            "issue",
             "event",
             "reviewee",
         )
 
     creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(write_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
     reviewee = serializers.SerializerMethodField()
-    event = DateField()
+    event = serializers.DateTimeField(required=False)
     created_at = LocalTimeField()
 
     def get_reviewee(self, obj):
@@ -62,15 +53,23 @@ class IssueSerializer(serializers.ModelSerializer):
             "outcome_notes",
             "provided_legal_services",
             "fileref",
+            "answers",
             "paralegal",
+            "paralegal_id",
             "lawyer",
+            "lawyer_id",
             "client",
             "support_worker",
+            "support_worker_id",
             "is_open",
             "is_sharepoint_set_up",
             "actionstep_id",
             "created_at",
             "url",
+            # Case review fields.
+            "is_conflict_check",
+            "is_eligibility_check",
+            "next_review",
         )
 
     id = serializers.CharField(read_only=True)
@@ -78,33 +77,68 @@ class IssueSerializer(serializers.ModelSerializer):
     paralegal = UserSerializer(read_only=True)
     client = ClientSerializer(read_only=True)
     support_worker = PersonSerializer(read_only=True)
+    support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
+    paralegal_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Paralegal"),
+        allow_null=True,
+    )
+    lawyer_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Lawyer"),
+        allow_null=True,
+    )
     topic_display = serializers.CharField(source="get_topic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
     created_at = LocalDateField()
     url = serializers.SerializerMethodField()
-
-    def get_url(self, obj):
-        return reverse("case-detail-view", args=(obj.pk,))
-
-
-class IssueAssignmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Issue
-        fields = ("paralegal", "lawyer")
+    # Case review fields.
+    is_conflict_check = serializers.SerializerMethodField()
+    is_eligibility_check = serializers.SerializerMethodField()
+    next_review = serializers.SerializerMethodField()
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
         # Wait 15 mins for Sharepoint data sync
-        fields["paralegal"].queryset = fields["paralegal"].queryset.filter(
+        fields["paralegal_id"].queryset = fields["paralegal_id"].queryset.filter(
             ms_account_created_at__lte=fifteen_minutes_ago
         )
         return fields
 
-    paralegal = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(groups__name="Paralegal"), allow_null=True
-    )
-    lawyer = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(groups__name="Lawyer"), allow_null=True
-    )
+    def validate_paralegal_id(self, paralegal: User):
+        return paralegal.id if paralegal else None
+
+    def validate_lawyer_id(self, lawyer: User):
+        return lawyer.id if lawyer else None
+
+    def get_url(self, obj):
+        return reverse("case-detail", args=(obj.pk,))
+
+    def get_is_conflict_check(self, obj):
+        return getattr(obj, "is_conflict_check", None)
+
+    def get_is_eligibility_check(self, obj):
+        return getattr(obj, "is_eligibility_check", None)
+
+    def get_next_review(self, obj):
+        next_review = getattr(obj, "next_review", None)
+        return next_review.strftime("%d/%m/%y") if next_review else None
+
+
+class IssueSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
+        fields = (
+            "topic",
+            "stage",
+            "outcome",
+            "is_open",
+            "lawyer",
+            "paralegal",
+            "search",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}
+
+    search = serializers.CharField(required=False)

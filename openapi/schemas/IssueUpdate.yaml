@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./IssueBase.yaml
+  - type: object
+    properties:
+      paralegal_id:
+        $ref: ./User.yaml
+        nullable: true
+      lawyer_id:
+        $ref: ./User.yaml
+        nullable: true
+      support_worker_id:
+        $ref: ./Person.yaml
+        nullable: true
+    required:
+      - paralegal_id
+      - lawyer_id
+      - support_worker_id

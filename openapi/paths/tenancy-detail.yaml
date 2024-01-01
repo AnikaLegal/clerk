@@ -15,7 +15,7 @@ get:
           schema:
             $ref: ../schemas/Tenancy.yaml
 
-put:
+patch:
   operationId: updateTenancy
   parameters:
     - description: Entity ID

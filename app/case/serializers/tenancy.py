@@ -19,6 +19,8 @@ class TenancySerializer(serializers.ModelSerializer):
             "is_on_lease",
             "landlord",
             "agent",
+            "landlord_id",
+            "agent_id",
             "client",
             "url",
         )
@@ -26,6 +28,8 @@ class TenancySerializer(serializers.ModelSerializer):
     client = ClientSerializer(read_only=True)
     landlord = PersonSerializer(read_only=True)
     agent = PersonSerializer(read_only=True)
+    landlord_id = serializers.IntegerField(write_only=True, allow_null=True)
+    agent_id = serializers.IntegerField(write_only=True, allow_null=True)
     url = serializers.SerializerMethodField()
     is_on_lease = TextChoiceField(LeaseType, allow_blank=True)
     started = serializers.DateTimeField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])

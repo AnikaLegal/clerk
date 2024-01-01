@@ -1,0 +1,75 @@
+get:
+  operationId: getCases
+  parameters:
+    - name: page
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: search
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: topic
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: stage
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: outcome
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: is_open
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: paralegal
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: lawyer
+      in: query
+      schema:
+        type: string
+      required: false
+
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              current:
+                type: number
+              next:
+                type: number
+                nullable: true
+              prev:
+                type: number
+                nullable: true
+              page_count:
+                type: number
+              item_count:
+                type: number
+              results:
+                type: array
+                items:
+                  $ref: ../schemas/Issue.yaml
+            required:
+              - current
+              - next
+              - prev
+              - page_count
+              - item_count
+              - results

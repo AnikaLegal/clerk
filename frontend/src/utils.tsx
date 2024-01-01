@@ -8,8 +8,8 @@ import { Provider } from 'react-redux'
 import { SnackbarProvider } from 'notistack'
 
 import { ErrorBoundary } from 'comps/error-boundary'
-import { store } from 'apiNew/store'
-import { Error as ErrorType } from 'apiNew'
+import { store } from 'api/store'
+import { Error as ErrorType } from 'api'
 
 const converter = new Converter()
 setFlavor('github')

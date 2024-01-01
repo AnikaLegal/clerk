@@ -9,7 +9,7 @@ import {
   NotificationTemplate,
   useUpdateNotificationTemplateMutation,
   useDeleteNotificationTemplateMutation,
-} from 'apiNew'
+} from 'api'
 
 interface DjangoContext {
   template: NotificationTemplate

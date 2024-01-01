@@ -8,6 +8,20 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 
 
+def login_required(view):
+    """
+    User must be logged in to view this page.
+    """
+
+    def view_wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return _redirect_to_login(request)
+
+        return view(request, *args, **kwargs)
+
+    return view_wrapper
+
+
 def paralegal_or_better_required(view):
     """
     User must be a paralegal or better to view this page.

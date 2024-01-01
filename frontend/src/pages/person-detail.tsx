@@ -6,11 +6,7 @@ import { useSnackbar } from 'notistack'
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { PersonForm } from 'forms/person'
 import { CaseListTable } from 'comps/case-table'
-import {
-  useDeletePersonMutation,
-  useUpdatePersonMutation,
-  Person,
-} from 'apiNew'
+import { useDeletePersonMutation, useUpdatePersonMutation, Person } from 'api'
 
 interface DjangoContext {
   person: Person

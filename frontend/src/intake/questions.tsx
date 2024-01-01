@@ -5,7 +5,7 @@ import { Field, Data, Submission } from 'intake/types'
 import { FIELD_TYPES, ROUTES, LINKS } from 'intake/consts'
 import { storeFormData } from 'intake/utils'
 import { Icon } from 'intake/design'
-import { api } from 'api'
+import { api } from 'intake/api'
 
 const isManagerAgent = (data: Data) => data.PROPERTY_MANAGER_IS_AGENT
 const isManagerLandlord = (data: Data) => !data.PROPERTY_MANAGER_IS_AGENT

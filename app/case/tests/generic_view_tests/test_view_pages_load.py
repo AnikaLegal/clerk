@@ -10,7 +10,6 @@ from django.urls import reverse
 from factory.django import DjangoModelFactory
 
 from core import factories
-from emails.models import EmailTemplate
 
 
 @dataclass
@@ -21,6 +20,11 @@ class PageTestCase:
 
 
 PAGE_TEST_CASE = [
+    PageTestCase(name="case-list", factory=factories.IssueFactory, is_detail=False),
+    PageTestCase(name="case-review", factory=factories.IssueFactory, is_detail=False),
+    PageTestCase(name="case-inbox", factory=factories.IssueFactory, is_detail=False),
+    PageTestCase(name="case-detail", factory=factories.IssueFactory, is_detail=True),
+    PageTestCase(name="case-docs", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
         name="person-create", factory=factories.PersonFactory, is_detail=False
@@ -87,4 +91,57 @@ def test_case_page_status_code(superuser_client, test_case):
 
     response = superuser_client.get(url)
     msg = f"URL name {test_case.name} failed, expecting status 200 got {response.status_code}"
+    assert response.status_code == 200, msg
+
+
+EMAIL_PAGE_TEST_CASE = [
+    PageTestCase(
+        name="case-email-list", factory=factories.EmailFactory, is_detail=False
+    ),
+    PageTestCase(name="case-email-draft", factory=None, is_detail=False),
+    PageTestCase(
+        name="case-email-edit", factory=factories.EmailFactory, is_detail=True
+    ),
+    PageTestCase(
+        name="case-email-preview", factory=factories.EmailFactory, is_detail=True
+    ),
+]
+
+EMAIL_TEST_NAMES = [tc.name for tc in EMAIL_PAGE_TEST_CASE]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("test_case", EMAIL_PAGE_TEST_CASE, ids=EMAIL_TEST_NAMES)
+def test_case_email_page_status_code(superuser_client, test_case):
+    """
+    Ensure URLs return the correct status code for email pages.
+    """
+    email = None
+    issue = factories.IssueFactory()
+    if test_case.factory:
+        email = test_case.factory(issue=issue)
+    if test_case.is_detail:
+        assert email, "A factory is required"
+        url = reverse(
+            test_case.name,
+            args=(issue.pk, email.pk),
+        )
+    else:
+        url = reverse(test_case.name, args=(issue.pk,))
+
+    response = superuser_client.get(url)
+    msg = f"URL name {test_case.name} failed, expecting status 200 got {response.status_code}"
+    assert response.status_code == 200, msg
+
+
+@pytest.mark.django_db
+def test_case_thread_view_page_status_code(superuser_client):
+    """
+    Ensure URLs return the correct status code for email thread view page.
+    """
+    issue = factories.IssueFactory()
+    factories.EmailFactory(issue=issue, subject="foo")
+    url = reverse("case-email-thread", args=(issue.pk, "foo"))
+    response = superuser_client.get(url)
+    msg = f"URL name case-email-thread failed, expecting status 200 got {response.status_code}"
     assert response.status_code == 200, msg

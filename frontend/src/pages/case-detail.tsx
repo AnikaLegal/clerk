@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Container,
   Header,
@@ -8,12 +8,20 @@ import {
   Feed,
   Checkbox,
 } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { useGetPeopleQuery, Tenancy } from 'apiNew'
+import {
+  useGetCaseQuery,
+  useGetPeopleQuery,
+  useUpdateTenancyMutation,
+  useUpdateCaseMutation,
+  IssueUpdate,
+  TenancyCreate,
+  Issue,
+} from 'api'
 import { TimelineNote } from 'comps/timeline-item'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { mount } from 'utils'
-import { api } from 'api'
+import { mount, getAPIErrorMessage } from 'utils'
 import { URLS } from 'consts'
 import {
   FilenoteForm,
@@ -27,89 +35,104 @@ import {
   ProgressForm,
   ConflictForm,
 } from 'forms'
+import { UserPermission, CaseDetailFormProps } from 'types'
 
-import { IssueDetail, IssueNote } from 'types'
-
-interface ReactContext {
-  issue: IssueDetail
-  notes: IssueNote[]
-  tenancy: Tenancy
-  details: { [title: string]: string }
-  actionstep_url: string
+interface DjangoContext {
+  user: UserPermission
+  case_pk: string
   urls: {
     detail: string
     email: string
     docs: string
   }
-  permissions: {
-    is_paralegal_or_better: boolean
-    is_coordinator_or_better: boolean
-  }
 }
 
-const REACT_CONTEXT = (window as any).REACT_CONTEXT as ReactContext
-
-const { details, urls, actionstep_url, permissions } = REACT_CONTEXT
+const {
+  case_pk,
+  urls,
+  user: permissions,
+} = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [issue, setIssue] = useState(REACT_CONTEXT.issue)
-  const [notes, setNotes] = useState(REACT_CONTEXT.notes)
-  const [tenancy, setTenancy] = useState(REACT_CONTEXT.tenancy)
+  const { enqueueSnackbar } = useSnackbar()
   const [activeFormId, setActiveFormId] = useState(null)
   const [showSystemNotes, setShowSystemNotes] = useState(true)
+  const [_updateTenancy, updateTenancyResult] = useUpdateTenancyMutation()
+  const [_updateCase, updateCaseResult] = useUpdateCaseMutation()
+
+  const caseResult = useGetCaseQuery({ id: case_pk })
+
+  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
+  const isInitialLoad = caseResult.isLoading
+  const isIssueLoading = caseResult.isFetching || updateCaseResult.isLoading
+  const isTenancyLoading = updateTenancyResult.isLoading
+
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const tenancy = caseResult.data!.tenancy
+  const notes = caseResult.data?.notes ?? []
+  const details = getSubmittedDetails(issue)
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
     .filter((note) => showSystemNotes || note.note_type !== 'EVENT')
 
-  const setSupportWorker = (supportWorker) =>
-    setIssue({ ...issue, support_worker: supportWorker })
+  const updateTenancy = (tenancyCreate: TenancyCreate) => {
+    _updateTenancy({ id: tenancy.id, tenancyCreate })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Updated tenancy', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update tenancy'), {
+          variant: 'error',
+        })
+      })
+  }
+
+  const updateCase = (issueUpdate: IssueUpdate) => {
+    _updateCase({ id: issue.id, issueUpdate })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Updated case', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update case'), {
+          variant: 'error',
+        })
+      })
+  }
 
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
-      api.case.landlord
-        .remove(issue.id)
-        .then(({ data }) => setTenancy(data as Tenancy))
+      updateTenancy({ landlord_id: null } as any)
     }
   }
   const onRemoveAgent = () => {
     if (confirm('Remove the agent for this case?')) {
-      api.case.agent
-        .remove(issue.id)
-        .then(({ data }) => setTenancy(data as Tenancy))
+      updateTenancy({ agent_id: null } as any)
     }
   }
   const onRemoveSupportWorker = () => {
     if (confirm('Remove the support worker for this case?')) {
-      api.case.supportWorker.remove(issue.id).then(() => setSupportWorker(null))
+      updateCase({ support_worker_id: null } as any)
     }
   }
 
   const onAddAgent = (agentId) => {
-    api.case.agent
-      .add(issue.id, agentId)
-      .then(({ data }) => setTenancy(data as Tenancy))
+    updateTenancy({ agent_id: agentId } as any)
   }
   const onAddLandlord = (landlordId) => {
-    api.case.landlord
-      .add(issue.id, landlordId)
-      .then(({ data }) => setTenancy(data as Tenancy))
+    updateTenancy({ landlord_id: landlordId } as any)
   }
   const onAddSupportWorker = (supportWorkerId) => {
-    api.case.supportWorker
-      .add(issue.id, supportWorkerId)
-      .then(({ data }) => setSupportWorker(data))
+    updateCase({ support_worker_id: supportWorkerId } as any)
   }
 
-  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
   return (
     <Container>
-      <CaseHeader
-        issue={issue}
-        actionstepUrl={actionstep_url}
-        activeTab={CASE_TABS.DETAIL}
-        urls={urls}
-      />
+      <CaseHeader issue={issue} activeTab={CASE_TABS.DETAIL} urls={urls} />
       <div className="ui two column grid" style={{ marginTop: '1rem' }}>
         <div className="column">
           <Segment>
@@ -162,12 +185,7 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm
-              issue={issue}
-              setIssue={setIssue}
-              setNotes={setNotes}
-              onCancel={() => setActiveFormId(null)}
-            />
+            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
           )}
           {!activeFormId && (
             <React.Fragment>
@@ -209,6 +227,7 @@ const App = () => {
                   title="Add a landlord"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddLandlord}
+                  isLoading={isTenancyLoading}
                 />
               )}
               {tenancy.agent ? (
@@ -228,6 +247,7 @@ const App = () => {
                   title="Add an agent"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddAgent}
+                  isLoading={isTenancyLoading}
                 />
               )}
               {issue.support_worker ? (
@@ -247,6 +267,7 @@ const App = () => {
                   title="Add a support worker"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddSupportWorker}
+                  isLoading={isIssueLoading}
                 />
               )}
               <EntityCard title="Other submitted data" tableData={details} />
@@ -258,7 +279,19 @@ const App = () => {
   )
 }
 
-const PersonSearchCard = ({ title, createUrl, onSelect }) => {
+interface PersonSearchCardProps {
+  title: string
+  createUrl: string
+  onSelect: (val: any) => void
+  isLoading: boolean
+}
+
+const PersonSearchCard: React.FC<PersonSearchCardProps> = ({
+  title,
+  createUrl,
+  onSelect,
+  isLoading,
+}) => {
   const { data, isFetching } = useGetPeopleQuery()
   const people = data || []
   return (
@@ -274,7 +307,7 @@ const PersonSearchCard = ({ title, createUrl, onSelect }) => {
           fluid
           search
           selection
-          loading={isFetching}
+          loading={isFetching || isLoading}
           placeholder="Select a person"
           options={people.map((p) => ({
             key: p.id,
@@ -328,7 +361,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
   </div>
 )
 
-const CASE_FORMS = {
+const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   filenote: FilenoteForm,
   review: ReviewForm,
   performance: PerformanceForm,
@@ -341,7 +374,14 @@ const CASE_FORMS = {
   outcome: OutcomeForm,
 }
 
-const CASE_FORM_OPTIONS = [
+interface CaseFormOption {
+  id: string
+  icon: string
+  text: string
+  when: (perms: UserPermission, issue: Issue) => boolean
+}
+
+const CASE_FORM_OPTIONS: CaseFormOption[] = [
   {
     id: 'filenote',
     icon: 'clipboard outline',
@@ -358,7 +398,7 @@ const CASE_FORM_OPTIONS = [
     id: 'performance',
     icon: 'clipboard outline',
     text: 'Add a paralegal performance review note',
-    when: (perms, issue) => perms.is_coordinator_or_better && issue.paralegal,
+    when: (perms, issue) => perms.is_coordinator_or_better && !!issue.paralegal,
   },
   {
     id: 'conflict',
@@ -403,5 +443,24 @@ const CASE_FORM_OPTIONS = [
     when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
   },
 ]
+
+const getSubmittedDetails = (issue: Issue): { [key: string]: string } =>
+  Object.entries(issue.answers).reduce((obj, [k, v]) => {
+    if (!v) return obj
+    // Chop off first part of title
+    const title = correctCase(k.split('_').slice(1).join('_'))
+    // Handle answers that are lists of answers
+    const answer = (Array.isArray(v) ? v : [v]).map(correctCase).join(', ')
+    return { ...obj, [title]: answer }
+  }, {})
+
+const correctCase = (str: any): string =>
+  String(str)
+    .split('_')
+    .map((s) => {
+      const lowered = s.toLowerCase()
+      return lowered[0].toUpperCase() + lowered.slice(1)
+    })
+    .join(' ')
 
 mount(App)

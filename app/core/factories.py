@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from emails.models import Email, EmailTemplate, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy
+from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
 from core.models.issue import CaseStage
 from notify.models import (
     Notification,
@@ -106,6 +106,17 @@ class IssueFactory(TimestampedModelFactory):
 
 
 @factory.django.mute_signals(post_save)
+class IssueNoteFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueNote
+
+    issue = factory.SubFactory(IssueFactory)
+    creator = factory.SubFactory(UserFactory)
+    note_type = "PARALEGAL"
+    text = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
 class FileUploadFactory(TimestampedModelFactory):
     class Meta:
         model = FileUpload
@@ -163,16 +174,6 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
     )
-
-    @factory.post_generation
-    def file(self, create, extracted, **kwargs):
-        if extracted:
-            file_name, file = extracted
-        else:
-            file_name = "image.png"
-            file = get_dummy_file(file_name)
-
-        self.file.save(file_name, file)
 
 
 def get_dummy_file(name):

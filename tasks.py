@@ -166,8 +166,8 @@ def sync_s3(c):
     FIXME: Improve upon public read status.
     """
     for sync_dir in SYNC_DIRS:
-        cmd = f"aws --profile anika s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(cmd, pty=True)
+        cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
+        c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
 
 
 @task

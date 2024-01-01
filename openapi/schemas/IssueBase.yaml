@@ -1,0 +1,22 @@
+type: object
+properties:
+  topic:
+    type: string
+  stage:
+    type: string
+  outcome:
+    type: string
+    nullable: true
+  outcome_notes:
+    type: string
+  provided_legal_services:
+    type: boolean
+  is_open:
+    type: boolean
+required:
+  - topic
+  - stage
+  - outcome
+  - outcome_notes
+  - provided_legal_services
+  - is_open

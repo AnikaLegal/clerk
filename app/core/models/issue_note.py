@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q, Exists, OuterRef, QuerySet
 
 from django.db import transaction
 
@@ -99,3 +100,21 @@ class IssueNote(TimestampedModel):
                 self.content_object = self.issue.paralegal
 
         super().save(*args, **kwargs)
+
+    @staticmethod
+    def annotate_with_eligibility_checks(queryset: QuerySet[Issue]) -> QuerySet[Issue]:
+        is_conflict_check = Q(note_type=NoteType.CONFLICT_CHECK_FAILURE) | Q(
+            note_type=NoteType.CONFLICT_CHECK_SUCCESS
+        )
+        conflict_check_subquery = IssueNote.objects.filter(is_conflict_check).filter(
+            issue=OuterRef("pk")
+        )
+        is_eligibility_check = Q(note_type=NoteType.ELIGIBILITY_CHECK_FAILURE) | Q(
+            note_type=NoteType.ELIGIBILITY_CHECK_SUCCESS
+        )
+        eligibility_check_subquery = IssueNote.objects.filter(
+            is_eligibility_check
+        ).filter(issue=OuterRef("pk"))
+        return queryset.annotate(
+            is_conflict_check=Exists(conflict_check_subquery)
+        ).annotate(is_eligibility_check=Exists(eligibility_check_subquery))

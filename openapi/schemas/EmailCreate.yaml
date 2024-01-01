@@ -1,0 +1,27 @@
+type: object
+properties:
+  issue:
+    type: string
+    format: uuid
+  to_address:
+    type: string
+  from_address:
+    type: string
+  cc_addresses:
+    type: array
+    items:
+      type: string
+  subject:
+    type: string
+  text:
+    type: string
+  html:
+    type: string
+required:
+  - issue
+  - to_address
+  - from_address
+  - cc_addresses
+  - subject
+  - text
+  - html

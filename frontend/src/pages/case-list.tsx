@@ -10,24 +10,40 @@ import {
   Dropdown,
 } from 'semantic-ui-react'
 
-import { api } from 'api'
 import { CaseListTable } from 'comps/case-table'
-import { mount, debounce, useEffectLazy } from 'utils'
+import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
-import { Issue, useGetUsersQuery } from 'apiNew'
+import { useGetUsersQuery, useGetCasesQuery } from 'api'
 
 interface DjangoContext {
-  issues: Issue[]
-  next_page: number
-  total_pages: number
-  total_count: number
-  prev_page: number
   choices: {
     stage: string[][]
     topic: string[][]
     outcome: string[][]
     is_open: string[][]
   }
+}
+
+interface SearchQuery {
+  page: number
+  search: string
+  topic: string
+  stage: string
+  outcome: string
+  isOpen: string
+  paralegal: string
+  lawyer: string
+}
+
+const INITIAL_QUERY = {
+  page: null,
+  search: '',
+  topic: '',
+  stage: '',
+  outcome: '',
+  isOpen: '',
+  paralegal: '',
+  lawyer: '',
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -43,41 +59,30 @@ const TABLE_FIELDS = [
   'provided_legal_services',
   'outcome',
 ]
-const debouncer = debounce(300)
 
 const App = () => {
+  // TODO: Debounce search keystrokes.
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [issues, setIssues] = useState(CONTEXT.issues)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalIssues, setTotalIssues] = useState(CONTEXT.total_count)
-  const [totalPages, setTotalPages] = useState(CONTEXT.total_pages)
-  const [query, setQuery] = useState({
-    search: '',
-    topic: '',
-    stage: '',
-    outcome: '',
-    is_open: '',
-    paralegal: '',
-    lawyer: '',
-  })
-  const onPageChange = (e, { activePage }) => setCurrentPage(activePage)
-  const search = debouncer(() => {
-    setIsLoading(true)
-    api.case
-      .search({ ...query, page: currentPage })
-      .then(({ data: { issues, total_pages, total_count } }) => {
-        setIssues(issues)
-        setTotalPages(total_pages)
-        setTotalIssues(total_count)
-        setIsLoading(false)
-      })
-      .catch(() => setIsLoading(false))
-  })
-  useEffectLazy(() => search(), [query, currentPage])
+  const [query, setQuery] = useState<SearchQuery>(INITIAL_QUERY)
 
+  const onPageChange = (e, { activePage }) =>
+    setQuery({ ...query, page: activePage })
+
+  const filteredQuery = Object.entries(query).reduce((obj, [k, v]) => {
+    if (v === null || v === '') return obj
+    return { ...obj, [k]: v }
+  }, {})
+
+  const casesResult = useGetCasesQuery(filteredQuery)
   const paralegalResults = useGetUsersQuery({ group: 'Paralegal' })
   const lawyerResults = useGetUsersQuery({ group: 'Lawyer' })
+
+  const issues = casesResult.data?.results ?? []
+  const totalIssues = casesResult.data?.item_count
+  const currentPage = casesResult.data?.current
+  const totalPages = casesResult.data?.page_count
+  const isLoading = casesResult.isFetching
+
   const isLoadingSelections =
     paralegalResults.isFetching || lawyerResults.isFetching
   return (
@@ -125,11 +130,11 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={query.is_open}
+                  value={query.isOpen}
                   placeholder="Is case open?"
                   options={choiceToOptions(CONTEXT.choices.is_open)}
                   onChange={(e, { value }) =>
-                    setQuery({ ...query, is_open: value as string })
+                    setQuery({ ...query, isOpen: value as string })
                   }
                 />
               </Form.Field>
@@ -221,20 +226,22 @@ const App = () => {
       <FadeTransition in={!isLoading}>
         <CaseListTable issues={issues} fields={TABLE_FIELDS} />
       </FadeTransition>
-      <Pagination
-        activePage={currentPage}
-        onPageChange={onPageChange as any}
-        totalPages={totalPages}
-        style={{ marginTop: '1em' }}
-        ellipsisItem={{
-          content: <Icon name="ellipsis horizontal" />,
-          icon: true,
-        }}
-        firstItem={{ content: <Icon name="angle double left" />, icon: true }}
-        lastItem={{ content: <Icon name="angle double right" />, icon: true }}
-        prevItem={{ content: <Icon name="angle left" />, icon: true }}
-        nextItem={{ content: <Icon name="angle right" />, icon: true }}
-      />
+      {!isLoading && (
+        <Pagination
+          activePage={currentPage}
+          onPageChange={onPageChange as any}
+          totalPages={totalPages}
+          style={{ marginTop: '1em' }}
+          ellipsisItem={{
+            content: <Icon name="ellipsis horizontal" />,
+            icon: true,
+          }}
+          firstItem={{ content: <Icon name="angle double left" />, icon: true }}
+          lastItem={{ content: <Icon name="angle double right" />, icon: true }}
+          prevItem={{ content: <Icon name="angle left" />, icon: true }}
+          nextItem={{ content: <Icon name="angle right" />, icon: true }}
+        />
+      )}
     </Container>
   )
 }

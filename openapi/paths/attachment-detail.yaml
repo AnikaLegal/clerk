@@ -1,0 +1,29 @@
+delete:
+  operationId: deleteEmailAttachment
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - description: Email ID
+      in: path
+      name: email_id
+      required: true
+      schema:
+        type: number
+    - description: Email Attachment ID
+      in: path
+      name: attachment_id
+      required: true
+      schema:
+        type: number
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

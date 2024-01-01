@@ -1,8 +1,8 @@
 {
   "schemaFile": "../app/openapi.generated.yaml",
-  "apiFile": "./src/apiNew/baseApi.ts",
+  "apiFile": "./src/api/baseApi.ts",
   "apiImport": "baseApi",
-  "outputFile": "./src/apiNew/api.generated.ts",
+  "outputFile": "./src/api/api.generated.ts",
   "exportName": "generatedApi",
   "hooks": true
 }

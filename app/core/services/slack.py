@@ -47,7 +47,7 @@ def send_case_assignment_slack(issue: str):
             lawyer_name=issue.lawyer.get_full_name(),
             paralegal_name=issue.paralegal.get_full_name(),
             case_url=settings.CLERK_BASE_URL
-            + reverse("case-detail-view", args=(str(issue.pk),)),
+            + reverse("case-detail", args=(str(issue.pk),)),
         )
         send_slack_direct_message(msg, slack_user["id"])
     else:
@@ -81,9 +81,7 @@ def send_email_alert_slack(email_pk: str):
     case_email_url = settings.CLERK_BASE_URL + reverse(
         "case-email-list", args=(str(issue.pk),)
     )
-    case_url = settings.CLERK_BASE_URL + reverse(
-        "case-detail-view", args=(str(issue.pk),)
-    )
+    case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
     msg = (
         "*New Email Notification*\n"
         f"A new email has been received for case <{case_url}|{issue.fileref}> .\n"
@@ -113,9 +111,7 @@ def send_email_alert_slack(email_pk: str):
 
 def get_text(issue: Issue):
     pk = issue.pk
-    case_url = settings.CLERK_BASE_URL + reverse(
-        "case-detail-view", args=(str(issue.pk),)
-    )
+    case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
     referrer_type = issue.client.referrer_type.title().replace("_", " ")
     referrer = issue.client.referrer
 
