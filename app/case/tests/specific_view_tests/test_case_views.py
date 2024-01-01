@@ -76,11 +76,11 @@ def test_case_list_view__as_paralegal_with_access(
     assert response.status_code == 200
     resp_data = response.json()
 
-    resp_data["current"] == 1
-    resp_data["item_count"] == 1
-    resp_data["page_count"] == 1
-    resp_data["next"] == None
-    resp_data["prev"] == None
+    assert resp_data["current"] == 1
+    assert resp_data["item_count"] == 1
+    assert resp_data["page_count"] == 1
+    assert resp_data["next"] is None
+    assert resp_data["prev"] is None
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
@@ -105,11 +105,11 @@ def test_case_list_view__as_coordinator(
     assert response.status_code == 200
     resp_data = response.json()
 
-    resp_data["current"] == 1
-    resp_data["item_count"] == 2
-    resp_data["page_count"] == 1
-    resp_data["next"] == None
-    resp_data["prev"] == None
+    assert resp_data["current"] == 1
+    assert resp_data["item_count"] == 2
+    assert resp_data["page_count"] == 1
+    assert resp_data["next"] is None
+    assert resp_data["prev"] is None
     results = resp_data["results"]
     assert len(results) == 2
     assert set(r["id"] for r in results) == {str(issue_a.pk), str(issue_b.pk)}
@@ -150,6 +150,44 @@ def test_case_get_view(superuser_client: APIClient):
     url = reverse("case-api-detail", args=(issue.pk,))
     response = superuser_client.get(url)
     assert response.status_code == 200
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_case_get_view__as_paralegal(
+    user_client: APIClient,
+    user: User,
+    paralegal_group,
+):
+    """
+    Paralegal users can fetch a given cases and see results when they're assigned
+    """
+    user.groups.set([paralegal_group])
+    annotate_group_access(user)
+    issue = factories.IssueFactory()
+    tenancy = factories.TenancyFactory(client=issue.client)
+    # Should be visible to a paralegal
+    issue_note_a = factories.IssueNoteFactory(issue=issue, note_type="PARALEGAL")
+    # Should be hidden from to a paralegal
+    factories.IssueNoteFactory(issue=issue, note_type="PERFORMANCE")
+
+    # User cannot get the case because they're not assigned
+    url = reverse("case-api-detail", args=(issue.pk,))
+    response = user_client.get(url)
+    assert response.status_code == 404  # Not found
+
+    # User can get the case now they're assigned
+    issue.paralegal = user
+    issue.save()
+    response = user_client.get(url)
+    assert response.status_code == 200
+    resp_data = response.json()
+
+    assert resp_data["issue"]["id"] == str(issue.pk)
+    assert resp_data["tenancy"]["id"] == tenancy.pk
+    notes = resp_data["notes"]
+    assert len(notes) == 1
+    assert notes[0]["id"] == issue_note_a.pk
     schema_tester.validate_response(response=response)
 
 
