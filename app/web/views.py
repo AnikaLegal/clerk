@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 
 from .models import BlogListPage, DashboardItem
-from .forms import ContactForm, ContentFeebackForm
+from .forms import ContactForm, ContentFeedbackForm
 
 from core.models import Issue
 from core.models.issue import CaseTopic
@@ -75,7 +75,7 @@ def landing_contact_form_view(request):
 
 @require_http_methods(["POST"])
 def content_feedback_form_view(request):
-    form = ContentFeebackForm(request.POST)
+    form = ContentFeedbackForm(request.POST)
     is_submitted = False
     if form.is_valid():
         form.save()

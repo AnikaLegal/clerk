@@ -2,7 +2,7 @@ from django.db import models
 from wagtail.core.models import Page
 
 
-class ContentFeeback(models.Model):
+class ContentFeedback(models.Model):
 
     SCORE_CHOICES = [(1, "⭐"), (2, "⭐⭐"), (3, "⭐⭐⭐"), (4, "⭐⭐⭐⭐"), (5, "⭐⭐⭐⭐⭐")]
 
