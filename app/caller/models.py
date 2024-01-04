@@ -13,4 +13,4 @@ class Call(TimestampedModel):
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     requires_callback = models.BooleanField(default=False)
     number_callbacks = models.IntegerField(default=0)
-    comments = models.CharField(max_length=256, blank=True, default="")
+    comments = models.TextField(blank=True, default="")

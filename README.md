@@ -12,6 +12,7 @@ This Django project has several apps:
 
 - accounts: User accounts
 - admin: Customization of Admin interface
+- blacklist: List contacts to avoid
 - caller: Call centre
 - case: Case management system website
 - clerk: Project settings
@@ -19,7 +20,7 @@ This Django project has several apps:
 - emails: Sending and receiving emails
 - intake: User intake forms (Housing health check only)
 - microsoft: Microsoft integration (Sharepoint)
-- office: Alternative communications when the office is closed.
+- office: Alternative communications when the office is closed
 - slack: Slack integration
 - web: Public website and blog
 - webhooks: Webhooks from 3rd party services
