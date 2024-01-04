@@ -14,6 +14,7 @@ from core.models.issue import CaseTopic
 from caller.choices import Choice
 from caller.messages import sms
 from office.closure.service import get_closure_call
+from blacklist.service import is_phone_blacklisted
 
 from .models import Call
 
@@ -33,6 +34,8 @@ TOPIC_MAPPING = {
     Choice.BONDS: CaseTopic.BONDS,
     Choice.CALLBACK: CaseTopic.OTHER,
 }
+
+BLACKLIST_COMMENT = "The caller's phone number is blacklisted."
 
 
 @require_http_methods(["GET"])
@@ -106,6 +109,11 @@ def collect_view(request):
     call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
     call.topic = TOPIC_MAPPING[choice]
     call.requires_callback = choice == Choice.CALLBACK
+
+    if is_phone_blacklisted(number):
+        call.requires_callback = False
+        call.comments = BLACKLIST_COMMENT
+
     call.save()
 
     return TwimlResponse(response)

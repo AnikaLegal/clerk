@@ -6,6 +6,9 @@ from django.urls import reverse
 from caller.models import Call
 from caller.choices import Choice
 
+from blacklist.models import Blacklist
+from caller.views import BLACKLIST_COMMENT
+
 @mock.patch("caller.views.MessagingResponse")
 def test_message_view(mock_MR, client):
     """
@@ -68,3 +71,35 @@ def test_collect_view(mock_VR, mock_G, mock_C, client):
     call = Call.objects.last()
     assert call.phone_number == from_number and call.requires_callback == True
     assert resp.status_code == 200
+
+@mock.patch("caller.views.Client")
+@mock.patch("caller.views.Gather")
+@mock.patch("caller.views.VoiceResponse")
+@pytest.mark.django_db
+def test_collect_view_blacklist(mock_VR, mock_G, mock_C, client):
+    """
+    Callback is false & blacklist comment is present when blacklisted user
+    selects callback option.
+    """
+    mock_response = mock.Mock()
+    mock_VR.return_value = mock_response
+    mock_gather = mock.Mock()
+    mock_G.return_value = mock_gather
+    mock_client = mock.Mock()
+    mock_C.return_value = mock_client
+    from_number = "+61456654377"
+    choice = Choice.CALLBACK
+
+    Blacklist.objects.create(phone=from_number)
+
+    client.get(reverse("caller-answer"), {"From": from_number})
+    resp = client.get(
+        reverse("caller-collect"), {"From": from_number, "Digits": choice}
+    )
+    mock_client.messages.create.assert_called_once()
+    assert resp.status_code == 200
+
+    call = Call.objects.last()
+    assert call.phone_number == from_number
+    assert not call.requires_callback
+    assert call.comments == BLACKLIST_COMMENT

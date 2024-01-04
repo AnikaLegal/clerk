@@ -18,8 +18,9 @@ def send_webflow_contact_slack(webflow_contact_pk: str):
 
 
 def get_text(webflow_contact: WebflowContact):
+    pk = str(webflow_contact.pk)
+    url = settings.CLERK_BASE_URL + "/admin/webhooks/webflowcontact/" + pk
     return (
-        "A client has just submitted a contact form on the landing page.\n"
-        f"Check out ID #{webflow_contact.pk} at "
-        "https://www.anikalegal.com/admin/webhooks/webflowcontact/"
+        "A contact request has been submitted via the landing page contact form.\n"
+        f"You can view the request here: <{url}|{pk}>.\n"
     )
