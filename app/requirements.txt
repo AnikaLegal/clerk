@@ -3,7 +3,7 @@ requests==2.27.1
 Django>=4
 
 # Content management system
-wagtail==2.16.1
+wagtail==5.2
 wagtail-localize
 
 # Cleans html

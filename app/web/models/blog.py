@@ -1,21 +1,15 @@
 from django.db import models
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from wagtail.core import blocks
-from wagtail.core.models import Page
-from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import (
+from wagtail import blocks
+from wagtail.models import Page
+from wagtail.fields import StreamField
+from wagtail.admin.panels import (
     FieldPanel,
-    StreamFieldPanel,
     MultiFieldPanel,
-    PrivacyModalPanel,
 )
-from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.blocks import ImageChooserBlock
 from django.utils import translation
 from django.template.response import TemplateResponse
-
-
-from .mixins import RICH_TEXT_FEATURES
 
 
 class BlogListPage(Page):
@@ -53,10 +47,11 @@ class BlogPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
             ("quote", blocks.BlockQuoteBlock()),
-        ]
+        ],
+        use_json_field=True,
     )
     main_image = models.ForeignKey(
         "wagtailimages.Image",
@@ -67,17 +62,16 @@ class BlogPage(Page):
     )
 
     promote_panels = [FieldPanel("slug")]
-    settings_panels = [PrivacyModalPanel()]
     content_panels = Page.content_panels + [
         FieldPanel("owner", heading="Author"),
         MultiFieldPanel(
             [
-                ImageChooserPanel("main_image"),
+                FieldPanel("main_image"),
                 FieldPanel("search_description"),
             ],
             "Search and social media",
         ),
-        StreamFieldPanel("body"),
+        FieldPanel("body"),
     ]
 
     def serve(self, request, *args, **kwargs):

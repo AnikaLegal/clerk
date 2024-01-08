@@ -10,14 +10,14 @@ from emails import urls as email_urls
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
 from webhooks.views import jotform_form_view, webflow_form_view, intake_no_email_view
-from wagtail.core import urls as wagtail_urls
+from wagtail import urls as wagtail_urls
 
 from django.urls import path, re_path
 from django.conf.urls import include
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
 from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.core import urls as wagtail_urls
+from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from web.sitemaps import SITEMAPS
 
