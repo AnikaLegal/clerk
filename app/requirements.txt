@@ -3,7 +3,7 @@ requests==2.27.1
 Django>=4
 
 # Content management system
-wagtail==5.2
+wagtail==5.2.2
 wagtail-localize
 
 # Cleans html
@@ -26,7 +26,7 @@ social-auth-app-django==5.0.0
 msal==1.16.0
 
 # API
-djangorestframework==3.13.1
+djangorestframework==3.14.0
 django-cors-headers==3.11.0
 
 # Emails and comms
