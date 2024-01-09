@@ -1,0 +1,7 @@
+{% comment %}
+Content is coming from the StandardBlock StreamField class within `blocks.py`
+{% endcomment %}
+
+<{{ self.size }}{% if self.anchor_target %} id="{{ self.anchor_target }}"{% endif %}>
+    {{ self.title }}
+</{{ self.size }}>

@@ -9,7 +9,7 @@ from wagtail.admin.panels import (
 )
 from wagtail.images.blocks import ImageChooserBlock
 from django.utils import translation
-from django.template.response import TemplateResponse
+from web.blocks import HeadingBlock
 
 
 class BlogListPage(Page):
@@ -46,7 +46,7 @@ class BlogPage(Page):
 
     body = StreamField(
         [
-            ("heading", blocks.CharBlock(form_classname="full title")),
+            ("heading", HeadingBlock(form_classname="full title")),
             ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
             ("quote", blocks.BlockQuoteBlock()),
@@ -61,16 +61,16 @@ class BlogPage(Page):
         null=True,
     )
 
-    promote_panels = [FieldPanel("slug")]
-    content_panels = Page.content_panels + [
-        FieldPanel("owner", heading="Author"),
+    promote_panels = Page.promote_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("main_image"),
-                FieldPanel("search_description"),
             ],
-            "Search and social media",
+            "For social media",
         ),
+    ]
+    content_panels = Page.content_panels + [
+        FieldPanel("owner", heading="Author"),
         FieldPanel("body"),
     ]
 
