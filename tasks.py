@@ -107,9 +107,12 @@ def bash(c, webpack=False):
 
 
 @task
-def shell(c):
+def shell(c, print_sql=False):
     """Get a Django shell in a Docker container"""
-    run(c, "./manage.py shell_plus")
+    cmd = "shell_plus"
+    if print_sql:
+        cmd += " --print-sql"
+    run(c, f"./manage.py {cmd}")
 
 
 @task
