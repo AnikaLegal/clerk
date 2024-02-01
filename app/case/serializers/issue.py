@@ -11,34 +11,6 @@ from .person import PersonSerializer
 from .fields import LocalTimeField, LocalDateField
 
 
-class IssueNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IssueNote
-        fields = (
-            "id",
-            "creator",
-            "creator_id",
-            "note_type",
-            "text",
-            "text_display",
-            "created_at",
-            "issue",
-            "event",
-            "reviewee",
-        )
-
-    creator = UserSerializer(read_only=True)
-    creator_id = serializers.IntegerField(write_only=True)
-    text_display = serializers.CharField(source="get_text", read_only=True)
-    reviewee = serializers.SerializerMethodField()
-    event = serializers.DateTimeField(required=False)
-    created_at = LocalTimeField()
-
-    def get_reviewee(self, obj):
-        if obj.note_type == "PERFORMANCE":
-            return UserSerializer(obj.content_object).data
-
-
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
@@ -125,6 +97,35 @@ class IssueSerializer(serializers.ModelSerializer):
     def get_next_review(self, obj):
         next_review = getattr(obj, "next_review", None)
         return next_review.strftime("%d/%m/%y") if next_review else None
+
+
+class IssueNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "id",
+            "creator",
+            "creator_id",
+            "note_type",
+            "text",
+            "text_display",
+            "created_at",
+            "issue",
+            "event",
+            "reviewee",
+        )
+
+    creator = UserSerializer(read_only=True)
+    creator_id = serializers.IntegerField(write_only=True)
+    text_display = serializers.CharField(source="get_text", read_only=True)
+    reviewee = serializers.SerializerMethodField()
+    issue = IssueSerializer(read_only=True)
+    event = serializers.DateTimeField(required=False)
+    created_at = LocalTimeField()
+
+    def get_reviewee(self, obj):
+        if obj.note_type == "PERFORMANCE":
+            return UserSerializer(obj.content_object).data
 
 
 class IssueSearchSerializer(serializers.ModelSerializer):
