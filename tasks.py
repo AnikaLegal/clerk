@@ -122,14 +122,22 @@ def psql(c):
 
 
 @task
-def test(c, recreate=False, interactive=False):
+def test(c, recreate=False, interactive=False, quiet=False):
     """Run pytest"""
     if interactive:
         cmd = "bash"
-    elif recreate:
-        cmd = "pytest -vv --create-db"
     else:
-        cmd = "pytest -vv --reuse-db"
+        cmd = "pytest"
+        if recreate:
+            cmd += " --create-db"
+        else:
+            cmd += " --reuse-db"
+
+        if quiet:
+            cmd += " --quiet --no-summary --exitfirst"
+        else:
+            cmd += " -vv"
+
     c.run(
         f"{COMPOSE} run --rm test {cmd}",
         pty=True,
