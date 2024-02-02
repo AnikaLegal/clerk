@@ -4,5 +4,9 @@ allOf:
     properties:
       creator_id:
         type: number
+      issue_id:
+        type: string
+        format: uuid
     required:
       - creator_id
+      - issue_id

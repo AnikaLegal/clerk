@@ -776,7 +776,6 @@ export type Tenancy = TenancyBase & {
 export type IssueNoteBase = {
   note_type: string
   text: string
-  issue: string
   event: string | null
 }
 export type IssueNote = IssueNoteBase & {
@@ -785,6 +784,7 @@ export type IssueNote = IssueNoteBase & {
   text_display: string
   created_at: string
   reviewee: User | null
+  issue: Issue
 }
 export type Error = {
   detail?: string | object | (string | object | any)[]
@@ -797,6 +797,7 @@ export type IssueUpdate = IssueBase & {
 }
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number
+  issue_id: string
 }
 export type SharepointDocument = {
   name: string

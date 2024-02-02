@@ -240,7 +240,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         issue = self.get_object()  # Checks permissions
         data = {
             **request.data,
-            "issue": issue.pk,
+            "issue_id": issue.pk,
             "creator_id": self.request.user.pk,
         }
         serializer = IssueNoteSerializer(data=data)

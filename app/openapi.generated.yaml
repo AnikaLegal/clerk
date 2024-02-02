@@ -1450,16 +1450,12 @@ components:
           type: string
         text:
           type: string
-        issue:
-          type: string
-          format: uuid
         event:
           type: string
           nullable: true
       required:
         - note_type
         - text
-        - issue
         - event
     IssueNote:
       allOf:
@@ -1478,12 +1474,15 @@ components:
               nullable: true
               allOf:
                 - $ref: "#/components/schemas/User"
+            issue:
+              $ref: "#/components/schemas/Issue"
           required:
             - id
             - creator
             - text_display
             - created_at
             - reviewee
+            - issue
     IssueUpdate:
       allOf:
         - $ref: "#/components/schemas/IssueBase"
@@ -1527,8 +1526,12 @@ components:
           properties:
             creator_id:
               type: number
+            issue_id:
+              type: string
+              format: uuid
           required:
             - creator_id
+            - issue_id
     SharepointDocument:
       type: object
       properties:
