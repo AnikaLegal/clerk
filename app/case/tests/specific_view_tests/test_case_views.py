@@ -146,7 +146,6 @@ def test_case_list_view__search(superuser_client: APIClient):
 def test_case_get_view(superuser_client: APIClient):
     issue = factories.IssueFactory()
     factories.IssueNoteFactory(issue=issue)
-    factories.TenancyFactory(client=issue.client)
     url = reverse("case-api-detail", args=(issue.pk,))
     response = superuser_client.get(url)
     assert response.status_code == 200
@@ -165,7 +164,6 @@ def test_case_get_view__as_paralegal(
     user.groups.set([paralegal_group])
     annotate_group_access(user)
     issue = factories.IssueFactory()
-    tenancy = factories.TenancyFactory(client=issue.client)
     # Should be visible to a paralegal
     issue_note_a = factories.IssueNoteFactory(issue=issue, note_type="PARALEGAL")
     # Should be hidden from to a paralegal
@@ -184,7 +182,7 @@ def test_case_get_view__as_paralegal(
     resp_data = response.json()
 
     assert resp_data["issue"]["id"] == str(issue.pk)
-    assert resp_data["tenancy"]["id"] == tenancy.pk
+    assert resp_data["tenancy"]["id"] == issue.tenancy.pk
     notes = resp_data["notes"]
     assert len(notes) == 1
     assert notes[0]["id"] == issue_note_a.pk

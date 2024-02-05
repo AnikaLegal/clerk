@@ -1,112 +1,48 @@
-import React from 'react'
-import { Formik } from 'formik'
-import { Container, Header, Button, Table } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
+import React, { useState } from 'react'
+import { Container, Header, Table } from 'semantic-ui-react'
 
-import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { TenancyForm } from 'forms'
-import { Tenancy, useUpdateTenancyMutation } from 'api'
+import { mount } from 'utils'
+import { CaseListTable } from 'comps/case-table'
+import { Tenancy, TenancyCreate, useUpdateTenancyMutation } from 'api'
+import { TableForm } from 'comps/table-form'
+import { FIELD_TYPES } from 'comps/field-component'
+import { getFormSchema } from 'comps/auto-form'
+import * as Yup from 'yup'
 
 interface DjangoContext {
   tenancy: Tenancy
+  issues: any[]
 }
 
-const { tenancy: initialTenancy } = (window as any)
+const { tenancy: initialTenancy, issues } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [isEditing, setIsEditing] = React.useState<boolean>(false)
-  const [tenancy, setTenancy] = React.useState<Tenancy>(initialTenancy)
-  const { enqueueSnackbar } = useSnackbar()
+  const [tenancy, setTenancy] = useState<Tenancy>(initialTenancy)
   const [updateTenancy] = useUpdateTenancyMutation()
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateTenancy({
+      id: tenancy.id,
+      tenancyCreate: values as TenancyCreate,
+    }).unwrap()
 
-  const propertyData = {
-    Address: tenancy.address,
-    Suburb: tenancy.suburb,
-    Postcode: tenancy.postcode,
-    'Tenancy Start Date': tenancy.started,
-    'Is Client On Lease': tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
-  }
   return (
     <Container>
       <Header as="h1">Tenancy</Header>
-      <Header as="h2">Property Details</Header>
-      {!isEditing && (
-        <div>
-          <Table className="definition small">
-            <Table.Body>
-              {Object.entries(propertyData).map(([label, value]) => (
-                <Table.Row key={label}>
-                  <Table.Cell className="three wide">{label}</Table.Cell>
-                  <Table.Cell>{value}</Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-          <Button primary onClick={() => setIsEditing(true)}>
-            Edit tenancy
-          </Button>
-        </div>
-      )}
-      {isEditing && (
-        <div>
-          <Formik
-            initialValues={{
-              address: tenancy.address,
-              suburb: tenancy.suburb,
-              postcode: tenancy.postcode,
-              started: tenancy.started,
-              is_on_lease: tenancy.is_on_lease.value,
-            }}
-            validate={(values) => {}}
-            onSubmit={(values, { setSubmitting, setErrors }) => {
-              updateTenancy({ id: tenancy.id, tenancyCreate: values })
-                .unwrap()
-                .then((tenancy) => {
-                  enqueueSnackbar('Updated tenancy', { variant: 'success' })
-                  setTenancy(tenancy)
-                  setSubmitting(false)
-                })
-                .catch((err) => {
-                  enqueueSnackbar(
-                    getAPIErrorMessage(err, 'Failed to update tenancy'),
-                    {
-                      variant: 'error',
-                    }
-                  )
-                  const requestErrors = getAPIFormErrors(err)
-                  if (requestErrors) {
-                    setErrors(requestErrors)
-                  }
-                  setSubmitting(false)
-                })
-            }}
-          >
-            {(formik) => (
-              <TenancyForm
-                formik={formik}
-                isOnLeaseChoices={tenancy.is_on_lease.choices}
-                onCancel={() => setIsEditing(false)}
-              />
-            )}
-          </Formik>
-        </div>
-      )}
-      <Header as="h2">Property People</Header>
+      <Header as="h3">Property details</Header>
+      <TableForm
+        fields={PROPERTY_FIELDS}
+        schema={PROPERTY_SCHEMA}
+        model={tenancy}
+        setModel={setTenancy}
+        modelName="tenancy"
+        onUpdate={update}
+      />
+      <Header as="h3">Property people</Header>
       <Table className="definition small">
         <Table.Body>
           <Table.Row>
-            <Table.Cell className="three wide">Client</Table.Cell>
-            <Table.Cell>
-              {tenancy.client ? (
-                <a href={tenancy.client.url}>{tenancy.client.full_name}</a>
-              ) : (
-                'No client'
-              )}
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell className="three wide">Agent</Table.Cell>
+            <Table.Cell className="four wide">Agent</Table.Cell>
             <Table.Cell>
               {tenancy.agent ? (
                 <a href={tenancy.agent.url}>{tenancy.agent.full_name}</a>
@@ -116,7 +52,7 @@ const App = () => {
             </Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell className="three wide">Landlord</Table.Cell>
+            <Table.Cell className="four wide">Landlord</Table.Cell>
             <Table.Cell>
               {tenancy.landlord ? (
                 <a href={tenancy.landlord.url}>{tenancy.landlord.full_name}</a>
@@ -127,8 +63,61 @@ const App = () => {
           </Table.Row>
         </Table.Body>
       </Table>
+      <Header as="h3">Cases</Header>
+      <CaseListTable issues={issues} fields={TABLE_FIELDS} />
     </Container>
   )
 }
+
+
+const TABLE_FIELDS = [
+  'fileref',
+  'topic',
+  'client',
+  'paralegal',
+  'lawyer',
+  'created_at',
+  'stage',
+  'provided_legal_services',
+  'outcome',
+]
+
+const PROPERTY_FIELDS = [
+  {
+    label: 'Address',
+    schema: Yup.string().required('Required'),
+    type: FIELD_TYPES.TEXT,
+    name: 'address',
+  },
+  {
+    label: 'Suburb',
+    schema: Yup.string().required('Required'),
+    type: FIELD_TYPES.TEXT,
+    name: 'suburb',
+  },
+  {
+    label: 'Postcode',
+    schema: Yup.string().required('Required'),
+    type: FIELD_TYPES.TEXT,
+    name: 'postcode',
+  },
+  {
+    label: 'Tenancy start date',
+    type: FIELD_TYPES.DATE,
+    name: 'started',
+  },
+  {
+    label: 'Is client on lease?',
+    type: FIELD_TYPES.SINGLE_CHOICE,
+    name: 'is_on_lease',
+  },
+  {
+    label: 'Rental circumstances',
+    type: FIELD_TYPES.SINGLE_CHOICE,
+    name: 'rental_circumstances',
+  },
+]
+
+const PROPERTY_SCHEMA = getFormSchema(PROPERTY_FIELDS)
 
 mount(App)

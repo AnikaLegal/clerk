@@ -3,12 +3,19 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.models import Issue, IssueNote
+from core.models.issue import EmploymentType, ReferrerType
 from accounts.models import User
 
 from .user import UserSerializer
 from .client import ClientSerializer
+from .tenancy import TenancySerializer
 from .person import PersonSerializer
-from .fields import LocalTimeField, LocalDateField
+from .fields import (
+    LocalTimeField,
+    LocalDateField,
+    TextChoiceField,
+    TextChoiceListField,
+)
 
 
 class IssueSerializer(serializers.ModelSerializer):
@@ -31,6 +38,12 @@ class IssueSerializer(serializers.ModelSerializer):
             "lawyer",
             "lawyer_id",
             "client",
+            "tenancy",
+            "employment_status",
+            "weekly_income",
+            "weekly_rent",
+            "referrer_type",
+            "referrer",
             "support_worker",
             "support_worker_id",
             "is_open",
@@ -48,6 +61,7 @@ class IssueSerializer(serializers.ModelSerializer):
     lawyer = UserSerializer(read_only=True)
     paralegal = UserSerializer(read_only=True)
     client = ClientSerializer(read_only=True)
+    tenancy = TenancySerializer(read_only=True)
     support_worker = PersonSerializer(read_only=True)
     support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
     paralegal_id = serializers.PrimaryKeyRelatedField(
@@ -64,6 +78,8 @@ class IssueSerializer(serializers.ModelSerializer):
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
     created_at = LocalDateField()
+    employment_status = TextChoiceListField(EmploymentType)
+    referrer_type = TextChoiceField(ReferrerType)
     url = serializers.SerializerMethodField()
     # Case review fields.
     is_conflict_check = serializers.SerializerMethodField()

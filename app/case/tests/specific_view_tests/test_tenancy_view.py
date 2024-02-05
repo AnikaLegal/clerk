@@ -11,8 +11,8 @@ def test_tenancy_view_object_permissions(
     user, user_client: APIClient, paralegal_group, coordinator_group
 ):
     client = ClientFactory()
-    issue = IssueFactory(client=client)
-    tenancy = TenancyFactory(client=client)
+    tenancy = TenancyFactory()
+    issue = IssueFactory(client=client, tenancy=tenancy)
     url = reverse("tenancy-api-detail", args=(tenancy.pk,))
 
     # Coordinator can access

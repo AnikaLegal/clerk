@@ -1,6 +1,6 @@
 import pytest
 
-from core.factories import FileUploadFactory, ClientFactory
+from core.factories import FileUploadFactory, ClientFactory, TenancyFactory
 from core.models import FileUpload, Issue, Submission
 from core.models.upload import FileUpload
 from core.services.submission import process_issue
@@ -14,6 +14,11 @@ Test case #1
 """
 REPAIRS_ANSWERS = {
     "ISSUES": "REPAIRS",
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "WEEKLY_RENT": 500,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "REFERRER_TYPE": "LEGAL_CENTRE",
     "REPAIRS_REQUIRED": ["Water", "Roof"],
     "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
     "REPAIRS_ISSUE_START": "2020-01-01",
@@ -32,6 +37,11 @@ REPAIRS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
+    "weekly_income": 1000,
+    "weekly_rent": 500,
+    "employment_status": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
+    "referrer_type": "LEGAL_CENTRE",
+    "referrer": "Justice Connect",
     "answers": {
         "REPAIRS_REQUIRED": ["Water", "Roof"],
         "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
@@ -49,6 +59,10 @@ Test case #2
 """
 EVICTIONS_ANSWERS = {
     "ISSUES": "EVICTION",
+    "WEEKLY_HOUSEHOLD_INCOME": 2000,
+    "WEEKLY_RENT": 500,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["WORKING_FULL_TIME"],
+    "REFERRER_TYPE": "WORD_OF_MOUTH",
     "EVICTIONS_IS_UNPAID_RENT": True,
     "EVICTIONS_IS_ALREADY_REMOVED": False,
     "EVICTIONS_HAS_NOTICE": True,
@@ -94,6 +108,11 @@ EVICTIONS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
+    "weekly_income": 2000,
+    "weekly_rent": 500,
+    "employment_status": ["WORKING_FULL_TIME"],
+    "referrer_type": "WORD_OF_MOUTH",
+    "referrer": "",
     "answers": {
         "EVICTIONS_IS_UNPAID_RENT": True,
         "EVICTIONS_IS_ALREADY_REMOVED": False,
@@ -136,6 +155,12 @@ Test case #3
 - Mostly same as repairs
 """
 BONDS_ANSWERS = {
+    "ISSUES": "BONDS",
+    "WEEKLY_HOUSEHOLD_INCOME": 1337,
+    "WEEKLY_RENT": None,
+    "WORK_OR_STUDY_CIRCUMSTANCES": ["LOOKING_FOR_WORK", "STUDENT"],
+    "COMMUNITY_ORGANISATION_REFERRER": "Jewish Care",
+    "REFERRER_TYPE": "COMMUNITY_ORGANISATION",
     "BONDS_CLAIM_REASONS": [
         "Damage",
         "Rent or other money owing",
@@ -187,7 +212,6 @@ BONDS_ANSWERS = {
             "file": "https://example.com/file-uploads/67bdb73c57fa8e3b7f01703ddd34d76b.png",
         },
     ],
-    "ISSUES": "BONDS",
 }
 BONDS_ISSUE = {
     "client": "Matthew",
@@ -196,6 +220,11 @@ BONDS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
+    "weekly_income": 1337,
+    "weekly_rent": None,
+    "employment_status": ["LOOKING_FOR_WORK", "STUDENT"],
+    "referrer_type": "COMMUNITY_ORGANISATION",
+    "referrer": "Jewish Care",
     "answers": {
         "BONDS_CLAIM_REASONS": [
             "Damage",
@@ -271,6 +300,8 @@ def test_process_submission(
     Ensure that intake form submissions can be processed,
     """
     client = ClientFactory(first_name="Matthew")
+    tenancy = TenancyFactory()
+
     # Create some file uploads that we can associate with the issue.
     for upload_id in expected_uploads:
         FileUploadFactory(id=upload_id, issue=None)
@@ -279,7 +310,7 @@ def test_process_submission(
     assert FileUpload.objects.count() == len(expected_uploads)
 
     sub = Submission.objects.create(answers=answers)
-    process_issue(answers, client)
+    process_issue(answers, client, tenancy)
 
     assert Issue.objects.count() == 1
     assert FileUpload.objects.count() == len(expected_uploads)

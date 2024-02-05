@@ -4,10 +4,9 @@ from django.urls import reverse
 from core.models import Client
 from core.models.client import (
     CallTime,
-    ReferrerType,
-    RentalType,
     EligibilityCircumstanceType,
-    EmploymentType,
+    AboriginalOrTorresStraitIslander,
+    RequiresInterpreter,
 )
 from .fields import TextChoiceField, TextChoiceListField
 
@@ -19,23 +18,20 @@ class ClientSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
+            "preferred_name",
             "email",
             "date_of_birth",
             "phone_number",
-            "employment_status",
-            "weekly_income",
             "gender",
+            "pronouns",
             "centrelink_support",
             "eligibility_notes",
             "requires_interpreter",
             "primary_language_non_english",
             "primary_language",
             "is_aboriginal_or_torres_strait_islander",
-            "rental_circumstances",
             "number_of_dependents",
             "eligibility_circumstances",
-            "referrer_type",
-            "referrer",
             "age",
             "full_name",
             "notes",
@@ -50,11 +46,12 @@ class ClientSerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateTimeField(
         format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
     )
-    referrer_type = TextChoiceField(ReferrerType)
     call_times = TextChoiceListField(CallTime)
-    employment_status = TextChoiceListField(EmploymentType)
     eligibility_circumstances = TextChoiceListField(EligibilityCircumstanceType)
-    rental_circumstances = TextChoiceField(RentalType)
+    is_aboriginal_or_torres_strait_islander = TextChoiceField(
+        AboriginalOrTorresStraitIslander
+    )
+    requires_interpreter = TextChoiceField(RequiresInterpreter)
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))

@@ -1171,62 +1171,6 @@ components:
             - is_paralegal
             - is_ms_account_set_up
             - ms_account_created_at
-    ClientBase:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-        phone_number:
-          type: string
-        weekly_income:
-          type: number
-          nullable: true
-        gender:
-          type: string
-          nullable: true
-        centrelink_support:
-          type: boolean
-        eligibility_notes:
-          type: string
-        requires_interpreter:
-          type: boolean
-        primary_language_non_english:
-          type: boolean
-        primary_language:
-          type: string
-        is_aboriginal_or_torres_strait_islander:
-          type: boolean
-        number_of_dependents:
-          type: number
-          nullable: true
-        referrer:
-          type: string
-        notes:
-          type: string
-        date_of_birth:
-          type: string
-          nullable: true
-      required:
-        - first_name
-        - last_name
-        - email
-        - phone_number
-        - weekly_income
-        - gender
-        - centrelink_support
-        - eligibility_notes
-        - requires_interpreter
-        - primary_language_non_english
-        - primary_language
-        - is_aboriginal_or_torres_strait_islander
-        - number_of_dependents
-        - referrer
-        - notes
-        - date_of_birth
     TextChoiceField:
       type: object
       properties:
@@ -1244,6 +1188,63 @@ components:
         - display
         - value
         - choices
+    ClientBase:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        preferred_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+        phone_number:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        pronouns:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        requires_interpreter:
+          $ref: "#/components/schemas/TextChoiceField"
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        is_aboriginal_or_torres_strait_islander:
+          $ref: "#/components/schemas/TextChoiceField"
+        number_of_dependents:
+          type: number
+          nullable: true
+        notes:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+      required:
+        - first_name
+        - last_name
+        - preferred_name
+        - email
+        - phone_number
+        - gender
+        - pronouns
+        - centrelink_support
+        - eligibility_notes
+        - requires_interpreter
+        - primary_language_non_english
+        - primary_language
+        - is_aboriginal_or_torres_strait_islander
+        - number_of_dependents
+        - notes
+        - date_of_birth
     TextChoiceListField:
       type: object
       properties:
@@ -1277,27 +1278,37 @@ components:
               type: integer
             full_name:
               type: string
-            referrer_type:
-              $ref: "#/components/schemas/TextChoiceField"
             call_times:
-              $ref: "#/components/schemas/TextChoiceListField"
-            employment_status:
               $ref: "#/components/schemas/TextChoiceListField"
             eligibility_circumstances:
               $ref: "#/components/schemas/TextChoiceListField"
-            rental_circumstances:
-              $ref: "#/components/schemas/TextChoiceField"
           required:
             - id
             - url
             - age
             - full_name
             - date_of_birth
-            - referrer_type
             - call_times
-            - employment_status
             - eligibility_circumstances
-            - rental_circumstances
+    TenancyBase:
+      type: object
+      properties:
+        address:
+          type: string
+        suburb:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        started:
+          type: string
+          nullable: true
+      required:
+        - address
+        - suburb
+        - postcode
+        - started
     PersonBase:
       type: object
       properties:
@@ -1329,6 +1340,30 @@ components:
             - id
             - url
             - support_contact_preferences
+    Tenancy:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            is_on_lease:
+              $ref: "#/components/schemas/TextChoiceField"
+            rental_circumstances:
+              $ref: "#/components/schemas/TextChoiceField"
+            landlord:
+              $ref: "#/components/schemas/Person"
+            agent:
+              $ref: "#/components/schemas/Person"
+          required:
+            - id
+            - url
+            - is_on_lease
+            - rental_circumstances
+            - landlord
+            - agent
     Issue:
       allOf:
         - $ref: "#/components/schemas/IssueBase"
@@ -1358,6 +1393,20 @@ components:
                 - $ref: "#/components/schemas/User"
             client:
               $ref: "#/components/schemas/Client"
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            tenancy:
+              $ref: "#/components/schemas/Tenancy"
+            weekly_rent:
+              type: integer
+              nullable: true
             support_worker:
               nullable: true
               allOf:
@@ -1391,6 +1440,12 @@ components:
             - paralegal
             - lawyer
             - client
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+            - tenancy
+            - weekly_rent
             - support_worker
             - is_sharepoint_set_up
             - actionstep_id
@@ -1400,49 +1455,6 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
-    TenancyBase:
-      type: object
-      properties:
-        address:
-          type: string
-        suburb:
-          type: string
-          nullable: true
-        postcode:
-          type: string
-          nullable: true
-        started:
-          type: string
-          nullable: true
-      required:
-        - address
-        - suburb
-        - postcode
-        - started
-    Tenancy:
-      allOf:
-        - $ref: "#/components/schemas/TenancyBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-            url:
-              type: string
-            is_on_lease:
-              $ref: "#/components/schemas/TextChoiceField"
-            landlord:
-              $ref: "#/components/schemas/Person"
-            agent:
-              $ref: "#/components/schemas/Person"
-            client:
-              $ref: "#/components/schemas/Client"
-          required:
-            - id
-            - url
-            - is_on_lease
-            - landlord
-            - agent
-            - client
     IssueNoteBase:
       type: object
       properties:
@@ -1497,10 +1509,27 @@ components:
             support_worker_id:
               $ref: "#/components/schemas/Person"
               nullable: true
+            weekly_rent:
+              type: integer
+              nullable: true
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
           required:
             - paralegal_id
             - lawyer_id
             - support_worker_id
+            - weekly_rent
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
     Error:
       description: The schema for an error response
       type: object
@@ -1680,6 +1709,8 @@ components:
           properties:
             is_on_lease:
               type: string
+            rental_circumstances:
+              type: string
             landlord_id:
               type: number
               nullable: true
@@ -1688,13 +1719,12 @@ components:
               nullable: true
           required:
             - is_on_lease
+            - rental_circumstances
     ClientCreate:
       allOf:
         - $ref: "#/components/schemas/ClientBase"
         - type: object
           properties:
-            referrer_type:
-              type: string
             call_times:
               type: array
               items:
@@ -1707,14 +1737,10 @@ components:
               type: array
               items:
                 type: string
-            rental_circumstances:
-              type: string
           required:
-            - referrer_type
             - call_times
             - employment_status
             - eligibility_circumstances
-            - rental_circumstances
     MicrosoftUserPermissions:
       type: object
       properties:

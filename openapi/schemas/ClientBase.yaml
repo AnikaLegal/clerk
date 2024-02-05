@@ -4,14 +4,17 @@ properties:
     type: string
   last_name:
     type: string
+  preferred_name:
+    type: string
+    nullable: true
   email:
     type: string
   phone_number:
     type: string
-  weekly_income:
-    type: number
-    nullable: true
   gender:
+    type: string
+    nullable: true
+  pronouns:
     type: string
     nullable: true
   centrelink_support:
@@ -19,18 +22,16 @@ properties:
   eligibility_notes:
     type: string
   requires_interpreter:
-    type: boolean
+    $ref: ./TextChoiceField.yaml
   primary_language_non_english:
     type: boolean
   primary_language:
     type: string
   is_aboriginal_or_torres_strait_islander:
-    type: boolean
+    $ref: ./TextChoiceField.yaml
   number_of_dependents:
     type: number
     nullable: true
-  referrer:
-    type: string
   notes:
     type: string
   date_of_birth:
@@ -39,10 +40,11 @@ properties:
 required:
   - first_name
   - last_name
+  - preferred_name
   - email
   - phone_number
-  - weekly_income
   - gender
+  - pronouns
   - centrelink_support
   - eligibility_notes
   - requires_interpreter
@@ -50,6 +52,5 @@ required:
   - primary_language
   - is_aboriginal_or_torres_strait_islander
   - number_of_dependents
-  - referrer
   - notes
   - date_of_birth

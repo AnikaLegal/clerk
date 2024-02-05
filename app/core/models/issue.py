@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.urls import reverse
@@ -9,6 +10,7 @@ from accounts.models import User
 
 from .person import Person
 from .client import Client
+from .tenancy import Tenancy
 from .timestamped import TimestampedModel
 
 
@@ -95,6 +97,36 @@ class CaseOutcome:
     }
 
 
+class ReferrerType(models.TextChoices):
+    LEGAL_CENTRE = "LEGAL_CENTRE", "Legal centre"
+    COMMUNITY_ORGANISATION = "COMMUNITY_ORGANISATION", "Community Organisation"
+    SEARCH = "SEARCH", "Search"
+    SOCIAL_MEDIA = "SOCIAL_MEDIA", "Social media"
+    WORD_OF_MOUTH = "WORD_OF_MOUTH", "Word of mouth"
+    ONLINE_AD = "ONLINE_AD", "Online ad"
+    HOUSING_SERVICE = "HOUSING_SERVICE", "Housing service"
+    RADIO = "RADIO", "Radio"
+    BILLBOARD = "BILLBOARD", "Billboard"
+    POSTER = "POSTER", "Poster"
+    RETURNING_CLIENT = "RETURNING_CLIENT", "Returning client"
+
+
+class EmploymentType(models.TextChoices):
+    WORKING_FULL_TIME = "WORKING_FULL_TIME", "Working full time"
+    WORKING_PART_TIME = "WORKING_PART_TIME", "Working part time"
+    WORKING_CASUALLY = "WORKING_CASUALLY", "Working casually"
+    WORKING_TEMPORARY = "WORKING_TEMPORARY", "Temporary work"
+    STUDENT = "STUDENT", "Student"
+    APPRENTICE = "APPRENTICE", "Apprentice"
+    RETIRED = "RETIRED", "Retired"
+    PARENT = "PARENT", "Full time parent"
+    TEMPORARILY_UNABLE = "TEMPORARILY_UNABLE", "Temporarily unable to work"
+    LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
+    NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
+    # Legacy below - Do not use.
+    UNEMPLOYED = "UNEMPLOYED", "Currently unemployed"
+
+
 class Issue(TimestampedModel):
     """
     A client's specific issue.
@@ -120,6 +152,8 @@ class Issue(TimestampedModel):
     answers = models.JSONField(encoder=DjangoJSONEncoder)
     # The person we are trying to help.
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    # The tenancy relating to the case.
+    tenancy = models.ForeignKey(Tenancy, on_delete=models.PROTECT)
     # The paralegal who is working on the case
     paralegal = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL
@@ -147,6 +181,27 @@ class Issue(TimestampedModel):
     is_welcome_email_sent = models.BooleanField(default=False)
     # Tracks whether a matching folder has been set up in Sharepoint.
     is_sharepoint_set_up = models.BooleanField(default=False)
+
+    # Store some point-in-time data with the case details so we can potentially
+    # track changes over time.
+
+    # Tenancy
+    weekly_rent = models.IntegerField(null=True, blank=True)
+
+    # Client
+    employment_status = ArrayField(
+        models.CharField(max_length=32, choices=EmploymentType.choices),
+        default=list,
+        blank=True,
+    )
+    weekly_income = models.IntegerField(null=True, blank=True)
+
+    # Referrer info: how did the client find us?
+    referrer_type = models.CharField(
+        max_length=64, choices=ReferrerType.choices, blank=True, default=""
+    )
+    # Specific referrer name.
+    referrer = models.CharField(max_length=64, blank=True, default="")
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)

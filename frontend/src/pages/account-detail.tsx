@@ -144,7 +144,7 @@ const FIELDS: FormField[] = [
     name: 'last_name',
   },
   {
-    label: 'Is Intern',
+    label: 'Is intern?',
     name: 'is_intern',
     type: FIELD_TYPES.BOOL,
     schema: Yup.string().required('Required'),
@@ -156,7 +156,7 @@ const FIELDS: FormField[] = [
     schema: Yup.number().integer().min(0),
   },
   {
-    label: 'Active',
+    label: 'Is active?',
     type: FIELD_TYPES.BOOL,
     name: 'is_active',
     schema: Yup.boolean(),

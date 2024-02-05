@@ -82,7 +82,6 @@ class TenancyFactory(TimestampedModelFactory):
     class Meta:
         model = Tenancy
 
-    client = factory.SubFactory(ClientFactory)
     agent = factory.SubFactory(PersonFactory)
     landlord = factory.SubFactory(PersonFactory)
     address = factory.Faker("address")
@@ -101,6 +100,7 @@ class IssueFactory(TimestampedModelFactory):
     topic = "REPAIRS"
     answers = {}
     client = factory.SubFactory(ClientFactory)
+    tenancy = factory.SubFactory(TenancyFactory)
     stage = "UNSTARTED"
     is_sharepoint_set_up = True
 

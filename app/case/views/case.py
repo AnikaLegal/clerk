@@ -138,7 +138,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
     def get_queryset(self):
         user = self.request.user
         queryset = (
-            Issue.objects.select_related("client")
+            Issue.objects.select_related("client", "tenancy")
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
         )
@@ -216,8 +216,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         note_data = IssueNoteSerializer(notes, many=True).data
 
         # Get tenancy data
-        tenancy = issue.client.tenancy_set.first()
-        tenancy_data = TenancySerializer(tenancy).data
+        tenancy_data = TenancySerializer(issue.tenancy).data
 
         # Return composite response
         response_data = {

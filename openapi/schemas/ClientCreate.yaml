@@ -2,8 +2,6 @@ allOf:
   - $ref: ./ClientBase.yaml
   - type: object
     properties:
-      referrer_type:
-        type: string
       call_times:
         type: array
         items:
@@ -16,12 +14,8 @@ allOf:
         type: array
         items:
           type: string
-      rental_circumstances:
-        type: string
     required:
       # Choice fields
-      - referrer_type
       - call_times
       - employment_status
       - eligibility_circumstances
-      - rental_circumstances

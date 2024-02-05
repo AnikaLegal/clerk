@@ -26,6 +26,20 @@ allOf:
           - $ref: ./User.yaml
       client:
         $ref: ./Client.yaml
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
+      tenancy:
+        $ref: ./Tenancy.yaml
+      weekly_rent:
+        type: integer
+        nullable: true
       support_worker:
         nullable: true
         allOf:
@@ -60,6 +74,12 @@ allOf:
       - paralegal
       - lawyer
       - client
+      - employment_status
+      - weekly_income
+      - referrer
+      - referrer_type
+      - tenancy
+      - weekly_rent
       - support_worker
       - is_sharepoint_set_up
       - actionstep_id

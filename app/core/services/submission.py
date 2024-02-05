@@ -51,7 +51,7 @@ def process_submission(sub_pk: str):
 
             logger.info("Processing Issue for Submission[%s]", sub_pk)
             try:
-                issue = process_issue(answers, client)
+                issue = process_issue(answers, client, tenancy)
                 logger.info("Processed Issue[%s] for Submission[%s]", issue.pk, sub_pk)
             except Exception:
                 logger.exception("Could not process Issue for Submission[%s]", sub_pk)
@@ -64,7 +64,7 @@ def process_submission(sub_pk: str):
     Submission.objects.filter(pk=sub.pk).update(is_processed=True)
 
 
-def process_issue(answers, client):
+def process_issue(answers, client, tenancy):
     topic = answers["ISSUES"]
     upload_answers = UPLOAD_ANSWERS[topic]
     issue_answers = {
@@ -89,11 +89,25 @@ def process_issue(answers, client):
             or "",
         )
 
+    referrer = ""
+    referrer = get_with_default(answers, "LEGAL_CENTER_REFERRER", referrer)
+    referrer = get_with_default(answers, "HOUSING_SERVICE_REFERRER", referrer)
+    referrer = get_with_default(answers, "COMMUNITY_ORGANISATION_REFERRER", referrer)
+    referrer = get_with_default(answers, "SOCIAL_REFERRER", referrer)
+
     issue = Issue.objects.create(
         topic=topic,
         answers=issue_answers,
-        client=client,
         support_worker=support_worker,
+        # Client data
+        client=client,
+        employment_status=get_as_list(answers, "WORK_OR_STUDY_CIRCUMSTANCES"),
+        weekly_income=answers.get("WEEKLY_HOUSEHOLD_INCOME"),
+        referrer_type=get_as_string(answers, "REFERRER_TYPE"),
+        referrer=referrer,
+        # Tanancy data
+        tenancy=tenancy,
+        weekly_rent=answers["WEEKLY_RENT"],
     )
     FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
     return issue
@@ -122,35 +136,26 @@ UPLOAD_ANSWERS = {
 
 
 def process_client(answers):
-    referrer = ""
-    referrer = get_with_default(answers, "LEGAL_CENTER_REFERRER", referrer)
-    referrer = get_with_default(answers, "HOUSING_SERVICE_REFERRER", referrer)
-    referrer = get_with_default(answers, "CHARITY_REFERRER", referrer)
-    referrer = get_with_default(answers, "SOCIAL_REFERRER", referrer)
     client, _ = Client.objects.get_or_create(
         email=answers["EMAIL"],
         defaults={
             "first_name": answers["FIRST_NAME"],
             "last_name": answers["LAST_NAME"],
+            "preferred_name": answers["PREFERRED_NAME"],
             "date_of_birth": parse_date_string(answers["DOB"]),
             "phone_number": answers["PHONE"],
-            "referrer_type": get_as_string(answers, "REFERRER_TYPE"),
-            "referrer": referrer,
             "gender": answers["GENDER"],
             "primary_language_non_english": answers["CAN_SPEAK_NON_ENGLISH"],
-            "is_aboriginal_or_torres_strait_islander": answers[
-                "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
-            ],
-            "weekly_income": answers.get("WEEKLY_HOUSEHOLD_INCOME"),
-            "employment_status": get_as_list(answers, "WORK_OR_STUDY_CIRCUMSTANCES"),
+            "is_aboriginal_or_torres_strait_islander": get_as_string(
+                answers, "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
+            ),
             "call_times": get_as_list(answers, "AVAILIBILITY"),
             "eligibility_circumstances": get_as_list(
                 answers, "ELIGIBILITY_CIRCUMSTANCES"
             ),
-            "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
             "number_of_dependents": answers.get("NUMBER_OF_DEPENDENTS"),
             "primary_language": get_as_string(answers, "FIRST_LANGUAGE"),
-            "requires_interpreter": get_as_bool(answers, "INTERPRETER"),
+            "requires_interpreter": get_as_string(answers, "INTERPRETER"),
             "centrelink_support": get_as_bool(answers, "CENTRELINK_SUPPORT"),
             "eligibility_notes": get_as_string(answers, "ELIGIBILITY_NOTES"),
         },
@@ -177,17 +182,21 @@ def process_tenancy(answers, client):
             phone_number=get_as_string(answers, "LANDLORD_PHONE") or "",
         )
 
-    tenancy, _ = Tenancy.objects.get_or_create(
-        address=answers["ADDRESS"],
-        client=client,
-        defaults={
-            "is_on_lease": answers["IS_ON_LEASE"],
-            "started": parse_date_string(answers["START_DATE"]),
-            "landlord": landlord,
-            "agent": agent,
-            "postcode": answers["POSTCODE"],
-            "suburb": answers["SUBURB"],
-        },
+    tenancy, _ = (
+        Tenancy.objects.filter(issue__client=client)
+        .distinct()
+        .get_or_create(
+            address=answers["ADDRESS"],
+            defaults={
+                "is_on_lease": answers["IS_ON_LEASE"],
+                "rental_circumstances": answers["RENTAL_CIRCUMSTANCES"],
+                "started": parse_date_string(answers["START_DATE"]),
+                "landlord": landlord,
+                "agent": agent,
+                "postcode": answers["POSTCODE"],
+                "suburb": answers["SUBURB"],
+            },
+        )
     )
     return tenancy
 

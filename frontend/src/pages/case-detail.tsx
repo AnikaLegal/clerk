@@ -8,7 +8,12 @@ import {
   Feed,
   Checkbox,
 } from 'semantic-ui-react'
+
+import { TableForm } from 'comps/table-form'
+import { getFormSchema } from 'comps/auto-form'
+import { FIELD_TYPES } from 'comps/field-component'
 import { useSnackbar } from 'notistack'
+import * as Yup from 'yup'
 
 import {
   useGetCaseQuery,
@@ -194,20 +199,22 @@ const App = () => {
                 url={issue.client.url}
                 tableData={{
                   Name: issue.client.full_name,
+                  ['Preferred name']: issue.client.preferred_name,
                   Email: issue.client.email,
                   Phone: issue.client.phone_number,
                   Age: issue.client.age,
                   Gender: issue.client.gender,
+                  Pronouns: issue.client.pronouns,
                 }}
               />
               <EntityCard
                 title="Tenancy"
                 url={tenancy.url}
                 tableData={{
-                  ['Street Address']: tenancy.address,
+                  ['Street address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
+                  ['Client on lease?']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
                 }}
               />
               {tenancy.landlord ? (
@@ -270,6 +277,14 @@ const App = () => {
                   isLoading={isIssueLoading}
                 />
               )}
+              <CurrentCircumstancesCard
+                initialIssue={issue}
+                updateCase={_updateCase}
+              />
+              <OtherInformationCard
+                initialIssue={issue}
+                updateCase={_updateCase}
+              />
               <EntityCard title="Other submitted data" tableData={details} />
             </React.Fragment>
           )}
@@ -351,7 +366,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
         <tbody>
           {Object.entries(tableData).map(([title, text]) => (
             <tr key={title}>
-              <td className="four wide">{title}</td>
+              <td className="four wide">{title[0].toUpperCase() + title.slice(1).toLowerCase()}</td>
               <td>{text}</td>
             </tr>
           ))}
@@ -360,6 +375,102 @@ const EntityCard: React.FC<EntityCardProps> = ({
     </div>
   </div>
 )
+
+const CurrentCircumstancesCard = ({
+  initialIssue,
+  updateCase,
+}) => {
+  const fields = [
+    {
+      label: 'Weekly rent',
+      schema: Yup.number().integer().min(0).nullable(true),
+      type: FIELD_TYPES.NUMBER,
+      name: 'weekly_rent',
+    },
+    {
+      label: 'Employment status',
+      schema: Yup.array().of(Yup.string()).required('Required'),
+      type: FIELD_TYPES.MULTI_CHOICE,
+      name: 'employment_status',
+    },
+    {
+      label: 'Weekly income',
+      name: 'weekly_income',
+      schema: Yup.number().integer().min(0).nullable(true),
+      type: FIELD_TYPES.NUMBER,
+    },
+  ]
+
+  return (
+    <TableFormCard
+      header="Current circumstances"
+      fields={fields}
+      initialIssue={initialIssue}
+      updateCase={updateCase}
+    />
+  )
+}
+
+const OtherInformationCard = ({
+  initialIssue,
+  updateCase,
+}) => {
+  const fields = [
+    {
+      label: 'Referrer type',
+      type: FIELD_TYPES.SINGLE_CHOICE,
+      name: 'referrer_type',
+    },
+    {
+      label: 'Referrer',
+      name: 'referrer',
+      type: FIELD_TYPES.TEXT,
+      schema: Yup.string(),
+    },
+  ]
+
+  return (
+    <TableFormCard
+      header="Other information"
+      fields={fields}
+      initialIssue={initialIssue}
+      updateCase={updateCase}
+    />
+  )
+}
+
+const TableFormCard = ({
+  header,
+  fields,
+  initialIssue,
+  updateCase,
+}) => {
+  const [issue, setIssue] = useState<Issue>(initialIssue)
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as IssueUpdate,
+    }).unwrap()
+
+  const schema = getFormSchema(fields)
+
+  return (
+    <div className="ui card fluid">
+      <div className="content">
+        <Header as="h3">{header}</Header>
+        <TableForm
+          fields={fields}
+          schema={schema}
+          model={issue}
+          setModel={setIssue}
+          modelName="case"
+          onUpdate={update}
+        />
+      </div>
+    </div>
+  )
+}
+
 
 const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   filenote: FilenoteForm,

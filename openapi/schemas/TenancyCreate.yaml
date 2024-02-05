@@ -4,6 +4,8 @@ allOf:
     properties:
       is_on_lease:
         type: string
+      rental_circumstances:
+        type: string
       landlord_id:
         type: number
         nullable: true
@@ -12,3 +14,4 @@ allOf:
         nullable: true
     required:
       - is_on_lease
+      - rental_circumstances

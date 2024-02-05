@@ -80,11 +80,8 @@ class ClientAdmin(admin.ModelAdmin):
         "last_name",
         "email",
         "phone_number",
-        "referrer_type",
-        "referrer",
         "created_at",
     )
-    list_filter = ("referrer_type",)
 
 
 @admin.register(Issue)
@@ -100,9 +97,11 @@ class IssueAdmin(admin.ModelAdmin):
         "is_alert_sent",
         "is_case_sent",
         "is_sharepoint_set_up",
+        "referrer_type",
+        "referrer",
         "created_at",
     )
-    list_filter = ("topic", "is_alert_sent", "is_case_sent")
+    list_filter = ("topic", "is_alert_sent", "is_case_sent", "referrer_type")
 
     list_select_related = ("client",)
 

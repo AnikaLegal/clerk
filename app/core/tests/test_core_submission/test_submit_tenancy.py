@@ -7,21 +7,21 @@ from core.factories import ClientFactory
 from core.models import Person, Tenancy
 from core.services.submission import process_tenancy
 
-
 BASE_ANSWERS = {
     "ADDRESS": "123 Fake St",
     "IS_ON_LEASE": "YES",
+    "RENTAL_CIRCUMSTANCES": "PARTNER",
     "POSTCODE": 3065,
     "START_DATE": "2019-01-01",
     "SUBURB": "Fitzroy",
 }
 BASE_TENANCY = {
-    "client": "Matthew",
     "address": "123 Fake St",
     "suburb": "Fitzroy",
     "postcode": "3065",
     "started": "2019-01-01",
     "is_on_lease": "YES",
+    "rental_circumstances": "PARTNER",
 }
 
 
@@ -160,8 +160,6 @@ def test_process_tenancy(
             assert _format_datetime(getattr(tenancy, k)) == v, k
         elif k in ["landlord", "agent"] and v:
             getattr(tenancy, k).full_name == v, k
-        elif k == "client":
-            getattr(tenancy, k).first_name == v, k
         else:
             assert getattr(tenancy, k) == v, k
 

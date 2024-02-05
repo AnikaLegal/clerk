@@ -688,28 +688,28 @@ export type User = UserCreate & {
   is_ms_account_set_up: boolean
   ms_account_created_at: string | null
 }
-export type ClientBase = {
-  first_name: string
-  last_name: string
-  email: string
-  phone_number: string
-  weekly_income: number | null
-  gender: string | null
-  centrelink_support: boolean
-  eligibility_notes: string
-  requires_interpreter: boolean
-  primary_language_non_english: boolean
-  primary_language: string
-  is_aboriginal_or_torres_strait_islander: boolean
-  number_of_dependents: number | null
-  referrer: string
-  notes: string
-  date_of_birth: string | null
-}
 export type TextChoiceField = {
   display: string
   value: string
   choices: string[][]
+}
+export type ClientBase = {
+  first_name: string
+  last_name: string
+  preferred_name: string | null
+  email: string
+  phone_number: string
+  gender: string | null
+  pronouns: string | null
+  centrelink_support: boolean
+  eligibility_notes: string
+  requires_interpreter: TextChoiceField
+  primary_language_non_english: boolean
+  primary_language: string
+  is_aboriginal_or_torres_strait_islander: TextChoiceField
+  number_of_dependents: number | null
+  notes: string
+  date_of_birth: string | null
 }
 export type TextChoiceListField = {
   display: string
@@ -721,11 +721,14 @@ export type Client = ClientBase & {
   url: string
   age: number
   full_name: string
-  referrer_type: TextChoiceField
   call_times: TextChoiceListField
-  employment_status: TextChoiceListField
   eligibility_circumstances: TextChoiceListField
-  rental_circumstances: TextChoiceField
+}
+export type TenancyBase = {
+  address: string
+  suburb: string | null
+  postcode: string | null
+  started: string | null
 }
 export type PersonBase = {
   full_name: string
@@ -738,6 +741,14 @@ export type Person = PersonBase & {
   url: string
   support_contact_preferences: TextChoiceField
 }
+export type Tenancy = TenancyBase & {
+  id: number
+  url: string
+  is_on_lease: TextChoiceField
+  rental_circumstances: TextChoiceField
+  landlord: Person
+  agent: Person
+}
 export type Issue = IssueBase & {
   id: string
   topic_display: string
@@ -748,6 +759,12 @@ export type Issue = IssueBase & {
   paralegal: User | null
   lawyer: User | null
   client: Client
+  employment_status: TextChoiceListField
+  weekly_income: number | null
+  referrer: string
+  referrer_type: TextChoiceField
+  tenancy: Tenancy
+  weekly_rent: number | null
   support_worker: Person | null
   actionstep_id: number | null
   created_at: string
@@ -758,20 +775,6 @@ export type Issue = IssueBase & {
   is_conflict_check: boolean | null
   is_eligibility_check: boolean | null
   next_review: string | null
-}
-export type TenancyBase = {
-  address: string
-  suburb: string | null
-  postcode: string | null
-  started: string | null
-}
-export type Tenancy = TenancyBase & {
-  id: number
-  url: string
-  is_on_lease: TextChoiceField
-  landlord: Person
-  agent: Person
-  client: Client
 }
 export type IssueNoteBase = {
   note_type: string
@@ -794,6 +797,11 @@ export type IssueUpdate = IssueBase & {
   paralegal_id: User
   lawyer_id: User
   support_worker_id: Person
+  weekly_rent: number | null
+  employment_status: TextChoiceListField
+  weekly_income: number | null
+  referrer: string
+  referrer_type: TextChoiceField
 }
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number
@@ -848,15 +856,14 @@ export type PersonCreate = PersonBase & {
 }
 export type TenancyCreate = TenancyBase & {
   is_on_lease: string
+  rental_circumstances: string
   landlord_id?: number | null
   agent_id?: number | null
 }
 export type ClientCreate = ClientBase & {
-  referrer_type: string
   call_times: string[]
   employment_status: string[]
   eligibility_circumstances: string[]
-  rental_circumstances: string
 }
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean

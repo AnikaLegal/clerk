@@ -36,7 +36,7 @@ def person_detail_page_view(request, pk):
     except Person.DoesNotExist:
         raise Http404()
 
-    q_filter = Q(client__tenancy__agent=person) | Q(client__tenancy__landlord=person)
+    q_filter = Q(tenancy__agent=person) | Q(tenancy__landlord=person)
     issues = Issue.objects.filter(q_filter).order_by("-created_at").all()
 
     context = {

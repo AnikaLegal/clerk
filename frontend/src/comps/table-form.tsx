@@ -95,7 +95,7 @@ const FieldTable = ({ fields, model }) => (
     <Table.Body>
       {fields.map(({ label, name, type }) => (
         <Table.Row key={label}>
-          <Table.Cell width={3}>{label}</Table.Cell>
+          <Table.Cell width={4}>{label}</Table.Cell>
           {type === FIELD_TYPES.TEXTAREA ? (
             <td
               dangerouslySetInnerHTML={{

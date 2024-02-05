@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import UpdateModelMixin, RetrieveModelMixin
 
 from case.utils.react import render_react_page
-from case.serializers import TenancySerializer
+from case.serializers import TenancySerializer, IssueSerializer
 from core.models import Tenancy
 from .auth import (
     paralegal_or_better_required,
@@ -26,7 +26,13 @@ def tenancy_detail_page_view(request, pk):
     if not (has_object_permission or request.user.is_coordinator_or_better):
         raise PermissionDenied()
 
-    context = {"tenancy": TenancySerializer(instance=tenancy).data}
+    context = {
+        "tenancy": TenancySerializer(instance=tenancy).data,
+        "issues": IssueSerializer(
+            tenancy.issue_set.all(), read_only=True, many=True
+        ).data,
+    }
+
     return render_react_page(request, "Tenancy", "tenancy-detail", context)
 
 

@@ -1,0 +1,167 @@
+[
+  {
+    "CENTRELINK_SUPPORT": true,
+    "ELIGIBILITY_NOTES": null,
+    "ADDRESS": "123 Fake St",
+    "AVAILIBILITY": [
+      "WEEK_DAY",
+      "WEEK_EVENING"
+    ],
+    "CAN_SPEAK_NON_ENGLISH": true,
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Chinese",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "male",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": "NO",
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "REPAIRS",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0411111122",
+    "LAST_NAME": "Segal",
+    "ELIGIBILITY_CIRCUMSTANCES": [
+      "SUBSTANCE_ABUSE"
+    ],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PREFERRED_NAME": "Matt",
+    "PROPERTY_MANAGER_IS_AGENT": false,
+    "REFERRER_TYPE": "LEGAL_CENTRE",
+    "START_DATE": "2019-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "WEEKLY_RENT": 500,
+    "WORK_OR_STUDY_CIRCUMSTANCES": [
+      "STUDENT",
+      "WORKING_PART_TIME"
+    ],
+    "REPAIRS_REQUIRED": [
+      "Water",
+      "Roof"
+    ],
+    "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
+    "REPAIRS_ISSUE_START": "2020-01-01",
+    "REPAIRS_ISSUE_PHOTO": [
+      {
+        "id": "5ace4b50-f95c-44e1-ae61-f245abc5ab42",
+        "file": "https://example.com/e249c2c2-15ed-4609-865f-c2109f06f6f8.png",
+        "issue": null
+      }
+    ],
+    "RENTAL_CIRCUMSTANCES": "PARTNER"
+  },
+  {
+    "CENTRELINK_SUPPORT": true,
+    "ELIGIBILITY_NOTES": null,
+    "ADDRESS": "123 Fake St",
+    "AVAILIBILITY": [
+      "WEEK_DAY",
+      "WEEK_EVENING"
+    ],
+    "CAN_SPEAK_NON_ENGLISH": true,
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Chinese",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "male",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": "NO",
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "REPAIRS",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0411111122",
+    "LAST_NAME": "Segal",
+    "ELIGIBILITY_CIRCUMSTANCES": [
+      "SUBSTANCE_ABUSE"
+    ],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PREFERRED_NAME": "Matt",
+    "PROPERTY_MANAGER_IS_AGENT": false,
+    "REFERRER_TYPE": "LEGAL_CENTRE",
+    "START_DATE": "2019-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "WEEKLY_RENT": 500,
+    "WORK_OR_STUDY_CIRCUMSTANCES": [
+      "STUDENT",
+      "WORKING_PART_TIME"
+    ],
+    "REPAIRS_REQUIRED": [
+      "Water",
+      "Roof"
+    ],
+    "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
+    "REPAIRS_ISSUE_START": "2020-01-01",
+    "REPAIRS_ISSUE_PHOTO": [
+      {
+        "id": "e69aeab1-d495-4355-a6a2-460d25d3449b",
+        "file": "https://example.com/e249c2c2-15ed-4609-865f-c2109f06f6f8.png",
+        "issue": null
+      }
+    ],
+    "RENTAL_CIRCUMSTANCES": "PARTNER"
+  },
+  {
+    "CENTRELINK_SUPPORT": true,
+    "ELIGIBILITY_NOTES": null,
+    "ADDRESS": "123456 Fake St",
+    "AVAILIBILITY": [
+      "WEEK_DAY",
+      "WEEK_EVENING"
+    ],
+    "CAN_SPEAK_NON_ENGLISH": true,
+    "DOB": "1990-08-15",
+    "EMAIL": "mattdsegal@gmail.com",
+    "FIRST_LANGUAGE": "Chinese",
+    "FIRST_NAME": "Matthew",
+    "GENDER": "male",
+    "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER": "NO",
+    "IS_ON_LEASE": "YES",
+    "ISSUES": "REPAIRS",
+    "LANDLORD_ADDRESS": "321 Fake St, Fitzroy 3065",
+    "LANDLORD_EMAIL": "john.smith@landlord.com",
+    "LANDLORD_NAME": "John Smith",
+    "LANDLORD_PHONE": "0411111122",
+    "LAST_NAME": "Segal",
+    "ELIGIBILITY_CIRCUMSTANCES": [
+      "SUBSTANCE_ABUSE"
+    ],
+    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "NUMBER_OF_DEPENDENTS": 0,
+    "PHONE": "0431417373",
+    "POSTCODE": 3065,
+    "PREFERRED_NAME": null,
+    "PROPERTY_MANAGER_IS_AGENT": false,
+    "REFERRER_TYPE": "LEGAL_CENTRE",
+    "START_DATE": "2019-01-01",
+    "SUBURB": "Fitzroy",
+    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "WEEKLY_RENT": 300,
+    "WORK_OR_STUDY_CIRCUMSTANCES": [
+      "STUDENT",
+      "WORKING_PART_TIME"
+    ],
+    "REPAIRS_REQUIRED": [
+      "Water",
+      "Roof"
+    ],
+    "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",
+    "REPAIRS_ISSUE_START": "2020-01-01",
+    "REPAIRS_ISSUE_PHOTO": [
+      {
+        "id": "9946010c-22b7-4ba8-9d06-d0dc0d2c42db",
+        "file": "https://example.com/e249c2c2-15ed-4609-865f-c2109f06f6f8.png",
+        "issue": null
+      }
+    ],
+    "RENTAL_CIRCUMSTANCES": "PARTNER"
+  }
+]

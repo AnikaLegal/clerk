@@ -112,8 +112,8 @@ def send_email_alert_slack(email_pk: str):
 def get_text(issue: Issue):
     pk = issue.pk
     case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
-    referrer_type = issue.client.referrer_type.title().replace("_", " ")
-    referrer = issue.client.referrer
+    referrer_type = issue.referrer_type.title().replace("_", " ")
+    referrer = issue.referrer
 
     if referrer_type:
         ref_str = f"*Referral type*: {referrer_type}"

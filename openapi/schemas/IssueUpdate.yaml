@@ -11,7 +11,24 @@ allOf:
       support_worker_id:
         $ref: ./Person.yaml
         nullable: true
+      weekly_rent:
+        type: integer
+        nullable: true
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
     required:
       - paralegal_id
       - lawyer_id
       - support_worker_id
+      - weekly_rent
+      - employment_status
+      - weekly_income
+      - referrer
+      - referrer_type
