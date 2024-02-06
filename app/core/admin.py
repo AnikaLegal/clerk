@@ -136,16 +136,11 @@ class TenancyAdmin(admin.ModelAdmin):
         "address",
         "postcode",
         "suburb",
-        "client_link",
         "landlord_link",
         "agent_link",
         "created_at",
     )
-    list_select_related = ("client", "landlord", "agent")
-
-    @admin_link("client", "Client")
-    def client_link(self, client):
-        return client.get_full_name()
+    list_select_related = ("landlord", "agent")
 
     @admin_link("landlord", "Landlord")
     def landlord_link(self, landlord):
