@@ -346,32 +346,3 @@ def process_email_for_display(email: Email):
     email.html = parse_email_html(email)
     for attachment in email.emailattachment_set.all():
         attachment.file.display_name = os.path.basename(attachment.file.name)
-
-
-def get_case_emails(issue: Issue):
-    tenancy = issue.client.tenancy_set.select_related("landlord", "agent").first()
-    emails = [
-        {
-            "email": issue.client.email,
-            "name": issue.client.get_full_name(),
-            "role": "Client",
-        }
-    ]
-    if tenancy.agent:
-        emails.append(
-            {
-                "email": tenancy.agent.email,
-                "name": tenancy.agent.full_name,
-                "role": "Agent",
-            }
-        )
-    if tenancy.landlord:
-        emails.append(
-            {
-                "email": tenancy.landlord.email,
-                "name": tenancy.landlord.full_name,
-                "role": "Landlord",
-            }
-        )
-
-    return emails
