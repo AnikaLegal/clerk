@@ -6,11 +6,11 @@ from django.db import migrations
 def _migrate_tenancy_is_on_lease_values(apps, schema_editor):
     Tenancy = apps.get_model("core", "Tenancy")
 
-    Tenancy.objects.filter(is_on_lease="FALSE").update(
+    Tenancy.objects.filter(is_on_lease__iexact="FALSE").update(
         is_on_lease="NO"
     )
 
-    Tenancy.objects.filter(is_on_lease="TRUE").update(
+    Tenancy.objects.filter(is_on_lease__iexact="TRUE").update(
         is_on_lease="YES"
     )
 
