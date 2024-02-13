@@ -2,7 +2,7 @@ from invoke import task
 
 APP_NAME = "clerk"
 HOST = "13.55.250.149"
-COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
+COMPOSE = "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 
 @task
@@ -30,7 +30,7 @@ def dev(c):
 
 @task
 def down(c):
-    """Stop docker-compose"""
+    """Stop docker compose"""
     c.run(f"{COMPOSE} down", pty=True)
 
 
@@ -42,13 +42,13 @@ def debug(c):
 
 @task
 def restart(c, service_name):
-    """Restart Docker-Compose service"""
+    """Restart docker compose service"""
     c.run(f"{COMPOSE} restart {service_name}", pty=True)
 
 
 @task
 def logs(c, service_name):
-    """View logs for Docker-Compose service"""
+    """View logs for docker compose service"""
     c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
 
 
