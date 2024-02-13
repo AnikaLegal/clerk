@@ -15,8 +15,8 @@ import { api } from 'api'
 export const AssignForm = ({ issue, setIssue, onCancel }) => {
   const [isSuccess, setSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [paralegals, setParalegals] = useState<User[]>([])
-  const [lawyers, setLawyers] = useState<User[]>([])
+  const [paralegalResults, setParalegals] = useState<User[]>([])
+  const [lawyerResults, setLawyers] = useState<User[]>([])
   useEffect(() => {
     api.accounts
       .search({ group: 'Paralegal' })
@@ -25,6 +25,22 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
       .then(({ data }) => setLawyers(data))
       .then(() => setIsLoading(false))
   }, [])
+
+  const lawyers = [
+    ...(lawyerResults ?? [])
+  ].filter(x => x.is_active)
+   .sort((a, b) => (a.email > b.email) ? 1 : -1)
+
+  const paralegals = [
+    ...(paralegalResults ?? [])
+  ].filter(x => x.is_active)
+
+  const ids = new Set(paralegalResults.map(x => x.id));
+  const merged = [
+    ...paralegalResults,
+    ...lawyerResults.filter(x => !ids.has(x.id))
+  ].sort((a, b) => (a.email > b.email) ? 1 : -1)
+
   return (
     <Segment>
       <Header>Assign a paralegal to this case.</Header>
@@ -72,6 +88,7 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
             error={Object.keys(errors).length > 0}
           >
             <Dropdown
+              clearable
               fluid
               selection
               search
@@ -79,7 +96,7 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a paralegal"
-              options={[{ id: null, email: '-' }, ...paralegals].map((u) => ({
+              options={merged.map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,
@@ -89,6 +106,7 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               }
             />
             <Dropdown
+              clearable
               fluid
               selection
               search
@@ -96,7 +114,7 @@ export const AssignForm = ({ issue, setIssue, onCancel }) => {
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a lawyer"
-              options={[{ id: null, email: '-' }, ...lawyers].map((u) => ({
+              options={lawyers.map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,

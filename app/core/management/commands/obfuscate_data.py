@@ -3,9 +3,10 @@ import logging
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Q
 from faker import Faker
 
-from accounts.models import User
+from accounts.models import User, CaseGroups
 from core.models import Client, Issue, Person, Tenancy, IssueNote, FileUpload
 from utils.signals import disable_signals, restore_signals
 
@@ -25,22 +26,26 @@ class Command(BaseCommand):
         people = Person.objects.all()
         tenancies = Tenancy.objects.all()
         notes = IssueNote.objects.exclude(note_type="EVENT")
-        paralegals = (
-            User.objects.filter(issue__isnull=False)
-            .prefetch_related("issue_set")
-            .distinct()
-        )
+
+        # Obfuscate any user that isn't a lawyer, admin or superuser. We want to
+        # keep the accounts unchanged for users in those groups so they can be
+        # used for testing.
+        users = User.objects.exclude(
+            Q(groups__name__in=[CaseGroups.LAWYER, CaseGroups.ADMIN])
+            | Q(is_superuser=True)
+        ).distinct()
+
         for t in tenancies:
             t.address = fake.street_address()
             t.suburb = fake.city()
             t.postcode = fake.postcode()
             t.save()
 
-        for p in paralegals:
-            p.email = fake.email()
-            p.first_name = fake.first_name()
-            p.last_name = fake.last_name()
-            p.save()
+        for u in users:
+            u.email = fake.email()
+            u.first_name = fake.first_name()
+            u.last_name = fake.last_name()
+            u.save()
 
         for p in people:
             p.full_name = fake.name()
