@@ -51,6 +51,21 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
       })
   }
 
+  const lawyers = [
+    ...(lawyerResults.data ?? [])
+  ].filter(x => x.is_active)
+   .sort((a, b) => (a.email > b.email) ? 1 : -1)
+
+  const paralegals = [
+    ...(paralegalResults.data ?? [])
+  ].filter(x => x.is_active)
+
+  const ids = new Set(paralegals.map(x => x.id));
+  const merged = [
+    ...paralegals,
+    ...lawyers.filter(x => !ids.has(x.id))
+  ].sort((a, b) => (a.email > b.email) ? 1 : -1)
+
   return (
     <Segment>
       <Header>Assign a paralegal to this case.</Header>
@@ -75,6 +90,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
             error={Object.keys(errors).length > 0}
           >
             <Dropdown
+              clearable
               fluid
               selection
               search
@@ -82,10 +98,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a paralegal"
-              options={[
-                { id: null, email: '-' },
-                ...(paralegalResults.data ?? []),
-              ].map((u) => ({
+              options={merged.map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,
@@ -95,6 +108,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
               }
             />
             <Dropdown
+              clearable
               fluid
               selection
               search
@@ -102,10 +116,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
               style={{ margin: '1em 0' }}
               loading={isSubmitting || isLoading}
               placeholder="Select a lawyer"
-              options={[
-                { id: null, email: '-' },
-                ...(lawyerResults.data ?? []),
-              ].map((u) => ({
+              options={lawyers.map((u) => ({
                 key: u.id,
                 value: u.id,
                 text: u.email,

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -66,7 +67,9 @@ class IssueSerializer(serializers.ModelSerializer):
     support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
     paralegal_id = serializers.PrimaryKeyRelatedField(
         write_only=True,
-        queryset=User.objects.filter(groups__name="Paralegal"),
+        queryset=User.objects.filter(
+            Q(groups__name="Paralegal") | Q(groups__name="Lawyer")
+        ).distinct(),
         allow_null=True,
     )
     lawyer_id = serializers.PrimaryKeyRelatedField(
