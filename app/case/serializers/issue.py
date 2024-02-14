@@ -115,7 +115,10 @@ class IssueAssignmentSerializer(serializers.ModelSerializer):
         return fields
 
     paralegal = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.filter(groups__name="Paralegal"), allow_null=True
+        queryset=User.objects.filter(
+            Q(groups__name="Paralegal") | Q(groups__name="Lawyer")
+        ).distinct(),
+        allow_null=True,
     )
     lawyer = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(groups__name="Lawyer"), allow_null=True
