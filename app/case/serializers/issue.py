@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
