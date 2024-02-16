@@ -6,7 +6,6 @@ authors = [
     "Matt Segal <matt.segal@anikalegal.com>",
     "Luca Vari <luca.vari@anikalegal.com>"
 ]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
