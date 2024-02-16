@@ -1,7 +1,17 @@
-[tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::UserWarning",
-    "ignore::django.utils.deprecation.RemovedInDjango50Warning",
-    "ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
+[tool.poetry]
+name = "clerk"
+version = "0.1.0"
+description = ""
+authors = [
+    "Matt Segal <matt.segal@anikalegal.com>",
+    "Luca Vari <luca.vari@anikalegal.com>"
 ]
-addopts = "--reuse-db --ds=clerk.settings.test"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
