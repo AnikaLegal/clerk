@@ -42,6 +42,8 @@ freezegun = "^1.4.0"
 openapi-spec-validator = "^0.5"
 drf-openapi-tester = "^2.3.3"
 django-override-storage = "^0.3.2"
+chardet = "^3.0"
+tzdata = "^2024.1"
 
 
 [tool.poetry.dev-dependencies]

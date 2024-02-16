@@ -3,14 +3,13 @@ FROM anikalaw/clerkbase:latest
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
 ARG DJANGO_SECRET_KEY=not-a-secret
 
-# Install Python packages
-COPY app/requirements.txt .
-RUN \
-  echo "Installing python packages..." && \
-  pip install -r requirements.txt
-
 # Mount the codebase
 ADD app /app
+
+# Install Python packages
+RUN \
+  echo "Installing python packages..." && \
+  poetry install --no-root --no-interaction --no-ansi
 
 # Copy Webpack prod build artifacts from clerk-webpack image
 COPY --from=clerk-webpack:local /build /build

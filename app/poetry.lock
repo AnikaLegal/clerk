@@ -172,11 +172,11 @@ pycparser = "*"
 
 [[package]]
 name = "chardet"
-version = "5.2.0"
-description = "Universal encoding detector for Python 3"
+version = "3.0.4"
+description = "Universal encoding detector for Python 2 and 3"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = "*"
 
 [[package]]
 name = "charset-normalizer"
@@ -1629,7 +1629,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ff7e2d08e6355553c0041140785e7dd3f58b390eb26b6c28721abef414b5d87c"
+content-hash = "cb48a6f52abfaa36ac0ec36816afda651ada8cc05e53639452be67d597e97e2c"
 
 [metadata.files]
 ansicon = []
