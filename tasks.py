@@ -1,4 +1,4 @@
-from invoke import Collection, task
+from invoke import task
 
 APP_NAME = "clerk"
 HOST = "13.55.250.149"
