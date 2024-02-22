@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./TenancyBase.yaml
+  - type: object
+    properties:
+      is_on_lease:
+        type: string
+      rental_circumstances:
+        type: string
+      landlord_id:
+        type: number
+        nullable: true
+      agent_id:
+        type: number
+        nullable: true
+    required:
+      - is_on_lease
+      - rental_circumstances

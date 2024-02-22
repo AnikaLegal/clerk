@@ -103,7 +103,7 @@ def test_get_closure_notice():
 
 
 @pytest.mark.django_db
-def test_get_closure_email_format():
+def test_get_closure_notice_format():
     template = ClosureTemplateFactory(notice_html=TEST_TEXT)
     expected = ClosureFactory(template=template)
     notice = get_closure_notice()

@@ -1,0 +1,1899 @@
+openapi: 3.0.1
+info:
+  title: Clerk API
+  description: API that the Django backend will provide.
+  version: 0.1.0
+paths:
+  /clerk/api/case/:
+    get:
+      operationId: getCases
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: search
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: stage
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: outcome
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: is_open
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: paralegal
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: lawyer
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Issue"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
+  /clerk/api/case/{id}/:
+    get:
+      operationId: getCase
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issue:
+                    $ref: "#/components/schemas/Issue"
+                  tenancy:
+                    $ref: "#/components/schemas/Tenancy"
+                  notes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IssueNote"
+                required:
+                  - issue
+                  - tenancy
+                  - notes
+    patch:
+      operationId: updateCase
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/case/{id}/note/:
+    post:
+      operationId: createCaseNote
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueNoteCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueNote"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/case/{id}/docs/:
+    get:
+      operationId: getCaseDocuments
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sharepoint_url:
+                    type: string
+                  documents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SharepointDocument"
+                required:
+                  - sharepoint_url
+                  - documents
+  /clerk/api/email/{id}/:
+    get:
+      operationId: getEmailThreads
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: slug
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailThread"
+  /clerk/api/email/{id}/create/:
+    post:
+      operationId: createEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{email_id}/:
+    get:
+      operationId: getEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+    patch:
+      operationId: updateEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Email"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteEmail
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{email_id}/attachment/:
+    post:
+      operationId: createEmailAttachment
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EmailAttachmentCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailAttachment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/:
+    delete:
+      operationId: deleteEmailAttachment
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+        - description: Email Attachment ID
+          in: path
+          name: attachment_id
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{email_id}/attachment/{attachment_id}/sharepoint/:
+    post:
+      operationId: uploadEmailAttachmentToSharepoint
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+        - description: Email Attachment ID
+          in: path
+          name: attachment_id
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
+    post:
+      operationId: downloadEmailAttachmentFromSharepoint
+      parameters:
+        - description: Case ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - description: Email ID
+          in: path
+          name: email_id
+          required: true
+          schema:
+            type: number
+        - description: Sharepoint ID
+          in: path
+          name: sharepoint_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/person/:
+    get:
+      operationId: getPeople
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+    post:
+      operationId: createPerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/person/search/:
+    get:
+      operationId: searchPeople
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+  /clerk/api/person/{id}/:
+    get:
+      operationId: getPerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+    put:
+      operationId: updatePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deletePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/tenancy/{id}/:
+    get:
+      operationId: getTenancy
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+    patch:
+      operationId: updateTenancy
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenancyCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenancy"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/client/{id}/:
+    patch:
+      operationId: updateClient
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/:
+    get:
+      operationId: getUsers
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: group
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/:
+    patch:
+      operationId: updateUser
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms/:
+    get:
+      operationId: getUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MicrosoftUserPermissions"
+  /clerk/api/account/{id}/perms-resync/:
+    post:
+      operationId: resyncUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms-promote/:
+    post:
+      operationId: promoteUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/{id}/perms-demote/:
+    post:
+      operationId: demoteUserAccountPermissions
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: "#/components/schemas/User"
+                  permissions:
+                    $ref: "#/components/schemas/MicrosoftUserPermissions"
+                required:
+                  - account
+                  - permissions
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-email/:
+    get:
+      operationId: getEmailTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmailTemplate"
+    post:
+      operationId: createEmailTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-email/{id}/:
+    get:
+      operationId: getEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+    patch:
+      operationId: updateEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailTemplateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteEmailTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-notify/:
+    get:
+      operationId: getNotificationTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationTemplate"
+    post:
+      operationId: createNotificationTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationTemplateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-notify/{id}/:
+    get:
+      operationId: getNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+    patch:
+      operationId: updateNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationTemplateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteNotificationTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-doc/:
+    get:
+      operationId: getDocumentTemplates
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DocumentTemplate"
+    post:
+      operationId: createDocumentTemplate
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DocumentTemplateCreate"
+      responses:
+        "201":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-doc/{id}/:
+    delete:
+      operationId: deleteDocumentTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+components:
+  schemas:
+    IssueBase:
+      type: object
+      properties:
+        topic:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        is_open:
+          type: boolean
+      required:
+        - topic
+        - stage
+        - outcome
+        - outcome_notes
+        - provided_legal_services
+        - is_open
+    UserCreate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          format: email
+      required:
+        - first_name
+        - last_name
+        - email
+        - username
+    User:
+      allOf:
+        - $ref: "#/components/schemas/UserCreate"
+        - type: object
+          properties:
+            id:
+              type: integer
+            case_capacity:
+              type: integer
+            is_intern:
+              type: boolean
+            is_active:
+              type: boolean
+            is_superuser:
+              type: boolean
+            full_name:
+              type: string
+            created_at:
+              type: string
+            groups:
+              type: array
+              items:
+                type: string
+            url:
+              type: string
+            is_admin_or_better:
+              type: boolean
+            is_coordinator_or_better:
+              type: boolean
+            is_paralegal_or_better:
+              type: boolean
+            is_admin:
+              type: boolean
+            is_coordinator:
+              type: boolean
+            is_paralegal:
+              type: boolean
+            is_ms_account_set_up:
+              type: boolean
+            ms_account_created_at:
+              type: string
+              nullable: true
+          required:
+            - id
+            - case_capacity
+            - is_intern
+            - is_active
+            - is_superuser
+            - full_name
+            - created_at
+            - groups
+            - url
+            - is_admin_or_better
+            - is_coordinator_or_better
+            - is_paralegal_or_better
+            - is_admin
+            - is_coordinator
+            - is_paralegal
+            - is_ms_account_set_up
+            - ms_account_created_at
+    TextChoiceField:
+      type: object
+      properties:
+        display:
+          type: string
+        value:
+          type: string
+        choices:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      required:
+        - display
+        - value
+        - choices
+    ClientBase:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        preferred_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+        phone_number:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        pronouns:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        requires_interpreter:
+          $ref: "#/components/schemas/TextChoiceField"
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        is_aboriginal_or_torres_strait_islander:
+          $ref: "#/components/schemas/TextChoiceField"
+        number_of_dependents:
+          type: number
+          nullable: true
+        notes:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+      required:
+        - first_name
+        - last_name
+        - preferred_name
+        - email
+        - phone_number
+        - gender
+        - pronouns
+        - centrelink_support
+        - eligibility_notes
+        - requires_interpreter
+        - primary_language_non_english
+        - primary_language
+        - is_aboriginal_or_torres_strait_islander
+        - number_of_dependents
+        - notes
+        - date_of_birth
+    TextChoiceListField:
+      type: object
+      properties:
+        display:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+        choices:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      required:
+        - display
+        - value
+        - choices
+    Client:
+      allOf:
+        - $ref: "#/components/schemas/ClientBase"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            url:
+              type: string
+            age:
+              type: integer
+            full_name:
+              type: string
+            call_times:
+              $ref: "#/components/schemas/TextChoiceListField"
+            eligibility_circumstances:
+              $ref: "#/components/schemas/TextChoiceListField"
+          required:
+            - id
+            - url
+            - age
+            - full_name
+            - date_of_birth
+            - call_times
+            - eligibility_circumstances
+    TenancyBase:
+      type: object
+      properties:
+        address:
+          type: string
+        suburb:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        started:
+          type: string
+          nullable: true
+      required:
+        - address
+        - suburb
+        - postcode
+        - started
+    PersonBase:
+      type: object
+      properties:
+        full_name:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        phone_number:
+          type: string
+      required:
+        - full_name
+        - email
+        - address
+        - phone_number
+    Person:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            support_contact_preferences:
+              $ref: "#/components/schemas/TextChoiceField"
+          required:
+            - id
+            - url
+            - support_contact_preferences
+    Tenancy:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            is_on_lease:
+              $ref: "#/components/schemas/TextChoiceField"
+            rental_circumstances:
+              $ref: "#/components/schemas/TextChoiceField"
+            landlord:
+              $ref: "#/components/schemas/Person"
+            agent:
+              $ref: "#/components/schemas/Person"
+          required:
+            - id
+            - url
+            - is_on_lease
+            - rental_circumstances
+            - landlord
+            - agent
+    Issue:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            topic_display:
+              type: string
+            stage_display:
+              type: string
+            outcome_display:
+              type: string
+              nullable: true
+            fileref:
+              type: string
+            is_sharepoint_set_up:
+              type: boolean
+            paralegal:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
+            lawyer:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
+            client:
+              $ref: "#/components/schemas/Client"
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            tenancy:
+              $ref: "#/components/schemas/Tenancy"
+            weekly_rent:
+              type: integer
+              nullable: true
+            support_worker:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/Person"
+            actionstep_id:
+              type: integer
+              nullable: true
+            created_at:
+              type: string
+            url:
+              type: string
+            answers:
+              type: object
+              additionalProperties:
+                type: string
+            is_conflict_check:
+              type: boolean
+              nullable: true
+            is_eligibility_check:
+              type: boolean
+              nullable: true
+            next_review:
+              type: string
+              nullable: true
+          required:
+            - id
+            - topic_display
+            - stage_display
+            - outcome_display
+            - fileref
+            - paralegal
+            - lawyer
+            - client
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+            - tenancy
+            - weekly_rent
+            - support_worker
+            - is_sharepoint_set_up
+            - actionstep_id
+            - created_at
+            - url
+            - answers
+            - is_conflict_check
+            - is_eligibility_check
+            - next_review
+    IssueNoteBase:
+      type: object
+      properties:
+        note_type:
+          type: string
+        text:
+          type: string
+        event:
+          type: string
+          nullable: true
+      required:
+        - note_type
+        - text
+        - event
+    IssueNote:
+      allOf:
+        - $ref: "#/components/schemas/IssueNoteBase"
+        - type: object
+          properties:
+            id:
+              type: number
+            creator:
+              $ref: "#/components/schemas/User"
+            text_display:
+              type: string
+            created_at:
+              type: string
+            reviewee:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
+            issue:
+              $ref: "#/components/schemas/Issue"
+          required:
+            - id
+            - creator
+            - text_display
+            - created_at
+            - reviewee
+            - issue
+    IssueUpdate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            paralegal_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            support_worker_id:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+            weekly_rent:
+              type: integer
+              nullable: true
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+          required:
+            - paralegal_id
+            - lawyer_id
+            - support_worker_id
+            - weekly_rent
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+    Error:
+      description: The schema for an error response
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: object
+                  - type: array
+        nonFieldErrors:
+          type: array
+          items:
+            type: string
+    IssueNoteCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueNoteBase"
+        - type: object
+          properties:
+            creator_id:
+              type: number
+            issue_id:
+              type: string
+              format: uuid
+          required:
+            - creator_id
+            - issue_id
+    SharepointDocument:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        id:
+          type: string
+        size:
+          type: number
+        is_file:
+          type: boolean
+      required:
+        - name
+        - url
+        - id
+        - size
+        - is_file
+    EmailCreate:
+      type: object
+      properties:
+        issue:
+          type: string
+          format: uuid
+        to_address:
+          type: string
+        from_address:
+          type: string
+        cc_addresses:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        text:
+          type: string
+        html:
+          type: string
+      required:
+        - issue
+        - to_address
+        - from_address
+        - cc_addresses
+        - subject
+        - text
+        - html
+    EmailAttachment:
+      type: object
+      properties:
+        id:
+          type: number
+        url:
+          type: string
+        name:
+          type: string
+        sharepoint_state:
+          type: string
+        content_type:
+          type: string
+        email:
+          type: number
+      required:
+        - id
+        - url
+        - name
+        - sharepoint_state
+        - content_type
+        - email
+    Email:
+      allOf:
+        - $ref: "#/components/schemas/EmailCreate"
+        - type: object
+          properties:
+            id:
+              type: number
+            created_at:
+              type: string
+            processed_at:
+              type: string
+              nullable: true
+            sender:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            state:
+              type: string
+            reply_url:
+              type: string
+            edit_url:
+              type: string
+            attachments:
+              type: array
+              items:
+                $ref: "#/components/schemas/EmailAttachment"
+          required:
+            - id
+            - created_at
+            - processed_at
+            - sender
+            - state
+            - reply_url
+            - edit_url
+            - attachments
+    EmailThread:
+      type: object
+      properties:
+        emails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Email"
+        subject:
+          type: string
+        slug:
+          type: string
+        most_recent:
+          type: string
+        url:
+          type: string
+      required:
+        - emails
+        - subject
+        - slug
+        - most_recent
+        - url
+    EmailAttachmentCreate:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+    PersonCreate:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            support_contact_preferences:
+              type: string
+          required:
+            - support_contact_preferences
+    TenancyCreate:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            is_on_lease:
+              type: string
+            rental_circumstances:
+              type: string
+            landlord_id:
+              type: number
+              nullable: true
+            agent_id:
+              type: number
+              nullable: true
+          required:
+            - is_on_lease
+            - rental_circumstances
+    ClientCreate:
+      allOf:
+        - $ref: "#/components/schemas/ClientBase"
+        - type: object
+          properties:
+            call_times:
+              type: array
+              items:
+                type: string
+            employment_status:
+              type: array
+              items:
+                type: string
+            eligibility_circumstances:
+              type: array
+              items:
+                type: string
+          required:
+            - call_times
+            - employment_status
+            - eligibility_circumstances
+    MicrosoftUserPermissions:
+      type: object
+      properties:
+        has_coordinator_perms:
+          type: boolean
+        paralegal_perm_issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+        paralegal_perm_missing_issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+      required:
+        - has_coordinator_perms
+        - paralegal_perm_issues
+        - paralegal_perm_missing_issues
+    EmailTemplateCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        subject:
+          type: string
+        text:
+          type: string
+      required:
+        - name
+        - topic
+        - subject
+        - text
+    EmailTemplate:
+      allOf:
+        - $ref: "#/components/schemas/EmailTemplateCreate"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            created_at:
+              type: string
+          required:
+            - id
+            - url
+            - created_at
+    NotificationTemplateBase:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        event_stage:
+          type: string
+        raw_text:
+          type: string
+        message_text:
+          type: string
+      required:
+        - name
+        - topic
+        - event_stage
+        - raw_text
+        - message_text
+    NotificationTemplate:
+      allOf:
+        - $ref: "#/components/schemas/NotificationTemplateBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+            created_at:
+              type: string
+            event:
+              $ref: "#/components/schemas/TextChoiceField"
+            channel:
+              $ref: "#/components/schemas/TextChoiceField"
+            target:
+              $ref: "#/components/schemas/TextChoiceField"
+          required:
+            - id
+            - url
+            - created_at
+            - event
+            - channel
+            - target
+    NotificationTemplateCreate:
+      allOf:
+        - $ref: "#/components/schemas/NotificationTemplateBase"
+        - type: object
+          properties:
+            event:
+              type: string
+            channel:
+              type: string
+            target:
+              type: string
+          required:
+            - event
+            - channel
+            - target
+    DocumentTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        topic:
+          type: string
+        url:
+          type: string
+        created_at:
+          type: string
+        modified_at:
+          type: string
+      required:
+        - id
+        - name
+        - topic
+        - url
+        - created_at
+        - modified_at
+    DocumentTemplateCreate:
+      type: object
+      properties:
+        topic:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - topic
+        - files
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    PermissionDenied:
+      description: Permission Denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NoContent:
+      description: The specific resource was deleted successfully

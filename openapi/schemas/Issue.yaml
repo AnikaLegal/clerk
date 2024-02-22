@@ -1,0 +1,91 @@
+allOf:
+  - $ref: ./IssueBase.yaml
+  - type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      topic_display:
+        type: string
+      stage_display:
+        type: string
+      outcome_display:
+        type: string
+        nullable: true
+      fileref:
+        type: string
+      is_sharepoint_set_up:
+        type: boolean
+      paralegal:
+        nullable: true
+        allOf:
+          - $ref: ./User.yaml
+      lawyer:
+        nullable: true
+        allOf:
+          - $ref: ./User.yaml
+      client:
+        $ref: ./Client.yaml
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
+      tenancy:
+        $ref: ./Tenancy.yaml
+      weekly_rent:
+        type: integer
+        nullable: true
+      support_worker:
+        nullable: true
+        allOf:
+          - $ref: ./Person.yaml
+      actionstep_id:
+        type: integer
+        nullable: true
+      created_at:
+        type: string
+      url:
+        type: string
+      answers:
+        type: object
+        additionalProperties:
+          type: string
+      # Case review fields
+      is_conflict_check:
+        type: boolean
+        nullable: true
+      is_eligibility_check:
+        type: boolean
+        nullable: true
+      next_review:
+        type: string
+        nullable: true
+    required:
+      - id
+      - topic_display
+      - stage_display
+      - outcome_display
+      - fileref
+      - paralegal
+      - lawyer
+      - client
+      - employment_status
+      - weekly_income
+      - referrer
+      - referrer_type
+      - tenancy
+      - weekly_rent
+      - support_worker
+      - is_sharepoint_set_up
+      - actionstep_id
+      - created_at
+      - url
+      - answers
+      - is_conflict_check
+      - is_eligibility_check
+      - next_review

@@ -1,0 +1,21 @@
+type: object
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  topic:
+    type: string
+  url:
+    type: string
+  created_at:
+    type: string
+  modified_at:
+    type: string
+required:
+  - id
+  - name
+  - topic
+  - url
+  - created_at
+  - modified_at

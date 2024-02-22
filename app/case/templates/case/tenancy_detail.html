@@ -20,8 +20,8 @@
             <tr>
                 <td class="three wide">Client</td>
                 <td>
-                    <a href="{% url 'client-detail' tenancy.client.pk %}">
-                        {{ tenancy.client.get_full_name|title }}
+                    <a href="{% url 'client-detail' client.pk %}">
+                        {{ client.get_full_name|title }}
                     </a>
                 </td>
             </tr>
@@ -29,11 +29,11 @@
                 <td class="three wide">Agent</td>
                 <td>
                     {% if tenancy.agent %}
-                        <a href="{% url 'person-detail' tenancy.agent.pk %}">
-                            {{ tenancy.agent.full_name|title }}
-                        </a>
+                    <a href="{% url 'person-detail' tenancy.agent.pk %}">
+                        {{ tenancy.agent.full_name|title }}
+                    </a>
                     {% else %}
-                        No agent
+                    No agent
                     {% endif %}
                 </td>
             </tr>
@@ -41,11 +41,11 @@
                 <td class="three wide">Landlord</td>
                 <td>
                     {% if tenancy.landlord %}
-                        <a href="{% url 'person-detail' tenancy.landlord.pk %}">
-                            {{ tenancy.landlord.full_name|title }}
-                        </a>
+                    <a href="{% url 'person-detail' tenancy.landlord.pk %}">
+                        {{ tenancy.landlord.full_name|title }}
+                    </a>
                     {% else %}
-                        No landlord
+                    No landlord
                     {% endif %}
                 </td>
             </tr>
@@ -55,4 +55,3 @@
 
 
 {% endblock %}
-

@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { markdownToHtml } from 'utils'
+import moment from 'moment'
 
 export const TimelineItem = ({
   title,
@@ -102,7 +103,7 @@ const NOTE_TYPES = {
       content={note.text_display}
       label="Case review"
       color="orange"
-      bottomLabel={<span>Next review {note.event}</span>}
+      bottomLabel={<span>Next review {moment(note.event).format("DD/MM/YY")}</span>}
     />
   ),
   PERFORMANCE: (note) => (

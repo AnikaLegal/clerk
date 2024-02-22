@@ -1,0 +1,21 @@
+allOf:
+  - $ref: ./ClientBase.yaml
+  - type: object
+    properties:
+      call_times:
+        type: array
+        items:
+          type: string
+      employment_status:
+        type: array
+        items:
+          type: string
+      eligibility_circumstances:
+        type: array
+        items:
+          type: string
+    required:
+      # Choice fields
+      - call_times
+      - employment_status
+      - eligibility_circumstances

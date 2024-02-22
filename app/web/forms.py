@@ -1,7 +1,7 @@
 from django import forms
 
 from webhooks.models import WebflowContact
-from web.models import ContentFeeback
+from web.models import ContentFeedback
 
 
 class ContactForm(forms.ModelForm):
@@ -15,7 +15,7 @@ class ContactForm(forms.ModelForm):
         ]
 
 
-class ContentFeebackForm(forms.ModelForm):
+class ContentFeedbackForm(forms.ModelForm):
     class Meta:
-        model = ContentFeeback
+        model = ContentFeedback
         fields = ["score", "reason", "name", "email", "page"]

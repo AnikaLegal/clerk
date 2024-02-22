@@ -8,27 +8,36 @@ import { TableForm } from 'comps/table-form'
 import { getFormSchema, FormField } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { api } from 'api'
 import { AccountPermissions } from 'comps/account-permissions'
 import { ErrorBoundary } from 'comps/error-boundary'
 import { FIELD_TYPES } from 'comps/field-component'
-import { AccountDetail, IssueDetail } from 'types'
+import { User, UserCreate, useUpdateUserMutation } from 'api'
 
-const creationSort = (a: IssueDetail, b: IssueDetail) =>
-  moment(b.created_at, 'DD/MM/YY').unix() -
-  moment(a.created_at, 'DD/MM/YY').unix()
+interface DjangoContext {
+  account: User
+  issue_set: any[]
+  lawyer_issues: any[]
+  performance_notes: any[]
+}
 
-const REACT_CONTEXT = (window as any).REACT_CONTEXT
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [account, setAccount] = useState(REACT_CONTEXT.account as AccountDetail)
+  const [account, setAccount] = useState(CONTEXT.account)
+  const [updateUser] = useUpdateUserMutation()
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateUser({
+      id: account.id,
+      userCreate: values as UserCreate,
+    }).unwrap()
+
   let tabPanes = [
     {
       menuItem: 'Paralegal cases',
       render: () => (
         <Tab.Pane>
           <CaseListTable
-            issues={account.issue_set.sort(creationSort)}
+            issues={CONTEXT.issue_set.sort(creationSort)}
             fields={PARALEGAL_TABLE_FIELDS}
           />
         </Tab.Pane>
@@ -39,7 +48,7 @@ const App = () => {
       render: () => (
         <Tab.Pane>
           <CaseListTable
-            issues={account.lawyer_issues.sort(creationSort)}
+            issues={CONTEXT.lawyer_issues.sort(creationSort)}
             fields={LAWYER_TABLE_FIELDS}
           />
         </Tab.Pane>
@@ -49,8 +58,8 @@ const App = () => {
       menuItem: 'Performance notes',
       render: () => (
         <Tab.Pane>
-          {account.performance_notes.length < 1 && 'No notes yet'}
-          {account.performance_notes.map((note) => (
+          {CONTEXT.performance_notes.length < 1 && 'No notes yet'}
+          {CONTEXT.performance_notes.map((note) => (
             <TimelineNote note={note} key={note.id} />
           ))}
         </Tab.Pane>
@@ -68,10 +77,10 @@ const App = () => {
     },
   ]
   // Prioritise lawyer issues if they exist
-  if (account.lawyer_issues.length > 0) {
+  if (CONTEXT.lawyer_issues.length > 0) {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
   }
-  if (!account.is_coordinator_or_better) {
+  if (CONTEXT.lawyer_issues.length === 0) {
     // Don't show lawyer cases.
     tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
   }
@@ -88,13 +97,17 @@ const App = () => {
         model={account}
         setModel={setAccount}
         modelName="account"
-        onUpdate={api.accounts.update}
+        onUpdate={update}
       />
 
       <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
     </Container>
   )
 }
+
+const creationSort = (a: any, b: any) =>
+  moment(b.created_at, 'DD/MM/YY').unix() -
+  moment(a.created_at, 'DD/MM/YY').unix()
 
 const PARALEGAL_TABLE_FIELDS = [
   'fileref',
@@ -131,7 +144,7 @@ const FIELDS: FormField[] = [
     name: 'last_name',
   },
   {
-    label: 'Is Intern',
+    label: 'Is intern?',
     name: 'is_intern',
     type: FIELD_TYPES.BOOL,
     schema: Yup.string().required('Required'),
@@ -143,16 +156,10 @@ const FIELDS: FormField[] = [
     schema: Yup.number().integer().min(0),
   },
   {
-    label: 'Active',
+    label: 'Is active?',
     type: FIELD_TYPES.BOOL,
     name: 'is_active',
     schema: Yup.boolean(),
-  },
-  {
-    label: 'University',
-    type: FIELD_TYPES.SINGLE_CHOICE,
-    name: 'university',
-    schema: Yup.string().optional(),
   },
 ]
 const SCHEMA = getFormSchema(FIELDS)

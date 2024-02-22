@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 from django.conf import settings
 from django.utils import timezone
@@ -20,6 +21,13 @@ TEMPLATE_PATHS = {
 }
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
+
+
+@dataclass
+class MicrosoftUserPermissions:
+    has_coordinator_perms: bool
+    paralegal_perm_issues: list[Issue]
+    paralegal_perm_missing_issues: list[Issue]
 
 
 def get_user_permissions(user):
@@ -46,11 +54,11 @@ def get_user_permissions(user):
             else:
                 paralegal_perm_missing_issues.append(issue)
 
-    return {
-        "has_coordinator_perms": has_coordinator_perms,
-        "paralegal_perm_issues": paralegal_perm_issues,
-        "paralegal_perm_missing_issues": paralegal_perm_missing_issues,
-    }
+    return MicrosoftUserPermissions(
+        has_coordinator_perms=has_coordinator_perms,
+        paralegal_perm_issues=paralegal_perm_issues,
+        paralegal_perm_missing_issues=paralegal_perm_missing_issues,
+    )
 
 
 def set_up_new_user(user):
@@ -191,7 +199,16 @@ def get_case_folder_info(issue):
 
     # Get the list of files (name, file URL) for the case folder.
     children = api.folder.get_children(case_path)
-    list_files = [(item["name"], item["webUrl"]) for item in children]
+    list_files = [
+        {
+            "name": item["name"],
+            "url": item["webUrl"],
+            "id": item["id"],
+            "size": item["size"],
+            "is_file": "file" in item,
+        }
+        for item in children
+    ]
 
     # Get the case folder URL.
     folder = api.folder.get(case_path)

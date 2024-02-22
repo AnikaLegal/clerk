@@ -6,6 +6,12 @@ COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
 
 
 @task
+def schema(c):
+    """Regenerate Open API schema and JavaScript API client"""
+    c.run("cd frontend && npm run schema")
+
+
+@task
 def build(c, webpack=False):
     """Build Docker environment locally"""
     if webpack:
@@ -101,26 +107,37 @@ def bash(c, webpack=False):
 
 
 @task
-def shell(c):
+def shell(c, print_sql=False):
     """Get a Django shell in a Docker container"""
-    run(c, "./manage.py shell_plus")
+    cmd = "shell_plus"
+    if print_sql:
+        cmd += " --print-sql"
+    run(c, f"./manage.py {cmd}")
 
 
 @task
 def psql(c):
-    """Get a Django shell in a Docker container"""
+    """Get a PostgreSQL shell in a Docker container"""
     run(c, "psql")
 
 
 @task
-def test(c, recreate=False, interactive=False):
+def test(c, recreate=False, interactive=False, quiet=False):
     """Run pytest"""
     if interactive:
         cmd = "bash"
-    elif recreate:
-        cmd = "pytest -vv --create-db"
     else:
-        cmd = "pytest -vv --reuse-db"
+        cmd = "pytest"
+        if recreate:
+            cmd += " --create-db"
+        else:
+            cmd += " --reuse-db"
+
+        if quiet:
+            cmd += " --quiet --no-summary --exitfirst"
+        else:
+            cmd += " -vv"
+
     c.run(
         f"{COMPOSE} run --rm test {cmd}",
         pty=True,
@@ -160,8 +177,8 @@ def sync_s3(c):
     FIXME: Improve upon public read status.
     """
     for sync_dir in SYNC_DIRS:
-        cmd = f"aws --profile anika s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(cmd, pty=True)
+        cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
+        c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
 
 
 @task

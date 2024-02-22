@@ -1,12 +1,12 @@
 import React from 'react'
 import { Formik } from 'formik'
 import { Container, Header } from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { mount } from 'utils'
-import { api } from 'api'
+import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { PersonForm } from 'forms/person'
-import { Person } from 'types'
 import { CaseListTable } from 'comps/case-table'
+import { useDeletePersonMutation, useUpdatePersonMutation, Person } from 'api'
 
 interface DjangoContext {
   person: Person
@@ -26,16 +26,30 @@ const TABLE_FIELDS = [
   'outcome',
 ]
 
-const { person, is_editable, issues, list_url } = (window as any)
-  .REACT_CONTEXT as DjangoContext
+const {
+  person: initialPerson,
+  is_editable,
+  issues,
+  list_url,
+} = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
+  const [person, setPerson] = React.useState<Person>(initialPerson)
+  const { enqueueSnackbar } = useSnackbar()
+  const [deletePerson] = useDeletePersonMutation()
+  const [updatePerson] = useUpdatePersonMutation()
   const handleDelete = (e) => {
     e.preventDefault()
     if (window.confirm('Are you sure you want to delete this person?')) {
-      api.person.delete(person.id).then(() => {
-        window.location.href = list_url
-      })
+      deletePerson({ id: person.id })
+        .then(() => {
+          window.location.href = list_url
+        })
+        .catch((err) => {
+          enqueueSnackbar(getAPIErrorMessage(err, 'Failed to delete person'), {
+            variant: 'error',
+          })
+        })
     }
   }
   return (
@@ -56,12 +70,26 @@ const App = () => {
         }}
         validate={(values) => {}}
         onSubmit={(values, { setSubmitting, setErrors }) => {
-          api.person.update(person.id, values).then(({ errors }) => {
-            if (errors) {
-              setErrors(errors)
-            }
-            setSubmitting(false)
-          })
+          updatePerson({ id: person.id, personCreate: values })
+            .unwrap()
+            .then((person) => {
+              enqueueSnackbar('Updated person', { variant: 'success' })
+              setPerson(person)
+              setSubmitting(false)
+            })
+            .catch((err) => {
+              enqueueSnackbar(
+                getAPIErrorMessage(err, 'Failed to update this person'),
+                {
+                  variant: 'error',
+                }
+              )
+              const requestErrors = getAPIFormErrors(err)
+              if (requestErrors) {
+                setErrors(requestErrors)
+              }
+              setSubmitting(false)
+            })
         }}
       >
         {(formik) => (

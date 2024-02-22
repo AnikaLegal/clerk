@@ -1,0 +1,16 @@
+type: object
+properties:
+  full_name:
+    type: string
+  email:
+    type: string
+  address:
+    type: string
+  phone_number:
+    type: string
+
+required:
+  - full_name
+  - email
+  - address
+  - phone_number

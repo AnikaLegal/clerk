@@ -1,0 +1,17 @@
+get:
+  operationId: searchPeople
+  parameters:
+    - name: query
+      in: query
+      schema:
+        type: string
+      required: true
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/Person.yaml

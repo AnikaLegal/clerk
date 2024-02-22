@@ -8,8 +8,8 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 
 from accounts.models import User
-from emails.models import Email, EmailState, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy
+from emails.models import Email, EmailTemplate, EmailAttachment
+from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
 from core.models.issue import CaseStage
 from notify.models import (
     Notification,
@@ -82,14 +82,13 @@ class TenancyFactory(TimestampedModelFactory):
     class Meta:
         model = Tenancy
 
-    client = factory.SubFactory(ClientFactory)
     agent = factory.SubFactory(PersonFactory)
     landlord = factory.SubFactory(PersonFactory)
     address = factory.Faker("address")
     started = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1y", end_date="-2y"
     )
-    is_on_lease = True
+    is_on_lease = "YES"
 
 
 @factory.django.mute_signals(post_save)
@@ -101,8 +100,20 @@ class IssueFactory(TimestampedModelFactory):
     topic = "REPAIRS"
     answers = {}
     client = factory.SubFactory(ClientFactory)
+    tenancy = factory.SubFactory(TenancyFactory)
     stage = "UNSTARTED"
     is_sharepoint_set_up = True
+
+
+@factory.django.mute_signals(post_save)
+class IssueNoteFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueNote
+
+    issue = factory.SubFactory(IssueFactory)
+    creator = factory.SubFactory(UserFactory)
+    note_type = "PARALEGAL"
+    text = factory.Faker("sentence")
 
 
 @factory.django.mute_signals(post_save)
@@ -143,6 +154,17 @@ class EmailFactory(factory.django.DjangoModelFactory):
 
 
 @factory.django.mute_signals(post_save)
+class EmailTemplateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmailTemplate
+
+    name = factory.Faker("sentence")
+    topic = "GENERAL"
+    text = factory.Faker("sentence")
+    subject = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
 class EmailAttachmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EmailAttachment
@@ -152,16 +174,6 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
     )
-
-    @factory.post_generation
-    def file(self, create, extracted, **kwargs):
-        if extracted:
-            file_name, file = extracted
-        else:
-            file_name = "image.png"
-            file = get_dummy_file(file_name)
-
-        self.file.save(file_name, file)
 
 
 def get_dummy_file(name):

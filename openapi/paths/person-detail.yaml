@@ -1,0 +1,61 @@
+get:
+  operationId: getPerson
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Person.yaml
+
+put:
+  operationId: updatePerson
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/PersonCreate.yaml
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Person.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+
+delete:
+  operationId: deletePerson
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

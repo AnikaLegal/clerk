@@ -1,0 +1,16 @@
+delete:
+  operationId: deleteDocumentTemplate
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

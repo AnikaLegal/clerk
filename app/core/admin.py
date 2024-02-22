@@ -80,11 +80,8 @@ class ClientAdmin(admin.ModelAdmin):
         "last_name",
         "email",
         "phone_number",
-        "referrer_type",
-        "referrer",
         "created_at",
     )
-    list_filter = ("referrer_type",)
 
 
 @admin.register(Issue)
@@ -100,9 +97,11 @@ class IssueAdmin(admin.ModelAdmin):
         "is_alert_sent",
         "is_case_sent",
         "is_sharepoint_set_up",
+        "referrer_type",
+        "referrer",
         "created_at",
     )
-    list_filter = ("topic", "is_alert_sent", "is_case_sent")
+    list_filter = ("topic", "is_alert_sent", "is_case_sent", "referrer_type")
 
     list_select_related = ("client",)
 
@@ -137,16 +136,11 @@ class TenancyAdmin(admin.ModelAdmin):
         "address",
         "postcode",
         "suburb",
-        "client_link",
         "landlord_link",
         "agent_link",
         "created_at",
     )
-    list_select_related = ("client", "landlord", "agent")
-
-    @admin_link("client", "Client")
-    def client_link(self, client):
-        return client.get_full_name()
+    list_select_related = ("landlord", "agent")
 
     @admin_link("landlord", "Landlord")
     def landlord_link(self, landlord):

@@ -1,9 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Button, Table } from 'semantic-ui-react'
 import { Formik } from 'formik'
+import { useSnackbar } from 'notistack'
 
 import { markdownToHtml } from 'utils'
-
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import {
   AutoForm,
   getModelChoices,
@@ -13,7 +14,6 @@ import {
 import { FIELD_TYPES } from './field-component'
 
 import * as Yup from 'yup'
-import { HandledResponse } from 'api'
 
 interface TableFormProps<ModelType extends { id: string | number }> {
   fields: FormField[]
@@ -24,7 +24,7 @@ interface TableFormProps<ModelType extends { id: string | number }> {
   onUpdate: (
     id: string | number,
     values: { [fieldName: string]: unknown }
-  ) => Promise<HandledResponse<unknown>>
+  ) => Promise<ModelType>
 }
 
 // Wrapper around AutoForm for updating a model or displating a table.
@@ -36,6 +36,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
   modelName,
   onUpdate,
 }: TableFormProps<ModelType>) => {
+  const { enqueueSnackbar } = useSnackbar()
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
   if (!isEditMode) {
@@ -54,15 +55,26 @@ export const TableForm = <ModelType extends { id: string | number }>({
         values: { [fieldName: string]: unknown },
         { setSubmitting, setErrors }: any
       ) => {
-        onUpdate(model.id, values).then(({ resp, data, errors }) => {
-          if (resp.status === 400) {
-            setErrors(errors)
-          } else if (resp.ok) {
-            setModel(data[modelName])
+        onUpdate(model.id, values)
+          .then((instance) => {
+            enqueueSnackbar(`Updated ${modelName}`, { variant: 'success' })
+            setModel(instance)
             toggleEditMode()
-          }
-          setSubmitting(false)
-        })
+            setSubmitting(false)
+          })
+          .catch((err) => {
+            enqueueSnackbar(
+              getAPIErrorMessage(err, `Failed to update this ${modelName}`),
+              {
+                variant: 'error',
+              }
+            )
+            const requestErrors = getAPIFormErrors(err)
+            if (requestErrors) {
+              setErrors(requestErrors)
+            }
+            setSubmitting(false)
+          })
       }}
     >
       {(formik) => (
@@ -83,7 +95,7 @@ const FieldTable = ({ fields, model }) => (
     <Table.Body>
       {fields.map(({ label, name, type }) => (
         <Table.Row key={label}>
-          <Table.Cell width={3}>{label}</Table.Cell>
+          <Table.Cell width={4}>{label}</Table.Cell>
           {type === FIELD_TYPES.TEXTAREA ? (
             <td
               dangerouslySetInnerHTML={{

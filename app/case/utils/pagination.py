@@ -1,17 +1,23 @@
-from urllib.parse import urlencode
-from django.core.paginator import Paginator
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
-def get_page(request, items, per_page, return_qs=True):
-    page_number = request.GET.get("page", 1) or 1
-    paginator = Paginator(items, per_page=per_page)
-    page = paginator.get_page(page_number)
-    next_page_num = page.next_page_number() if page.has_next() else paginator.num_pages
-    prev_page_num = page.previous_page_number() if page.has_previous() else 1
-    if return_qs:
-        get_query = {k: v for k, v in request.GET.items()}
-        next_qs = "?" + urlencode({**get_query, "page": next_page_num})
-        prev_qs = "?" + urlencode({**get_query, "page": prev_page_num})
-        return page, next_qs, prev_qs
-    else:
-        return page, next_page_num, prev_page_num
+class ClerkPaginator(PageNumberPagination):
+    def get_paginated_response(self, data):
+        next_page_number, prev_page_number = None, None
+        if self.page.has_next():
+            next_page_number = self.page.next_page_number()
+
+        if self.page.has_previous():
+            prev_page_number = self.page.previous_page_number()
+
+        return Response(
+            {
+                "page_count": self.page.paginator.num_pages,
+                "item_count": self.page.paginator.count,
+                "current": self.page.number,
+                "next": next_page_number,
+                "prev": prev_page_number,
+                "results": data,
+            }
+        )

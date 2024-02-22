@@ -1,0 +1,25 @@
+allOf:
+  - $ref: ./IssueNoteBase.yaml
+  - type: object
+    properties:
+      id:
+        type: number
+      creator:
+        $ref: ./User.yaml
+      text_display:
+        type: string
+      created_at:
+        type: string
+      reviewee:
+        nullable: true
+        allOf:
+          - $ref: ./User.yaml
+      issue:
+        $ref: ./Issue.yaml
+    required:
+      - id
+      - creator
+      - text_display
+      - created_at
+      - reviewee
+      - issue

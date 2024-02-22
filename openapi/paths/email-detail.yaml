@@ -1,0 +1,82 @@
+get:
+  operationId: getEmail
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - description: Email ID
+      in: path
+      name: email_id
+      required: true
+      schema:
+        type: number
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Email.yaml
+
+patch:
+  operationId: updateEmail
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - description: Email ID
+      in: path
+      name: email_id
+      required: true
+      schema:
+        type: number
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/EmailCreate.yaml
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Email.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+
+delete:
+  operationId: deleteEmail
+  parameters:
+    - description: Case ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - description: Email ID
+      in: path
+      name: email_id
+      required: true
+      schema:
+        type: number
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

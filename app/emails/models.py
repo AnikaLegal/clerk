@@ -32,7 +32,6 @@ STATE_CHOICES = (
 
 
 class Email(models.Model):
-
     from_address = models.EmailField(default="")
     to_address = models.EmailField(default="", blank=True)
     cc_addresses = ArrayField(models.EmailField(), default=list, blank=True)
@@ -66,6 +65,12 @@ class Email(models.Model):
     def get_sent_note_text(self):
         return "Email sent"
 
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return self.issue.paralegal_id == user.pk
+
 
 class EmailTemplate(TimestampedModel):
     name = models.CharField(max_length=64)
@@ -96,3 +101,9 @@ class EmailAttachment(models.Model):
         default=SharepointState.NOT_UPLOADED,
         choices=SharepointState.choices,
     )
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return self.email.issue.paralegal_id == user.pk

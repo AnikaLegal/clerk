@@ -1,14 +1,20 @@
 import React, { useState } from 'react'
-import { Button, Container, Header, Table, Input } from 'semantic-ui-react'
+import {
+  Button,
+  Container,
+  Header,
+  Table,
+  Input,
+  Loader,
+} from 'semantic-ui-react'
+import { useSnackbar } from 'notistack'
 
-import { mount, debounce, useEffectLazy } from 'utils'
-import { api } from 'api'
+import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
+import api, { useGetPeopleQuery } from 'api'
+
 import { FadeTransition } from 'comps/transitions'
 
-import { Person } from 'types'
-
 interface DjangoContext {
-  people: Person[]
   create_url: string
 }
 
@@ -17,20 +23,20 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [people, setPeople] = useState(CONTEXT.people)
   const [query, setQuery] = useState('')
+  const { enqueueSnackbar } = useSnackbar()
+  const listResults = useGetPeopleQuery()
+  const [searchQuery, searchResults] = api.useLazySearchPeopleQuery()
+
+  const isLoading = searchResults.isFetching || listResults.isFetching
+  const people = (query ? searchResults.data : listResults.data) || []
+
   const search = debouncer(() => {
-    setIsLoading(true)
-    api.person
-      .search({ person: query })
-      .then(({ data }) => {
-        if (data) {
-          setPeople(data)
-        }
-        setIsLoading(false)
+    searchQuery({ query }).catch((err) => {
+      enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search parties'), {
+        variant: 'error',
       })
-      .catch(() => setIsLoading(false))
+    })
   })
   useEffectLazy(() => search(), [query])
   return (
@@ -48,6 +54,9 @@ const App = () => {
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
+      <Loader active={listResults.isLoading} inline="centered">
+        Loading...
+      </Loader>
       <FadeTransition in={!isLoading}>
         <Table celled>
           <Table.Header>

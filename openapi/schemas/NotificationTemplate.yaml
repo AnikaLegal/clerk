@@ -1,0 +1,24 @@
+allOf:
+  - $ref: ./NotificationTemplateBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+      created_at:
+        type: string
+      event:
+        $ref: ./TextChoiceField.yaml
+      channel:
+        $ref: ./TextChoiceField.yaml
+      target:
+        $ref: ./TextChoiceField.yaml
+
+    required:
+      - id
+      - url
+      - created_at
+      - event
+      - channel
+      - target

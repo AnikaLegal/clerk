@@ -1,0 +1,42 @@
+get:
+  operationId: getNotificationTemplates
+  parameters:
+    - name: name
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: topic
+      in: query
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/NotificationTemplate.yaml
+
+post:
+  operationId: createNotificationTemplate
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/NotificationTemplateCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/NotificationTemplate.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

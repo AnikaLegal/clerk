@@ -1,5 +1,5 @@
 import React from 'react'
-import { DateInput } from 'semantic-ui-calendar-react'
+import DateInput from 'comps/date-input'
 import { Input, Dropdown, InputOnChangeData } from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
 
@@ -57,7 +57,7 @@ const NumberField = ({
   return (
     <Input
       placeholder={placeholder}
-      value={value || ''}
+      value={!value && value !== 0 ? '' : value}
       name={name}
       onChange={(e, { name, value }) =>
         setFieldValue(name, value === '' ? null : value, false)

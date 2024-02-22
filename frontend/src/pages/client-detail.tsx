@@ -7,13 +7,25 @@ import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { api } from 'api'
-import { ClientDetail } from 'types'
+import { Client, ClientCreate, useUpdateClientMutation } from 'api'
+
+interface DjangoContext {
+  client: Client
+  issues: any[]
+}
+
+const { client: initialClient, issues } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [client, setClient] = useState(
-    (window as any).REACT_CONTEXT.client as ClientDetail
-  )
+  const [client, setClient] = useState<Client>(initialClient)
+  const [updateClient] = useUpdateClientMutation()
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateClient({
+      id: client.id,
+      clientCreate: values as ClientCreate,
+    }).unwrap()
+
   return (
     <Container>
       <Header as="h1">{client.full_name} (Client)</Header>
@@ -24,7 +36,7 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Contact details</Header>
       <TableForm
@@ -33,7 +45,7 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Other Information</Header>
       <TableForm
@@ -42,10 +54,10 @@ const App = () => {
         model={client}
         setModel={setClient}
         modelName="client"
-        onUpdate={api.client.update}
+        onUpdate={update}
       />
       <Header as="h3">Cases</Header>
-      <CaseListTable issues={client.issue_set} fields={TABLE_FIELDS} />
+      <CaseListTable issues={issues} fields={TABLE_FIELDS} />
     </Container>
   )
 }
@@ -75,10 +87,20 @@ const PERSONAL_FIELDS = [
     name: 'last_name',
   },
   {
+    label: 'Preferred name',
+    type: FIELD_TYPES.TEXT,
+    name: 'preferred_name',
+  },
+  {
     label: 'Gender',
     name: 'gender',
     type: FIELD_TYPES.TEXT,
     schema: Yup.string().required('Required'),
+  },
+  {
+    label: 'Pronouns',
+    type: FIELD_TYPES.TEXT,
+    name: 'pronouns',
   },
   {
     label: 'Date of birth',
@@ -123,24 +145,7 @@ const OTHER_FIELDS = [
     name: 'eligibility_circumstances',
   },
   {
-    label: 'Rental circumstances',
-    type: FIELD_TYPES.SINGLE_CHOICE,
-    name: 'rental_circumstances',
-  },
-  {
-    label: 'Employment status',
-    schema: Yup.array().of(Yup.string()).required('Required'),
-    type: FIELD_TYPES.MULTI_CHOICE,
-    name: 'employment_status',
-  },
-  {
-    label: 'Weekly income',
-    name: 'weekly_income',
-    schema: Yup.number().integer().positive().nullable(true),
-    type: FIELD_TYPES.NUMBER,
-  },
-  {
-    label: 'Is on Centrelink',
+    label: 'Is on Centrelink?',
     name: 'centrelink_support',
     schema: Yup.bool(),
     type: FIELD_TYPES.BOOL,
@@ -148,7 +153,7 @@ const OTHER_FIELDS = [
   {
     label: 'Number of dependents',
     name: 'number_of_dependents',
-    schema: Yup.number().integer().positive().nullable(true),
+    schema: Yup.number().integer().min(0).nullable(true),
     type: FIELD_TYPES.NUMBER,
   },
   {
@@ -158,27 +163,14 @@ const OTHER_FIELDS = [
     type: FIELD_TYPES.TEXT,
   },
   {
-    label: 'Requires an interpreter',
+    label: 'Requires an interpreter?',
     name: 'requires_interpreter',
-    schema: Yup.bool(),
-    type: FIELD_TYPES.BOOL,
-  },
-  {
-    label: 'Is Aboriginal or Torres Strait Islander',
-    name: 'is_aboriginal_or_torres_strait_islander',
-    schema: Yup.bool(),
-    type: FIELD_TYPES.BOOL,
-  },
-  {
-    label: 'Referrer',
-    name: 'referrer',
-    type: FIELD_TYPES.TEXT,
-    schema: Yup.string(),
-  },
-  {
-    label: 'Referrer type',
     type: FIELD_TYPES.SINGLE_CHOICE,
-    name: 'referrer_type',
+  },
+  {
+    label: 'Is Aboriginal or Torres Strait Islander?',
+    name: 'is_aboriginal_or_torres_strait_islander',
+    type: FIELD_TYPES.SINGLE_CHOICE,
   },
 ]
 const PERSONAL_SCHEMA = getFormSchema(PERSONAL_FIELDS)

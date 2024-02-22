@@ -1,0 +1,33 @@
+allOf:
+  - $ref: ./EmailCreate.yaml
+  - type: object
+    properties:
+      id:
+        type: number
+      created_at:
+        type: string
+      processed_at:
+        type: string
+        nullable: true
+      sender:
+        $ref: ./User.yaml
+        nullable: true
+      state:
+        type: string
+      reply_url:
+        type: string
+      edit_url:
+        type: string
+      attachments:
+        type: array
+        items:
+          $ref: ./EmailAttachment.yaml
+    required:
+      - id
+      - created_at
+      - processed_at
+      - sender
+      - state
+      - reply_url
+      - edit_url
+      - attachments

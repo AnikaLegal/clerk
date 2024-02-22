@@ -38,6 +38,8 @@ export type Issue = {
   fileuploadSet: Array<Upload>
   isAnswered: boolean
   isSubmitted: boolean
+  referrerType: string
+  referrer: string
 }
 
 export type Client = {
@@ -51,8 +53,6 @@ export type Client = {
   dateOfBirth?: string
   phoneNumber?: string
   callTime: string
-  referrerType: string
-  referrer: string
 }
 
 export type Data = { [key: string]: any }

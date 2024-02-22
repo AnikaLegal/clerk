@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Container,
   Header,
@@ -9,10 +9,24 @@ import {
   Checkbox,
 } from 'semantic-ui-react'
 
+import { TableForm } from 'comps/table-form'
+import { getFormSchema } from 'comps/auto-form'
+import { FIELD_TYPES } from 'comps/field-component'
+import { useSnackbar } from 'notistack'
+import * as Yup from 'yup'
+
+import {
+  useGetCaseQuery,
+  useGetPeopleQuery,
+  useUpdateTenancyMutation,
+  useUpdateCaseMutation,
+  IssueUpdate,
+  TenancyCreate,
+  Issue,
+} from 'api'
 import { TimelineNote } from 'comps/timeline-item'
 import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { mount } from 'utils'
-import { api } from 'api'
+import { mount, getAPIErrorMessage } from 'utils'
 import { URLS } from 'consts'
 import {
   FilenoteForm,
@@ -26,83 +40,104 @@ import {
   ProgressForm,
   ConflictForm,
 } from 'forms'
+import { UserPermission, CaseDetailFormProps } from 'types'
 
-import { IssueDetail, IssueNote, Tenancy } from 'types'
-
-interface ReactContext {
-  issue: IssueDetail
-  notes: IssueNote[]
-  tenancy: Tenancy
-  details: { [title: string]: string }
-  actionstep_url: string
+interface DjangoContext {
+  user: UserPermission
+  case_pk: string
   urls: {
     detail: string
     email: string
     docs: string
   }
-  permissions: {
-    is_paralegal_or_better: boolean
-    is_coordinator_or_better: boolean
-  }
 }
 
-const REACT_CONTEXT = (window as any).REACT_CONTEXT as ReactContext
-
-const { details, urls, actionstep_url, permissions } = REACT_CONTEXT
+const {
+  case_pk,
+  urls,
+  user: permissions,
+} = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [issue, setIssue] = useState(REACT_CONTEXT.issue)
-  const [notes, setNotes] = useState(REACT_CONTEXT.notes)
-  const [tenancy, setTenancy] = useState(REACT_CONTEXT.tenancy)
+  const { enqueueSnackbar } = useSnackbar()
   const [activeFormId, setActiveFormId] = useState(null)
   const [showSystemNotes, setShowSystemNotes] = useState(true)
+  const [_updateTenancy, updateTenancyResult] = useUpdateTenancyMutation()
+  const [_updateCase, updateCaseResult] = useUpdateCaseMutation()
+
+  const caseResult = useGetCaseQuery({ id: case_pk })
+
+  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
+  const isInitialLoad = caseResult.isLoading
+  const isIssueLoading = caseResult.isFetching || updateCaseResult.isLoading
+  const isTenancyLoading = updateTenancyResult.isLoading
+
+  if (isInitialLoad) return null
+
+  const issue = caseResult.data!.issue
+  const tenancy = caseResult.data!.tenancy
+  const notes = caseResult.data?.notes ?? []
+  const details = getSubmittedDetails(issue)
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
     .filter((note) => showSystemNotes || note.note_type !== 'EVENT')
 
-  const setSupportWorker = (supportWorker) =>
-    setIssue({ ...issue, support_worker: supportWorker })
+  const updateTenancy = (tenancyCreate: TenancyCreate) => {
+    _updateTenancy({ id: tenancy.id, tenancyCreate })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Updated tenancy', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update tenancy'), {
+          variant: 'error',
+        })
+      })
+  }
+
+  const updateCase = (issueUpdate: IssueUpdate) => {
+    _updateCase({ id: issue.id, issueUpdate })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Updated case', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update case'), {
+          variant: 'error',
+        })
+      })
+  }
 
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
-      api.case.landlord.remove(issue.id).then(({ data }) => setTenancy(data))
+      updateTenancy({ landlord_id: null } as any)
     }
   }
   const onRemoveAgent = () => {
     if (confirm('Remove the agent for this case?')) {
-      api.case.agent.remove(issue.id).then(({ data }) => setTenancy(data))
+      updateTenancy({ agent_id: null } as any)
     }
   }
   const onRemoveSupportWorker = () => {
     if (confirm('Remove the support worker for this case?')) {
-      api.case.supportWorker.remove(issue.id).then(() => setSupportWorker(null))
+      updateCase({ support_worker_id: null } as any)
     }
   }
 
   const onAddAgent = (agentId) => {
-    api.case.agent.add(issue.id, agentId).then(({ data }) => setTenancy(data))
+    updateTenancy({ agent_id: agentId } as any)
   }
   const onAddLandlord = (landlordId) => {
-    api.case.landlord
-      .add(issue.id, landlordId)
-      .then(({ data }) => setTenancy(data))
+    updateTenancy({ landlord_id: landlordId } as any)
   }
   const onAddSupportWorker = (supportWorkerId) => {
-    api.case.supportWorker
-      .add(issue.id, supportWorkerId)
-      .then(({ data }) => setSupportWorker(data))
+    updateCase({ support_worker_id: supportWorkerId } as any)
   }
 
-  const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
   return (
     <Container>
-      <CaseHeader
-        issue={issue}
-        actionstepUrl={actionstep_url}
-        activeTab={CASE_TABS.DETAIL}
-        urls={urls}
-      />
+      <CaseHeader issue={issue} activeTab={CASE_TABS.DETAIL} urls={urls} />
       <div className="ui two column grid" style={{ marginTop: '1rem' }}>
         <div className="column">
           <Segment>
@@ -155,12 +190,7 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm
-              issue={issue}
-              setIssue={setIssue}
-              setNotes={setNotes}
-              onCancel={() => setActiveFormId(null)}
-            />
+            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
           )}
           {!activeFormId && (
             <React.Fragment>
@@ -169,20 +199,22 @@ const App = () => {
                 url={issue.client.url}
                 tableData={{
                   Name: issue.client.full_name,
+                  ['Preferred name']: issue.client.preferred_name,
                   Email: issue.client.email,
                   Phone: issue.client.phone_number,
                   Age: issue.client.age,
                   Gender: issue.client.gender,
+                  Pronouns: issue.client.pronouns,
                 }}
               />
               <EntityCard
                 title="Tenancy"
                 url={tenancy.url}
                 tableData={{
-                  ['Street Address']: tenancy.address,
+                  ['Street address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease']: tenancy.is_on_lease,
+                  ['Client on lease?']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
                 }}
               />
               {tenancy.landlord ? (
@@ -194,7 +226,7 @@ const App = () => {
                     Name: tenancy.landlord.full_name,
                     Address: tenancy.landlord.address,
                     Email: tenancy.landlord.email,
-                    Phone: tenancy.landlord.phone,
+                    Phone: tenancy.landlord.phone_number,
                   }}
                 />
               ) : (
@@ -202,6 +234,7 @@ const App = () => {
                   title="Add a landlord"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddLandlord}
+                  isLoading={isTenancyLoading}
                 />
               )}
               {tenancy.agent ? (
@@ -221,6 +254,7 @@ const App = () => {
                   title="Add an agent"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddAgent}
+                  isLoading={isTenancyLoading}
                 />
               )}
               {issue.support_worker ? (
@@ -240,8 +274,17 @@ const App = () => {
                   title="Add a support worker"
                   createUrl={URLS.PERSON.CREATE}
                   onSelect={onAddSupportWorker}
+                  isLoading={isIssueLoading}
                 />
               )}
+              <CurrentCircumstancesCard
+                initialIssue={issue}
+                updateCase={_updateCase}
+              />
+              <OtherInformationCard
+                initialIssue={issue}
+                updateCase={_updateCase}
+              />
               <EntityCard title="Other submitted data" tableData={details} />
             </React.Fragment>
           )}
@@ -251,15 +294,21 @@ const App = () => {
   )
 }
 
-const PersonSearchCard = ({ title, createUrl, onSelect }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [people, setPeople] = useState([])
-  useEffect(() => {
-    api.person.list().then(({ data }) => {
-      setPeople(data)
-      setIsLoading(false)
-    })
-  }, [])
+interface PersonSearchCardProps {
+  title: string
+  createUrl: string
+  onSelect: (val: any) => void
+  isLoading: boolean
+}
+
+const PersonSearchCard: React.FC<PersonSearchCardProps> = ({
+  title,
+  createUrl,
+  onSelect,
+  isLoading,
+}) => {
+  const { data, isFetching } = useGetPeopleQuery()
+  const people = data || []
   return (
     <div className="ui card fluid">
       <div className="content">
@@ -273,7 +322,7 @@ const PersonSearchCard = ({ title, createUrl, onSelect }) => {
           fluid
           search
           selection
-          loading={isLoading}
+          loading={isFetching || isLoading}
           placeholder="Select a person"
           options={people.map((p) => ({
             key: p.id,
@@ -317,7 +366,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
         <tbody>
           {Object.entries(tableData).map(([title, text]) => (
             <tr key={title}>
-              <td className="four wide">{title}</td>
+              <td className="four wide">{title[0].toUpperCase() + title.slice(1).toLowerCase()}</td>
               <td>{text}</td>
             </tr>
           ))}
@@ -327,7 +376,103 @@ const EntityCard: React.FC<EntityCardProps> = ({
   </div>
 )
 
-const CASE_FORMS = {
+const CurrentCircumstancesCard = ({
+  initialIssue,
+  updateCase,
+}) => {
+  const fields = [
+    {
+      label: 'Weekly rent',
+      schema: Yup.number().integer().min(0).nullable(true),
+      type: FIELD_TYPES.NUMBER,
+      name: 'weekly_rent',
+    },
+    {
+      label: 'Employment status',
+      schema: Yup.array().of(Yup.string()).required('Required'),
+      type: FIELD_TYPES.MULTI_CHOICE,
+      name: 'employment_status',
+    },
+    {
+      label: 'Weekly income',
+      name: 'weekly_income',
+      schema: Yup.number().integer().min(0).nullable(true),
+      type: FIELD_TYPES.NUMBER,
+    },
+  ]
+
+  return (
+    <TableFormCard
+      header="Current circumstances"
+      fields={fields}
+      initialIssue={initialIssue}
+      updateCase={updateCase}
+    />
+  )
+}
+
+const OtherInformationCard = ({
+  initialIssue,
+  updateCase,
+}) => {
+  const fields = [
+    {
+      label: 'Referrer type',
+      type: FIELD_TYPES.SINGLE_CHOICE,
+      name: 'referrer_type',
+    },
+    {
+      label: 'Referrer',
+      name: 'referrer',
+      type: FIELD_TYPES.TEXT,
+      schema: Yup.string(),
+    },
+  ]
+
+  return (
+    <TableFormCard
+      header="Other information"
+      fields={fields}
+      initialIssue={initialIssue}
+      updateCase={updateCase}
+    />
+  )
+}
+
+const TableFormCard = ({
+  header,
+  fields,
+  initialIssue,
+  updateCase,
+}) => {
+  const [issue, setIssue] = useState<Issue>(initialIssue)
+  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+    updateCase({
+      id: issue.id,
+      issueUpdate: values as IssueUpdate,
+    }).unwrap()
+
+  const schema = getFormSchema(fields)
+
+  return (
+    <div className="ui card fluid">
+      <div className="content">
+        <Header as="h3">{header}</Header>
+        <TableForm
+          fields={fields}
+          schema={schema}
+          model={issue}
+          setModel={setIssue}
+          modelName="case"
+          onUpdate={update}
+        />
+      </div>
+    </div>
+  )
+}
+
+
+const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   filenote: FilenoteForm,
   review: ReviewForm,
   performance: PerformanceForm,
@@ -340,7 +485,14 @@ const CASE_FORMS = {
   outcome: OutcomeForm,
 }
 
-const CASE_FORM_OPTIONS = [
+interface CaseFormOption {
+  id: string
+  icon: string
+  text: string
+  when: (perms: UserPermission, issue: Issue) => boolean
+}
+
+const CASE_FORM_OPTIONS: CaseFormOption[] = [
   {
     id: 'filenote',
     icon: 'clipboard outline',
@@ -357,7 +509,7 @@ const CASE_FORM_OPTIONS = [
     id: 'performance',
     icon: 'clipboard outline',
     text: 'Add a paralegal performance review note',
-    when: (perms, issue) => perms.is_coordinator_or_better && issue.paralegal,
+    when: (perms, issue) => perms.is_coordinator_or_better && !!issue.paralegal,
   },
   {
     id: 'conflict',
@@ -402,5 +554,24 @@ const CASE_FORM_OPTIONS = [
     when: (perms, issue) => perms.is_coordinator_or_better && !issue.is_open,
   },
 ]
+
+const getSubmittedDetails = (issue: Issue): { [key: string]: string } =>
+  Object.entries(issue.answers).reduce((obj, [k, v]) => {
+    if (!v) return obj
+    // Chop off first part of title
+    const title = correctCase(k.split('_').slice(1).join('_'))
+    // Handle answers that are lists of answers
+    const answer = (Array.isArray(v) ? v : [v]).map(correctCase).join(', ')
+    return { ...obj, [title]: answer }
+  }, {})
+
+const correctCase = (str: any): string =>
+  String(str)
+    .split('_')
+    .map((s) => {
+      const lowered = s.toLowerCase()
+      return lowered[0].toUpperCase() + lowered.slice(1)
+    })
+    .join(' ')
 
 mount(App)

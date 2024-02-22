@@ -1,0 +1,14 @@
+allOf:
+  - $ref: ./PersonBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+      support_contact_preferences:
+        $ref: ./TextChoiceField.yaml
+    required:
+      - id
+      - url
+      - support_contact_preferences

@@ -1,0 +1,26 @@
+allOf:
+  - $ref: ./ClientBase.yaml
+  - type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      url:
+        type: string
+      age:
+        type: integer
+      full_name:
+        type: string
+      call_times:
+        $ref: ./TextChoiceListField.yaml
+      eligibility_circumstances:
+        $ref: ./TextChoiceListField.yaml
+    required:
+      - id
+      - url
+      - age
+      - full_name
+      - date_of_birth
+      # Choice fields
+      - call_times
+      - eligibility_circumstances
