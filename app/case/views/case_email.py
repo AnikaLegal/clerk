@@ -241,9 +241,6 @@ class EmailApiViewset(GenericViewSet):
         return Response(serializer.data, status=201)
 
     def get_attachment(self, email: Email, attachment_id: int) -> EmailAttachment:
-        if not email.state == EmailState.DRAFT:
-            raise Http404()
-
         try:
             attachment = email.emailattachment_set.get(pk=attachment_id)
         except EmailAttachment.DoesNotExist:
@@ -259,6 +256,9 @@ class EmailApiViewset(GenericViewSet):
     )
     def delete_attachment(self, request, pk=None, email_id=None, attachment_id=None):
         email = self.get_email(email_id)
+        if not email.state == EmailState.DRAFT:
+            raise Http404()
+
         attachment = self.get_attachment(email, attachment_id)
         attachment.delete()
         return Response(status=204)
