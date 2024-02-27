@@ -204,7 +204,7 @@ class EmailApiViewset(GenericViewSet):
 
         data = {**request.data}
         if data.get("state") == EmailState.READY_TO_SEND:
-            data["html"] = render_email_template(email.html)
+            data["html"] = render_email_template(data["html"])
 
         serializer = EmailSerializer(email, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
