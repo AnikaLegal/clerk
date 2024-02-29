@@ -1,9 +1,9 @@
-{% extends "web/_base.html" %} 
+{% extends "web/_base.html" %}
 {% load static %}
 {% load wagtail_clerk %}
-{% block title %}Impact{% endblock %} 
+{% block title %}Impact{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="Impact" description="Our vision is a world where everyone can access justice" %}            
+{% include 'web/snippets/_social_meta.html' with title="Impact" description="Our vision is a world where everyone can access justice" %}
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -13,7 +13,7 @@
             <span class="callout">everyone</span> can access justice
         </h1>
         <p style="max-width: 575px">
-            We fight for this vision by providing free legal assistance to those who can’t access it through 
+            We fight for this vision by providing free legal assistance to those who can’t access it through
             practical legal training and trusted partnerships.
         </p>
         <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.pdf' %}">
@@ -23,26 +23,14 @@
 </div>
 <div class="segment gold round-large top-right bottom-left">
     <div class="container wide">
-        <h2>In the last 12 months<br class="mobile-break"> we have</h2>
+        <h2>Our impact FY22-23</h2>
         <div class="divider"></div>
         <div class="card-grid tight">
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/wrench.svg' %}">
-                <p class="compact">
-                    Assisted {{ repairs_advice_count }} tenants who needed repairs at their rental properties.
-                </p>
+            <div class="card tight" style="max-width: 70%; flex: 45%">
+                <img src="{% static 'web/img/impact/impact-fy-22-23-1.png' %}" style="max-height: max-content; border-radius: 22px; box-shadow: 0px 4px 41px #ebb90042;">
             </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/cash.svg' %}">
-                <p class="compact">
-                    Assisted {{ bonds_advice_count }} people who were reclaiming their rental bond.
-                </p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/house.svg' %}">
-                <p class="compact">
-                    Assisted {{ evictions_advice_count }} tenants who were being evicted from their homes.
-                </p>
+            <div class="card tight" style="max-width: 70%; flex: 45%">
+                <img src="{% static 'web/img/impact/impact-fy-22-23-2.png' %}" style="max-height: max-content; border-radius: 22px; box-shadow: 0px 4px 41px #ebb90042;">
             </div>
         </div>
     </div>
@@ -51,16 +39,16 @@
     <div class="container wide">
         <div class="story right">
             <div class="blue-ball">
-                <img
-                style="object-position: 50% 20%;max-height: 465px;"
+                <img style="object-position: 50% 20%;max-height: 465px;"
                     class="round not-responsive top-left bottom-left bottom-right"
-                    src="{% static 'web/img/photos/louise.jpg' %}"
-                >
+                    src="{% static 'web/img/photos/louise.jpg' %}">
             </div>
             <div class="content">
                 <h2>Louise’s story</h2>
-                <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
-                <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
+                <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her
+                    home in preparation for the birth of her baby.</p>
+                <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up,
+                    it was all just getting too hard”.</p>
                 <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
                     <button>Read more</button>
                 </a>
@@ -73,17 +61,18 @@
         <div class="story left">
             <div class="content">
                 <h2>Sam’s story</h2>
-                <p class="light">Sam joined Anika to get his first community law experience by helping a pregnant mother get her unsafe home repaired just a week before the birth of the her baby.</p>
-                <p class="light">“Seeing how our assistance empowered Louise during what she told me was one of the most stressful periods of her life, emphasised to me the unique and powerful social justice organisation Anika is poised to become”</p>
+                <p class="light">Sam joined Anika to get his first community law experience by helping a pregnant mother
+                    get her unsafe home repaired just a week before the birth of the her baby.</p>
+                <p class="light">“Seeing how our assistance empowered Louise during what she told me was one of the most
+                    stressful periods of her life, emphasised to me the unique and powerful social justice organisation
+                    Anika is poised to become”</p>
                 <a href="{% clerk_slugurl 'meet-sam-one-of-our-volunteer-paralegals' %}">
                     <button>Read more</button>
                 </a>
             </div>
             <div class="blue-ball right">
-                <img
-                    class="round not-responsive top-right bottom-left bottom-right"
-                    src="{% static 'web/img/photos/sam.jpg' %}"
-                >
+                <img class="round not-responsive top-right bottom-left bottom-right"
+                    src="{% static 'web/img/photos/sam.jpg' %}">
             </div>
         </div>
     </div>
@@ -95,7 +84,9 @@
                 <h2>Louise, repairs client:</h2>
                 <p class="header">
                     <i style="font-weight: 400">
-                        “The empathy that everyone at Anika showed for our situation was<br class="desktop-break"> amazing, and with Sam taking over, everything just became so much<br class="desktop-break"> easier for me.”
+                        “The empathy that everyone at Anika showed for our situation was<br class="desktop-break">
+                        amazing, and with Sam taking over, everything just became so much<br class="desktop-break">
+                        easier for me.”
                     </i>
                 </p>
                 <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
@@ -106,7 +97,8 @@
                 <h2>Erica, rent reduction client:</h2>
                 <p class="header">
                     <i style="font-weight: 400">
-                        “Without Anika’s assistance, I wouldn’t have felt comfortable negotiating with the agent. I was kind of terrified, to be completely honest, as they had been really difficult in the past.”                    
+                        “Without Anika’s assistance, I wouldn’t have felt comfortable negotiating with the agent. I was
+                        kind of terrified, to be completely honest, as they had been really difficult in the past.”
                     </i>
                 </p>
                 <a href="{% clerk_slugurl 'erica-rent-reduction' %}">
@@ -127,7 +119,8 @@
             Our service is, and will always be, 100% free to those who need it.
         </p>
         <p>
-            If you would like to discuss how you or your organisation can support Anika Legal, please get in touch with our Head of Partnerships. 
+            If you would like to discuss how you or your organisation can support Anika Legal, please get in touch with
+            our Head of Partnerships.
         </p>
         <a href="mailto:partnerships@anikalegal.com">
             <button style="margin-top: 50px;">Get in touch</button>
@@ -135,21 +128,24 @@
     </div>
 </div>
 <style>
-#toc-brag {
-    padding: 100px 0 45px 0;
-}
-#toc-brag p {
-    max-width: 963px;
-    margin-top: 31px;
-}
-@media (max-width: 600px) {
     #toc-brag {
-        padding: 10px 0 45px 0;
+        padding: 100px 0 45px 0;
     }
-}
-#toc-links {
-    padding-bottom: 45px;
-}
+
+    #toc-brag p {
+        max-width: 963px;
+        margin-top: 31px;
+    }
+
+    @media (max-width: 600px) {
+        #toc-brag {
+            padding: 10px 0 45px 0;
+        }
+    }
+
+    #toc-links {
+        padding-bottom: 45px;
+    }
 </style>
 <div class="container">
     <div class="brag" id="toc-brag">
@@ -158,12 +154,11 @@
         </h2>
         <div class="divider"></div>
         <p>
-            At the heart of Anika’s approach to measuring impact is a Theory of Change, a framework that breaks down the inputs and activities required to produce the outputs and a chain of outcomes that lead to a longer-term change. By following this Theory of Change, we can see how our actions move the needle on access to justice.
+            At the heart of Anika’s approach to measuring impact is a Theory of Change, a framework that breaks down the
+            inputs and activities required to produce the outputs and a chain of outcomes that lead to a longer-term
+            change. By following this Theory of Change, we can see how our actions move the needle on access to justice.
         </p>
     </div>
-</div>
-<div class="container wide">
-    {% include 'web/snippets/_theory_of_change.html' with id="toc-links" %}
 </div>
 <div class="pre-footer">
     <div class="segment">
