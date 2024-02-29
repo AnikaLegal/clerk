@@ -1,8 +1,8 @@
-{% extends "web/_base.html" %} 
+{% extends "web/_base.html" %}
 {% load static %}
-{% block title %}Reports{% endblock %} 
+{% block title %}Reports{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="Reports" description="Anika Legal is an independent legal practice, tax-deductible charity & social enterprise. Our Annual, Financial and Impact Reports outline the work we do." %}            
+{% include 'web/snippets/_social_meta.html' with title="Reports" description="Anika Legal is an independent legal practice, tax-deductible charity & social enterprise. Our Annual, Financial and Impact Reports outline the work we do." %}
 {% endblock %}
 {% block content %}
 <div class="hero-gold">
@@ -21,10 +21,8 @@
                     <button>Latest annual report</button>
                 </a>
             </div>
-            <img 
-                class="round not-responsive top-left top-right bottom-left" 
-                src="{% static 'web/img/photos/mum.jpg' %}"
-            >
+            <img class="round not-responsive top-left top-right bottom-left"
+                src="{% static 'web/img/photos/mum.jpg' %}">
         </div>
     </div>
 </div>
@@ -42,7 +40,8 @@
                     Access to Justice & Technology Network submission to the NLAP Review (October 2023)
                 </h2>
                 <p>
-                    Access to Justice & Technology Network submission to the Independent Review of the National Legal Assistance Partnership (2020-2025) regarding the role of technology in addressing unmet legal need.
+                    Access to Justice & Technology Network submission to the Independent Review of the National Legal
+                    Assistance Partnership (2020-2025) regarding the role of technology in addressing unmet legal need.
                 </p>
                 <a href="{% static 'web/docs/Access-to-Justice-and-Technology-Network-NLAP-Review-Submission.pdf' %}">
                     <button>View</button>
@@ -81,9 +80,16 @@
                 <p>
                     Read about the work we've done over the last year.
                 </p>
-                <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.pdf' %}">
-                    <button>View</button>
-                </a>
+                <div
+                    style="width:100%; margin-top: auto; display: flex;
+                    flex-wrap: wrap; justify-content: space-evenly; gap: 10px">
+                    <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.pdf' %}">
+                        <button>View</button>
+                    </a>
+                    <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.docx' %}">
+                        <button>Accessible</button>
+                    </a>
+                </div>
             </div>
 
             <div class="card">
@@ -167,7 +173,7 @@
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Financial Report<br class="mobile-break"> 2018-2019</h2>
                 <p>
-                    See an overview of our finances. 
+                    See an overview of our finances.
                 </p>
                 <a href="{% static 'web/docs/financial-report-2018-2019.pdf' %}">
                     <button>View</button>
