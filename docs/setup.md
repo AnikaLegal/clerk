@@ -8,6 +8,8 @@ You will need:
 - `docker-compose` ([install](https://docs.docker.com/compose/install/))
 - `transcrypt` ([install](https://github.com/elasticdog/transcrypt#usage))
 - `inv` ([install](https://www.pyinvoke.org/installing.html))
+- `Bump My Version`
+  ([install](https://callowayproject.github.io/bump-my-version/#installation))
 
 ## Optional for Local Development
 

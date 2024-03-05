@@ -12,6 +12,12 @@ def schema(c):
 
 
 @task
+def bump(c, part="patch"):
+    """Bump clerk version & create git tag using the new version"""
+    c.run(f"bump-my-version --allow-dirty bump {part}")
+
+
+@task
 def build(c, webpack=False):
     """Build Docker environment locally"""
     if webpack:
