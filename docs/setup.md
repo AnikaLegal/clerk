@@ -4,10 +4,14 @@ This repository should work on Linux and Mac.
 
 You will need:
 
-- `docker` ([install](https://docs.docker.com/install/#supported-platforms))
-- `docker compose (v2)` ([install](https://docs.docker.com/compose/install/))
-- `transcrypt` ([install](https://github.com/elasticdog/transcrypt#usage))
-- `inv` ([install](https://www.pyinvoke.org/installing.html))
+- docker ([install](https://docs.docker.com/engine/install/))
+
+  Docker Engine or Docker Desktop can be used. Docker Engine seems to use less
+  resources than Docker Desktop.
+
+- docker compose (v2) ([install](https://docs.docker.com/compose/install/))
+- transcrypt ([install](https://github.com/elasticdog/transcrypt#usage))
+- inv ([install](https://www.pyinvoke.org/installing.html))
 
 ## Optional for Local Development
 
