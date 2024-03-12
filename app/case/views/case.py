@@ -46,8 +46,14 @@ def case_list_page_view(request):
                 ("False", "Closed"),
             ],
         },
+        "create_url": reverse("case-create"),
     }
-    return render_react_page(request, f"Cases", "case-list", context)
+    return render_react_page(request, "Cases", "case-list", context)
+
+@api_view(["GET"])
+@coordinator_or_better_required
+def case_create_page_view(request):
+    return render_react_page(request, "Create case", "case-create", {})
 
 
 @api_view(["GET"])
