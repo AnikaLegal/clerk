@@ -25,6 +25,7 @@ PAGE_TEST_CASE = [
     PageTestCase(name="case-inbox", factory=factories.IssueFactory, is_detail=False),
     PageTestCase(name="case-detail", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="case-docs", factory=factories.IssueFactory, is_detail=True),
+    PageTestCase(name="case-create", factory=None, is_detail=False),
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
         name="person-create", factory=factories.PersonFactory, is_detail=False
@@ -90,7 +91,7 @@ def test_case_page_status_code(superuser_client, test_case):
         url = reverse(test_case.name)
 
     response = superuser_client.get(url)
-    msg = f"URL name {test_case.name} failed, expecting status 200 got {response.status_code}"
+    msg = f"URL name {test_case.name} failed, expecting status 200, got {response.status_code}"
     assert response.status_code == 200, msg
 
 

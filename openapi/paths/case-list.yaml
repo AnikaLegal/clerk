@@ -41,7 +41,6 @@ get:
       schema:
         type: string
       required: false
-
   responses:
     "200":
       description: Successful response.
@@ -73,3 +72,22 @@ get:
               - page_count
               - item_count
               - results
+post:
+  operationId: createCase
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IssueCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Issue.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

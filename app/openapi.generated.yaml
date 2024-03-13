@@ -79,6 +79,25 @@ paths:
                   - page_count
                   - item_count
                   - results
+    post:
+      operationId: createCase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/case/{id}/:
     get:
       operationId: getCase
@@ -1422,6 +1441,7 @@ components:
               type: object
               additionalProperties:
                 type: string
+              nullable: true
             is_conflict_check:
               type: boolean
               nullable: true
@@ -1455,6 +1475,65 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
+    IssueCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            paralegal_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            client_id:
+              $ref: "#/components/schemas/Client"
+            tenancy_id:
+              $ref: "#/components/schemas/Tenancy"
+            support_worker_id:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            weekly_rent:
+              type: integer
+              nullable: true
+          required:
+            - paralegal_id
+            - lawyer_id
+            - client_id
+            - tenancy_id
+            - support_worker_id
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+            - weekly_rent
+    Error:
+      description: The schema for an error response
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: object
+                  - type: array
+        nonFieldErrors:
+          type: array
+          items:
+            type: string
     IssueNoteBase:
       type: object
       properties:
@@ -1527,24 +1606,6 @@ components:
             - weekly_income
             - referrer
             - referrer_type
-    Error:
-      description: The schema for an error response
-      type: object
-      properties:
-        detail:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
-              items:
-                oneOf:
-                  - type: string
-                  - type: object
-                  - type: array
-        nonFieldErrors:
-          type: array
-          items:
-            type: string
     IssueNoteCreate:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"

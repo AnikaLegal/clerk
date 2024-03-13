@@ -77,7 +77,7 @@ const App = () => {
   const issue = caseResult.data!.issue
   const tenancy = caseResult.data!.tenancy
   const notes = caseResult.data?.notes ?? []
-  const details = getSubmittedDetails(issue)
+  const details = issue.answers ? getSubmittedDetails(issue.answers) : null
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
@@ -151,8 +151,7 @@ const App = () => {
                       id === activeFormId
                         ? setActiveFormId(null)
                         : setActiveFormId(id)
-                    }
-                  >
+                    }>
                     <List.Content>
                       <div className="header">
                         <i className={`${icon} icon`}></i>
@@ -285,7 +284,9 @@ const App = () => {
                 initialIssue={issue}
                 updateCase={_updateCase}
               />
-              <EntityCard title="Other submitted data" tableData={details} />
+              { details && (
+                <EntityCard title="Other submitted data" tableData={details} />
+              )}
             </React.Fragment>
           )}
         </div>
@@ -555,8 +556,8 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
   },
 ]
 
-const getSubmittedDetails = (issue: Issue): { [key: string]: string } =>
-  Object.entries(issue.answers).reduce((obj, [k, v]) => {
+const getSubmittedDetails = (answers: Record<string, string>): { [key: string]: string } =>
+  Object.entries(answers).reduce((obj, [k, v]) => {
     if (!v) return obj
     // Chop off first part of title
     const title = correctCase(k.split('_').slice(1).join('_'))

@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from accounts.models import User
 from case.middleware import annotate_group_access
 from core import factories
-from core.models import IssueNote
+from core.models import Issue, IssueNote
 from conftest import schema_tester
 
 
@@ -199,6 +199,58 @@ def test_case_update_view(superuser_client: APIClient):
     schema_tester.validate_response(response=response)
     issue.refresh_from_db()
     assert not issue.is_open
+
+
+@pytest.mark.django_db
+def test_case_create_view_permissions(
+    user_client: APIClient,
+    user: User,
+    paralegal_group,
+    coordinator_group,
+):
+    """
+    Paralegal users can't create cases. Coordinator users can create cases.
+    """
+    url = reverse("case-api-list")
+    client = factories.ClientFactory()
+    tenancy = factories.TenancyFactory()
+    data = {
+        "topic": "REPAIRS",
+        "client_id": client.pk,
+        "tenancy_id": tenancy.pk,
+    }
+
+    # Paralegal user.
+    user.groups.set([paralegal_group])
+    annotate_group_access(user)
+    response = user_client.post(url, data=data, format="json")
+    assert response.status_code == 403
+
+    # Coordinator user.
+    user.groups.set([coordinator_group])
+    annotate_group_access(user)
+    response = user_client.post(url, data=data, format="json")
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_case_create_view(superuser_client: APIClient):
+    client = factories.ClientFactory()
+    tenancy = factories.TenancyFactory()
+    data = {
+        "topic": "REPAIRS",
+        "client_id": client.pk,
+        "tenancy_id": tenancy.pk,
+    }
+    url = reverse("case-api-list")
+    response = superuser_client.post(url, data=data, format="json")
+    assert response.status_code == 201
+    schema_tester.validate_response(response=response)
+
+    issue = Issue.objects.get()
+    assert issue.topic == "REPAIRS"
+    assert issue.client == client
+    assert issue.tenancy == tenancy
 
 
 # TODO: Test permissions

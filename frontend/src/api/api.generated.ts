@@ -16,6 +16,13 @@ const injectedRtkApi = api.injectEndpoints({
         },
       }),
     }),
+    createCase: build.mutation<CreateCaseApiResponse, CreateCaseApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/`,
+        method: 'POST',
+        body: queryArg.issueCreate,
+      }),
+    }),
     getCase: build.query<GetCaseApiResponse, GetCaseApiArg>({
       query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/` }),
     }),
@@ -361,6 +368,10 @@ export type GetCasesApiArg = {
   isOpen?: string
   paralegal?: string
   lawyer?: string
+}
+export type CreateCaseApiResponse = /** status 201 Successful response. */ Issue
+export type CreateCaseApiArg = {
+  issueCreate: IssueCreate
 }
 export type GetCaseApiResponse = /** status 200 Successful response. */ {
   issue: Issue
@@ -771,10 +782,26 @@ export type Issue = IssueBase & {
   url: string
   answers: {
     [key: string]: string
-  }
+  } | null
   is_conflict_check: boolean | null
   is_eligibility_check: boolean | null
   next_review: string | null
+}
+export type Error = {
+  detail?: string | object | (string | object | any)[]
+  nonFieldErrors?: string[]
+}
+export type IssueCreate = IssueBase & {
+  paralegal_id: User
+  lawyer_id: User
+  client_id: Client
+  tenancy_id: Tenancy
+  support_worker_id: Person
+  employment_status: TextChoiceListField
+  weekly_income: number | null
+  referrer: string
+  referrer_type: TextChoiceField
+  weekly_rent: number | null
 }
 export type IssueNoteBase = {
   note_type: string
@@ -787,10 +814,6 @@ export type IssueNote = IssueNoteBase & {
   text_display: string
   created_at: string
   reviewee: User | null
-}
-export type Error = {
-  detail?: string | object | (string | object | any)[]
-  nonFieldErrors?: string[]
 }
 export type IssueUpdate = IssueBase & {
   paralegal_id: User
@@ -914,6 +937,7 @@ export type DocumentTemplateCreate = {
 }
 export const {
   useGetCasesQuery,
+  useCreateCaseMutation,
   useGetCaseQuery,
   useUpdateCaseMutation,
   useCreateCaseNoteMutation,
