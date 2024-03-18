@@ -11,6 +11,10 @@ from core.models.client import (
 from .fields import TextChoiceField, TextChoiceListField
 
 
+class ClientSearchSerializer(serializers.Serializer):
+    search = serializers.CharField(max_length=256, required=True)
+
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
@@ -40,18 +44,21 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.CharField(read_only=True)
-    age = serializers.SerializerMethodField()
-    full_name = serializers.SerializerMethodField()
-    url = serializers.SerializerMethodField()
     date_of_birth = serializers.DateTimeField(
-        format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
+        format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False
     )
-    call_times = TextChoiceListField(CallTime)
-    eligibility_circumstances = TextChoiceListField(EligibilityCircumstanceType)
+    call_times = TextChoiceListField(CallTime, required=False)
+    eligibility_circumstances = TextChoiceListField(
+        EligibilityCircumstanceType, required=False
+    )
     is_aboriginal_or_torres_strait_islander = TextChoiceField(
-        AboriginalOrTorresStraitIslander
+        AboriginalOrTorresStraitIslander, required=False
     )
-    requires_interpreter = TextChoiceField(RequiresInterpreter)
+    requires_interpreter = TextChoiceField(RequiresInterpreter, required=False)
+
+    full_name = serializers.SerializerMethodField()
+    age = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))

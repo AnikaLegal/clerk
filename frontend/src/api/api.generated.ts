@@ -165,6 +165,28 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.tenancyCreate,
       }),
     }),
+    getClients: build.query<GetClientsApiResponse, GetClientsApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/`,
+        params: { page: queryArg.page, search: queryArg.search },
+      }),
+    }),
+    createClient: build.mutation<CreateClientApiResponse, CreateClientApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/`,
+        method: 'POST',
+        body: queryArg.clientCreate,
+      }),
+    }),
+    searchClient: build.query<SearchClientApiResponse, SearchClientApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/search/`,
+        params: { query: queryArg.query },
+      }),
+    }),
+    getClient: build.query<GetClientApiResponse, GetClientApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/client/${queryArg.id}/` }),
+    }),
     updateClient: build.mutation<UpdateClientApiResponse, UpdateClientApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/client/${queryArg.id}/`,
@@ -530,6 +552,33 @@ export type UpdateTenancyApiArg = {
   /** Successful response. */
   tenancyCreate: TenancyCreate
 }
+export type GetClientsApiResponse = /** status 200 Successful response. */ {
+  current: number
+  next: number | null
+  prev: number | null
+  page_count: number
+  item_count: number
+  results: Client[]
+}
+export type GetClientsApiArg = {
+  page?: number
+  search?: string
+}
+export type CreateClientApiResponse =
+  /** status 201 Successful response. */ Client
+export type CreateClientApiArg = {
+  clientCreate: ClientCreate
+}
+export type SearchClientApiResponse =
+  /** status 200 Successful response. */ Client[]
+export type SearchClientApiArg = {
+  query: string
+}
+export type GetClientApiResponse = /** status 200 Successful response. */ Client
+export type GetClientApiArg = {
+  /** Entity ID */
+  id: string
+}
 export type UpdateClientApiResponse =
   /** status 200 Successful response. */ Client
 export type UpdateClientApiArg = {
@@ -730,7 +779,7 @@ export type TextChoiceListField = {
 export type Client = ClientBase & {
   id: string
   url: string
-  age: number
+  age: number | null
   full_name: string
   call_times: TextChoiceListField
   eligibility_circumstances: TextChoiceListField
@@ -959,6 +1008,10 @@ export const {
   useDeletePersonMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
+  useGetClientsQuery,
+  useCreateClientMutation,
+  useSearchClientQuery,
+  useGetClientQuery,
   useUpdateClientMutation,
   useGetUsersQuery,
   useCreateUserMutation,

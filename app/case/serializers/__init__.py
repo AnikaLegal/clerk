@@ -1,4 +1,4 @@
-from .client import ClientSerializer
+from .client import ClientSerializer, ClientSearchSerializer
 from .email import (
     EmailTemplateSerializer,
     EmailAttachmentSerializer,

@@ -9,6 +9,7 @@ allOf:
         type: string
       age:
         type: integer
+        nullable: true
       full_name:
         type: string
       call_times:
