@@ -32,6 +32,7 @@ class Command(BaseCommand):
         # used for testing.
         users = User.objects.exclude(
             Q(groups__name__in=[CaseGroups.LAWYER, CaseGroups.ADMIN])
+            | Q(email="dummy.test@anikalegal.com")
             | Q(is_superuser=True)
         ).distinct()
 
