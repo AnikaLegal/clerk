@@ -1,9 +1,16 @@
 from django.http import Http404
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, Value
+from django.db.models.functions import Concat, Trim
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, CreateModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.mixins import (
+    UpdateModelMixin,
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+)
+
 
 from case.serializers import (
     ClientSerializer,
@@ -63,8 +70,7 @@ class ClientApiViewset(
             permission_classes = [CoordinatorOrBetterPermission]
         else:
             permission_classes = [
-                CoordinatorOrBetterPermission
-                | ParalegalOrBetterObjectPermission
+                CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
             ]
 
         return [p() for p in permission_classes]
@@ -85,7 +91,7 @@ class ClientApiViewset(
             # Paralegals can only see the clients from assigned cases
             queryset = queryset.filter(issue__paralegal=user)
         elif not user.is_coordinator_or_better:
-            # If you're not a paralegal or coordinator you can't see nuthin.
+            # If you're not a paralegal or coordinator+ you can't see nuthin.
             queryset = queryset.none()
 
         serializer = ClientSearchSerializer(
@@ -95,12 +101,13 @@ class ClientApiViewset(
         search = serializer.validated_data.get("search", None)
         if search:
             q_filter = (
-                Q(first_name__icontains=search)
-                | Q(last_name__icontains=search)
+                Q(full_name__icontains=search)
                 | Q(preferred_name__icontains=search)
                 | Q(email__icontains=search)
                 | Q(phone_number__icontains=search)
             )
-            queryset = queryset.filter(q_filter)
+            queryset = queryset.annotate(
+                full_name=Concat(Trim("first_name"), Value(" "), Trim("last_name"))
+            ).filter(q_filter)
 
         return queryset
