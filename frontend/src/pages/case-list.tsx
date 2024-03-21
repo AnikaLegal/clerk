@@ -96,7 +96,7 @@ const App = () => {
           Showing {issues.length} of {totalIssues} cases
         </Header.Subheader>
         {CONTEXT.user.is_coordinator_or_better && (
-          <Header.Subheader style={{ 'margin-top': '1rem' }}>
+          <Header.Subheader style={{ marginTop: '1rem' }}>
             <a href={CONTEXT.create_url}>
               <Button primary>Create a new case</Button>
             </a>
