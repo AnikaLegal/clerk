@@ -86,7 +86,7 @@ class RequiresInterpreter(models.TextChoices):
     NO = "NO", "No"
     YES_WRITTEN = "YES_WRITTEN", "Yes (written communication)"
     YES_SPOKEN = "YES_SPOKEN", "Yes (spoken communiction)"
-    YES_WRITTEN_AND_SPOKEN = "YES_WRITTEN_SPOKEN", "Yes (written and spoken)"
+    YES_WRITTEN_SPOKEN = "YES_WRITTEN_SPOKEN", "Yes (written and spoken)"
     YES_CONFIRM = "YES_CONFIRM", "Yes (Confirm if written and/or spoken)"
     UNKNOWN = "UNKNOWN", "Unknown"
 
