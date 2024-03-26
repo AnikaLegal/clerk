@@ -14,7 +14,8 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - | gunzip | \
         --host $PGHOST \
         --port $PGPORT \
         --username $PGUSER \
-        --no-owner
+        --no-owner \
+        --if-exists
 
 echo -e "\nRunning migrations"
 ./manage.py migrate
@@ -26,7 +27,7 @@ c=SlackChannel.objects.get(name=f'Test{space}Alerts');\
 SlackMessage.objects.all().update(channel=c);\
 SlackUser.objects.all().delete()\
 "
-./manage.py shell_plus -c "$SHELL_CMD"
+./manage.py shell_plus --quiet-load -c "$SHELL_CMD"
 
 echo -e "\nDeleting all Scheduled tasks."
 SHELL_CMD="\
@@ -35,7 +36,7 @@ Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
 OrmQ.objects.all().delete();\
 "
-./manage.py shell_plus -c "$SHELL_CMD"
+./manage.py shell_plus --quiet-load -c "$SHELL_CMD"
 
 echo -e "\nObfuscating all personally identifiable information."
 ./manage.py obfuscate_data

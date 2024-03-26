@@ -126,7 +126,6 @@ class IssueNoteSerializer(serializers.ModelSerializer):
             "text",
             "text_display",
             "created_at",
-            "issue",
             "issue_id",
             "event",
             "reviewee",
@@ -136,7 +135,6 @@ class IssueNoteSerializer(serializers.ModelSerializer):
     creator_id = serializers.IntegerField(write_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
     reviewee = serializers.SerializerMethodField()
-    issue = IssueSerializer(read_only=True)
     issue_id = serializers.UUIDField(write_only=True)
     event = serializers.DateTimeField(required=False)
     created_at = LocalTimeField()

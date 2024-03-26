@@ -787,7 +787,6 @@ export type IssueNote = IssueNoteBase & {
   text_display: string
   created_at: string
   reviewee: User | null
-  issue: Issue
 }
 export type Error = {
   detail?: string | object | (string | object | any)[]

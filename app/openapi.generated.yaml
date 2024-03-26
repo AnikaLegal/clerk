@@ -1486,15 +1486,12 @@ components:
               nullable: true
               allOf:
                 - $ref: "#/components/schemas/User"
-            issue:
-              $ref: "#/components/schemas/Issue"
           required:
             - id
             - creator
             - text_display
             - created_at
             - reviewee
-            - issue
     IssueUpdate:
       allOf:
         - $ref: "#/components/schemas/IssueBase"

@@ -108,11 +108,11 @@ BOARD = [
     {
         "image": "web/img/photos/board/denis.png",
         "name": "Denis Nelthorpe AM",
-        "title": "President",
+        "title": "Chair",
         "brags": [
             """Denis joined the Board of Anika Legal in June 2021 and is the
-            organisation’s President. He brings a wealth of experience from over
-            40 years in the legal assistance sector including as the CEO of
+            organisation’s Chair. He brings a wealth of experience from over 40
+            years in the legal assistance sector including as the CEO of
             WEstjustice and other leadership roles. He is currently also the
             Chair of Southside Justice and the Deputy Chair of the National
             Consumer Advisory Committee at the Insurance Council of
@@ -120,41 +120,69 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/marcia.png",
-        "name": "Marcia Pinskier FAICD",
-        "title": "Chair",
+        "image": "web/img/photos/board/kim.png",
+        "name": "Kim Shaw",
+        "title": "Board Member",
         "brags": [
-            """Marcia joined the Board of Anika Legal in June 2021 and is the
-            organisation’s Chair. Marcia is an expert on good governance in the
-            not-for-profit sector. She is a Fellow of the Australian Institute
-            of Company Directors and has chaired numerous not-for-profit boards.
-            Marcia is currently a Doctoral Candidate at Monash University,
-            researching Leadership and Institutional Child Sexual Abuse.""",
+            """Kim is an experienced Board Director and Committee member who
+            brings strong governance, legal, risk and strategic capabilities to
+            these environments. She is an Executive Director and the Division
+            Head of Personal Legal Services at Maurice Blackburn Lawyers, as
+            well as a member of the RMIT Law Advisory Board.  She is also a
+            Director of an NGO that supports sustained economic development in
+            disadvantaged and vulnerable communities in the Asia Pacific
+            including through financial literacy in schools and supporting micro
+            enterprises particularly for women."""
         ],
     },
     {
-        "image": "web/img/photos/advisors/david-mandel.png",
+        "image": "web/img/photos/board/david-mandel.png",
         "name": "David Mandel",
         "title": "Board Member",
         "brags": [
             """David is a non-executive director for both ASX listed and
             not-for-profit organisations with a portfolio across the healthcare,
-            technology, e-commerce and sport sectors.""",
-            """With a total of 15 years NED experience, David makes valuable
-            contributions to Anika both in terms of commercial acumen, vision
-            and to the cultural aspirations of the organisation.""",
+            technology, e-commerce and sport sectors. With a total of 15 years
+            NED experience, David makes valuable contributions to Anika both in
+            terms of commercial acumen, vision and to the cultural aspirations
+            of the organisation.""",
         ],
     },
     {
-        "image": "web/img/photos/team/mike.png",
+        "image": "web/img/photos/board/jacinta.png",
+        "name": "Jacinta Lewin",
+        "title": "Board Member",
+        "brags": [
+            """Jacinta brings experience in governance, business, human rights
+            and administrative law. She is a Principal Lawyer in Maurice
+            Blackburn Lawyers' Social Justice Practice, a board member of the
+            Victoria Legal Services Board + Commissioner, and has Board director
+            and Committee member experience in Social Security Rights Victoria
+            and the Law Institute of Victoria respectively."""
+        ],
+    },
+    {
+        "image": "web/img/photos/board/mike.png",
         "name": "Michael Choong",
         "title": "Board Member",
         "brags": [
-            """Michael has over six years of experience across the technology,
+            """Michael has over seven years of experience across the technology,
             retail, and not-for-profit sectors. He is currently a Senior
             Strategy Manager at SEEK, responsible for supporting their Latin
             American businesses. He joined Anika Legal’s leadership team in
             January 2020.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/board/maggie.png",
+        "name": "Maggie Hill",
+        "title": "Board Member",
+        "brags": [
+            """Maggie has fifteen years of specialist communications, marketing,
+            and media experience, across varied sectors and issue complexity.
+            She has led the corporate affairs function at a national
+            not-for-profit organisation, worked as an executive within the
+            Victorian Government, and as a ministerial media advisor."""
         ],
     },
     {
@@ -165,8 +193,9 @@ BOARD = [
             """Noel is the Chief Executive Officer and co-founder of Anika
             Legal, and has led the founding team to become an organisation of 62
             volunteers, and to receive successive AFR Client Choice Awards for
-            Startup of the Year (2019, 2020). He was recently recognised as a
-            2023 Victorian Young Australian of the Year nominee.""",
+            Startup of the Year (2019, 2020). Noel was a finalist for the
+            Victorian Young Australian of the Year (2023) and NFP Emerging
+            Leader award (2023).""",
         ],
     },
 ]
@@ -202,7 +231,7 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/team/matt.png",
+        "image": "web/img/photos/advisors/matt.png",
         "name": "Matthew Segal",
         "title": "Technical Advisor and full-stack software developer",
         "brags": [
@@ -240,17 +269,6 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/lucy.png",
-        "name": "Lucy Majstorovic",
-        "title": "Head of Partnerships & Philanthropy",
-        "brags": [
-            """Lucy is our Head of Partnerships & Philanthropy, working with our
-            trusted partners to maximise Anika’s impact.""",
-            """Lucy previously worked in consumer goods, where she gained
-            experience in relationship management, marketing and analytics.""",
-        ],
-    },
-    {
         "image": "web/img/photos/team/jacqui.png",
         "name": "Jacqui Siebel",
         "title": "Head of Operations",
@@ -261,6 +279,21 @@ TEAM_MEMBERS = [
             Justice Connect and has considerable community legal sector
             experience in project management, innovation, monitoring and
             evaluation.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/dale.png",
+        "name": "Dale Walker",
+        "title": "Head of Partnerships & Fundraising",
+        "brags": [
+            """Dale leads our Partnerships & Fundraising function, ensuring that
+            Anika can continue to grow sustainably.""",
+            """Dale has over eight years of experience in leading large, highly
+            engaged teams and managing strategic partnerships across the private
+            and not-for-profit sectors. Dale has a Masters of Business
+            Administration, and a strong understanding of the donor development
+            cycle and solicitation process, as well as how to use data to
+            increase fundraising effectiveness.""",
         ],
     },
     {
@@ -288,6 +321,17 @@ TEAM_MEMBERS = [
             """Luca is a software developer with extensive experience working
             with large national institutions in the cultural and heritage
             sector.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/lucy.png",
+        "name": "Lucy Majstorovic",
+        "title": "Partnerships & Fundraising Lead",
+        "brags": [
+            """Lucy supports our Partnership and Fundraising team, working with
+            our trusted partners to maximise Anika’s impact.""",
+            """Lucy previously worked in consumer goods, where she gained
+            experience in relationship management, marketing and analytics""",
         ],
     },
 ]

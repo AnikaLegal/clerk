@@ -29,11 +29,15 @@ const { case_pk, case_email_address, urls, draft_url } = (window as any)
 const App = () => {
   const caseResult = useGetCaseQuery({ id: case_pk })
   const threadResult = useGetEmailThreadsQuery({ id: case_pk })
-  const isInitialLoad = caseResult.isLoading || threadResult.isLoading
-  if (isInitialLoad) return null
+
+  if (caseResult.isLoading || threadResult.isLoading)
+    return null
 
   const issue = caseResult.data!.issue
-  const emailThreads = threadResult.data
+  const emailThreads =
+    threadResult.isError && threadResult.error.status === 404 ? [] :
+    threadResult.data
+
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.EMAIL} urls={urls} />
