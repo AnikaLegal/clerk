@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = [
     "Matt Segal <matt.segal@anikalegal.com>",
-    "Luca Vari <luca.vari@anikalegal.com>"
+    "Luca Vari <luca.vari@anikalegal.com>",
 ]
 
 [tool.poetry.dependencies]
@@ -45,20 +45,17 @@ django-override-storage = "^0.3.2"
 chardet = "^3.0"
 tzdata = "^2024.1"
 
-
 [tool.poetry.dev-dependencies]
 ipython = "^8.21.0"
 django-extensions = "^3.2.3"
 django-browser-reload = "^1.12.1"
 django-debug-toolbar = "^4.3.0"
 debugpy = "^1.8.1"
-watchdog = {extras = ["watchmedo"], version = "^4.0.0"}
-
+watchdog = { extras = ["watchmedo"], version = "^4.0.0" }
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
 
 [tool.pytest.ini_options]
 filterwarnings = [
