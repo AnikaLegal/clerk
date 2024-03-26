@@ -1,6 +1,7 @@
 # Backend
 requests==2.27.1
 Django>=4
+tzdata
 
 # Content management system
 wagtail==2.16.1

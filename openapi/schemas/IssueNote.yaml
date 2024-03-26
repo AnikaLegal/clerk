@@ -14,12 +14,9 @@ allOf:
         nullable: true
         allOf:
           - $ref: ./User.yaml
-      issue:
-        $ref: ./Issue.yaml
     required:
       - id
       - creator
       - text_display
       - created_at
       - reviewee
-      - issue
