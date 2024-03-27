@@ -51,4 +51,4 @@ RUN echo "Setting Python 3.10 as default Python." && \
 
 RUN echo "Downloading and installing Poetry for Python 3.10" && \
     curl https://install.python-poetry.org --silent --output /tmp/get-poetry.py && \
-    python /tmp/get-poetry.py
+    python /tmp/get-poetry.py --yes
