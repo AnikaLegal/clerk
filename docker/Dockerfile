@@ -3,6 +3,7 @@ FROM anikalaw/clerkbase:latest
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
 ARG DJANGO_SECRET_KEY=not-a-secret
 ENV PATH="/root/.local/bin:${PATH}"
+ENV POETRY_VIRTUALENVS_CREATE=false
 
 # Mount the codebase
 ADD app /app
