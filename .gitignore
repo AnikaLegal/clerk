@@ -10,6 +10,7 @@ __target__
 # Python
 *.pyc
 venv/
+.venv/
 
 # Tests
 *pytest_cache*
