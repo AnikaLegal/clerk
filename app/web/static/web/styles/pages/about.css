@@ -1,11 +1,15 @@
 .about-graphic {
-  width: 100%;
+  width: 76%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .about-graphic.desktop {
-  padding-top: 3rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 .about-graphic.mobile {
   padding-top: 1rem;
+  padding-bottom: 1rem;
   display: none;
 }
 .brag {

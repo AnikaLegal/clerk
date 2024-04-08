@@ -1,54 +1,91 @@
-{% extends "web/_base.html" %} 
+{% extends "web/_base.html" %}
 {% load static %}
 {% block title %}About{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can’t access it through practical legal education and trusted partnerships" %}            
+{% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can’t access it through practical legal education and trusted partnerships" %}
 {% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/about.css' %}">
 {% endblock %}
 
-
 {% block content %}
-<div class="container wide">
-    <div class="brag">
-        <h1>
-            Anika Legal provides free legal assistance to people<br class="desktop-break"> who<br class="mobile-break"> can’t access it through <br class="mobile-break">
-            <span class="callout">practical legal<br class="desktop-break"> education</span>
-            <br class="mobile-break">
-            and
-            <span class="callout">trusted partnerships</span>
-        </h1>
-        <div class="divider"></div>
-        <img class="about-graphic desktop" src="{% static 'web/img/about-graphic-desktop.png' %}">
-        <img class="about-graphic mobile" src="{% static 'web/img/about-graphic-mobile.png' %}">
+
+<div class="hero-gold round-large bottom-left">
+    <div class="hero-segment">
+        <div class="brag container wide">
+            <p><strong>Our Vision</strong></p>
+            <h2>
+                A world where everyone can <span class="callout">access
+                justice</span>
+            </h2>
+            <p><strong>Our Mission</strong></p>
+            <h2>
+                Empower renters to live in <span class="callout">safe
+                homes</span> with <span class="callout">dignity</span>
+            </h2>
+        </div>
     </div>
 </div>
-<div class="segment gold round-large top-right bottom-left">
-    <div class="container">
-        <h2>Our Approach</h2>
+<div class="segment">
+    <div class="container wide">
+        <div class="card-grid">
+            <div class="card">
+                <h2>The Problem</h2>
+                <div class="divider"></div>
+                <p style="max-width: 575px">
+                    Imagine living in a home that made you sick, having to choose
+                    between paying rent or eating, or living in constant fear of
+                    becoming homeless. That is the reality for most of the 7 million
+                    renters in Australia who are denied a safe home.
+                </p>
+            </div>
+            <div class="card">
+                <h2>What We Do</h2>
+                <div class="divider"></div>
+                <p style="max-width: 575px">
+                    Anika Legal is a free, non-profit legal service for renters. Through
+                    casework, innovation and systemic advocacy, we support our clients
+                    and fight for a fair housing system so that every renter can thrive
+                    in a safe, secure, affordable home that supports their quality of
+                    life.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="segment">
+    <div class="container wide">
+        <h2>Achieving our Vision</h2>
         <div class="divider"></div>
-        <div class="card-grid four">
+        <img class="about-graphic desktop" src="{% static 'web/img/about-graphic.png' %}">
+        <img class="about-graphic mobile" src="{% static 'web/img/about-graphic.png' %}">
+        <div class="card-grid tight">
             <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/clients.svg' %}">
-                <p class="header">Clients</p>
-                <p class="compact">We provide our clients with a legal service that’s easy-to-use, lightning-fast, and with a real human every step of the way</p>
+                <p class="header">Casework evidence fuels advocacy for systemic
+                    change</p>
+                <p class="compact">Our ability to take on more cases aligned
+                    with our advocacy goals, empowers renters to live in safe homes
+                    and builds the evidence base for critical reforms to the housing
+                    system. This in turn improves our ability to raise funding.</p>
             </div>
             <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/students.svg' %}">
-                <p class="header">Students</p>
-                <p class="compact">We provide law students with practical training opportunities that are meaningful,  flexible and future-focused</p>
+                <p class="header">Additional funding enables investment in
+                    innovation & technology</p>
+                <p class="compact">As Anika attracts more funding, it enables us
+                    to invest in our innovation & technology platform, which enables
+                    us to leverage untapped resources (students & lawyers) to
+                    contribute thousands of hours to housing justice. It also
+                    enables us to expand our service offerings and deliver them more
+                    efficiently.</p>
             </div>
             <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/universities.svg' %}">
-                <p class="header">Universities</p>
-                <p class="compact">We enable universities to offer practical legal training to their students, with an emphasis on technology</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/partners.svg' %}">
-                <p class="header">Partners</p>
-                <p class="compact">We allow our trusted partners to deliver positive social impact by supporting innovative and effective solutions</p>
+                <p class="header">Expanding our service offerings enables us to
+                    grow our student & lawyer programs</p>
+                <p class="compact">Expanding our service offerings enables us to
+                    create opportunities for more students & lawyers to contribute
+                    to access to justice. This leads to a more socially responsible
+                    legal profession.</p>
             </div>
         </div>
     </div>
@@ -83,18 +120,43 @@
 <div class="segment" style="padding-top: 15px; padding-bottom: 0">
     <div class="container">
         <div class="story center">
-            <img 
-                class="round not-responsive top-left bottom-right bottom-left" 
-                src="{% static 'web/img/photos/founders.jpg' %}"
-                style="max-height: 568px;object-position: 50% 35%;"   
-            >
+            <img class="round not-responsive top-left bottom-right bottom-left"
+                src="{% static 'web/img/photos/founders.jpg' %}" style="max-height: 568px;object-position: 50% 35%;">
             <div class="content">
                 <h2>Our Story</h2>
                 <p>
-                    Anika began as six friends who entered the Melbourne Global Legal Hackathon 2018. What started as a weekend to hang out and solve some legal problems culminated in the winning idea for Anika, a whirlwind two months of building on the initial idea, and progressing to the Global Legal Hackathon final at a gala in New York City. After placing runners-up at the global final, the six friends, united by a passion for access to justice and the idea, decided to turn the idea into a reality and became co-founders of Anika Legal.
+                    The idea for Anika came about as six friends entered the
+                    2018 Melbourne Global Legal Hackathon - a competition to
+                    devise a solution to improve access to justice. They
+                    immediately realised the scale of the barriers to justice,
+                    and that a completely different approach was needed to
+                    tackle such a massive problem. That hackathon weekend
+                    birthed Anika, winning the Melbourne chapter and taking them
+                    to the global final in New York. After placing runners-up,
+                    the six friends decided to turn the idea into a reality and
+                    became the Co-founders of Anika.
                 </p>
                 <p>
-                    Now, these six friends are part of the collective that is Anika, a registered charity and social enterprise which provides free legal assistance to people who can’t access it, as well as practical legal education to law students. The team of six co-founders has blossomed to a team of 70 passionate people (and growing!), united by our vision of a world where everyone has access to justice.
+                    'Anika' is the Hindu goddess for justice - a warrior goddess
+                    known for protecting all that is good against evil and
+                    oppression. 'Anicca' is also the buddhist concept of things
+                    being in a constant state of change. The name Anika
+                    perfectly captures our vision and mission. Our vision of a
+                    world where everyone can access justice. Our mission of
+                    fighting for justice by doing things differently.
+                </p>
+                <p>
+                    Today, Anika is a registered charity and social enterprise
+                    with a team of over 70 people, united by our passion for
+                    bridging the justice gap. Anika has empowered hundreds of
+                    people to uphold their rights, and advocated for vital
+                    systemic changes to the justice system.
+                </p>
+                <p>
+                    If you want to help build a world where everyone can access
+                    justice, <a href="https://anika-legal.raisely.com/">donate
+                        here</a> or <a href="{% url 'subscribe' %}">subscribe to our
+                        newsletter.</a>
                 </p>
             </div>
         </div>
