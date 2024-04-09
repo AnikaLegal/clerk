@@ -219,15 +219,38 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/clyde-fernandez.png",
-        "name": "Clyde Fernandez",
-        "title": "GM & Regional Vice President at Salesforce",
+        "image": "web/img/photos/advisors/alan-peckham.png",
+        "name": "Alan Peckham",
+        "title": """Operations Consultant, Former Chief Administrative Officer
+        at Herbert Smith Freehills""",
         "brags": [
-            """Clyde is a career technologist who has spent time working in many
-            sectors in Australia, Asia & the UK.""",
-            """Clyde also likes to share his perspectives on 'The future of the
-            work', 'How to succeed in a constantly growing VUCA world' and 'Why
-            Equity & Ethics matter, now more than ever'.""",
+            """Alan has spent over 25 years working in the legal sector as a
+            practitioner and in a range of executive roles, most recently as
+            Chief Administrative Officer at Herbert Smith Freehills. Alan has
+            been sharing his operations experience and expertise with our
+            team.""",
+            """Alan is also a senior advisor to TILT Legal, a legal tech
+            consultancy that helps legal teams reinvent themselves by using
+            cutting edge technology / AI, and sits on the Advisory Board of
+            Pickering Pearce, a strategy consulting firm that provides
+            innovative and independent advice to law firms around the world.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/gary-adler.png",
+        "name": "Gary Adler",
+        "title": "Chief Digital Officer at MinterEllison",
+        "brags": [
+            """Gary is an experienced Chief Information and Digital Officer
+            skilled in digital transformation, leveraging generative AI and
+            automation platforms to create new operational efficiencies inside
+            various business structures, IT strategy, and cyber risk strategy.
+            He was named 10th in Australia's top digital & tech chiefs in the
+            leading CIO50 Index.""",
+            """Gary has sat on the advisory panel for software companies,
+            start-ups, and editorials. Gary is also a Non-executive Director at
+            AccessEAP, where he is a member of the Board and the Audit and Risk
+            Management Committee.""",
         ],
     },
     {
