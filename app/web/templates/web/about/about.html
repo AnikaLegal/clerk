@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}About{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can’t access it through practical legal education and trusted partnerships" %}
+{% include 'web/snippets/_social_meta.html' with title="About" description="Anika Legal provides legal assistance to people who can't access it through practical legal education and trusted partnerships" %}
 {% endblock %}
 
 {% block styles %}
@@ -17,17 +17,17 @@
             <p><strong>Our Vision</strong></p>
             <h2>
                 A world where everyone can <span class="callout">access
-                justice</span>
+                    justice</span>
             </h2>
             <p><strong>Our Mission</strong></p>
             <h2>
                 Empower renters to live in <span class="callout">safe
-                homes</span> with <span class="callout">dignity</span>
+                    homes</span> with <span class="callout">dignity</span>
             </h2>
         </div>
     </div>
 </div>
-<div class="segment">
+<div class="segment" style="padding-bottom: 0;">
     <div class="container wide">
         <div class="card-grid">
             <div class="card">
@@ -54,38 +54,41 @@
         </div>
     </div>
 </div>
-<div class="segment">
+<div class="segment" style="padding-top: 50px;">
     <div class="container wide">
         <h2>Achieving our Vision</h2>
         <div class="divider"></div>
-        <img class="about-graphic desktop" src="{% static 'web/img/about-graphic.png' %}">
-        <img class="about-graphic mobile" src="{% static 'web/img/about-graphic.png' %}">
-        <div class="card-grid tight">
-            <div class="card">
-                <p class="header">Casework evidence fuels advocacy for systemic
-                    change</p>
-                <p class="compact">Our ability to take on more cases aligned
-                    with our advocacy goals, empowers renters to live in safe homes
-                    and builds the evidence base for critical reforms to the housing
-                    system. This in turn improves our ability to raise funding.</p>
+        <div id="vision" class="box">
+            <div class="item graphic">
+                <img src="{% static 'web/img/about-graphic.png' %}">
             </div>
-            <div class="card">
-                <p class="header">Additional funding enables investment in
-                    innovation & technology</p>
-                <p class="compact">As Anika attracts more funding, it enables us
-                    to invest in our innovation & technology platform, which enables
-                    us to leverage untapped resources (students & lawyers) to
-                    contribute thousands of hours to housing justice. It also
-                    enables us to expand our service offerings and deliver them more
-                    efficiently.</p>
-            </div>
-            <div class="card">
-                <p class="header">Expanding our service offerings enables us to
-                    grow our student & lawyer programs</p>
-                <p class="compact">Expanding our service offerings enables us to
-                    create opportunities for more students & lawyers to contribute
-                    to access to justice. This leads to a more socially responsible
-                    legal profession.</p>
+            <div class="item text box">
+                <div class="item">
+                    <p class="header">Casework evidence fuels advocacy for systemic
+                        change</p>
+                    <p class="compact">Our ability to take on more cases aligned
+                        with our advocacy goals, empowers renters to live in safe homes
+                        and builds the evidence base for critical reforms to the housing
+                        system. This in turn improves our ability to raise funding.</p>
+                </div>
+                <div class="item">
+                    <p class="header">Additional funding enables investment in
+                        innovation & technology</p>
+                    <p class="compact">As Anika attracts more funding, it enables us
+                        to invest in our innovation & technology platform, which enables
+                        us to leverage untapped resources (students & lawyers) to
+                        contribute thousands of hours to housing justice. It also
+                        enables us to expand our service offerings and deliver them more
+                        efficiently.</p>
+                </div>
+                <div class="item">
+                    <p class="header">Expanding our service offerings enables us to
+                        grow our student & lawyer programs</p>
+                    <p class="compact">Expanding our service offerings enables us to
+                        create opportunities for more students & lawyers to contribute
+                        to access to justice. This leads to a more socially responsible
+                        legal profession.</p>
+                </div>
             </div>
         </div>
     </div>
