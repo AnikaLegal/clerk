@@ -162,6 +162,12 @@ def restore(c):
     run(c, "/app/scripts/tasks/dev-restore.sh")
 
 
+@task
+def migrate(c):
+    """Create and apply local database migrations"""
+    run(c, 'bash -c "./manage.py makemigrations && ./manage.py migrate"')
+
+
 S3_PROD = "anika-clerk"
 S3_TEST = "anika-clerk-test"
 SYNC_DIRS = [
