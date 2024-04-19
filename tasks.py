@@ -65,9 +65,12 @@ def ngrok(c, url):
 
 
 @task
-def own(c, username):
+def own(c, user=None):
     """Assert file ownership of project"""
-    c.run(f"sudo chown -R {username}:{username} .", pty=True)
+    if not user:
+        import os
+        user = os.getenv("USER")
+    c.run(f"sudo chown -R {user}: .", pty=True)
 
 
 @task
