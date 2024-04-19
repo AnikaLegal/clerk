@@ -3,6 +3,10 @@ from core.models.timestamped import TimestampedModel
 from core.models.issue import CaseTopic, CaseStage
 from django.core.exceptions import ValidationError
 
+TASK_TRIGGER_TOPICS = [
+    ("ANY", "Any"),
+    *CaseTopic.ACTIVE_CHOICES,
+]
 
 class TaskTriggerEvent(models.TextChoices):
     """
@@ -11,15 +15,16 @@ class TaskTriggerEvent(models.TextChoices):
     Future considerations may be:
     - case first created
     - case open/closed change
-    - case assignment change
     - case outcome change
     - email received
     """
 
-    STAGE_CHANGE = "STAGE_CHANGE", "Stage changed"
+    CASE_LAWYER_ASSIGN = "CASE_LAWYER_ASSIGN", "Case lawyer assigned"
+    CASE_PARALEGAL_ASSIGN = "CASE_PARALEGAL_ASSIGN", "Case paralegal assigned"
+    CASE_STAGE_CHANGE = "CASE_STAGE_CHANGE", "Case stage changed"
 
 
-class TaskTriggerAssignee(models.TextChoices):
+class TaskTriggerAssignedTo(models.TextChoices):
     """
     Who gets assigned the task.
     """
@@ -30,25 +35,25 @@ class TaskTriggerAssignee(models.TextChoices):
 
 
 class TaskTrigger(TimestampedModel):
-    topic = models.CharField(max_length=32, choices=CaseTopic.ACTIVE_CHOICES)
+    topic = models.CharField(max_length=32, choices=TASK_TRIGGER_TOPICS)
     event = models.CharField(
         max_length=32,
         choices=TaskTriggerEvent.choices,
-        default=TaskTriggerEvent.STAGE_CHANGE,
+        default=TaskTriggerEvent.CASE_STAGE_CHANGE,
     )
     # Only relevant when event is STAGE_CHANGED
     event_stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, blank=True, default=""
     )
-    assignee = models.CharField(max_length=32, choices=TaskTriggerAssignee.choices)
+    tasks_assigned_to = models.CharField(max_length=32, choices=TaskTriggerAssignedTo.choices)
 
     def clean(self):
-        if self.event == TaskTriggerEvent.STAGE_CHANGE and not self.event_stage:
+        if self.event == TaskTriggerEvent.CASE_STAGE_CHANGE and not self.event_stage:
             raise ValidationError(
                 'The {0} field cannot be empty when the {1} field is "{2}"'.format(
                     TaskTrigger._meta.get_field("event_stage").verbose_name,
                     TaskTrigger._meta.get_field("event").verbose_name,
-                    TaskTriggerEvent.STAGE_CHANGE.label,
+                    TaskTriggerEvent.CASE_STAGE_CHANGE.label,
                 )
             )
 
