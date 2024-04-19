@@ -1,6 +1,6 @@
 from django.db import models
 from core.models.timestamped import TimestampedModel
-from .trigger import TaskTrigger
+from .template import TaskTemplate
 
 
 class TaskStatus(models.TextChoices):
@@ -15,7 +15,7 @@ class TaskStatus(models.TextChoices):
 
 
 class Task(TimestampedModel):
-    trigger = models.ForeignKey(TaskTrigger, on_delete=models.PROTECT)
+    template = models.ForeignKey(TaskTemplate, on_delete=models.PROTECT)
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )

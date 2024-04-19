@@ -24,9 +24,9 @@ class TaskTriggerAssignee(models.TextChoices):
     Who gets assigned the task.
     """
 
-    ASSIGNED_PARALEGAL = "ASSIGNED_PARALEGAL", "Assigned paralegal"
-    ASSIGNED_LAWYER = "ASSIGNED_LAWYER", "Assigned lawyer"
-    COORDINATORS = "COORDINATORS", "Coordinators"
+    USER_PARALEGAL = "USER_PARALEGAL", "The paralegal assigned to the case"
+    USER_LAWYER = "USER_LAWYER", "The lawyer assigned to the case"
+    GROUP_COORDINATOR = "GROUP_COORDINATOR", "Coordinators"
 
 
 class TaskTrigger(TimestampedModel):
