@@ -6,4 +6,4 @@ class TaskConfig(AppConfig):
     name = "task"
 
     def ready(self):
-        import notify.signals
+        import task.signals
