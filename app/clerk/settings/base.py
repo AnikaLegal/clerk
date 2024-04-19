@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "intake.apps.IntakeConfig",
     "office.apps.OfficeConfig",
     "blacklist.apps.BlacklistConfig",
+    "task.apps.TaskConfig",
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
