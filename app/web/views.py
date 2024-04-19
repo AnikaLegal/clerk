@@ -221,8 +221,8 @@ ADVISORS = [
     {
         "image": "web/img/photos/advisors/alan-peckham.png",
         "name": "Alan Peckham",
-        "title": """Operations Consultant, Former Chief Administrative Officer
-        at Herbert Smith Freehills""",
+        "title": """Consultant, Former Chief Administrative Officer at Herbert
+        Smith Freehills""",
         "brags": [
             """Alan has spent over 25 years working in the legal sector as a
             practitioner and in a range of executive roles, most recently as

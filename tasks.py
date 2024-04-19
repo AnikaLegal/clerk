@@ -65,9 +65,12 @@ def ngrok(c, url):
 
 
 @task
-def own(c, username):
+def own(c, user=None):
     """Assert file ownership of project"""
-    c.run(f"sudo chown -R {username}:{username} .", pty=True)
+    if not user:
+        import os
+        user = os.getenv("USER")
+    c.run(f"sudo chown -R {user}: .", pty=True)
 
 
 @task
@@ -157,6 +160,12 @@ def reset(c):
 def restore(c):
     """Restore local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
+
+
+@task
+def migrate(c):
+    """Create and apply local database migrations"""
+    run(c, 'bash -c "./manage.py makemigrations && ./manage.py migrate"')
 
 
 S3_PROD = "anika-clerk"
