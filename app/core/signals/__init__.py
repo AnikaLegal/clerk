@@ -1,1 +1,1 @@
-from . import issue, submission
+from . import issue, issue_event, submission

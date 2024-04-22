@@ -5,7 +5,7 @@ from django.db import transaction
 from accounts.models import User
 
 from .issue import Issue
-from .issue_note import IssueNote, NoteType
+from .issue_note import IssueNote
 from .timestamped import TimestampedModel
 
 
@@ -24,6 +24,7 @@ class IssueEvent(TimestampedModel):
     """
     An event that happens for an issue.
     """
+
     # Store previous and next values
     # This is kinda gross but I like it better than putting everything in a JSON
     prev_is_open = models.BooleanField(blank=True, null=True)
@@ -96,12 +97,7 @@ class IssueEvent(TimestampedModel):
         for event_type, create_kwargs in zip(event_types, create_kwargs_list):
             create_kwargs["event_type"] = event_type
             create_kwargs["issue"] = issue
-            event = IssueEvent.objects.create(**create_kwargs)
-            IssueNote.objects.create(
-                issue=issue,
-                note_type=NoteType.EVENT,
-                content_object=event,
-            )
+            IssueEvent.objects.create(**create_kwargs)
 
     def get_text(self):
         is_user_changed = self.prev_user is not None or self.next_user is not None
