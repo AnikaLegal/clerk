@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import transaction
 
@@ -10,29 +9,21 @@ from .issue_note import IssueNote, NoteType
 from .timestamped import TimestampedModel
 
 
-class EventType:
+class EventType(models.TextChoices):
     # A supervising lawyer has been assigned.
-    LAWYER = "LAWYER"
+    LAWYER = "LAWYER", "Lawyer assigned"
     # A paralegal has been assigned.
-    PARALEGAL = "PARALEGAL"
+    PARALEGAL = "PARALEGAL", "Paralegal assigned"
     # The case stage has changed
-    STAGE = "STAGE"
+    STAGE = "STAGE", "Stage change"
     # The case has opened/closed
-    OPEN = "OPEN"
+    OPEN = "OPEN", "Open change"
 
 
 class IssueEvent(TimestampedModel):
     """
     An event that happens for an issue.
     """
-
-    EVENT_CHOICES = (
-        (EventType.LAWYER, "Lawyer assigned"),
-        (EventType.PARALEGAL, "Paralegal assigned"),
-        (EventType.STAGE, "Stage change"),
-        (EventType.OPEN, "Open change"),
-    )
-
     # Store previous and next values
     # This is kinda gross but I like it better than putting everything in a JSON
     prev_is_open = models.BooleanField(blank=True, null=True)
@@ -52,7 +43,7 @@ class IssueEvent(TimestampedModel):
     # Any notes created for this event (usually just one)
     issue_notes = GenericRelation(IssueNote)
 
-    event_type = models.CharField(max_length=32, choices=EVENT_CHOICES)
+    event_type = models.CharField(max_length=32, choices=EventType.choices)
 
     # Optinal Actionstep ID, for file notes imported from Actionstep
     actionstep_id = models.IntegerField(blank=True, null=True)
