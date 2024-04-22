@@ -22,6 +22,7 @@ This Django project has several apps:
 - microsoft: Microsoft integration (Sharepoint)
 - office: Alternative communications when the office is closed
 - slack: Slack integration
+- task: Automatically create user tasks when the case changes
 - web: Public website and blog
 - webhooks: Webhooks from 3rd party services
 
