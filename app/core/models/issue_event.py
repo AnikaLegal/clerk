@@ -10,6 +10,8 @@ from .timestamped import TimestampedModel
 
 
 class EventType(models.TextChoices):
+    # The case was created
+    CREATE = "CREATE", "Created"
     # A supervising lawyer has been assigned.
     LAWYER = "LAWYER", "Lawyer assigned"
     # A paralegal has been assigned.
@@ -51,46 +53,74 @@ class IssueEvent(TimestampedModel):
 
     @staticmethod
     @transaction.atomic
-    def maybe_generate_event(issue: Issue, prev_issue: Issue):
-        assert issue.pk == prev_issue.pk
+    def maybe_generate_event(issue: Issue, prev_issue: Issue | None):
+        assert prev_issue == None or issue.pk == prev_issue.pk
         create_kwargs_list = []
         event_types = []
-        if issue.lawyer != prev_issue.lawyer:
-            # Lawyer changed
-            create_kwargs = {
-                "prev_user": prev_issue.lawyer,
-                "next_user": issue.lawyer,
-            }
-            create_kwargs_list.append(create_kwargs)
-            event_types.append(EventType.LAWYER)
 
-        if issue.paralegal != prev_issue.paralegal:
-            # Paralegal changed
+        if not prev_issue:
+            # Case created
             create_kwargs = {
-                "prev_user": prev_issue.paralegal,
-                "next_user": issue.paralegal,
-            }
-            create_kwargs_list.append(create_kwargs)
-            event_types.append(EventType.PARALEGAL)
-
-        if issue.is_open != prev_issue.is_open:
-            # Open state changed
-            create_kwargs = {
-                "prev_is_open": prev_issue.is_open,
                 "next_is_open": issue.is_open,
-                "prev_stage": prev_issue.stage,
                 "next_stage": issue.stage,
             }
             create_kwargs_list.append(create_kwargs)
-            event_types.append(EventType.OPEN)
-        elif issue.stage != prev_issue.stage:
-            # Stage changed
-            create_kwargs = {
-                "prev_stage": prev_issue.stage,
-                "next_stage": issue.stage,
-            }
-            create_kwargs_list.append(create_kwargs)
-            event_types.append(EventType.STAGE)
+            event_types.append(EventType.CREATE)
+
+            if issue.lawyer:
+                # Lawyer changed
+                create_kwargs = {
+                    "next_user": issue.lawyer,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.LAWYER)
+
+            if issue.paralegal:
+                # Paralegal changed
+                create_kwargs = {
+                    "next_user": issue.paralegal,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.PARALEGAL)
+
+            # TODO: check is_open & stage for changes from the default?
+        else:
+            if issue.lawyer != prev_issue.lawyer:
+                # Lawyer changed
+                create_kwargs = {
+                    "prev_user": prev_issue.lawyer,
+                    "next_user": issue.lawyer,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.LAWYER)
+
+            if issue.paralegal != prev_issue.paralegal:
+                # Paralegal changed
+                create_kwargs = {
+                    "prev_user": prev_issue.paralegal,
+                    "next_user": issue.paralegal,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.PARALEGAL)
+
+            if issue.is_open != prev_issue.is_open:
+                # Open state changed
+                create_kwargs = {
+                    "prev_is_open": prev_issue.is_open,
+                    "next_is_open": issue.is_open,
+                    "prev_stage": prev_issue.stage,
+                    "next_stage": issue.stage,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.OPEN)
+            elif issue.stage != prev_issue.stage:
+                # Stage changed
+                create_kwargs = {
+                    "prev_stage": prev_issue.stage,
+                    "next_stage": issue.stage,
+                }
+                create_kwargs_list.append(create_kwargs)
+                event_types.append(EventType.STAGE)
 
         # TODO: Change in case outcome
 
