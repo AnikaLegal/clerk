@@ -1,5 +1,5 @@
 from django.db import models
-from core.models.timestamped import TimestampedModel
+from core.models import TimestampedModel
 from .trigger import TaskTrigger
 
 class TaskTemplate(TimestampedModel):
