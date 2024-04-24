@@ -3,9 +3,6 @@ from django.forms import Textarea
 from django.db import models
 from task.models import Task, TaskTrigger, TaskTemplate
 
-admin.site.register(Task)
-admin.site.register(TaskTemplate)
-
 
 class TemplateInline(admin.TabularInline):
     model = TaskTemplate
@@ -25,3 +22,27 @@ class TemplateInline(admin.TabularInline):
 @admin.register(TaskTrigger)
 class TaskTriggerAdmin(admin.ModelAdmin):
     inlines = (TemplateInline,)
+    list_display = (
+        "id",
+        "topic",
+        "event",
+        "event_stage",
+        "tasks_assigned_to",
+    )
+    ordering = ("topic",)
+
+
+@admin.register(TaskTemplate)
+class TaskTemplateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+    )
+
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "status",
+    )
