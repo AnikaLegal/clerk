@@ -22,9 +22,7 @@ class TaskTriggerAssignedTo(models.TextChoices):
 
 class TaskTrigger(TimestampedModel):
     topic = models.CharField(max_length=32, choices=TaskTriggerTopic.CHOICES)
-    event = models.CharField(
-        max_length=32, choices=EventType.choices, default=EventType.STAGE
-    )
+    event = models.CharField(max_length=32, choices=EventType.choices)
     # Only relevant when event is STAGE_CHANGED
     event_stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, blank=True, default=""
