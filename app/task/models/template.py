@@ -8,11 +8,12 @@ class TaskType(models.TextChoices):
     The type of the task.
     """
 
-    CHECK = "CHECK", "Perform a conflict/eligibility check"
-    CONTACT = "CONTACT", "Contact client/support person or other/third party"
+    CHECK = "CHECK", "Check for conflict/eligibility"
+    CONTACT = "CONTACT", "Contact client or other party"
     DRAFT = "DRAFT", "Draft document or advice"
     REVIEW = "REVIEW", "Review document or advice"
     SEND = "SEND", "Send document or advice"
+    OTHER = "OTHER", "Any other task"
 
 
 class TaskTemplate(TimestampedModel):
