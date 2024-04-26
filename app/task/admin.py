@@ -8,6 +8,7 @@ class TemplateInline(admin.TabularInline):
     model = TaskTemplate
     extra = 0
     fields = (
+        "type",
         "name",
         "description",
         "_order",
@@ -36,6 +37,7 @@ class TaskTriggerAdmin(admin.ModelAdmin):
 class TaskTemplateAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "type",
         "name",
         "description",
     )
@@ -45,5 +47,8 @@ class TaskTemplateAdmin(admin.ModelAdmin):
 class TaskAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "type",
+        "name",
+        "description",
         "status",
     )

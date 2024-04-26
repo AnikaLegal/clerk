@@ -31,4 +31,10 @@ def create_tasks(issue_event_pk: int):
     for trigger in TaskTrigger.objects.filter(query):
         for template in trigger.templates.all():
             if not Task.objects.filter(template=template, issue=issue).exists():
-                Task.objects.create(template=template, issue=issue)
+                Task.objects.create(
+                    template=template,
+                    issue=issue,
+                    type=template.type,
+                    name=template.name,
+                    description=template.description,
+                )

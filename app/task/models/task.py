@@ -1,6 +1,6 @@
 from django.db import models
 from core.models import TimestampedModel, Issue
-from .template import TaskTemplate
+from .template import TaskTemplate, TaskType
 
 
 class TaskStatus(models.TextChoices):
@@ -15,7 +15,12 @@ class TaskStatus(models.TextChoices):
 
 
 class Task(TimestampedModel):
-    template = models.ForeignKey(TaskTemplate, on_delete=models.PROTECT)
+    template = models.ForeignKey(
+        TaskTemplate, on_delete=models.PROTECT, blank=True, null=True
+    )
+    type = models.CharField(max_length=32, choices=TaskType.choices)
+    name = models.CharField(max_length=64)
+    description = models.TextField(blank=True, default="")
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED

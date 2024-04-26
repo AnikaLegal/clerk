@@ -2,7 +2,21 @@ from django.db import models
 from core.models import TimestampedModel
 from .trigger import TaskTrigger
 
+
+class TaskType(models.TextChoices):
+    """
+    The type of the task.
+    """
+
+    CHECK = "CHECK", "Perform a conflict/eligibility check"
+    CONTACT = "CONTACT", "Contact client/support person or other/third party"
+    DRAFT = "DRAFT", "Draft document or advice"
+    REVIEW = "REVIEW", "Review document or advice"
+    SEND = "SEND", "Send document or advice"
+
+
 class TaskTemplate(TimestampedModel):
+    type = models.CharField(max_length=32, choices=TaskType.choices)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
     trigger = models.ForeignKey(

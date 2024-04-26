@@ -12,7 +12,7 @@ class TaskTriggerTopic:
 
 class TaskTriggerAssignedTo(models.TextChoices):
     """
-    Who gets assigned the task.
+    Who gets assigned the task(s).
     """
 
     PARALEGAL = "PARALEGAL", "The paralegal assigned to the case"
