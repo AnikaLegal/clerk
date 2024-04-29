@@ -51,4 +51,5 @@ class TaskAdmin(admin.ModelAdmin):
         "name",
         "description",
         "status",
+        "assigned_to",
     )
