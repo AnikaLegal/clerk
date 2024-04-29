@@ -1,6 +1,9 @@
 from django.db import models
+
+from accounts.models import User
 from core.models import TimestampedModel, Issue
 from .template import TaskTemplate, TaskType
+from .trigger import TasksAssignedTo
 
 
 class TaskStatus(models.TextChoices):
@@ -25,5 +28,20 @@ class Task(TimestampedModel):
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
+    assigned_to = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name="assigned_tasks"
+    )
 
-    # assigned_to =
+    def save(self, *args, **kwargs):
+
+        if not self.assigned_to_id and self.template_id and self.issue_id:
+            trigger = self.template.trigger
+            if trigger.tasks_assigned_to == TasksAssignedTo.PARALEGAL:
+                self.assigned_to = self.issue.paralegal
+            elif trigger.tasks_assigned_to == TasksAssignedTo.LAWYER:
+                self.assigned_to = self.issue.lawyer
+            elif trigger.tasks_assigned_to == TasksAssignedTo.COORDINATOR:
+                # TODO: Yuk! How to make this not suck?
+                self.assigned_to = User.objects.get(email="coordinators@anikalegal.com")
+
+        return super().save(*args, **kwargs)

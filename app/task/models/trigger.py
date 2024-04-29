@@ -5,12 +5,12 @@ from core.models.issue_event import EventType
 from django.core.exceptions import ValidationError
 
 
-class TaskTriggerTopic:
+class TriggerTopic:
     ANY = "ANY"
     CHOICES = [(ANY, "Any"), *CaseTopic.ACTIVE_CHOICES]
 
 
-class TaskTriggerAssignedTo(models.TextChoices):
+class TasksAssignedTo(models.TextChoices):
     """
     Who gets assigned the task(s).
     """
@@ -21,14 +21,14 @@ class TaskTriggerAssignedTo(models.TextChoices):
 
 
 class TaskTrigger(TimestampedModel):
-    topic = models.CharField(max_length=32, choices=TaskTriggerTopic.CHOICES)
+    topic = models.CharField(max_length=32, choices=TriggerTopic.CHOICES)
     event = models.CharField(max_length=32, choices=EventType.choices)
     # Only relevant when event is STAGE_CHANGED
     event_stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, blank=True, default=""
     )
     tasks_assigned_to = models.CharField(
-        max_length=32, choices=TaskTriggerAssignedTo.choices
+        max_length=32, choices=TasksAssignedTo.choices
     )
 
     def clean(self):
