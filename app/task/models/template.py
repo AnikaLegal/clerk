@@ -13,7 +13,7 @@ class TaskType(models.TextChoices):
     DRAFT = "DRAFT", "Draft document or advice"
     REVIEW = "REVIEW", "Review document or advice"
     SEND = "SEND", "Send document or advice"
-    OTHER = "OTHER", "Any other task"
+    OTHER = "OTHER", "Other"
 
 
 class TaskTemplate(TimestampedModel):
