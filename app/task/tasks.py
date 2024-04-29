@@ -2,31 +2,24 @@ import logging
 from django.db.models import Q
 from utils.sentry import sentry_task
 
-from accounts.models import User
-from core.models import Issue
 from core.models.issue_event import IssueEvent, EventType
-from task.models import TaskTrigger, TaskTemplate, Task
-from task.models.trigger import TriggerTopic, TasksAssignedTo
+from task.models import TaskTrigger, Task
+from task.models.trigger import TriggerTopic
 
 
 logger = logging.getLogger(__name__)
 
 
 @sentry_task
-def maybe_create_or_update_tasks(issue_event_pk: int):
+def maybe_create_tasks(event_pk: int):
     """
     Look for task triggers matching the issue event details and create tasks
     based on the templates associated with the trigger.
     """
     try:
-        event = IssueEvent.objects.get(pk=issue_event_pk)
+        event = IssueEvent.objects.get(pk=event_pk)
     except IssueEvent.DoesNotExist:
         return
-
-    # TODO: handle events where e.g. paralegal removed.
-    if event.event_type == EventType.PARALEGAL or event.event_type == EventType.LAWYER:
-        if event.prev_user_id and event.next_user_id:
-            pass
 
     issue = event.issue
     query = Q(event=event.event_type, topic__in=[issue.topic, TriggerTopic.ANY])
@@ -38,8 +31,9 @@ def maybe_create_or_update_tasks(issue_event_pk: int):
             if not Task.objects.filter(template=template, issue=issue).exists():
                 Task.objects.create(
                     template=template,
-                    issue=issue,
                     type=template.type,
                     name=template.name,
                     description=template.description,
+                    issue=issue,
+                    assigned_to=trigger.tasks_assigned_to,
                 )

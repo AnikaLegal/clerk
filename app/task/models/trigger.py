@@ -15,8 +15,8 @@ class TasksAssignedTo(models.TextChoices):
     Who gets assigned the task(s).
     """
 
-    PARALEGAL = "PARALEGAL", "The paralegal assigned to the case"
-    LAWYER = "LAWYER", "The lawyer assigned to the case"
+    PARALEGAL = "PARALEGAL", "The case paralegal"
+    LAWYER = "LAWYER", "The case lawyer"
     COORDINATOR = "COORDINATOR", "Coordinators"
 
 
