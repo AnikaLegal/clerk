@@ -1,8 +1,8 @@
 from django.db import models
 
+from accounts.models import User
 from core.models import TimestampedModel, Issue
 from .template import TaskTemplate, TaskType
-from .trigger import TasksAssignedTo
 
 
 class TaskStatus(models.TextChoices):
@@ -27,4 +27,4 @@ class Task(TimestampedModel):
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
-    assigned_to = models.CharField(max_length=32, choices=TasksAssignedTo.choices)
+    assigned_to = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")

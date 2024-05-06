@@ -2,8 +2,7 @@ from django.db import models
 from core.models import TimestampedModel
 from core.models.issue import CaseTopic, CaseStage
 from core.models.issue_event import EventType
-from django.core.exceptions import ValidationError
-from django.db.models import Q, F
+from django.db.models import Q
 
 
 class TriggerTopic(CaseTopic):
@@ -11,7 +10,7 @@ class TriggerTopic(CaseTopic):
     ACTIVE_CHOICES = [(ANY, "Any"), *CaseTopic.ACTIVE_CHOICES]
 
 
-class TasksAssignedTo(models.TextChoices):
+class TasksCaseRole(models.TextChoices):
     """
     Who gets assigned the task(s).
     """
@@ -28,7 +27,7 @@ class TaskTrigger(TimestampedModel):
     event_stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, blank=True, null=True, default=None
     )
-    tasks_assigned_to = models.CharField(max_length=32, choices=TasksAssignedTo.choices)
+    tasks_assigned_to = models.CharField(max_length=32, choices=TasksCaseRole.choices)
 
     class Meta:
         constraints = [
