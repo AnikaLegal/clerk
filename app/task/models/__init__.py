@@ -1,3 +1,3 @@
-from .trigger import TaskTrigger
-from .template import TaskTemplate
 from .task import Task
+from .template import TaskTemplate
+from .trigger import TaskTrigger
