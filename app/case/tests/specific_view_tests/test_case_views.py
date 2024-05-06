@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 from accounts.models import User
 from case.middleware import annotate_group_access
 from core import factories
+from core.models.issue import CaseStage
 from core.models import IssueNote
 from conftest import schema_tester
 
@@ -199,6 +200,43 @@ def test_case_update_view(superuser_client: APIClient):
     schema_tester.validate_response(response=response)
     issue.refresh_from_db()
     assert not issue.is_open
+
+
+@pytest.mark.django_db
+def test_case_validation_stage(
+    superuser_client: APIClient, user, paralegal_group, lawyer_group
+):
+    user.groups.set([paralegal_group, lawyer_group])
+    annotate_group_access(user)
+
+    issue = factories.IssueFactory()
+    url = reverse("case-api-detail", args=(issue.pk,))
+    data = {"stage": CaseStage.CLIENT_AGREEMENT}
+
+    # Can't update case stage without paralegal & lawyer
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 400
+
+    # Can't update case stage with just paralegal.
+    issue.lawyer = None
+    issue.paralegal = user
+    issue.save()
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 400
+
+    # Can't update case stage with just lawyer.
+    issue.lawyer = user
+    issue.paralegal = None
+    issue.save()
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 400
+
+    # Can update case stage with both lawyer & paralegal.
+    issue.lawyer = user
+    issue.paralegal = user
+    issue.save()
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 200
 
 
 # TODO: Test permissions

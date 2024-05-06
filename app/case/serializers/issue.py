@@ -3,8 +3,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.models import Issue, IssueNote
-from core.models.issue import EmploymentType, ReferrerType
+from core.models.issue import EmploymentType, ReferrerType, CaseStage
 from accounts.models import User
+from rest_framework.exceptions import ValidationError
 
 from .user import UserSerializer
 from .client import ClientSerializer
@@ -94,6 +95,17 @@ class IssueSerializer(serializers.ModelSerializer):
             ms_account_created_at__lte=fifteen_minutes_ago
         )
         return fields
+
+    def validate_stage(self, stage: str):
+        issue: Issue = self.instance
+        if stage != CaseStage.UNSTARTED and None in [
+            issue.paralegal_id,
+            issue.lawyer_id,
+        ]:
+            raise ValidationError(
+                "Cannot progress the case stage without an assigned lawyer & paralegal."
+            )
+        return stage
 
     def validate_paralegal_id(self, paralegal: User):
         return paralegal.id if paralegal else None
