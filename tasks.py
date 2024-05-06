@@ -69,6 +69,7 @@ def own(c, user=None):
     """Assert file ownership of project"""
     if not user:
         import os
+
         user = os.getenv("USER")
     c.run(f"sudo chown -R {user}: .", pty=True)
 
@@ -125,7 +126,7 @@ def psql(c):
 
 
 @task
-def test(c, recreate=False, interactive=False, quiet=False):
+def test(c, recreate=False, interactive=False, quiet=False, debug=False):
     """Run pytest"""
     if interactive:
         cmd = "bash"
@@ -141,8 +142,12 @@ def test(c, recreate=False, interactive=False, quiet=False):
         else:
             cmd += " -vv"
 
+    debug_args = ""
+    if debug:
+        debug_args = "-p 8123:8123 -e DEBUG_PYTEST=true"
+
     c.run(
-        f"{COMPOSE} run --rm test {cmd}",
+        f"{COMPOSE} run --rm {debug_args} test {cmd}",
         pty=True,
         env={
             "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
