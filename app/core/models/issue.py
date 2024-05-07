@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 from django.conf import settings
 
@@ -207,6 +207,7 @@ class Issue(TimestampedModel):
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
 
+    @transaction.atomic()
     def save(self, *args, **kwargs):
         if not self.fileref:
             self.fileref = self.get_next_fileref()

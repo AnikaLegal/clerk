@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 def pre_save_issue(sender, instance, **kwargs):
     """
     Detect state changes and create IssueEvents as required.
-    This arguably belongs in the Issue.save() method coz then we could do atomic transactions.
     """
     issue: Issue = instance
     if not issue.pk:
@@ -33,9 +32,9 @@ def pre_save_issue(sender, instance, **kwargs):
     if prev_issue == None:
         return
 
-    # TODO: move elsewhere? issue event post save handler?
-    # If the save subsequently fails we have already sent out notifications etc.
-    # 
+    # TODO: move elsewhere? issue event post save handler? If the save
+    # subsequently fails we have already sent out notifications etc.
+    #
     # If the paralegal for the current Issue object is different from that in
     # the database.  We need to update the matching folder on Sharepoint by
     # removing the old paralegal and adding the new one.
