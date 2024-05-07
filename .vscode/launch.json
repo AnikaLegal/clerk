@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Run Django",
+        "name": "Attach debugger",
         "type": "python",
         "request": "attach",
         "django": true,
