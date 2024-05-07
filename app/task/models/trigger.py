@@ -7,21 +7,21 @@ from django.db.models import Q
 
 class TriggerTopic(CaseTopic):
     ANY = "ANY"
-    ACTIVE_CHOICES = [(ANY, "Any"), *CaseTopic.ACTIVE_CHOICES]
+    choices = [(ANY, "Any"), *CaseTopic.ACTIVE_CHOICES]
 
 
 class TasksCaseRole(models.TextChoices):
     """
-    Who gets assigned the task(s).
+    The role of the user assigned to the task(s).
     """
 
-    PARALEGAL = "PARALEGAL", "The case paralegal"
-    LAWYER = "LAWYER", "The case lawyer"
+    PARALEGAL = "PARALEGAL", "Paralegal"
+    LAWYER = "LAWYER", "Lawyer"
     COORDINATOR = "COORDINATOR", "Coordinators"
 
 
 class TaskTrigger(TimestampedModel):
-    topic = models.CharField(max_length=32, choices=TriggerTopic.ACTIVE_CHOICES)
+    topic = models.CharField(max_length=32, choices=TriggerTopic.choices)
     event = models.CharField(max_length=32, choices=EventType.choices)
     # Only relevant when event is STAGE
     event_stage = models.CharField(
