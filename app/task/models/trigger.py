@@ -27,7 +27,7 @@ class TaskTrigger(TimestampedModel):
     event_stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, blank=True, null=True, default=None
     )
-    tasks_assigned_to = models.CharField(max_length=32, choices=TasksCaseRole.choices)
+    tasks_assignment_role = models.CharField(max_length=32, choices=TasksCaseRole.choices)
 
     class Meta:
         constraints = [

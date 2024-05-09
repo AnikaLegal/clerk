@@ -1,6 +1,6 @@
 from django.db import models
-from accounts.models import User
 
+from accounts.models import User
 from core.models import TimestampedModel
 from .task import Task
 

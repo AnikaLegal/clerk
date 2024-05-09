@@ -28,7 +28,7 @@ class TaskTriggerAdmin(admin.ModelAdmin):
         "topic",
         "event",
         "event_stage",
-        "tasks_assigned_to",
+        "tasks_assignment_role",
     )
     ordering = ("topic",)
 
@@ -51,5 +51,6 @@ class TaskAdmin(admin.ModelAdmin):
         "name",
         "description",
         "status",
-        "role",
+        "is_open",
     )
+    readonly_fields = ("is_open",)
