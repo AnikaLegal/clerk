@@ -11,6 +11,8 @@ inv test
 
 This launches a docker container used to run the tests.
 
+### Interactive
+
 To run specific tests, use the `--interactive` flag to open a shell on the
 docker container. The `pytest` utility can then be used to run specific tests
 directly:
@@ -19,6 +21,8 @@ directly:
 inv test -i
 pytest -vv path/to/test.py
 ```
+
+### Debugging
 
 To debug tests using vscode use the `--debug` flag to run the python `debugpy`
 debugger on the docker container:
