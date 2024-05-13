@@ -65,9 +65,13 @@ def ngrok(c, url):
 
 
 @task
-def own(c, username):
+def own(c, user=None):
     """Assert file ownership of project"""
-    c.run(f"sudo chown -R {username}:{username} .", pty=True)
+    if not user:
+        import os
+
+        user = os.getenv("USER")
+    c.run(f"sudo chown -R {user}: .", pty=True)
 
 
 @task
@@ -122,7 +126,7 @@ def psql(c):
 
 
 @task
-def test(c, recreate=False, interactive=False, quiet=False):
+def test(c, recreate=False, interactive=False, quiet=False, debug=False):
     """Run pytest"""
     if interactive:
         cmd = "bash"
@@ -138,8 +142,12 @@ def test(c, recreate=False, interactive=False, quiet=False):
         else:
             cmd += " -vv"
 
+    debug_args = ""
+    if debug:
+        debug_args = "-p 8123:8123 -e DEBUG_PYTEST=true"
+
     c.run(
-        f"{COMPOSE} run --rm test {cmd}",
+        f"{COMPOSE} run --rm {debug_args} test {cmd}",
         pty=True,
         env={
             "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
@@ -157,6 +165,12 @@ def reset(c):
 def restore(c):
     """Restore local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
+
+
+@task
+def migrate(c):
+    """Create and apply local database migrations"""
+    run(c, 'bash -c "./manage.py makemigrations && ./manage.py migrate"')
 
 
 S3_PROD = "anika-clerk"

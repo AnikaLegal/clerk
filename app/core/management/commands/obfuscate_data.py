@@ -32,6 +32,7 @@ class Command(BaseCommand):
         # used for testing.
         users = User.objects.exclude(
             Q(groups__name__in=[CaseGroups.LAWYER, CaseGroups.ADMIN])
+            | Q(email="dummy.test@anikalegal.com")
             | Q(is_superuser=True)
         ).distinct()
 
@@ -57,6 +58,8 @@ class Command(BaseCommand):
         for c in clients:
             c.first_name = fake.first_name()
             c.last_name = fake.last_name()
+            if c.preferred_name:
+                c.preferred_name = fake.first_name()
             c.email = fake.email()
             c.phone_number = fake.phone_number()
             c.save()

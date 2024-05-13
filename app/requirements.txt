@@ -9,6 +9,7 @@ wagtail-localize
 
 # Cleans html
 html-sanitizer==1.9.3
+lxml[html_clean]
 
 # Infrastructure
 psycopg2-binary

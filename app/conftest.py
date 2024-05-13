@@ -1,7 +1,10 @@
 """
 Pytest configuration
 """
+
 import pytest
+import os
+import debugpy
 from django.contrib.auth.models import Group
 from rest_framework.test import APIClient
 from openapi_tester import SchemaTester
@@ -37,6 +40,13 @@ def pytest_configure(config):
     Register restore signals mark
     """
     config.addinivalue_line("markers", "enable_signals: Mark test to use signals.")
+
+
+def pytest_sessionstart(session):
+    if os.environ.get("DEBUG_PYTEST"):
+        debugpy.listen(("0.0.0.0", 8123))
+        print("Waiting for debug client to attach...")
+        debugpy.wait_for_client()
 
 
 @pytest.fixture

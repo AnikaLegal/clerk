@@ -42,9 +42,14 @@
 <body>
     {% notice %}
     <header>
+        <div>
         <a href="{% url 'landing' %}">
-            <img src="{% static 'web/brand/logo-color.svg' %}">
+            <img src="{% static 'web/brand/logo-color.svg' %}" style="margin-right: 20px;">
         </a>
+        <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">
+            <img src="{% static 'web/brand/acnc-charity.png' %}"/>
+        </a>
+        </div>
         <nav class="large">
             {% include 'web/snippets/_header_menu.html' %}
         </nav>
@@ -93,9 +98,14 @@
         <div class=inner>
             <div class=column>
                 <h3>
-                    <img style="margin-right: 20px;" src="{% static 'web/brand/logo-footer.svg' %}" />
-                    <a href="https://www.acnc.gov.au/charity/3acdc07aacf256d03811dc298a2d5aea">
-                        <img src="{% static 'web/brand/acnc-charity.png' %}" style="height:33px" />
+                    <a href="{% url 'landing' %}">
+                        <img src="{% static 'web/brand/logo-footer.svg' %}" style="margin-right:20px;"/>
+                    </a>
+                    <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">
+                        <img src="{% static 'web/brand/acnc-charity.png' %}" style="height:33px;margin-right:20px;" />
+                    </a>
+                    <a href="https://www.fclc.org.au/">
+                        <img src="{% static 'web/img/partners/federation-vic.jpg' %}" style="height:33px;">
                     </a>
                 </h3>
                 <p>
