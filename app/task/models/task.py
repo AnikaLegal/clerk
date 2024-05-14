@@ -3,6 +3,7 @@ from django.db import models
 from accounts.models import User
 from core.models import TimestampedModel, Issue
 from .template import TaskTemplate, TaskType
+from .comment import TaskComment, CommentType
 
 
 class TaskStatus(models.TextChoices):
@@ -54,4 +55,11 @@ class Task(TimestampedModel):
 
         super().save(*args, **kwargs)
 
-
+    def create_comment(
+        self, text: str, type: CommentType = CommentType.SYSTEM
+    ) -> TaskComment:
+        return TaskComment.objects.create(
+            task=self,
+            type=type,
+            text=text,
+        )
