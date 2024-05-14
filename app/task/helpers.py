@@ -8,8 +8,8 @@ from task.models.trigger import TriggerTopic
 
 def get_open_tasks_by_user(issue: Issue, user: User) -> QuerySet[Task]:
     """
-    Return open tasks associated with the supplied issue and owned or assigned
-    to the supplied user.
+    Return open tasks associated with the supplied issue and owned by or
+    assigned to the supplied user.
     """
     return Task.objects.filter(issue=issue, is_open=True).filter(
         Q(owner=user) | Q(assigned_to=user)
@@ -41,7 +41,10 @@ def is_lawyer_acting_as_paralegal(issue: Issue) -> bool:
     """
     True if the user assigned as the paralegal is a member of the lawyer group.
     """
-    return issue.paralegal_id and issue.paralegal.groups.filter(name=CaseGroups.LAWYER).exists()
+    return (
+        issue.paralegal_id
+        and issue.paralegal.groups.filter(name=CaseGroups.LAWYER).exists()
+    )
 
 
 def is_user_changed(event: IssueEvent) -> bool:
