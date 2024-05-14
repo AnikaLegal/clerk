@@ -55,7 +55,7 @@ class Task(TimestampedModel):
 
         super().save(*args, **kwargs)
 
-    def create_comment(
+    def add_comment(
         self, text: str, type: CommentType = CommentType.SYSTEM
     ) -> TaskComment:
         return TaskComment.objects.create(

@@ -42,8 +42,8 @@ def maybe_close_tasks(event: IssueEvent):
             task.status = TaskStatus.NOT_DONE
             task.save()
 
-            text = f"This task was closed because the user {prev_user} was removed from the case."
-            task.create_comment(text)
+            text = f"This task was closed because {prev_user} was removed from the case."
+            task.add_comment(text)
 
 
 def maybe_update_tasks(event: IssueEvent):
@@ -71,7 +71,7 @@ def maybe_update_tasks(event: IssueEvent):
                 task.save()
 
                 text = f"This task was reassigned from {prev_user} to {next_user} because the case user was changed."
-                task.create_comment(text)
+                task.add_comment(text)
 
 
 def maybe_create_tasks(event: IssueEvent):
