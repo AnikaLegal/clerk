@@ -55,8 +55,13 @@ class TaskAdmin(admin.ModelAdmin):
         "assigned_to_link",
         "status",
         "is_open",
+        "is_suspended",
     )
-    readonly_fields = ("is_open",)
+    readonly_fields = (
+        "is_open",
+        "is_suspended",
+        "prev_owner_role",
+    )
 
     @admin_link("owner", "Owner")
     def owner_link(self, user):

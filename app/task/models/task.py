@@ -17,19 +17,42 @@ class TaskStatus(models.TextChoices):
     NOT_DONE = "NOT_DONE", "Not done"
 
 
+class OwnerRole(models.TextChoices):
+    """
+    Used to keep track of the previous ownership role of tasks when their owner
+    is removed from a case.
+    """
+
+    PARALEGAL = "PARALEGAL", "Paralegal"
+    LAWYER = "LAWYER", "Lawyer"
+
+
 class Task(TimestampedModel):
+
     type = models.CharField(max_length=32, choices=TaskType.choices)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
+
+    # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)
+    is_suspended = models.BooleanField(default=False)
 
     # The issue to which the task relates.
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+
     # The original assignee.
-    owner = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")
+    owner = models.ForeignKey(
+        User, on_delete=models.PROTECT, blank=True, null=True, related_name="+"
+    )
+    # Internal field used to handle task ownership & assignment when users are
+    # removed from & assigned back to a case.
+    prev_owner_role = models.CharField(
+        max_length=32, choices=OwnerRole.choices, default=None, blank=True, null=True
+    )
+
     # The current assignee.
     assigned_to = models.ForeignKey(
         User,
@@ -38,6 +61,7 @@ class Task(TimestampedModel):
         blank=True,
         related_name="+",
     )
+
     # If the task was created by the system then this refers to the template
     # used to create the task.
     template = models.ForeignKey(
@@ -45,16 +69,18 @@ class Task(TimestampedModel):
     )
 
     def save(self, *args, **kwargs):
-        if not self.owner_id:
-            self.owner = self.assigned_to
+        # As a convenience, set the owner as the assignee if the task does not
+        # have one.
+        if self.owner and not self.assigned_to:
+            self.assigned_to = self.owner
 
-        if self.status in [TaskStatus.DONE, TaskStatus.NOT_DONE]:
-            self.is_open = False
-        else:
-            self.is_open = True
+        # Set some internal status flags.
+        self.is_open = self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+        self.is_suspended = not self.owner and self.prev_owner_role is not None
 
         super().save(*args, **kwargs)
 
+    # Convenience method used to add a comment related to the task instance.
     def add_comment(
         self, text: str, type: CommentType = CommentType.SYSTEM
     ) -> TaskComment:
