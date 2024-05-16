@@ -4,7 +4,6 @@ from django_q.tasks import async_task
 from django.db import transaction
 
 from core.models import IssueEvent
-from task.models import Task
 from .tasks import handle_event
 
 
