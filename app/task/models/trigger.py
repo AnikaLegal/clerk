@@ -35,7 +35,7 @@ class TaskTrigger(TimestampedModel):
                 check=~Q(event=EventType.STAGE) | Q(event_stage__isnull=False),
                 name="%(app_label)s_%(class)s_event_stage_required",
                 # TODO: enable below on django version >= 4.1
-                # violation_error_message=f'Event stage is required when the event is "{EventType.STAGE.label}'
+                # violation_error_message=f'Event stage is required when the event is "{EventType.STAGE.label}"'
                 # ),
             ),
         ]
