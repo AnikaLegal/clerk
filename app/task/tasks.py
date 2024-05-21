@@ -1,12 +1,14 @@
 import logging
 from utils.sentry import sentry_task
 from django.db.models import Q, QuerySet
+from django.db import transaction
 
 from accounts.models import User
 from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
 from task.models import Task, TaskTrigger
 from task.models.trigger import TasksCaseRole, TriggerTopic
+
 
 from .helpers import (
     is_user_added,
@@ -21,21 +23,41 @@ logger = logging.getLogger(__name__)
 
 
 @sentry_task
+@transaction.atomic
 def handle_event(event_pk: int):
     event = IssueEvent.objects.get(pk=event_pk)
+    notify_tasks: set[int] = set()
 
     if is_user_removed(event):
-        maybe_revert_tasks(event)
-        maybe_suspend_tasks(event)
+        reverted_tasks = maybe_revert_tasks(event)
+        notify_tasks.update(reverted_tasks)
+
+        # We don't notify when tasks are suspended.
+        suspended_tasks = maybe_suspend_tasks(event)
+
     elif is_user_changed(event):
-        maybe_reassign_tasks(event)
+        reassigned_tasks = maybe_reassign_tasks(event)
+        notify_tasks.update(reassigned_tasks)
+
     else:
         if is_user_added(event):
-            maybe_resume_tasks(event)
-        maybe_create_tasks(event)
+            resumed_tasks = maybe_resume_tasks(event)
+            notify_tasks.update(resumed_tasks)
+
+        created_tasks = maybe_create_tasks(event)
+        notify_tasks.update(created_tasks)
+
+    notify(list(notify_tasks), force=True)
 
 
-def maybe_revert_tasks(event: IssueEvent) -> QuerySet[Task]:
+@sentry_task
+def handle_task(task_pk: int):
+    task = Task.objects.get(pk=task_pk)
+    notify([task.pk])
+
+
+@transaction.atomic
+def maybe_revert_tasks(event: IssueEvent) -> list[int]:
     """
     Revert tasks assigned to but not owned by the user being removed from the
     case back to their owner.
@@ -45,20 +67,24 @@ def maybe_revert_tasks(event: IssueEvent) -> QuerySet[Task]:
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
-        Q(assigned_to=prev_user) & ~Q(owner=prev_user)
+    tasks = (
+        Task.objects.select_for_update()
+        .filter(issue=issue, is_open=True)
+        .filter(Q(assigned_to=prev_user) & ~Q(owner=prev_user))
     )
     for task in tasks:
         task.assigned_to = task.owner
+        task.is_system_update = True
         task.save()
 
         text = f"This task was reassigned back to {task.owner} because {prev_user} was removed from the case."
         task.add_comment(text)
 
-    return tasks
+    return [task.pk for task in tasks]
 
 
-def maybe_suspend_tasks(event: IssueEvent) -> QuerySet[Task]:
+@transaction.atomic
+def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     """
     Suspend tasks owned by the user being removed from the case.
     """
@@ -67,20 +93,24 @@ def maybe_suspend_tasks(event: IssueEvent) -> QuerySet[Task]:
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = Task.objects.filter(issue=issue, is_open=True, owner=prev_user)
+    tasks = Task.objects.select_for_update().filter(
+        issue=issue, is_open=True, owner=prev_user
+    )
     for task in tasks:
         task.prev_owner_role = event.event_type
         task.owner = None
         task.assigned_to = None
+        task.is_system_update = True
         task.save()
 
         text = f"This task was suspended because {prev_user} was removed from the case."
         task.add_comment(text)
 
-    return tasks
+    return [task.pk for task in tasks]
 
 
-def maybe_reassign_tasks(event: IssueEvent) -> QuerySet[Task]:
+@transaction.atomic
+def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     """
     Update task ownership/assignee if the case lawyer or paralegal changes.
     """
@@ -96,25 +126,29 @@ def maybe_reassign_tasks(event: IssueEvent) -> QuerySet[Task]:
     # paralegal is changed. We cannot determine which tasks belong to their role
     # as the lawyer & which to their role as paralegal so we do nothing.
     if is_user_assigned_to_issue(issue, prev_user):
-        return Task.objects.none()
+        return []
 
-    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
-        Q(owner=prev_user) | Q(assigned_to=prev_user)
+    tasks = (
+        Task.objects.select_for_update()
+        .filter(issue=issue, is_open=True)
+        .filter(Q(owner=prev_user) | Q(assigned_to=prev_user))
     )
     for task in tasks:
         if task.owner == prev_user:
             task.owner = next_user
         if task.assigned_to == prev_user:
             task.assigned_to = next_user
+        task.is_system_update = True
         task.save()
 
         text = f"This task was reassigned from {prev_user} to {next_user} because the case user was changed."
         task.add_comment(text)
 
-    return tasks
+    return [task.pk for task in tasks]
 
 
-def maybe_resume_tasks(event: IssueEvent) -> QuerySet[Task]:
+@transaction.atomic
+def maybe_resume_tasks(event: IssueEvent) -> list[int]:
     """
     Resume tasks that were previously suspended when a user was removed from the
     case.
@@ -124,22 +158,23 @@ def maybe_resume_tasks(event: IssueEvent) -> QuerySet[Task]:
     issue = event.issue
     next_user = event.next_user
 
-    tasks = Task.objects.filter(
+    tasks = Task.objects.select_for_update().filter(
         issue=issue, is_suspended=True, prev_owner_role=event.event_type
     )
     for task in tasks:
-        task.prev_owner_role = None
         task.owner = next_user
         task.assigned_to = next_user
+        task.prev_owner_role = None
+        task.is_system_update = True
         task.save()
 
         text = f"This task was resumed because {next_user} was added to the case."
         task.add_comment(text)
 
-    return tasks
+    return [task.pk for task in tasks]
 
 
-def maybe_create_tasks(event: IssueEvent) -> None:
+def maybe_create_tasks(event: IssueEvent) -> list[int]:
     """
     Look for task triggers matching the event details and create tasks based on
     the templates associated with the trigger.
@@ -147,7 +182,7 @@ def maybe_create_tasks(event: IssueEvent) -> None:
 
     # Don't create any tasks if a user has been removed from a case.
     if is_user_removed(event):
-        return
+        return []
 
     # Look for triggers matching the event.
     triggers = TaskTrigger.objects.filter(event=event.event_type)
@@ -168,18 +203,23 @@ def maybe_create_tasks(event: IssueEvent) -> None:
         ):
             break
 
+        task_pks = []
         for template in trigger.templates.all():
             if not Task.objects.filter(
                 issue=event.issue, template=template, owner=user
             ).exists():
-                Task.objects.create(
+                task = Task.objects.create(
                     issue=event.issue,
                     template=template,
                     type=template.type,
                     name=template.name,
                     description=template.description,
                     owner=user,
+                    is_system_update=True,
                 )
+                task_pks.append(task.pk)
+
+        return task_pks
 
 
 def get_user_by_role(issue: Issue, role: TasksCaseRole) -> User | None:
@@ -191,3 +231,31 @@ def get_user_by_role(issue: Issue, role: TasksCaseRole) -> User | None:
         # TODO: move this elsewhere.
         return User.objects.get(email="coordinators@anikalegal.com")
     return None
+
+
+@transaction.atomic
+def notify(task_pks: list[int], force: bool = False):
+
+    if not task_pks:
+        return
+
+    try: # TODO: Finer grained error handling?
+        tasks = Task.objects.filter(pk__in=task_pks)
+        for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
+            user = task.assigned_to
+            tasks_by_user = tasks.select_for_update().filter(assigned_to_id=user.pk)
+            if not force:
+                tasks_by_user = tasks_by_user.filter(
+                    is_notify_pending=True, is_system_update=False
+                )
+            if tasks_by_user.exists():
+                notify_user(user, tasks_by_user)
+    finally:
+        tasks.update(is_notify_pending=False, is_system_update=False)
+
+
+def notify_user(user: User, tasks: QuerySet[Task]):
+    assert tasks.exists()
+
+    # TODO: generate the notification text and notify the user.
+    pass

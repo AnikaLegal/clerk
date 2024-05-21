@@ -6,7 +6,7 @@ from task.models import Task, TaskTrigger, TaskTemplate, TaskComment
 from utils.admin import admin_link
 
 
-class TemplateInline(admin.TabularInline):
+class TaskTemplateInline(admin.TabularInline):
     model = TaskTemplate
     extra = 0
     fields = (
@@ -24,7 +24,7 @@ class TemplateInline(admin.TabularInline):
 
 @admin.register(TaskTrigger)
 class TaskTriggerAdmin(admin.ModelAdmin):
-    inlines = (TemplateInline,)
+    inlines = (TaskTemplateInline,)
     list_display = (
         "id",
         "topic",
@@ -45,8 +45,15 @@ class TaskTemplateAdmin(admin.ModelAdmin):
     )
 
 
+class TaskCommentInline(admin.TabularInline):
+    model = TaskComment
+    extra = 0
+    show_change_link = True
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
+    inlines = (TaskCommentInline,)
     list_display = (
         "id",
         "type",
@@ -58,6 +65,8 @@ class TaskAdmin(admin.ModelAdmin):
         "is_suspended",
     )
     readonly_fields = (
+        "is_notify_pending",
+        "is_system_update",
         "is_open",
         "is_suspended",
         "prev_owner_role",

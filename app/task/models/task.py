@@ -40,6 +40,21 @@ class Task(TimestampedModel):
     is_open = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
 
+    # We use these two flags to handle sending notifications when the assignee
+    # changes. The flags operate as follows:
+    #
+    # - is_notify_pending: indicates that the assignee has changed and,
+    #   therefore, we potentially need to notify them.
+    #
+    # - is_system_update: indicates that the system is creating or updating
+    #   tasks, potentially en masse (e.g. creating multiple tasks for a single
+    #   user in response to a task trigger being activated) and will handle
+    #   notifications itself so as to only send out a single notification
+    #   instead of one for every created or updated task.
+    #
+    is_notify_pending = models.BooleanField(default=False)
+    is_system_update = models.BooleanField(default=False)
+
     # The issue to which the task relates.
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
 
@@ -73,6 +88,16 @@ class Task(TimestampedModel):
         # have one.
         if self.owner and not self.assigned_to:
             self.assigned_to = self.owner
+
+        # Set internal status flag to indicate if a notification is potentially
+        # required.
+        try:
+            prev_task = Task.objects.get(pk=self.pk)
+        except Task.DoesNotExist:
+            prev_task = None
+        self.is_notify_pending = self.assigned_to_id is not None and (
+            prev_task is None or prev_task.assigned_to_id != self.assigned_to_id
+        )
 
         # Set some internal status flags.
         self.is_open = self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
