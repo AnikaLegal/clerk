@@ -26,25 +26,35 @@ logger = logging.getLogger(__name__)
 @transaction.atomic
 def handle_event(event_pk: int):
     event = IssueEvent.objects.get(pk=event_pk)
+    logger.info(
+        'Handling "%s" IssueEvent<%s> on Issue<%s>',
+        event.event_type,
+        event.pk,
+        event.issue_id,
+    )
     notify_tasks: set[int] = set()
 
     if is_user_removed(event):
         reverted_tasks = maybe_revert_tasks(event)
+        logger.info("Reverted %s task(s)", len(reverted_tasks))
         notify_tasks.update(reverted_tasks)
 
         # We don't notify when tasks are suspended.
         suspended_tasks = maybe_suspend_tasks(event)
+        logger.info("Suspended %s task(s)", len(suspended_tasks))
 
     elif is_user_changed(event):
         reassigned_tasks = maybe_reassign_tasks(event)
+        logger.info("Reassigned %s task(s)", len(reassigned_tasks))
         notify_tasks.update(reassigned_tasks)
-
     else:
         if is_user_added(event):
             resumed_tasks = maybe_resume_tasks(event)
+            logger.info("Resumed %s task(s)", len(resumed_tasks))
             notify_tasks.update(resumed_tasks)
 
         created_tasks = maybe_create_tasks(event)
+        logger.info("Created %s task(s)", len(created_tasks))
         notify_tasks.update(created_tasks)
 
     notify(list(notify_tasks), force=True)
