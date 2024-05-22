@@ -8,7 +8,8 @@ from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
 from task.models import Task, TaskTrigger
 from task.models.trigger import TasksCaseRole, TriggerTopic
-
+from slack.services import get_slack_user_by_email, send_slack_direct_message
+from django.template.loader import render_to_string
 
 from .helpers import (
     is_user_added,
@@ -239,7 +240,7 @@ def notify(task_pks: list[int], force: bool = False):
     if not task_pks:
         return
 
-    try: # TODO: Finer grained error handling?
+    try:  # TODO: Finer grained error handling?
         tasks = Task.objects.filter(pk__in=task_pks)
         for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
             user = task.assigned_to
@@ -257,5 +258,11 @@ def notify(task_pks: list[int], force: bool = False):
 def notify_user(user: User, tasks: QuerySet[Task]):
     assert tasks.exists()
 
-    # TODO: generate the notification text and notify the user.
-    pass
+    # TODO: template needs work.
+    context = { "tasks": list(tasks.values()) }
+    text = render_to_string("task/tasks_assigned.md", context)
+
+    email = user.email
+    slack_user = get_slack_user_by_email(email)
+    if slack_user:
+        send_slack_direct_message(text, slack_user["id"])
