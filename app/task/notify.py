@@ -9,11 +9,7 @@ from django.template.loader import render_to_string
 
 
 @transaction.atomic
-def notify(task_pks: list[int], force: bool = False):
-
-    if not task_pks:
-        return
-
+def notify(task_pks: list[int], force: bool = False) -> None:
     try:  # TODO: Finer grained error handling?
         tasks = Task.objects.filter(pk__in=task_pks)
         for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
@@ -24,18 +20,21 @@ def notify(task_pks: list[int], force: bool = False):
                     is_notify_pending=True, is_system_update=False
                 )
             if tasks_by_user.exists():
-                notify_user(user, tasks_by_user)
+                notify_user_of_task_assignment(user, tasks_by_user)
     finally:
         tasks.update(is_notify_pending=False, is_system_update=False)
 
 
-def notify_user(user: User, tasks: QuerySet[Task]):
+def notify_user_of_task_assignment(user: User, tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
 
     # TODO: template needs work.
     context = {"tasks": list(tasks.values())}
     text = render_to_string("task/tasks_assigned.md", context)
+    notify_user(user, text)
 
+
+def notify_user(user: User, text: str) -> None:
     email = user.email
     slack_user = get_slack_user_by_email(email)
     if slack_user:
