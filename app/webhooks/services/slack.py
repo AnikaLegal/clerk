@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def send_webflow_contact_slack(webflow_contact_pk: str):
     webflow_contact = WebflowContact.objects.get(pk=webflow_contact_pk)
     text = get_text(webflow_contact)
-    logging.info("Notifying Slack of WebflowContact<%s>", webflow_contact_pk)
+    logger.info("Notifying Slack of WebflowContact<%s>", webflow_contact_pk)
     send_slack_message(settings.SLACK_MESSAGE.LANDING_FORM, text)
     # Mark request as sent
     WebflowContact.objects.filter(pk=webflow_contact.pk).update(is_alert_sent=True)
