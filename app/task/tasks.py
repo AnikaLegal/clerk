@@ -31,12 +31,12 @@ def handle_event(event_pk: int):
         event.pk,
         event.issue_id,
     )
-    notify_tasks: set[int] = set()
+    notify_task_pks: set[int] = set()
 
     if is_user_removed(event):
         reverted_tasks = maybe_revert_tasks(event)
         logger.info("Reverted %s task(s)", len(reverted_tasks))
-        notify_tasks.update(reverted_tasks)
+        notify_task_pks.update(reverted_tasks)
 
         # We don't notify when tasks are suspended.
         suspended_tasks = maybe_suspend_tasks(event)
@@ -45,25 +45,38 @@ def handle_event(event_pk: int):
     elif is_user_changed(event):
         reassigned_tasks = maybe_reassign_tasks(event)
         logger.info("Reassigned %s task(s)", len(reassigned_tasks))
-        notify_tasks.update(reassigned_tasks)
+        notify_task_pks.update(reassigned_tasks)
     else:
         if is_user_added(event):
             resumed_tasks = maybe_resume_tasks(event)
             logger.info("Resumed %s task(s)", len(resumed_tasks))
-            notify_tasks.update(resumed_tasks)
+            notify_task_pks.update(resumed_tasks)
 
         created_tasks = maybe_create_tasks(event)
         logger.info("Created %s task(s)", len(created_tasks))
-        notify_tasks.update(created_tasks)
+        notify_task_pks.update(created_tasks)
 
-    if notify_tasks:
-        notify_of_assignment(list(notify_tasks), force=True)
+    if notify_task_pks:
+        tasks = Task.objects.filter(pk__in=notify_task_pks)
+        try:
+            notify_of_assignment(tasks)
+        finally:
+            tasks.update(is_notify_pending=False, is_system_update=False)
 
 
 @sentry_task
 def handle_task(task_pk: int):
-    task = Task.objects.get(pk=task_pk)
-    notify_of_assignment([task.pk])
+    # This is a somewhat unusual way of getting & using a single task. We do it
+    # this way because it is convenient and allows us to use a single notify
+    # method for one or more tasks.
+    tasks = Task.objects.filter(pk=task_pk)
+    try:
+        task = tasks.first()
+        if task.is_notify_pending and not task.is_system_update:
+            notify_of_assignment(tasks)
+    finally:
+        if task.is_notify_pending or task.is_system_update:
+            tasks.update(is_notify_pending=False, is_system_update=False)
 
 
 @transaction.atomic

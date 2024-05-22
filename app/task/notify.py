@@ -11,29 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
-def notify_of_assignment(task_pks: list[int], force: bool = False) -> None:
-    """
-    Notify users of task assignment if the supplied tasks have pending
-    notifications. If the "force" parameter is true we notify users of task
-    assignment without checking for pending notification.
-    """
-    if not task_pks:
-        logger.warning("No tasks provided")
-        return
+def notify_of_assignment(tasks: QuerySet[Task]) -> None:
+    assert tasks.exists()
+    logger.info("Notifying assignment of %s task(s)", tasks.count())
 
-    try:  # TODO: Finer grained error handling?
-        tasks = Task.objects.filter(pk__in=task_pks)
-        for task in tasks.distinct("assigned_to").exclude(assigned_to_id__isnull=True):
-            user = task.assigned_to
-            tasks_by_user = tasks.select_for_update().filter(assigned_to_id=user.pk)
-            if not force:
-                tasks_by_user = tasks_by_user.filter(
-                    is_notify_pending=True, is_system_update=False
-                )
-            if tasks_by_user.exists():
-                notify_user_of_assignment(user, tasks_by_user)
-    finally:
-        tasks.update(is_notify_pending=False, is_system_update=False)
+    for task in tasks.distinct("assigned_to").exclude(assigned_to_id__isnull=True):
+        user = task.assigned_to
+        tasks_by_user = tasks.select_for_update().filter(assigned_to_id=user.pk)
+        notify_user_of_assignment(user, tasks_by_user)
 
 
 def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
