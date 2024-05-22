@@ -1,6 +1,7 @@
 """
 Django settings for clerk project.
 """
+
 import os
 
 IS_PROD = False
@@ -260,12 +261,23 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "root": {"level": "INFO", "handlers": ["console", "file"]},
+    "formatters": {
+        "default": {
+            "format": "{asctime} - {levelname} - {name} - {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
-        "console": {"level": "INFO", "class": "logging.StreamHandler"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
             "filename": "/var/log/django.log",
+            "formatter": "default",
         },
     },
     "loggers": {
