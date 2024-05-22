@@ -12,7 +12,13 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def notify_of_assignment(task_pks: list[int], force: bool = False) -> None:
+    """
+    Notify users of task assignment if the supplied tasks have pending
+    notifications. If the "force" parameter is true we notify users of task
+    assignment without checking for pending notification.
+    """
     if not task_pks:
+        logger.warning("No tasks provided")
         return
 
     try:  # TODO: Finer grained error handling?
@@ -32,6 +38,7 @@ def notify_of_assignment(task_pks: list[int], force: bool = False) -> None:
 
 def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
+    logger.info("Notifying User<%s> assignment of %s tasks", user.pk, tasks.count())
 
     # TODO: template needs work.
     context = {"tasks": list(tasks.values())}

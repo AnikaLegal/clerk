@@ -56,7 +56,8 @@ def handle_event(event_pk: int):
         logger.info("Created %s task(s)", len(created_tasks))
         notify_tasks.update(created_tasks)
 
-    notify_of_assignment(list(notify_tasks), force=True)
+    if notify_tasks:
+        notify_of_assignment(list(notify_tasks), force=True)
 
 
 @sentry_task
