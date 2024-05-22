@@ -16,9 +16,8 @@ from .helpers import (
     is_user_assigned_to_issue,
     is_lawyer_acting_as_paralegal,
 )
-from .notify import notify
+from .notify import notify_of_assignment
 
-# TODO: add logging.
 logger = logging.getLogger(__name__)
 
 
@@ -57,13 +56,13 @@ def handle_event(event_pk: int):
         logger.info("Created %s task(s)", len(created_tasks))
         notify_tasks.update(created_tasks)
 
-    notify(list(notify_tasks), force=True)
+    notify_of_assignment(list(notify_tasks), force=True)
 
 
 @sentry_task
 def handle_task(task_pk: int):
     task = Task.objects.get(pk=task_pk)
-    notify([task.pk])
+    notify_of_assignment([task.pk])
 
 
 @transaction.atomic

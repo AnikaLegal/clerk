@@ -7,12 +7,17 @@ from task.models import Task
 from slack.services import get_slack_user_by_email, send_slack_direct_message
 from django.template.loader import render_to_string
 
+logger = logging.getLogger(__name__)
+
 
 @transaction.atomic
-def notify(task_pks: list[int], force: bool = False) -> None:
+def notify_of_assignment(task_pks: list[int], force: bool = False) -> None:
+    if not task_pks:
+        return
+
     try:  # TODO: Finer grained error handling?
         tasks = Task.objects.filter(pk__in=task_pks)
-        for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
+        for task in tasks.distinct("assigned_to").exclude(assigned_to_id__isnull=True):
             user = task.assigned_to
             tasks_by_user = tasks.select_for_update().filter(assigned_to_id=user.pk)
             if not force:
@@ -20,12 +25,12 @@ def notify(task_pks: list[int], force: bool = False) -> None:
                     is_notify_pending=True, is_system_update=False
                 )
             if tasks_by_user.exists():
-                notify_user_of_task_assignment(user, tasks_by_user)
+                notify_user_of_assignment(user, tasks_by_user)
     finally:
         tasks.update(is_notify_pending=False, is_system_update=False)
 
 
-def notify_user_of_task_assignment(user: User, tasks: QuerySet[Task]) -> None:
+def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
 
     # TODO: template needs work.
