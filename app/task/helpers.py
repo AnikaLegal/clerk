@@ -28,7 +28,11 @@ def is_user_added(event: IssueEvent) -> bool:
     True if the supplied event represents a change to a previously unassigned
     paralegal or lawyer.
     """
-    return is_user_event(event) and event.prev_user_id is None
+    return (
+        is_user_event(event)
+        and event.prev_user_id is None
+        and event.next_user_id is not None
+    )
 
 
 def is_user_changed(event: IssueEvent) -> bool:
@@ -36,7 +40,12 @@ def is_user_changed(event: IssueEvent) -> bool:
     True if the supplied event represents a change to a previously assigned
     paralegal or lawyer.
     """
-    return is_user_event(event) and event.prev_user_id is not None
+    return (
+        is_user_event(event)
+        and event.prev_user_id is not None
+        and event.next_user_id is not None
+        and event.prev_user_id != event.next_user_id
+    )
 
 
 def is_user_removed(event: IssueEvent) -> bool:
@@ -44,7 +53,11 @@ def is_user_removed(event: IssueEvent) -> bool:
     True if the supplied event represents the removal of the assigned paralegal
     or lawyer.
     """
-    return is_user_event(event) and event.next_user_id is None
+    return (
+        is_user_event(event)
+        and event.prev_user_id is not None
+        and event.next_user_id is None
+    )
 
 
 def is_user_event(event: IssueEvent) -> bool:
