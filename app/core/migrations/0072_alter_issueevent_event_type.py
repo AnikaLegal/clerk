@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0070_alter_issue_employment_status"),
+        ("core", "0071_alter_issue_outcome_notes"),
     ]
 
     operations = [
