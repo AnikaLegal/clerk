@@ -79,7 +79,6 @@ def handle_task(task_pk: int):
             tasks.update(is_notify_pending=False, is_system_update=False)
 
 
-@transaction.atomic
 def maybe_revert_tasks(event: IssueEvent) -> list[int]:
     """
     Revert tasks assigned to but not owned by the user being removed from the
@@ -90,10 +89,8 @@ def maybe_revert_tasks(event: IssueEvent) -> list[int]:
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = (
-        Task.objects.select_for_update()
-        .filter(issue=issue, is_open=True)
-        .filter(Q(assigned_to=prev_user) & ~Q(owner=prev_user))
+    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
+        Q(assigned_to=prev_user) & ~Q(owner=prev_user)
     )
     for task in tasks:
         task.assigned_to = task.owner
@@ -106,7 +103,6 @@ def maybe_revert_tasks(event: IssueEvent) -> list[int]:
     return [task.pk for task in tasks]
 
 
-@transaction.atomic
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     """
     Suspend tasks owned by the user being removed from the case.
@@ -116,9 +112,7 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = Task.objects.select_for_update().filter(
-        issue=issue, is_open=True, owner=prev_user
-    )
+    tasks = Task.objects.filter(issue=issue, is_open=True, owner=prev_user)
     for task in tasks:
         task.prev_owner_role = event.event_type
         task.owner = None
@@ -132,7 +126,6 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     return [task.pk for task in tasks]
 
 
-@transaction.atomic
 def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     """
     Update task ownership/assignee if the case lawyer or paralegal changes.
@@ -155,10 +148,8 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
         )
         return []
 
-    tasks = (
-        Task.objects.select_for_update()
-        .filter(issue=issue, is_open=True)
-        .filter(Q(owner=prev_user) | Q(assigned_to=prev_user))
+    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
+        Q(owner=prev_user) | Q(assigned_to=prev_user)
     )
     for task in tasks:
         if task.owner == prev_user:
@@ -174,7 +165,6 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     return [task.pk for task in tasks]
 
 
-@transaction.atomic
 def maybe_resume_tasks(event: IssueEvent) -> list[int]:
     """
     Resume tasks that were previously suspended when a user was removed from the
@@ -185,7 +175,7 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
     issue = event.issue
     next_user = event.next_user
 
-    tasks = Task.objects.select_for_update().filter(
+    tasks = Task.objects.filter(
         issue=issue, is_suspended=True, prev_owner_role=event.event_type
     )
     for task in tasks:
