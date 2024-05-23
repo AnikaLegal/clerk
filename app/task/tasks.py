@@ -58,7 +58,7 @@ def handle_event(event_pk: int):
 
     if notify_tasks:
         try:
-            notify_of_assignment(notify_tasks)
+            notify_of_assignment(list(notify_tasks))
         finally:
             Task.objects.filter(pk__in=notify_tasks).update(
                 is_notify_pending=False, is_system_update=False
@@ -210,6 +210,7 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
     logger.debug("triggers.query: %s", triggers.query)
 
     # Create tasks based on the templates associated with any triggers.
+    task_pks = []
     for trigger in triggers:
         logger.info("IssueEvent<%s> activated TaskTrigger<%s>", event.pk, trigger.pk)
         role = trigger.tasks_assignment_role
@@ -224,7 +225,6 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
             logger.info("Not creating tasks as lawyer is acting as paralegal")
             break
 
-        task_pks = []
         for template in trigger.templates.all():
             if not Task.objects.filter(
                 issue=event.issue, template=template, owner=user
@@ -240,7 +240,7 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
                 )
                 task_pks.append(task.pk)
 
-        return task_pks
+    return task_pks
 
 
 def get_user_by_role(issue: Issue, role: TasksCaseRole) -> User | None:
