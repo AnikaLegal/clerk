@@ -1,6 +1,5 @@
 import logging
 from django.db.models import QuerySet
-from django.db import transaction
 
 from accounts.models import User
 from task.models import Task
@@ -10,21 +9,21 @@ from django.template.loader import render_to_string
 logger = logging.getLogger(__name__)
 
 
-@transaction.atomic
 def notify_of_assignment(tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
-    logger.info("Notifying assignment of %s task(s)", tasks.count())
+    logger.info("Notifying assignment of task(s): %s", [t.pk for t in tasks])
 
-    for task in tasks.distinct("assigned_to").exclude(assigned_to_id__isnull=True):
+    for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
         user = task.assigned_to
-        tasks_by_user = tasks.select_for_update().filter(assigned_to_id=user.pk)
+        tasks_by_user = tasks.filter(assigned_to=user.pk)
         notify_user_of_assignment(user, tasks_by_user)
 
 
 def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
-    logger.info("Notifying User<%s> assignment of %s tasks", user.pk, tasks.count())
-
+    logger.info(
+        "Notifying User<%s> assignment of task(s): %s", user.pk, [t.pk for t in tasks]
+    )
     # TODO: template needs work.
     context = {"tasks": list(tasks.values())}
     text = render_to_string("task/tasks_assigned.md", context)

@@ -31,33 +31,33 @@ def handle_event(event_pk: int):
         event.pk,
         event.issue_id,
     )
-    notify_task_pks: set[int] = set()
+    notify_tasks: set[int] = set()
 
     if is_user_removed(event):
         reverted_tasks = maybe_revert_tasks(event)
-        logger.info("Reverted %s task(s)", len(reverted_tasks))
-        notify_task_pks.update(reverted_tasks)
+        logger.info("Reverted task(s): %s", reverted_tasks)
+        notify_tasks.update(reverted_tasks)
 
         # We don't notify when tasks are suspended.
         suspended_tasks = maybe_suspend_tasks(event)
-        logger.info("Suspended %s task(s)", len(suspended_tasks))
+        logger.info("Suspended task(s): %s", suspended_tasks)
 
     elif is_user_changed(event):
         reassigned_tasks = maybe_reassign_tasks(event)
-        logger.info("Reassigned %s task(s)", len(reassigned_tasks))
-        notify_task_pks.update(reassigned_tasks)
+        logger.info("Reassigned task(s): %s", reassigned_tasks)
+        notify_tasks.update(reassigned_tasks)
     else:
         if is_user_added(event):
             resumed_tasks = maybe_resume_tasks(event)
-            logger.info("Resumed %s task(s)", len(resumed_tasks))
-            notify_task_pks.update(resumed_tasks)
+            logger.info("Resumed task(s): %s", resumed_tasks)
+            notify_tasks.update(resumed_tasks)
 
         created_tasks = maybe_create_tasks(event)
-        logger.info("Created %s task(s)", len(created_tasks))
-        notify_task_pks.update(created_tasks)
+        logger.info("Created task(s): %s", created_tasks)
+        notify_tasks.update(created_tasks)
 
-    if notify_task_pks:
-        tasks = Task.objects.filter(pk__in=notify_task_pks)
+    if notify_tasks:
+        tasks = Task.objects.filter(pk__in=notify_tasks)
         try:
             notify_of_assignment(tasks)
         finally:
@@ -149,6 +149,10 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     # paralegal is changed. We cannot determine which tasks belong to their role
     # as the lawyer & which to their role as paralegal so we do nothing.
     if is_user_assigned_to_issue(issue, prev_user):
+        logger.info(
+            "Not reassigning tasks as User<%s> still assigned to another role on case",
+            prev_user.pk,
+        )
         return []
 
     tasks = (
@@ -212,9 +216,11 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
     triggers = triggers.filter(topic__in=[event.issue.topic, TriggerTopic.ANY])
     if event.event_type == EventType.STAGE:
         triggers = triggers.filter(event_stage=event.next_stage)
+    logger.debug("triggers.query: %s", triggers.query)
 
     # Create tasks based on the templates associated with any triggers.
     for trigger in triggers:
+        logger.info("IssueEvent<%s> activated TaskTrigger<%s>", event.pk, trigger.pk)
         role = trigger.tasks_assignment_role
         user = get_user_by_role(event.issue, role)
 
@@ -224,6 +230,7 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
         if role == TasksCaseRole.PARALEGAL and is_lawyer_acting_as_paralegal(
             event.issue
         ):
+            logger.info("Not creating tasks as lawyer is acting as paralegal")
             break
 
         task_pks = []
