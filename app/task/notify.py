@@ -9,9 +9,11 @@ from django.template.loader import render_to_string
 logger = logging.getLogger(__name__)
 
 
-def notify_of_assignment(tasks: QuerySet[Task]) -> None:
+def notify_of_assignment(task_pks: list[int]) -> None:
+    assert task_pks
+    tasks = Task.objects.filter(pk__in=task_pks)
     assert tasks.exists()
-    logger.info("Notifying assignment of task(s): %s", [t.pk for t in tasks])
+    logger.info("Notifying assignment of task(s): %s", task_pks)
 
     for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
         user = task.assigned_to

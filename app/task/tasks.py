@@ -57,11 +57,12 @@ def handle_event(event_pk: int):
         notify_tasks.update(created_tasks)
 
     if notify_tasks:
-        tasks = Task.objects.filter(pk__in=notify_tasks)
         try:
-            notify_of_assignment(tasks)
+            notify_of_assignment(notify_tasks)
         finally:
-            tasks.update(is_notify_pending=False, is_system_update=False)
+            Task.objects.filter(pk__in=notify_tasks).update(
+                is_notify_pending=False, is_system_update=False
+            )
 
 
 @sentry_task
@@ -73,7 +74,7 @@ def handle_task(task_pk: int):
     try:
         task = tasks.first()
         if task.is_notify_pending and not task.is_system_update:
-            notify_of_assignment(tasks)
+            notify_of_assignment([task.pk])
     finally:
         if task.is_notify_pending or task.is_system_update:
             tasks.update(is_notify_pending=False, is_system_update=False)
