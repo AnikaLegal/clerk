@@ -26,10 +26,17 @@ def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
     logger.info(
         "Notifying User<%s> assignment of task(s): %s", user.pk, [t.pk for t in tasks]
     )
-    # TODO: template needs work.
-    context = {"tasks": list(tasks.values())}
-    text = render_to_string("task/tasks_assigned.md", context)
+
+    text = get_assignment_notify_text(tasks)
     notify_user(user, text)
+
+
+def get_assignment_notify_text(tasks: QuerySet[Task]) -> str:
+    assert tasks.exists()
+
+    # TODO: template needs work.
+    context = {"tasks": tasks}
+    return render_to_string("task/tasks_assigned.md", context)
 
 
 def notify_user(user: User, text: str) -> None:
