@@ -8,9 +8,19 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 
 from accounts.models import User
+from core.models import (
+    Client,
+    FileUpload,
+    Issue,
+    Person,
+    Tenancy,
+    IssueNote,
+    IssueEvent,
+)
 from emails.models import Email, EmailTemplate, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
+
 from core.models.issue import CaseStage
+from core.models.issue_event import EventType
 from notify.models import (
     Notification,
     NOTIFY_TOPIC_CHOICES,
@@ -114,6 +124,15 @@ class IssueNoteFactory(TimestampedModelFactory):
     creator = factory.SubFactory(UserFactory)
     note_type = "PARALEGAL"
     text = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
+class IssueEventFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueEvent
+
+    issue = factory.SubFactory(IssueFactory)
+    event_type = EventType.CREATE
 
 
 @factory.django.mute_signals(post_save)

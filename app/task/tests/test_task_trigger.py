@@ -1,28 +1,11 @@
 import pytest
 
-from core.factories import IssueFactory
+from core.factories import IssueEventFactory
 from core.models.issue_event import EventType
 from task.factories import TaskTriggerFactory, TaskTemplateFactory
 from task.models import Task
 
-"""
-Changes required to core factories to support testing task creation easily:
 
-    index 8bcf553..b87da65 100644
-    --- a/app/core/factories.py
-    +++ b/app/core/factories.py
-    @@ -91,7 +91,6 @@ class TenancyFactory(TimestampedModelFactory):
-        is_on_lease = "YES"
-    
-    
-    -@factory.django.mute_signals(post_save)
-    class IssueFactory(TimestampedModelFactory):
-        class Meta:
-            model = Issue
-
-We need to remove the muting of post_save signals.
-"""
-@pytest.mark.skip(reason="requires changes to core factories")
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 def test_task_trigger__tasks_created_when_issue_created(
@@ -36,6 +19,7 @@ def test_task_trigger__tasks_created_when_issue_created(
     TaskTemplateFactory(trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
-        IssueFactory()
+        event = IssueEventFactory(event_type=EventType.CREATE)
+        event.save()
 
-    assert Task.objects.count() == 2
+    assert Task.objects.filter(issue=event.issue).count() == 2
