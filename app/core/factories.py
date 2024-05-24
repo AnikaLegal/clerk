@@ -158,7 +158,7 @@ class EmailTemplateFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EmailTemplate
 
-    name = factory.Faker("sentence")
+    name = factory.Faker("text", max_nb_chars=45)
     topic = "GENERAL"
     text = factory.Faker("sentence")
     subject = factory.Faker("sentence")
