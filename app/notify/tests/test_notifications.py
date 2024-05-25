@@ -16,7 +16,7 @@ def mock_get_slack_user_by_email(email: str):
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
-def test_send_notifcation__with_same_issue_topic(mock_send_message):
+def test_send_notification__with_same_issue_topic(mock_send_message):
     paralegal = UserFactory()
     issue = IssueFactory(topic="REPAIRS", stage="UNSTARTED", paralegal=paralegal)
     notification = NotificationFactory(
@@ -45,7 +45,7 @@ def test_send_notifcation__with_same_issue_topic(mock_send_message):
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
-def test_send_notifcation__with_different_issue_topic(mock_send_message):
+def test_send_notification__with_different_issue_topic(mock_send_message):
     issue = IssueFactory(topic="BONDS", stage="UNSTARTED", paralegal=UserFactory())
     NotificationFactory(
         topic="REPAIRS",
@@ -65,7 +65,7 @@ def test_send_notifcation__with_different_issue_topic(mock_send_message):
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
-def test_send_notifcation__with_general_issue_topic(mock_send_message):
+def test_send_notification__with_general_issue_topic(mock_send_message):
     paralegal = UserFactory()
     issue = IssueFactory(topic="BONDS", stage="UNSTARTED", paralegal=paralegal)
     notification = NotificationFactory(
@@ -94,7 +94,7 @@ def test_send_notifcation__with_general_issue_topic(mock_send_message):
 @pytest.mark.django_db
 @patch("notify.signals.get_slack_user_by_email", mock_get_slack_user_by_email)
 @patch("notify.signals.send_slack_direct_message")
-def test_send_notifcation__with_lawyer_target(mock_send_message):
+def test_send_notification__with_lawyer_target(mock_send_message):
     lawyer = UserFactory()
     issue = IssueFactory(topic="BONDS", stage="UNSTARTED", lawyer=lawyer)
     notification = NotificationFactory(
