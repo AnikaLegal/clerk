@@ -4,7 +4,7 @@ from uuid import uuid4
 import factory
 from faker import Faker
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.utils import timezone
 
 from accounts.models import User
@@ -126,7 +126,7 @@ class IssueNoteFactory(TimestampedModelFactory):
     text = factory.Faker("sentence")
 
 
-@factory.django.mute_signals(post_save)
+@factory.django.mute_signals(pre_save, post_save)
 class IssueEventFactory(TimestampedModelFactory):
     class Meta:
         model = IssueEvent
