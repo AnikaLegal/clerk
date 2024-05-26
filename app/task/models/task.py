@@ -4,6 +4,7 @@ from accounts.models import User
 from core.models import TimestampedModel, Issue
 from .template import TaskTemplate, TaskType
 from .comment import TaskComment, CommentType
+from .attachment import TaskAttachment
 
 
 class TaskStatus(models.TextChoices):
@@ -113,4 +114,14 @@ class Task(TimestampedModel):
             task=self,
             type=type,
             text=text,
+        )
+
+    # Convenience method used to add an attachment related to the task instance.
+    def add_attachment(
+        self, file: str, comment: TaskComment | None = None
+    ) -> TaskAttachment:
+        return TaskAttachment.objects.create(
+            task=self,
+            comment=comment,
+            file=file,
         )
