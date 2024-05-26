@@ -2,10 +2,10 @@ import pytest
 from blacklist.models import Blacklist
 from blacklist.service import is_blacklisted, is_email_blacklisted, is_phone_blacklisted
 
-EMAIL_ONE = "first.last@domain.com"
+EMAIL_ONE = "first.last@example.com"
 PHONE_ONE = "0987654321"
 
-EMAIL_TWO = "last.first@domain.com"
+EMAIL_TWO = "last.first@example.com"
 PHONE_TWO = "0123456789"
 
 
