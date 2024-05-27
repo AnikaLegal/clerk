@@ -68,8 +68,7 @@ def handle_event(event_pk: int):
 @sentry_task
 def handle_task(task_pk: int):
     # This is a somewhat unusual way of getting & using a single task. We do it
-    # this way because it is convenient and allows us to use a single notify
-    # method for one or more tasks.
+    # because it is convenient.
     tasks = Task.objects.filter(pk=task_pk)
     try:
         task = tasks.first()
