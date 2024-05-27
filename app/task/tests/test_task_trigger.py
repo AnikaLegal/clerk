@@ -21,7 +21,7 @@ def test_task_trigger__tasks_created_on_issue_events(
     django_capture_on_commit_callbacks,
 ):
     """
-    Test task trigger activates and tasks are created when an issue is created.
+    Test task trigger activates and tasks are created for each issue event type.
     """
     event_stage = None
     if event_type == EventType.STAGE:
