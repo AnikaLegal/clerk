@@ -27,7 +27,7 @@ class TaskTemplateFactory(TimestampedModelFactory):
         model = TaskTemplate
 
     type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
-    name = factory.Faker("sentence")
+    name = factory.Faker("text", max_nb_chars=45)
     description = factory.Faker("paragraph")
     trigger = factory.SubFactory(TaskTriggerFactory)
 
