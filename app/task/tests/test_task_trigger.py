@@ -140,6 +140,7 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
     assert Task.objects.filter(
         issue=issue, assigned_to=lawyer, owner=lawyer, template__in=lawyer_templates
     ).count() == len(lawyer_templates)
+
     assert Task.objects.filter(
         issue=issue,
         assigned_to=paralegal,
