@@ -112,7 +112,7 @@ def test_task__tasks_suspended(
     )
     # Different issue but same assignee & owner as tasks to be suspended.
     tasks_3 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_2, assigned_to=user_1, owner=user_2
+        randint(1, 3), issue=issue_2, assigned_to=user_1, owner=user_1
     )
     # Different issue, assignee & owner as tasks to be suspended.
     tasks_4 = TaskFactory.create_batch(
@@ -153,7 +153,7 @@ def test_task__tasks_suspended(
 
     # Tasks belonging to a different issue but with the same users are unchanged.
     assert Task.objects.filter(
-        issue=issue_2, assigned_to=user_1, owner=user_2, pk__in=[t.pk for t in tasks_3]
+        issue=issue_2, assigned_to=user_1, owner=user_1, pk__in=[t.pk for t in tasks_3]
     ).count() == len(tasks_3)
 
     # Tasks belonging to a different issue, assignee & owner are unchanged.
@@ -194,8 +194,8 @@ def test_task__tasks_resumed(
         owner=None,
         prev_owner_role=OwnerRole.LAWYER,
     )
-    # Active (i.e. not suspended) tasks related to the same issue and assigned
-    # to the user should ultimately own the resumed tasks.
+    # Active (i.e. not suspended) tasks related to the same issue and currently assigned
+    # to the user that will ultimately own the resumed tasks.
     tasks_3 = TaskFactory.create_batch(
         randint(1, 3), issue=issue, assigned_to=next_user, owner=next_user
     )
@@ -247,7 +247,7 @@ def test_task__tasks_resumed(
         pk__in=[t.pk for t in tasks_1],
     ).count() == len(tasks_1)
 
-    # The suspended tasks previously owned by the lawyer are unchanged?
+    # The suspended tasks previously owned by the lawyer role are unchanged?
     assert Task.objects.filter(
         issue=issue,
         is_suspended=True,
