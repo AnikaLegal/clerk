@@ -46,6 +46,7 @@ def handle_event(event_pk: int):
         reassigned_tasks = maybe_reassign_tasks(event)
         logger.info("Reassigned task(s): %s", reassigned_tasks)
         notify_tasks.update(reassigned_tasks)
+
     else:
         if is_user_added(event):
             resumed_tasks = maybe_resume_tasks(event)
