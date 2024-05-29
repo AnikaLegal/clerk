@@ -143,3 +143,5 @@ def test_task_notify__notify_on_assignee_change(
         task.save()
 
     mock_notify.assert_called_once()
+    assert user == mock_notify.call_args.args[0]
+    assert task.pk == mock_notify.call_args.args[1].first().pk
