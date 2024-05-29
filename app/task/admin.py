@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import Textarea
 from django.db import models
 
-from task.models import Task, TaskTrigger, TaskTemplate, TaskComment
+from task.models import Task, TaskTrigger, TaskTemplate, TaskComment, TaskAttachment
 from utils.admin import admin_link
 
 
@@ -51,9 +51,15 @@ class TaskCommentInline(admin.TabularInline):
     show_change_link = True
 
 
+class TaskAttachmentInline(admin.TabularInline):
+    model = TaskAttachment
+    extra = 0
+    show_change_link = True
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    inlines = (TaskCommentInline,)
+    inlines = (TaskCommentInline, TaskAttachmentInline)
     list_display = (
         "id",
         "type",
