@@ -1,6 +1,6 @@
 import factory
 from faker import Faker
-from django.db.models.signals import post_save
+from random import randint
 
 from core.factories import TimestampedModelFactory, IssueFactory, UserFactory
 from core.models.issue_event import EventType
@@ -16,10 +16,14 @@ fake = Faker()
 class TaskTriggerFactory(TimestampedModelFactory):
     class Meta:
         model = TaskTrigger
+        skip_postgeneration_save = True
 
     topic = TriggerTopic.ANY
     event = EventType.PARALEGAL
     tasks_assignment_role = TasksCaseRole.PARALEGAL
+    templates = factory.RelatedFactoryList(
+        "task.factories.TaskTemplateFactory", "trigger", size=lambda: randint(1, 5)
+    )
 
 
 class TaskTemplateFactory(TimestampedModelFactory):

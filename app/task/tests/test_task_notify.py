@@ -5,7 +5,7 @@ from random import randint
 from core.factories import IssueEventFactory, IssueFactory, UserFactory
 from core.models.issue import CaseStage
 from core.models.issue_event import EventType
-from task.factories import TaskTriggerFactory, TaskTemplateFactory
+from task.factories import TaskTriggerFactory, TaskFactory
 from task.models import Task
 from task.models.trigger import TasksCaseRole
 
@@ -17,7 +17,7 @@ EVENT_TYPES = [c[0] for c in EventType.choices]
 @pytest.mark.enable_signals
 @pytest.mark.parametrize("event_type", EVENT_TYPES)
 @mock.patch("task.tasks.notify_of_assignment")
-def test_task_notify__single_notification_via_trigger(
+def test_trigger_notify__single_notification(
     mock_notify,
     event_type,
     django_capture_on_commit_callbacks,
@@ -29,9 +29,7 @@ def test_task_notify__single_notification_via_trigger(
     event_stage = None
     if event_type == EventType.STAGE:
         event_stage = CaseStage.UNSTARTED
-
     trigger = TaskTriggerFactory(event=event_type, event_stage=event_stage)
-    templates = TaskTemplateFactory.create_batch(randint(1, 3), trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=event_type)
@@ -43,15 +41,16 @@ def test_task_notify__single_notification_via_trigger(
     mock_notify.assert_called_once()
     # notify_of_assignment takes a list of task ids to notify about. This should
     # match the number of templates used to create tasks.
-    assert mock_notify.call_args and len(mock_notify.call_args.args[0]) == len(
-        templates
+    assert (
+        mock_notify.call_args
+        and len(mock_notify.call_args.args[0]) == trigger.templates.count()
     )
 
 
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 @mock.patch("task.tasks.notify_of_assignment")
-def test_task_notify__notify_tasks_match_created_tasks(
+def test_trigger_notify__notify_tasks_match_created_tasks(
     mock_notify,
     django_capture_on_commit_callbacks,
 ):
@@ -61,11 +60,9 @@ def test_task_notify__notify_tasks_match_created_tasks(
     """
     paralegal = UserFactory()
     issue = IssueFactory(paralegal=paralegal)
-
     trigger = TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.PARALEGAL
     )
-    templates = TaskTemplateFactory.create_batch(randint(2, 4), trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
@@ -75,7 +72,10 @@ def test_task_notify__notify_tasks_match_created_tasks(
     notify_task_pks = mock_notify.call_args.args[0]
 
     tasks = Task.objects.filter(
-        issue=issue, assigned_to=paralegal, owner=paralegal, template__in=templates
+        issue=issue,
+        assigned_to=paralegal,
+        owner=paralegal,
+        template__in=trigger.templates.all(),
     )
     created_task_pks = [t.pk for t in tasks]
 
@@ -85,7 +85,7 @@ def test_task_notify__notify_tasks_match_created_tasks(
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 @mock.patch("task.notify.notify_user_of_assignment")
-def test_task_notify__notify_tasks_match_created_tasks_for_multiple_users(
+def test_task_notify__notify_on_assignee_change(
     mock_notify,
     django_capture_on_commit_callbacks,
 ):
@@ -97,15 +97,13 @@ def test_task_notify__notify_tasks_match_created_tasks_for_multiple_users(
     paralegal = UserFactory()
     issue = IssueFactory(lawyer=lawyer, paralegal=paralegal)
 
-    lawyer_trigger = TaskTriggerFactory(
+    TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.LAWYER
     )
-    TaskTemplateFactory.create_batch(randint(2, 4), trigger=lawyer_trigger)
 
-    paralegal_trigger = TaskTriggerFactory(
+    TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.PARALEGAL
     )
-    TaskTemplateFactory.create_batch(randint(2, 4), trigger=paralegal_trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
@@ -128,3 +126,20 @@ def test_task_notify__notify_tasks_match_created_tasks_for_multiple_users(
         created_task_pks = [t.pk for t in created_tasks]
         notify_task_pks = [t.pk for t in notify_tasks]
         assert sorted(notify_task_pks) == sorted(created_task_pks)
+
+
+@pytest.mark.django_db
+@pytest.mark.enable_signals
+@mock.patch("task.notify.notify_user_of_assignment")
+def test_task_notify__notify_on_assignee_change(
+    mock_notify,
+    django_capture_on_commit_callbacks,
+):
+    task = TaskFactory()
+    user = UserFactory()
+
+    with django_capture_on_commit_callbacks(execute=True):
+        task.assigned_to = user
+        task.save()
+
+    mock_notify.assert_called_once()

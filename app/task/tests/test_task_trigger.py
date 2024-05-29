@@ -26,9 +26,7 @@ def test_task_trigger__tasks_created_on_issue_events(
     event_stage = None
     if event_type == EventType.STAGE:
         event_stage = CaseStage.UNSTARTED
-
     trigger = TaskTriggerFactory(event=event_type, event_stage=event_stage)
-    templates = TaskTemplateFactory.create_batch(randint(1, 3), trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=event_type)
@@ -36,9 +34,12 @@ def test_task_trigger__tasks_created_on_issue_events(
             event.next_stage = CaseStage.UNSTARTED
         event.save()
 
-    assert Task.objects.filter(
-        issue=event.issue, template__in=templates
-    ).count() == len(templates)
+    assert (
+        Task.objects.filter(
+            issue=event.issue, template__in=trigger.templates.all()
+        ).count()
+        == trigger.templates.count()
+    )
 
 
 @pytest.mark.django_db
@@ -56,17 +57,16 @@ def test_task_trigger__tasks_assigned_correctly(
     user = UserFactory()
     kwargs = {field_name: user}
     issue = IssueFactory(**kwargs)
-
     trigger = TaskTriggerFactory(event=EventType.CREATE, tasks_assignment_role=role)
-    templates = TaskTemplateFactory.create_batch(randint(1, 3), trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
         event.save()
 
-    assert Task.objects.filter(
-        issue=issue, assigned_to=user, owner=user
-    ).count() == len(templates)
+    assert (
+        Task.objects.filter(issue=issue, assigned_to=user, owner=user).count()
+        == trigger.templates.count()
+    )
 
 
 # NOTE: As we are using the actual Anika coordinator email we make sure that,
@@ -87,14 +87,14 @@ def test_task_trigger__tasks_assigned_correctly_to_coordinators(
     trigger = TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.COORDINATOR
     )
-    templates = TaskTemplateFactory.create_batch(randint(1, 3), trigger=trigger)
 
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
         event.save()
 
-    assert Task.objects.filter(issue=event.issue, assigned_to=user).count() == len(
-        templates
+    assert (
+        Task.objects.filter(issue=event.issue, assigned_to=user).count()
+        == trigger.templates.count()
     )
 
     # NOTE: Not necessary for the test case. Helps catch a change in the code
@@ -119,15 +119,8 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
     lawyer_trigger = TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.LAWYER
     )
-    lawyer_templates = TaskTemplateFactory.create_batch(
-        randint(1, 3), trigger=lawyer_trigger
-    )
-
     paralegal_trigger = TaskTriggerFactory(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.PARALEGAL
-    )
-    paralegal_templates = TaskTemplateFactory.create_batch(
-        randint(1, 3), trigger=paralegal_trigger
     )
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -137,13 +130,21 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
     # Tasks are created for each of the triggers, associated with the
     # appropriate templates and assigned to the correct users based on their
     # role?
-    assert Task.objects.filter(
-        issue=issue, assigned_to=lawyer, owner=lawyer, template__in=lawyer_templates
-    ).count() == len(lawyer_templates)
-
-    assert Task.objects.filter(
-        issue=issue,
-        assigned_to=paralegal,
-        owner=paralegal,
-        template__in=paralegal_templates,
-    ).count() == len(paralegal_templates)
+    assert (
+        Task.objects.filter(
+            issue=issue,
+            assigned_to=lawyer,
+            owner=lawyer,
+            template__in=lawyer_trigger.templates.all(),
+        ).count()
+        == lawyer_trigger.templates.count()
+    )
+    assert (
+        Task.objects.filter(
+            issue=issue,
+            assigned_to=paralegal,
+            owner=paralegal,
+            template__in=paralegal_trigger.templates.all(),
+        ).count()
+        == paralegal_trigger.templates.count()
+    )
