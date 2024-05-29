@@ -48,10 +48,9 @@ class Task(TimestampedModel):
     #   therefore, we potentially need to notify them.
     #
     # - is_system_update: indicates that the system is creating or updating
-    #   tasks, potentially en masse (e.g. creating multiple tasks for a single
-    #   user in response to a task trigger being activated) and will handle
-    #   notifications itself so as to only send out a single notification
-    #   instead of one for every created or updated task.
+    # tasks, potentially en masse (e.g. creating multiple tasks for a single
+    # user in response to a task trigger being activated) and will only send out
+    # a single notification instead of one for every created or updated task.
     #
     is_notify_pending = models.BooleanField(default=False)
     is_system_update = models.BooleanField(default=False)
@@ -64,7 +63,7 @@ class Task(TimestampedModel):
         User, on_delete=models.PROTECT, blank=True, null=True, related_name="+"
     )
     # Internal field used to handle task ownership & assignment when users are
-    # removed from & assigned back to a case.
+    # removed from & assigned back to a case. TODO: explain.
     prev_owner_role = models.CharField(
         max_length=32, choices=OwnerRole.choices, default=None, blank=True, null=True
     )
