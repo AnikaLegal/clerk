@@ -5,7 +5,7 @@ from random import randint
 from core.factories import IssueEventFactory, IssueFactory, UserFactory
 from core.models.issue import CaseStage
 from core.models.issue_event import EventType
-from task.factories import TaskTriggerFactory, TaskTemplateFactory
+from task.factories import TaskTriggerFactory
 from task.models import Task
 from task.models.trigger import TasksCaseRole
 
