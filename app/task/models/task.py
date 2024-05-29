@@ -116,11 +116,8 @@ class Task(TimestampedModel):
         )
 
     # Convenience method used to add an attachment related to the task instance.
-    def add_attachment(
-        self, file: str, comment: TaskComment | None = None
-    ) -> TaskAttachment:
+    def add_attachment(self, file: str) -> TaskAttachment:
         return TaskAttachment.objects.create(
             task=self,
-            comment=comment,
             file=file,
         )

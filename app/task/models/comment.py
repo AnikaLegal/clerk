@@ -2,6 +2,7 @@ from django.db import models
 
 from accounts.models import User
 from core.models import TimestampedModel
+from .attachment import TaskAttachment
 
 
 class CommentType(models.TextChoices):
@@ -22,3 +23,10 @@ class TaskComment(TimestampedModel):
     class Meta:
         verbose_name = "comment"
 
+    # Convenience method used to add an attachment related to the comment instance.
+    def add_attachment(self, file: str) -> TaskAttachment:
+        return TaskAttachment.objects.create(
+            task=self.task,
+            comment=self,
+            file=file,
+        )
