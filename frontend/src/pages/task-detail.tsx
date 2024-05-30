@@ -9,8 +9,9 @@ import { useGetTaskQuery, useDeleteTaskMutation, useUpdateTaskMutation, Task } f
 
 interface DjangoContext {
   task_pk: string
+  list_url: string
 }
-const { task_pk } = (window as any).REACT_CONTEXT as DjangoContext
+const { task_pk, list_url } = (window as any).REACT_CONTEXT as DjangoContext
 
 const TABLE_FIELDS = [
   'fileref',
@@ -38,7 +39,7 @@ const App = () => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       deleteTask({ id: task.id })
         .then(() => {
-          window.location.href = list_url // TODO
+          window.location.href = list_url
         })
         .catch((err) => {
           enqueueSnackbar(getAPIErrorMessage(err, 'Failed to delete task'), {

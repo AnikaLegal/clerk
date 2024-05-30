@@ -1,8 +1,7 @@
-from django.db.models import Q
-from django.db.models import Q, QuerySet
-from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view
+from django.db.models import Q, QuerySet
+from django.urls import reverse
 
 from case.views.auth import (
     paralegal_or_better_required,
@@ -27,7 +26,7 @@ def task_list_page_view(request):
 @api_view(["GET"])
 @paralegal_or_better_required
 def task_detail_page_view(request, pk):
-    context = {"task_pk": pk}
+    context = {"task_pk": pk, "list_url": reverse("task-list")}
     return render_react_page(request, "Task", "task-detail", context)
 
 
