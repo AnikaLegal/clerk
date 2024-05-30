@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.urls import reverse
 
 from .models import Task
 from .models.template import TaskType
@@ -20,6 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "issue_id",
             "owner_id",
             "assigned_to_id",
+            "url",
         )
 
     type = TextChoiceField(TaskType)
@@ -27,6 +29,11 @@ class TaskSerializer(serializers.ModelSerializer):
     issue_id = serializers.UUIDField()
     owner_id = serializers.IntegerField()
     assigned_to_id = serializers.IntegerField()
+
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse("task-detail", args=(obj.pk,))
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):

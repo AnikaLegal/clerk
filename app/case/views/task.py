@@ -1,16 +1,34 @@
 from django.db.models import Q
 from django.db.models import Q, QuerySet
+from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import api_view
 
 from case.views.auth import (
+    paralegal_or_better_required,
     CoordinatorOrBetterPermission,
     ParalegalOrBetterObjectPermission,
 )
+from case.utils.react import render_react_page
 from task.models import Task
 from task.serializers import TaskSerializer, TaskSearchSerializer
 
 # TODO:
 # - review permissions.
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
+def task_list_page_view(request):
+    context = {}
+    return render_react_page(request, "Tasks", "task-list", context)
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
+def task_detail_page_view(request, pk):
+    context = {"task_pk": pk}
+    return render_react_page(request, "Task", "task-detail", context)
 
 
 class TaskApiViewset(ModelViewSet):

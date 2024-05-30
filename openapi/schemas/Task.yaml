@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./TaskBase.yaml
+  - type: object
+    properties:
+      id:
+        type: string
+      type:
+        $ref: ./TextChoiceField.yaml
+      status:
+        $ref: ./TextChoiceField.yaml
+      url:
+        type: string
+    required:
+      - id
+      - url
+      - type
+      - status

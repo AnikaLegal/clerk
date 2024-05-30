@@ -8,7 +8,6 @@ const CONTACT_OPTIONS = [
     value: '',
     text: '-',
   },
-
   {
     key: 'DIRECT_ONLY',
     value: 'DIRECT_ONLY',

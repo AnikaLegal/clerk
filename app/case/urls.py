@@ -93,6 +93,11 @@ urlpatterns = [
         case_email.email_draft_preview_page_view,
         name="case-email-preview",
     ),
+    # Tasks
+    path("tasks/", task.task_list_page_view, name="task-list"),
+    re_path(
+        f"^tasks/{INT_PK}/$", task.task_detail_page_view, name="task-detail"
+    ),
     # Parties
     path("parties/", person.person_list_page_view, name="person-list"),
     path("parties/create/", person.person_create_page_view, name="person-create"),

@@ -340,6 +340,32 @@ const injectedRtkApi = api.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    getTasks: build.query<GetTasksApiResponse, GetTasksApiArg>({
+      query: () => ({ url: `/clerk/api/task/` }),
+    }),
+    createTask: build.mutation<CreateTaskApiResponse, CreateTaskApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/`,
+        method: 'POST',
+        body: queryArg.taskCreate,
+      }),
+    }),
+    getTask: build.query<GetTaskApiResponse, GetTaskApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/task/${queryArg.id}/` }),
+    }),
+    updateTask: build.mutation<UpdateTaskApiResponse, UpdateTaskApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/`,
+        method: 'PUT',
+        body: queryArg.taskCreate,
+      }),
+    }),
+    deleteTask: build.mutation<DeleteTaskApiResponse, DeleteTaskApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -655,6 +681,30 @@ export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number
 }
+export type GetTasksApiResponse = /** status 200 Successful response. */ Task[]
+export type GetTasksApiArg = void
+export type CreateTaskApiResponse = /** status 201 Successful response. */ Task
+export type CreateTaskApiArg = {
+  taskCreate: TaskCreate
+}
+export type GetTaskApiResponse = /** status 200 Successful response. */ Task
+export type GetTaskApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type UpdateTaskApiResponse = /** status 200 Successful response. */ Task
+export type UpdateTaskApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  taskCreate: TaskCreate
+}
+export type DeleteTaskApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteTaskApiArg = {
+  /** Entity ID */
+  id: number
+}
 export type IssueBase = {
   topic: string
   stage: string
@@ -912,6 +962,22 @@ export type DocumentTemplateCreate = {
   topic: string
   files: Blob[]
 }
+export type TaskBase = {
+  name: string
+  description: string
+  is_open: boolean
+  is_suspended: boolean
+}
+export type Task = TaskBase & {
+  id: string
+  type: TextChoiceField
+  status: TextChoiceField
+  url: string
+}
+export type TaskCreate = TaskBase & {
+  type: string
+  status: string
+}
 export const {
   useGetCasesQuery,
   useGetCaseQuery,
@@ -956,4 +1022,9 @@ export const {
   useGetDocumentTemplatesQuery,
   useCreateDocumentTemplateMutation,
   useDeleteDocumentTemplateMutation,
+  useGetTasksQuery,
+  useCreateTaskMutation,
+  useGetTaskQuery,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
 } = injectedRtkApi

@@ -1,0 +1,11 @@
+allOf:
+  - $ref: ./TaskBase.yaml
+  - type: object
+    properties:
+      type:
+        type: string
+      status:
+        type: string
+    required:
+      - type
+      - status

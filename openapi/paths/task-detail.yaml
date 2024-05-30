@@ -1,0 +1,61 @@
+get:
+  operationId: getTask
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Task.yaml
+
+put:
+  operationId: updateTask
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/TaskCreate.yaml
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Task.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+
+delete:
+  operationId: deleteTask
+  parameters:
+    - description: Entity ID
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

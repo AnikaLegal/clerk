@@ -61,3 +61,7 @@ paths:
     $ref: paths/template-doc-list.yaml
   /clerk/api/template-doc/{id}/:
     $ref: paths/template-doc-detail.yaml
+  /clerk/api/task/:
+    $ref: paths/task-list.yaml
+  /clerk/api/task/{id}/:
+    $ref: paths/task-detail.yaml
