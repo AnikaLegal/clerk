@@ -27,3 +27,19 @@ class TaskSerializer(serializers.ModelSerializer):
     issue_id = serializers.UUIDField()
     owner_id = serializers.IntegerField()
     assigned_to_id = serializers.IntegerField()
+
+
+class TaskSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = (
+            "type",
+            "name",
+            "status",
+            "is_open",
+            "is_suspended",
+            "issue",
+            "owner",
+            "assigned_to",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}

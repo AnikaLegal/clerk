@@ -13,6 +13,7 @@ from .views import (
     document_templates,
     case,
     case_email,
+    task,
 )
 
 from .views import root
@@ -31,6 +32,7 @@ router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
+router.register("task", task.TaskApiViewset, basename="task-api")
 router.register(
     "template-email",
     email_templates.EmailTemplateApiViewset,
