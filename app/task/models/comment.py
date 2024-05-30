@@ -15,7 +15,12 @@ class TaskComment(TimestampedModel):
     A comment made on a task.
     """
 
-    task = models.ForeignKey("task.Task", on_delete=models.CASCADE)
+    task = models.ForeignKey(
+        "task.Task",
+        on_delete=models.CASCADE,
+        related_name="comments",
+        related_query_name="comment",
+    )
     type = models.CharField(max_length=32, choices=CommentType.choices)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     text = models.TextField(blank=True, default="")
