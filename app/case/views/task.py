@@ -2,6 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view
 from django.db.models import Q, QuerySet
 from django.urls import reverse
+from django.http import Http404
 
 from case.views.auth import (
     paralegal_or_better_required,
@@ -26,6 +27,8 @@ def task_list_page_view(request):
 @api_view(["GET"])
 @paralegal_or_better_required
 def task_detail_page_view(request, pk):
+    if not Task.objects.filter(pk=pk).exists():
+        raise Http404()
     context = {"task_pk": pk, "list_url": reverse("task-list")}
     return render_react_page(request, "Task", "task-detail", context)
 
@@ -65,7 +68,30 @@ class TaskApiViewset(ModelViewSet):
         serializer = TaskSearchSerializer(data=self.request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         terms = serializer.validated_data
+
         for key, value in terms.items():
-            queryset = queryset.filter(**{key: value})
+            if key == "q" and value:
+                # Run free text search query
+                parts = value.split(" ")
+                query = None
+                for part in parts:
+                    q_filter = (
+                        Q(name__icontains=part)
+                        | Q(owner__first_name__icontains=part)
+                        | Q(owner__last_name__icontains=part)
+                        | Q(owner__email__icontains=part)
+                        | Q(assigned_to__first_name__icontains=part)
+                        | Q(assigned_to__last_name__icontains=part)
+                        | Q(assigned_to__email__icontains=part)
+                        | Q(issue__fileref__icontains=part)
+                    )
+                    if query:
+                        query |= q_filter
+                    else:
+                        query = q_filter
+
+                queryset = queryset.filter(query)
+            else:
+                queryset = queryset.filter(**{key: value})
 
         return queryset

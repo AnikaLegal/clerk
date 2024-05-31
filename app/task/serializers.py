@@ -48,5 +48,9 @@ class TaskSearchSerializer(serializers.ModelSerializer):
             "issue",
             "owner",
             "assigned_to",
+            "q",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
+
+    # General query.
+    q = serializers.CharField(required=False)
