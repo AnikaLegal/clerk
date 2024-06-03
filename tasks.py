@@ -181,6 +181,12 @@ def migrate(c):
     run(c, 'bash -c "./manage.py makemigrations && ./manage.py migrate"')
 
 
+@task
+def superuser(c, email):
+    """Create superuser for local development & testing"""
+    run(c, f"./manage.py createsuperuser --no-input --username {email} --email {email}")
+
+
 S3_PROD = "anika-clerk"
 S3_TEST = "anika-clerk-test"
 SYNC_DIRS = [
