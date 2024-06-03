@@ -156,15 +156,23 @@ def test(c, recreate=False, interactive=False, quiet=False, debug=False):
 
 
 @task
+def obfuscate(c):
+    """Obfuscate personally identifiable info from prod"""
+    run(c, "./manage.py obfuscate_data")
+
+
+@task
 def reset(c):
     """Reset local database"""
     run(c, "/app/scripts/tasks/dev-reset.sh")
 
 
-@task
-def restore(c):
+@task()
+def restore(c, no_obfuscate=False):
     """Restore local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
+    if not no_obfuscate:
+        obfuscate(c)
 
 
 @task
@@ -193,12 +201,6 @@ def sync_s3(c):
     for sync_dir in SYNC_DIRS:
         cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
         c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
-
-
-@task
-def obfuscate(c):
-    """Obfuscate personally identifiable info from prod"""
-    run(c, "./manage.py obfuscate_data")
 
 
 def run(c, cmd: str, service="web"):
