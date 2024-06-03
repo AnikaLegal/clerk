@@ -25,17 +25,18 @@ git rm --cached -r .
 git reset --hard
 ```
 
-Envars are stored in .env and encrypted using transcrypt. You can see encryoted files with `transcrypt --list`.
+Environment variables are stored in .env files and encrypted using transcrypt.
+You can list all encrypted files with `transcrypt --list`.
 
-To intialise the repository on cloning run
+To intialise the repository on cloning, run:
 
 ```bash
 transcrypt -c aes-256-cbc -p $TRANSCRYPT_PASSWORD
 ```
 
-The values of these secrets will be provided to you if you need them. They should be available in the Tech team Bitwarden account.
+The transcrypt password is available in the Tech team Bitwarden account.
 
-Next, you want to build the Docker environment that we'll be using:
+Next, build the Docker environment that we'll be using:
 
 ```bash
 # Build Webpack container
@@ -44,21 +45,33 @@ inv build -w
 inv build
 ```
 
-Now you can set up your database with this reset command:
+You can set up your database with the `reset` command:
 
 ```bash
 inv reset
 ```
 
-Finallly you can exit the container shell and bring up the webserver:
+Create a user for local development and testing using your Anika email address:
+
+```bash
+inv superuser your.name@anikalegal.com
+```
+
+Finally you can bring up the web server:
 
 ```bash
 inv dev
 ```
 
-Now you should be able to visit [`http://localhost:8000/admin`](http://localhost:8000/admin) and see the Clerk site.
+You should now be able to access:
 
-You can view other commands with
+- The Anika website at [`http://localhost:8000`](http://localhost:8000).
+- The Clerk CMS at [`http://localhost:8000/clerk`](http://localhost:8000/clerk).
+- The Django Admin Interface at
+  [`http://localhost:8000/admin`](http://localhost:8000/admin).
+
+You can list other available commands using the `--list` argument of the
+`invoke` command:
 
 ```bash
 inv -l

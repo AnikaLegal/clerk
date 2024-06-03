@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @sentry_task
 @transaction.atomic
 def send_welcome_email(issue_pk: str):
-    logging.info("Creating welcome email for Issue<%s>", issue_pk)
+    logger.info("Creating welcome email for Issue<%s>", issue_pk)
     issue = Issue.objects.select_related("client").get(pk=issue_pk)
     client = issue.client
     case_email = build_clerk_address(issue, email_only=True)
@@ -27,7 +27,7 @@ def send_welcome_email(issue_pk: str):
 
     if (not settings.IS_PROD) and (not client.email.endswith("@anikalegal.com")):
         msg = "Not sending welcome email for Issue<%s> - only Anika emails allowed in non-prod environments"
-        logging.error(msg, issue_pk)
+        logger.error(msg, issue_pk)
     else:
         Email.objects.create(
             subject="Thanks for your enquiry",

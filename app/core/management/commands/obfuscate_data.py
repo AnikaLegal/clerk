@@ -19,6 +19,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **kwargs):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
+        self.stdout.write("\nObfuscating personal information...")
         disable_signals()
         fake = Faker()
         clients = Client.objects.all()
@@ -44,6 +45,7 @@ class Command(BaseCommand):
 
         for u in users:
             u.email = fake.email()
+            u.username = u.email # Username same as fake email.
             u.first_name = fake.first_name()
             u.last_name = fake.last_name()
             u.save()
