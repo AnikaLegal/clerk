@@ -7,7 +7,7 @@ COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
 
 @task
 def schema(c):
-    """Regenerate Open API schema and JavaScript API client"""
+    """Regenerate OpenAPI schema and JavaScript API client"""
     c.run("cd frontend && npm run schema")
 
 
@@ -30,7 +30,7 @@ def dev(c):
 
 @task
 def down(c):
-    """Stop docker-compose"""
+    """Stop Docker Compose"""
     c.run(f"{COMPOSE} down", pty=True)
 
 
@@ -42,13 +42,13 @@ def debug(c):
 
 @task
 def restart(c, service_name):
-    """Restart Docker-Compose service"""
+    """Restart Docker Compose service"""
     c.run(f"{COMPOSE} restart {service_name}", pty=True)
 
 
 @task
 def logs(c, service_name):
-    """View logs for Docker-Compose service"""
+    """View logs for Docker Compose service"""
     c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
 
 
@@ -60,7 +60,7 @@ def ssh(c):
 
 @task
 def ngrok(c, url):
-    """Add ngrok URL to sendgrid to receive emails on dev address"""
+    """Add ngrok URL to SendGrid to receive emails on dev address"""
     run(c, f"./manage.py setup_dev_inbound_emails {url}")
 
 
@@ -169,7 +169,7 @@ def reset(c):
 
 @task()
 def restore(c, no_obfuscate=False):
-    """Restore local database from production backups"""
+    """Restore and obfuscate local database from production backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
     if not no_obfuscate:
         obfuscate(c)
