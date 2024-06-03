@@ -19,6 +19,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **kwargs):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
+        self.stdout.write("\nObfuscating personal information...")
         disable_signals()
         fake = Faker()
         clients = Client.objects.all()
