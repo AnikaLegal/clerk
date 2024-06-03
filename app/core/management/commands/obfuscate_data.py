@@ -45,6 +45,7 @@ class Command(BaseCommand):
 
         for u in users:
             u.email = fake.email()
+            u.username = u.email # Username same as fake email.
             u.first_name = fake.first_name()
             u.last_name = fake.last_name()
             u.save()
