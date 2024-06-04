@@ -5,6 +5,8 @@ from .models import Task
 from .models.template import TaskType
 from .models.task import TaskStatus
 from case.serializers.fields import TextChoiceField
+from case.serializers.issue import IssueSerializer
+from case.serializers.user import UserSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -19,16 +21,23 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_open",
             "is_suspended",
             "issue_id",
+            "issue",
             "owner_id",
+            "owner",
             "assigned_to_id",
+            "assigned_to",
             "url",
         )
 
     type = TextChoiceField(TaskType)
     status = TextChoiceField(TaskStatus)
+
     issue_id = serializers.UUIDField()
+    issue = IssueSerializer(read_only=True)
     owner_id = serializers.IntegerField()
+    owner = UserSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
+    assigned_to = UserSerializer(read_only=True)
 
     url = serializers.SerializerMethodField()
 
@@ -49,8 +58,10 @@ class TaskSearchSerializer(serializers.ModelSerializer):
             "owner",
             "assigned_to",
             "q",
+            "issue__topic",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
     # General query.
     q = serializers.CharField(required=False)
+    issue__topic = serializers.CharField(required=False)

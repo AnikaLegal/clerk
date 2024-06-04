@@ -10,7 +10,8 @@ from case.views.auth import (
     ParalegalOrBetterObjectPermission,
 )
 from case.utils.react import render_react_page
-from task.models import Task
+from core.models.issue import CaseTopic
+from task.models.task import Task, TaskType
 from task.serializers import TaskSerializer, TaskSearchSerializer
 
 # TODO:
@@ -20,7 +21,16 @@ from task.serializers import TaskSerializer, TaskSearchSerializer
 @api_view(["GET"])
 @paralegal_or_better_required
 def task_list_page_view(request):
-    context = {}
+    context = {
+        "choices": {
+            "type": TaskType.choices,
+            "is_open": [
+                ("true", "Open"),
+                ("false", "Closed"),
+            ],
+            "case_topic": CaseTopic.CHOICES,
+        },
+    }
     return render_react_page(request, "Tasks", "task-list", context)
 
 
@@ -70,28 +80,29 @@ class TaskApiViewset(ModelViewSet):
         terms = serializer.validated_data
 
         for key, value in terms.items():
-            if key == "q" and value:
-                # Run free text search query
-                parts = value.split(" ")
-                query = None
-                for part in parts:
-                    q_filter = (
-                        Q(name__icontains=part)
-                        | Q(owner__first_name__icontains=part)
-                        | Q(owner__last_name__icontains=part)
-                        | Q(owner__email__icontains=part)
-                        | Q(assigned_to__first_name__icontains=part)
-                        | Q(assigned_to__last_name__icontains=part)
-                        | Q(assigned_to__email__icontains=part)
-                        | Q(issue__fileref__icontains=part)
-                    )
-                    if query:
-                        query |= q_filter
-                    else:
-                        query = q_filter
+            if value is not None:
+                if key == "q":
+                    # Run free text search query
+                    parts = value.split(" ")
+                    query = None
+                    for part in parts:
+                        q_filter = (
+                            Q(name__icontains=part)
+                            | Q(owner__first_name__icontains=part)
+                            | Q(owner__last_name__icontains=part)
+                            | Q(owner__email__icontains=part)
+                            | Q(assigned_to__first_name__icontains=part)
+                            | Q(assigned_to__last_name__icontains=part)
+                            | Q(assigned_to__email__icontains=part)
+                            | Q(issue__fileref__icontains=part)
+                        )
+                        if query:
+                            query |= q_filter
+                        else:
+                            query = q_filter
 
-                queryset = queryset.filter(query)
-            else:
-                queryset = queryset.filter(**{key: value})
+                    queryset = queryset.filter(query)
+                else:
+                    queryset = queryset.filter(**{key: value})
 
         return queryset
