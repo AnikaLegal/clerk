@@ -341,7 +341,21 @@ const injectedRtkApi = api.injectEndpoints({
       }),
     }),
     getTasks: build.query<GetTasksApiResponse, GetTasksApiArg>({
-      query: () => ({ url: `/clerk/api/task/` }),
+      query: (queryArg) => ({
+        url: `/clerk/api/task/`,
+        params: {
+          q: queryArg.q,
+          type: queryArg['type'],
+          name: queryArg.name,
+          status: queryArg.status,
+          is_open: queryArg.isOpen,
+          is_suspended: queryArg.isSuspended,
+          issue: queryArg.issue,
+          owner: queryArg.owner,
+          assigned_to: queryArg.assignedTo,
+          issue__topic: queryArg.issueTopic,
+        },
+      }),
     }),
     createTask: build.mutation<CreateTaskApiResponse, CreateTaskApiArg>({
       query: (queryArg) => ({
@@ -682,7 +696,18 @@ export type DeleteDocumentTemplateApiArg = {
   id: number
 }
 export type GetTasksApiResponse = /** status 200 Successful response. */ Task[]
-export type GetTasksApiArg = void
+export type GetTasksApiArg = {
+  q?: string
+  type?: string
+  name?: string
+  status?: string
+  isOpen?: string
+  isSuspended?: string
+  issue?: string
+  owner?: string
+  assignedTo?: string
+  issueTopic?: string
+}
 export type CreateTaskApiResponse = /** status 201 Successful response. */ Task
 export type CreateTaskApiArg = {
   taskCreate: TaskCreate

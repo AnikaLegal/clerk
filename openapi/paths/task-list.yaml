@@ -1,5 +1,56 @@
 get:
   operationId: getTasks
+  parameters:
+    - name: q
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: type
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: name
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: status
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: is_open
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: is_suspended
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: issue
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: owner
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: assigned_to
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: issue__topic
+      in: query
+      schema:
+        type: string
+      required: false
   responses:
     "200":
       description: Successful response.
