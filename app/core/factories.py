@@ -18,8 +18,7 @@ from core.models import (
     IssueEvent,
 )
 from emails.models import Email, EmailTemplate, EmailAttachment
-
-from core.models.issue import CaseStage
+from core.models.issue import CaseStage, CaseTopic
 from core.models.issue_event import EventType
 from notify.models import (
     Notification,
@@ -107,7 +106,9 @@ class IssueFactory(TimestampedModelFactory):
         model = Issue
 
     id = factory.LazyAttribute(lambda x: uuid4())
-    topic = "REPAIRS"
+    topic = factory.Faker(
+        "random_element", elements=[CaseTopic.BONDS, CaseTopic.REPAIRS]
+    )
     answers = {}
     client = factory.SubFactory(ClientFactory)
     tenancy = factory.SubFactory(TenancyFactory)
