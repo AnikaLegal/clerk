@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, QuerySet
 from django.urls import reverse
 from django.http import Http404
@@ -46,9 +47,6 @@ def task_detail_page_view(request, pk):
 
 class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = [
-        CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
-    ]
     extensions_query_params_enabled = False
 
     def get_extensions_mixin_context(self):
@@ -76,9 +74,21 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
             }
         return context
 
+    def get_permissions(self):
+        if self.action == "list":
+            # Anyone can try look at the list
+            permission_classes = [IsAuthenticated]
+        else:
+            # But for other stuff you need to be a coordinator+ or have object permission
+            permission_classes = [
+                CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
+            ]
+        return [p() for p in permission_classes]
+
     def get_queryset(self):
         user = self.request.user
-        queryset = Task.objects.filter(Q(owner=user) | Q(assigned_to=user))
+
+        queryset = Task.objects.all()
         queryset = queryset.select_related("issue", "owner", "assigned_to")
 
         if self.action == "retrieve":
@@ -88,6 +98,7 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
 
         # Permissions.
         if user.is_paralegal:
+            queryset = queryset.filter(Q(owner=user) | Q(assigned_to=user))
             # Double check: Even if they are the owner or assigned to a task
             # paralegals should only be able to see the tasks related to cases
             # of which they are the assigned paralegal.
