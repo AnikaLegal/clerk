@@ -1,15 +1,25 @@
 from rest_framework import serializers
+from rest_framework_serializer_extensions.serializers import SerializerExtensionsMixin
 from django.urls import reverse
 
+from case.serializers import IssueSerializer, UserSerializer
 from .models import Task
-from .models.template import TaskType
-from .models.task import TaskStatus
-from case.serializers.fields import TextChoiceField
-from case.serializers.issue import IssueSerializer
-from case.serializers.user import UserSerializer
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class IssueExtSerializer(SerializerExtensionsMixin, IssueSerializer):
+    class Meta:
+        model = IssueSerializer.Meta.model
+        fields = IssueSerializer.Meta.fields
+
+
+class UserExtSerializer(SerializerExtensionsMixin, UserSerializer):
+    class Meta:
+        model = UserSerializer.Meta.model
+        fields = UserSerializer.Meta.fields
+        read_only_fields = UserSerializer.Meta.read_only_fields
+
+
+class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = (
@@ -20,26 +30,18 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "is_open",
             "is_suspended",
-            "issue_id",
-            "issue",
-            "owner_id",
-            "owner",
-            "assigned_to_id",
-            "assigned_to",
             "url",
         )
-
-    type = TextChoiceField(TaskType)
-    status = TextChoiceField(TaskStatus)
-
-    issue_id = serializers.UUIDField()
-    issue = IssueSerializer(read_only=True)
-    owner_id = serializers.IntegerField()
-    owner = UserSerializer(read_only=True)
-    assigned_to_id = serializers.IntegerField()
-    assigned_to = UserSerializer(read_only=True)
+        read_only_fields = ("url", "is_open", "is_suspended")
+        expandable_fields = dict(
+            issue=IssueExtSerializer,
+            owner=UserExtSerializer,
+            assigned_to=UserExtSerializer,
+        )
 
     url = serializers.SerializerMethodField()
+    type = serializers.CharField(source="get_type_display")
+    status = serializers.CharField(source="get_status_display")
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
@@ -62,6 +64,5 @@ class TaskSearchSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
-    # General query.
-    q = serializers.CharField(required=False)
+    q = serializers.CharField(required=False)  # General query.
     issue__topic = serializers.CharField(required=False)

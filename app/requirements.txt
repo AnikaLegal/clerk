@@ -30,6 +30,7 @@ msal==1.16.0
 # API
 djangorestframework==3.13.1
 django-cors-headers==3.11.0
+djangorestframework-serializer-extensions
 
 # Emails and comms
 mailchimp3==3.0.16

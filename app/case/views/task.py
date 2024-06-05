@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 from rest_framework.decorators import api_view
 from django.db.models import Q, QuerySet
 from django.urls import reverse
@@ -43,11 +44,37 @@ def task_detail_page_view(request, pk):
     return render_react_page(request, "Task", "task-detail", context)
 
 
-class TaskApiViewset(ModelViewSet):
+class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = [
         CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
     ]
+    extensions_query_params_enabled = False
+
+    def get_extensions_mixin_context(self):
+        context = super(TaskApiViewset, self).get_extensions_mixin_context()
+        context["expand"] = {"issue", "owner", "assigned_to"}
+        if self.action == "list":
+            context["only"] = {
+                "id",
+                "type",
+                "name",
+                "status",
+                "is_open",
+                "is_suspended",
+                "url",
+                "issue__id",
+                "issue__fileref",
+                "issue__topic_display",
+                "issue__url",
+                "owner__id",
+                "owner__full_name",
+                "owner__url",
+                "assigned_to__id",
+                "assigned_to__full_name",
+                "assigned_to__url",
+            }
+        return context
 
     def get_queryset(self):
         user = self.request.user
