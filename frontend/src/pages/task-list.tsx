@@ -8,10 +8,8 @@ import {
   Input,
   Label,
 } from 'semantic-ui-react'
-
 import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
 import api from 'api'
-
 import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {
@@ -20,7 +18,8 @@ interface DjangoContext {
     status: string[][]
     is_open: string[][]
     case_topic: string[][]
-  }
+  },
+  user_id: string
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -32,7 +31,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [tasks, setTasks] = useState<[]>([])
   const [query, setQuery] = useState<string>()
-  const [filter, setFilter] = useState<{}>({ isOpen: "true" })
+  const [filter, setFilter] = useState<{}>({ isOpen: "true", "assignedTo": CONTEXT.user_id })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
 
@@ -67,9 +66,18 @@ const App = () => {
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
+  const userResults = api.useGetUsersQuery({})
+  const users = [
+    ...(userResults.data ?? [])
+  ].sort((a, b) => (a.email > b.email) ? 1 : -1)
+
   return (
     <Container>
-      <Header as="h1">Tasks</Header>
+      <Header as="h1">Tasks
+        <Header.Subheader>
+          Showing {tasks.length} tasks
+        </Header.Subheader>
+      </Header>
       <Form>
         <Form.Field>
           <Input
@@ -133,6 +141,42 @@ const App = () => {
                   placeholder="Task Type"
                   options={choiceToOptions(CONTEXT.choices.type)}
                   onChange={(e, { value }) => updateFilter('type', value)}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group style={{ marginTop: '1em' }}>
+              <Form.Field width={8}>
+                <Dropdown
+                  clearable
+                  fluid
+                  search
+                  selection
+                  value={filter.assignedTo || ''}
+                  loading={userResults.isFetching}
+                  placeholder="Select the assignee"
+                  options={users.map((u) => ({
+                    key: u.id,
+                    value: u.id,
+                    text: u.email,
+                  }))}
+                  onChange={(e, { value }) => updateFilter('assignedTo', value)}
+                />
+              </Form.Field>
+              <Form.Field width={8}>
+                <Dropdown
+                  clearable
+                  fluid
+                  search
+                  selection
+                  value={filter.owner || ''}
+                  loading={userResults.isFetching}
+                  placeholder="Select the owner"
+                  options={users.map((u) => ({
+                    key: u.id,
+                    value: u.id,
+                    text: u.email,
+                  }))}
+                  onChange={(e, { value }) => updateFilter('owner', value)}
                 />
               </Form.Field>
             </Form.Group>

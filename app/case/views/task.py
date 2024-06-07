@@ -33,6 +33,7 @@ def task_list_page_view(request):
             ],
             "case_topic": CaseTopic.CHOICES,
         },
+        "user_id": request.user.id,
     }
     return render_react_page(request, "Tasks", "task-list", context)
 
