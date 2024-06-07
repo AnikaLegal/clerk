@@ -143,6 +143,17 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('type', value)}
                 />
               </Form.Field>
+              <Form.Field width={8}>
+                <Dropdown
+                  fluid
+                  selection
+                  clearable
+                  value={filter.status || ''}
+                  placeholder="Task Status"
+                  options={choiceToOptions(CONTEXT.choices.status)}
+                  onChange={(e, { value }) => updateFilter('status', value)}
+                />
+              </Form.Field>
             </Form.Group>
             <Form.Group style={{ marginTop: '1em' }}>
               <Form.Field width={8}>
