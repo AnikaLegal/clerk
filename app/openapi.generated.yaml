@@ -1130,7 +1130,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Task"
+                  $ref: "#/components/schemas/TaskList"
     post:
       operationId: createTask
       requestBody:
@@ -2021,6 +2021,76 @@ components:
       required:
         - topic
         - files
+    TaskList:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        is_open:
+          type: boolean
+        is_suspended:
+          type: boolean
+        url:
+          type: string
+        issue:
+          type: object
+          properties:
+            id:
+              type: string
+            topic_display:
+              type: string
+            fileref:
+              type: string
+            url:
+              type: string
+          required:
+            - id
+            - topic_display
+            - fileref
+            - url
+        owner:
+          type: object
+          properties:
+            id:
+              type: integer
+            full_name:
+              type: string
+            url:
+              type: string
+          required:
+            - id
+            - full_name
+            - url
+        assigned_to:
+          type: object
+          properties:
+            id:
+              type: integer
+            full_name:
+              type: string
+            url:
+              type: string
+          required:
+            - id
+            - full_name
+            - url
+      required:
+        - id
+        - type
+        - name
+        - status
+        - is_open
+        - is_suspended
+        - url
+        - issue
+        - owner
+        - assigned_to
     TaskBase:
       type: object
       properties:
@@ -2037,24 +2107,6 @@ components:
         - description
         - is_open
         - is_suspended
-    Task:
-      allOf:
-        - $ref: "#/components/schemas/TaskBase"
-        - type: object
-          properties:
-            id:
-              type: string
-            type:
-              $ref: "#/components/schemas/TextChoiceField"
-            status:
-              $ref: "#/components/schemas/TextChoiceField"
-            url:
-              type: string
-          required:
-            - id
-            - url
-            - type
-            - status
     TaskCreate:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2066,6 +2118,33 @@ components:
               type: string
           required:
             - type
+            - status
+    Task:
+      allOf:
+        - $ref: "#/components/schemas/TaskBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            type:
+              type: string
+            status:
+              type: string
+            url:
+              type: string
+            issue:
+              $ref: "#/components/schemas/Issue"
+            owner:
+              $ref: "#/components/schemas/User"
+            assigned_to:
+              $ref: "#/components/schemas/User"
+          required:
+            - id
+            - url
+            - type
+            - issue
+            - owner
+            - assigned_to
             - status
   responses:
     BadRequest:

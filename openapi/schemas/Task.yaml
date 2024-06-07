@@ -3,15 +3,24 @@ allOf:
   - type: object
     properties:
       id:
-        type: string
+        type: integer
       type:
-        $ref: ./TextChoiceField.yaml
+        type: string
       status:
-        $ref: ./TextChoiceField.yaml
+        type: string
       url:
         type: string
+      issue:
+        $ref: ./Issue.yaml
+      owner:
+        $ref: ./User.yaml
+      assigned_to:
+        $ref: ./User.yaml
     required:
       - id
       - url
       - type
+      - issue
+      - owner
+      - assigned_to
       - status

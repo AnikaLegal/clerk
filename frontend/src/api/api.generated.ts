@@ -695,7 +695,8 @@ export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number
 }
-export type GetTasksApiResponse = /** status 200 Successful response. */ Task[]
+export type GetTasksApiResponse =
+  /** status 200 Successful response. */ TaskList[]
 export type GetTasksApiArg = {
   q?: string
   type?: string
@@ -987,6 +988,31 @@ export type DocumentTemplateCreate = {
   topic: string
   files: Blob[]
 }
+export type TaskList = {
+  id: number
+  type: string
+  name: string
+  status: string
+  is_open: boolean
+  is_suspended: boolean
+  url: string
+  issue: {
+    id: string
+    topic_display: string
+    fileref: string
+    url: string
+  }
+  owner: {
+    id: number
+    full_name: string
+    url: string
+  }
+  assigned_to: {
+    id: number
+    full_name: string
+    url: string
+  }
+}
 export type TaskBase = {
   name: string
   description: string
@@ -994,10 +1020,13 @@ export type TaskBase = {
   is_suspended: boolean
 }
 export type Task = TaskBase & {
-  id: string
-  type: TextChoiceField
-  status: TextChoiceField
+  id: number
+  type: string
+  status: string
   url: string
+  issue: Issue
+  owner: User
+  assigned_to: User
 }
 export type TaskCreate = TaskBase & {
   type: string

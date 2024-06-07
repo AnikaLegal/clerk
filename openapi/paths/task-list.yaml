@@ -59,8 +59,7 @@ get:
           schema:
             type: array
             items:
-              $ref: ../schemas/Task.yaml
-
+              $ref: ../schemas/TaskList.yaml
 post:
   operationId: createTask
   requestBody:
