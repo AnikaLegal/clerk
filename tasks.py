@@ -12,14 +12,19 @@ def schema(c):
 
 
 @task
-def build(c, webpack=False):
+def build(c, base=False, webpack=False):
     """Build Docker environment locally"""
-    if webpack:
-        c.run(
-            f"docker build -f docker/Dockerfile.webpack -t {APP_NAME}-webpack:local ."
-        )
-    else:
-        c.run(f"docker build -f docker/Dockerfile -t {APP_NAME}:local .")
+
+    file = "Dockerfile"
+    tag = f"{APP_NAME}:local"
+    if base:
+        file = "Dockerfile.base"
+        tag = "anikalaw/clerkbase:latest"
+    elif webpack:
+        file = "Dockerfile.webpack"
+        tag = f"{APP_NAME}-webpack:local"
+
+    c.run(f"docker build --file docker/{file} --tag {tag} .")
 
 
 @task
