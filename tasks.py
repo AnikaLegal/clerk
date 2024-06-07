@@ -12,14 +12,19 @@ def schema(c):
 
 
 @task
-def build(c, webpack=False):
+def build(c, base=False, webpack=False):
     """Build Docker environment locally"""
-    if webpack:
-        c.run(
-            f"docker build -f docker/Dockerfile.webpack -t {APP_NAME}-webpack:local ."
-        )
-    else:
-        c.run(f"docker build -f docker/Dockerfile -t {APP_NAME}:local .")
+
+    file = "Dockerfile"
+    tag = f"{APP_NAME}:local"
+    if base:
+        file = "Dockerfile.base"
+        tag = "anikalaw/clerkbase:latest"
+    elif webpack:
+        file = "Dockerfile.webpack"
+        tag = f"{APP_NAME}-webpack:local"
+
+    c.run(f"docker build --file docker/{file} --tag {tag} .")
 
 
 @task
@@ -125,8 +130,15 @@ def psql(c):
     run(c, "psql")
 
 
-@task
-def test(c, recreate=False, interactive=False, quiet=False, debug=False):
+@task(incrementable=["verbose"])
+def test(
+    c,
+    recreate=False,
+    interactive=False,
+    quiet=False,
+    verbose=0,
+    debug=False,
+):
     """Run pytest"""
     if interactive:
         cmd = "bash"
@@ -139,8 +151,8 @@ def test(c, recreate=False, interactive=False, quiet=False, debug=False):
 
         if quiet:
             cmd += " --quiet --no-summary --exitfirst"
-        else:
-            cmd += " -vv"
+        elif verbose:
+            cmd += " -" + ("v" * verbose)
 
     debug_args = ""
     if debug:
