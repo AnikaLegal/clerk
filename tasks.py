@@ -125,8 +125,15 @@ def psql(c):
     run(c, "psql")
 
 
-@task
-def test(c, recreate=False, interactive=False, quiet=False, debug=False):
+@task(incrementable=["verbose"])
+def test(
+    c,
+    recreate=False,
+    interactive=False,
+    quiet=False,
+    verbose=0,
+    debug=False,
+):
     """Run pytest"""
     if interactive:
         cmd = "bash"
@@ -139,8 +146,8 @@ def test(c, recreate=False, interactive=False, quiet=False, debug=False):
 
         if quiet:
             cmd += " --quiet --no-summary --exitfirst"
-        else:
-            cmd += " -vv"
+        elif verbose:
+            cmd += " -" + ("v" * verbose)
 
     debug_args = ""
     if debug:
