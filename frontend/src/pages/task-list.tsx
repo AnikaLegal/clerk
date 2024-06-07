@@ -164,7 +164,7 @@ const App = () => {
                   selection
                   value={filter.assignedTo || ''}
                   loading={userResults.isFetching}
-                  placeholder="Select the assignee"
+                  placeholder="Assignee"
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
@@ -181,7 +181,7 @@ const App = () => {
                   selection
                   value={filter.owner || ''}
                   loading={userResults.isFetching}
-                  placeholder="Select the owner"
+                  placeholder="Owner"
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
