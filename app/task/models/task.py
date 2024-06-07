@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse
+from django.conf import settings
 
 from accounts.models import User
 from core.models import TimestampedModel, Issue
@@ -104,6 +106,11 @@ class Task(TimestampedModel):
         self.is_suspended = not self.owner and self.prev_owner_role is not None
 
         super().save(*args, **kwargs)
+
+    @property
+    def url(self):
+        if self.pk:
+            return settings.CLERK_BASE_URL + reverse("task-detail", args=(self.pk,))
 
     # Convenience method used to add a comment related to the task instance.
     def add_comment(
