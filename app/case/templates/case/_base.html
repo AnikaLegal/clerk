@@ -24,13 +24,13 @@
                 <div class="nav-items">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'case-list' %}" class="item">Cases</a>
-                        <a href="{% url 'task-list' %}" class="item">Tasks</a>
                     {% endif %}
                     {% if request.user.is_coordinator_or_better %}
                         <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
                         <a href="{% url 'case-review' %}" class="item">Review</a>
                     {% endif %}
                     {% if request.user.is_authenticated %}
+                        <a href="{% url 'task-list' %}" class="item">Tasks</a>
                         <a href="{% url 'person-list' %}" class="item">Parties</a>
                     {% endif %}
                     {% if request.user.is_coordinator_or_better %}
