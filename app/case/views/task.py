@@ -13,7 +13,7 @@ from case.views.auth import (
 )
 from case.utils.react import render_react_page
 from core.models.issue import CaseTopic
-from task.models.task import Task, TaskType
+from task.models.task import Task, TaskType, TaskStatus
 from task.serializers import TaskSerializer, TaskSearchSerializer
 
 # TODO:
@@ -26,6 +26,7 @@ def task_list_page_view(request):
     context = {
         "choices": {
             "type": TaskType.choices,
+            "status": TaskStatus.choices,
             "is_open": [
                 ("true", "Open"),
                 ("false", "Closed"),

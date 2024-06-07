@@ -40,8 +40,6 @@ class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
         )
 
     url = serializers.SerializerMethodField()
-    type = serializers.CharField(source="get_type_display")
-    status = serializers.CharField(source="get_status_display")
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))

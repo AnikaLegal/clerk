@@ -9,49 +9,62 @@ import {
   Label,
 } from 'semantic-ui-react'
 
-import { mount, debounce } from 'utils'
+import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
 import api from 'api'
 
 import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {
   choices: {
-    is_open: string[][]
     type: string[][]
+    status: string[][]
+    is_open: string[][]
     case_topic: string[][]
   }
 }
+
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const debouncer = debounce(300)
+const TYPE_LABELS = choiceToMap(CONTEXT.choices.type)
+const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [tasks, setTasks] = useState<[]>([])
-  const [query, setQuery] = useState<{}>({isOpen: "true"})
-  const [getTasks] = api.useLazyGetTasksQuery()
+  const [query, setQuery] = useState<string>()
+  const [filter, setFilter] = useState<{}>({ isOpen: "true" })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
+  const [getTasks] = api.useLazyGetTasksQuery()
 
-  const search = debouncer(() => {
+  const debouncedQuery = useDebounce(query, 300);
+
+  const search = () => {
     setIsLoading(true)
-    getTasks(query)
+    getTasks(filter)
       .unwrap()
       .then((tasks) => {
         setTasks(tasks)
         setIsLoading(false)
       })
       .catch(() => setIsLoading(false))
-  })
-  useEffect(() => search(), [query])
+  }
+  useEffect(() => search(), [filter])
 
-  const updateQuery = (name, value) => {
+  const updateFilter = (name, value) => {
+    var updated = {}
     if (value === null || value === '') {
-      const { [name]: tmp, ...rest } = query
-      setQuery(rest)
+      const { [name]: _, ...remaining } = filter
+      updated = remaining
     }
     else {
-      setQuery({ ...query, [name]: value })
+      updated = { ...filter, [name]: value }
     }
+    setFilter(updated)
   }
+
+  const updateQuery = () => {
+    updateFilter("q", debouncedQuery)
+  }
+  useEffect(() => updateQuery(), [debouncedQuery])
 
   return (
     <Container>
@@ -60,8 +73,8 @@ const App = () => {
         <Form.Field>
           <Input
             placeholder="Search by file ref, task name, owner or assignee"
-            value={query.q || ''}
-            onChange={(e) => updateQuery('q', e.target.value)}
+            value={query || ''}
+            onChange={(e) => setQuery(e.target.value)}
             loading={isLoading}
           />
         </Form.Field>
@@ -93,10 +106,10 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={query.isOpen || ''}
+                  value={filter.isOpen || ''}
                   placeholder="Is task open?"
                   options={choiceToOptions(CONTEXT.choices.is_open)}
-                  onChange={(e, { value }) => updateQuery('isOpen', value)}
+                  onChange={(e, { value }) => updateFilter('isOpen', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -104,10 +117,10 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={query.issueTopic || ''}
+                  value={filter.issueTopic || ''}
                   placeholder="Case Topic"
                   options={choiceToOptions(CONTEXT.choices.case_topic)}
-                  onChange={(e, { value }) => updateQuery('issueTopic', value)}
+                  onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -115,10 +128,10 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={query.type || ''}
+                  value={filter.type || ''}
                   placeholder="Task Type"
                   options={choiceToOptions(CONTEXT.choices.type)}
-                  onChange={(e, { value }) => updateQuery('type', value)}
+                  onChange={(e, { value }) => updateFilter('type', value)}
                 />
               </Form.Field>
             </Form.Group>
@@ -153,14 +166,14 @@ const App = () => {
                 <Table.Cell>
                   <a href={task.url}>{task.name}</a>
                 </Table.Cell>
-                <Table.Cell>{task.type.display}</Table.Cell>
+                <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
                 <Table.Cell>
                   <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
                 </Table.Cell>
                 <Table.Cell>
                   <a href={task.owner.url}>{task.owner.full_name}</a>
                 </Table.Cell>
-                <Table.Cell>{task.status.display}</Table.Cell>
+                <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
@@ -169,12 +182,4 @@ const App = () => {
     </Container>
   )
 }
-
-const choiceToOptions = (choices) =>
-  choices.map(([value, label]) => ({
-    key: label,
-    text: label,
-    value: value,
-  }))
-
 mount(App)

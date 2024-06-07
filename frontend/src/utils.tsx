@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { hydrate, render } from 'react-dom'
 import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
@@ -87,6 +87,22 @@ export const debounce = (delay) => {
       timer = setTimeout(() => func(...args), delay)
     }
   }
+}
+
+export const useDebounce = (value: any, delay: number): any => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }
 
 // Debounce user input, returns a promise
@@ -182,3 +198,23 @@ const parseError = (error: any) => {
     return String(error)
   }
 }
+
+export const choiceToMap = (choices: string[][]): Map<string, string> => {
+  return choices.reduce(function (map, entry) {
+    map.set(entry[0], entry[1])
+    return map
+  }, new Map)
+}
+
+interface OptionItem {
+  key: string;
+  text: string;
+  value: string;
+}
+
+export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
+  choices.map(([value, label]) => ({
+    key: label,
+    text: label,
+    value: value,
+  }))
