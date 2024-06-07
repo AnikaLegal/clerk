@@ -998,7 +998,7 @@ export type TaskList = {
   url: string
   issue: {
     id: string
-    topic_display: string
+    topic: string
     fileref: string
     url: string
   }

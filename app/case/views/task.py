@@ -64,7 +64,7 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
                 "url",
                 "issue__id",
                 "issue__fileref",
-                "issue__topic_display",
+                "issue__topic",
                 "issue__url",
                 "owner__id",
                 "owner__full_name",

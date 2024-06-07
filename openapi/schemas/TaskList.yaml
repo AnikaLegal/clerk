@@ -19,7 +19,7 @@ properties:
     properties:
       id:
         type: string
-      topic_display:
+      topic:
         type: string
       fileref:
         type: string
@@ -27,7 +27,7 @@ properties:
         type: string
     required:
       - id
-      - topic_display
+      - topic
       - fileref
       - url
   owner:

@@ -24,6 +24,7 @@ interface DjangoContext {
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+const TOPIC_LABELS = choiceToMap(CONTEXT.choices.case_topic)
 const TYPE_LABELS = choiceToMap(CONTEXT.choices.type)
 const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
@@ -162,7 +163,7 @@ const App = () => {
                 <Table.Cell>
                   <a href={task.issue.url}>{task.issue.fileref}</a>
                 </Table.Cell>
-                <Table.Cell>{task.issue.topic_display}</Table.Cell>
+                <Table.Cell>{TOPIC_LABELS.get(task.issue.topic)}</Table.Cell>
                 <Table.Cell>
                   <a href={task.url}>{task.name}</a>
                 </Table.Cell>

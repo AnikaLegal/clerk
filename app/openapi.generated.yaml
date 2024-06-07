@@ -2043,7 +2043,7 @@ components:
           properties:
             id:
               type: string
-            topic_display:
+            topic:
               type: string
             fileref:
               type: string
@@ -2051,7 +2051,7 @@ components:
               type: string
           required:
             - id
-            - topic_display
+            - topic
             - fileref
             - url
         owner:
