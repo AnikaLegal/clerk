@@ -65,8 +65,6 @@ flake8
 faker
 pytest-django
 pytest-factoryboy
-# https://github.com/Teemu/pytest-sugar/issues/187
-# pytest-sugar
 responses
 freezegun
 openapi-spec-validator
