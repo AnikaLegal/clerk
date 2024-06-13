@@ -977,3 +977,70 @@ before the final footer.
     align-items: center;
   }
 }
+
+#footer-banner {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  background-color: var(--blue-dark);
+}
+.footer-banner-contents {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  min-height: 100%;
+}
+.footer-banner-image {
+  flex: 1 1 35%;
+  align-self: stretch;
+  clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
+}
+.footer-banner-image img {
+  max-width: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+}
+.footer-banner-text {
+  flex: 1 0 45%;
+  color: white;
+  padding: 1rem;
+  line-height: 1;
+}
+.footer-banner-action {
+  flex: 1 0 20%;
+  color: white;
+  text-align: center;
+  margin: auto;
+  width: 50%;
+}
+.footer-banner-header {
+  font-size: xx-large;
+}
+.footer-banner-subheading {
+  padding-top: 1rem;
+  line-height: 1;
+}
+.footer-banner-action > a > button {
+  display: revert;
+  padding: 0.5rem 1rem;
+  box-shadow: none;
+  background-color: beige;
+  color: var(--dark-0);
+  font-size: medium;
+}
+.footer-banner-close {
+  padding: 0.5rem;
+}
+.footer-banner-close {
+  align-self:flex-start;
+}
+.footer-banner-close > button {
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0.5rem;
+  box-shadow: none;
+  font-size: medium;
+  color: var(--dark-0);
+  background-color:beige;
+}
