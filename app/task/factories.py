@@ -1,5 +1,6 @@
 import factory
 from faker import Faker
+from django.utils import timezone
 from random import randint
 
 from core.factories import TimestampedModelFactory, IssueFactory, UserFactory
@@ -47,3 +48,18 @@ class TaskFactory(TimestampedModelFactory):
     issue = factory.SubFactory(IssueFactory)
     owner = factory.SubFactory(UserFactory)
     assigned_to = factory.SelfAttribute("owner")
+    created_at = factory.Faker(
+        "date_time_between", tzinfo=timezone.utc, start_date="-3M"
+    )
+    is_open = factory.LazyAttribute(
+        lambda self: self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+    )
+    closed_at = factory.Maybe(
+        "is_open",
+        yes_declaration=None,
+        no_declaration=factory.Faker(
+            "past_datetime",
+            start_date=factory.SelfAttribute("..created_at"),
+            tzinfo=timezone.utc,
+        ),
+    )
