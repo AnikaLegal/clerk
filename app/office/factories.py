@@ -8,7 +8,7 @@ class ClosureTemplateFactory(factory.django.DjangoModelFactory):
         model = ClosureTemplate
 
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="-1M"
     )
     call_text = factory.Faker("text")
     email_html = factory.Faker("text")
@@ -20,7 +20,7 @@ class ClosureFactory(factory.django.DjangoModelFactory):
         model = Closure
 
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="-1M"
     )
     close_date = factory.Faker("date_between", start_date="-2w", end_date="-1w")
     reopen_date = factory.Faker("date_between", start_date="+1w", end_date="+2w")
