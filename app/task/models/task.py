@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import functions
 from django.urls import reverse
 from django.conf import settings
 
@@ -38,6 +39,7 @@ class Task(TimestampedModel):
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
+    closed_at = models.DateTimeField(blank=True, null=True, default=None)
 
     # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)
@@ -105,6 +107,17 @@ class Task(TimestampedModel):
         self.is_open = self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
         self.is_suspended = not self.owner and self.prev_owner_role is not None
 
+        # Set the closed date when the task is first closed and clear the closed
+        # date if the task is reopened.
+        """
+        if self.is_open:
+            if self.closed_at is not None:
+                self.closed_at = None
+        else:
+            if self.closed_at is None:
+                self.closed_at = timezone.now()
+        """
+
         super().save(*args, **kwargs)
 
     @property
@@ -128,3 +141,17 @@ class Task(TimestampedModel):
             task=self,
             file=file,
         )
+
+    @staticmethod
+    def annotate_with_days_open(
+        queryset: models.QuerySet["Task"],
+    ) -> models.QuerySet["Task"]:
+        expression = models.Case(
+            models.When(
+                models.Q(closed_at__isnull=False),
+                then=(models.F("closed_at") - models.F("created_at")),
+            ),
+            default=(functions.Now() - models.F("created_at")),
+            output_field=models.DurationField(),
+        )
+        return queryset.annotate(days_open=(functions.ExtractDay(expression)))

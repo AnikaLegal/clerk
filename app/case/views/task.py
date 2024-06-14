@@ -62,6 +62,9 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
                 "status",
                 "is_open",
                 "is_suspended",
+                "created_at",
+                "closed_at",
+                "days_open",
                 "url",
                 "issue__id",
                 "issue__fileref",
@@ -91,11 +94,13 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
         user = self.request.user
 
         queryset = Task.objects.all()
+        queryset = Task.annotate_with_days_open(queryset)
         queryset = queryset.select_related("issue", "owner", "assigned_to")
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("comments", "attachments")
         elif self.action == "list":
+            queryset = queryset.order_by("-days_open")
             queryset = self.search_queryset(queryset)
 
         # Permissions.

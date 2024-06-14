@@ -30,16 +30,25 @@ class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
             "status",
             "is_open",
             "is_suspended",
+            "created_at",
+            "closed_at",
+            "days_open",
             "url",
         )
-        read_only_fields = ("url", "is_open", "is_suspended")
+        read_only_fields = (
+            "is_open",
+            "is_suspended",
+            "created_at",
+            "closed_at",
+        )
         expandable_fields = dict(
             issue=IssueExtSerializer,
             owner=UserExtSerializer,
             assigned_to=UserExtSerializer,
         )
 
-    url = serializers.SerializerMethodField()
+    days_open = serializers.IntegerField(read_only=True)
+    url = serializers.SerializerMethodField(read_only=True)
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
