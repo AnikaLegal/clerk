@@ -10,7 +10,7 @@ from django.utils import timezone
 from accounts.models import User
 from emails.models import Email, EmailTemplate, EmailAttachment
 from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
-from core.models.issue import CaseStage
+from core.models.issue import CaseStage, CaseTopic
 from notify.models import (
     Notification,
     NOTIFY_TOPIC_CHOICES,
@@ -97,7 +97,9 @@ class IssueFactory(TimestampedModelFactory):
         model = Issue
 
     id = factory.LazyAttribute(lambda x: uuid4())
-    topic = "REPAIRS"
+    topic = factory.Faker(
+        "random_element", elements=[CaseTopic.BONDS, CaseTopic.REPAIRS]
+    )
     answers = {}
     client = factory.SubFactory(ClientFactory)
     tenancy = factory.SubFactory(TenancyFactory)

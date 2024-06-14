@@ -3,6 +3,7 @@
 {% load notice %}
 {% load wagtailcore_tags %}
 {% load wagtail_clerk %}
+{% load cookie %}
 <html lang="en">
 
 <head>
@@ -43,12 +44,12 @@
     {% notice %}
     <header>
         <div>
-        <a href="{% url 'landing' %}">
-            <img src="{% static 'web/brand/logo-color.svg' %}" style="margin-right: 20px;">
-        </a>
-        <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">
-            <img src="{% static 'web/brand/acnc-charity.png' %}"/>
-        </a>
+            <a href="{% url 'landing' %}">
+                <img src="{% static 'web/brand/logo-color.svg' %}" style="margin-right: 20px;">
+            </a>
+            <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">
+                <img src="{% static 'web/brand/acnc-charity.png' %}" />
+            </a>
         </div>
         <nav class="large">
             {% include 'web/snippets/_header_menu.html' %}
@@ -99,7 +100,7 @@
             <div class=column>
                 <h3>
                     <a href="{% url 'landing' %}">
-                        <img src="{% static 'web/brand/logo-footer.svg' %}" style="margin-right:20px;"/>
+                        <img src="{% static 'web/brand/logo-footer.svg' %}" style="margin-right:20px;" />
                     </a>
                     <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">
                         <img src="{% static 'web/brand/acnc-charity.png' %}" style="height:33px;margin-right:20px;" />
@@ -165,6 +166,33 @@
                 </p>
             </div>
         </div>
+        {% get_cookie "dismiss_footer_banner" as dismiss_footer_banner %}
+        {% if not dismiss_footer_banner %}
+        <div id="footer-banner">
+            <div class="footer-banner-contents">
+                <div class="footer-banner-image">
+                    <img src="{% static 'web/img/footer-banner.png' %}">
+                </div>
+                <div class="footer-banner-text">
+                    <div class="footer-banner-header">
+                        Keep renters in healthy homes. Support Anika Legal before 30 June.
+                    </div>
+                    <div class="footer-banner-subheading">
+                        With your support, we can provide urgent, ongoing legal assistance to Victorian renters this
+                        winter.
+                    </div>
+                </div>
+                <div class="footer-banner-action">
+                    <a href="https://cold-houses.raiselysite.com/"><button>Donate now</button></a>
+                </div>
+            </div>
+            <div class="footer-banner-close">
+                <button onclick="dismissFooterBanner()">
+                    <img class="icon" src="{% static 'web/img/close.svg' %}">
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </footer>
     {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
@@ -172,6 +200,12 @@
         document.body.addEventListener('htmx:configRequest', (event) => {
             event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         })
+    </script>
+    <script>
+        function dismissFooterBanner() {
+            document.cookie = "dismiss_footer_banner=true; Path=/";
+            document.getElementById("footer-banner").style.display = "none";
+        }
     </script>
     {% block scripts %}{% endblock %}
 </body>
