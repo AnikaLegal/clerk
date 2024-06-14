@@ -5,7 +5,7 @@ from core.factories import IssueEventFactory, IssueFactory, UserFactory
 from core.models.issue_event import EventType
 from task.factories import TaskFactory
 from task.models import Task
-from task.models.task import OwnerRole
+from task.models.task import OwnerRole, TaskStatus
 
 
 @pytest.mark.django_db
@@ -32,19 +32,35 @@ def test_task__tasks_reverted(
     # Tasks that should be reverted as they are assigned to user removed from
     # case.
     tasks_1 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=user_1, owner=user_2
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=user_1,
+        owner=user_2,
     )
     # Same issue but different assignee as tasks to be reverted.
     tasks_2 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=user_3, owner=user_2
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=user_3,
+        owner=user_2,
     )
     # Different issue but same assignee & owner as tasks to be reverted.
     tasks_3 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_2, assigned_to=user_1, owner=user_2
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_2,
+        assigned_to=user_1,
+        owner=user_2,
     )
     # Different issue, assignee & owner as tasks to be reverted.
     tasks_4 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_3, assigned_to=user_4, owner=user_4
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_3,
+        assigned_to=user_4,
+        owner=user_4,
     )
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -104,19 +120,35 @@ def test_task__tasks_suspended(
 
     # Tasks that should be suspended.
     tasks_1 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=user_1, owner=user_1
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=user_1,
+        owner=user_1,
     )
     # Same issue but different assignee & owner as tasks to be suspended.
     tasks_2 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=user_2, owner=user_2
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=user_2,
+        owner=user_2,
     )
     # Different issue but same assignee & owner as tasks to be suspended.
     tasks_3 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_2, assigned_to=user_1, owner=user_1
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_2,
+        assigned_to=user_1,
+        owner=user_1,
     )
     # Different issue, assignee & owner as tasks to be suspended.
     tasks_4 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_3, assigned_to=user_3, owner=user_3
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_3,
+        assigned_to=user_3,
+        owner=user_3,
     )
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -293,19 +325,35 @@ def test_task__tasks_reassigned(
 
     # Tasks that should be reassigned.
     tasks_1 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=prev_user, owner=prev_user
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=prev_user,
+        owner=prev_user,
     )
     # Same issue but different assignee & owner as tasks to be reassigned.
     tasks_2 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_1, assigned_to=other_user, owner=other_user
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_1,
+        assigned_to=other_user,
+        owner=other_user,
     )
     # Different issue but same assignee & owner as tasks to be reassigned.
     tasks_3 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_2, assigned_to=prev_user, owner=prev_user
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_2,
+        assigned_to=prev_user,
+        owner=prev_user,
     )
     # Different issue, assignee & owner as tasks to be reassigned.
     tasks_4 = TaskFactory.create_batch(
-        randint(1, 3), issue=issue_3, assigned_to=other_user, owner=other_user
+        randint(1, 3),
+        status=TaskStatus.NOT_STARTED,
+        issue=issue_3,
+        assigned_to=other_user,
+        owner=other_user,
     )
 
     with django_capture_on_commit_callbacks(execute=True):

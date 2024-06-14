@@ -44,7 +44,9 @@ class TaskFactory(TimestampedModelFactory):
     type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
     name = factory.Faker("text", max_nb_chars=45)
     description = factory.Faker("paragraph")
-    status = TaskStatus.NOT_STARTED
+    status = factory.Faker(
+        "random_element", elements=[c[0] for c in TaskStatus.choices]
+    )
     issue = factory.SubFactory(IssueFactory)
     owner = factory.SubFactory(UserFactory)
     assigned_to = factory.SelfAttribute("owner")
