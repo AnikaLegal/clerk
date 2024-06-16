@@ -53,10 +53,10 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class TimestampedModelFactory(factory.django.DjangoModelFactory):
     modified_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-1m", end_date="now"
+        "date_time_between", tzinfo=timezone.utc, start_date="-1M", end_date="now"
     )
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="-1M"
     )
 
 
@@ -169,7 +169,7 @@ class EmailFactory(factory.django.DjangoModelFactory):
     text = factory.Faker("sentence")
     received_data = {}
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="now"
     )
 
 
@@ -192,7 +192,7 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
     email = factory.SubFactory(EmailFactory)
     content_type = "image/png"
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="now"
     )
 
 
