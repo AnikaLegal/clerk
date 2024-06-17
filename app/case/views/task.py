@@ -31,9 +31,12 @@ def task_list_page_view(request):
                 ("true", "Open"),
                 ("false", "Closed"),
             ],
+            "my_tasks": [
+                ("true", "My tasks"),
+                ("false", "All tasks"),
+            ],
             "case_topic": CaseTopic.CHOICES,
-        },
-        "user_id": request.user.id,
+        }
     }
     return render_react_page(request, "Tasks", "task-list", context)
 
@@ -145,8 +148,13 @@ class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
                             query |= q_filter
                         else:
                             query = q_filter
-
                     queryset = queryset.filter(query)
+                elif key == "my_tasks":
+                    if value:
+                        query = Q(owner=self.request.user) | Q(
+                            assigned_to=self.request.user
+                        )
+                        queryset = queryset.filter(query)
                 else:
                     queryset = queryset.filter(**{key: value})
 

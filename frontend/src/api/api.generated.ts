@@ -354,6 +354,7 @@ const injectedRtkApi = api.injectEndpoints({
           owner: queryArg.owner,
           assigned_to: queryArg.assignedTo,
           issue__topic: queryArg.issueTopic,
+          my_tasks: queryArg.myTasks,
         },
       }),
     }),
@@ -708,6 +709,7 @@ export type GetTasksApiArg = {
   owner?: string
   assignedTo?: string
   issueTopic?: string
+  myTasks?: string
 }
 export type CreateTaskApiResponse = /** status 201 Successful response. */ Task
 export type CreateTaskApiArg = {

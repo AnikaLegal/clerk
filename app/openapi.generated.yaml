@@ -1122,6 +1122,11 @@ paths:
           schema:
             type: string
           required: false
+        - name: my_tasks
+          in: query
+          schema:
+            type: string
+          required: false
       responses:
         "200":
           description: Successful response.
