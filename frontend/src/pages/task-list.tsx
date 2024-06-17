@@ -205,6 +205,7 @@ const App = () => {
               <Table.HeaderCell>Assigned To</Table.HeaderCell>
               <Table.HeaderCell>Owner</Table.HeaderCell>
               <Table.HeaderCell>Task Status</Table.HeaderCell>
+              <Table.HeaderCell>Days Open</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -230,6 +231,7 @@ const App = () => {
                   <a href={task.owner.url}>{task.owner.full_name}</a>
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+                <Table.Cell>{task.days_open}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
