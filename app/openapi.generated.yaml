@@ -2036,6 +2036,13 @@ components:
           type: boolean
         is_suspended:
           type: boolean
+        created_at:
+          type: string
+        closed_at:
+          type: string
+          nullable: true
+        days_open:
+          type: integer
         url:
           type: string
         issue:
@@ -2087,6 +2094,9 @@ components:
         - status
         - is_open
         - is_suspended
+        - created_at
+        - closed_at
+        - days_open
         - url
         - issue
         - owner

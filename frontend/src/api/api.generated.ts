@@ -995,6 +995,9 @@ export type TaskList = {
   status: string
   is_open: boolean
   is_suspended: boolean
+  created_at: string
+  closed_at: string | null
+  days_open: number
   url: string
   issue: {
     id: string
