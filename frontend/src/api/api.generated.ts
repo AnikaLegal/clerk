@@ -1021,8 +1021,6 @@ export type TaskList = {
 export type TaskBase = {
   name: string
   description: string
-  is_open: boolean
-  is_suspended: boolean
 }
 export type Task = TaskBase & {
   id: number
@@ -1032,6 +1030,11 @@ export type Task = TaskBase & {
   issue: Issue
   owner: User
   assigned_to: User
+  is_open: boolean
+  is_suspended: boolean
+  created_at: string
+  closed_at: string | null
+  days_open: number
 }
 export type TaskCreate = TaskBase & {
   type: string

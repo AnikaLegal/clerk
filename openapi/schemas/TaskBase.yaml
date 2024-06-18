@@ -4,12 +4,6 @@ properties:
     type: string
   description:
     type: string
-  is_open:
-    type: boolean
-  is_suspended:
-    type: boolean
 required:
   - name
   - description
-  - is_open
-  - is_suspended

@@ -16,11 +16,27 @@ allOf:
         $ref: ./User.yaml
       assigned_to:
         $ref: ./User.yaml
+      is_open:
+        type: boolean
+      is_suspended:
+        type: boolean
+      created_at:
+        type: string
+      closed_at:
+        type: string
+        nullable: true
+      days_open:
+        type: integer
     required:
       - id
       - url
       - type
+      - status
       - issue
       - owner
       - assigned_to
-      - status
+      - is_open
+      - is_suspended
+      - created_at
+      - closed_at
+      - days_open
