@@ -25,8 +25,7 @@ from task.serializers import TaskSerializer, TaskSearchSerializer
 def task_list_page_view(request):
     context = {
         "choices": {
-            "type": TaskType.choices,
-            "status": TaskStatus.choices,
+            "case_topic": CaseTopic.CHOICES,
             "is_open": [
                 ("true", "Open"),
                 ("false", "Closed"),
@@ -35,7 +34,8 @@ def task_list_page_view(request):
                 ("true", "My tasks"),
                 ("false", "All tasks"),
             ],
-            "case_topic": CaseTopic.CHOICES,
+            "status": TaskStatus.choices,
+            "type": TaskType.choices,
         }
     }
     return render_react_page(request, "Tasks", "task-list", context)
@@ -46,7 +46,15 @@ def task_list_page_view(request):
 def task_detail_page_view(request, pk):
     if not Task.objects.filter(pk=pk).exists():
         raise Http404()
-    context = {"task_pk": pk, "list_url": reverse("task-list")}
+
+    context = {
+        "choices": {
+            "status": TaskStatus.choices,
+            "type": TaskType.choices,
+        },
+        "task_pk": pk,
+        "list_url": reverse("task-list"),
+    }
     return render_react_page(request, "Task", "task-detail", context)
 
 

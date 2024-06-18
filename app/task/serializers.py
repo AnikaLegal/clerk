@@ -3,6 +3,7 @@ from rest_framework_serializer_extensions.serializers import SerializerExtension
 from django.urls import reverse
 
 from case.serializers import IssueSerializer, UserSerializer
+from case.serializers.fields import LocalDateField
 from .models import Task
 
 
@@ -47,6 +48,8 @@ class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
             assigned_to=UserExtSerializer,
         )
 
+    created_at = LocalDateField()
+    closed_at = LocalDateField()
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
 
