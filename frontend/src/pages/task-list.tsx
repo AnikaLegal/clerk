@@ -182,6 +182,7 @@ const App = () => {
                     text: u.email,
                   }))}
                   onChange={(e, { value }) => updateFilter("assignedTo", value)}
+                  loading={userResults.isLoading}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -198,6 +199,7 @@ const App = () => {
                     text: u.email,
                   }))}
                   onChange={(e, { value }) => updateFilter("owner", value)}
+                  loading={userResults.isLoading}
                 />
               </Form.Field>
             </Form.Group>
