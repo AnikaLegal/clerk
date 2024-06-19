@@ -371,7 +371,7 @@ const injectedRtkApi = api.injectEndpoints({
     updateTask: build.mutation<UpdateTaskApiResponse, UpdateTaskApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/task/${queryArg.id}/`,
-        method: 'PUT',
+        method: 'PATCH',
         body: queryArg.taskCreate,
       }),
     }),
@@ -1039,6 +1039,9 @@ export type Task = TaskBase & {
 export type TaskCreate = TaskBase & {
   type: string
   status: string
+  issue_id: string
+  owner_id: number
+  assigned_to_id: number
 }
 export const {
   useGetCasesQuery,

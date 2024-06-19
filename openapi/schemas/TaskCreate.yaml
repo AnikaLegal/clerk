@@ -6,6 +6,16 @@ allOf:
         type: string
       status:
         type: string
+      issue_id:
+        type: string
+        format: uuid
+      owner_id:
+        type: number
+      assigned_to_id:
+        type: number
     required:
       - type
       - status
+      - issue_id
+      - owner_id
+      - assigned_to_id

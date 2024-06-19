@@ -15,7 +15,7 @@ get:
           schema:
             $ref: ../schemas/Task.yaml
 
-put:
+patch:
   operationId: updateTask
   parameters:
     - description: Entity ID
