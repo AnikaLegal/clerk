@@ -1,5 +1,4 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_serializer_extensions.views import SerializerExtensionsAPIViewMixin
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, QuerySet
@@ -14,7 +13,7 @@ from case.views.auth import (
 from case.utils.react import render_react_page
 from core.models.issue import CaseTopic
 from task.models.task import Task, TaskType, TaskStatus
-from task.serializers import TaskSerializer, TaskSearchSerializer
+from task.serializers import TaskSerializer, TaskListSerializer, TaskSearchSerializer
 
 # TODO:
 # - review permissions.
@@ -58,37 +57,12 @@ def task_detail_page_view(request, pk):
     return render_react_page(request, "Task", "task-detail", context)
 
 
-class TaskApiViewset(SerializerExtensionsAPIViewMixin, ModelViewSet):
-    serializer_class = TaskSerializer
-    extensions_query_params_enabled = False
+class TaskApiViewset(ModelViewSet):
 
-    def get_extensions_mixin_context(self):
-        context = super(TaskApiViewset, self).get_extensions_mixin_context()
-        context["expand"] = {"issue", "owner", "assigned_to"}
+    def get_serializer_class(self):
         if self.action == "list":
-            context["only"] = {
-                "id",
-                "type",
-                "name",
-                "status",
-                "is_open",
-                "is_suspended",
-                "created_at",
-                "closed_at",
-                "days_open",
-                "url",
-                "issue__id",
-                "issue__fileref",
-                "issue__topic",
-                "issue__url",
-                "owner__id",
-                "owner__full_name",
-                "owner__url",
-                "assigned_to__id",
-                "assigned_to__full_name",
-                "assigned_to__url",
-            }
-        return context
+            return TaskListSerializer
+        return TaskSerializer
 
     def get_permissions(self):
         if self.action == "list":

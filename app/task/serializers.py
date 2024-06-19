@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework_serializer_extensions.serializers import SerializerExtensionsMixin
 from django.urls import reverse
 
 from case.serializers import IssueSerializer, UserSerializer
@@ -7,28 +6,41 @@ from case.serializers.fields import LocalDateField
 from .models import Task
 
 
-class IssueExtSerializer(SerializerExtensionsMixin, IssueSerializer):
-    class Meta:
-        model = IssueSerializer.Meta.model
-        fields = IssueSerializer.Meta.fields
+class TaskListSerializer(serializers.ModelSerializer):
+    class TaskListIssueSerializer(IssueSerializer):
+        class Meta:
+            model = IssueSerializer.Meta.model
+            fields = (
+                "id",
+                "fileref",
+                "topic",
+                "url",
+            )
 
+        # Bypass the parent method as it references a field we do not include.
+        def get_fields(self, *args, **kwargs):
+            return super(IssueSerializer, self).get_fields(*args, **kwargs)
 
-class UserExtSerializer(SerializerExtensionsMixin, UserSerializer):
-    class Meta:
-        model = UserSerializer.Meta.model
-        fields = UserSerializer.Meta.fields
-        read_only_fields = UserSerializer.Meta.read_only_fields
+    class TaskListUserSerializer(UserSerializer):
+        class Meta:
+            model = UserSerializer.Meta.model
+            read_only_fields = UserSerializer.Meta.read_only_fields
+            fields = (
+                "id",
+                "full_name",
+                "url",
+            )
 
-
-class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = (
             "id",
             "type",
             "name",
-            "description",
             "status",
+            "issue",
+            "owner",
+            "assigned_to",
             "is_open",
             "is_suspended",
             "created_at",
@@ -39,22 +51,57 @@ class TaskSerializer(SerializerExtensionsMixin, serializers.ModelSerializer):
         read_only_fields = (
             "is_open",
             "is_suspended",
-            "created_at",
-            "closed_at",
-        )
-        expandable_fields = dict(
-            issue=IssueExtSerializer,
-            owner=UserExtSerializer,
-            assigned_to=UserExtSerializer,
         )
 
-    created_at = LocalDateField()
-    closed_at = LocalDateField()
+    issue = TaskListIssueSerializer(read_only=True)
+    owner = TaskListUserSerializer(read_only=True)
+    assigned_to = TaskListUserSerializer(read_only=True)
+    created_at = LocalDateField(read_only=True)
+    closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = (
+            "id",
+            "type",
+            "name",
+            "description",
+            "status",
+            "issue_id",
+            "issue",
+            "owner_id",
+            "owner",
+            "assigned_to_id",
+            "assigned_to",
+            "is_open",
+            "is_suspended",
+            "created_at",
+            "closed_at",
+            "days_open",
+            "url",
+        )
+        read_only_fields = (
+            "is_open",
+            "is_suspended",
+        )
+
+    issue_id = serializers.UUIDField(write_only=True)
+    issue = IssueSerializer(read_only=True)
+    owner_id = serializers.IntegerField(write_only=True)
+    owner = UserSerializer(read_only=True)
+    assigned_to_id = serializers.IntegerField(write_only=True)
+    assigned_to = UserSerializer(read_only=True)
+
+    created_at = LocalDateField(read_only=True)
+    closed_at = LocalDateField(read_only=True)
+    days_open = serializers.IntegerField(read_only=True)
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
