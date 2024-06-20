@@ -39,7 +39,7 @@ const App = () => {
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateTask({
       id: task.id,
-      taskCreate: { ...values, "issue_id": task.issue_id } as TaskCreate,
+      taskCreate: values as TaskCreate,
     }).unwrap()
 
   const choices = (formFields: FormField[], model: Model) =>
