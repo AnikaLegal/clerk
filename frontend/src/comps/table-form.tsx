@@ -10,9 +10,10 @@ import {
   getModelChoices,
   getModelInitialValues,
   FormField,
+  Choices,
+  Model,
 } from 'comps/auto-form'
 import { FIELD_TYPES } from './field-component'
-
 import * as Yup from 'yup'
 
 interface TableFormProps<ModelType extends { id: string | number }> {
@@ -25,9 +26,13 @@ interface TableFormProps<ModelType extends { id: string | number }> {
     id: string | number,
     values: { [fieldName: string]: unknown }
   ) => Promise<ModelType>
+  choices?: (
+    formFields: FormField[],
+    model: Model,
+  ) => Choices
 }
 
-// Wrapper around AutoForm for updating a model or displating a table.
+// Wrapper around AutoForm for updating a model or displaying a table.
 export const TableForm = <ModelType extends { id: string | number }>({
   fields,
   schema,
@@ -35,6 +40,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
   setModel,
   modelName,
   onUpdate,
+  choices = getModelChoices,
 }: TableFormProps<ModelType>) => {
   const { enqueueSnackbar } = useSnackbar()
   const [isEditMode, setEditMode] = useState(false)
@@ -42,7 +48,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
   if (!isEditMode) {
     return (
       <>
-        <FieldTable fields={fields} model={model} />
+        <FieldTable fields={fields} model={model} choices={choices(fields, model)}/>
         <Button onClick={toggleEditMode}>Edit</Button>
       </>
     )
@@ -80,7 +86,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
       {(formik) => (
         <AutoForm
           fields={fields}
-          choices={getModelChoices(fields, model)}
+          choices={choices(fields, model)}
           formik={formik}
           onCancel={toggleEditMode}
           submitText="Update"
@@ -90,7 +96,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
   )
 }
 
-const FieldTable = ({ fields, model }) => (
+const FieldTable = ({ fields, model, choices }) => (
   <Table size="small" definition>
     <Table.Body>
       {fields.map(({ label, name, type }) => (
@@ -103,7 +109,7 @@ const FieldTable = ({ fields, model }) => (
               }}
             />
           ) : (
-            <Table.Cell>{getValueDisplay(model[name])}</Table.Cell>
+            <Table.Cell>{getValueDisplay(model, name, choices)}</Table.Cell>
           )}
         </Table.Row>
       ))}
@@ -111,19 +117,24 @@ const FieldTable = ({ fields, model }) => (
   </Table>
 )
 
-const getValueDisplay = (val: any): React.ReactNode => {
-  const t = typeof val
-  if (t === 'undefined' || val === null || val === '') {
+const getValueDisplay = (model, name, choices): React.ReactNode => {
+  let value = model[name]
+  const type = typeof value
+  if (type === 'undefined' || value === null || value === '') {
     return '-'
   }
-  if (t === 'object' && val && val.choices) {
-    return val.display || '-'
+  if (type === 'object' && value && value.choices) {
+    return value.display || '-'
   }
-  if (val === false) {
+
+  const choice = choices?.[name]?.find((item) => item[0] === value)?.[1]
+  value = choice ?? value
+
+  if (value === false) {
     return 'No'
   }
-  if (val === true) {
+  if (value === true) {
     return 'Yes'
   }
-  return val
+  return value
 }

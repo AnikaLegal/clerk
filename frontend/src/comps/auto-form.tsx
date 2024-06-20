@@ -42,11 +42,11 @@ export const getFormSchema = (formFields: FormField[]) =>
     )
   )
 
-type Model = {
+export type Model = {
   [fieldName: string]: any
 }
 
-type Choices = {
+export type Choices = {
   [fieldName: string]: [string, string][]
 }
 
