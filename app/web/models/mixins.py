@@ -10,6 +10,7 @@ RICH_TEXT_FEATURES = [
     "ol",
     "ul",  # ordered / unordered lists
     "link",  # page, external and email links
+    "document-link",
 ]
 
 
