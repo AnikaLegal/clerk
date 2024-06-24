@@ -34,7 +34,7 @@ echo -e "\nDeleting all Scheduled tasks."
 SHELL_CMD="Success.objects.all().delete();\
 Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
-OrmQ.objects.all().delete();\
-./manage.py shell_plus --quiet-load -c \"${SHELL_CMD}\""
+OrmQ.objects.all().delete()"
+./manage.py shell_plus --quiet-load -c "${SHELL_CMD}"
 
 echo -e "\nDatabase restore finished."
