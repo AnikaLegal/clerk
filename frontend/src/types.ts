@@ -1,4 +1,19 @@
-import { Issue } from 'api'
+import { Dispatch, SetStateAction } from "react"
+import { Issue } from "api"
+
+export type ModelId = string | number
+export interface Model {
+  [fieldName: string]: any
+}
+export interface ModelType {
+  id: ModelId
+}
+export interface SetModel<Type extends ModelType> {
+  (ModelType): Dispatch<SetStateAction<Type>>
+}
+export interface ModelChoices {
+  [fieldName: string]: [string, string][]
+}
 
 export interface UserPermission {
   is_admin: boolean
@@ -13,3 +28,4 @@ export interface CaseDetailFormProps {
   issue: Issue
   onCancel: () => void
 }
+
