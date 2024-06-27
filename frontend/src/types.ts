@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react"
 import { Issue } from "api"
 
 export type ModelId = string | number
+
 export interface Model {
   [fieldName: string]: any
 }
@@ -11,6 +12,11 @@ export interface ModelType {
 export interface SetModel<Type extends ModelType> {
   (ModelType): Dispatch<SetStateAction<Type>>
 }
+
+export interface UpdateModel<Type extends ModelType> {
+  (id: ModelId, values: Model): Promise<Type>
+}
+
 export interface ModelChoices {
   [fieldName: string]: [string, string][]
 }
