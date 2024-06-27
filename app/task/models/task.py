@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import functions
 from django.urls import reverse
 from django.conf import settings
+from django.utils import timezone
 
 from accounts.models import User
 from core.models import TimestampedModel, Issue
@@ -109,14 +110,12 @@ class Task(TimestampedModel):
 
         # Set the closed date when the task is first closed and clear the closed
         # date if the task is reopened.
-        """
         if self.is_open:
             if self.closed_at is not None:
                 self.closed_at = None
         else:
             if self.closed_at is None:
                 self.closed_at = timezone.now()
-        """
 
         super().save(*args, **kwargs)
 
