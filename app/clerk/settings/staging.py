@@ -62,6 +62,8 @@ TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
+# Google Analytics
+GOOGLE_ANALYTICS_ID = "G-ZVV8S5CGHZ"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
