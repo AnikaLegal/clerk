@@ -166,8 +166,10 @@
                 </p>
             </div>
         </div>
-        {% get_cookie "dismiss_footer_banner" as dismiss_footer_banner %}
-        {% if not dismiss_footer_banner %}
+        {% get_cookie "dismiss_footer_banner_bonds_report" as dismiss_footer_banner %}
+        {% clerk_slugurl 'blog' as blog_url %}
+        {% with blog_url|add:'broken-bonds/' as report_url %}
+        {% if request.path != report_url and not dismiss_footer_banner %}
         <div id="footer-banner">
             <div class="footer-banner-contents">
                 <div class="footer-banner-image">
@@ -175,15 +177,17 @@
                 </div>
                 <div class="footer-banner-text">
                     <div class="footer-banner-header">
-                        Keep renters in healthy homes. Support Anika Legal before 30 June.
+                        Report: Broken Bonds - Renters tied up by unfair bond
+                        claims
                     </div>
                     <div class="footer-banner-subheading">
-                        With your support, we can provide urgent, ongoing legal assistance to Victorian renters this
-                        winter.
+                        We've delved deep into the data surrounding rental bond
+                        disputes, and their impact on Victorian renters. Read
+                        the full report today.
                     </div>
                 </div>
                 <div class="footer-banner-action">
-                    <a href="https://cold-houses.raiselysite.com/"><button>Donate now</button></a>
+                    <a href="{{ report_url }}"><button>Read the report here</button></a>
                 </div>
             </div>
             <div class="footer-banner-close">
@@ -193,6 +197,7 @@
             </div>
         </div>
         {% endif %}
+        {% endwith %}
     </footer>
     {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
@@ -203,7 +208,7 @@
     </script>
     <script>
         function dismissFooterBanner() {
-            document.cookie = "dismiss_footer_banner=true; Path=/";
+            document.cookie = "dismiss_footer_banner_bonds_report=true; max-age=604800; Path=/";
             document.getElementById("footer-banner").style.display = "none";
         }
     </script>
