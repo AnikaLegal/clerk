@@ -167,8 +167,7 @@
             </div>
         </div>
         {% get_cookie "dismiss_footer_banner_bonds_report" as dismiss_footer_banner %}
-        {% clerk_slugurl 'blog' as blog_url %}
-        {% with blog_url|add:'broken-bonds/' as report_url %}
+        {% slugurl 'broken-bonds' as report_url %}
         {% if request.path != report_url and not dismiss_footer_banner %}
         <div id="footer-banner">
             <div class="footer-banner-contents">
@@ -197,7 +196,6 @@
             </div>
         </div>
         {% endif %}
-        {% endwith %}
     </footer>
     {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
