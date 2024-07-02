@@ -1,5 +1,6 @@
 {% extends "web/_base.html" %}
 {% load static %}
+{% load wagtailcore_tags %}
 {% block title %}Reports{% endblock %}
 {% block social_meta %}
 {% include 'web/snippets/_social_meta.html' with title="Reports" description="Anika Legal is an independent legal practice, tax-deductible charity & social enterprise. Our Annual, Financial and Impact Reports outline the work we do." %}
@@ -14,11 +15,12 @@
             <div class="content">
                 <h1>Reports</h1>
                 <p style="max-width: 530px">
-                    Anika Legal is an independent legal practice, tax-deductible charity & social enterprise.
-                    Our Annual, Financial and Impact Reports outline the work we do.
+                    Anika Legal is an independent legal practice, tax-deductible
+                    charity & social enterprise.  Our Annual, Financial and
+                    Impact Reports outline the work we do.
                 </p>
-                <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.pdf' %}">
-                    <button>Latest annual report</button>
+                <a href="{% slugurl 'broken-bonds' %}">
+                    <button>Read our Broken Bonds report</button>
                 </a>
             </div>
             <img class="round not-responsive top-left top-right bottom-left"
@@ -34,6 +36,19 @@
         </h2>
         <div class="divider"></div>
         <div class="link-list two">
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>
+                    Broken Bonds
+                </h2>
+                <p>
+                    Our Broken Bonds report explores the experiences of renters
+                    facing unfair bond claims.
+                </p>
+                <a href="{% slugurl 'broken-bonds' %}">
+                    <button>View</button>
+                </a>
+            </div>
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>
