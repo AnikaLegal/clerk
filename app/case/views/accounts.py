@@ -3,7 +3,7 @@ from typing import Optional
 
 from django.http import Http404
 from django.contrib.auth.models import Group
-from django.db.models import Q
+from django.db.models import QuerySet, Q
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -21,6 +21,7 @@ from case.views.auth import (
     CoordinatorOrBetterPermission,
 )
 from case.serializers import (
+    AccountSearchSerializer,
     UserSerializer,
     UserCreateSerializer,
     IssueSerializer,
@@ -87,23 +88,36 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     permission_classes = [CoordinatorOrBetterPermission]
 
     def get_queryset(self):
-        """Filter by query params"""
         queryset = (
             User.objects.prefetch_related("groups").order_by("-date_joined").all()
         )
-        name = self.request.query_params.get("name")
-        group = self.request.query_params.get("group")
 
-        query = None
-        if name:
-            query = Q(first_name__icontains=name) | Q(last_name__icontains=name)
+        if self.action == "list":
+            queryset = self.search_queryset(queryset)
 
-        if group:
-            group_query = Q(groups__name=group)
-            query = (query & group_query) if query else group_query
+        return queryset
 
-        if query:
-            queryset = queryset.filter(query)
+    def search_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
+        """
+        Filter queryset by search terms in query params
+        """
+        search_query_serializer = AccountSearchSerializer(
+            data=self.request.query_params, partial=True
+        )
+        search_query_serializer.is_valid(raise_exception=True)
+        search_query = search_query_serializer.validated_data
+
+        for key, value in search_query.items():
+            if value is not None:
+                if key == "name":
+                    queryset = queryset.filter(
+                        Q(first_name__icontains=value) | Q(last_name__icontains=value)
+                    )
+                elif key == "group":
+                    queryset = queryset.filter(groups__name=value)
+                else:
+                    # Apply basic field filtering
+                    queryset = queryset.filter(**{key: value})
 
         return queryset
 

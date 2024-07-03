@@ -1,3 +1,4 @@
+from .account import AccountSearchSerializer
 from .client import ClientSerializer
 from .email import (
     EmailTemplateSerializer,
