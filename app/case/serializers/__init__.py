@@ -1,4 +1,4 @@
-from .account import AccountSearchSerializer
+from .account import AccountSearchSerializer, AccountSortSerializer
 from .client import ClientSerializer
 from .email import (
     EmailTemplateSerializer,

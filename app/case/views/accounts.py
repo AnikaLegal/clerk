@@ -22,6 +22,7 @@ from case.views.auth import (
 )
 from case.serializers import (
     AccountSearchSerializer,
+    AccountSortSerializer,
     UserSerializer,
     UserCreateSerializer,
     IssueSerializer,
@@ -88,14 +89,21 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     permission_classes = [CoordinatorOrBetterPermission]
 
     def get_queryset(self):
-        queryset = (
-            User.objects.prefetch_related("groups").order_by("-date_joined").all()
-        )
+        queryset = User.objects.prefetch_related("groups").all()
 
         if self.action == "list":
+            queryset = self.sort_queryset(queryset)
             queryset = self.search_queryset(queryset)
 
         return queryset
+
+    def sort_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
+        serializer = AccountSortSerializer(
+            data=self.request.query_params, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        sort = serializer.validated_data.get("sort", ["-date_joined"])
+        return queryset.order_by(*sort)
 
     def search_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
         """
