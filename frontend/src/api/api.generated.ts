@@ -168,7 +168,12 @@ const injectedRtkApi = api.injectEndpoints({
     getUsers: build.query<GetUsersApiResponse, GetUsersApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/account/`,
-        params: { name: queryArg.name, group: queryArg.group },
+        params: {
+          name: queryArg.name,
+          group: queryArg.group,
+          is_active: queryArg.isActive,
+          sort: queryArg.sort,
+        },
       }),
     }),
     createUser: build.mutation<CreateUserApiResponse, CreateUserApiArg>({
@@ -572,6 +577,18 @@ export type GetUsersApiResponse = /** status 200 Successful response. */ User[]
 export type GetUsersApiArg = {
   name?: string
   group?: string
+  isActive?: boolean
+  sort?:
+    | 'case_capacity'
+    | '-case_capacity'
+    | 'date_joined'
+    | '-date_joined'
+    | 'email'
+    | '-email'
+    | 'first_name'
+    | '-first_name'
+    | 'last_name'
+    | '-last_name'
 }
 export type CreateUserApiResponse = /** status 201 Successful response. */ User
 export type CreateUserApiArg = {
