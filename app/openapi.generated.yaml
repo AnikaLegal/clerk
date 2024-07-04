@@ -649,6 +649,27 @@ paths:
           schema:
             type: string
           required: false
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+          required: false
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - case_capacity
+              - "-case_capacity"
+              - date_joined
+              - "-date_joined"
+              - email
+              - "-email"
+              - first_name
+              - "-first_name"
+              - last_name
+              - "-last_name"
+          required: false
       responses:
         "200":
           description: Successful response.
