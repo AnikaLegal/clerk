@@ -64,7 +64,7 @@ GENERIC_API_TEST_CASES = [
     APIViewTestCase(
         factory=UserFactory,
         base_view_name="account-api",
-        test_read_permission=lambda user: user.is_coordinator_or_better,
+        test_read_permission=lambda user: user.is_paralegal_or_better,
         test_write_permissions=lambda user: user.is_coordinator_or_better,
         actions=[Action.LIST, Action.UPDATE],  # Create tested elsewhere.
     ),

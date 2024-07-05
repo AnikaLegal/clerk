@@ -4,8 +4,57 @@ from rest_framework.test import APIClient
 from rest_framework.reverse import reverse
 
 from accounts.models import User
-from core.factories import UserFactory
+from core.factories import UserFactory, IssueFactory
 from microsoft.service import MicrosoftUserPermissions
+
+
+@pytest.mark.django_db
+def test_account_details_view__as_paralegal(
+    paralegal_user_client: APIClient,
+):
+    """
+    Paralegal users can only view their own details page.
+    """
+    assert User.objects.count() == 1
+    user = User.objects.first()
+
+    url = reverse("account-detail", kwargs=dict(pk=user.pk))
+    response = paralegal_user_client.get(url)
+    assert response.status_code == 200
+
+    user = UserFactory()
+    assert User.objects.count() == 2
+
+    url = reverse("account-detail", kwargs=dict(pk=user.pk))
+    response = paralegal_user_client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_account_list_view__as_paralegal(
+    paralegal_user_client: APIClient,
+):
+    """
+    Paralegal users can only list their own account and the accounts of lawyers
+    supervising cases that they are assigned to.
+    """
+    assert User.objects.count() == 1
+    user = User.objects.first()
+
+    issue = IssueFactory(paralegal=user, lawyer=UserFactory())
+    IssueFactory(paralegal=UserFactory(), lawyer=issue.lawyer)
+    IssueFactory(paralegal=UserFactory(), lawyer=UserFactory())
+    UserFactory() # Another user not related to any cases.
+
+    assert User.objects.count() == 6
+
+    url = reverse("account-api-list")
+    response = paralegal_user_client.get(url)
+    body = response.json()
+
+    assert response.status_code == 200
+    assert len(body) == 2
+    assert {user.id, issue.lawyer.id} == {body[0]["id"], body[1]["id"]}
 
 
 @pytest.mark.django_db

@@ -1,9 +1,9 @@
 import logging
 from typing import Optional
 
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.contrib.auth.models import Group
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet, Q, Subquery
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -13,11 +13,12 @@ from django_q.tasks import async_task
 from django.core.exceptions import PermissionDenied
 
 from accounts.models import User, CaseGroups
+from core.models import Issue
 from case.utils.react import render_react_page
-from accounts.models import User
 from case.views.auth import (
     paralegal_or_better_required,
     coordinator_or_better_required,
+    ParalegalOrBetterObjectPermission,
     CoordinatorOrBetterPermission,
 )
 from case.serializers import (
@@ -46,8 +47,12 @@ def account_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@paralegal_or_better_required
 def account_detail_page_view(request, pk):
+    # Paralegals can only retrieve their own details page.
+    if request.user.is_paralegal and str(request.user.id) != pk:
+        raise PermissionDenied
+
     try:
         user = (
             User.objects.prefetch_related(
@@ -86,14 +91,36 @@ def account_create_page_view(request):
 
 class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     serializer_class = UserSerializer
-    permission_classes = [CoordinatorOrBetterPermission]
+
+    def get_permissions(self):
+        if self.action == "list":
+            permission_classes = [ParalegalOrBetterObjectPermission]
+        else:
+            permission_classes = [CoordinatorOrBetterPermission]
+
+        return [p() for p in permission_classes]
 
     def get_queryset(self):
-        queryset = User.objects.prefetch_related("groups").all()
+        user = self.request.user
+
+        queryset = User.objects.all()
+        queryset = queryset.prefetch_related("groups")
 
         if self.action == "list":
             queryset = self.sort_queryset(queryset)
             queryset = self.search_queryset(queryset)
+
+        if user.is_paralegal:
+            # Paralegals can access their own account.
+            query = Q(id=user.id)
+
+            # Paralegals can access the accounts of the lawyers that are
+            # supervising cases they are assigned to.
+            sub_query = Issue.objects.filter(paralegal=user).only("id")
+            query |= Q(lawyer_issue__in=Subquery(sub_query))
+
+            # Distinct required here because of the subquery above.
+            queryset = queryset.filter(query).distinct()
 
         return queryset
 
