@@ -69,6 +69,13 @@ def user_client(user: User) -> APIClient:
 
 
 @pytest.fixture
+def paralegal_user_client(user: User, paralegal_group) -> APIClient:
+    user.groups.set([paralegal_group])
+    annotate_group_access(user)
+    return _login_user(user)
+
+
+@pytest.fixture
 def superuser_client(superuser: User) -> APIClient:
     annotate_group_access(superuser)
     return _login_user(superuser)
