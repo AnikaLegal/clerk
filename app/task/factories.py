@@ -43,7 +43,9 @@ class TaskFactory(TimestampedModelFactory):
 
     type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
     name = factory.Faker("text", max_nb_chars=45)
-    description = factory.Faker("paragraph")
+    description = "\n\n".join(
+        [fake.text(max_nb_chars=randint(100, 200)) for _ in range(randint(2, 5))]
+    )
     status = factory.Faker(
         "random_element", elements=[c[0] for c in TaskStatus.choices]
     )
@@ -51,7 +53,7 @@ class TaskFactory(TimestampedModelFactory):
     owner = factory.SubFactory(UserFactory)
     assigned_to = factory.SelfAttribute("owner")
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-3M"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M"
     )
     is_open = factory.LazyAttribute(
         lambda self: self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
