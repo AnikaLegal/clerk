@@ -96,7 +96,7 @@ export const TableForm = <ModelType extends { id: string | number }>({
   )
 }
 
-const FieldTable = ({ fields, model, choices }) => (
+export const FieldTable = ({ fields, model, choices }) => (
   <Table size="small" definition>
     <Table.Body>
       {fields.map(({ label, name, type }) => (

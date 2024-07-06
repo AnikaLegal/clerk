@@ -4,8 +4,8 @@ import moment from 'moment'
 import * as Yup from 'yup'
 
 import { TimelineNote } from 'comps/timeline-item'
-import { TableForm } from 'comps/table-form'
-import { getFormSchema, FormField } from 'comps/auto-form'
+import { TableForm, FieldTable } from 'comps/table-form'
+import { getFormSchema, getModelChoices, FormField } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { AccountPermissions } from 'comps/account-permissions'
@@ -14,6 +14,7 @@ import { FIELD_TYPES } from 'comps/field-component'
 import { User, UserCreate, useUpdateUserMutation } from 'api'
 
 interface DjangoContext {
+  user: User
   account: User
   issue_set: any[]
   lawyer_issues: any[]
@@ -91,14 +92,19 @@ const App = () => {
         <Header.Subheader>{account.email}</Header.Subheader>
       </Header>
       <Header as="h3">User details</Header>
-      <TableForm
-        fields={FIELDS}
-        schema={SCHEMA}
-        model={account}
-        setModel={setAccount}
-        modelName="account"
-        onUpdate={update}
-      />
+
+      {CONTEXT.user.is_coordinator_or_better ? (
+        <TableForm
+          fields={FIELDS}
+          schema={SCHEMA}
+          model={account}
+          setModel={setAccount}
+          modelName="account"
+          onUpdate={update}
+        />
+      ) : (
+        <FieldTable fields={FIELDS} model={account} choices={getModelChoices(FIELDS, account)} />
+      )}
 
       <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
     </Container>
