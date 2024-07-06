@@ -66,10 +66,8 @@ const App = () => {
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
-  const userResults = api.useGetUsersQuery({})
-  const users = [
-    ...(userResults.data ?? [])
-  ].sort((a, b) => (a.email > b.email) ? 1 : -1)
+  const userResults = api.useGetUsersQuery({isActive: true, sort: "email"})
+  const users = userResults.data ?? []
 
   return (
     <Container>
