@@ -35,26 +35,21 @@ def test_account_list_view__as_paralegal(
     paralegal_user_client: APIClient,
 ):
     """
-    Paralegal users can only list their own account and the accounts of lawyers
-    supervising cases that they are assigned to.
+    Paralegal users can only list their own account.
     """
     assert User.objects.count() == 1
     user = User.objects.first()
+    UserFactory()
 
-    issue = IssueFactory(paralegal=user, lawyer=UserFactory())
-    IssueFactory(paralegal=UserFactory(), lawyer=issue.lawyer)
-    IssueFactory(paralegal=UserFactory(), lawyer=UserFactory())
-    UserFactory() # Another user not related to any cases.
-
-    assert User.objects.count() == 6
+    assert User.objects.count() == 2
 
     url = reverse("account-api-list")
     response = paralegal_user_client.get(url)
     body = response.json()
 
     assert response.status_code == 200
-    assert len(body) == 2
-    assert {user.id, issue.lawyer.id} == {body[0]["id"], body[1]["id"]}
+    assert len(body) == 1
+    assert body[0]["id"] == user.id
 
 
 @pytest.mark.django_db
@@ -115,6 +110,35 @@ def test_get_account_permissions_view(
         "paralegal_perm_issues": [],
         "paralegal_perm_missing_issues": [],
     }
+
+
+@pytest.mark.django_db
+@patch("case.views.accounts.get_user_permissions")
+def test_get_account_permissions_view__as_paralegal(
+    mock_get_user_permissions, paralegal_user_client: APIClient
+):
+    assert User.objects.count() == 1
+    user = User.objects.first()
+
+    url = reverse("account-api-perms", args=(user.pk,))
+    mock_get_user_permissions.return_value = MicrosoftUserPermissions(
+        has_coordinator_perms=False,
+        paralegal_perm_issues=[],
+        paralegal_perm_missing_issues=[],
+    )
+
+    response = paralegal_user_client.get(url)
+    assert response.status_code == 200
+    assert response.json() == {
+        "has_coordinator_perms": False,
+        "paralegal_perm_issues": [],
+        "paralegal_perm_missing_issues": [],
+    }
+
+    user = UserFactory()
+    url = reverse("account-api-perms", args=(user.pk,))
+    response = paralegal_user_client.get(url)
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

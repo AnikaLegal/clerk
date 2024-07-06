@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericRelation
+from typing_extensions import Self
 
 
 class CaseGroups:
@@ -20,6 +21,7 @@ class University(models.Model):
     """
     The university/tertiary institution that a paralegal is associated with.
     """
+
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
@@ -38,7 +40,9 @@ class User(AbstractUser):
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)
     ms_account_created_at = models.DateTimeField(blank=True, null=True)
-    university = models.ForeignKey(University, blank=True, null=True, on_delete=models.PROTECT)
+    university = models.ForeignKey(
+        University, blank=True, null=True, on_delete=models.PROTECT
+    )
 
     def save(self, *args, **kwargs):
         # Ensure email always lowercase
@@ -46,6 +50,12 @@ class User(AbstractUser):
             self.email = self.email.lower()
 
         return super().save(*args, **kwargs)
+
+    def check_permission(self, user: Self) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return (user.is_coordinator_or_better or self.id == user.id)
 
     def __str__(self):
         return self.email
