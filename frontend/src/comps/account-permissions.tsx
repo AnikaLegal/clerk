@@ -39,6 +39,7 @@ export const AccountPermissions: React.FC<AccountPermissionsProps> = ({
         setPerms(perms)
         setIsLoading(false)
       })
+      .catch(() => setIsLoading(false))
   }, [])
   return (
     <>
