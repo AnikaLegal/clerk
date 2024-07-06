@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from "react"
-import { Container, Header, Grid, Divider, Segment, Rail, Form, Button, Dropdown } from "semantic-ui-react"
+import React, { useState, useMemo, useEffect } from "react"
+import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown } from "semantic-ui-react"
 
-import api, { Task, TaskCreate } from "api"
+import api, { Task, TaskCreate, User } from "api"
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
 
 import { ModelId, ModelType, Model, SetModel, UpdateModel, ModelChoices } from "types"
@@ -19,6 +19,7 @@ interface DjangoContext {
   }
   task_pk: string
   list_url: string
+  user: User
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
@@ -27,11 +28,11 @@ const App = () => {
   if (taskResult.isLoading)
     return null
   return (
-    <TaskDetails data={taskResult.data} choices={CONTEXT.choices} />
+    <TaskDetail data={taskResult.data} choices={CONTEXT.choices} perms={CONTEXT.user} />
   )
 }
 
-export const TaskDetails = ({ data, choices }: { data: Task, choices: ModelChoices }) => {
+export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: ModelChoices, perms: User }) => {
   const [task, setTask] = useState<Task>(data)
   const [updateTask] = api.useUpdateTaskMutation()
 
@@ -44,10 +45,14 @@ export const TaskDetails = ({ data, choices }: { data: Task, choices: ModelChoic
   return (
     <Container>
       <Segment basic>
-        <TaskBody task={task} setTask={setTask} update={update} choices={choices} />
-        <TaskRail task={task} setTask={setTask} update={update} choices={choices} />
-        <Divider />
+        <TaskBody task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+        <TaskRail task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
         {/* 
+          <Divider />
+          <TaskAttachments />
+        */}
+        {/* 
+          <Divider />
           <TaskComments />
         */}
       </Segment>
@@ -66,10 +71,11 @@ interface TaskProps<Type extends ModelType> {
   task: Type,
   setTask: SetModel<Type>,
   update: UpdateModel<Type>,
-  choices: ModelChoices
+  choices: ModelChoices,
+  perms: User,
 }
 
-export const TaskBody = ({ task, setTask, update, choices }: TaskProps<Task>) => {
+export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
 
@@ -88,11 +94,13 @@ export const TaskBody = ({ task, setTask, update, choices }: TaskProps<Task>) =>
               </Header.Subheader>
             </Header>
           </Grid.Column>
-          <Grid.Column style={{ width: "auto" }}>
-            <Button onClick={toggleEditMode}>
-              Edit
-            </Button>
-          </Grid.Column>
+          {perms.is_coordinator_or_better &&
+            <Grid.Column style={{ width: "auto" }}>
+              <Button onClick={toggleEditMode}>
+                Edit
+              </Button>
+            </Grid.Column>
+          }
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
@@ -167,9 +175,29 @@ export const TaskBody = ({ task, setTask, update, choices }: TaskProps<Task>) =>
   )
 }
 
-export const TaskRail = ({ task, setTask, update, choices }: TaskProps<Task>) => {
+export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
+  const [getUsers] = api.useLazyGetUsersQuery()
+  const [isUsersLoading, setIsUsersLoading] = useState(false)
+  const [userOptions, setUserOptions] = useState([])
+
   const statusOptions = useMemo(() => choiceToOptions(choices.status), [])
   const { enqueueSnackbar } = useSnackbar()
+
+  useEffect(() => {
+    setIsUsersLoading(true)
+    getUsers({})
+      .unwrap()
+      .then((users) => {
+        setUserOptions(users.filter(x => x.is_active)
+          .sort((a, b) => (a.email > b.email) ? 1 : -1).map((u) => ({
+            key: u.id,
+            value: u.id,
+            text: u.email,
+          })))
+        setIsUsersLoading(false)
+      })
+      .catch(() => setIsUsersLoading(false))
+  }, [])
 
   const handleChange = (name: string, value: string) => {
     update(task.id, { [name]: value })
@@ -191,6 +219,12 @@ export const TaskRail = ({ task, setTask, update, choices }: TaskProps<Task>) =>
     <Rail attached dividing position="right">
       <Segment basic>
         <Grid>
+          <Grid.Row columns={1}>
+            <Grid.Column>
+              <Header sub>Fileref</Header>
+              <a href={task.issue.url}>{task.issue.fileref}</a>
+            </Grid.Column>
+          </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Status</Header>
@@ -205,12 +239,6 @@ export const TaskRail = ({ task, setTask, update, choices }: TaskProps<Task>) =>
               {task.days_open}
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row columns={1}>
-            <Grid.Column>
-              <Header sub>Fileref</Header>
-              <a href={task.issue.url}>{task.issue.fileref}</a>
-            </Grid.Column>
-          </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Date Created</Header>
@@ -221,14 +249,36 @@ export const TaskRail = ({ task, setTask, update, choices }: TaskProps<Task>) =>
               {task.closed_at || "-"}
             </Grid.Column>
           </Grid.Row>
-          <Grid.Row columns={2}>
+          <Grid.Row columns={1}>
             <Grid.Column>
               <Header sub>Assigned To</Header>
-              <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
+              <Dropdown
+                fluid
+                selection
+                search
+                disabled={!perms.is_paralegal_or_better}
+                selectOnNavigation={false}
+                loading={isUsersLoading}
+                value={task.assigned_to.id}
+                options={userOptions}
+                onChange={(e, { value }) => handleChange("assigned_to_id", value)}
+              />
             </Grid.Column>
+          </Grid.Row>
+          <Grid.Row columns={1}>
             <Grid.Column>
               <Header sub>Owner</Header>
-              <a href={task.owner.url}>{task.owner.full_name}</a>
+              <Dropdown
+                fluid
+                selection
+                search
+                disabled={!perms.is_coordinator_or_better}
+                selectOnNavigation={false}
+                loading={isUsersLoading}
+                value={task.owner.id}
+                options={userOptions}
+                onChange={(e, { value }) => handleChange("owner_id", value)}
+              />
             </Grid.Column>
           </Grid.Row>
         </Grid>
