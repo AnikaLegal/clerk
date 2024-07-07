@@ -14,7 +14,7 @@ interface DjangoContext {
     status: [string, string][]
     type: [string, string][]
   }
-  task_pk: string
+  task_pk: number
   list_url: string
   user: User
 }
@@ -196,7 +196,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
       .catch(() => setIsUsersLoading(false))
   }, [])
 
-  const handleChange = (name: string, value: string) => {
+  const handleChange = (name: string, value: any) => {
     update(task.id, { [name]: value })
       .then((instance) => {
         enqueueSnackbar(`Updated task`, { variant: 'success' })
