@@ -1,13 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react"
-import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown } from "semantic-ui-react"
-
 import api, { Task, TaskCreate, User } from "api"
+import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card } from "semantic-ui-react"
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
-
 import { ModelId, ModelType, Model, SetModel, UpdateModel, ModelChoices } from "types"
 import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
 import { FIELD_TYPES } from "comps/field-component"
-
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from "yup"
@@ -217,72 +214,91 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
 
   return (
     <Rail attached dividing position="right">
-      <Segment basic>
-        <Grid>
-          <Grid.Row columns={1}>
-            <Grid.Column>
-              <Header sub>Fileref</Header>
-              <a href={task.issue.url}>{task.issue.fileref}</a>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={2}>
-            <Grid.Column>
-              <Header sub>Status</Header>
-              <Dropdown
-                value={task.status}
-                options={statusOptions}
-                onChange={(e, { value }) => handleChange("status", value)}
-              />
-            </Grid.Column>
-            <Grid.Column>
-              <Header sub>Days Open</Header>
-              {task.days_open}
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={2}>
-            <Grid.Column>
-              <Header sub>Date Created</Header>
-              {task.created_at}
-            </Grid.Column>
-            <Grid.Column>
-              <Header sub>Date Closed</Header>
-              {task.closed_at || "-"}
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={1}>
-            <Grid.Column>
-              <Header sub>Assigned To</Header>
-              <Dropdown
-                fluid
-                selection
-                search
-                disabled={!perms.is_paralegal_or_better}
-                selectOnNavigation={false}
-                loading={isUsersLoading}
-                value={task.assigned_to.id}
-                options={userOptions}
-                onChange={(e, { value }) => handleChange("assigned_to_id", value)}
-              />
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={1}>
-            <Grid.Column>
-              <Header sub>Owner</Header>
-              <Dropdown
-                fluid
-                selection
-                search
-                disabled={!perms.is_coordinator_or_better}
-                selectOnNavigation={false}
-                loading={isUsersLoading}
-                value={task.owner.id}
-                options={userOptions}
-                onChange={(e, { value }) => handleChange("owner_id", value)}
-              />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Card fluid>
+        <Card.Content>
+          <Grid>
+            <Grid.Row columns={2}>
+              <Grid.Column>
+                <Header sub>Status</Header>
+                <Dropdown
+                  value={task.status}
+                  options={statusOptions}
+                  onChange={(e, { value }) => handleChange("status", value)}
+                />
+              </Grid.Column>
+              <Grid.Column>
+                <Header sub>Days Open</Header>
+                {task.days_open}
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row columns={2}>
+              <Grid.Column>
+                <Header sub>Date Created</Header>
+                {task.created_at}
+              </Grid.Column>
+              <Grid.Column>
+                <Header sub>Date Closed</Header>
+                {task.closed_at || "-"}
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row columns={1}>
+              <Grid.Column>
+                <Header sub>Assigned To</Header>
+                <Dropdown
+                  search
+                  disabled={!perms.is_paralegal_or_better}
+                  selectOnNavigation={false}
+                  loading={isUsersLoading}
+                  value={task.assigned_to.id}
+                  options={userOptions}
+                  onChange={(e, { value }) => handleChange("assigned_to_id", value)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row columns={1}>
+              <Grid.Column>
+                <Header sub>Owner</Header>
+                <Dropdown
+                  search
+                  disabled={!perms.is_coordinator_or_better}
+                  selectOnNavigation={false}
+                  loading={isUsersLoading}
+                  value={task.owner.id}
+                  options={userOptions}
+                  onChange={(e, { value }) => handleChange("owner_id", value)}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Card.Content>
+      </Card>
+      <Card fluid>
+        <Card.Content header='Case' />
+        <Card.Content>
+          <Grid>
+            <Grid.Row columns={2}>
+              <Grid.Column>
+                <Header sub>Fileref</Header>
+                <a href={task.issue.url}>{task.issue.fileref}</a>
+              </Grid.Column>
+              <Grid.Column>
+                <Header sub>Topic</Header>
+                {task.issue.topic_display}
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row columns={2}>
+              <Grid.Column>
+                <Header sub>Assigned to</Header>
+                <a href={task.issue.paralegal.url}>{task.issue.paralegal.full_name}</a>
+              </Grid.Column>
+              <Grid.Column>
+                <Header sub>Supervised by</Header>
+                <a href={task.issue.lawyer.url}>{task.issue.lawyer.full_name}</a>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Card.Content>
+      </Card>
     </Rail>
   )
 }
