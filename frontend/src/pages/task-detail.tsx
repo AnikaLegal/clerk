@@ -173,24 +173,19 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
 }
 
 export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
-  const [getUsers] = api.useLazyGetUsersQuery()
+  const [users, setUsers] = useState([])
   const [isUsersLoading, setIsUsersLoading] = useState(false)
-  const [userOptions, setUserOptions] = useState([])
+  const [getUsers] = api.useLazyGetUsersQuery()
 
   const statusOptions = useMemo(() => choiceToOptions(choices.status), [])
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     setIsUsersLoading(true)
-    getUsers({})
+    getUsers({ isActive: true, sort: "email" })
       .unwrap()
       .then((users) => {
-        setUserOptions(users.filter(x => x.is_active)
-          .sort((a, b) => (a.email > b.email) ? 1 : -1).map((u) => ({
-            key: u.id,
-            value: u.id,
-            text: u.email,
-          })))
+        setUsers(users)
         setIsUsersLoading(false)
       })
       .catch(() => setIsUsersLoading(false))
@@ -250,7 +245,11 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                   selectOnNavigation={false}
                   loading={isUsersLoading}
                   value={task.assigned_to.id}
-                  options={userOptions}
+                  options={users.map((u) => ({
+                    key: u.id,
+                    value: u.id,
+                    text: u.email,
+                  }))}
                   onChange={(e, { value }) => handleChange("assigned_to_id", value)}
                 />
               </Grid.Column>
@@ -264,7 +263,11 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                   selectOnNavigation={false}
                   loading={isUsersLoading}
                   value={task.owner.id}
-                  options={userOptions}
+                  options={users.map((u) => ({
+                    key: u.id,
+                    value: u.id,
+                    text: u.email,
+                  }))}
                   onChange={(e, { value }) => handleChange("owner_id", value)}
                 />
               </Grid.Column>
