@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react"
-import api, { Task, TaskCreate, User } from "api"
+import api, { Task, TaskCreate } from "api"
 import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card } from "semantic-ui-react"
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
-import { ModelId, ModelType, Model, SetModel, UpdateModel, ModelChoices } from "types"
+import { ModelType, Model, SetModel, UpdateModel, ModelChoices, UserPermission } from "types"
 import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
 import { FIELD_TYPES } from "comps/field-component"
 import { CaseSummaryCard } from "comps/case-summary-card"
@@ -17,7 +17,7 @@ interface DjangoContext {
   }
   task_pk: number
   list_url: string
-  user: User
+  user: UserPermission
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
@@ -30,11 +30,11 @@ const App = () => {
   )
 }
 
-export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: ModelChoices, perms: User }) => {
+export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: ModelChoices, perms: UserPermission }) => {
   const [task, setTask] = useState<Task>(data)
   const [updateTask] = api.useUpdateTaskMutation()
 
-  const update = (id: ModelId, values: Model) =>
+  const update = (values: Model) =>
     updateTask({
       id: task.id,
       taskCreate: values as TaskCreate,
@@ -70,7 +70,7 @@ interface TaskProps<Type extends ModelType> {
   setTask: SetModel<Type>,
   update: UpdateModel<Type>,
   choices: ModelChoices,
-  perms: User,
+  perms: UserPermission,
 }
 
 export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
@@ -114,7 +114,7 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   }
 
   const submit = (values: Model, { setSubmitting, setErrors }: any) => {
-    update(task.id, values)
+    update(values)
       .then((instance) => {
         enqueueSnackbar(`Updated task`, { variant: 'success' })
         setTask(instance)
@@ -193,7 +193,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   }, [])
 
   const handleChange = (name: string, value: any) => {
-    update(task.id, { [name]: value })
+    update({ [name]: value })
       .then((instance) => {
         enqueueSnackbar(`Updated task`, { variant: 'success' })
         setTask(instance)
@@ -209,7 +209,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   }
 
   return (
-    <Rail attached dividing position="right">
+    <Rail attached position="right">
       <Card fluid>
         <Card.Content>
           <Grid>
