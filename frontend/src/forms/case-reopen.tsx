@@ -45,7 +45,7 @@ export const ReopenForm: React.FC<CaseDetailFormProps> = ({
       .then(() => {
         setSubmitting(false)
         setSuccess(true)
-        enqueueSnackbar('Case re-open succeess', { variant: 'success' })
+        enqueueSnackbar('Case re-open success', { variant: 'success' })
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Case re-open failed'), {
