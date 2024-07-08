@@ -1,14 +1,14 @@
-import React, { useState, useMemo, useEffect } from "react"
-import api, { Task, TaskCreate } from "api"
-import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card } from "semantic-ui-react"
+import React, { useState, useMemo, useEffect } from 'react'
+import api, { Task, TaskCreate } from 'api'
+import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
-import { ModelType, Model, SetModel, UpdateModel, ModelChoices, UserPermission } from "types"
+import { ModelType, Model, SetModel, UpdateModel, ModelChoices, UserPermission } from 'types'
 import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
-import { FIELD_TYPES } from "comps/field-component"
-import { CaseSummaryCard } from "comps/case-summary-card"
+import { FIELD_TYPES } from 'comps/field-component'
+import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
-import * as Yup from "yup"
+import * as Yup from 'yup'
 
 interface DjangoContext {
   choices: {
@@ -84,8 +84,8 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
     return (
       <Grid>
         <Grid.Row>
-          <Grid.Column style={{ flexGrow: "1" }}>
-            <Header as="h1">
+          <Grid.Column style={{ flexGrow: '1' }}>
+            <Header as='h1'>
               {task.name}
               <Header.Subheader>
                 {typeLabels.get(task.type)}
@@ -93,7 +93,7 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
             </Header>
           </Grid.Column>
           {perms.is_coordinator_or_better &&
-            <Grid.Column style={{ width: "auto" }}>
+            <Grid.Column style={{ width: 'auto' }}>
               <Button onClick={toggleEditMode}>
                 Edit
               </Button>
@@ -138,21 +138,21 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
 
   const fields = [
     {
-      label: "Name",
-      schema: Yup.string().required("Required"),
+      label: 'Name',
+      schema: Yup.string().required('Required'),
       type: FIELD_TYPES.TEXT,
-      name: "name",
+      name: 'name',
     },
     {
-      label: "Type",
-      schema: Yup.string().required("Required"),
+      label: 'Type',
+      schema: Yup.string().required('Required'),
       type: FIELD_TYPES.SINGLE_CHOICE,
-      name: "type",
+      name: 'type',
     },
     {
-      label: "Description",
+      label: 'Description',
       type: FIELD_TYPES.TEXTAREA,
-      name: "description",
+      name: 'description',
     },
   ]
   const schema = getFormSchema(fields)
@@ -166,7 +166,7 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
           choices={choices}
           formik={formik}
           onCancel={toggleEditMode}
-          submitText="Update"
+          submitText='Update'
         />
       )}
     </Formik>
@@ -183,7 +183,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
 
   useEffect(() => {
     setIsUsersLoading(true)
-    getUsers({ isActive: true, sort: "email" })
+    getUsers({ isActive: true, sort: 'email' })
       .unwrap()
       .then((users) => {
         setUsers(users)
@@ -209,7 +209,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   }
 
   return (
-    <Rail attached position="right">
+    <Rail attached position='right'>
       <Card fluid>
         <Card.Content>
           <Grid>
@@ -219,7 +219,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                 <Dropdown
                   value={task.status}
                   options={statusOptions}
-                  onChange={(e, { value }) => handleChange("status", value)}
+                  onChange={(e, { value }) => handleChange('status', value)}
                 />
               </Grid.Column>
               <Grid.Column>
@@ -234,7 +234,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
               </Grid.Column>
               <Grid.Column>
                 <Header sub>Date Closed</Header>
-                {task.closed_at || "-"}
+                {task.closed_at || '-'}
               </Grid.Column>
             </Grid.Row>
             <Grid.Row columns={1}>
@@ -251,7 +251,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                     value: u.id,
                     text: u.email,
                   }))}
-                  onChange={(e, { value }) => handleChange("assigned_to_id", value)}
+                  onChange={(e, { value }) => handleChange('assigned_to_id', value)}
                 />
               </Grid.Column>
             </Grid.Row>
@@ -269,7 +269,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                     value: u.id,
                     text: u.email,
                   }))}
-                  onChange={(e, { value }) => handleChange("owner_id", value)}
+                  onChange={(e, { value }) => handleChange('owner_id', value)}
                 />
               </Grid.Column>
             </Grid.Row>
