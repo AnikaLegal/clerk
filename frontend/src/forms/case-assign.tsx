@@ -40,7 +40,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
       .then(() => {
         setSubmitting(false)
         setSuccess(true)
-        enqueueSnackbar('Assignment succeess', { variant: 'success' })
+        enqueueSnackbar('Assignment success', { variant: 'success' })
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Assignment failed'), {

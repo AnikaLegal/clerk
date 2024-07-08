@@ -47,7 +47,7 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
       .then(() => {
         setSubmitting(false)
         setSuccess(true)
-        enqueueSnackbar('Case close succeess', { variant: 'success' })
+        enqueueSnackbar('Case close success', { variant: 'success' })
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Case close failed'), {
