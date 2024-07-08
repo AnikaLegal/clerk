@@ -5,7 +5,7 @@ import { Header, Grid, Card } from "semantic-ui-react"
 export const CaseSummaryCard = ({ issue }: { issue: Issue }) => {
     return (
         <Card fluid>
-            <Card.Content header='Case' />
+            <Card.Content header='Case summary' />
             <Card.Content>
                 <Grid>
                     <Grid.Row columns={2}>
