@@ -34,6 +34,32 @@ export const CaseSummaryCard = ({ issue }: { issue: Issue }) => {
                     </Grid.Row>
                 </Grid>
             </Card.Content>
+            <Card.Content>
+                <Grid>
+                    <Grid.Row columns={2}>
+                        <Grid.Column>
+                            <Header sub>Client</Header>
+                            <a href={issue.client.url}>{issue.client.full_name}</a>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Header sub>Preferred name</Header>
+                            {issue.client.preferred_name || "-"}
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row columns={1}>
+                        <Grid.Column>
+                            <Header sub>Email</Header>
+                            {issue.client.email || "-"}
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row columns={1}>
+                        <Grid.Column>
+                            <Header sub>Phone</Header>
+                            {issue.client.phone_number || "-"}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </Card.Content>
         </Card>
     )
 }
