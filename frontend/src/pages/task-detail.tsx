@@ -5,6 +5,7 @@ import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptio
 import { ModelId, ModelType, Model, SetModel, UpdateModel, ModelChoices } from "types"
 import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
 import { FIELD_TYPES } from "comps/field-component"
+import { CaseSummaryCard } from "comps/case-summary-card"
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from "yup"
@@ -275,33 +276,7 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
           </Grid>
         </Card.Content>
       </Card>
-      <Card fluid>
-        <Card.Content header='Case' />
-        <Card.Content>
-          <Grid>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Header sub>Fileref</Header>
-                <a href={task.issue.url}>{task.issue.fileref}</a>
-              </Grid.Column>
-              <Grid.Column>
-                <Header sub>Topic</Header>
-                {task.issue.topic_display}
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Header sub>Assigned to</Header>
-                <a href={task.issue.paralegal.url}>{task.issue.paralegal.full_name}</a>
-              </Grid.Column>
-              <Grid.Column>
-                <Header sub>Supervised by</Header>
-                <a href={task.issue.lawyer.url}>{task.issue.lawyer.full_name}</a>
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Card.Content>
-      </Card>
+      <CaseSummaryCard issue={task.issue} />
     </Rail>
   )
 }
