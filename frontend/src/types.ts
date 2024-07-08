@@ -11,7 +11,7 @@ export interface ModelType {
   id: ModelId
 }
 export interface UpdateModel<Type extends ModelType> {
-  (id: ModelId, values: Model): Promise<Type>
+  (values: Model): Promise<Type>
 }
 
 export interface ModelChoices {
