@@ -85,29 +85,18 @@ const App = () => {
             loading={isLoading}
           />
         </Form.Field>
-        {!showAdvancedSearch && (
-          <Label
-            style={{ cursor: 'pointer' }}
-            onClick={(e) => {
-              e.preventDefault()
-              setShowAdvancedSearch(true)
-            }}
-          >
-            Advanced search
-          </Label>
-        )}
+        <Label
+          style={{ cursor: 'pointer', marginBottom: '1rem'  }}
+          onClick={(e) => {
+            e.preventDefault()
+            setShowAdvancedSearch(!showAdvancedSearch)
+          }}
+        >
+          {showAdvancedSearch ? 'Hide advanced search' : 'Advanced search'}
+        </Label>
         {showAdvancedSearch && (
           <>
-            <Label
-              style={{ cursor: 'pointer' }}
-              onClick={(e) => {
-                e.preventDefault()
-                setShowAdvancedSearch(false)
-              }}
-            >
-              Hide advanced search
-            </Label>
-            <Form.Group style={{ marginTop: '1em' }}>
+            <Form.Group>
               <Form.Field width={8}>
                 <Dropdown
                   clearable
