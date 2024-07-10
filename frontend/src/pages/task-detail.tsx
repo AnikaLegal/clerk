@@ -1,15 +1,42 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import api, { Task, TaskCreate } from 'api'
-import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card, Comment, Divider, Loader } from 'semantic-ui-react'
-import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
-import { ModelType, Model, SetModel, UpdateModel, ModelChoices, UserPermission } from 'types'
-import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
+import {
+  Container,
+  Header,
+  Grid,
+  Segment,
+  Rail,
+  Form,
+  Button,
+  Dropdown,
+  Card,
+  Comment,
+  Divider,
+  Loader,
+} from 'semantic-ui-react'
+import {
+  getAPIErrorMessage,
+  getAPIFormErrors,
+  mount,
+  choiceToMap,
+  choiceToOptions,
+  markdownToHtml,
+} from 'utils'
+import {
+  ModelType,
+  Model,
+  SetModel,
+  UpdateModel,
+  ModelChoices,
+  UserPermission,
+} from 'types'
+import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
-import moment from 'moment';
+import moment from 'moment'
 
 interface DjangoContext {
   choices: {
@@ -24,14 +51,25 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const taskResult = api.useGetTaskQuery({ id: CONTEXT.task_pk })
-  if (taskResult.isLoading)
-    return null
+  if (taskResult.isLoading) return null
   return (
-    <TaskDetail data={taskResult.data} choices={CONTEXT.choices} perms={CONTEXT.user} />
+    <TaskDetail
+      data={taskResult.data}
+      choices={CONTEXT.choices}
+      perms={CONTEXT.user}
+    />
   )
 }
 
-export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: ModelChoices, perms: UserPermission }) => {
+export const TaskDetail = ({
+  data,
+  choices,
+  perms,
+}: {
+  data: Task
+  choices: ModelChoices
+  perms: UserPermission
+}) => {
   const [task, setTask] = useState<Task>(data)
   const [updateTask] = api.useUpdateTaskMutation()
 
@@ -45,11 +83,29 @@ export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: Mode
     <Container>
       <Segment basic>
         <Segment basic>
-          <TaskBody task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+          <TaskBody
+            task={task}
+            setTask={setTask}
+            update={update}
+            choices={choices}
+            perms={perms}
+          />
         </Segment>
-        <TaskRail task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+        <TaskRail
+          task={task}
+          setTask={setTask}
+          update={update}
+          choices={choices}
+          perms={perms}
+        />
         <Segment basic>
-          <TaskComments task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+          <TaskComments
+            task={task}
+            setTask={setTask}
+            update={update}
+            choices={choices}
+            perms={perms}
+          />
         </Segment>
       </Segment>
     </Container>
@@ -58,20 +114,27 @@ export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: Mode
 
 export const MarkdownDisplay = ({ value }: { value: string }) => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: value ? markdownToHtml(value) : '-' }} />
+    <div
+      dangerouslySetInnerHTML={{ __html: value ? markdownToHtml(value) : '-' }}
+    />
   )
 }
 
-
 interface TaskProps<Type extends ModelType> {
-  task: Type,
-  setTask: SetModel<Type>,
-  update: UpdateModel<Type>,
-  choices: ModelChoices,
-  perms: UserPermission,
+  task: Type
+  setTask: SetModel<Type>
+  update: UpdateModel<Type>
+  choices: ModelChoices
+  perms: UserPermission
 }
 
-export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
+export const TaskBody = ({
+  task,
+  setTask,
+  update,
+  choices,
+  perms,
+}: TaskProps<Task>) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
 
@@ -83,20 +146,16 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
       <Grid>
         <Grid.Row>
           <Grid.Column style={{ flexGrow: '1' }}>
-            <Header as='h1'>
+            <Header as="h1">
               {task.name}
-              <Header.Subheader>
-                {typeLabels.get(task.type)}
-              </Header.Subheader>
+              <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
             </Header>
           </Grid.Column>
-          {perms.is_coordinator_or_better &&
+          {perms.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
-              <Button onClick={toggleEditMode}>
-                Edit
-              </Button>
+              <Button onClick={toggleEditMode}>Edit</Button>
             </Grid.Column>
-          }
+          )}
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
@@ -120,12 +179,9 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
         setSubmitting(false)
       })
       .catch((err) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(err, `Failed to update this task`),
-          {
-            variant: 'error',
-          }
-        )
+        enqueueSnackbar(getAPIErrorMessage(err, `Failed to update this task`), {
+          variant: 'error',
+        })
         const requestErrors = getAPIFormErrors(err)
         if (requestErrors) {
           setErrors(requestErrors)
@@ -156,22 +212,31 @@ export const TaskBody = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   const schema = getFormSchema(fields)
 
   return (
-    <Formik initialValues={getModelInitialValues(fields, task)}
-      validationSchema={schema} onSubmit={submit} >
+    <Formik
+      initialValues={getModelInitialValues(fields, task)}
+      validationSchema={schema}
+      onSubmit={submit}
+    >
       {(formik) => (
         <AutoForm
           fields={fields}
           choices={choices}
           formik={formik}
           onCancel={toggleEditMode}
-          submitText='Update'
+          submitText="Update"
         />
       )}
     </Formik>
   )
 }
 
-export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
+export const TaskRail = ({
+  task,
+  setTask,
+  update,
+  choices,
+  perms,
+}: TaskProps<Task>) => {
   const [users, setUsers] = useState([])
   const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [getUsers] = api.useLazyGetUsersQuery()
@@ -197,17 +262,14 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
         setTask(instance)
       })
       .catch((err) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(err, `Failed to update this task`),
-          {
-            variant: 'error',
-          }
-        )
+        enqueueSnackbar(getAPIErrorMessage(err, `Failed to update this task`), {
+          variant: 'error',
+        })
       })
   }
 
   return (
-    <Rail attached position='right'>
+    <Rail attached position="right">
       <Card fluid>
         <Card.Content>
           <Grid>
@@ -249,7 +311,9 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
                     value: u.id,
                     text: u.email,
                   }))}
-                  onChange={(e, { value }) => handleChange('assigned_to_id', value)}
+                  onChange={(e, { value }) =>
+                    handleChange('assigned_to_id', value)
+                  }
                 />
               </Grid.Column>
             </Grid.Row>
@@ -279,24 +343,28 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
   )
 }
 
-
-export const TaskComments = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
-
+export const TaskComments = ({
+  task,
+  setTask,
+  update,
+  choices,
+  perms,
+}: TaskProps<Task>) => {
   const commentResults = api.useGetTaskCommentsQuery({ id: task.id })
   const comments = commentResults.data || []
 
   return (
     <Comment.Group>
       <Divider />
-      <Header as='h4'>
-        Comments
-      </Header>
+      <Header as="h4">Comments</Header>
       <Loader inverted inline active={commentResults.isLoading} />
       {comments.map((comment) => (
         <Segment>
           <Comment>
             <Comment.Content>
-              <Comment.Author as='a'>{comment.creator.full_name}</Comment.Author>
+              <Comment.Author as="a">
+                {comment.creator.full_name}
+              </Comment.Author>
               <Comment.Metadata>
                 <div>{moment(comment.created_at).fromNow()}</div>
               </Comment.Metadata>
