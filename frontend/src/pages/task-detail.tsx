@@ -37,6 +37,19 @@ import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
 import moment from 'moment'
+import styled from 'styled-components'
+
+const StyledCommentGroup = styled(Comment.Group)`
+  && {
+    max-width: 100%;
+  }
+`
+
+const CenteredDiv = styled.div`
+  max-width: 76%;
+  margin-left: auto;
+  margin-right: auto;
+`
 
 interface DjangoContext {
   choices: {
@@ -82,15 +95,20 @@ export const TaskDetail = ({
   return (
     <Container>
       <Segment basic>
-        <Segment basic>
-          <TaskBody
-            task={task}
-            setTask={setTask}
-            update={update}
-            choices={choices}
-            perms={perms}
-          />
-        </Segment>
+        <CenteredDiv>
+          <Segment basic>
+            <TaskBody
+              task={task}
+              setTask={setTask}
+              update={update}
+              choices={choices}
+              perms={perms}
+            />
+          </Segment>
+          <Segment basic>
+            <TaskComments task={task} />
+          </Segment>
+        </CenteredDiv>
         <TaskRail
           task={task}
           setTask={setTask}
@@ -98,9 +116,6 @@ export const TaskDetail = ({
           choices={choices}
           perms={perms}
         />
-        <Segment basic>
-          <TaskComments task={task} />
-        </Segment>
       </Segment>
     </Container>
   )
@@ -342,12 +357,12 @@ export const TaskComments = ({ task }: { task: Task }) => {
   const comments = commentResults.data || []
 
   return (
-    <Comment.Group>
+    <StyledCommentGroup>
       <Divider />
       <Header as="h4">Comments</Header>
       <Loader inverted inline active={commentResults.isLoading} />
       {comments.map((comment) => (
-        <Segment>
+        <Segment key={comment.id}>
           <Comment>
             <Comment.Content>
               <Comment.Author as="a">
@@ -361,7 +376,7 @@ export const TaskComments = ({ task }: { task: Task }) => {
           </Comment>
         </Segment>
       ))}
-    </Comment.Group>
+    </StyledCommentGroup>
   )
 }
 
