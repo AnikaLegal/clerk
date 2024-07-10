@@ -3,34 +3,36 @@ from django.urls import reverse
 
 from case.serializers import IssueSerializer, UserSerializer
 from case.serializers.fields import LocalDateField
-from .models import Task
+from .models import Task, TaskComment
+
+
+class TaskListIssueSerializer(IssueSerializer):
+    class Meta:
+        model = IssueSerializer.Meta.model
+        fields = (
+            "id",
+            "fileref",
+            "topic",
+            "url",
+        )
+
+    # Bypass the parent method as it references a field we do not include.
+    def get_fields(self, *args, **kwargs):
+        return super(IssueSerializer, self).get_fields(*args, **kwargs)
+
+
+class TaskListUserSerializer(UserSerializer):
+    class Meta:
+        model = UserSerializer.Meta.model
+        read_only_fields = UserSerializer.Meta.read_only_fields
+        fields = (
+            "id",
+            "full_name",
+            "url",
+        )
 
 
 class TaskListSerializer(serializers.ModelSerializer):
-    class TaskListIssueSerializer(IssueSerializer):
-        class Meta:
-            model = IssueSerializer.Meta.model
-            fields = (
-                "id",
-                "fileref",
-                "topic",
-                "url",
-            )
-
-        # Bypass the parent method as it references a field we do not include.
-        def get_fields(self, *args, **kwargs):
-            return super(IssueSerializer, self).get_fields(*args, **kwargs)
-
-    class TaskListUserSerializer(UserSerializer):
-        class Meta:
-            model = UserSerializer.Meta.model
-            read_only_fields = UserSerializer.Meta.read_only_fields
-            fields = (
-                "id",
-                "full_name",
-                "url",
-            )
-
     class Meta:
         model = Task
         fields = (
@@ -126,3 +128,22 @@ class TaskSearchSerializer(serializers.ModelSerializer):
     # Special case searches.
     q = serializers.CharField(required=False)  # General query.
     my_tasks = serializers.BooleanField(required=False)
+
+
+class TaskCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskComment
+        fields = (
+            "id",
+            "task_id",
+            "creator_id",
+            "creator",
+            "created_at",
+            "type",
+            "text",
+        )
+
+    task_id = serializers.IntegerField(write_only=True)
+    creator_id = serializers.IntegerField(write_only=True)
+    creator = TaskListUserSerializer(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)

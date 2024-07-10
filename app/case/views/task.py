@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django.db.models import Q, QuerySet
 from django.urls import reverse
 from django.http import Http404
@@ -13,7 +14,13 @@ from case.views.auth import (
 from case.utils.react import render_react_page
 from core.models.issue import CaseTopic
 from task.models.task import Task, TaskType, TaskStatus
-from task.serializers import TaskSerializer, TaskListSerializer, TaskSearchSerializer
+from task.models.comment import CommentType
+from task.serializers import (
+    TaskSerializer,
+    TaskListSerializer,
+    TaskSearchSerializer,
+    TaskCommentSerializer,
+)
 
 # TODO:
 # - review permissions.
@@ -62,6 +69,8 @@ class TaskApiViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return TaskListSerializer
+        elif self.action == "comments_view":
+            return TaskCommentSerializer
         return TaskSerializer
 
     def get_permissions(self):
@@ -141,3 +150,31 @@ class TaskApiViewset(ModelViewSet):
                     queryset = queryset.filter(**{key: value})
 
         return queryset
+
+    @action(
+        detail=True,
+        methods=["GET", "POST"],
+        url_path="comments",
+        url_name="comments",
+    )
+    def comments_view(self, request, pk):
+        """
+        View task comments.
+        """
+        task = self.get_object()
+
+        if request.method == "GET":
+            comments = task.comments.all()
+            data = TaskCommentSerializer(comments, many=True).data
+            return Response(data)
+        else:
+            data = {
+                **request.data,
+                "task_id": task.pk,
+                "creator_id": self.request.user.pk,
+                "type": CommentType.USER,
+            }
+            serializer = TaskCommentSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=201)
