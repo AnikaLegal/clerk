@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import api, { Task, TaskCreate } from 'api'
 import {
   Container,
@@ -8,27 +8,17 @@ import {
   Rail,
   Form,
   Button,
-  Dropdown,
-  Card,
-  Divider
+  Divider,
 } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
   getAPIFormErrors,
   mount,
   choiceToMap,
-  choiceToOptions,
   markdownToHtml,
 } from 'utils'
-import {
-  ModelType,
-  Model,
-  SetModel,
-  UpdateModel,
-  ModelChoices,
-  UserPermission,
-} from 'types'
-import { TaskCommentGroup } from 'comps/task'
+import { Model, ModelChoices, UserPermission, TaskDetailProps } from 'types'
+import { TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseSummaryCard } from 'comps/case-summary-card'
@@ -123,21 +113,13 @@ export const MarkdownDisplay = ({ value }: { value: string }) => {
   )
 }
 
-interface TaskProps<Type extends ModelType> {
-  task: Type
-  setTask: SetModel<Type>
-  update: UpdateModel<Type>
-  choices: ModelChoices
-  perms: UserPermission
-}
-
 export const TaskBody = ({
   task,
   setTask,
   update,
   choices,
   perms,
-}: TaskProps<Task>) => {
+}: TaskDetailProps<Task>) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
 
@@ -239,108 +221,16 @@ export const TaskRail = ({
   update,
   choices,
   perms,
-}: TaskProps<Task>) => {
-  const [users, setUsers] = useState([])
-  const [isUsersLoading, setIsUsersLoading] = useState(false)
-  const [getUsers] = api.useLazyGetUsersQuery()
-
-  const statusOptions = useMemo(() => choiceToOptions(choices.status), [])
-  const { enqueueSnackbar } = useSnackbar()
-
-  useEffect(() => {
-    setIsUsersLoading(true)
-    getUsers({ isActive: true, sort: 'email' })
-      .unwrap()
-      .then((users) => {
-        setUsers(users)
-        setIsUsersLoading(false)
-      })
-      .catch(() => setIsUsersLoading(false))
-  }, [])
-
-  const handleChange = (name: string, value: any) => {
-    update({ [name]: value })
-      .then((instance) => {
-        enqueueSnackbar(`Updated task`, { variant: 'success' })
-        setTask(instance)
-      })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, `Failed to update this task`), {
-          variant: 'error',
-        })
-      })
-  }
-
+}: TaskDetailProps<Task>) => {
   return (
     <Rail attached position="right">
-      <Card fluid>
-        <Card.Content>
-          <Grid>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Header sub>Status</Header>
-                <Dropdown
-                  value={task.status}
-                  options={statusOptions}
-                  onChange={(e, { value }) => handleChange('status', value)}
-                />
-              </Grid.Column>
-              <Grid.Column>
-                <Header sub>Days Open</Header>
-                {task.days_open}
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row columns={2}>
-              <Grid.Column>
-                <Header sub>Date Created</Header>
-                {task.created_at}
-              </Grid.Column>
-              <Grid.Column>
-                <Header sub>Date Closed</Header>
-                {task.closed_at || '-'}
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row columns={1}>
-              <Grid.Column>
-                <Header sub>Assigned To</Header>
-                <Dropdown
-                  search
-                  disabled={!perms.is_paralegal_or_better}
-                  selectOnNavigation={false}
-                  loading={isUsersLoading}
-                  value={task.assigned_to.id}
-                  options={users.map((u) => ({
-                    key: u.id,
-                    value: u.id,
-                    text: u.email,
-                  }))}
-                  onChange={(e, { value }) =>
-                    handleChange('assigned_to_id', value)
-                  }
-                />
-              </Grid.Column>
-            </Grid.Row>
-            <Grid.Row columns={1}>
-              <Grid.Column>
-                <Header sub>Owner</Header>
-                <Dropdown
-                  search
-                  disabled={!perms.is_coordinator_or_better}
-                  selectOnNavigation={false}
-                  loading={isUsersLoading}
-                  value={task.owner.id}
-                  options={users.map((u) => ({
-                    key: u.id,
-                    value: u.id,
-                    text: u.email,
-                  }))}
-                  onChange={(e, { value }) => handleChange('owner_id', value)}
-                />
-              </Grid.Column>
-            </Grid.Row>
-          </Grid>
-        </Card.Content>
-      </Card>
+      <TaskMetaCard
+        task={task}
+        setTask={setTask}
+        update={update}
+        choices={choices}
+        perms={perms}
+      />
       <CaseSummaryCard issue={task.issue} />
     </Rail>
   )
