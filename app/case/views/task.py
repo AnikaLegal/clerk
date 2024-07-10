@@ -164,8 +164,10 @@ class TaskApiViewset(ModelViewSet):
         task = self.get_object()
 
         if request.method == "GET":
-            comments = task.comments.all()
-            data = TaskCommentSerializer(comments, many=True).data
+            queryset = task.comments.all()
+            queryset = queryset.select_related("creator")
+            queryset = queryset.order_by("-created_at")
+            data = TaskCommentSerializer(queryset, many=True).data
             return Response(data)
         else:
             data = {
