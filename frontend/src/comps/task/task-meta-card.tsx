@@ -11,7 +11,7 @@ export const TaskMetaCard = ({
   update,
   choices,
   perms,
-}: TaskDetailProps<Task>) => {
+}: TaskDetailProps) => {
   const [users, setUsers] = useState([])
   const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [getUsers] = api.useLazyGetUsersQuery()

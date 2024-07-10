@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react"
-import { Issue } from "api"
+import { Issue, Task } from "api"
 
 export type ModelId = string | number
 export type SetModel<Type extends ModelType> = Dispatch<SetStateAction<Type>>
@@ -32,10 +32,10 @@ export interface CaseDetailFormProps {
   onCancel: () => void
 }
 
-export interface TaskDetailProps<Type extends ModelType> {
-  task: Type
-  setTask: SetModel<Type>
-  update: UpdateModel<Type>
+export interface TaskDetailProps {
+  task: Task
+  setTask: SetModel<Task>
+  update: UpdateModel<Task>
   choices: ModelChoices
   perms: UserPermission
 }

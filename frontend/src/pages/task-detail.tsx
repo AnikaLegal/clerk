@@ -119,7 +119,7 @@ export const TaskBody = ({
   update,
   choices,
   perms,
-}: TaskDetailProps<Task>) => {
+}: TaskDetailProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
 
@@ -221,7 +221,7 @@ export const TaskRail = ({
   update,
   choices,
   perms,
-}: TaskDetailProps<Task>) => {
+}: TaskDetailProps) => {
   return (
     <Rail attached position="right">
       <TaskMetaCard
