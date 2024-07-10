@@ -10,9 +10,7 @@ import {
   Button,
   Dropdown,
   Card,
-  Comment,
-  Divider,
-  Loader,
+  Divider
 } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
@@ -30,20 +28,14 @@ import {
   ModelChoices,
   UserPermission,
 } from 'types'
+import { TaskCommentGroup } from 'comps/task'
 import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
-import moment from 'moment'
 import styled from 'styled-components'
-
-const StyledCommentGroup = styled(Comment.Group)`
-  && {
-    max-width: 100%;
-  }
-`
 
 const CenteredDiv = styled.div`
   max-width: 76%;
@@ -106,7 +98,9 @@ export const TaskDetail = ({
             />
           </Segment>
           <Segment basic>
-            <TaskComments task={task} />
+            <Divider />
+            <Header as="h4">Comments</Header>
+            <TaskCommentGroup task={task} />
           </Segment>
         </CenteredDiv>
         <TaskRail
@@ -349,34 +343,6 @@ export const TaskRail = ({
       </Card>
       <CaseSummaryCard issue={task.issue} />
     </Rail>
-  )
-}
-
-export const TaskComments = ({ task }: { task: Task }) => {
-  const commentResults = api.useGetTaskCommentsQuery({ id: task.id })
-  const comments = commentResults.data || []
-
-  return (
-    <StyledCommentGroup>
-      <Divider />
-      <Header as="h4">Comments</Header>
-      <Loader inverted inline active={commentResults.isLoading} />
-      {comments.map((comment) => (
-        <Segment key={comment.id}>
-          <Comment>
-            <Comment.Content>
-              <Comment.Author as="a">
-                {comment.creator.full_name}
-              </Comment.Author>
-              <Comment.Metadata>
-                <div>{moment(comment.created_at).fromNow()}</div>
-              </Comment.Metadata>
-              <Comment.Text>{comment.text}</Comment.Text>
-            </Comment.Content>
-          </Comment>
-        </Segment>
-      ))}
-    </StyledCommentGroup>
   )
 }
 
