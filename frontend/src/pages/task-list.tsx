@@ -10,6 +10,7 @@ import {
 } from 'semantic-ui-react'
 import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
 import api, { TaskList, GetTasksApiArg } from 'api'
+import { UserPermission } from 'types'
 import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {
@@ -20,6 +21,7 @@ interface DjangoContext {
     case_topic: string[][]
     my_tasks: string[][]
   }
+  user: UserPermission
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -87,7 +89,7 @@ const App = () => {
           />
         </Form.Field>
         <Label
-          style={{ cursor: 'pointer', marginBottom: '1rem'  }}
+          style={{ cursor: 'pointer', marginBottom: '1rem' }}
           onClick={(e) => {
             e.preventDefault()
             setShowAdvancedSearch(!showAdvancedSearch)
@@ -98,18 +100,20 @@ const App = () => {
         {showAdvancedSearch && (
           <>
             <Form.Group>
-              <Form.Field width={8}>
-                <Dropdown
-                  clearable
-                  fluid
-                  search
-                  selection
-                  value={filter.myTasks || ''}
-                  placeholder="My tasks?"
-                  options={choiceToOptions(CONTEXT.choices.my_tasks)}
-                  onChange={(e, { value }) => updateFilter('myTasks', value)}
-                />
-              </Form.Field>
+              {CONTEXT.user.is_coordinator_or_better && (
+                <Form.Field width={8}>
+                  <Dropdown
+                    clearable
+                    fluid
+                    search
+                    selection
+                    value={filter.myTasks || ''}
+                    placeholder="My tasks?"
+                    options={choiceToOptions(CONTEXT.choices.my_tasks)}
+                    onChange={(e, { value }) => updateFilter('myTasks', value)}
+                  />
+                </Form.Field>
+              )}
               <Form.Field width={8}>
                 <Dropdown
                   fluid
