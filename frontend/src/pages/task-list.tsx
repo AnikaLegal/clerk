@@ -31,11 +31,14 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [tasks, setTasks] = useState<TaskList[]>([])
   const [query, setQuery] = useState<string>()
-  const [filter, setFilter] = useState<GetTasksApiArg>({ isOpen: 'true', myTasks: 'true' })
+  const [filter, setFilter] = useState<GetTasksApiArg>({
+    isOpen: 'true',
+    myTasks: 'true',
+  })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
 
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedQuery = useDebounce(query, 300)
 
   const search = () => {
     setIsLoading(true)
@@ -54,8 +57,7 @@ const App = () => {
     if (value === null || value === '') {
       const { [name]: _, ...remaining } = filter
       updated = remaining
-    }
-    else {
+    } else {
       updated = { ...filter, [name]: value }
     }
     setFilter(updated)
@@ -66,20 +68,19 @@ const App = () => {
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
-  const userResults = api.useGetUsersQuery({isActive: true, sort: 'email'})
+  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const users = userResults.data ?? []
 
   return (
     <Container>
-      <Header as='h1'>Tasks
-        <Header.Subheader>
-          Showing {tasks.length} tasks
-        </Header.Subheader>
+      <Header as="h1">
+        Tasks
+        <Header.Subheader>Showing {tasks.length} tasks</Header.Subheader>
       </Header>
       <Form>
         <Form.Field>
           <Input
-            placeholder='Search by file ref, task name, owner or assignee'
+            placeholder="Search by file ref, task name, owner or assignee"
             value={query || ''}
             onChange={(e) => setQuery(e.target.value)}
             loading={isLoading}
@@ -104,7 +105,7 @@ const App = () => {
                   search
                   selection
                   value={filter.myTasks || ''}
-                  placeholder='My tasks?'
+                  placeholder="My tasks?"
                   options={choiceToOptions(CONTEXT.choices.my_tasks)}
                   onChange={(e, { value }) => updateFilter('myTasks', value)}
                 />
@@ -115,7 +116,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.isOpen || ''}
-                  placeholder='Is task open?'
+                  placeholder="Is task open?"
                   options={choiceToOptions(CONTEXT.choices.is_open)}
                   onChange={(e, { value }) => updateFilter('isOpen', value)}
                 />
@@ -126,7 +127,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.issueTopic || ''}
-                  placeholder='Case Topic'
+                  placeholder="Case Topic"
                   options={choiceToOptions(CONTEXT.choices.case_topic)}
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
@@ -137,7 +138,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.type || ''}
-                  placeholder='Task Type'
+                  placeholder="Task Type"
                   options={choiceToOptions(CONTEXT.choices.type)}
                   onChange={(e, { value }) => updateFilter('type', value)}
                 />
@@ -150,7 +151,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.status || ''}
-                  placeholder='Task Status'
+                  placeholder="Task Status"
                   options={choiceToOptions(CONTEXT.choices.status)}
                   onChange={(e, { value }) => updateFilter('status', value)}
                 />
@@ -162,7 +163,7 @@ const App = () => {
                   search
                   selection
                   value={filter.assignedTo || ''}
-                  placeholder='Assignee'
+                  placeholder="Assignee"
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
@@ -179,7 +180,7 @@ const App = () => {
                   search
                   selection
                   value={filter.owner || ''}
-                  placeholder='Owner'
+                  placeholder="Owner"
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
@@ -224,7 +225,9 @@ const App = () => {
                 </Table.Cell>
                 <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
                 <Table.Cell>
-                  <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
+                  <a href={task.assigned_to.url}>
+                    {task.assigned_to.full_name}
+                  </a>
                 </Table.Cell>
                 <Table.Cell>
                   <a href={task.owner.url}>{task.owner.full_name}</a>
