@@ -65,3 +65,5 @@ paths:
     $ref: paths/task-list.yaml
   /clerk/api/task/{id}/:
     $ref: paths/task-detail.yaml
+  /clerk/api/task/{id}/comments/:
+    $ref: paths/task-comments-list.yaml

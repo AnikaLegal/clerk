@@ -1,0 +1,31 @@
+allOf:
+  - $ref: ./TaskCommentBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      task_id:
+        type: number
+      type:
+        type: string
+      creator:
+        type: object
+        properties:
+          id:
+            type: integer
+          full_name:
+            type: string
+          url:
+            type: string
+        required:
+          - id
+          - full_name
+          - url
+      created_at:
+        type: string
+    required:
+      - id
+      - task_id
+      - type
+      - creator
+      - created_at

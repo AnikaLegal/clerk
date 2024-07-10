@@ -386,6 +386,24 @@ const injectedRtkApi = api.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    getTaskComments: build.query<
+      GetTaskCommentsApiResponse,
+      GetTaskCommentsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/comments/`,
+      }),
+    }),
+    createTaskComment: build.mutation<
+      CreateTaskCommentApiResponse,
+      CreateTaskCommentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/comments/`,
+        method: 'POST',
+        body: queryArg.taskCommentCreate,
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -750,6 +768,20 @@ export type DeleteTaskApiArg = {
   /** Entity ID */
   id: number
 }
+export type GetTaskCommentsApiResponse =
+  /** status 200 Successful response. */ TaskComment[]
+export type GetTaskCommentsApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type CreateTaskCommentApiResponse =
+  /** status 201 Successful response. */ TaskComment
+export type CreateTaskCommentApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  taskCommentCreate: TaskCommentCreate
+}
 export type IssueBase = {
   topic: string
   stage: string
@@ -1060,6 +1092,21 @@ export type TaskCreate = TaskBase & {
   owner_id: number
   assigned_to_id: number
 }
+export type TaskCommentBase = {
+  text: string
+}
+export type TaskComment = TaskCommentBase & {
+  id: number
+  task_id: number
+  type: string
+  creator: {
+    id: number
+    full_name: string
+    url: string
+  }
+  created_at: string
+}
+export type TaskCommentCreate = TaskBase & object
 export const {
   useGetCasesQuery,
   useGetCaseQuery,
@@ -1109,4 +1156,6 @@ export const {
   useGetTaskQuery,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
+  useGetTaskCommentsQuery,
+  useCreateTaskCommentMutation,
 } = injectedRtkApi
