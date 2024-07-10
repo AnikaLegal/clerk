@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import api, { Task, TaskCreate } from 'api'
-import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card } from 'semantic-ui-react'
+import { Container, Header, Grid, Segment, Rail, Form, Button, Dropdown, Card, Comment, Divider, Loader } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap, choiceToOptions, markdownToHtml } from 'utils'
 import { ModelType, Model, SetModel, UpdateModel, ModelChoices, UserPermission } from 'types'
 import { getFormSchema, AutoForm, getModelInitialValues, } from 'comps/auto-form'
@@ -9,6 +9,7 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
+import moment from 'moment';
 
 interface DjangoContext {
   choices: {
@@ -43,16 +44,13 @@ export const TaskDetail = ({ data, choices, perms }: { data: Task, choices: Mode
   return (
     <Container>
       <Segment basic>
-        <TaskBody task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+        <Segment basic>
+          <TaskBody task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+        </Segment>
         <TaskRail task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
-        {/* 
-          <Divider />
-          <TaskAttachments />
-        */}
-        {/* 
-          <Divider />
-          <TaskComments />
-        */}
+        <Segment basic>
+          <TaskComments task={task} setTask={setTask} update={update} choices={choices} perms={perms} />
+        </Segment>
       </Segment>
     </Container>
   )
@@ -278,6 +276,36 @@ export const TaskRail = ({ task, setTask, update, choices, perms }: TaskProps<Ta
       </Card>
       <CaseSummaryCard issue={task.issue} />
     </Rail>
+  )
+}
+
+
+export const TaskComments = ({ task, setTask, update, choices, perms }: TaskProps<Task>) => {
+
+  const commentResults = api.useGetTaskCommentsQuery({ id: task.id })
+  const comments = commentResults.data || []
+
+  return (
+    <Comment.Group>
+      <Divider />
+      <Header as='h4'>
+        Comments
+      </Header>
+      <Loader inverted inline active={commentResults.isLoading} />
+      {comments.map((comment) => (
+        <Segment>
+          <Comment>
+            <Comment.Content>
+              <Comment.Author as='a'>{comment.creator.full_name}</Comment.Author>
+              <Comment.Metadata>
+                <div>{moment(comment.created_at).fromNow()}</div>
+              </Comment.Metadata>
+              <Comment.Text>{comment.text}</Comment.Text>
+            </Comment.Content>
+          </Comment>
+        </Segment>
+      ))}
+    </Comment.Group>
   )
 }
 
