@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from 'react'
 import {
   Container,
   Dropdown,
@@ -7,10 +7,10 @@ import {
   Table,
   Input,
   Label,
-} from "semantic-ui-react"
-import { mount, useDebounce, choiceToMap, choiceToOptions } from "utils"
-import api from "api"
-import { FadeTransition } from "comps/transitions"
+} from 'semantic-ui-react'
+import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
+import api, { TaskList } from 'api'
+import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {
   choices: {
@@ -31,7 +31,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [tasks, setTasks] = useState<[]>([])
   const [query, setQuery] = useState<string>()
-  const [filter, setFilter] = useState<{}>({ isOpen: "true", myTasks: "true" })
+  const [filter, setFilter] = useState<{}>({ isOpen: 'true', myTasks: 'true' })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
 
@@ -51,7 +51,7 @@ const App = () => {
 
   const updateFilter = (name, value) => {
     var updated = {}
-    if (value === null || value === "") {
+    if (value === null || value === '') {
       const { [name]: _, ...remaining } = filter
       updated = remaining
     }
@@ -62,16 +62,16 @@ const App = () => {
   }
 
   const updateQuery = () => {
-    updateFilter("q", debouncedQuery)
+    updateFilter('q', debouncedQuery)
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
-  const userResults = api.useGetUsersQuery({isActive: true, sort: "email"})
+  const userResults = api.useGetUsersQuery({isActive: true, sort: 'email'})
   const users = userResults.data ?? []
 
   return (
     <Container>
-      <Header as="h1">Tasks
+      <Header as='h1'>Tasks
         <Header.Subheader>
           Showing {tasks.length} tasks
         </Header.Subheader>
@@ -79,15 +79,15 @@ const App = () => {
       <Form>
         <Form.Field>
           <Input
-            placeholder="Search by file ref, task name, owner or assignee"
-            value={query || ""}
+            placeholder='Search by file ref, task name, owner or assignee'
+            value={query || ''}
             onChange={(e) => setQuery(e.target.value)}
             loading={isLoading}
           />
         </Form.Field>
         {!showAdvancedSearch && (
           <Label
-            style={{ cursor: "pointer" }}
+            style={{ cursor: 'pointer' }}
             onClick={(e) => {
               e.preventDefault()
               setShowAdvancedSearch(true)
@@ -99,7 +99,7 @@ const App = () => {
         {showAdvancedSearch && (
           <>
             <Label
-              style={{ cursor: "pointer" }}
+              style={{ cursor: 'pointer' }}
               onClick={(e) => {
                 e.preventDefault()
                 setShowAdvancedSearch(false)
@@ -107,17 +107,17 @@ const App = () => {
             >
               Hide advanced search
             </Label>
-            <Form.Group style={{ marginTop: "1em" }}>
+            <Form.Group style={{ marginTop: '1em' }}>
               <Form.Field width={8}>
                 <Dropdown
                   clearable
                   fluid
                   search
                   selection
-                  value={filter.myTasks || ""}
-                  placeholder="My tasks?"
+                  value={filter.myTasks || ''}
+                  placeholder='My tasks?'
                   options={choiceToOptions(CONTEXT.choices.my_tasks)}
-                  onChange={(e, { value }) => updateFilter("myTasks", value)}
+                  onChange={(e, { value }) => updateFilter('myTasks', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -125,10 +125,10 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={filter.isOpen || ""}
-                  placeholder="Is task open?"
+                  value={filter.isOpen || ''}
+                  placeholder='Is task open?'
                   options={choiceToOptions(CONTEXT.choices.is_open)}
-                  onChange={(e, { value }) => updateFilter("isOpen", value)}
+                  onChange={(e, { value }) => updateFilter('isOpen', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -136,10 +136,10 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={filter.issueTopic || ""}
-                  placeholder="Case Topic"
+                  value={filter.issueTopic || ''}
+                  placeholder='Case Topic'
                   options={choiceToOptions(CONTEXT.choices.case_topic)}
-                  onChange={(e, { value }) => updateFilter("issueTopic", value)}
+                  onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -147,23 +147,23 @@ const App = () => {
                   fluid
                   selection
                   clearable
-                  value={filter.type || ""}
-                  placeholder="Task Type"
+                  value={filter.type || ''}
+                  placeholder='Task Type'
                   options={choiceToOptions(CONTEXT.choices.type)}
-                  onChange={(e, { value }) => updateFilter("type", value)}
+                  onChange={(e, { value }) => updateFilter('type', value)}
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Group style={{ marginTop: "1em" }}>
+            <Form.Group style={{ marginTop: '1em' }}>
               <Form.Field width={8}>
                 <Dropdown
                   fluid
                   selection
                   clearable
-                  value={filter.status || ""}
-                  placeholder="Task Status"
+                  value={filter.status || ''}
+                  placeholder='Task Status'
                   options={choiceToOptions(CONTEXT.choices.status)}
-                  onChange={(e, { value }) => updateFilter("status", value)}
+                  onChange={(e, { value }) => updateFilter('status', value)}
                 />
               </Form.Field>
               <Form.Field width={8}>
@@ -172,14 +172,14 @@ const App = () => {
                   fluid
                   search
                   selection
-                  value={filter.assignedTo || ""}
-                  placeholder="Assignee"
+                  value={filter.assignedTo || ''}
+                  placeholder='Assignee'
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
                     text: u.email,
                   }))}
-                  onChange={(e, { value }) => updateFilter("assignedTo", value)}
+                  onChange={(e, { value }) => updateFilter('assignedTo', value)}
                   loading={userResults.isLoading}
                 />
               </Form.Field>
@@ -189,14 +189,14 @@ const App = () => {
                   fluid
                   search
                   selection
-                  value={filter.owner || ""}
-                  placeholder="Owner"
+                  value={filter.owner || ''}
+                  placeholder='Owner'
                   options={users.map((u) => ({
                     key: u.id,
                     value: u.id,
                     text: u.email,
                   }))}
-                  onChange={(e, { value }) => updateFilter("owner", value)}
+                  onChange={(e, { value }) => updateFilter('owner', value)}
                   loading={userResults.isLoading}
                 />
               </Form.Field>
