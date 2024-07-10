@@ -9,7 +9,7 @@ import {
   Label,
 } from 'semantic-ui-react'
 import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
-import api, { TaskList } from 'api'
+import api, { TaskList, GetTasksApiArg } from 'api'
 import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {
@@ -29,9 +29,9 @@ const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [tasks, setTasks] = useState<[]>([])
+  const [tasks, setTasks] = useState<TaskList[]>([])
   const [query, setQuery] = useState<string>()
-  const [filter, setFilter] = useState<{}>({ isOpen: 'true', myTasks: 'true' })
+  const [filter, setFilter] = useState<GetTasksApiArg>({ isOpen: 'true', myTasks: 'true' })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
 
@@ -49,7 +49,7 @@ const App = () => {
   }
   useEffect(() => search(), [filter])
 
-  const updateFilter = (name, value) => {
+  const updateFilter = (name: keyof GetTasksApiArg, value) => {
     var updated = {}
     if (value === null || value === '') {
       const { [name]: _, ...remaining } = filter
