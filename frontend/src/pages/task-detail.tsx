@@ -99,13 +99,7 @@ export const TaskDetail = ({
           perms={perms}
         />
         <Segment basic>
-          <TaskComments
-            task={task}
-            setTask={setTask}
-            update={update}
-            choices={choices}
-            perms={perms}
-          />
+          <TaskComments task={task} />
         </Segment>
       </Segment>
     </Container>
@@ -343,13 +337,7 @@ export const TaskRail = ({
   )
 }
 
-export const TaskComments = ({
-  task,
-  setTask,
-  update,
-  choices,
-  perms,
-}: TaskProps<Task>) => {
+export const TaskComments = ({ task }: { task: Task }) => {
   const commentResults = api.useGetTaskCommentsQuery({ id: task.id })
   const comments = commentResults.data || []
 
