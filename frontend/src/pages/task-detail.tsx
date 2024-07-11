@@ -1,15 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import api, { Task, TaskCreate } from 'api'
-import {
-  Container,
-  Header,
-  Grid,
-  Segment,
-  Rail,
-  Form,
-  Button,
-  Divider,
-} from 'semantic-ui-react'
+import { Header, Grid, Segment, Form, Button, Divider } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
   getAPIFormErrors,
@@ -25,13 +16,6 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
-import styled from 'styled-components'
-
-const CenteredDiv = styled.div`
-  max-width: 76%;
-  margin-left: auto;
-  margin-right: auto;
-`
 
 interface DjangoContext {
   choices: {
@@ -75,10 +59,13 @@ export const TaskDetail = ({
     }).unwrap()
 
   return (
-    <Container>
-      <Segment basic>
-        <CenteredDiv>
-          <Segment basic>
+    <Grid columns="equal" relaxed>
+      <Grid.Row>
+        <Grid.Column>
+          <CaseSummaryCard issue={task.issue} />
+        </Grid.Column>
+        <Grid.Column width={8}>
+          <Segment basic style={{ paddingTop: '0' }}>
             <TaskBody
               task={task}
               setTask={setTask}
@@ -92,8 +79,8 @@ export const TaskDetail = ({
             <Header as="h4">Comments</Header>
             <TaskCommentGroup task={task} />
           </Segment>
-        </CenteredDiv>
-        <Rail attached position="right">
+        </Grid.Column>
+        <Grid.Column>
           <TaskMetaCard
             task={task}
             setTask={setTask}
@@ -101,10 +88,9 @@ export const TaskDetail = ({
             choices={choices}
             perms={perms}
           />
-          <CaseSummaryCard issue={task.issue} />
-        </Rail>
-      </Segment>
-    </Container>
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
   )
 }
 
