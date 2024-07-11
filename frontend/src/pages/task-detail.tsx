@@ -93,13 +93,16 @@ export const TaskDetail = ({
             <TaskCommentGroup task={task} />
           </Segment>
         </CenteredDiv>
-        <TaskRail
-          task={task}
-          setTask={setTask}
-          update={update}
-          choices={choices}
-          perms={perms}
-        />
+        <Rail attached position="right">
+          <TaskMetaCard
+            task={task}
+            setTask={setTask}
+            update={update}
+            choices={choices}
+            perms={perms}
+          />
+          <CaseSummaryCard issue={task.issue} />
+        </Rail>
       </Segment>
     </Container>
   )
@@ -212,27 +215,6 @@ export const TaskBody = ({
         />
       )}
     </Formik>
-  )
-}
-
-export const TaskRail = ({
-  task,
-  setTask,
-  update,
-  choices,
-  perms,
-}: TaskDetailProps) => {
-  return (
-    <Rail attached position="right">
-      <TaskMetaCard
-        task={task}
-        setTask={setTask}
-        update={update}
-        choices={choices}
-        perms={perms}
-      />
-      <CaseSummaryCard issue={task.issue} />
-    </Rail>
   )
 }
 
