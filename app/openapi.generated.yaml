@@ -2292,7 +2292,7 @@ components:
             - created_at
     TaskCommentCreate:
       allOf:
-        - $ref: "#/components/schemas/TaskBase"
+        - $ref: "#/components/schemas/TaskCommentBase"
         - type: object
   responses:
     BadRequest:
