@@ -86,12 +86,12 @@ export const LinkButtonGroup = ({
     <>
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
         <Popup
-          content="Link"
+          content="Add link"
           mouseEnterDelay={popupDelay}
           trigger={linkButton}
         />
         <Popup
-          content="Unlink"
+          content="Remove link"
           mouseEnterDelay={popupDelay}
           trigger={unlinkButton}
         />
@@ -202,7 +202,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       disabled={!editor.can().chain().focus().toggleHighlight().run()}
       active={editor.isActive('highlight')}
     >
-      <IconHighlighter height={"12px"}/>
+      <IconHighlighter height={'12px'} />
     </Button>
   )
 
@@ -230,7 +230,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           trigger={underlineButton}
         />
         <Popup
-          content="Highlight"
+          content="Highlight text"
           mouseEnterDelay={popupDelay}
           trigger={highlightButton}
         />
@@ -301,12 +301,22 @@ export const RichtextEditor = ({ onSubmit }: RichtextEditorProps) => {
       >
         <EditorContent editor={editor} />
         <div style={{ padding: '0' }}>
-          <Button
-            circular
-            icon="save"
-            size="small"
-            style={{ display: 'block', marginLeft: 'auto', marginRight: '0' }}
-            onClick={() => onSubmit(editor)}
+          <Popup
+            content="Submit comment"
+            mouseEnterDelay={1000}
+            trigger={
+              <Button
+                circular
+                icon="arrow up"
+                size="small"
+                style={{
+                  display: 'block',
+                  marginLeft: 'auto',
+                  marginRight: '0',
+                }}
+                onClick={() => onSubmit(editor)}
+              />
+            }
           />
         </div>
       </Segment>
