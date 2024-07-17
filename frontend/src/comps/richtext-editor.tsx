@@ -286,8 +286,8 @@ const extensions = [
 ]
 
 export interface RichTextEditorProps {
-  showToolBar: boolean
-  popupDelay: number
+  showToolBar?: boolean
+  popupDelay?: number
   onSubmit: (editor: Editor) => void
 }
 
