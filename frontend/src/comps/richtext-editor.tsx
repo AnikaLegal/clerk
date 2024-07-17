@@ -6,6 +6,7 @@ import Link from '@tiptap/extension-link'
 import Highlight from '@tiptap/extension-highlight'
 import { useEditor, EditorContent, Editor, JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import TextAlign from '@tiptap/extension-text-align'
 import { Button, Segment, Popup, Modal, Form, Input } from 'semantic-ui-react'
 
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
@@ -151,20 +152,6 @@ const RichTextEditorToolBar = ({
   if (!editor) {
     return null
   }
-  const undoButton = (
-    <Button
-      icon="undo"
-      onClick={() => editor.chain().focus().undo().run()}
-      disabled={!editor.can().chain().focus().undo().run()}
-    />
-  )
-  const redoButton = (
-    <Button
-      icon="redo"
-      onClick={() => editor.chain().focus().redo().run()}
-      disabled={!editor.can().chain().focus().redo().run()}
-    />
-  )
   return (
     <Segment size="mini">
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
@@ -231,10 +218,50 @@ const RichTextEditorToolBar = ({
         />
       </Button.Group>
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
-        <Button icon="align left" />
-        <Button icon="align center" />
-        <Button icon="align right" />
-        <Button icon="align justify" />
+        <Popup
+          content="Align left"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="align left"
+              onClick={() => editor.chain().focus().setTextAlign('left').run()}
+              active={editor.isActive({ textAlign: 'left' })}
+            />
+          }
+        />
+        <Popup
+          content="Align center"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="align center"
+              onClick={() => editor.chain().focus().setTextAlign('center').run()}
+              active={editor.isActive({ textAlign: 'center' })}
+            />
+          }
+        />
+        <Popup
+          content="Align right"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="align right"
+              onClick={() => editor.chain().focus().setTextAlign('right').run()}
+              active={editor.isActive({ textAlign: 'right' })}
+            />
+          }
+        />
+        <Popup
+          content="Justify text"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="align justify"
+              onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+              active={editor.isActive({ textAlign: 'justify' })}
+            />
+          }
+        />
       </Button.Group>{' '}
       <LinkButtonGroup editor={editor} popupDelay={popupDelay} />{' '}
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
@@ -288,6 +315,9 @@ const extensions = [
   }),
   Link.configure({
     openOnClick: false,
+  }),
+  TextAlign.configure({
+    types: ['heading', 'paragraph'],
   }),
 ]
 
