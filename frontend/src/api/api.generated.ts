@@ -1094,6 +1094,7 @@ export type TaskCreate = TaskBase & {
 }
 export type TaskCommentBase = {
   text: string
+  richtext: object
 }
 export type TaskComment = TaskCommentBase & {
   id: number

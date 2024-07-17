@@ -141,6 +141,7 @@ class TaskCommentSerializer(serializers.ModelSerializer):
             "created_at",
             "type",
             "text",
+            "richtext",
         )
 
     task_id = serializers.IntegerField()
