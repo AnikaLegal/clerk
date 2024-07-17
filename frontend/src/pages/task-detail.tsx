@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react'
-import api, { Task, TaskCreate } from 'api'
+import React, { useState, useMemo, useEffect } from 'react'
+import api, { Task, TaskCreate, TaskComment, TaskCommentCreate } from 'api'
 import { Header, Grid, Segment, Form, Button, Divider } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
   getAPIFormErrors,
   mount,
   choiceToMap,
-  markdownToHtml,
+  MarkdownAsHtmlDisplay,
 } from 'utils'
 import { Model, ModelChoices, UserPermission, TaskDetailProps } from 'types'
 import { TaskCommentGroup, TaskMetaCard } from 'comps/task'
@@ -14,8 +14,11 @@ import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
-import { useSnackbar } from 'notistack'
+import { useSnackbar, enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
+
+import { RichtextEditor } from 'comps/richtext-editor'
+import { Editor } from '@tiptap/react'
 
 interface DjangoContext {
   choices: {
@@ -77,7 +80,13 @@ export const TaskDetail = ({
           <Segment basic>
             <Divider />
             <Header as="h4">Comments</Header>
-            <TaskCommentGroup task={task} />
+            <TaskComments
+              task={task}
+              setTask={setTask}
+              update={update}
+              choices={choices}
+              perms={perms}
+            />
           </Segment>
         </Grid.Column>
         <Grid.Column>
@@ -91,14 +100,6 @@ export const TaskDetail = ({
         </Grid.Column>
       </Grid.Row>
     </Grid>
-  )
-}
-
-export const MarkdownDisplay = ({ value }: { value: string }) => {
-  return (
-    <div
-      dangerouslySetInnerHTML={{ __html: value ? markdownToHtml(value) : '-' }}
-    />
   )
 }
 
@@ -135,7 +136,7 @@ export const TaskBody = ({
           <Grid.Column>
             <Form>
               <Form.Field>
-                <MarkdownDisplay value={task.description} />
+                <MarkdownAsHtmlDisplay markdown={task.description} />
               </Form.Field>
             </Form>
           </Grid.Column>
@@ -201,6 +202,61 @@ export const TaskBody = ({
         />
       )}
     </Formik>
+  )
+}
+
+export const TaskComments = ({
+  task,
+  setTask,
+  update,
+  choices,
+  perms,
+}: TaskDetailProps) => {
+  const [comments, setComments] = useState<TaskComment[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [getTaskComments] = api.useLazyGetTaskCommentsQuery()
+  const [createComment] = api.useCreateTaskCommentMutation()
+
+  const getComments = () => {
+    setIsLoading(true)
+    getTaskComments({ id: task.id })
+      .unwrap()
+      .then((comments) => {
+        setComments(comments)
+        setIsLoading(false)
+      })
+      .catch(() => setIsLoading(false))
+  }
+  useEffect(() => getComments(), [])
+
+  const onCreateComment = (editor: Editor) => {
+    if (!editor.isEmpty) {
+      const values: TaskCommentCreate = {
+        text: editor.getText(),
+        richtext: editor.getJSON(),
+      }
+      createComment({
+        id: task.id,
+        taskCommentCreate: values,
+      })
+        .then((instance) => {
+          enqueueSnackbar(`Added comment`, { variant: 'success' })
+          getComments()
+          editor.commands.clearContent()
+        })
+        .catch((err) => {
+          enqueueSnackbar(getAPIErrorMessage(err, `Failed to add comment`), {
+            variant: 'error',
+          })
+        })
+    }
+  }
+
+  return (
+    <>
+      <RichtextEditor onSubmit={onCreateComment} />
+      <TaskCommentGroup comments={comments} loading={isLoading} />
+    </>
   )
 }
 

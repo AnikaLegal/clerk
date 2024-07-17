@@ -1,8 +1,9 @@
 import React from 'react'
-import api, { Task } from 'api'
-import { Header, Segment, Comment, Divider, Loader } from 'semantic-ui-react'
+import { TaskComment } from 'api'
+import { Segment, Comment, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import styled from 'styled-components'
+import { RichtextDisplay } from 'comps/richtext-editor'
 
 const StyledCommentGroup = styled(Comment.Group)`
   && {
@@ -10,13 +11,16 @@ const StyledCommentGroup = styled(Comment.Group)`
   }
 `
 
-export const TaskCommentGroup = ({ task }: { task: Task }) => {
-  const commentResults = api.useGetTaskCommentsQuery({ id: task.id })
-  const comments = commentResults.data || []
-
+export const TaskCommentGroup = ({
+  comments,
+  loading,
+}: {
+  comments: TaskComment[]
+  loading: boolean
+}) => {
   return (
     <StyledCommentGroup>
-      <Loader inverted inline active={commentResults.isLoading} />
+      <Loader inverted inline active={loading} />
       {comments.map((comment) => (
         <Segment key={comment.id}>
           <Comment>
@@ -27,7 +31,7 @@ export const TaskCommentGroup = ({ task }: { task: Task }) => {
               <Comment.Metadata>
                 <div>{moment(comment.created_at).fromNow()}</div>
               </Comment.Metadata>
-              <Comment.Text>{comment.text}</Comment.Text>
+              <RichtextDisplay content={comment.richtext} />
             </Comment.Content>
           </Comment>
         </Segment>
