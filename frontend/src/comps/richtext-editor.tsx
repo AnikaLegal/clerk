@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Color } from '@tiptap/extension-color'
-import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
@@ -9,7 +7,6 @@ import Highlight from '@tiptap/extension-highlight'
 import { useEditor, EditorContent, Editor, JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Button, Segment, Popup, Modal, Form, Input } from 'semantic-ui-react'
-import { NodePos } from '@tiptap/react'
 
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
 export function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
@@ -284,11 +281,11 @@ const extensions = [
   }),
 ]
 
-export interface RichtextEditorProps {
+export interface RichTextEditorProps {
   onSubmit: (editor: Editor) => void
 }
 
-export const RichtextEditor = ({ onSubmit }: RichtextEditorProps) => {
+export const RichTextEditor = ({ onSubmit }: RichTextEditorProps) => {
   const editor: Editor = useEditor({
     extensions: extensions,
   })
@@ -324,7 +321,7 @@ export const RichtextEditor = ({ onSubmit }: RichtextEditorProps) => {
   )
 }
 
-export const RichtextDisplay = ({ content }: { content: JSONContent }) => {
+export const RichTextDisplay = ({ content }: { content: JSONContent }) => {
   const editor: Editor = useEditor({
     editable: false,
     content: content,

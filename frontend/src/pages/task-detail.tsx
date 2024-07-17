@@ -17,7 +17,7 @@ import { Formik } from 'formik'
 import { useSnackbar, enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
-import { RichtextEditor } from 'comps/richtext-editor'
+import { RichTextEditor } from 'comps/richtext-editor'
 import { Editor } from '@tiptap/react'
 
 interface DjangoContext {
@@ -254,7 +254,7 @@ export const TaskComments = ({
 
   return (
     <>
-      <RichtextEditor onSubmit={onCreateComment} />
+      <RichTextEditor onSubmit={onCreateComment} />
       <TaskCommentGroup comments={comments} loading={isLoading} />
     </>
   )

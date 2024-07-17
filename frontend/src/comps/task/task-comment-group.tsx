@@ -3,7 +3,7 @@ import { TaskComment } from 'api'
 import { Segment, Comment, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import styled from 'styled-components'
-import { RichtextDisplay } from 'comps/richtext-editor'
+import { RichTextDisplay } from 'comps/richtext-editor'
 
 const StyledCommentGroup = styled(Comment.Group)`
   && {
@@ -31,7 +31,7 @@ export const TaskCommentGroup = ({
               <Comment.Metadata>
                 <div>{moment(comment.created_at).fromNow()}</div>
               </Comment.Metadata>
-              <RichtextDisplay content={comment.richtext} />
+              <RichTextDisplay content={comment.richtext} />
             </Comment.Content>
           </Comment>
         </Segment>
