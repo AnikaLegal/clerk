@@ -165,75 +165,69 @@ const RichTextEditorToolBar = ({
       disabled={!editor.can().chain().focus().redo().run()}
     />
   )
-  const boldButton = (
-    <Button
-      icon="bold"
-      onClick={() => editor.chain().focus().toggleBold().run()}
-      active={editor.isActive('bold')}
-    />
-  )
-  const italicButton = (
-    <Button
-      icon="italic"
-      onClick={() => editor.chain().focus().toggleItalic().run()}
-      disabled={!editor.can().chain().focus().toggleItalic().run()}
-      active={editor.isActive('italic')}
-    />
-  )
-  const underlineButton = (
-    <Button
-      icon="underline"
-      onClick={() => editor.chain().focus().toggleUnderline().run()}
-      disabled={!editor.can().chain().focus().toggleUnderline().run()}
-      active={editor.isActive('underline')}
-    />
-  )
-  const strikeButton = (
-    <Button
-      icon="strikethrough"
-      onClick={() => editor.chain().focus().toggleStrike().run()}
-      disabled={!editor.can().chain().focus().toggleStrike().run()}
-      active={editor.isActive('strike')}
-    />
-  )
-  const highlightButton = (
-    <Button
-      icon
-      onClick={() => editor.chain().focus().toggleHighlight().run()}
-      disabled={!editor.can().chain().focus().toggleHighlight().run()}
-      active={editor.isActive('highlight')}
-    >
-      <IconHighlighter height={'12px'} />
-    </Button>
-  )
-
   return (
     <Segment size="mini">
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
         <Popup
           content="Bold"
           mouseEnterDelay={popupDelay}
-          trigger={boldButton}
+          trigger={
+            <Button
+              icon="bold"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              active={editor.isActive('bold')}
+            />
+          }
         />
         <Popup
           content="Italic"
           mouseEnterDelay={popupDelay}
-          trigger={italicButton}
+          trigger={
+            <Button
+              icon="italic"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              disabled={!editor.can().chain().focus().toggleItalic().run()}
+              active={editor.isActive('italic')}
+            />
+          }
         />
         <Popup
           content="Strikethrough"
           mouseEnterDelay={popupDelay}
-          trigger={strikeButton}
+          trigger={
+            <Button
+              icon="strikethrough"
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              disabled={!editor.can().chain().focus().toggleStrike().run()}
+              active={editor.isActive('strike')}
+            />
+          }
         />
         <Popup
           content="Underline"
           mouseEnterDelay={popupDelay}
-          trigger={underlineButton}
+          trigger={
+            <Button
+              icon="underline"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              disabled={!editor.can().chain().focus().toggleUnderline().run()}
+              active={editor.isActive('underline')}
+            />
+          }
         />
         <Popup
           content="Highlight text"
           mouseEnterDelay={popupDelay}
-          trigger={highlightButton}
+          trigger={
+            <Button
+              icon
+              onClick={() => editor.chain().focus().toggleHighlight().run()}
+              disabled={!editor.can().chain().focus().toggleHighlight().run()}
+              active={editor.isActive('highlight')}
+            >
+              <IconHighlighter height={'12px'} />
+            </Button>
+          }
         />
       </Button.Group>
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
@@ -247,12 +241,24 @@ const RichTextEditorToolBar = ({
         <Popup
           content="Undo"
           mouseEnterDelay={popupDelay}
-          trigger={undoButton}
+          trigger={
+            <Button
+              icon="undo"
+              onClick={() => editor.chain().focus().undo().run()}
+              disabled={!editor.can().chain().focus().undo().run()}
+            />
+          }
         />
         <Popup
           content="Redo"
           mouseEnterDelay={popupDelay}
-          trigger={redoButton}
+          trigger={
+            <Button
+              icon="redo"
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().chain().focus().redo().run()}
+            />
+          }
         />
       </Button.Group>{' '}
     </Segment>
