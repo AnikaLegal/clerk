@@ -286,20 +286,24 @@ const extensions = [
 ]
 
 export interface RichTextEditorProps {
-  onSubmit: (editor: Editor) => void
+  showToolBar: boolean
   popupDelay: number
+  onSubmit: (editor: Editor) => void
 }
 
 export const RichTextEditor = ({
-  onSubmit,
+  showToolBar = false,
   popupDelay = 1000,
+  onSubmit,
 }: RichTextEditorProps) => {
   const editor: Editor = useEditor({
     extensions: extensions,
   })
   return (
     <Segment.Group>
-      <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
+      {showToolBar && (
+        <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
+      )}
       <Segment
         className="ProseMirror-parent"
         style={{ padding: '0.5rem', height: 'auto' }}
