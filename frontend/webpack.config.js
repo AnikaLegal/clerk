@@ -18,7 +18,10 @@ const config = {
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin(),
-    new BundleTracker({ filename: '/build/webpack-stats.json' }),
+    new BundleTracker({ 
+      path: './build',
+      filename: 'webpack-stats.json',
+    }),
   ],
   resolve: {
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
@@ -43,8 +46,8 @@ const config = {
 }
 
 module.exports = (env, argv) => {
-  const isDeveopment = argv.mode === 'development'
-  if (isDeveopment) {
+  const isDevelopment = argv.mode === 'development'
+  if (isDevelopment) {
     // Setup dev server for hot reload
     config.devtool = 'inline-source-map'
     config.devServer = {
