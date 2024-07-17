@@ -141,12 +141,16 @@ export const LinkButtonGroup = ({
   )
 }
 
-const MenuBar = ({ editor }: { editor: Editor | null }) => {
+const RichTextEditorToolBar = ({
+  editor,
+  popupDelay,
+}: {
+  editor: Editor | null
+  popupDelay: number
+}) => {
   if (!editor) {
     return null
   }
-
-  const popupDelay: number = 1000
   const undoButton = (
     <Button
       icon="undo"
@@ -283,15 +287,19 @@ const extensions = [
 
 export interface RichTextEditorProps {
   onSubmit: (editor: Editor) => void
+  popupDelay: number
 }
 
-export const RichTextEditor = ({ onSubmit }: RichTextEditorProps) => {
+export const RichTextEditor = ({
+  onSubmit,
+  popupDelay = 1000,
+}: RichTextEditorProps) => {
   const editor: Editor = useEditor({
     extensions: extensions,
   })
   return (
     <Segment.Group>
-      <MenuBar editor={editor} />
+      <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
       <Segment
         className="ProseMirror-parent"
         style={{ padding: '0.5rem', height: 'auto' }}
@@ -300,7 +308,7 @@ export const RichTextEditor = ({ onSubmit }: RichTextEditorProps) => {
         <div style={{ padding: '0' }}>
           <Popup
             content="Submit comment"
-            mouseEnterDelay={1000}
+            mouseEnterDelay={popupDelay}
             trigger={
               <Button
                 circular
