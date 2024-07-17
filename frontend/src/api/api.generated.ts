@@ -1106,7 +1106,7 @@ export type TaskComment = TaskCommentBase & {
   }
   created_at: string
 }
-export type TaskCommentCreate = TaskBase & object
+export type TaskCommentCreate = TaskCommentBase & object
 export const {
   useGetCasesQuery,
   useGetCaseQuery,
