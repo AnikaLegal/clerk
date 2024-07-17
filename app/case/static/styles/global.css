@@ -115,6 +115,9 @@ main {
 .ProseMirror-focused {
   outline: none;
 }
+.ProseMirror-display {
+  margin-top: 0.5rem;
+}
 
 .tiptap :first-child {
   margin-top: 0;
