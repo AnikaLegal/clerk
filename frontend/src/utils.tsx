@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { hydrate, render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
 import styled from 'styled-components'
@@ -47,7 +47,7 @@ export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
 }
 
 export const mount = (App: React.ComponentType) => {
-  const root = document.getElementById('app')
+  const container = document.getElementById('app')
   const rootComponent = (
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
@@ -60,11 +60,15 @@ export const mount = (App: React.ComponentType) => {
     </Provider>
   )
 
-  if (root.hasChildNodes()) {
-    hydrate(rootComponent, root)
-  } else {
-    render(rootComponent, root)
+  if (!container.hasChildNodes()) {
+    const root = createRoot(container)
+    root.render(rootComponent)
   }
+  /*
+  else {
+    // TODO: hydration?
+  }
+  */
 }
 
 const FadeInOnLoad = styled.div`
@@ -90,19 +94,19 @@ export const debounce = (delay) => {
 }
 
 export const useDebounce = (value: any, delay: number): any => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+  const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+      setDebouncedValue(value)
+    }, delay)
 
     return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+      clearTimeout(handler)
+    }
+  }, [value, delay])
 
-  return debouncedValue;
+  return debouncedValue
 }
 
 // Debounce user input, returns a promise
@@ -203,13 +207,13 @@ export const choiceToMap = (choices: string[][]): Map<string, string> => {
   return choices.reduce(function (map, entry) {
     map.set(entry[0], entry[1])
     return map
-  }, new Map)
+  }, new Map())
 }
 
 interface OptionItem {
-  key: string;
-  text: string;
-  value: string;
+  key: string
+  text: string
+  value: string
 }
 
 export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
