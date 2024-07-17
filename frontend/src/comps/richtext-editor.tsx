@@ -18,6 +18,18 @@ export function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
+// icon:368-clear-formatting | Icomoon https://icomoon.io/ | Keyamoon
+export function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" {...props}>
+      <path
+        fill="currentColor"
+        d="M0 14h9v2H0zM14 2H9.273L6.402 13H4.335L7.206 2H3.001V0h11zm.528 14L12.5 13.972 10.472 16l-.972-.972L11.528 13 9.5 10.972l.972-.972 2.028 2.028L14.528 10l.972.972L13.472 13l2.028 2.028z"
+      />
+    </svg>
+  )
+}
+
 export const LinkButtonGroup = ({
   editor,
   popupDelay,
@@ -216,6 +228,18 @@ const RichTextEditorToolBar = ({
             </Button>
           }
         />
+        <Popup
+          content="Clear formatting"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon
+              onClick={() => editor.chain().focus().unsetAllMarks().run()}
+            >
+              <Icon368ClearFormatting height={'12px'} />
+            </Button>
+          }
+        />
       </Button.Group>
       <Button.Group basic style={{ marginRight: '0.5rem' }}>
         <Popup
@@ -235,7 +259,9 @@ const RichTextEditorToolBar = ({
           trigger={
             <Button
               icon="align center"
-              onClick={() => editor.chain().focus().setTextAlign('center').run()}
+              onClick={() =>
+                editor.chain().focus().setTextAlign('center').run()
+              }
               active={editor.isActive({ textAlign: 'center' })}
             />
           }
@@ -257,7 +283,9 @@ const RichTextEditorToolBar = ({
           trigger={
             <Button
               icon="align justify"
-              onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+              onClick={() =>
+                editor.chain().focus().setTextAlign('justify').run()
+              }
               active={editor.isActive({ textAlign: 'justify' })}
             />
           }
