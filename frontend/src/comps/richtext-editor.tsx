@@ -10,7 +10,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import { Button, Segment, Popup, Modal, Form, Input } from 'semantic-ui-react'
 
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
-export function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
+function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 576 512" fill="currentColor" {...props}>
       <path d="M331 315l158.4-215-29.3-29.4L245 229l86 86zm-187 5v-71.7c0-15.3 7.2-29.6 19.5-38.6L436.6 8.4C444 2.9 453 0 462.2 0c11.4 0 22.4 4.5 30.5 12.6l54.8 54.8c8.1 8.1 12.6 19 12.6 30.5 0 9.2-2.9 18.2-8.4 25.6l-201.3 273c-9 12.3-23.4 19.5-38.6 19.5H240l-25.4 25.4c-12.5 12.5-32.8 12.5-45.3 0l-50.7-50.7c-12.5-12.5-12.5-32.8 0-45.3L144 320zM23 466.3l63-63 70.6 70.6-31 31c-4.5 4.5-10.6 7-17 7H40c-13.3 0-24-10.7-24-24v-4.7c0-6.4 2.5-12.5 7-17z" />
@@ -19,7 +19,7 @@ export function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
 }
 
 // icon:368-clear-formatting | Icomoon https://icomoon.io/ | Keyamoon
-export function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
+function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 16 16" fill="currentColor" {...props}>
       <path
@@ -30,7 +30,7 @@ export function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-export const LinkButtonGroup = ({
+const LinkButtonGroup = ({
   editor,
   popupDelay,
 }: {
