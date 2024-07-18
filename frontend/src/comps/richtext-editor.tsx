@@ -320,6 +320,36 @@ const RichTextEditorToolBar = ({
   )
 }
 
+const RichTextEditorActions = ({
+  editor,
+  popupDelay,
+  onSubmit,
+}: {
+  editor: Editor | null
+  popupDelay: number
+  onSubmit: (editor: Editor) => void
+}) => {
+  if (!editor) {
+    return null
+  }
+  return (
+    <div className="actions">
+      <Popup
+        content="Submit comment"
+        mouseEnterDelay={popupDelay}
+        trigger={
+          <Button
+            circular
+            icon="arrow up"
+            size="small"
+            onClick={() => onSubmit(editor)}
+          />
+        }
+      />
+    </div>
+  )
+}
+
 const extensions = [
   TextStyle,
   Underline,
@@ -370,20 +400,11 @@ export const RichTextEditor = ({
       )}
       <Segment className="editor-content">
         <EditorContent className="content" editor={editor} />
-        <div className="actions">
-          <Popup
-            content="Submit comment"
-            mouseEnterDelay={popupDelay}
-            trigger={
-              <Button
-                circular
-                icon="arrow up"
-                size="small"
-                onClick={() => onSubmit(editor)}
-              />
-            }
-          />
-        </div>
+        <RichTextEditorActions
+          editor={editor}
+          popupDelay={popupDelay}
+          onSubmit={onSubmit}
+        />
       </Segment>
     </Segment.Group>
   )
