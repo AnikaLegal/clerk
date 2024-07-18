@@ -230,7 +230,7 @@ export const TaskComments = ({
   useEffect(() => getComments(), [])
 
   const onCreateComment = (editor: Editor) => {
-    if (!editor.isEmpty) {
+    if (!editor.isEmpty && editor.getText().trim() != "") {
       const values: TaskCommentCreate = {
         text: editor.getText(),
         richtext: editor.getJSON(),
