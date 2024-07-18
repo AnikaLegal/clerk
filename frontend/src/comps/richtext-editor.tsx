@@ -7,6 +7,7 @@ import Highlight from '@tiptap/extension-highlight'
 import { useEditor, EditorContent, Editor, JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
+import { Level } from '@tiptap/extension-heading'
 import {
   Button,
   Segment,
@@ -14,6 +15,7 @@ import {
   Modal,
   Form,
   Input,
+  Icon,
   SemanticSIZES,
 } from 'semantic-ui-react'
 
@@ -187,6 +189,8 @@ const RichTextEditorToolBar = ({
     return null
   }
 
+  const headingLevels: Level[] = [1, 2, 3, 4]
+
   return (
     <Segment className="toolbar" size="mini">
       <Button.Group basic size={buttonSize}>
@@ -263,6 +267,27 @@ const RichTextEditorToolBar = ({
             </Button>
           }
         />
+      </Button.Group>
+      <Button.Group basic size={buttonSize}>
+        {Array.from(headingLevels, (level: Level) => {
+          return (
+            <Popup
+              content={'Heading ' + level}
+              mouseEnterDelay={popupDelay}
+              trigger={
+                <Button
+                  icon
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: level }).run()
+                  }
+                  active={editor.isActive('heading', { level: level })}
+                >
+                  <Icon name="header">{level}</Icon>
+                </Button>
+              }
+            />
+          )
+        })}
       </Button.Group>
       <Button.Group basic size={buttonSize}>
         <Popup
