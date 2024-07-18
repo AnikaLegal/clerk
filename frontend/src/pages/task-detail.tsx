@@ -19,6 +19,7 @@ import * as Yup from 'yup'
 
 import { RichTextEditor } from 'comps/richtext-editor'
 import { Editor } from '@tiptap/react'
+import { EditorState } from 'prosemirror-state'
 
 interface DjangoContext {
   choices: {
@@ -230,7 +231,7 @@ export const TaskComments = ({
   useEffect(() => getComments(), [])
 
   const onCreateComment = (editor: Editor) => {
-    if (!editor.isEmpty && editor.getText().trim() != "") {
+    if (!editor.isEmpty && editor.getText().trim() != '') {
       const values: TaskCommentCreate = {
         text: editor.getText(),
         richtext: editor.getJSON(),
@@ -242,7 +243,18 @@ export const TaskComments = ({
         .then((instance) => {
           enqueueSnackbar(`Added comment`, { variant: 'success' })
           getComments()
+
+          /* Clear editor content & history. Be nice to have a cleaner way to do
+           * this. See https://github.com/ueberdosis/tiptap/issues/491
+           */
           editor.commands.clearContent()
+          editor.view.updateState(
+            EditorState.create({
+              doc: editor.state.doc,
+              plugins: editor.state.plugins,
+              schema: editor.state.schema,
+            })
+          )
         })
         .catch((err) => {
           enqueueSnackbar(getAPIErrorMessage(err, `Failed to add comment`), {
