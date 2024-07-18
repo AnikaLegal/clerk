@@ -7,12 +7,26 @@ import Highlight from '@tiptap/extension-highlight'
 import { useEditor, EditorContent, Editor, JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
-import { Button, Segment, Popup, Modal, Form, Input } from 'semantic-ui-react'
+import {
+  Button,
+  Segment,
+  Popup,
+  Modal,
+  Form,
+  Input,
+  SemanticSIZES,
+} from 'semantic-ui-react'
 
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
 function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 576 512" fill="currentColor" {...props}>
+    <svg
+      viewBox="0 0 576 512"
+      fill="currentColor"
+      height="1em"
+      width="1em"
+      {...props}
+    >
       <path d="M331 315l158.4-215-29.3-29.4L245 229l86 86zm-187 5v-71.7c0-15.3 7.2-29.6 19.5-38.6L436.6 8.4C444 2.9 453 0 462.2 0c11.4 0 22.4 4.5 30.5 12.6l54.8 54.8c8.1 8.1 12.6 19 12.6 30.5 0 9.2-2.9 18.2-8.4 25.6l-201.3 273c-9 12.3-23.4 19.5-38.6 19.5H240l-25.4 25.4c-12.5 12.5-32.8 12.5-45.3 0l-50.7-50.7c-12.5-12.5-12.5-32.8 0-45.3L144 320zM23 466.3l63-63 70.6 70.6-31 31c-4.5 4.5-10.6 7-17 7H40c-13.3 0-24-10.7-24-24v-4.7c0-6.4 2.5-12.5 7-17z" />
     </svg>
   )
@@ -21,7 +35,13 @@ function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
 // icon:368-clear-formatting | Icomoon https://icomoon.io/ | Keyamoon
 function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 16 16" fill="currentColor" {...props}>
+    <svg
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      height="1em"
+      width="1em"
+      {...props}
+    >
       <path
         fill="currentColor"
         d="M0 14h9v2H0zM14 2H9.273L6.402 13H4.335L7.206 2H3.001V0h11zm.528 14L12.5 13.972 10.472 16l-.972-.972L11.528 13 9.5 10.972l.972-.972 2.028 2.028L14.528 10l.972.972L13.472 13l2.028 2.028z"
@@ -33,9 +53,11 @@ function Icon368ClearFormatting(props: React.SVGProps<SVGSVGElement>) {
 const LinkButtonGroup = ({
   editor,
   popupDelay,
+  buttonSize = 'mini',
 }: {
   editor: Editor | null
   popupDelay: number
+  buttonSize?: SemanticSIZES
 }) => {
   if (!editor) {
     return null
@@ -45,24 +67,10 @@ const LinkButtonGroup = ({
   let url = editor.getAttributes('link').href
   let title = ''
   if (url) {
+    // Try to get the link text.
     const head = editor.state.selection.head
     title = editor.$pos(head).textContent
   }
-
-  const linkButton = (
-    <Button
-      icon="linkify"
-      onClick={() => setShowModal(true)}
-      active={editor.isActive('link')}
-    />
-  )
-  const unlinkButton = (
-    <Button
-      icon="unlinkify"
-      onClick={() => editor.chain().focus().unsetLink().run()}
-      disabled={!editor.isActive('link')}
-    />
-  )
 
   const ref = useRef(null)
   useEffect(() => {
@@ -94,16 +102,28 @@ const LinkButtonGroup = ({
 
   return (
     <>
-      <Button.Group basic>
+      <Button.Group basic size={buttonSize}>
         <Popup
           content="Add link"
           mouseEnterDelay={popupDelay}
-          trigger={linkButton}
+          trigger={
+            <Button
+              icon="linkify"
+              onClick={() => setShowModal(true)}
+              active={editor.isActive('link')}
+            />
+          }
         />
         <Popup
           content="Remove link"
           mouseEnterDelay={popupDelay}
-          trigger={unlinkButton}
+          trigger={
+            <Button
+              icon="unlinkify"
+              onClick={() => editor.chain().focus().unsetLink().run()}
+              disabled={!editor.isActive('link')}
+            />
+          }
         />
       </Button.Group>
       <Modal
@@ -157,16 +177,19 @@ const LinkButtonGroup = ({
 const RichTextEditorToolBar = ({
   editor,
   popupDelay,
+  buttonSize = 'mini',
 }: {
   editor: Editor | null
   popupDelay: number
+  buttonSize?: SemanticSIZES
 }) => {
   if (!editor) {
     return null
   }
+
   return (
     <Segment className="toolbar" size="mini">
-      <Button.Group basic>
+      <Button.Group basic size={buttonSize}>
         <Popup
           content="Bold"
           mouseEnterDelay={popupDelay}
@@ -224,7 +247,7 @@ const RichTextEditorToolBar = ({
               disabled={!editor.can().chain().focus().toggleHighlight().run()}
               active={editor.isActive('highlight')}
             >
-              <IconHighlighter height={'12px'} />
+              <IconHighlighter />
             </Button>
           }
         />
@@ -236,12 +259,12 @@ const RichTextEditorToolBar = ({
               icon
               onClick={() => editor.chain().focus().unsetAllMarks().run()}
             >
-              <Icon368ClearFormatting height={'12px'} />
+              <Icon368ClearFormatting />
             </Button>
           }
         />
       </Button.Group>
-      <Button.Group basic>
+      <Button.Group basic size={buttonSize}>
         <Popup
           content="Align left"
           mouseEnterDelay={popupDelay}
@@ -290,9 +313,13 @@ const RichTextEditorToolBar = ({
             />
           }
         />
-      </Button.Group>{' '}
-      <LinkButtonGroup editor={editor} popupDelay={popupDelay} />{' '}
-      <Button.Group basic>
+      </Button.Group>
+      <LinkButtonGroup
+        editor={editor}
+        popupDelay={popupDelay}
+        buttonSize={buttonSize}
+      />
+      <Button.Group basic size={buttonSize}>
         <Popup
           content="Undo"
           mouseEnterDelay={popupDelay}
