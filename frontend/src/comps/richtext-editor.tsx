@@ -291,6 +291,41 @@ const RichTextEditorToolBar = ({
       </Button.Group>
       <Button.Group basic size={buttonSize}>
         <Popup
+          content="Quote"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="quote right"
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              active={editor.isActive('blockquote')}
+            />
+          }
+        />
+        <Popup
+          content="Bullet list"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="list ul"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              active={editor.isActive('bulletList')}
+            />
+          }
+        />
+        <Popup
+          content="Ordered list"
+          mouseEnterDelay={popupDelay}
+          trigger={
+            <Button
+              icon="list ol"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              active={editor.isActive('orderedList')}
+            />
+          }
+        />
+      </Button.Group>
+      <Button.Group basic size={buttonSize}>
+        <Popup
           content="Align left"
           mouseEnterDelay={popupDelay}
           trigger={
