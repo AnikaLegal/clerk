@@ -103,20 +103,41 @@ main {
 
 /* Tiptap richtext editor */
 
-[contenteditable="false"].ProseMirror {
-  min-height: auto;
+.richtext-editor .toolbar {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
-.ProseMirror {
-  min-height: 100px;
+.richtext-editor .editor-content {
+  padding: 0.5rem;
+  height: auto;
 }
-.ProseMirror-parent:focus-within {
+.richtext-editor .editor-content:focus-within {
   outline: 1px solid #85b7d9;
 }
-.ProseMirror-focused {
+.richtext-editor .content,
+.richtext-editor .content > div {
+  min-height: 100px;
+}
+.richtext-editor .content > div {
   outline: none;
 }
-.ProseMirror-display {
+.richtext-editor .actions {
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.richtext-editor .actions > button {
+  margin: 0;
+}
+
+.richtext-display {
   margin-top: 0.5rem;
+  min-height: auto;
 }
 
 .tiptap :first-child {
@@ -193,11 +214,11 @@ main {
   margin: 2rem 0;
 }
 
-  /* Placeholder (at the top) */
-  .tiptap p.is-editor-empty:first-child::before {
-    color: #adb5bd;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-  }
+/* Placeholder (at the top) */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

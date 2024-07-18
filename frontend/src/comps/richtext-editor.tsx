@@ -94,7 +94,7 @@ export const LinkButtonGroup = ({
 
   return (
     <>
-      <Button.Group basic style={{ marginRight: '0.5rem' }}>
+      <Button.Group basic>
         <Popup
           content="Add link"
           mouseEnterDelay={popupDelay}
@@ -165,8 +165,8 @@ const RichTextEditorToolBar = ({
     return null
   }
   return (
-    <Segment size="mini">
-      <Button.Group basic style={{ marginRight: '0.5rem' }}>
+    <Segment className="toolbar" size="mini">
+      <Button.Group basic>
         <Popup
           content="Bold"
           mouseEnterDelay={popupDelay}
@@ -241,7 +241,7 @@ const RichTextEditorToolBar = ({
           }
         />
       </Button.Group>
-      <Button.Group basic style={{ marginRight: '0.5rem' }}>
+      <Button.Group basic>
         <Popup
           content="Align left"
           mouseEnterDelay={popupDelay}
@@ -292,7 +292,7 @@ const RichTextEditorToolBar = ({
         />
       </Button.Group>{' '}
       <LinkButtonGroup editor={editor} popupDelay={popupDelay} />{' '}
-      <Button.Group basic style={{ marginRight: '0.5rem' }}>
+      <Button.Group basic>
         <Popup
           content="Undo"
           mouseEnterDelay={popupDelay}
@@ -364,16 +364,13 @@ export const RichTextEditor = ({
     extensions: extensions,
   })
   return (
-    <Segment.Group>
+    <Segment.Group className="richtext-editor">
       {showToolBar && (
         <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
       )}
-      <Segment
-        className="ProseMirror-parent"
-        style={{ padding: '0.5rem', height: 'auto' }}
-      >
-        <EditorContent editor={editor} />
-        <div style={{ padding: '0' }}>
+      <Segment className="editor-content">
+        <EditorContent className="content" editor={editor} />
+        <div className="actions">
           <Popup
             content="Submit comment"
             mouseEnterDelay={popupDelay}
@@ -382,11 +379,6 @@ export const RichTextEditor = ({
                 circular
                 icon="arrow up"
                 size="small"
-                style={{
-                  display: 'block',
-                  marginLeft: 'auto',
-                  marginRight: '0',
-                }}
                 onClick={() => onSubmit(editor)}
               />
             }
@@ -403,5 +395,5 @@ export const RichTextDisplay = ({ content }: { content: JSONContent }) => {
     content: content,
     extensions: extensions,
   })
-  return <EditorContent className="ProseMirror-display" editor={editor} />
+  return <EditorContent className="richtext-display" editor={editor} />
 }
