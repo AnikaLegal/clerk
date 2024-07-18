@@ -204,13 +204,13 @@ main {
   padding: 0;
 }
 .tiptap blockquote {
-  border-left: 3px solid var(--gray-3);
+  border-left: 3px solid var(--grey-3);
   margin: 1.5rem 0;
   padding-left: 1rem;
 }
 .tiptap hr {
   border: none;
-  border-top: 1px solid var(--gray-2);
+  border-top: 1px solid var(--grey-2);
   margin: 2rem 0;
 }
 
