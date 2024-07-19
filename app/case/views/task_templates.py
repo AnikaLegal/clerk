@@ -16,7 +16,9 @@ from case.views.auth import (
 @api_view(["GET"])
 @coordinator_or_better_required
 def template_task_list_page_view(request):
-    context = {}
+    context = {
+        "create_url": reverse("template-task-create"),
+    }
     return render_react_page(request, "Task Templates", "task-template-list", context)
 
 
@@ -35,7 +37,9 @@ def template_task_detail_page_view(request, pk):
     except TaskTrigger.DoesNotExist:
         raise Http404()
 
-    context = {}
+    context = {
+        "list_url": reverse("template-task-list"),
+    }
     return render_react_page(request, "Task Templates", "task-template-detail", context)
 
 
