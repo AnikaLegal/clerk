@@ -14,6 +14,7 @@ from .views import (
     case,
     case_email,
     task,
+    task_templates,
 )
 
 from .views import root
@@ -47,6 +48,11 @@ router.register(
     "template-doc",
     document_templates.DocumentTemplateApiViewset,
     basename="template-doc-api",
+)
+router.register(
+    "template-task",
+    task_templates.TaskTemplateApiViewset,
+    basename="template-task-api",
 )
 
 
@@ -95,8 +101,21 @@ urlpatterns = [
     ),
     # Tasks
     path("tasks/", task.task_list_page_view, name="task-list"),
+    re_path(f"^tasks/{INT_PK}/$", task.task_detail_page_view, name="task-detail"),
+    path(
+        "templates/task/",
+        task_templates.template_task_list_page_view,
+        name="template-task-list",
+    ),
+    path(
+        "templates/task/create/",
+        task_templates.template_task_create_page_view,
+        name="template-task-create",
+    ),
     re_path(
-        f"^tasks/{INT_PK}/$", task.task_detail_page_view, name="task-detail"
+        f"^templates/task/{INT_PK}/$",
+        task_templates.template_task_detail_page_view,
+        name="template-task-detail",
     ),
     # Parties
     path("parties/", person.person_list_page_view, name="person-list"),
