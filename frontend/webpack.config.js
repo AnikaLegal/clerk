@@ -19,7 +19,7 @@ const config = {
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin(),
     new BundleTracker({ 
-      path: './build',
+      path: '/build',
       filename: 'webpack-stats.json',
     }),
   ],
