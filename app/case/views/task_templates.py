@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 
 from task.models import TaskTrigger
-from task.serializers import TaskTemplateSerializer
+from task.serializers import TaskTriggerSerializer
 from case.utils.react import render_react_page
 
 from case.views.auth import (
@@ -44,7 +44,7 @@ def template_task_detail_page_view(request, pk):
 
 
 class TaskTemplateApiViewset(ModelViewSet):
-    serializer_class = TaskTemplateSerializer
+    serializer_class = TaskTriggerSerializer
     permission_classes = [CoordinatorOrBetterPermission]
 
     def get_queryset(self):

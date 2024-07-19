@@ -3,13 +3,33 @@ from django.urls import reverse
 
 from case.serializers import IssueSerializer, UserSerializer
 from case.serializers.fields import LocalDateField
-from .models import Task, TaskComment, TaskTrigger
+from .models import Task, TaskComment, TaskTrigger, TaskTemplate
 
 
 class TaskTemplateSerializer(serializers.ModelSerializer):
     class Meta:
+        model = TaskTemplate
+        fields = (
+            "id",
+            "type",
+            "name",
+            "description",
+        )
+
+
+class TaskTriggerSerializer(serializers.ModelSerializer):
+    class Meta:
         model = TaskTrigger
-        fields = ("id",)
+        fields = (
+            "id",
+            "topic",
+            "event",
+            "event_stage",
+            "tasks_assignment_role",
+            "templates",
+        )
+
+    templates = TaskTemplateSerializer(many=True)
 
 
 class TaskListIssueSerializer(IssueSerializer):
