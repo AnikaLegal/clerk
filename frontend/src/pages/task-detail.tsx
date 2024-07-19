@@ -230,7 +230,7 @@ export const TaskComments = ({
   }
   useEffect(() => getComments(), [])
 
-  const onCreateComment = (editor: Editor) => {
+  const handleSubmit = (editor: Editor) => {
     if (!editor.isEmpty && editor.getText().trim() != '') {
       const values: TaskCommentCreate = {
         text: editor.getText(),
@@ -266,7 +266,7 @@ export const TaskComments = ({
 
   return (
     <>
-      <RichTextEditor onSubmit={onCreateComment} />
+      <RichTextEditor onSubmit={handleSubmit} />
       <TaskCommentGroup comments={comments} loading={isLoading} />
     </>
   )
