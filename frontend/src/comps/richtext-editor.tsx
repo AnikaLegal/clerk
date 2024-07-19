@@ -17,6 +17,7 @@ import {
   Input,
   Icon,
   SemanticSIZES,
+  Label,
 } from 'semantic-ui-react'
 
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
@@ -419,10 +420,23 @@ const RichTextEditorActions = ({
   if (!editor) {
     return null
   }
+
+  editor.setOptions({
+    editorProps: {
+      handleDOMEvents: {
+        keydown: (view, e) => {
+          if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault()
+            onSubmit(editor)
+          }
+        },
+      },
+    },
+  })
+
   return (
     <div className="actions">
       <Popup
-        content="Submit comment"
         mouseEnterDelay={popupDelay}
         trigger={
           <Button
@@ -432,7 +446,10 @@ const RichTextEditorActions = ({
             onClick={() => onSubmit(editor)}
           />
         }
-      />
+      >
+        <p>Submit comment</p>
+        <Label>Ctrl</Label>+<Label>Enter</Label>
+      </Popup>
     </div>
   )
 }
@@ -480,6 +497,7 @@ export const RichTextEditor = ({
   const editor: Editor = useEditor({
     extensions: extensions,
   })
+
   return (
     <Segment.Group className="richtext-editor">
       {showToolBar && (
