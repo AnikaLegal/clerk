@@ -222,3 +222,15 @@ main {
   height: 0;
   pointer-events: none;
 }
+
+/* When displaying richtext don't leave a margin at the bottom and don't display
+ * the empty break element inserted when a new paragraph is entered when editing. */
+.richtext-display .tiptap *:last-child {
+  margin-bottom: 0;
+}
+.richtext-display .tiptap .ProseMirror-trailingBreak {
+  display: none;
+}
+.richtext-display .tiptap *:has(+p > br.ProseMirror-trailingBreak) {
+  margin-bottom: 0;
+}
