@@ -12,5 +12,6 @@ def template_list_page_view(request):
         "email_url": reverse("template-email-list"),
         "doc_url": reverse("template-doc-list"),
         "notify_url": reverse("template-notify-list"),
+        "task_url": reverse("template-task-list"),
     }
     return render_react_page(request, "Templates", "template-list", context)

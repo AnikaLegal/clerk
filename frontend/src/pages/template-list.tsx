@@ -7,9 +7,10 @@ interface DjangoContext {
   email_url: string
   doc_url: string
   notify_url: string
+  task_url: string
 }
 
-const { email_url, doc_url, notify_url } = (window as any)
+const { email_url, doc_url, notify_url, task_url } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -36,6 +37,17 @@ const App = () => {
             </a>
             <List.Description>
               Documents automatically added to every new case{' '}
+            </List.Description>
+          </List.Content>
+        </List.Item>
+        <List.Item>
+          <Icon name="tasks" style={{ verticalAlign: 'middle' }} />
+          <List.Content>
+            <a className="header" href={task_url}>
+              Task templates
+            </a>
+            <List.Description>
+              Tasks that are created in response to case events{' '}
             </List.Description>
           </List.Content>
         </List.Item>
