@@ -41,17 +41,6 @@ const App = () => {
           </List.Content>
         </List.Item>
         <List.Item>
-          <Icon name="tasks" style={{ verticalAlign: 'middle' }} />
-          <List.Content>
-            <a className="header" href={task_url}>
-              Task templates
-            </a>
-            <List.Description>
-              Tasks that are created in response to case events{' '}
-            </List.Description>
-          </List.Content>
-        </List.Item>
-        <List.Item>
           <Icon name="bell outline" style={{ verticalAlign: 'middle' }} />
           <List.Content>
             <a className="header" href={notify_url}>
@@ -59,6 +48,17 @@ const App = () => {
             </a>
             <List.Description>
               Notifications that are sent in response to case events{' '}
+            </List.Description>
+          </List.Content>
+        </List.Item>
+        <List.Item>
+          <Icon name="tasks" style={{ verticalAlign: 'middle' }} />
+          <List.Content>
+            <a className="header" href={task_url}>
+              Task templates
+            </a>
+            <List.Description>
+              Tasks that are created in response to case events{' '}
             </List.Description>
           </List.Content>
         </List.Item>
