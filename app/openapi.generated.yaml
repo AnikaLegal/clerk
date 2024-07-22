@@ -1282,6 +1282,97 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-task/:
+    get:
+      operationId: getTaskTriggers
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskTrigger"
+    post:
+      operationId: createTaskTrigger
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTriggerCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskTrigger"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-task/{id}/:
+    get:
+      operationId: getTaskTrigger
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskTrigger"
+    patch:
+      operationId: updateTaskTrigger
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTriggerCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskTrigger"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteTaskTrigger
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
     IssueBase:
@@ -2293,6 +2384,60 @@ components:
     TaskCommentCreate:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
+        - type: object
+    TaskTriggerBase:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        event:
+          type: string
+        tasks_assignment_role:
+          type: string
+        event_stage:
+          type: string
+        templates:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              type:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+            required:
+              - type
+              - name
+      required:
+        - name
+        - topic
+        - event
+        - tasks_assignment_role
+        - templates
+    TaskTrigger:
+      allOf:
+        - $ref: "#/components/schemas/TaskTriggerBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+            created_at:
+              type: string
+            url:
+              type: string
+          required:
+            - id
+            - created_at
+            - url
+    TaskTriggerCreate:
+      allOf:
+        - $ref: "#/components/schemas/TaskTriggerBase"
         - type: object
   responses:
     BadRequest:

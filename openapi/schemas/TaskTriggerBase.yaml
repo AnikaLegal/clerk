@@ -1,0 +1,34 @@
+type: object
+properties:
+  name:
+    type: string
+  topic:
+    type: string
+  event:
+    type: string
+  tasks_assignment_role:
+    type: string
+  event_stage:
+    type: string
+  templates:
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - type
+        - name
+required:
+  - name
+  - topic
+  - event
+  - tasks_assignment_role
+  - templates

@@ -67,3 +67,7 @@ paths:
     $ref: paths/task-detail.yaml
   /clerk/api/task/{id}/comments/:
     $ref: paths/task-comments-list.yaml
+  /clerk/api/template-task/:
+    $ref: paths/task-trigger-list.yaml
+  /clerk/api/template-task/{id}/:
+    $ref: paths/task-trigger-detail.yaml

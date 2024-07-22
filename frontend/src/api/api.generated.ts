@@ -404,6 +404,49 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.taskCommentCreate,
       }),
     }),
+    getTaskTriggers: build.query<
+      GetTaskTriggersApiResponse,
+      GetTaskTriggersApiArg
+    >({
+      query: () => ({ url: `/clerk/api/template-task/` }),
+    }),
+    createTaskTrigger: build.mutation<
+      CreateTaskTriggerApiResponse,
+      CreateTaskTriggerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-task/`,
+        method: 'POST',
+        body: queryArg.taskTriggerCreate,
+      }),
+    }),
+    getTaskTrigger: build.query<
+      GetTaskTriggerApiResponse,
+      GetTaskTriggerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-task/${queryArg.id}/`,
+      }),
+    }),
+    updateTaskTrigger: build.mutation<
+      UpdateTaskTriggerApiResponse,
+      UpdateTaskTriggerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-task/${queryArg.id}/`,
+        method: 'PATCH',
+        body: queryArg.taskTriggerCreate,
+      }),
+    }),
+    deleteTaskTrigger: build.mutation<
+      DeleteTaskTriggerApiResponse,
+      DeleteTaskTriggerApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-task/${queryArg.id}/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -782,6 +825,34 @@ export type CreateTaskCommentApiArg = {
   /** Successful response. */
   taskCommentCreate: TaskCommentCreate
 }
+export type GetTaskTriggersApiResponse =
+  /** status 200 Successful response. */ TaskTrigger[]
+export type GetTaskTriggersApiArg = void
+export type CreateTaskTriggerApiResponse =
+  /** status 201 Successful response. */ TaskTrigger
+export type CreateTaskTriggerApiArg = {
+  taskTriggerCreate: TaskTriggerCreate
+}
+export type GetTaskTriggerApiResponse =
+  /** status 200 Successful response. */ TaskTrigger
+export type GetTaskTriggerApiArg = {
+  /** Entity ID */
+  id: number
+}
+export type UpdateTaskTriggerApiResponse =
+  /** status 200 Successful response. */ TaskTrigger
+export type UpdateTaskTriggerApiArg = {
+  /** Entity ID */
+  id: number
+  /** Successful response. */
+  taskTriggerCreate: TaskTriggerCreate
+}
+export type DeleteTaskTriggerApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteTaskTriggerApiArg = {
+  /** Entity ID */
+  id: number
+}
 export type IssueBase = {
   topic: string
   stage: string
@@ -1108,6 +1179,25 @@ export type TaskComment = TaskCommentBase & {
   created_at: string
 }
 export type TaskCommentCreate = TaskCommentBase & object
+export type TaskTriggerBase = {
+  name: string
+  topic: string
+  event: string
+  tasks_assignment_role: string
+  event_stage?: string
+  templates: {
+    id?: number
+    type: string
+    name: string
+    description?: string
+  }[]
+}
+export type TaskTrigger = TaskTriggerBase & {
+  id: number
+  created_at: string
+  url: string
+}
+export type TaskTriggerCreate = TaskTriggerBase & object
 export const {
   useGetCasesQuery,
   useGetCaseQuery,
@@ -1159,4 +1249,9 @@ export const {
   useDeleteTaskMutation,
   useGetTaskCommentsQuery,
   useCreateTaskCommentMutation,
+  useGetTaskTriggersQuery,
+  useCreateTaskTriggerMutation,
+  useGetTaskTriggerQuery,
+  useUpdateTaskTriggerMutation,
+  useDeleteTaskTriggerMutation,
 } = injectedRtkApi

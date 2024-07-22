@@ -1,0 +1,14 @@
+allOf:
+  - $ref: ./TaskTriggerBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+      created_at:
+        type: string
+      url:
+        type: string
+    required:
+      - id
+      - created_at
+      - url
