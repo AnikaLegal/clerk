@@ -21,6 +21,7 @@ class TasksCaseRole(models.TextChoices):
 
 
 class TaskTrigger(TimestampedModel):
+    name = models.CharField(max_length=128)
     topic = models.CharField(max_length=32, choices=TriggerTopic.choices)
     event = models.CharField(max_length=32, choices=EventType.choices)
     # Only relevant when event is STAGE
