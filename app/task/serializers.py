@@ -16,6 +16,8 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
             "description",
         )
 
+    id = serializers.IntegerField()
+
 
 class TaskTriggerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +32,46 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
         )
 
     templates = TaskTemplateSerializer(many=True)
+
+    def create(self, validated_data):
+        templates_data = validated_data.pop("templates")
+        trigger = TaskTrigger.objects.create(**validated_data)
+        for data in templates_data:
+            TaskTemplate.objects.create(trigger=trigger, **data)
+        return trigger
+
+    def update(self, instance, validated_data):
+        to_add = []
+        to_delete = []
+        to_update = []
+
+        # Determine whether we need to add, delete or update any templates based
+        # on the incoming nested templates data.
+        for data in validated_data.pop("templates"):
+            if "id" in data:
+                to_update.append(data)
+            else:
+                to_add.append(data)
+
+        ids = {x["id"] for x in to_update}
+        for template in instance.templates.all():
+            if not template.id in ids:
+                to_delete.append(template.id)
+
+        # Do the required operations.
+        for id in to_delete:
+            instance.templates.all().get(id=id).delete()
+
+        for data in to_add:
+            TaskTemplate.objects.create(trigger=instance, **data)
+
+        for data in to_update:
+            template = instance.templates.all().get(id=data["id"])
+            for attr, value in data.items():
+                setattr(template, attr, value)
+            template.save()
+
+        return super().update(instance, validated_data)
 
 
 class TaskListIssueSerializer(IssueSerializer):
