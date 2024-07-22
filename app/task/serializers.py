@@ -24,14 +24,22 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
         model = TaskTrigger
         fields = (
             "id",
+            "name",
             "topic",
             "event",
             "event_stage",
             "tasks_assignment_role",
             "templates",
+            "created_at",
+            "url",
         )
 
     templates = TaskTemplateSerializer(many=True)
+    created_at = LocalDateField(read_only=True)
+    url = serializers.SerializerMethodField(read_only=True)
+
+    def get_url(self, obj):
+        return reverse("template-task-detail", args=(obj.pk,))
 
     def create(self, validated_data):
         templates_data = validated_data.pop("templates")
