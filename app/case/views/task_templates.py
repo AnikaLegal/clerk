@@ -34,7 +34,14 @@ def template_task_list_page_view(request):
 @api_view(["GET"])
 @coordinator_or_better_required
 def template_task_create_page_view(request):
-    context = {}
+    context = {
+        "choices": {
+            "topic": TriggerTopic.choices,
+            "event": EventType.choices,
+            "event_stage": CaseStage.CHOICES,
+            "tasks_assignment_role": TasksCaseRole.choices,
+        },
+    }
     return render_react_page(request, "Task Templates", "task-template-create", context)
 
 
