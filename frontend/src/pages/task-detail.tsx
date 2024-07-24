@@ -17,7 +17,7 @@ import { Formik } from 'formik'
 import { useSnackbar, enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
-import { RichTextEditor } from 'comps/richtext-editor'
+import { RichTextCommentEditor } from 'comps/richtext-editor'
 import { Editor } from '@tiptap/react'
 import { EditorState } from 'prosemirror-state'
 
@@ -244,8 +244,8 @@ export const TaskComments = ({
           enqueueSnackbar(`Added comment`, { variant: 'success' })
           getComments()
 
-          /* Clear editor content & history. Be nice to have a cleaner way to do
-           * this. See https://github.com/ueberdosis/tiptap/issues/491
+          /* Clear editor content & history. Be nice to have a cleaner way to
+           * clear history. See https://github.com/ueberdosis/tiptap/issues/491
            */
           editor.commands.clearContent()
           editor.view.updateState(
@@ -266,7 +266,10 @@ export const TaskComments = ({
 
   return (
     <>
-      <RichTextEditor onSubmit={handleSubmit} />
+      <RichTextCommentEditor
+        onSubmit={handleSubmit}
+        placeholder="Leave a comment…"
+      />
       <TaskCommentGroup comments={comments} loading={isLoading} />
     </>
   )

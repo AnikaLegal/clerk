@@ -427,7 +427,7 @@ const RichTextEditorToolBar = ({
   )
 }
 
-const RichTextEditorActions = ({
+const RichTextCommentEditorActions = ({
   editor,
   popupDelay,
   onSubmit,
@@ -478,23 +478,7 @@ const extensions = [
   TextStyle,
   Underline,
   Highlight,
-  StarterKit.configure({
-    bulletList: {
-      keepMarks: true,
-      // TODO : Making this as `false` because marks are not preserved when I try to
-      // preserve attrs, awaiting a bit of help
-      keepAttributes: false,
-    },
-    orderedList: {
-      keepMarks: true,
-      // TODO : Making this as `false` because marks are not preserved when I try to
-      // preserve attrs, awaiting a bit of help
-      keepAttributes: false,
-    },
-  }),
-  Placeholder.configure({
-    placeholder: 'Leave a comment…',
-  }),
+  StarterKit,
   Link.configure({
     openOnClick: false,
   }),
@@ -503,33 +487,71 @@ const extensions = [
   }),
 ]
 
-export interface RichTextEditorProps {
-  showToolBar?: boolean
-  popupDelay?: number
+export interface RichTextCommentProps {
+  disabled?: boolean
   onSubmit: (editor: Editor) => void
+  placeholder?: string
+  popupDelay?: number
 }
 
-export const RichTextEditor = ({
-  showToolBar = false,
-  popupDelay = 1000,
+export const RichTextCommentEditor = ({
+  disabled = false,
   onSubmit,
-}: RichTextEditorProps) => {
+  placeholder = '',
+  popupDelay = 1000,
+}: RichTextCommentProps) => {
   const editor: Editor = useEditor({
-    extensions: extensions,
+    extensions: [
+      ...extensions,
+      Placeholder.configure({ placeholder: placeholder }),
+    ],
   })
+  if (!editor) {
+    return null
+  }
+  editor.setEditable(!disabled)
 
   return (
     <Segment.Group className="richtext-editor">
-      {showToolBar && (
-        <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
-      )}
       <Segment className="editor-content">
         <EditorContent className="content" editor={editor} />
-        <RichTextEditorActions
+        <RichTextCommentEditorActions
           editor={editor}
           popupDelay={popupDelay}
           onSubmit={onSubmit}
         />
+      </Segment>
+    </Segment.Group>
+  )
+}
+
+export interface RichTextEditorProps {
+  disabled?: boolean
+  placeholder?: string
+  popupDelay?: number
+}
+
+export const RichTextEditor = ({
+  disabled = false,
+  placeholder = '',
+  popupDelay = 1000,
+}: RichTextEditorProps) => {
+  const editor: Editor = useEditor({
+    extensions: [
+      ...extensions,
+      Placeholder.configure({ placeholder: placeholder }),
+    ],
+  })
+  if (!editor) {
+    return null
+  }
+  editor.setEditable(!disabled)
+
+  return (
+    <Segment.Group className="richtext-editor">
+      <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
+      <Segment className="editor-content">
+        <EditorContent className="content" editor={editor} />
       </Segment>
     </Segment.Group>
   )
