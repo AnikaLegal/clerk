@@ -12,6 +12,7 @@ interface DjangoContext {
     event: string[][]
     event_stage: string[][]
     tasks_assignment_role: string[][]
+    task_type: string[][]
   }
 }
 
@@ -33,7 +34,6 @@ const App = () => {
           tasks_assignment_role: '',
           templates: [],
         }}
-        validate={(values) => {}}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           createTaskTrigger({ taskTriggerCreate: values })
             .unwrap()
@@ -54,11 +54,7 @@ const App = () => {
         }}
       >
         {(formik) => (
-          <TaskTemplateForm
-            formik={formik}
-            choices={CONTEXT.choices}
-            create
-          />
+          <TaskTemplateForm formik={formik} choices={CONTEXT.choices} create />
         )}
       </Formik>
     </Container>

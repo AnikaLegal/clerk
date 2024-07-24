@@ -1179,18 +1179,19 @@ export type TaskComment = TaskCommentBase & {
   created_at: string
 }
 export type TaskCommentCreate = TaskCommentBase & object
+export type TaskTemplate = {
+  id?: number
+  type: string
+  name: string
+  description?: string
+}
 export type TaskTriggerBase = {
   name: string
   topic: string
   event: string
   tasks_assignment_role: string
   event_stage?: string
-  templates: {
-    id?: number
-    type: string
-    name: string
-    description?: string
-  }[]
+  templates: TaskTemplate[]
 }
 export type TaskTrigger = TaskTriggerBase & {
   id: number

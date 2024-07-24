@@ -282,6 +282,7 @@ const RichTextEditorToolBar = ({
         {Array.from(headingLevels, (level: Level) => {
           return (
             <Popup
+              key={level}
               content={'Heading ' + level}
               mouseEnterDelay={popupDelay}
               trigger={
@@ -501,6 +502,7 @@ export const RichTextCommentEditor = ({
   popupDelay = 1000,
 }: RichTextCommentProps) => {
   const editor: Editor = useEditor({
+    editable: !disabled,
     extensions: [
       ...extensions,
       Placeholder.configure({ placeholder: placeholder }),
@@ -509,8 +511,6 @@ export const RichTextCommentEditor = ({
   if (!editor) {
     return null
   }
-  editor.setEditable(!disabled)
-
   return (
     <Segment.Group className="richtext-editor">
       <Segment className="editor-content">
@@ -527,16 +527,20 @@ export const RichTextCommentEditor = ({
 
 export interface RichTextEditorProps {
   disabled?: boolean
+  onUpdate?
   placeholder?: string
   popupDelay?: number
 }
 
 export const RichTextEditor = ({
   disabled = false,
+  onUpdate,
   placeholder = '',
   popupDelay = 1000,
 }: RichTextEditorProps) => {
   const editor: Editor = useEditor({
+    editable: !disabled,
+    onUpdate: onUpdate,
     extensions: [
       ...extensions,
       Placeholder.configure({ placeholder: placeholder }),
@@ -545,8 +549,6 @@ export const RichTextEditor = ({
   if (!editor) {
     return null
   }
-  editor.setEditable(!disabled)
-
   return (
     <Segment.Group className="richtext-editor">
       <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />

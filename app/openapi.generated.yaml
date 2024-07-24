@@ -2385,6 +2385,20 @@ components:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
         - type: object
+    TaskTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - type
+        - name
     TaskTriggerBase:
       type: object
       properties:
@@ -2401,19 +2415,7 @@ components:
         templates:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-              type:
-                type: string
-              name:
-                type: string
-              description:
-                type: string
-            required:
-              - type
-              - name
+            $ref: "#/components/schemas/TaskTemplate"
       required:
         - name
         - topic

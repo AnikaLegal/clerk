@@ -13,19 +13,7 @@ properties:
   templates:
     type: array
     items:
-      type: object
-      properties:
-        id:
-          type: integer
-        type:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-      required:
-        - type
-        - name
+      $ref: ./TaskTemplate.yaml
 required:
   - name
   - topic
