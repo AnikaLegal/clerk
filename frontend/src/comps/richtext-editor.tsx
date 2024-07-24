@@ -83,6 +83,7 @@ const LinkButtonGroup = ({
   }, [showModal])
 
   function handleSubmit(e) {
+    e.stopPropagation()
     if (url) {
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url
@@ -111,6 +112,7 @@ const LinkButtonGroup = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="linkify"
               onClick={() => setShowModal(true)}
               active={editor.isActive('link')}
@@ -122,6 +124,7 @@ const LinkButtonGroup = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="unlinkify"
               onClick={() => editor.chain().focus().unsetLink().run()}
               disabled={!editor.isActive('link')}
@@ -200,6 +203,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="bold"
               onClick={() => editor.chain().focus().toggleBold().run()}
               active={editor.isActive('bold')}
@@ -211,6 +215,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="italic"
               onClick={() => editor.chain().focus().toggleItalic().run()}
               disabled={!editor.can().chain().focus().toggleItalic().run()}
@@ -223,6 +228,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="strikethrough"
               onClick={() => editor.chain().focus().toggleStrike().run()}
               disabled={!editor.can().chain().focus().toggleStrike().run()}
@@ -235,6 +241,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="underline"
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               disabled={!editor.can().chain().focus().toggleUnderline().run()}
@@ -247,6 +254,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon
               onClick={() => editor.chain().focus().toggleHighlight().run()}
               disabled={!editor.can().chain().focus().toggleHighlight().run()}
@@ -261,6 +269,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon
               onClick={() => editor.chain().focus().unsetAllMarks().run()}
             >
@@ -277,6 +286,7 @@ const RichTextEditorToolBar = ({
               mouseEnterDelay={popupDelay}
               trigger={
                 <Button
+                  type="button"
                   icon
                   onClick={() =>
                     editor.chain().focus().toggleHeading({ level: level }).run()
@@ -296,6 +306,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="quote right"
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               active={editor.isActive('blockquote')}
@@ -307,6 +318,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="list ul"
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               active={editor.isActive('bulletList')}
@@ -318,6 +330,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="list ol"
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
               active={editor.isActive('orderedList')}
@@ -331,6 +344,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="align left"
               onClick={() => editor.chain().focus().setTextAlign('left').run()}
               active={editor.isActive({ textAlign: 'left' })}
@@ -342,6 +356,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="align center"
               onClick={() =>
                 editor.chain().focus().setTextAlign('center').run()
@@ -355,6 +370,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="align right"
               onClick={() => editor.chain().focus().setTextAlign('right').run()}
               active={editor.isActive({ textAlign: 'right' })}
@@ -366,6 +382,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="align justify"
               onClick={() =>
                 editor.chain().focus().setTextAlign('justify').run()
@@ -386,6 +403,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="undo"
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().chain().focus().undo().run()}
@@ -397,6 +415,7 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
+              type="button"
               icon="redo"
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().chain().focus().redo().run()}
@@ -443,6 +462,7 @@ const RichTextEditorActions = ({
             circular
             icon="arrow up"
             size="small"
+            type="button"
             onClick={() => onSubmit(editor)}
           />
         }
