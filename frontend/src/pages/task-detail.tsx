@@ -17,7 +17,7 @@ import { Formik } from 'formik'
 import { useSnackbar, enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
-import { RichTextCommentEditor } from 'comps/richtext-editor'
+import { RichTextDisplay, RichTextCommentEditor } from 'comps/richtext-editor'
 import { Editor } from '@tiptap/react'
 import { EditorState } from 'prosemirror-state'
 
@@ -137,7 +137,7 @@ export const TaskBody = ({
           <Grid.Column>
             <Form>
               <Form.Field>
-                <MarkdownAsHtmlDisplay markdown={task.description} />
+                <RichTextDisplay content={task.description} />
               </Form.Field>
             </Form>
           </Grid.Column>
@@ -181,7 +181,7 @@ export const TaskBody = ({
     },
     {
       label: 'Description',
-      type: FIELD_TYPES.TEXTAREA,
+      type: FIELD_TYPES.RICHTEXT,
       name: 'description',
     },
   ]
