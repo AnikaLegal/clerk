@@ -559,7 +559,7 @@ export const RichTextEditor = ({
   )
 }
 
-export const RichTextDisplay = ({ content }: { content: JSONContent }) => {
+export const RichTextDisplay = ({ content }: { content: string }) => {
   const editor: Editor = useEditor({
     editable: false,
     content: content,

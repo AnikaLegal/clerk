@@ -233,8 +233,7 @@ export const TaskComments = ({
   const handleSubmit = (editor: Editor) => {
     if (!editor.isEmpty && editor.getText().trim() != '') {
       const values: TaskCommentCreate = {
-        text: editor.getText(),
-        richtext: editor.getJSON(),
+        text: editor.getHTML(),
       }
       createComment({
         id: task.id,

@@ -24,7 +24,6 @@ class TaskComment(TimestampedModel):
     type = models.CharField(max_length=32, choices=CommentType.choices)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     text = models.TextField(blank=True, default="")
-    richtext = models.JSONField(blank=True, null=True)
 
     class Meta:
         verbose_name = "comment"

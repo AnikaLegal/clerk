@@ -33,7 +33,7 @@ export const TaskCommentGroup = ({
               <Comment.Metadata>
                 <div>{moment(comment.created_at).fromNow()}</div>
               </Comment.Metadata>
-              <RichTextDisplay content={comment.richtext} />
+              <RichTextDisplay content={comment.text} />
             </Comment.Content>
           </Comment>
         </Segment>

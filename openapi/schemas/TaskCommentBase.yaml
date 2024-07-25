@@ -2,8 +2,5 @@ type: object
 properties:
   text:
     type: string
-  richtext:
-    type: object
 required:
   - text
-  - richtext

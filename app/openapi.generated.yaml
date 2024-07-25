@@ -2344,11 +2344,8 @@ components:
       properties:
         text:
           type: string
-        richtext:
-          type: object
       required:
         - text
-        - richtext
     TaskComment:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"

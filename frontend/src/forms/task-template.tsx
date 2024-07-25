@@ -36,7 +36,7 @@ const RichTextField = ({
   const [field, meta, helpers] = useField(name)
 
   const handleUpdate = ({ editor }: { editor: Editor }) => {
-    helpers.setValue(editor.getText())
+    helpers.setValue(editor.getHTML())
     if (props.onUpdate) {
       props.onUpdate(editor)
     }
