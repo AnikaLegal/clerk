@@ -526,6 +526,7 @@ export const RichTextCommentEditor = ({
 }
 
 export interface RichTextEditorProps {
+  content?: string
   disabled?: boolean
   onUpdate?
   placeholder?: string
@@ -533,12 +534,14 @@ export interface RichTextEditorProps {
 }
 
 export const RichTextEditor = ({
+  content,
   disabled = false,
   onUpdate,
   placeholder = '',
   popupDelay = 1000,
 }: RichTextEditorProps) => {
   const editor: Editor = useEditor({
+    content: content,
     editable: !disabled,
     onUpdate: onUpdate,
     extensions: [
