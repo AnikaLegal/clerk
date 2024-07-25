@@ -528,9 +528,10 @@ export const RichTextCommentEditor = ({
 export interface RichTextEditorProps {
   content?: string
   disabled?: boolean
-  onUpdate?
+  onUpdate? // TODO: add type
   placeholder?: string
   popupDelay?: number
+  showToolbar?: boolean
 }
 
 export const RichTextEditor = ({
@@ -539,6 +540,7 @@ export const RichTextEditor = ({
   onUpdate,
   placeholder = '',
   popupDelay = 1000,
+  showToolbar = true,
 }: RichTextEditorProps) => {
   const editor: Editor = useEditor({
     content: content,
@@ -554,7 +556,9 @@ export const RichTextEditor = ({
   }
   return (
     <Segment.Group className="richtext-editor">
-      <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
+      {showToolbar && (
+        <RichTextEditorToolBar editor={editor} popupDelay={popupDelay} />
+      )}
       <Segment className="editor-content">
         <EditorContent className="content" editor={editor} />
       </Segment>
