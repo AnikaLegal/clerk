@@ -55,7 +55,15 @@ def template_task_detail_page_view(request, pk):
         raise Http404()
 
     context = {
+        "choices": {
+            "topic": TriggerTopic.choices,
+            "event": EventType.choices,
+            "event_stage": CaseStage.CHOICES,
+            "tasks_assignment_role": TasksCaseRole.choices,
+            "task_type": TaskType.choices,
+        },
         "list_url": reverse("template-task-list"),
+        "task_trigger_pk": pk,
     }
     return render_react_page(request, "Task Templates", "task-template-detail", context)
 

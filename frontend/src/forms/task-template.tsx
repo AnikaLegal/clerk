@@ -45,7 +45,11 @@ const RichTextField = ({
   return (
     <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
       <label>{label}</label>
-      <RichTextEditor {...props} onUpdate={handleUpdate} />
+      <RichTextEditor
+        content={field.value}
+        {...props}
+        onUpdate={handleUpdate}
+      />
       <ErrorMessage name={name} />
     </div>
   )
@@ -83,7 +87,7 @@ const DropdownField = ({
   return (
     <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
       <label>{label}</label>
-      <Dropdown fluid selection {...props} onChange={handleChange} />
+      <Dropdown fluid selection {...field} {...props} onChange={handleChange} />
       <ErrorMessage name={name} />
     </div>
   )
@@ -204,7 +208,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                 </Grid.Column>
               </Grid.Row>
             </Grid>
-            {values.templates.length > 0 && (
+            {values.templates && values.templates.length > 0 && (
               <Accordion fluid styled>
                 {values.templates.map((template, index) => (
                   <div key={index}>

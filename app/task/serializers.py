@@ -16,7 +16,7 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
             "description",
         )
 
-    id = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField(required=False)
 
 
 class TaskTriggerSerializer(serializers.ModelSerializer):
