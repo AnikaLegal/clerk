@@ -142,6 +142,12 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
     setActiveIndex(newIndex)
   }
 
+  // By default, show an empty template input area when creating a template.
+  if (create && values.templates && values.templates.length == 0) {
+    values.templates.push({})
+    setActiveIndex(0)
+  }
+
   return (
     <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
       <InputField
