@@ -79,7 +79,7 @@ export const TaskMetaCard = ({
                 disabled={!perms.is_paralegal_or_better}
                 selectOnNavigation={false}
                 loading={isUsersLoading}
-                value={task.assigned_to.id}
+                value={task.assigned_to ? task.assigned_to.id : ''}
                 options={users.map((u) => ({
                   key: u.id,
                   value: u.id,
@@ -99,7 +99,7 @@ export const TaskMetaCard = ({
                 disabled={!perms.is_coordinator_or_better}
                 selectOnNavigation={false}
                 loading={isUsersLoading}
-                value={task.owner.id}
+                value={task.owner ? task.owner.id : ''}
                 options={users.map((u) => ({
                   key: u.id,
                   value: u.id,
