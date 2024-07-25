@@ -229,12 +229,16 @@ const App = () => {
                 </Table.Cell>
                 <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
                 <Table.Cell>
-                  <a href={task.assigned_to.url}>
-                    {task.assigned_to.full_name}
-                  </a>
+                  {task.assigned_to && (
+                    <a href={task.assigned_to.url}>
+                      {task.assigned_to.full_name}
+                    </a>
+                  )}
                 </Table.Cell>
                 <Table.Cell>
-                  <a href={task.owner.url}>{task.owner.full_name}</a>
+                  {task.owner && (
+                    <a href={task.owner.url}>{task.owner.full_name}</a>
+                  )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
                 <Table.Cell>{task.days_open}</Table.Cell>
