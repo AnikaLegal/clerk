@@ -2,12 +2,15 @@ import React from 'react'
 import DateInput from 'comps/date-input'
 import { Input, Dropdown, InputOnChangeData } from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
+import { Editor } from '@tiptap/react'
+import { RichTextEditor } from 'comps/richtext-editor'
 
 export const FIELD_TYPES = {
   TEXT: 'TEXT',
   NUMBER: 'NUMBER',
   EMAIL: 'EMAIL',
   TEXTAREA: 'TEXTAREA',
+  RICHTEXT: 'RICHTEXT',
   DATE: 'DATE',
   SINGLE_CHOICE: 'SINGLE_CHOICE',
   MULTI_CHOICE: 'MULTI_CHOICE',
@@ -96,24 +99,23 @@ const ChoiceField =
     isSubmitting,
   }: FieldComponentProps & {
     choices: NonNullable<FieldComponentProps['choices']>
-  }) =>
-    (
-      <Dropdown
-        fluid
-        selection
-        multiple={multiple}
-        value={value}
-        style={{ margin: '1em 0' }}
-        placeholder={placeholder}
-        disabled={isSubmitting}
-        options={choices.map(([value, label]) => ({
-          key: value,
-          value: value,
-          text: label,
-        }))}
-        onChange={(e, { value }) => setFieldValue(name, value, true)}
-      />
-    )
+  }) => (
+    <Dropdown
+      fluid
+      selection
+      multiple={multiple}
+      value={value}
+      style={{ margin: '1em 0' }}
+      placeholder={placeholder}
+      disabled={isSubmitting}
+      options={choices.map(([value, label]) => ({
+        key: value,
+        value: value,
+        text: label,
+      }))}
+      onChange={(e, { value }) => setFieldValue(name, value, true)}
+    />
+  )
 
 const BoolField = ({
   name,
@@ -161,6 +163,23 @@ const TextAreaField = ({
   />
 )
 
+const RichTextField = ({
+  name,
+  placeholder,
+  value,
+  setFieldValue,
+  isSubmitting,
+}: FieldComponentProps) => (
+  <RichTextEditor
+    content={value}
+    placeholder={placeholder}
+    disabled={isSubmitting}
+    onUpdate={({ editor }: { editor: Editor }) =>
+      setFieldValue(name, editor.getHTML(), false)
+    }
+  />
+)
+
 export const FIELD_COMPONENTS: {
   [fieldType in FieldComponentType]: React.FunctionComponent<FieldComponentProps>
 } = {
@@ -168,6 +187,7 @@ export const FIELD_COMPONENTS: {
   NUMBER: (props: FieldComponentProps) => <NumberField {...props} />,
   EMAIL: (props: FieldComponentProps) => <TextField {...props} type="email" />,
   TEXTAREA: TextAreaField,
+  RICHTEXT: RichTextField,
   DATE: DateField,
   BOOL: BoolField,
   SINGLE_CHOICE: ChoiceField(false),
