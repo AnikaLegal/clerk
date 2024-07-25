@@ -25,9 +25,11 @@ export const TaskCommentGroup = ({
         <Segment key={comment.id}>
           <Comment>
             <Comment.Content>
-              <Comment.Author as="a">
-                {comment.creator.full_name}
-              </Comment.Author>
+              {comment.creator && (
+                <Comment.Author as="a">
+                  {comment.creator.full_name}
+                </Comment.Author>
+              )}
               <Comment.Metadata>
                 <div>{moment(comment.created_at).fromNow()}</div>
               </Comment.Metadata>
