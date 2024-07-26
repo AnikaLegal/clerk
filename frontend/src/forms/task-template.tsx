@@ -192,7 +192,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         disabled={isSubmitting}
       />
       <FieldArray name="templates">
-        {({ insert, remove, push }) => (
+        {(arrayHelpers) => (
           <div>
             <Grid style={{ marginBottom: '0.25rem' }}>
               <Grid.Row columns={2} style={{ alignItems: 'center' }}>
@@ -205,8 +205,12 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                     size="mini"
                     type="button"
                     onClick={() => {
-                      push({})
-                      setActiveIndex(values.templates.length)
+                      /* NOTE: The push function doesn't update synchronously so
+                       * to have confidence that the index is for the last item in
+                       * the array (i.e. the one we are about to push), we set
+                       * the index before the push */
+                      setActiveIndex(values.templates?.length || 0)
+                      arrayHelpers.push({})
                     }}
                   >
                     Add task
