@@ -4,7 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Highlight from '@tiptap/extension-highlight'
-import { useEditor, EditorContent, Editor, JSONContent } from '@tiptap/react'
+import { useEditor, EditorContent, Editor, EditorEvents } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import { Level } from '@tiptap/extension-heading'
@@ -20,6 +20,7 @@ import {
   Label,
 } from 'semantic-ui-react'
 
+export type { Editor, EditorEvents }
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
 function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -475,6 +476,57 @@ const RichTextCommentEditorActions = ({
   )
 }
 
+const updatePlaceholder = (editor: Editor, placeholder: string) => {
+  if (editor) {
+    const extension = editor.extensionManager.extensions.find(
+      (extension) => extension.name === 'placeholder'
+    )
+    if (extension) {
+      extension.options['placeholder'] = placeholder
+      // NOOP to update editor
+      editor.view.dispatch(editor.state.tr)
+    }
+  }
+}
+
+const updateEditable = (editor: Editor, editable: boolean) => {
+  if (editor) {
+    editor.setEditable(editable)
+  }
+}
+
+const updateContent = (editor: Editor, content: string) => {
+  if (editor) {
+    editor.commands.setContent(content)
+  }
+}
+
+const updateOnUpdate = (
+  editor: Editor,
+  handleUpdate: ({}: EditorEvents['update']) => void
+) => {
+  if (editor) {
+    if (handleUpdate) {
+      editor.on('update', handleUpdate)
+    } else {
+      editor.off('update')
+    }
+  }
+}
+
+const updateOnBlur = (
+  editor: Editor,
+  handleBlur: ({}: EditorEvents['blur']) => void
+) => {
+  if (editor) {
+    if (handleBlur) {
+      editor.on('blur', handleBlur)
+    } else {
+      editor.off('blur')
+    }
+  }
+}
+
 const extensions = [
   TextStyle,
   Underline,
@@ -503,14 +555,11 @@ export const RichTextCommentEditor = ({
 }: RichTextCommentProps) => {
   const editor: Editor = useEditor({
     editable: !disabled,
-    extensions: [
-      ...extensions,
-      Placeholder.configure({ placeholder: placeholder }),
-    ],
+    extensions: [...extensions, Placeholder],
   })
-  if (!editor) {
-    return null
-  }
+  useEffect(() => updatePlaceholder(editor, placeholder), [editor, placeholder])
+  useEffect(() => updateEditable(editor, !disabled), [editor, disabled])
+
   return (
     <Segment.Group className="richtext-editor">
       <Segment className="editor-content">
@@ -528,7 +577,8 @@ export const RichTextCommentEditor = ({
 export interface RichTextEditorProps {
   content?: string
   disabled?: boolean
-  onUpdate? // TODO: add type
+  onUpdate?: ({ editor, transaction }: EditorEvents['update']) => void
+  onBlur?: ({ editor, event, transaction }: EditorEvents['blur']) => void
   placeholder?: string
   popupDelay?: number
   showToolbar?: boolean
@@ -537,6 +587,7 @@ export interface RichTextEditorProps {
 export const RichTextEditor = ({
   content,
   disabled = false,
+  onBlur,
   onUpdate,
   placeholder = '',
   popupDelay = 1000,
@@ -545,15 +596,14 @@ export const RichTextEditor = ({
   const editor: Editor = useEditor({
     content: content,
     editable: !disabled,
-    onUpdate: onUpdate,
-    extensions: [
-      ...extensions,
-      Placeholder.configure({ placeholder: placeholder }),
-    ],
+    extensions: [...extensions, Placeholder],
   })
-  if (!editor) {
-    return null
-  }
+  useEffect(() => updatePlaceholder(editor, placeholder), [editor, placeholder])
+  useEffect(() => updateEditable(editor, !disabled), [editor, disabled])
+  useEffect(() => updateContent(editor, content), [editor, content])
+  useEffect(() => updateOnUpdate(editor, onUpdate), [editor, onUpdate])
+  useEffect(() => updateOnBlur(editor, onBlur), [editor, onBlur])
+
   return (
     <Segment.Group className="richtext-editor">
       {showToolbar && (

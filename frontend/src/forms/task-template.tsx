@@ -8,12 +8,16 @@ import {
   Form,
   Grid,
   Header,
+  Icon,
   Input,
   InputProps,
 } from 'semantic-ui-react'
 import { choiceToOptions, choiceToMap } from 'utils'
-import { Editor } from '@tiptap/react'
-import { RichTextEditor, RichTextEditorProps } from 'comps/richtext-editor'
+import {
+  RichTextEditor,
+  RichTextEditorProps,
+  EditorEvents,
+} from 'comps/richtext-editor'
 
 interface TaskTemplateFormProps {
   create?: boolean
@@ -35,10 +39,12 @@ const RichTextField = ({
 }: { name: string; label: string } & RichTextEditorProps) => {
   const [field, meta, helpers] = useField(name)
 
-  const handleUpdate = ({ editor }: { editor: Editor }) => {
-    helpers.setValue(editor.getHTML())
-    if (props.onUpdate) {
-      props.onUpdate(editor)
+  const handleBlur = ({ editor, event, transaction }: EditorEvents['blur']) => {
+    if (editor) {
+      helpers.setValue(editor.getHTML())
+      if (props.onBlur) {
+        props.onBlur({ editor, event, transaction })
+      }
     }
   }
 
@@ -46,9 +52,9 @@ const RichTextField = ({
     <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
       <label>{label}</label>
       <RichTextEditor
-        content={field.value}
         {...props}
-        onUpdate={handleUpdate}
+        content={field.value || ''}
+        onBlur={handleBlur}
       />
       <ErrorMessage name={name} />
     </div>
@@ -93,20 +99,18 @@ const DropdownField = ({
   )
 }
 
-const TemplateHeader = ({
+const TemplateHeaderText = ({
   index,
   type,
   name,
-  typeMap,
 }: {
   index: number
   type: string | undefined
   name: string | undefined
-  typeMap: Map<string, string>
 }) => {
   let header = `${index + 1}.`
   if (type) {
-    header += ' ' + typeMap.get(type)
+    header += ' ' + type
   }
   if (name) {
     if (type) {
@@ -114,7 +118,7 @@ const TemplateHeader = ({
     }
     header += ' ' + name
   }
-  return <p>{`${header}`}</p>
+  return <span>{`${header}`}</span>
 }
 
 export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
@@ -143,9 +147,13 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   }
 
   // By default, show an empty template input area when creating a template.
-  if (create && values.templates && values.templates.length == 0) {
-    values.templates.push({})
-    setActiveIndex(0)
+  if (values.templates) {
+    if (values.templates.length == 0) {
+      values.templates.push({})
+    }
+    if (values.templates.length == 1 && activeIndex !== 0) {
+      setActiveIndex(0)
+    }
   }
 
   return (
@@ -227,12 +235,32 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                       index={index}
                       onClick={handleAccordionClick}
                     >
-                      <TemplateHeader
-                        index={index}
-                        type={template.type}
-                        name={template.name}
-                        typeMap={taskTypes}
+                      <Icon
+                        name={
+                          activeIndex === index ? 'chevron up' : 'chevron down'
+                        }
+                        style={{ marginTop: '5px', marginRight: '1rem' }}
                       />
+                      <TemplateHeaderText
+                        index={index}
+                        type={taskTypes.get(template.type)}
+                        name={template.name}
+                      />
+                      <div style={{ float: 'right' }}>
+                        <Icon
+                          name="delete"
+                          link
+                          style={{ marginTop: '5px' }}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            arrayHelpers.remove(index)
+                            setActiveIndex(
+                              activeIndex === index ? -1 : activeIndex - 1
+                            )
+                          }}
+                        />
+                      </div>
                     </Accordion.Title>
                     <Accordion.Content active={activeIndex === index}>
                       <DropdownField
@@ -241,16 +269,20 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                         placeholder="Select the task type"
                         options={choiceToOptions(choices.task_type)}
                         disabled={isSubmitting}
+                        value={template.type || ''}
                       />
                       <InputField
                         name={`templates.${index}.name`}
                         label="Task name"
                         disabled={isSubmitting}
+                        value={template.name || ''}
                       />
                       <RichTextField
                         name={`templates.${index}.description`}
                         label="Task description"
                         disabled={isSubmitting}
+                        placeholder="Describe the task in detail"
+                        content={template.description || ''}
                       />
                     </Accordion.Content>
                   </div>
