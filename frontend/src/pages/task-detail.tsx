@@ -1,13 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import api, { Task, TaskCreate, TaskComment, TaskCommentCreate } from 'api'
 import { Header, Grid, Segment, Form, Button, Divider } from 'semantic-ui-react'
-import {
-  getAPIErrorMessage,
-  getAPIFormErrors,
-  mount,
-  choiceToMap,
-  MarkdownAsHtmlDisplay,
-} from 'utils'
+import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap } from 'utils'
 import { Model, ModelChoices, UserPermission, TaskDetailProps } from 'types'
 import { TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
@@ -17,8 +11,7 @@ import { Formik } from 'formik'
 import { useSnackbar, enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
-import { RichTextDisplay, RichTextCommentEditor } from 'comps/richtext-editor'
-import { Editor } from '@tiptap/react'
+import { RichTextDisplay, RichTextCommentEditor, Editor } from 'comps/richtext-editor'
 import { EditorState } from 'prosemirror-state'
 
 interface DjangoContext {
