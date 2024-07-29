@@ -115,6 +115,7 @@ const LinkButtonGroup = ({
             <Button
               type="button"
               icon="linkify"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => setShowModal(true)}
               active={editor.isActive('link')}
             />
@@ -127,6 +128,7 @@ const LinkButtonGroup = ({
             <Button
               type="button"
               icon="unlinkify"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().unsetLink().run()}
               disabled={!editor.isActive('link')}
             />
@@ -206,7 +208,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="bold"
-              onClick={() => editor.chain().focus().toggleBold().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleBold().run()}
               active={editor.isActive('bold')}
             />
           }
@@ -218,7 +221,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="italic"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleItalic().run()}
               disabled={!editor.can().chain().focus().toggleItalic().run()}
               active={editor.isActive('italic')}
             />
@@ -231,7 +235,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="strikethrough"
-              onClick={() => editor.chain().focus().toggleStrike().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleStrike().run()}
               disabled={!editor.can().chain().focus().toggleStrike().run()}
               active={editor.isActive('strike')}
             />
@@ -244,7 +249,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="underline"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleUnderline().run()}
               disabled={!editor.can().chain().focus().toggleUnderline().run()}
               active={editor.isActive('underline')}
             />
@@ -257,7 +263,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon
-              onClick={() => editor.chain().focus().toggleHighlight().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleHighlight().run()}
               disabled={!editor.can().chain().focus().toggleHighlight().run()}
               active={editor.isActive('highlight')}
             >
@@ -270,9 +277,10 @@ const RichTextEditorToolBar = ({
           mouseEnterDelay={popupDelay}
           trigger={
             <Button
-              type="button"
               icon
-              onClick={() => editor.chain().focus().unsetAllMarks().run()}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().unsetAllMarks().run()}
             >
               <Icon368ClearFormatting />
             </Button>
@@ -290,7 +298,8 @@ const RichTextEditorToolBar = ({
                 <Button
                   type="button"
                   icon
-                  onClick={() =>
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={(e) =>
                     editor.chain().focus().toggleHeading({ level: level }).run()
                   }
                   active={editor.isActive('heading', { level: level })}
@@ -310,7 +319,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="quote right"
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleBlockquote().run()}
               active={editor.isActive('blockquote')}
             />
           }
@@ -322,7 +332,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="list ul"
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleBulletList().run()}
               active={editor.isActive('bulletList')}
             />
           }
@@ -334,7 +345,8 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="list ol"
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => editor.chain().focus().toggleOrderedList().run()}
               active={editor.isActive('orderedList')}
             />
           }
@@ -348,6 +360,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="align left"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().setTextAlign('left').run()}
               active={editor.isActive({ textAlign: 'left' })}
             />
@@ -360,6 +373,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="align center"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() =>
                 editor.chain().focus().setTextAlign('center').run()
               }
@@ -374,6 +388,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="align right"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().setTextAlign('right').run()}
               active={editor.isActive({ textAlign: 'right' })}
             />
@@ -386,6 +401,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="align justify"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() =>
                 editor.chain().focus().setTextAlign('justify').run()
               }
@@ -407,6 +423,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="undo"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().chain().focus().undo().run()}
             />
@@ -419,6 +436,7 @@ const RichTextEditorToolBar = ({
             <Button
               type="button"
               icon="redo"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().chain().focus().redo().run()}
             />
