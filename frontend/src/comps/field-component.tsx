@@ -2,8 +2,7 @@ import React from 'react'
 import DateInput from 'comps/date-input'
 import { Input, Dropdown, InputOnChangeData } from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
-import { Editor } from '@tiptap/react'
-import { RichTextEditor } from 'comps/richtext-editor'
+import { RichTextEditor, EditorEvents } from 'comps/richtext-editor'
 
 export const FIELD_TYPES = {
   TEXT: 'TEXT',
@@ -174,7 +173,7 @@ const RichTextField = ({
     content={value}
     placeholder={placeholder}
     disabled={isSubmitting}
-    onUpdate={({ editor }: { editor: Editor }) =>
+    onBlur={({ editor, event, transaction }: EditorEvents['blur']) =>
       setFieldValue(name, editor.getHTML(), false)
     }
   />
