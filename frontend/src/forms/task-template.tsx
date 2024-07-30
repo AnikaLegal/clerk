@@ -275,6 +275,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                         name={`templates.${index}.name`}
                         label="Task name"
                         disabled={isSubmitting}
+                        placeholder="Provide more specific task information"
                         value={template.name || ''}
                       />
                       <RichTextField
