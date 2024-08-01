@@ -85,7 +85,7 @@ class Task(TimestampedModel):
     # If the task was created by the system then this refers to the template
     # used to create the task.
     template = models.ForeignKey(
-        TaskTemplate, on_delete=models.PROTECT, blank=True, null=True
+        TaskTemplate, on_delete=models.SET_NULL, blank=True, null=True
     )
 
     def save(self, *args, **kwargs):
