@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 @sentry_task
 @transaction.atomic
-def handle_event(event_pk: int):
+def handle_event_save(event_pk: int):
     event = IssueEvent.objects.get(pk=event_pk)
     logger.info(
         'Handling "%s" IssueEvent<%s> on Issue<%s>',
@@ -67,7 +67,7 @@ def handle_event(event_pk: int):
 
 
 @sentry_task
-def handle_task(task_pk: int):
+def handle_task_save(task_pk: int):
     # This is a somewhat unusual way of getting & using a single task. We do it
     # because it is convenient.
     tasks = Task.objects.filter(pk=task_pk)
