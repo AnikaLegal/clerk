@@ -12,7 +12,7 @@ ssh -o StrictHostKeyChecking=no root@$HOST /bin/bash << EOF
     set -e
     cd /srv/clerk_test/
     docker pull anikalaw/clerk:staging
-    docker-compose \
+    docker compose \
         -p task \
         -f docker-compose.staging.yml \
         run --rm web \
