@@ -8,6 +8,7 @@ class TaskType(models.TextChoices):
     The type of the task.
     """
 
+    MANAGE = "MANAGE", "Manage the case file"
     CHECK = "CHECK", "Check for conflict/eligibility"
     CONTACT = "CONTACT", "Contact client or other party"
     DRAFT = "DRAFT", "Draft document or advice"
