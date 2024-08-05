@@ -89,7 +89,6 @@ header .nav-items a:visited {
 }
 
 main {
-  max-width: 1240px;
   width: calc(100vw - 2 * var(--container-padding));
   margin: 0 auto;
   padding-bottom: 6rem;
