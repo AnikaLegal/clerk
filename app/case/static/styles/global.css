@@ -118,7 +118,7 @@ main {
 }
 .richtext-editor .content,
 .richtext-editor .content > div {
-  min-height: 100px;
+  min-height: 2rem;
 }
 .richtext-editor .content > div {
   outline: none;

@@ -481,7 +481,7 @@ const RichTextCommentEditorActions = ({
           <Button
             circular
             icon="arrow up"
-            size="small"
+            size="tiny"
             type="button"
             onClick={() => onSubmit(editor)}
           />
