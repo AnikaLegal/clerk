@@ -45,7 +45,7 @@ jobs:
 
       # Run clerk unit tests
       - name: Run unit tests
-        run: docker-compose -f docker/docker-compose.ci.yml run --rm test  pytest -vv
+        run: docker compose -f docker/docker-compose.ci.yml run --rm test  pytest -vv
 
       # If the tests passed and we're on master/develop, then login to DockerHub
       - name: Login to DockerHub
