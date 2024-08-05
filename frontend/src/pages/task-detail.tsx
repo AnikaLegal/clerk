@@ -61,7 +61,7 @@ export const TaskDetail = ({
         <Grid.Column>
           <CaseSummaryCard issue={task.issue} />
         </Grid.Column>
-        <Grid.Column width={8}>
+        <Grid.Column width={8} style={{marginRight: '6rem', marginLeft: '6rem'}}>
           <Segment basic style={{ paddingTop: '0' }}>
             <TaskBody
               task={task}
