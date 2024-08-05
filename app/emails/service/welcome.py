@@ -74,6 +74,9 @@ We’re reviewing your case and will aim to be in touch within the next week. We
 Once a paralegal is assigned to your matter, they will email you to introduce themselves and organise a time to call you. Please note that any calls will appear from an unknown number.
 </p>
 <p>
+We understand that rental problems in a rental crisis can be incredibly stressful. Our largely volunteer-led team will do our best to help you resolve your issue. We ask that you treat our volunteers and staff with respect. Aggressive or abusive behaviour to our team will not be tolerated.
+</p>
+<p>
 If you have any questions in the meantime, or decide you no longer wish to proceed with our service, then you may reply to this email, or email us at the following address:
 </p>
 <p>
