@@ -1,24 +1,35 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import api, { Task, TaskCreate, TaskComment, TaskCommentCreate } from 'api'
+import React, { useState, useMemo } from 'react'
+import api, { Task, TaskCreate, TaskCommentCreate } from 'api'
 import { Header, Grid, Segment, Form, Button, Divider } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount, choiceToMap } from 'utils'
-import { Model, ModelChoices, UserPermission, TaskDetailProps } from 'types'
-import { TaskCommentGroup, TaskMetaCard } from 'comps/task'
+import {
+  Model,
+  ModelChoices,
+  UserPermission,
+  TaskDetailProps,
+  TaskStatus,
+} from 'types'
+import { TaskCommentGroup, TaskMetaCard, TaskActionsCard } from 'comps/task'
 import { getFormSchema, AutoForm, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { Formik } from 'formik'
-import { useSnackbar, enqueueSnackbar } from 'notistack'
+import { enqueueSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
-import { RichTextDisplay, RichTextCommentEditor, Editor } from 'comps/richtext-editor'
-import { EditorState } from 'prosemirror-state'
+import {
+  RichTextDisplay,
+  RichTextCommentEditor,
+  Editor,
+  resetEditor,
+} from 'comps/richtext-editor'
 
 interface DjangoContext {
   choices: {
     status: [string, string][]
     type: [string, string][]
   }
+  status: TaskStatus
   task_pk: number
   list_url: string
   user: UserPermission
@@ -33,6 +44,7 @@ const App = () => {
       data={taskResult.data}
       choices={CONTEXT.choices}
       perms={CONTEXT.user}
+      status={CONTEXT.status}
     />
   )
 }
@@ -41,10 +53,12 @@ export const TaskDetail = ({
   data,
   choices,
   perms,
+  status,
 }: {
   data: Task
   choices: ModelChoices
   perms: UserPermission
+  status: TaskStatus
 }) => {
   const [task, setTask] = useState<Task>(data)
   const [updateTask] = api.useUpdateTaskMutation()
@@ -61,7 +75,10 @@ export const TaskDetail = ({
         <Grid.Column>
           <CaseSummaryCard issue={task.issue} />
         </Grid.Column>
-        <Grid.Column width={8} style={{marginRight: '6rem', marginLeft: '6rem'}}>
+        <Grid.Column
+          width={8}
+          style={{ marginRight: '6rem', marginLeft: '6rem' }}
+        >
           <Segment basic style={{ paddingTop: '0' }}>
             <TaskBody
               task={task}
@@ -84,6 +101,13 @@ export const TaskDetail = ({
           </Segment>
         </Grid.Column>
         <Grid.Column>
+          <TaskActionsCard
+            task={task}
+            setTask={setTask}
+            update={update}
+            perms={perms}
+            status={status}
+          />
           <TaskMetaCard
             task={task}
             setTask={setTask}
@@ -106,8 +130,6 @@ export const TaskBody = ({
 }: TaskDetailProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
-
-  const { enqueueSnackbar } = useSnackbar()
   const toggleEditMode = () => setEditMode(!isEditMode)
 
   if (!isEditMode) {
@@ -142,7 +164,7 @@ export const TaskBody = ({
   const submit = (values: Model, { setSubmitting, setErrors }: any) => {
     update(values)
       .then((instance) => {
-        enqueueSnackbar(`Updated task`, { variant: 'success' })
+        enqueueSnackbar('Updated task', { variant: 'success' })
         setTask(instance)
         toggleEditMode()
         setSubmitting(false)
@@ -216,18 +238,7 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
       })
         .then((instance) => {
           enqueueSnackbar('Added comment', { variant: 'success' })
-
-          /* Clear editor content & history. Be nice to have a cleaner way to
-           * clear history. See https://github.com/ueberdosis/tiptap/issues/491
-           */
-          editor.commands.clearContent()
-          editor.view.updateState(
-            EditorState.create({
-              doc: editor.state.doc,
-              plugins: editor.state.plugins,
-              schema: editor.state.schema,
-            })
-          )
+          resetEditor(editor)
         })
         .catch((err) => {
           enqueueSnackbar(getAPIErrorMessage(err, 'Failed to add comment'), {

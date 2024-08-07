@@ -32,12 +32,19 @@ export interface CaseDetailFormProps {
   onCancel: () => void
 }
 
+export interface TaskStatus {
+  cancel: string
+  finish: string
+  start: string
+  stop: string
+}
+
 export interface TaskDetailProps {
-  task: Task
-  setTask: SetModel<Task>
-  update: UpdateModel<Task>
   choices: ModelChoices
   perms: UserPermission
+  setTask: SetModel<Task>
+  task: Task
+  update: UpdateModel<Task>
 }
 
 

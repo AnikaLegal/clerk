@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import api, { Task } from 'api'
 import { Header, Grid, Dropdown, Card } from 'semantic-ui-react'
-import { getAPIErrorMessage, choiceToOptions } from 'utils'
+import { getAPIErrorMessage, choiceToMap } from 'utils'
 import { useSnackbar } from 'notistack'
 import { TaskDetailProps } from 'types'
 
@@ -16,7 +16,7 @@ export const TaskMetaCard = ({
   const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [getUsers] = api.useLazyGetUsersQuery()
 
-  const statusOptions = useMemo(() => choiceToOptions(choices.status), [])
+  const statusMap = useMemo(() => choiceToMap(choices.status), [])
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -50,11 +50,7 @@ export const TaskMetaCard = ({
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Status</Header>
-              <Dropdown
-                value={task.status}
-                options={statusOptions}
-                onChange={(e, { value }) => handleChange('status', value)}
-              />
+              {statusMap.get(task.status)}
             </Grid.Column>
             <Grid.Column>
               <Header sub>Days Open</Header>

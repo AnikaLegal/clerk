@@ -42,7 +42,7 @@ def task_list_page_view(request):
             ],
             "status": TaskStatus.choices,
             "type": TaskType.choices,
-        }
+        },
     }
     return render_react_page(request, "Tasks", "task-list", context)
 
@@ -57,6 +57,12 @@ def task_detail_page_view(request, pk):
         "choices": {
             "status": TaskStatus.choices,
             "type": TaskType.choices,
+        },
+        "status": {
+            "start": TaskStatus.IN_PROGRESS,
+            "stop": TaskStatus.NOT_STARTED,
+            "finish": TaskStatus.DONE,
+            "cancel": TaskStatus.NOT_DONE,
         },
         "task_pk": pk,
         "list_url": reverse("task-list"),
