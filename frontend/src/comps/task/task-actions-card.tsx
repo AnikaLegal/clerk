@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react'
 import api, { TaskCommentCreate } from 'api'
-import { Card, List, Button, Form, Modal } from 'semantic-ui-react'
-import { enqueueSnackbar } from 'notistack'
-import { TaskDetailProps, TaskStatus } from 'types'
-import { getAPIErrorMessage } from 'utils'
 import {
-  RichTextCommentEditor,
   EditorExtensions,
-  useEditor,
   Placeholder,
   resetEditor,
+  RichTextCommentEditor,
+  useEditor,
 } from 'comps/richtext-editor'
+import { enqueueSnackbar } from 'notistack'
+import React, { useEffect, useState } from 'react'
+import { Button, Card, Form, List, Modal } from 'semantic-ui-react'
+import { TaskDetailProps, TaskStatus } from 'types/task'
+import { getAPIErrorMessage } from 'utils'
 
 interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
   status: TaskStatus

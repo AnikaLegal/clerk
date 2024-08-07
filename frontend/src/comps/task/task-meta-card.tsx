@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import api, { Task } from 'api'
-import { Header, Grid, Dropdown, Card } from 'semantic-ui-react'
-import { getAPIErrorMessage, choiceToMap } from 'utils'
+import api from 'api'
 import { useSnackbar } from 'notistack'
-import { TaskDetailProps } from 'types'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Card, Dropdown, Grid, Header } from 'semantic-ui-react'
+import { TaskDetailProps } from 'types/task'
+import { choiceToMap, getAPIErrorMessage } from 'utils'
 
 export const TaskMetaCard = ({
   task,

@@ -10,7 +10,7 @@ import {
 } from 'semantic-ui-react'
 import { useSnackbar } from 'notistack'
 
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useUpdateCaseMutation, useGetUsersQuery } from 'api'
 

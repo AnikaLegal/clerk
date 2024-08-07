@@ -4,7 +4,7 @@ import { Header, Form, Button, Message, Segment } from 'semantic-ui-react'
 import moment from 'moment'
 import { useSnackbar } from 'notistack'
 
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useCreateCaseNoteMutation } from 'api'
 import { TextArea } from 'comps/textarea'

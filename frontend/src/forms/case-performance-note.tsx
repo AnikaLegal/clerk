@@ -7,7 +7,7 @@ import moment from 'moment'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'
 import { useCreateCaseNoteMutation } from 'api'
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
 export const PerformanceForm: React.FC<CaseDetailFormProps> = ({

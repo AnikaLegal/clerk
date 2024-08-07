@@ -10,7 +10,7 @@ import { MarkdownExplainer } from 'comps/markdown-editor'
 import { TextArea } from 'comps/textarea'
 import { useCreateCaseNoteMutation } from 'api'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 
 export const ReviewForm: React.FC<CaseDetailFormProps> = ({
   issue,

@@ -12,7 +12,7 @@ import moment from 'moment'
 import { useSnackbar } from 'notistack'
 
 import { useCreateCaseNoteMutation } from 'api'
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { TimelineNote } from 'comps/timeline-item'
 import { MarkdownExplainer } from 'comps/markdown-editor'

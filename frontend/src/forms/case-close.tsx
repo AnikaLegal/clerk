@@ -12,7 +12,7 @@ import {
 import * as Yup from 'yup'
 import { useSnackbar } from 'notistack'
 
-import { CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useUpdateCaseMutation } from 'api'
 import { TextArea } from 'comps/textarea'
