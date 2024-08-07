@@ -199,42 +199,23 @@ export const TaskBody = ({
   )
 }
 
-export const TaskComments = ({
-  task,
-  setTask,
-  update,
-  choices,
-  perms,
-}: TaskDetailProps) => {
-  const [comments, setComments] = useState<TaskComment[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [getTaskComments] = api.useLazyGetTaskCommentsQuery()
-  const [createComment] = api.useCreateTaskCommentMutation()
+export const TaskComments = ({ task }: TaskDetailProps) => {
+  const [createTaskComment] = api.useCreateTaskCommentMutation()
 
-  const getComments = () => {
-    setIsLoading(true)
-    getTaskComments({ id: task.id })
-      .unwrap()
-      .then((comments) => {
-        setComments(comments)
-        setIsLoading(false)
-      })
-      .catch(() => setIsLoading(false))
-  }
-  useEffect(() => getComments(), [])
+  const commentResult = api.useGetTaskCommentsQuery({ id: task.id })
+  const comments = commentResult.data || []
 
   const handleSubmit = (editor: Editor) => {
     if (!editor.isEmpty && editor.getText().trim() != '') {
       const values: TaskCommentCreate = {
         text: editor.getHTML(),
       }
-      createComment({
+      createTaskComment({
         id: task.id,
         taskCommentCreate: values,
       })
         .then((instance) => {
-          enqueueSnackbar(`Added comment`, { variant: 'success' })
-          getComments()
+          enqueueSnackbar('Added comment', { variant: 'success' })
 
           /* Clear editor content & history. Be nice to have a cleaner way to
            * clear history. See https://github.com/ueberdosis/tiptap/issues/491
@@ -249,7 +230,7 @@ export const TaskComments = ({
           )
         })
         .catch((err) => {
-          enqueueSnackbar(getAPIErrorMessage(err, `Failed to add comment`), {
+          enqueueSnackbar(getAPIErrorMessage(err, 'Failed to add comment'), {
             variant: 'error',
           })
         })
@@ -262,7 +243,7 @@ export const TaskComments = ({
         onSubmit={handleSubmit}
         placeholder="Leave a comment…"
       />
-      <TaskCommentGroup comments={comments} loading={isLoading} />
+      <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
     </>
   )
 }
