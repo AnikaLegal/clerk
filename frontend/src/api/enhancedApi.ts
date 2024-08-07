@@ -1,6 +1,6 @@
 import { generatedApi } from './api.generated'
 
-const ENTITY_TYPES = ['CASE', 'EMAIL'] as const
+const ENTITY_TYPES = ['CASE', 'EMAIL', 'TASK_COMMENT'] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
   addTagTypes: ENTITY_TYPES,
@@ -41,6 +41,12 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteEmailAttachment: {
       invalidatesTags: [{ type: 'EMAIL' }],
+    },
+    getTaskComments: {
+      providesTags: [{ type: 'TASK_COMMENT' }],
+    },
+    createTaskComment: {
+      invalidatesTags: [{ type: 'TASK_COMMENT' }],
     },
   },
 })
