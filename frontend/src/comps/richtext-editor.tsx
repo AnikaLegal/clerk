@@ -8,6 +8,7 @@ import { useEditor, EditorContent, Editor, EditorEvents } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import { Level } from '@tiptap/extension-heading'
+import { EditorState } from 'prosemirror-state'
 import {
   Button,
   Segment,
@@ -22,6 +23,22 @@ import {
 
 export type { Editor, EditorEvents }
 export { useEditor, Placeholder }
+
+export const resetEditor = (editor: Editor) => {
+  if (editor) {
+    /* Clear editor content & history. Be nice to have a cleaner way to
+     * clear history. See https://github.com/ueberdosis/tiptap/issues/491
+     */
+    editor.commands.clearContent()
+    editor.view.updateState(
+      EditorState.create({
+        doc: editor.state.doc,
+        plugins: editor.state.plugins,
+        schema: editor.state.schema,
+      })
+    )
+  }
+}
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
 function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   return (
