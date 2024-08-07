@@ -2,7 +2,6 @@ import React from 'react'
 import { Container, Header, Label } from 'semantic-ui-react'
 import styled from 'styled-components'
 import { useSnackbar } from 'notistack'
-
 import { mount, getAPIErrorMessage } from 'utils'
 import {
   useGetCaseQuery,
@@ -12,7 +11,7 @@ import {
   Issue,
   EmailAttachment,
 } from 'api'
-import { UserPermission } from 'types'
+import { UserPermission } from 'types/global'
 
 interface DjangoContext {
   case_pk: string

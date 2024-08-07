@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import { useGetUsersQuery, useUpdateCaseMutation } from 'api'
 import { Formik } from 'formik'
+import { useSnackbar } from 'notistack'
+import React, { useState } from 'react'
 import {
-  Header,
-  Form,
   Button,
+  Dropdown,
+  Form,
+  Header,
   Message,
   Segment,
-  Dropdown,
 } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
-
 import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation, useGetUsersQuery } from 'api'
 
 export const AssignForm: React.FC<CaseDetailFormProps> = ({
   issue,

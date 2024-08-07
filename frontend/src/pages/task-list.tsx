@@ -10,7 +10,7 @@ import {
 } from 'semantic-ui-react'
 import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
 import api, { TaskList, GetTasksApiArg } from 'api'
-import { UserPermission } from 'types'
+import { UserPermission } from 'types/global'
 import { FadeTransition } from 'comps/transitions'
 
 interface DjangoContext {

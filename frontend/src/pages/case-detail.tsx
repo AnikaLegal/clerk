@@ -40,7 +40,7 @@ import {
   ProgressForm,
   ConflictForm,
 } from 'forms'
-import { UserPermission } from 'types'
+import { UserPermission } from 'types/global'
 import { CaseDetailFormProps } from 'types/case'
 
 interface DjangoContext {

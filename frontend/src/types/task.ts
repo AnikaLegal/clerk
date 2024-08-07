@@ -1,5 +1,5 @@
 import { Task } from 'api'
-import { ModelChoices, UserPermission, SetModel, UpdateModel } from 'types'
+import { ModelChoices, UserPermission, SetModel, UpdateModel } from 'types/global'
 
 export interface TaskStatus {
   cancel: string
