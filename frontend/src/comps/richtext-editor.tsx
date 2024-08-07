@@ -21,6 +21,7 @@ import {
 } from 'semantic-ui-react'
 
 export type { Editor, EditorEvents }
+export { useEditor, Placeholder }
 // icon:highlighter | Fontawesome https://fontawesome.com/ | Fontawesome
 function IconHighlighter(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -500,7 +501,7 @@ const updatePlaceholder = (editor: Editor, placeholder: string) => {
       (extension) => extension.name === 'placeholder'
     )
     if (extension) {
-      extension.options['placeholder'] = placeholder
+      extension.options.placeholder = placeholder
       // NOOP to update editor
       editor.view.dispatch(editor.state.tr)
     }
@@ -545,24 +546,25 @@ const updateOnBlur = (
   }
 }
 
-const extensions = [
-  TextStyle,
-  Underline,
+export const EditorExtensions = [
   Highlight,
-  StarterKit,
   Link.configure({
     openOnClick: false,
   }),
+  StarterKit,
   TextAlign.configure({
     types: ['heading', 'paragraph'],
   }),
+  TextStyle,
+  Underline,
 ]
 
 export interface RichTextCommentProps {
   disabled?: boolean
-  onSubmit: (editor: Editor) => void
+  onSubmit?: (editor: Editor) => void
   placeholder?: string
   popupDelay?: number
+  editor?: Editor
 }
 
 export const RichTextCommentEditor = ({
@@ -570,11 +572,14 @@ export const RichTextCommentEditor = ({
   onSubmit,
   placeholder = '',
   popupDelay = 1000,
-}: RichTextCommentProps) => {
-  const editor: Editor = useEditor({
+  editor = useEditor({
     editable: !disabled,
-    extensions: [...extensions, Placeholder],
-  })
+    extensions: [
+      ...EditorExtensions,
+      Placeholder.configure({ placeholder: placeholder }),
+    ],
+  }),
+}: RichTextCommentProps) => {
   useEffect(() => updatePlaceholder(editor, placeholder), [editor, placeholder])
   useEffect(() => updateEditable(editor, !disabled), [editor, disabled])
 
@@ -582,11 +587,13 @@ export const RichTextCommentEditor = ({
     <Segment.Group className="richtext-editor">
       <Segment className="editor-content">
         <EditorContent className="content" editor={editor} />
-        <RichTextCommentEditorActions
-          editor={editor}
-          popupDelay={popupDelay}
-          onSubmit={onSubmit}
-        />
+        {onSubmit && (
+          <RichTextCommentEditorActions
+            editor={editor}
+            popupDelay={popupDelay}
+            onSubmit={onSubmit}
+          />
+        )}
       </Segment>
     </Segment.Group>
   )
@@ -614,7 +621,10 @@ export const RichTextEditor = ({
   const editor: Editor = useEditor({
     content: content,
     editable: !disabled,
-    extensions: [...extensions, Placeholder],
+    extensions: [
+      ...EditorExtensions,
+      Placeholder.configure({ placeholder: placeholder }),
+    ],
   })
   useEffect(() => updatePlaceholder(editor, placeholder), [editor, placeholder])
   useEffect(() => updateEditable(editor, !disabled), [editor, disabled])
@@ -638,7 +648,7 @@ export const RichTextDisplay = ({ content }: { content: string }) => {
   const editor: Editor = useEditor({
     editable: false,
     content: content,
-    extensions: extensions,
+    extensions: EditorExtensions,
   })
   return <EditorContent className="richtext-display" editor={editor} />
 }
