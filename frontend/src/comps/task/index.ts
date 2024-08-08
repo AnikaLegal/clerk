@@ -1,8 +1,8 @@
-import { TaskActionsCard } from './task-actions-card'
+import { TaskActionCard } from './task-action-card'
 import { TaskCommentGroup } from './task-comment-group'
 import { TaskMetaCard } from './task-meta-card'
 export {
-  TaskActionsCard,
+  TaskActionCard,
   TaskCommentGroup,
   TaskMetaCard,
 }

@@ -2,7 +2,7 @@ import api, { Task, TaskCommentCreate, TaskCreate } from 'api'
 import { AutoForm, getFormSchema, getModelInitialValues } from 'comps/auto-form'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { FIELD_TYPES } from 'comps/field-component'
-import { TaskActionsCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
+import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useMemo, useState } from 'react'
@@ -96,7 +96,7 @@ export const TaskDetail = ({
           </Segment>
         </Grid.Column>
         <Grid.Column>
-          <TaskActionsCard
+          <TaskActionCard
             task={task}
             setTask={setTask}
             update={update}

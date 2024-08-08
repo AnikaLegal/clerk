@@ -41,7 +41,7 @@ interface TaskModalProps extends TaskActionProps {
   option: TaskOption
 }
 
-export const TaskActionsCard = ({
+export const TaskActionCard = ({
   perms,
   setTask,
   status,
