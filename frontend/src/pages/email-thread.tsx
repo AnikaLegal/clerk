@@ -232,19 +232,18 @@ const EmailList = styled.div`
   margin-top: 1.5rem;
 `
 
-const EmailContainer = styled.div`
+const EmailContainer = styled.div<{ state }>`
   border: 6px solid var(--grey);
   box-shadow: 1px 1px 5px -2px #999;
-
   ${({ state }) => {
     if (state === 'INGESTED') {
-      return `border-color: var(--gold-light);`
+      return 'border-color: var(--gold-light);'
     } else if (state === 'DELIVERY_FAILURE') {
-      return `border-color: var(--peach);`
+      return 'border-color: var(--peach);'
     }
   }}
 `
-const EmailHeader = styled.div`
+const EmailHeader = styled.div<{ state }>`
   padding: 1rem;
   background-color: var(--grey);
   border-bottom: solid 1px var(--grey);
@@ -293,7 +292,7 @@ const EmailBody = styled.div`
 const EmailControls = styled.div`
   padding: 0 1rem 1rem 1rem;
 `
-const EmailAttachmentBlock = styled.div`
+const EmailAttachmentBlock = styled.div<{ received }>`
   padding: 1rem;
   background-color: var(--grey);
   ${({ received }) =>

@@ -96,7 +96,7 @@ export const ReopenForm: React.FC<CaseDetailFormProps> = ({
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
                 <div className="header">{k}</div>
-                <p>{v}</p>
+                <p>{v as string}</p>
               </Message>
             ))}
             <Button

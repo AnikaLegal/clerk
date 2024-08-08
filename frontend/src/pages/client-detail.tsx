@@ -153,7 +153,7 @@ const OTHER_FIELDS = [
   {
     label: 'Number of dependents',
     name: 'number_of_dependents',
-    schema: Yup.number().integer().min(0).nullable(true),
+    schema: Yup.number().integer().min(0).nullable(),
     type: FIELD_TYPES.NUMBER,
   },
   {

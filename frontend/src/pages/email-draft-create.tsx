@@ -205,7 +205,7 @@ const TemplateForm = ({ templates, onSubmit, parent_email }) => {
                   touched[k] && (
                     <div key={k} className="ui error message">
                       <div className="header">{k}</div>
-                      <p>{v}</p>
+                      <p>{v as string}</p>
                     </div>
                   )
               )}
@@ -273,7 +273,7 @@ const CustomDraftForm = ({ onSubmit, parent_email }) => {
               touched[k] && (
                 <div key={k} className="ui error message">
                   <div className="header">{k}</div>
-                  <p>{v}</p>
+                  <p>{v as string}</p>
                 </div>
               )
           )}

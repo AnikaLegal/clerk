@@ -86,7 +86,7 @@ export const FormErrors: React.FC<FormErrorsProps> = ({
       .map(([k, v]) => (
         <div key={k} className="ui error message">
           <div className="header">{labels ? labels[k] : k}</div>
-          <p>{typeof v === 'object' ? Object.values(v) : v}</p>
+          <p>{typeof v === 'object' ? Object.values(v) : v as string}</p>
         </div>
       ))}
   </>

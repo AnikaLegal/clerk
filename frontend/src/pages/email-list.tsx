@@ -30,13 +30,13 @@ const App = () => {
   const caseResult = useGetCaseQuery({ id: case_pk })
   const threadResult = useGetEmailThreadsQuery({ id: case_pk })
 
-  if (caseResult.isLoading || threadResult.isLoading)
-    return null
+  if (caseResult.isLoading || threadResult.isLoading) return null
 
   const issue = caseResult.data!.issue
-  const emailThreads =
-    threadResult.isError && threadResult.error.status === 404 ? [] :
-    threadResult.data
+
+  const { error } = threadResult
+  const notFound = error && 'status' in error && error.status === 404
+  const emailThreads = notFound ? [] : threadResult.data
 
   return (
     <Container>

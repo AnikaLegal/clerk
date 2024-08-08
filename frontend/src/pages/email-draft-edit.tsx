@@ -339,7 +339,7 @@ const FileUploadAttachForm = () => {
     <Formik
       initialValues={{ file: null }}
       validationSchema={Yup.object().shape({
-        file: Yup.mixed()
+        file: Yup.mixed<File>()
           .test('file-required', 'Please select a file', (file) =>
             Boolean(file)
           )

@@ -45,7 +45,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
     {Object.entries(errors).map(([k, v]) => (
       <div key={k} className="ui error message">
         <div className="header">{k}</div>
-        <p>{v}</p>
+        <p>{v as string}</p>
       </div>
     ))}
     <Button

@@ -215,7 +215,9 @@ const App = () => {
                   ['Street address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease?']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
+                  ['Client on lease?']: tenancy.is_on_lease
+                    ? tenancy.is_on_lease.display
+                    : '',
                 }}
               />
               {tenancy.landlord ? (
@@ -339,7 +341,7 @@ const PersonSearchCard: React.FC<PersonSearchCardProps> = ({
 
 interface EntityCardProps {
   title: string
-  tableData: any
+  tableData: { [key: string]: string | number }
   url?: string
   onRemove?: () => void
 }
@@ -367,7 +369,9 @@ const EntityCard: React.FC<EntityCardProps> = ({
         <tbody>
           {Object.entries(tableData).map(([title, text]) => (
             <tr key={title}>
-              <td className="four wide">{title[0].toUpperCase() + title.slice(1).toLowerCase()}</td>
+              <td className="four wide">
+                {title[0].toUpperCase() + title.slice(1).toLowerCase()}
+              </td>
               <td>{text}</td>
             </tr>
           ))}
@@ -377,14 +381,11 @@ const EntityCard: React.FC<EntityCardProps> = ({
   </div>
 )
 
-const CurrentCircumstancesCard = ({
-  initialIssue,
-  updateCase,
-}) => {
+const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Weekly rent',
-      schema: Yup.number().integer().min(0).nullable(true),
+      schema: Yup.number().integer().min(0).nullable(),
       type: FIELD_TYPES.NUMBER,
       name: 'weekly_rent',
     },
@@ -397,7 +398,7 @@ const CurrentCircumstancesCard = ({
     {
       label: 'Weekly income',
       name: 'weekly_income',
-      schema: Yup.number().integer().min(0).nullable(true),
+      schema: Yup.number().integer().min(0).nullable(),
       type: FIELD_TYPES.NUMBER,
     },
   ]
@@ -412,10 +413,7 @@ const CurrentCircumstancesCard = ({
   )
 }
 
-const OtherInformationCard = ({
-  initialIssue,
-  updateCase,
-}) => {
+const OtherInformationCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Referrer type',
@@ -440,12 +438,7 @@ const OtherInformationCard = ({
   )
 }
 
-const TableFormCard = ({
-  header,
-  fields,
-  initialIssue,
-  updateCase,
-}) => {
+const TableFormCard = ({ header, fields, initialIssue, updateCase }) => {
   const [issue, setIssue] = useState<Issue>(initialIssue)
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateCase({
@@ -471,7 +464,6 @@ const TableFormCard = ({
     </div>
   )
 }
-
 
 const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   filenote: FilenoteForm,
