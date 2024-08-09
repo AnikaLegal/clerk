@@ -5,7 +5,7 @@ import moment from 'moment'
 import styled from 'styled-components'
 import { RichTextDisplay } from 'comps/richtext-editor'
 
-const StyledCommentGroup = styled(Comment.Group)`
+const FullWidthCommentGroup = styled(Comment.Group)`
   && {
     max-width: 100%;
   }
@@ -19,7 +19,7 @@ export const TaskCommentGroup = ({
   loading: boolean
 }) => {
   return (
-    <StyledCommentGroup>
+    <FullWidthCommentGroup>
       <Loader inverted inline active={loading} />
       {comments.map((comment) => (
         <Segment key={comment.id}>
@@ -38,6 +38,6 @@ export const TaskCommentGroup = ({
           </Comment>
         </Segment>
       ))}
-    </StyledCommentGroup>
+    </FullWidthCommentGroup>
   )
 }
