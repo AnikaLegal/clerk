@@ -104,11 +104,12 @@ export const TaskDetail = ({
             status={status}
           />
           <TaskMetaCard
-            task={task}
-            setTask={setTask}
-            update={update}
             choices={choices}
             perms={perms}
+            setTask={setTask}
+            status={status}
+            task={task}
+            update={update}
           />
         </Grid.Column>
       </Grid.Row>

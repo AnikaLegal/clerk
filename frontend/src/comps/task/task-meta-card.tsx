@@ -1,17 +1,30 @@
 import api from 'api'
 import { useSnackbar } from 'notistack'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Card, Dropdown, Grid, Header } from 'semantic-ui-react'
-import { TaskDetailProps } from 'types/task'
+import {
+  Card,
+  Dropdown,
+  Grid,
+  Header,
+  Label,
+  SemanticCOLORS,
+} from 'semantic-ui-react'
+import styled from 'styled-components'
+import { TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage } from 'utils'
 
+export interface TaskMetaCardProps extends TaskDetailProps {
+  status: TaskStatus
+}
+
 export const TaskMetaCard = ({
-  task,
-  setTask,
-  update,
   choices,
   perms,
-}: TaskDetailProps) => {
+  setTask,
+  status,
+  task,
+  update,
+}: TaskMetaCardProps) => {
   const [users, setUsers] = useState([])
   const [isUsersLoading, setIsUsersLoading] = useState(false)
   const [getUsers] = api.useLazyGetUsersQuery()
@@ -43,6 +56,12 @@ export const TaskMetaCard = ({
       })
   }
 
+  const statusColor: SemanticCOLORS =
+    (task.status === status.started && 'blue') ||
+    (task.status === status.finished && 'green') ||
+    (task.status === status.cancelled && 'red') ||
+    'grey'
+
   return (
     <Card fluid>
       <Card.Content>
@@ -50,11 +69,13 @@ export const TaskMetaCard = ({
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Status</Header>
-              {statusMap.get(task.status)}
+              <StatusLabel color={statusColor}>
+                {statusMap.get(task.status)}
+              </StatusLabel>
             </Grid.Column>
             <Grid.Column>
               <Header sub>Days Open</Header>
-              {task.days_open}
+              <PlainLabel>{task.days_open}</PlainLabel>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row columns={2}>
@@ -110,3 +131,21 @@ export const TaskMetaCard = ({
     </Card>
   )
 }
+
+const PlainLabel = styled(Label)`
+  && {
+    background-color: unset;
+    color: unset;
+    font-size: unset;
+    font-weight: unset;
+    margin: 0;
+    padding-left: 0;
+  }
+`
+
+const StatusLabel = styled(Label)`
+  && {
+    font-size: unset;
+    margin: 0;
+  }
+`
