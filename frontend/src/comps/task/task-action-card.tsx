@@ -67,28 +67,28 @@ export const TaskActionCard = ({
       icon: 'undo',
       text: 'Reopen the task',
       when: () => perms.is_paralegal_or_better && !task.is_open,
-      action: () => handleChange('status', status.stop),
+      action: () => handleChange('status', status.stopped),
     },
     {
       id: 'start',
       icon: 'play circle outline',
       text: 'Start the task',
-      when: () => perms.is_paralegal_or_better && task.status === status.stop,
-      action: () => handleChange('status', status.start),
+      when: () => perms.is_paralegal_or_better && task.status === status.stopped,
+      action: () => handleChange('status', status.started),
     },
     {
       id: 'stop',
       icon: 'stop circle outline',
       text: 'Stop the task',
-      when: () => perms.is_paralegal_or_better && task.status === status.start,
-      action: () => handleChange('status', status.stop),
+      when: () => perms.is_paralegal_or_better && task.status === status.started,
+      action: () => handleChange('status', status.stopped),
     },
     {
       id: 'finish',
       icon: 'check',
       text: 'Finish the task',
       when: () => perms.is_paralegal_or_better && task.is_open,
-      action: () => handleChange('status', status.finish),
+      action: () => handleChange('status', status.finished),
     },
     {
       id: 'cancel',
@@ -191,7 +191,7 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
     }
 
     Promise.all([
-      update({ status: status.cancel }),
+      update({ status: status.cancelled }),
       createComment({ id: task.id, taskCommentCreate: values }),
     ])
       .then((results) => {
@@ -225,6 +225,7 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
   return (
     <Modal
       as="Form"
+      centered={false}
       className="form"
       open={open}
       onClose={handleClose}
@@ -234,7 +235,7 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
       <Modal.Header>Cancel the task</Modal.Header>
       <Modal.Content>
         <Form.Field required>
-          <label>Why is the task being cancelled?</label>
+          <label>Briefly explain why the task was not completed</label>
           <RichTextCommentEditor editor={editor} />
         </Form.Field>
       </Modal.Content>

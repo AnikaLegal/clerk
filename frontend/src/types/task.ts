@@ -2,10 +2,10 @@ import { Task } from 'api'
 import { ModelChoices, UserPermission, SetModel, UpdateModel } from 'types/global'
 
 export interface TaskStatus {
-  cancel: string
-  finish: string
-  start: string
-  stop: string
+  cancelled: string
+  finished: string
+  started: string
+  stopped: string
 }
 
 export interface TaskDetailProps {
