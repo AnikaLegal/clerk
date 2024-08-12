@@ -1,8 +1,10 @@
 import { TaskActionCard } from './task-action-card'
 import { TaskCommentGroup } from './task-comment-group'
 import { TaskMetaCard } from './task-meta-card'
+import { CancelTaskModal } from './task-action-modals'
 export {
   TaskActionCard,
   TaskCommentGroup,
   TaskMetaCard,
+  CancelTaskModal,
 }
