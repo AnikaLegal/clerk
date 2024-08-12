@@ -14,9 +14,13 @@ properties:
     type: boolean
   created_at:
     type: string
+  due_at:
+    type: string
   closed_at:
     type: string
     nullable: true
+  is_urgent:
+    type: boolean
   days_open:
     type: integer
   url:

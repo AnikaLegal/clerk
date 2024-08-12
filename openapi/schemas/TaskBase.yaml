@@ -4,6 +4,13 @@ properties:
     type: string
   description:
     type: string
+  due_at:
+    type: string
+    nullable: true
+  is_urgent:
+    type: boolean
 required:
   - name
   - description
+  - due_at
+  - is_urgent
