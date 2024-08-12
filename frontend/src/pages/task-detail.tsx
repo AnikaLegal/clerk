@@ -6,7 +6,16 @@ import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useMemo, useState } from 'react'
-import { Button, Divider, Form, Grid, Header, Segment } from 'semantic-ui-react'
+import {
+  Button,
+  Divider,
+  Form,
+  Grid,
+  Header,
+  Label,
+  Segment,
+  SemanticCOLORS,
+} from 'semantic-ui-react'
 import { Model, ModelChoices, UserPermission } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
@@ -30,6 +39,13 @@ interface DjangoContext {
   user: UserPermission
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
+export interface TaskBodyProps extends TaskDetailProps {
+  status: TaskStatus
+}
+export interface TaskHeaderProps extends TaskDetailProps {
+  status: TaskStatus
+}
 
 const App = () => {
   const taskResult = api.useGetTaskQuery({ id: CONTEXT.task_pk })
@@ -81,6 +97,7 @@ export const TaskDetail = ({
               update={update}
               choices={choices}
               perms={perms}
+              status={status}
             />
           </Segment>
           <Segment basic>
@@ -107,7 +124,6 @@ export const TaskDetail = ({
             choices={choices}
             perms={perms}
             setTask={setTask}
-            status={status}
             task={task}
             update={update}
           />
@@ -123,7 +139,8 @@ export const TaskBody = ({
   update,
   choices,
   perms,
-}: TaskDetailProps) => {
+  status,
+}: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
   const toggleEditMode = () => setEditMode(!isEditMode)
@@ -133,10 +150,14 @@ export const TaskBody = ({
       <Grid>
         <Grid.Row>
           <Grid.Column style={{ flexGrow: '1' }}>
-            <Header as="h1">
-              {task.name}
-              <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
-            </Header>
+            <TaskHeader
+              task={task}
+              setTask={setTask}
+              update={update}
+              choices={choices}
+              perms={perms}
+              status={status}
+            />
           </Grid.Column>
           {perms.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
@@ -214,6 +235,39 @@ export const TaskBody = ({
         />
       )}
     </Formik>
+  )
+}
+
+export const TaskHeader = ({
+  task,
+  setTask,
+  update,
+  choices,
+  perms,
+  status,
+}: TaskHeaderProps) => {
+  const typeLabels = useMemo(() => choiceToMap(choices.type), [])
+  const statusLabels = useMemo(() => choiceToMap(choices.status), [])
+
+  const statusColor: SemanticCOLORS =
+    (task.status === status.started && 'blue') ||
+    (task.status === status.finished && 'green') ||
+    (task.status === status.cancelled && 'red') ||
+    'grey'
+
+  return (
+    <>
+      <Header as="h1">
+        {task.name}
+        <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
+      </Header>
+      <span>
+        <Label color={statusColor}>
+          Status
+          <Label.Detail>{statusLabels.get(task.status)}</Label.Detail>
+        </Label>
+      </span>
+    </>
   )
 }
 
