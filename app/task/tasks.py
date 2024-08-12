@@ -235,6 +235,8 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
                     type=template.type,
                     name=template.name,
                     description=template.description,
+                    due_at=template.due_at,
+                    is_urgent=template.is_urgent,
                     owner=user,
                     is_system_update=True,
                 )
