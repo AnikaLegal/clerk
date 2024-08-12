@@ -36,7 +36,7 @@ class TaskTemplateFactory(TimestampedModelFactory):
     description = factory.Faker("paragraph")
     trigger = factory.SubFactory(TaskTriggerFactory)
     due_at = factory.Faker(
-        "date_between", start_date="+1d", end_date="+2w"
+        "date_time_between", tzinfo=timezone.utc, start_date="+1d", end_date="+2w"
     )
     is_urgent = factory.Faker("random_element", elements=[True, False])
 
@@ -60,7 +60,7 @@ class TaskFactory(TimestampedModelFactory):
         "date_time_between", tzinfo=timezone.utc, start_date="-2M"
     )
     due_at = factory.Faker(
-        "date_between", start_date="+1d", end_date="+2w"
+        "date_time_between", tzinfo=timezone.utc, start_date="+1d", end_date="+2w"
     )
     is_urgent = factory.Faker("random_element", elements=[True, False])
     is_open = factory.LazyAttribute(

@@ -14,6 +14,8 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
             "type",
             "name",
             "description",
+            "due_at",
+            "is_urgent",
         )
 
     id = serializers.IntegerField(required=False)
@@ -122,7 +124,9 @@ class TaskListSerializer(serializers.ModelSerializer):
             "is_open",
             "is_suspended",
             "created_at",
+            "due_at",
             "closed_at",
+            "is_urgent",
             "days_open",
             "url",
         )
@@ -135,6 +139,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     owner = TaskListUserSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
     created_at = LocalDateField(read_only=True)
+    due_at = LocalDateField()
     closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
@@ -161,7 +166,9 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_open",
             "is_suspended",
             "created_at",
+            "due_at",
             "closed_at",
+            "is_urgent",
             "days_open",
             "url",
         )
@@ -178,6 +185,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(read_only=True)
 
     created_at = LocalDateField(read_only=True)
+    due_at = LocalDateField()
     closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
 
@@ -191,6 +199,7 @@ class TaskSearchSerializer(serializers.ModelSerializer):
             "status",
             "is_open",
             "is_suspended",
+            "is_urgent",
             "issue",
             "owner",
             "assigned_to",
