@@ -16,6 +16,7 @@ import { mount, useDebounce } from 'utils'
 interface DjangoContext {
   create_url: string
   groups: string[]
+  user: User
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
@@ -40,9 +41,11 @@ const App = () => {
   return (
     <Container>
       <Header as="h1">Accounts</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Invite a paralegal</Button>
-      </a>
+      {CONTEXT.user.is_coordinator_or_better && (
+        <a href={CONTEXT.create_url}>
+          <Button primary>Invite a paralegal</Button>
+        </a>
+      )}
       <div
         style={{
           margin: '1rem 0',
