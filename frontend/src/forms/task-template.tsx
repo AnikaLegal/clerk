@@ -151,8 +151,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   if (values.templates) {
     if (values.templates.length == 0) {
       values.templates.push({} as TaskTemplate)
-    }
-    if (values.templates.length == 1 && activeIndex !== 0) {
       setActiveIndex(0)
     }
   }
