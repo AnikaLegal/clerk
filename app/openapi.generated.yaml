@@ -2203,6 +2203,7 @@ components:
           type: string
         due_at:
           type: string
+          nullable: true
         closed_at:
           type: string
           nullable: true
@@ -2404,9 +2405,16 @@ components:
           type: string
         description:
           type: string
+        due_in:
+          type: integer
+          nullable: true
+        is_urgent:
+          type: boolean
       required:
         - type
         - name
+        - due_in
+        - is_urgent
     TaskTriggerBase:
       type: object
       properties:

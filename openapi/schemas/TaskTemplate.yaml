@@ -8,6 +8,13 @@ properties:
     type: string
   description:
     type: string
+  due_in:
+    type: integer
+    nullable: true
+  is_urgent:
+    type: boolean
 required:
   - type
   - name
+  - due_in
+  - is_urgent

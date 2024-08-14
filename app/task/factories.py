@@ -35,9 +35,7 @@ class TaskTemplateFactory(TimestampedModelFactory):
     name = factory.Faker("text", max_nb_chars=45)
     description = factory.Faker("paragraph")
     trigger = factory.SubFactory(TaskTriggerFactory)
-    due_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="+1d", end_date="+2w"
-    )
+    due_in = factory.Faker("pyint", min_value=1, max_value=14)
     is_urgent = factory.Faker("random_element", elements=[True, False])
 
 

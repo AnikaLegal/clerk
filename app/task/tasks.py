@@ -2,6 +2,9 @@ import logging
 from utils.sentry import sentry_task
 from django.db.models import Q
 from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
+
 
 from accounts.models import User
 from core.models import Issue, IssueEvent
@@ -225,17 +228,19 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
             logger.info("Not creating tasks as lawyer is acting as paralegal")
             break
 
+        now = timezone.now()
         for template in trigger.templates.all():
             if not Task.objects.filter(
                 issue=event.issue, template=template, owner=user
             ).exists():
+                due_at = (now + timedelta(days=template.due_in)) if template.due_in else None
                 task = Task.objects.create(
                     issue=event.issue,
                     template=template,
                     type=template.type,
                     name=template.name,
                     description=template.description,
-                    due_at=template.due_at,
+                    due_at=due_at,
                     is_urgent=template.is_urgent,
                     owner=user,
                     is_system_update=True,

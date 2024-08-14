@@ -18,6 +18,7 @@ import {
   RichTextEditorProps,
   EditorEvents,
 } from 'comps/richtext-editor'
+import { TaskTemplate } from 'api'
 
 interface TaskTemplateFormProps {
   create?: boolean
@@ -149,7 +150,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   // By default, show an empty template input area when creating a template.
   if (values.templates) {
     if (values.templates.length == 0) {
-      values.templates.push({})
+      values.templates.push({} as TaskTemplate)
     }
     if (values.templates.length == 1 && activeIndex !== 0) {
       setActiveIndex(0)
@@ -228,66 +229,92 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             </Grid>
             {values.templates && values.templates.length > 0 && (
               <Accordion fluid styled>
-                {values.templates.map((template, index) => (
-                  <div key={index}>
-                    <Accordion.Title
-                      active={activeIndex === index}
-                      index={index}
-                      onClick={handleAccordionClick}
-                    >
-                      <Icon
-                        name={
-                          activeIndex === index ? 'chevron up' : 'chevron down'
-                        }
-                        style={{ marginTop: '5px', marginRight: '1rem' }}
-                      />
-                      <TemplateHeaderText
+                {values.templates.map(
+                  (template: TaskTemplate, index: number) => (
+                    <div key={index}>
+                      <Accordion.Title
+                        active={activeIndex === index}
                         index={index}
-                        type={taskTypes.get(template.type)}
-                        name={template.name}
-                      />
-                      <div style={{ float: 'right' }}>
+                        onClick={handleAccordionClick}
+                      >
                         <Icon
-                          name="delete"
-                          link
-                          style={{ marginTop: '5px' }}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            arrayHelpers.remove(index)
-                            setActiveIndex(
-                              activeIndex === index ? -1 : activeIndex - 1
-                            )
+                          name={
+                            activeIndex === index
+                              ? 'chevron up'
+                              : 'chevron down'
+                          }
+                          style={{ marginTop: '5px', marginRight: '1rem' }}
+                        />
+                        <TemplateHeaderText
+                          index={index}
+                          type={taskTypes.get(template.type)}
+                          name={template.name}
+                        />
+                        <div style={{ float: 'right' }}>
+                          <Icon
+                            name="delete"
+                            link
+                            style={{ marginTop: '5px' }}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              arrayHelpers.remove(index)
+                              setActiveIndex(
+                                activeIndex === index ? -1 : activeIndex - 1
+                              )
+                            }}
+                          />
+                        </div>
+                      </Accordion.Title>
+                      <Accordion.Content active={activeIndex === index}>
+                        <DropdownField
+                          name={`templates.${index}.type`}
+                          label="Task type"
+                          placeholder="Select the task type"
+                          options={choiceToOptions(choices.task_type)}
+                          disabled={isSubmitting}
+                          value={template.type || ''}
+                        />
+                        <InputField
+                          name={`templates.${index}.name`}
+                          label="Task name"
+                          disabled={isSubmitting}
+                          placeholder="Provide more specific task information"
+                          value={template.name || ''}
+                        />
+                        <InputField
+                          type="number"
+                          name={`templates.${index}.due_in`}
+                          label="Due in"
+                          disabled={isSubmitting}
+                          placeholder="The number of days from when the task is assigned until it is due"
+                          value={template.due_in || ''}
+                          onChange={(e, { value }) => {
+                            setFieldValue(`templates.${index}.due_in`, value !== '' ? value : null)
                           }}
                         />
-                      </div>
-                    </Accordion.Title>
-                    <Accordion.Content active={activeIndex === index}>
-                      <DropdownField
-                        name={`templates.${index}.type`}
-                        label="Task type"
-                        placeholder="Select the task type"
-                        options={choiceToOptions(choices.task_type)}
-                        disabled={isSubmitting}
-                        value={template.type || ''}
-                      />
-                      <InputField
-                        name={`templates.${index}.name`}
-                        label="Task name"
-                        disabled={isSubmitting}
-                        placeholder="Provide more specific task information"
-                        value={template.name || ''}
-                      />
-                      <RichTextField
-                        name={`templates.${index}.description`}
-                        label="Task description"
-                        disabled={isSubmitting}
-                        placeholder="Describe the task in detail"
-                        content={template.description || ''}
-                      />
-                    </Accordion.Content>
-                  </div>
-                ))}
+                        <DropdownField
+                          name={`templates.${index}.is_urgent`}
+                          label="Urgent?"
+                          placeholder="Is the task urgent?"
+                          options={[
+                            { key: 'yes', text: 'Yes', value: true },
+                            { key: 'no', text: 'No', value: false },
+                          ]}
+                          disabled={isSubmitting}
+                          value={template.is_urgent || false}
+                        />
+                        <RichTextField
+                          name={`templates.${index}.description`}
+                          label="Task description"
+                          disabled={isSubmitting}
+                          placeholder="Describe the task in detail"
+                          content={template.description || ''}
+                        />
+                      </Accordion.Content>
+                    </div>
+                  )
+                )}
               </Accordion>
             )}
           </div>

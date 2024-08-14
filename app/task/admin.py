@@ -13,7 +13,7 @@ class TaskTemplateInline(admin.TabularInline):
         "type",
         "name",
         "description",
-        "due_at",
+        "due_in",
         "is_urgent",
         "_order",
     )
@@ -44,7 +44,7 @@ class TaskTemplateAdmin(admin.ModelAdmin):
         "type",
         "name",
         "description",
-        "due_at",
+        "due_in",
         "is_urgent",
     )
 

@@ -1118,7 +1118,7 @@ export type TaskList = {
   is_open: boolean
   is_suspended: boolean
   created_at: string
-  due_at?: string
+  due_at?: string | null
   closed_at: string | null
   is_urgent?: boolean
   days_open: number
@@ -1187,6 +1187,8 @@ export type TaskTemplate = {
   type: string
   name: string
   description?: string
+  due_in: number | null
+  is_urgent: boolean
 }
 export type TaskTriggerBase = {
   name: string

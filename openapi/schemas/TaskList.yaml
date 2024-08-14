@@ -16,6 +16,7 @@ properties:
     type: string
   due_at:
     type: string
+    nullable: true
   closed_at:
     type: string
     nullable: true

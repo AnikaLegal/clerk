@@ -21,7 +21,9 @@ class TaskTemplate(TimestampedModel):
     type = models.CharField(max_length=32, choices=TaskType.choices)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
-    due_at = models.DateTimeField(blank=True, null=True, default=None)
+    # Number of days from when the task is assigned until it is due.
+    due_in = models.IntegerField(blank=True, null=True, default=None)
+
     is_urgent = models.BooleanField(default=False)
     trigger = models.ForeignKey(
         TaskTrigger,

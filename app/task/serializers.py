@@ -14,7 +14,7 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
             "type",
             "name",
             "description",
-            "due_at",
+            "due_in",
             "is_urgent",
         )
 
