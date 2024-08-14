@@ -34,8 +34,12 @@ class TaskTemplateFactory(TimestampedModelFactory):
     type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
     name = factory.Faker("text", max_nb_chars=45)
     description = factory.Faker("paragraph")
-    trigger = factory.SubFactory(TaskTriggerFactory)
-    due_in = factory.Faker("pyint", min_value=1, max_value=14)
+    trigger = factory.SubFactory(TaskTriggerFactory, templates=[])
+    due_in = factory.Maybe(
+        factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
+        yes_declaration=factory.Faker("pyint", min_value=1, max_value=14),
+        no_declaration=None,
+    )
     is_urgent = factory.Faker("random_element", elements=[True, False])
 
 
@@ -57,7 +61,6 @@ class TaskFactory(TimestampedModelFactory):
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2M"
     )
-
     due_at = factory.Maybe(
         factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
         yes_declaration=factory.Faker(
