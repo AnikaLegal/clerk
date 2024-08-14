@@ -212,6 +212,21 @@ export const TaskBody = ({
       name: 'type',
     },
     {
+      label: 'Status',
+      type: FIELD_TYPES.SINGLE_CHOICE,
+      name: 'status',
+    },
+    {
+      label: 'Due date',
+      type: FIELD_TYPES.DATE,
+      name: 'due_at',
+    },
+    {
+      label: 'Urgent?',
+      type: FIELD_TYPES.BOOL,
+      name: 'is_urgent',
+    },
+    {
       label: 'Description',
       type: FIELD_TYPES.RICHTEXT,
       name: 'description',
@@ -260,8 +275,14 @@ export const TaskHeader = ({
       <Header as="h1">
         {task.name}
         <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
+        {task.due_at && <Header.Subheader>Due {task.due_at}</Header.Subheader>}
       </Header>
       <span>
+        {task.is_urgent && (
+          <Label color="red">
+            Urgent
+          </Label>
+        )}
         <Label color={statusColor}>
           Status
           <Label.Detail>{statusLabels.get(task.status)}</Label.Detail>

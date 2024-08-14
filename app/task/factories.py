@@ -59,10 +59,18 @@ class TaskFactory(TimestampedModelFactory):
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2M"
     )
-    due_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="+1d", end_date="+2w"
+
+    due_at = factory.Maybe(
+        factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
+        yes_declaration=factory.Faker(
+            "date_time_between",
+            tzinfo=timezone.utc,
+            start_date="-1w",
+            end_date="+2w",
+        ),
+        no_declaration=None,
     )
-    is_urgent = factory.Faker("random_element", elements=[True, False])
+    is_urgent = factory.Faker("boolean", chance_of_getting_true=10)
     is_open = factory.LazyAttribute(
         lambda self: self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
     )

@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import { IconUrgent } from '@tabler/icons-react'
+import api, { GetTasksApiArg, TaskList } from 'api'
+import { FadeTransition } from 'comps/transitions'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import {
   Container,
   Dropdown,
   Form,
   Header,
-  Table,
   Input,
   Label,
+  Table,
+  SemanticCOLORS,
 } from 'semantic-ui-react'
-import { mount, useDebounce, choiceToMap, choiceToOptions } from 'utils'
-import api, { TaskList, GetTasksApiArg } from 'api'
 import { UserPermission } from 'types/global'
-import { FadeTransition } from 'comps/transitions'
+import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
 
 interface DjangoContext {
   choices: {
@@ -72,6 +75,29 @@ const App = () => {
 
   const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const users = userResults.data ?? []
+
+  const getDueDateColor = (task: TaskList): SemanticCOLORS => {
+    if (task.is_urgent) {
+      return 'red'
+    }
+    if (task.due_at) {
+      const now = moment().startOf('day')
+      const due_at = moment(task.due_at, 'DD/MM/YY')
+      const days = due_at.diff(now, 'days')
+      if (days <= 7) {
+        if (days >= 3) {
+          return 'green'
+        } else if (days >= 2) {
+          return 'yellow'
+        } else if (days >= 1) {
+          return 'orange'
+        } else {
+          return 'red'
+        }
+      }
+    }
+    return null
+  }
 
   return (
     <Container>
@@ -209,7 +235,8 @@ const App = () => {
               <Table.HeaderCell>Assigned To</Table.HeaderCell>
               <Table.HeaderCell>Owner</Table.HeaderCell>
               <Table.HeaderCell>Task Status</Table.HeaderCell>
-              <Table.HeaderCell>Days Open</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
+              <Table.HeaderCell>Due Date</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -241,7 +268,21 @@ const App = () => {
                   )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
-                <Table.Cell>{task.days_open}</Table.Cell>
+                <Table.Cell>{task.created_at}</Table.Cell>
+                <Table.Cell
+                  className={getDueDateColor(task)}
+                  textAlign="center"
+                >
+                  {task.is_urgent ? (
+                    <span className="icon-tada">
+                      <IconUrgent stroke={1.75} />
+                    </span>
+                  ) : task.due_at ? (
+                    task.due_at
+                  ) : (
+                    '-'
+                  )}
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>

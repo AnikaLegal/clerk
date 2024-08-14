@@ -100,7 +100,7 @@ class TaskApiViewset(ModelViewSet):
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("comments", "attachments")
         elif self.action == "list":
-            queryset = queryset.order_by("-days_open")
+            queryset = queryset.order_by("-is_urgent", "due_at", "-days_open")
             queryset = self.search_queryset(queryset)
 
         # Permissions.
