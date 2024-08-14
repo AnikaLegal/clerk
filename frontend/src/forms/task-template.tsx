@@ -288,7 +288,10 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                           placeholder="The number of days from when the task is assigned until it is due"
                           value={template.due_in || ''}
                           onChange={(e, { value }) => {
-                            setFieldValue(`templates.${index}.due_in`, value !== '' ? value : null)
+                            setFieldValue(
+                              `templates.${index}.due_in`,
+                              value !== '' ? value : null
+                            )
                           }}
                         />
                         <DropdownField
