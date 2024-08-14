@@ -1,11 +1,12 @@
 import pytest
 from unittest import mock
 from random import randint
+from datetime import timedelta
 
 from core.factories import IssueEventFactory, IssueFactory, UserFactory
 from core.models.issue import CaseStage
 from core.models.issue_event import EventType
-from task.factories import TaskTriggerFactory
+from task.factories import TaskTriggerFactory, TaskTemplateFactory
 from task.models import Task
 from task.models.trigger import TasksCaseRole
 
@@ -97,9 +98,9 @@ def test_task_trigger__tasks_assigned_correctly_to_coordinators(
         == trigger.templates.count()
     )
 
-    # NOTE: Not necessary for the test case. Helps catch a change in the code
-    # that notifies when a task is assigned and consequently prevent
-    # accidentally sending notifications (see note above).
+    # NOTE: Not necessary for the test case. Helps catch changes to the
+    # notification code and consequently prevent accidentally sending
+    # notifications (see note above).
     mock_notify.assert_called_once()
 
 
@@ -147,4 +148,25 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
             template__in=paralegal_trigger.templates.all(),
         ).count()
         == paralegal_trigger.templates.count()
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.enable_signals
+def test_task_template__due_date_set_correctly(
+    django_capture_on_commit_callbacks,
+):
+    """
+    Test that the task due date is set to task creation date plus the number of
+    days specified in the task template.
+    """
+    template = TaskTemplateFactory(due_in=randint(1, 365))
+    with django_capture_on_commit_callbacks(execute=True):
+        event = IssueEventFactory(event_type=EventType.PARALEGAL)
+        event.save()
+
+    assert Task.objects.count() == 1
+    task = Task.objects.first()
+    assert (
+        task.due_at.date() == (task.created_at + timedelta(days=template.due_in)).date()
     )
