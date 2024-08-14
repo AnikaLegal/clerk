@@ -1,54 +1,42 @@
+import api, { GetUsersApiArg, User } from 'api'
+import { GroupLabels } from 'comps/group-label'
+import { FadeTransition } from 'comps/transitions'
 import React, { useState } from 'react'
 import {
   Button,
   Container,
+  Dropdown,
   Header,
-  Table,
   Icon,
   Input,
-  Dropdown,
+  Table,
 } from 'semantic-ui-react'
-
-import { mount, debounce, useEffectLazy } from 'utils'
-import { FadeTransition } from 'comps/transitions'
-import { GroupLabels } from 'comps/group-label'
-import api, { User } from 'api'
+import { mount, useDebounce } from 'utils'
 
 interface DjangoContext {
-  users: User[]
   create_url: string
+  groups: string[]
 }
-
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-const GROUP_OPTIONS = [
-  { key: '', value: '', text: 'All groups' },
-  { key: 'Paralegal', value: 'Paralegal', text: 'Paralegal' },
-  { key: 'Coordinator', value: 'Coordinator', text: 'Coordinator' },
-  { key: 'Lawyer', value: 'Lawyer', text: 'Lawyer' },
-  { key: 'Admin', value: 'Admin', text: 'Admin' },
-]
-
-const debouncer = debounce(300)
-
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [users, setUsers] = useState<User[]>(CONTEXT.users)
-  const [name, setName] = useState<string>('')
-  const [group, setGroups] = useState<string>('')
-  const [getUsers] = api.useLazyGetUsersQuery()
+  const [args, setArgs] = useState<GetUsersApiArg>({})
+  const debounced = useDebounce(args, 300)
+  const userResults = api.useGetUsersQuery(debounced)
 
-  const search = debouncer(() => {
-    setIsLoading(true)
-    getUsers({ name, group })
-      .unwrap()
-      .then((users) => {
-        setUsers(users)
-        setIsLoading(false)
-      })
-      .catch(() => setIsLoading(false))
-  })
-  useEffectLazy(() => search(), [name, group])
+  const users = userResults.data || []
+
+  const updateArgs = (name: keyof GetUsersApiArg, value) => {
+    var updated = {}
+    if (value === null || value === '') {
+      const { [name]: _, ...remaining } = args
+      updated = remaining
+    } else {
+      updated = { ...args, [name]: value }
+    }
+    setArgs(updated)
+  }
+
   return (
     <Container>
       <Header as="h1">Accounts</Header>
@@ -66,19 +54,24 @@ const App = () => {
         <Input
           icon="search"
           placeholder="Search names..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={args.name}
+          onChange={(e, { value }) => updateArgs('name', value)}
         />
         <Dropdown
+          clearable
           fluid
           selection
           placeholder="Filter groups"
-          options={GROUP_OPTIONS}
-          onChange={(e, { value }) => setGroups(String(value))}
-          value={group}
+          options={CONTEXT.groups.map((value) => ({
+            key: value,
+            value: value,
+            text: value,
+          }))}
+          value={args.group}
+          onChange={(e, { value }) => updateArgs('group', value)}
         />
       </div>
-      <FadeTransition in={!isLoading}>
+      <FadeTransition in={!userResults.isLoading}>
         <Table celled>
           <Table.Header>
             <Table.Row>
