@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   Dropdown,
+  Form,
   Header,
   Icon,
   Input,
@@ -46,34 +47,47 @@ const App = () => {
           <Button primary>Invite a paralegal</Button>
         </a>
       )}
-      <div
-        style={{
-          margin: '1rem 0',
-          display: 'grid',
-          gap: '1rem',
-          gridTemplateColumns: '1fr 1fr',
-        }}
-      >
-        <Input
-          icon="search"
-          placeholder="Search names..."
-          value={args.name}
-          onChange={(e, { value }) => updateArgs('name', value)}
-        />
-        <Dropdown
-          clearable
-          fluid
-          selection
-          placeholder="Filter groups"
-          options={CONTEXT.groups.map((value) => ({
-            key: value,
-            value: value,
-            text: value,
-          }))}
-          value={args.group}
-          onChange={(e, { value }) => updateArgs('group', value)}
-        />
-      </div>
+      <Form>
+        <Form.Group widths="equal">
+          <Form.Field>
+            <Input
+              icon="search"
+              placeholder="Search names..."
+              value={args.name}
+              onChange={(e, { value }) => updateArgs('name', value)}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Dropdown
+              clearable
+              fluid
+              selection
+              placeholder="Filter groups"
+              options={CONTEXT.groups.map((value) => ({
+                key: value,
+                value: value,
+                text: value,
+              }))}
+              value={args.group}
+              onChange={(e, { value }) => updateArgs('group', value)}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Dropdown
+              clearable
+              fluid
+              selection
+              placeholder="Active?"
+              options={[
+                { key: 'yes', value: true, text: 'Yes' },
+                { key: 'no', value: false, text: 'No' },
+              ]}
+              value={args.isActive}
+              onChange={(e, { value }) => updateArgs('isActive', value)}
+            />
+          </Form.Field>
+        </Form.Group>
+      </Form>
       <FadeTransition in={!userResults.isLoading}>
         <Table celled>
           <Table.Header>
