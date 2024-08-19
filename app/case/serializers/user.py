@@ -59,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_paralegal",
             "is_ms_account_set_up",
             "ms_account_created_at",
+            "is_system_account",
         )
         read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
 

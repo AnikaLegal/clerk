@@ -167,6 +167,12 @@ const FIELDS: FormField[] = [
     name: 'is_active',
     schema: Yup.boolean(),
   },
+  {
+    label: 'Is system account?',
+    type: FIELD_TYPES.BOOL,
+    name: 'is_system_account',
+    schema: Yup.boolean(),
+  },
 ]
 const SCHEMA = getFormSchema(FIELDS)
 

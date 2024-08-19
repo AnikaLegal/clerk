@@ -885,6 +885,7 @@ export type User = UserCreate & {
   is_paralegal: boolean
   is_ms_account_set_up: boolean
   ms_account_created_at: string | null
+  is_system_account: boolean
 }
 export type TextChoiceField = {
   display: string

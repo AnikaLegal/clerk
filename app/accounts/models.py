@@ -43,6 +43,8 @@ class User(AbstractUser):
     university = models.ForeignKey(
         University, blank=True, null=True, on_delete=models.PROTECT
     )
+    # These accounts are used internally, all users can view them.
+    is_system_account = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # Ensure email always lowercase
@@ -55,7 +57,11 @@ class User(AbstractUser):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return (user.is_coordinator_or_better or self.id == user.id)
+        return (
+            user.is_coordinator_or_better
+            or self.id == user.id
+            or self.is_system_account
+        )
 
     def __str__(self):
         return self.email
