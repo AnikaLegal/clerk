@@ -22,6 +22,7 @@ services:
     volumes:
       - ../app:/app
       - build:/build
+      - ipython_data_local:/root/.ipython/profile_default
     links:
       - worker
       - webpack
@@ -65,3 +66,4 @@ services:
 volumes:
   clerk-postgres-data:
   build:
+  ipython_data_local:
