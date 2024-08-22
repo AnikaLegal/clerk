@@ -1,6 +1,6 @@
 import re
-
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.utils.html import strip_tags
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -18,9 +18,16 @@ def render_email_template(html: str) -> str:
         for a_tag in soup.find_all("a"):
             a_tag["style"] = "color:#438fef;text-decoration:underline;"
 
-        context = {"html": mark_safe(soup.body.decode_contents())}
+        html = mark_safe(soup.body.decode_contents())
     else:
-        context = {"html": ""}
+        html = ""
+
+    context = {
+        "html": html,
+        "image_url": "https://{bucket}.s3-{region}.amazonaws.com".format(
+            bucket=settings.EMAIL_BUCKET_NAME, region=settings.AWS_REGION_NAME
+        ),
+    }
     return render_to_string("case/email_preview.html", context)
 
 
