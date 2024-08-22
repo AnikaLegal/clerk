@@ -286,6 +286,16 @@ LOGGING = {
             "handlers": ["console", "file"],
             "propagate": False,
         },
+        "django.server": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "django-q": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
         "django.db.backends": {
             "level": "ERROR",
             "handlers": ["console", "file"],
