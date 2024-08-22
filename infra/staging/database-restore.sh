@@ -22,7 +22,7 @@ ssh -o StrictHostKeyChecking=no root@$HOST /bin/bash << EOF
     psql -c "DROP DATABASE IF EXISTS \"clerk-test\";"
     sudo -Hiu postgres -- psql -U postgres -c "CREATE DATABASE \"clerk-test\" WITH OWNER = \"clerk\" ENCODING = 'UTF8';"
 
-    docker-compose \
+    docker compose \
         -p task \
         -f docker-compose.staging.yml \
         run --rm web \

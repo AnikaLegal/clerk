@@ -2,7 +2,7 @@ from invoke import task
 
 APP_NAME = "clerk"
 HOST = "13.55.250.149"
-COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
+COMPOSE = "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 
 @task
@@ -12,7 +12,7 @@ def schema(c):
 
 
 @task
-def build(c, base=False, webpack=False):
+def build(c, base=False, webpack=False, no_cache=False):
     """Build Docker environment locally"""
 
     file = "Dockerfile"
@@ -24,7 +24,11 @@ def build(c, base=False, webpack=False):
         file = "Dockerfile.webpack"
         tag = f"{APP_NAME}-webpack:local"
 
-    c.run(f"docker build --file docker/{file} --tag {tag} .")
+    args = ""
+    if no_cache:
+        args += "--no-cache"
+
+    c.run(f"docker build {args} --file docker/{file} --tag {tag} .")
 
 
 @task

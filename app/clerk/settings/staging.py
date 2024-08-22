@@ -53,8 +53,8 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "em7221.test-mail.anikalegal.com"
+EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
-
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
