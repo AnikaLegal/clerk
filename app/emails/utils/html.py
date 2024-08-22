@@ -24,7 +24,7 @@ def render_email_template(html: str) -> str:
 
     context = {
         "html": html,
-        "image_url": "https://{bucket}.s3-{region}.amazonaws.com".format(
+        "bucket_url": "https://{bucket}.s3-{region}.amazonaws.com".format(
             bucket=settings.EMAIL_BUCKET_NAME, region=settings.AWS_REGION_NAME
         ),
     }
