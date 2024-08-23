@@ -275,7 +275,7 @@ const App = () => {
                 >
                   {task.is_urgent ? (
                     <span className="icon-tada">
-                      <IconUrgent stroke={1.75} />
+                      <IconUrgent stroke={1.25} />
                     </span>
                   ) : task.due_at ? (
                     task.due_at
