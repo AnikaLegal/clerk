@@ -109,16 +109,16 @@ const EmailItem: React.FC<EmailItemProps> = ({
           </p>
         )}
         <p>
-          <strong>To:</strong>&nbsp;
+          <strong>To: </strong>
           {email.to_address}
         </p>
         <p>
-          <strong>From:</strong>&nbsp;
+          <strong>From: </strong>
           {email.from_address}
         </p>
         {email.cc_addresses.length > 0 && (
           <p>
-            <strong>CC:</strong>&nbsp;
+            <strong>CC: </strong>
             {email.cc_addresses.join(', ')}
           </p>
         )}

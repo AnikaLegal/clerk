@@ -6,7 +6,7 @@ import { markdownToHtml, markdownToSlackyMarkdown } from 'utils'
 
 export const MarkdownExplainer = () => (
   <Segment secondary>
-    Text can be formatted using Markdown. See&nbsp;
+    Text can be formatted using Markdown. See{" "}
     <a
       href="https://www.markdownguide.org/cheat-sheet/#basic-syntax"
       target="_blank"
@@ -14,7 +14,7 @@ export const MarkdownExplainer = () => (
     >
       here
     </a>
-    &nbsp;for a basic reference.
+    {" "}for a basic reference.
   </Segment>
 )
 
@@ -120,7 +120,7 @@ export const MarkdownTextArea = ({ value, ...props }) => {
   return (
     <>
       <Segment secondary>
-        This text can be formatted using Markdown. See&nbsp;
+        This text can be formatted using Markdown. See{" "}
         <a
           href="https://www.markdownguide.org/cheat-sheet/#basic-syntax"
           target="_blank"
@@ -128,7 +128,7 @@ export const MarkdownTextArea = ({ value, ...props }) => {
         >
           here
         </a>
-        &nbsp;for a basic reference.
+        {" "}for a basic reference.
       </Segment>
       <TextArea value={value} {...props} />
       <div

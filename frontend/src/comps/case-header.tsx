@@ -35,17 +35,17 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           <br />
           {issue.paralegal ? (
             <span>
-              Assigned to&nbsp;
-              <a href={issue.paralegal.url}>{issue.paralegal.full_name},</a>
-              &nbsp;
+              Assigned to{" "}
+              <a href={issue.paralegal.url}>{issue.paralegal.full_name}</a>
+              {", "}
             </span>
           ) : (
             'Not assigned, '
           )}
           {issue.lawyer ? (
             <span>
-              supervised by&nbsp;
-              <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>&nbsp;
+              supervised by{" "}
+              <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>{" "}
             </span>
           ) : (
             'not supervised '
