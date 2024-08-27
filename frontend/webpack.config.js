@@ -43,8 +43,8 @@ const config = {
 }
 
 module.exports = (env, argv) => {
-  const isDeveopment = argv.mode === 'development'
-  if (isDeveopment) {
+  const isDevelopment = argv.mode === 'development'
+  if (isDevelopment) {
     // Setup dev server for hot reload
     config.devtool = 'inline-source-map'
     config.devServer = {
