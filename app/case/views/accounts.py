@@ -67,7 +67,6 @@ def account_detail_page_view(request, pk):
     context = {
         "account_id": pk,
         "is_current_user_account": request.user == user,
-        "is_lawyer_account": user.groups.filter(name=CaseGroups.LAWYER).exists(),
         "performance_notes": IssueNoteSerializer(
             user.issue_notes.all(), many=True
         ).data,

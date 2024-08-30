@@ -31,7 +31,6 @@ import * as Yup from 'yup'
 interface DjangoContext {
   user: User
   account_id: number
-  is_lawyer_account: boolean
   is_current_user_account: boolean
   performance_notes: any[]
 }
@@ -48,8 +47,10 @@ const App = () => {
 
 export const AccountDetailPage = ({ data }: { data: User }) => {
   const [account, setAccount] = useState<User>(data)
-
   const [updateUser] = useUpdateUserMutation()
+
+  const isLawyerAccount = account.groups.includes('Lawyer') 
+
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateUser({
       id: account.id,
@@ -90,7 +91,7 @@ export const AccountDetailPage = ({ data }: { data: User }) => {
 
   // Show the lawyer tab first for lawyer accounts and don't display it at all
   // for non-lawyer accounts.
-  if (CONTEXT.is_lawyer_account) {
+  if (isLawyerAccount) {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
   } else {
     tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
