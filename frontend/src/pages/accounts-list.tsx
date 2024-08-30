@@ -44,7 +44,9 @@ const App = () => {
       <Header as="h1">Accounts</Header>
       {CONTEXT.user.is_coordinator_or_better && (
         <a href={CONTEXT.create_url}>
-          <Button primary>Invite a paralegal</Button>
+          <Button primary style={{ marginBottom: '1rem' }}>
+            Invite a paralegal
+          </Button>
         </a>
       )}
       <Form>
