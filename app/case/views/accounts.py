@@ -7,7 +7,7 @@ from django.db.models import QuerySet, Q
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, ListModelMixin
+from rest_framework.mixins import UpdateModelMixin, ListModelMixin, RetrieveModelMixin
 from django.urls import reverse
 from django_q.tasks import async_task
 from django.core.exceptions import PermissionDenied
@@ -87,11 +87,17 @@ def account_create_page_view(request):
     return render_react_page(request, "Invite paralegal", "account-create", {})
 
 
-class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
+class AccountApiViewset(
+    GenericViewSet, UpdateModelMixin, ListModelMixin, RetrieveModelMixin
+):
     serializer_class = UserSerializer
 
     def get_permissions(self):
-        if self.action == "list" or self.action == "get_account_detail_permissions":
+        if (
+            self.action == "list"
+            or self.action == "retrieve"
+            or self.action == "get_account_detail_permissions"
+        ):
             permission_classes = [ParalegalOrBetterObjectPermission]
         else:
             permission_classes = [CoordinatorOrBetterPermission]
@@ -109,15 +115,15 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
             queryset = self.search_queryset(queryset)
 
             if user.is_paralegal:
-                # Paralegals can only list their own account.
-                queryset = queryset.filter(id=user.id)
+                # Paralegals can only view their own & so-called system
+                # accounts.
+                query = Q(id=user.id)
+                queryset = queryset.filter(query)
 
         return queryset
 
     def sort_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
-        serializer = AccountSortSerializer(
-            data=self.request.query_params, partial=True
-        )
+        serializer = AccountSortSerializer(data=self.request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         sort = serializer.validated_data.get("sort", ["-date_joined"])
         return queryset.order_by(*sort)
@@ -166,6 +172,9 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     )
     def get_account_detail_permissions(self, request, pk):
         user = self.get_object()
+        #
+        if not request.user.is_coordinator_or_better and user != request.user:
+            raise PermissionDenied
         perms_data = _load_ms_permissions(user)
         return Response(perms_data)
 
