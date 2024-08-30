@@ -118,6 +118,7 @@ class AccountApiViewset(
                 # Paralegals can only view their own & so-called system
                 # accounts.
                 query = Q(id=user.id)
+                query |= Q(is_system_account=True)
                 queryset = queryset.filter(query)
 
         return queryset
