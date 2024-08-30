@@ -27,9 +27,6 @@ from case.views.auth import (
 from microsoft.service import get_case_folder_info
 
 
-COORDINATORS_EMAIL = "coordinators@anikalegal.com"
-
-
 @api_view(["GET"])
 @login_required
 def case_list_page_view(request):
