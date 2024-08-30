@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 def account_list_page_view(request):
     context = {
         "create_url": reverse("account-create"),
-        "groups": list(Group.objects.values_list('name', flat=True))
+        "groups": list(Group.objects.values_list("name", flat=True)),
     }
     return render_react_page(request, "Accounts", "accounts-list", context)
 
@@ -52,12 +52,6 @@ def account_detail_page_view(request, pk):
             User.objects.prefetch_related(
                 "groups",
                 "issue_notes",
-                "issue_set__paralegal__groups",
-                "issue_set__lawyer__groups",
-                "issue_set__client",
-                "lawyer_issues__paralegal__groups",
-                "lawyer_issues__lawyer__groups",
-                "lawyer_issues__client",
             )
             .distinct()
             .get(pk=pk)
@@ -66,14 +60,14 @@ def account_detail_page_view(request, pk):
         raise Http404()
 
     # Check whether the user has access permissions.
-    if (not user.check_permission(request.user)):
+    if not user.check_permission(request.user):
         raise PermissionDenied()
 
     name = user.get_full_name()
     context = {
-        "account": UserSerializer(user).data,
-        "issue_set": IssueSerializer(user.issue_set.all(), many=True).data,
-        "lawyer_issues": IssueSerializer(user.lawyer_issues.all(), many=True).data,
+        "account_id": pk,
+        "is_current_user_account": request.user == user,
+        "is_lawyer_account": user.groups.filter(name=CaseGroups.LAWYER).exists(),
         "performance_notes": IssueNoteSerializer(
             user.issue_notes.all(), many=True
         ).data,

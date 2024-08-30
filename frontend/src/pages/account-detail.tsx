@@ -1,30 +1,54 @@
-import React, { useState } from 'react'
-import { Container, Header, Tab } from 'semantic-ui-react'
-import moment from 'moment'
-import * as Yup from 'yup'
-
-import { TimelineNote } from 'comps/timeline-item'
-import { TableForm, FieldTable } from 'comps/table-form'
-import { getFormSchema, getModelChoices, FormField } from 'comps/auto-form'
-import { CaseListTable } from 'comps/case-table'
-import { mount } from 'utils'
+import {
+  GetCasesApiArg,
+  GetCasesApiResponse,
+  useGetCasesQuery,
+  useGetUserQuery,
+  useGetUsersQuery,
+  User,
+  UserCreate,
+  useUpdateUserMutation,
+} from 'api'
 import { AccountPermissions } from 'comps/account-permissions'
+import { FormField, getFormSchema, getModelChoices } from 'comps/auto-form'
+import { CaseListTable } from 'comps/case-table'
 import { ErrorBoundary } from 'comps/error-boundary'
 import { FIELD_TYPES } from 'comps/field-component'
-import { User, UserCreate, useUpdateUserMutation } from 'api'
+import { FieldTable, TableForm } from 'comps/table-form'
+import { TimelineNote } from 'comps/timeline-item'
+import moment from 'moment'
+import React, { useState } from 'react'
+import {
+  Container,
+  Header,
+  Icon,
+  Pagination,
+  PaginationProps,
+  Tab,
+} from 'semantic-ui-react'
+import { mount } from 'utils'
+import * as Yup from 'yup'
 
 interface DjangoContext {
   user: User
-  account: User
-  issue_set: any[]
-  lawyer_issues: any[]
+  account_id: number
+  is_lawyer_account: boolean
+  is_current_user_account: boolean
   performance_notes: any[]
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [account, setAccount] = useState(CONTEXT.account)
+  const accountResult = useGetUserQuery({ id: CONTEXT.account_id })
+  if (accountResult.isLoading) {
+    return null
+  }
+  return <AccountDetailPage data={accountResult.data} />
+}
+
+export const AccountDetailPage = ({ data }: { data: User }) => {
+  const [account, setAccount] = useState<User>(data)
+
   const [updateUser] = useUpdateUserMutation()
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateUser({
@@ -35,25 +59,11 @@ const App = () => {
   let tabPanes = [
     {
       menuItem: 'Paralegal cases',
-      render: () => (
-        <Tab.Pane>
-          <CaseListTable
-            issues={CONTEXT.issue_set.sort(creationSort)}
-            fields={PARALEGAL_TABLE_FIELDS}
-          />
-        </Tab.Pane>
-      ),
+      render: () => <ParalegalCasesTab account={account} />,
     },
     {
       menuItem: 'Lawyer cases',
-      render: () => (
-        <Tab.Pane>
-          <CaseListTable
-            issues={CONTEXT.lawyer_issues.sort(creationSort)}
-            fields={LAWYER_TABLE_FIELDS}
-          />
-        </Tab.Pane>
-      ),
+      render: () => <LawyerCasesTab account={account} />,
     },
     {
       menuItem: 'Performance notes',
@@ -77,14 +87,15 @@ const App = () => {
       ),
     },
   ]
-  // Prioritise lawyer issues if they exist
-  if (CONTEXT.lawyer_issues.length > 0) {
+
+  // Show the lawyer tab first for lawyer accounts and don't display it at all
+  // for non-lawyer accounts.
+  if (CONTEXT.is_lawyer_account) {
     tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
-  }
-  if (CONTEXT.lawyer_issues.length === 0) {
-    // Don't show lawyer cases.
+  } else {
     tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
   }
+
   return (
     <Container>
       <Header as="h1" disabled={!account.is_active}>
@@ -103,11 +114,109 @@ const App = () => {
           onUpdate={update}
         />
       ) : (
-        <FieldTable fields={FIELDS} model={account} choices={getModelChoices(FIELDS, account)} />
+        <FieldTable
+          fields={FIELDS}
+          model={account}
+          choices={getModelChoices(FIELDS, account)}
+        />
       )}
-
-      <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
+      {(CONTEXT.user.is_coordinator_or_better ||
+        CONTEXT.is_current_user_account) && (
+        <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
+      )}
     </Container>
+  )
+}
+
+export const ParalegalCasesTab = ({ account }: { account: User }) => {
+  const [args, setArgs] = useState<GetCasesApiArg>({
+    paralegal: account.id.toString(),
+  })
+  const result = useGetCasesQuery(args)
+
+  const onPageChange = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    { activePage }: { activePage?: number | string }
+  ) => setArgs({ ...args, page: activePage as number })
+
+  return (
+    <Tab.Pane loading={result.isLoading}>
+      <PaginatedCaseList
+        data={result.data}
+        fields={PARALEGAL_TABLE_FIELDS}
+        onPageChange={onPageChange}
+      />
+    </Tab.Pane>
+  )
+}
+
+export const LawyerCasesTab = ({ account }: { account: User }) => {
+  const [args, setArgs] = useState<GetCasesApiArg>({
+    lawyer: account.id.toString(),
+  })
+  const result = useGetCasesQuery(args)
+
+  const onPageChange = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    { activePage }: { activePage?: number | string }
+  ) => setArgs({ ...args, page: activePage as number })
+
+  return (
+    <Tab.Pane loading={result.isLoading}>
+      <PaginatedCaseList
+        data={result.data}
+        fields={LAWYER_TABLE_FIELDS}
+        onPageChange={onPageChange}
+      />
+    </Tab.Pane>
+  )
+}
+
+export const PaginatedCaseList = ({
+  data,
+  fields,
+  onPageChange,
+}: {
+  data: GetCasesApiResponse
+  fields: string[]
+  onPageChange: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    data: PaginationProps
+  ) => void
+}) => {
+  if (!data) {
+    return null
+  }
+  const results = [...data.results]
+  const currentPage = data.current
+  const totalPages = data.page_count
+  const itemCount = data.item_count
+
+  return (
+    <>
+      <CaseListTable issues={results.sort(creationSort)} fields={fields} />
+      {itemCount > results.length && (
+        <Pagination
+          activePage={currentPage}
+          onPageChange={onPageChange}
+          totalPages={totalPages}
+          ellipsisItem={{
+            content: <Icon name="ellipsis horizontal" />,
+            icon: true,
+          }}
+          firstItem={{
+            content: <Icon name="angle double left" />,
+            icon: true,
+          }}
+          lastItem={{
+            content: <Icon name="angle double right" />,
+            icon: true,
+          }}
+          prevItem={{ content: <Icon name="angle left" />, icon: true }}
+          nextItem={{ content: <Icon name="angle right" />, icon: true }}
+        />
+      )}
+    </>
   )
 }
 
