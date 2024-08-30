@@ -65,8 +65,8 @@ def account_detail_page_view(request, pk):
 
     name = user.get_full_name()
     context = {
-        "account_id": pk,
-        "is_current_user_account": request.user == user,
+        "account_id": user.id,
+        "current_user_id": request.user.id,
         "performance_notes": IssueNoteSerializer(
             user.issue_notes.all(), many=True
         ).data,

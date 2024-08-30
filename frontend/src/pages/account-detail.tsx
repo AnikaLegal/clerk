@@ -31,7 +31,7 @@ import * as Yup from 'yup'
 interface DjangoContext {
   user: User
   account_id: number
-  is_current_user_account: boolean
+  current_user_id: number
   performance_notes: any[]
 }
 
@@ -42,14 +42,24 @@ const App = () => {
   if (accountResult.isLoading) {
     return null
   }
-  return <AccountDetailPage data={accountResult.data} />
+  const showTabs: boolean =
+    CONTEXT.user.is_coordinator_or_better ||
+    CONTEXT.account_id === CONTEXT.current_user_id
+
+  return <AccountDetailPage data={accountResult.data} showTabs={showTabs} />
 }
 
-export const AccountDetailPage = ({ data }: { data: User }) => {
+export const AccountDetailPage = ({
+  data,
+  showTabs,
+}: {
+  data: User
+  showTabs: boolean
+}) => {
   const [account, setAccount] = useState<User>(data)
   const [updateUser] = useUpdateUserMutation()
 
-  const isLawyerAccount = account.groups.includes('Lawyer') 
+  const isLawyerAccount = account.groups.includes('Lawyer')
 
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateUser({
@@ -121,10 +131,7 @@ export const AccountDetailPage = ({ data }: { data: User }) => {
           choices={getModelChoices(FIELDS, account)}
         />
       )}
-      {(CONTEXT.user.is_coordinator_or_better ||
-        CONTEXT.is_current_user_account) && (
-        <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
-      )}
+      {showTabs && <Tab style={{ marginTop: '2em' }} panes={tabPanes} />}
     </Container>
   )
 }
