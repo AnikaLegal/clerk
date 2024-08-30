@@ -13,6 +13,7 @@ from .views import (
     document_templates,
     case,
     case_email,
+    case_note,
     task,
     task_templates,
 )
@@ -28,6 +29,7 @@ SLUG = "(?P<slug>[\-\w]+)"
 
 router = DefaultRouter()
 router.register("case", case.CaseApiViewset, basename="case-api")
+router.register("case-note", case_note.CaseNoteApiViewset, basename="case-note-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")

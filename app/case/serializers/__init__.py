@@ -7,9 +7,10 @@ from .email import (
     EmailThreadSerializer,
 )
 from .issue import (
+    IssueNoteSearchSerializer,
     IssueNoteSerializer,
-    IssueSerializer,
     IssueSearchSerializer,
+    IssueSerializer,
 )
 from .documents import DocumentTemplateSerializer
 from .notification import NotificationSerializer

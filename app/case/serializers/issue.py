@@ -171,3 +171,14 @@ class IssueSearchSerializer(serializers.ModelSerializer):
         extra_kwargs = {f: {"required": False} for f in fields}
 
     search = serializers.CharField(required=False)
+
+
+class IssueNoteSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "issue",
+            "creator",
+            "note_type",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}
