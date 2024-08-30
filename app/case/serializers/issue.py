@@ -147,7 +147,7 @@ class IssueNoteSerializer(serializers.ModelSerializer):
     creator_id = serializers.IntegerField(write_only=True)
     text_display = serializers.CharField(source="get_text", read_only=True)
     reviewee = serializers.SerializerMethodField()
-    issue_id = serializers.UUIDField(write_only=True)
+    issue_id = serializers.UUIDField()
     event = serializers.DateTimeField(required=False)
     created_at = LocalTimeField()
 

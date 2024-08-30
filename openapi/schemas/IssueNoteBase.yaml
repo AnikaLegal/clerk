@@ -7,7 +7,11 @@ properties:
   event:
     type: string
     nullable: true
+  issue_id:
+    type: string
+    format: uuid
 required:
   - note_type
   - text
   - event
+  - issue_id

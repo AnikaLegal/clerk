@@ -987,6 +987,7 @@ export type IssueNoteBase = {
   note_type: string
   text: string
   event: string | null
+  issue_id: string
 }
 export type IssueNote = IssueNoteBase & {
   id: number
@@ -1011,7 +1012,6 @@ export type IssueUpdate = IssueBase & {
 }
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number
-  issue_id: string
 }
 export type SharepointDocument = {
   name: string
