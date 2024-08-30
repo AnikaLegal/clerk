@@ -55,9 +55,13 @@ class TaskFactory(TimestampedModelFactory):
     status = factory.Faker(
         "random_element", elements=[c[0] for c in TaskStatus.choices]
     )
-    issue = factory.SubFactory(IssueFactory)
     owner = factory.SubFactory(UserFactory)
     assigned_to = factory.SelfAttribute("owner")
+    issue = factory.SubFactory(
+        IssueFactory,
+        paralegal=factory.SelfAttribute("..owner"),
+        lawyer=factory.SubFactory(UserFactory),
+    )
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2M"
     )

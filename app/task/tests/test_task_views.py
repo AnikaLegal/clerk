@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 from accounts.models import User
 from case.middleware import annotate_group_access
 from task.factories import TaskFactory
+from core.factories import UserFactory
 from conftest import schema_tester
 
 
@@ -62,7 +63,7 @@ def test_task_list_view__as_paralegal_with_no_access_to_issue(
     annotate_group_access(user)
     url = reverse("task-api-list")
 
-    TaskFactory(owner=user)
+    TaskFactory(owner=user, issue__paralegal=UserFactory())
 
     response = user_client.get(url)
     assert response.status_code == 200
@@ -109,7 +110,7 @@ def test_task_list_view__as_paralegal_with_access(
     task = TaskFactory(owner=user, issue__paralegal=user)
 
     # Other tasks but no access.
-    TaskFactory(owner=user)
+    TaskFactory(owner=user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=user)
     TaskFactory()
 
@@ -135,7 +136,7 @@ def test_task_list_view__as_coordinator(
     url = reverse("task-api-list")
 
     TaskFactory(owner=user, issue__paralegal=user)
-    TaskFactory(owner=user)
+    TaskFactory(owner=user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=user)
     TaskFactory()
 
