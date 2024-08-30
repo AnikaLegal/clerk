@@ -125,9 +125,9 @@ const App = () => {
         </Label>
         {showAdvancedSearch && (
           <>
-            <Form.Group>
+            <Form.Group widths='equal'>
               {CONTEXT.user.is_coordinator_or_better && (
-                <Form.Field width={8}>
+                <Form.Field>
                   <Dropdown
                     clearable
                     fluid
@@ -140,7 +140,7 @@ const App = () => {
                   />
                 </Form.Field>
               )}
-              <Form.Field width={8}>
+              <Form.Field>
                 <Dropdown
                   fluid
                   selection
@@ -151,7 +151,7 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('isOpen', value)}
                 />
               </Form.Field>
-              <Form.Field width={8}>
+              <Form.Field>
                 <Dropdown
                   fluid
                   selection
@@ -162,7 +162,7 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
-              <Form.Field width={8}>
+              <Form.Field>
                 <Dropdown
                   fluid
                   selection
@@ -174,8 +174,8 @@ const App = () => {
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Group style={{ marginTop: '1em' }}>
-              <Form.Field width={8}>
+            <Form.Group widths='equal'>
+              <Form.Field>
                 <Dropdown
                   fluid
                   selection
@@ -186,7 +186,7 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('status', value)}
                 />
               </Form.Field>
-              <Form.Field width={8}>
+              <Form.Field>
                 <Dropdown
                   clearable
                   fluid
@@ -203,7 +203,7 @@ const App = () => {
                   loading={userResults.isLoading}
                 />
               </Form.Field>
-              <Form.Field width={8}>
+              <Form.Field>
                 <Dropdown
                   clearable
                   fluid
