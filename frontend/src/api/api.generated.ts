@@ -113,6 +113,18 @@ const injectedRtkApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
+    getNotes: build.query<GetNotesApiResponse, GetNotesApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/note/`,
+        params: {
+          page: queryArg.page,
+          issue: queryArg.issue,
+          creator: queryArg.creator,
+          note_type: queryArg.noteType,
+          reviewee: queryArg.reviewee,
+        },
+      }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -582,6 +594,21 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   emailId: number
   /** Sharepoint ID */
   sharepointId: string
+}
+export type GetNotesApiResponse = /** status 200 Successful response. */ {
+  current: number
+  next: number | null
+  prev: number | null
+  page_count: number
+  item_count: number
+  results: IssueNote[]
+}
+export type GetNotesApiArg = {
+  page?: number
+  issue?: string
+  creator?: string
+  noteType?: string
+  reviewee?: string
 }
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[]
@@ -1228,6 +1255,7 @@ export const {
   useDeleteEmailAttachmentMutation,
   useUploadEmailAttachmentToSharepointMutation,
   useDownloadEmailAttachmentFromSharepointMutation,
+  useGetNotesQuery,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,

@@ -27,6 +27,8 @@ paths:
     $ref: paths/attachment-sharepoint-upload.yaml
   /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
     $ref: paths/attachment-sharepoint-download.yaml
+  /clerk/api/note/:
+    $ref: paths/note-list.yaml
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:
