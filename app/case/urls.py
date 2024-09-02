@@ -2,6 +2,7 @@ from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    note,
     person,
     tenancy,
     client,
@@ -13,7 +14,6 @@ from .views import (
     document_templates,
     case,
     case_email,
-    case_note,
     task,
     task_templates,
 )
@@ -29,13 +29,13 @@ SLUG = "(?P<slug>[\-\w]+)"
 
 router = DefaultRouter()
 router.register("case", case.CaseApiViewset, basename="case-api")
-router.register("case-note", case_note.CaseNoteApiViewset, basename="case-note-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
 router.register("task", task.TaskApiViewset, basename="task-api")
+router.register("note", note.NoteApiViewset, basename="note-api")
 router.register(
     "template-email",
     email_templates.EmailTemplateApiViewset,

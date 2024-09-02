@@ -21,14 +21,14 @@ from case.utils import ClerkPaginator
 logger = logging.getLogger(__name__)
 
 
-class CaseNotePaginator(ClerkPaginator):
+class NotePaginator(ClerkPaginator):
     page_size = 20
     max_page_size = 100
 
 
-class CaseNoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
+class NoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     serializer_class = IssueNoteSerializer
-    pagination_class = CaseNotePaginator
+    pagination_class = NotePaginator
 
     def get_permissions(self):
         if self.action == "list":
@@ -76,14 +76,15 @@ class CaseNoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         search_query = search_query_serializer.validated_data
 
         for key, value in search_query.items():
-            if key == "reviewee":
-                user_type = ContentType.objects.get_for_model(User)
-                queryset = queryset.filter(
-                    note_type=NoteType.PERFORMANCE,
-                    content_type=user_type,
-                    object_id=value,
-                )
-            else:
-                queryset = queryset.filter(**{key: value})
+            if value != None:
+                if key == "reviewee":
+                    user_type = ContentType.objects.get_for_model(User)
+                    queryset = queryset.filter(
+                        note_type=NoteType.PERFORMANCE,
+                        content_type=user_type,
+                        object_id=value,
+                    )
+                else:
+                    queryset = queryset.filter(**{key: value})
 
         return queryset
