@@ -1,10 +1,13 @@
 import logging
 
 from django.db.models import QuerySet, Q
+from django.contrib.contenttypes.models import ContentType
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 
+from accounts.models import User
 from core.models import IssueNote
+from core.models.issue_note import NoteType
 from case.views.auth import (
     ParalegalOrBetterObjectPermission,
     CoordinatorOrBetterPermission,
@@ -37,6 +40,8 @@ class CaseNoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
 
     def get_queryset(self):
         user = self.request.user
+
+        # Paralegals are restricted in the type of notes they can access.
         if user.is_coordinator_or_better:
             note_types = IssueNote.COORDINATOR_NOTE_TYPES
         else:
@@ -52,8 +57,8 @@ class CaseNoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
             queryset = self.search_queryset(queryset)
 
             if user.is_paralegal:
-                # Paralegals can only view their own & so-called system
-                # accounts.
+                # Paralegals can only view their own notes & the notes added to
+                # issues that they are assigned as the paralegal.
                 query = Q(creator=user)
                 query |= Q(issue__paralegal=user)
                 queryset = queryset.filter(query)
@@ -71,7 +76,14 @@ class CaseNoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         search_query = search_query_serializer.validated_data
 
         for key, value in search_query.items():
-            if value is not None:
+            if key == "reviewee":
+                user_type = ContentType.objects.get_for_model(User)
+                queryset = queryset.filter(
+                    note_type=NoteType.PERFORMANCE,
+                    content_type=user_type,
+                    object_id=value,
+                )
+            else:
                 queryset = queryset.filter(**{key: value})
 
         return queryset

@@ -180,5 +180,8 @@ class IssueNoteSearchSerializer(serializers.ModelSerializer):
             "issue",
             "creator",
             "note_type",
+            "reviewee",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
+
+    reviewee = serializers.CharField(required=False)
