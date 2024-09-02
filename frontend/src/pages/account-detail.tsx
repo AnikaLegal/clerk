@@ -3,7 +3,9 @@ import {
   GetCasesApiResponse,
   useGetCasesQuery,
   useGetUserQuery,
-  useGetUsersQuery,
+  useGetNotesQuery,
+  GetNotesApiArg,
+  GetNotesApiResponse,
   User,
   UserCreate,
   useUpdateUserMutation,
@@ -32,7 +34,6 @@ interface DjangoContext {
   user: User
   account_id: number
   current_user_id: number
-  performance_notes: any[]
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -42,24 +43,12 @@ const App = () => {
   if (accountResult.isLoading) {
     return null
   }
-  const showTabs: boolean =
-    CONTEXT.user.is_coordinator_or_better ||
-    CONTEXT.account_id === CONTEXT.current_user_id
-
-  return <AccountDetailPage data={accountResult.data} showTabs={showTabs} />
+  return <AccountDetailPage data={accountResult.data} />
 }
 
-export const AccountDetailPage = ({
-  data,
-  showTabs,
-}: {
-  data: User
-  showTabs: boolean
-}) => {
+export const AccountDetailPage = ({ data }: { data: User }) => {
   const [account, setAccount] = useState<User>(data)
   const [updateUser] = useUpdateUserMutation()
-
-  const isLawyerAccount = account.groups.includes('Lawyer')
 
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateUser({
@@ -67,27 +56,35 @@ export const AccountDetailPage = ({
       userCreate: values as UserCreate,
     }).unwrap()
 
-  let tabPanes = [
-    {
+  const isLawyerAccount = account.groups.includes('Lawyer')
+  const showTabs =
+    CONTEXT.user.is_coordinator_or_better ||
+    CONTEXT.account_id === CONTEXT.current_user_id
+
+  let tabPanes = []
+
+  if (showTabs) {
+    // Show the lawyer tab for lawyer accounts only.
+    if (isLawyerAccount) {
+      tabPanes.push({
+        menuItem: 'Lawyer cases',
+        render: () => <LawyerCasesTab account={account} />,
+      })
+    }
+
+    tabPanes.push({
       menuItem: 'Paralegal cases',
       render: () => <ParalegalCasesTab account={account} />,
-    },
-    {
-      menuItem: 'Lawyer cases',
-      render: () => <LawyerCasesTab account={account} />,
-    },
-    {
-      menuItem: 'Performance notes',
-      render: () => (
-        <Tab.Pane>
-          {CONTEXT.performance_notes.length < 1 && 'No notes yet'}
-          {CONTEXT.performance_notes.map((note) => (
-            <TimelineNote note={note} key={note.id} />
-          ))}
-        </Tab.Pane>
-      ),
-    },
-    {
+    })
+
+    if (CONTEXT.user.is_coordinator_or_better) {
+      tabPanes.push({
+        menuItem: 'Performance notes',
+        render: () => <PerformanceNotesTab account={account} />,
+      })
+    }
+
+    tabPanes.push({
       menuItem: 'Permissions',
       render: () => (
         <Tab.Pane>
@@ -96,15 +93,7 @@ export const AccountDetailPage = ({
           </ErrorBoundary>
         </Tab.Pane>
       ),
-    },
-  ]
-
-  // Show the lawyer tab first for lawyer accounts and don't display it at all
-  // for non-lawyer accounts.
-  if (isLawyerAccount) {
-    tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
-  } else {
-    tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
+    })
   }
 
   return (
@@ -180,6 +169,24 @@ export const LawyerCasesTab = ({ account }: { account: User }) => {
   )
 }
 
+export const PerformanceNotesTab = ({ account }: { account: User }) => {
+  const [args, setArgs] = useState<GetNotesApiArg>({
+    noteType: 'PERFORMANCE',
+    reviewee: account.id.toString(),
+  })
+  const result = useGetNotesQuery(args)
+  const onPageChange = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    { activePage }: { activePage?: number | string }
+  ) => setArgs({ ...args, page: activePage as number })
+
+  return (
+    <Tab.Pane loading={result.isLoading}>
+      <PaginatedNotes data={result.data} onPageChange={onPageChange} />
+    </Tab.Pane>
+  )
+}
+
 export const PaginatedCaseList = ({
   data,
   fields,
@@ -203,6 +210,54 @@ export const PaginatedCaseList = ({
   return (
     <>
       <CaseListTable issues={results.sort(creationSort)} fields={fields} />
+      {itemCount > results.length && (
+        <Pagination
+          activePage={currentPage}
+          onPageChange={onPageChange}
+          totalPages={totalPages}
+          ellipsisItem={{
+            content: <Icon name="ellipsis horizontal" />,
+            icon: true,
+          }}
+          firstItem={{
+            content: <Icon name="angle double left" />,
+            icon: true,
+          }}
+          lastItem={{
+            content: <Icon name="angle double right" />,
+            icon: true,
+          }}
+          prevItem={{ content: <Icon name="angle left" />, icon: true }}
+          nextItem={{ content: <Icon name="angle right" />, icon: true }}
+        />
+      )}
+    </>
+  )
+}
+
+export const PaginatedNotes = ({
+  data,
+  onPageChange,
+}: {
+  data: GetNotesApiResponse
+  onPageChange: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    data: PaginationProps
+  ) => void
+}) => {
+  if (!data) {
+    return null
+  }
+  const results = [...data.results]
+  const currentPage = data.current
+  const totalPages = data.page_count
+  const itemCount = data.item_count
+
+  return (
+    <>
+      {results.length == 0
+        ? 'No notes yet'
+        : results.map((note) => <TimelineNote note={note} key={note.id} />)}
       {itemCount > results.length && (
         <Pagination
           activePage={currentPage}

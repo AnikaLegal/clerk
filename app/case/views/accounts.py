@@ -48,17 +48,9 @@ def account_list_page_view(request):
 @paralegal_or_better_required
 def account_detail_page_view(request, pk):
     try:
-        user = (
-            User.objects.prefetch_related(
-                "groups",
-                "issue_notes",
-            )
-            .distinct()
-            .get(pk=pk)
-        )
+        user = User.objects.get(pk=pk)
     except User.DoesNotExist:
         raise Http404()
-
     # Check whether the user has access permissions.
     if not user.check_permission(request.user):
         raise PermissionDenied()
@@ -67,9 +59,6 @@ def account_detail_page_view(request, pk):
     context = {
         "account_id": user.id,
         "current_user_id": request.user.id,
-        "performance_notes": IssueNoteSerializer(
-            user.issue_notes.all(), many=True
-        ).data,
     }
     return render_react_page(request, f"User {name}", "account-detail", context)
 
