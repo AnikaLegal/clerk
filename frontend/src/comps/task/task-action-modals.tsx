@@ -1,4 +1,4 @@
-import api, { TaskCommentCreate } from 'api'
+import api, { TaskCommentCreate, User } from 'api'
 import {
   EditorExtensions,
   Placeholder,
@@ -6,10 +6,16 @@ import {
   RichTextCommentEditor,
   useEditor,
 } from 'comps/richtext-editor'
-import { ModalProps } from 'comps/task/task-action-card'
+import { ModalProps, TaskModal } from 'comps/task/task-action-card'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState, useRef } from 'react'
-import { Button, Dropdown, Form, Modal } from 'semantic-ui-react'
+import {
+  Button,
+  Dropdown,
+  DropdownItemProps,
+  Form,
+  Modal,
+} from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 
 export const CancelTaskModal: React.FC<ModalProps> = ({
@@ -116,7 +122,7 @@ export const ReassignTaskModal: React.FC<ModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [userId, setUserId] = useState<number>()
 
-  const userResults = api.useGetUsersQuery({ isActive: true })
+  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const users = userResults.data || []
 
   const handleSubmit = (e) => {
@@ -182,6 +188,114 @@ export const ReassignTaskModal: React.FC<ModalProps> = ({
           disabled={isSubmitting || !userId || userId === task.assigned_to?.id}
         >
           Reassign task
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+export const QuestionModal: React.FC<ModalProps> = ({
+  task,
+  setTask,
+  update,
+  status,
+  open,
+  onClose,
+}) => {
+  const [canSubmit, setCanSubmit] = useState<boolean>(false)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [userId, setUserId] = useState<number>()
+
+  const userResults = api.useGetUsersQuery({ isActive: true })
+
+  const paralegal = task.issue.paralegal
+  const lawyer = task.issue.lawyer
+
+  const caseUserOptions: User[] = [paralegal, lawyer]
+    .filter((u) => u)
+    .filter(({ full_name }) => full_name)
+    .filter(({ id }) => id !== task.assigned_to.id)
+
+  const otherUserOptions: User[] = (userResults.data || [])
+    .filter(({ id }) => !caseUserOptions.find((u) => id === u.id))
+    .filter(({ id }) => id !== task.assigned_to.id)
+    .filter(({ full_name }) => full_name)
+    .sort((a, b) => a.full_name.localeCompare(b.full_name))
+
+  const handleClose = () => {
+    setUserId(null)
+    resetEditor(editor)
+    onClose()
+  }
+
+  const handleSubmit = (e) => {
+    e.stopPropagation()
+    setIsSubmitting(true)
+    setIsSubmitting(false)
+    handleClose()
+  }
+
+  const editor = useEditor({ extensions: EditorExtensions })
+
+  const handleUpdates = () => {
+    setCanSubmit(userId && !editor.isEmpty && editor.getText().trim() != '')
+  }
+  useEffect(handleUpdates, [editor, userId])
+
+  useEffect(() => {
+    if (editor) editor.on('update', handleUpdates)
+  }, [editor, userId])
+
+  return (
+    <Modal
+      as="Form"
+      centered={false}
+      className="form"
+      open={open}
+      onClose={handleClose}
+      onSubmit={(e) => handleSubmit(e)}
+      size="tiny"
+    >
+      <Modal.Header>Ask a question about this task</Modal.Header>
+      <Modal.Content>
+        <Form.Field>
+          <label>To</label>
+          <Dropdown
+            fluid
+            search
+            selection
+            loading={userResults.isLoading}
+            onChange={(e, { value }) => setUserId(value as number)}
+            openOnFocus={false}
+            searchInput={{ autoFocus: true }}
+            value={userId || ''}
+            options={[...caseUserOptions, ...otherUserOptions].map((u) => ({
+              key: u.id,
+              value: u.id,
+              text: u.full_name,
+              description:
+                (paralegal && u.id === paralegal.id && 'Paralegal') ||
+                (lawyer && u.id === lawyer.id && 'Case Lawyer') ||
+                '',
+            }))}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Question</label>
+          <RichTextCommentEditor editor={editor} />
+        </Form.Field>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
+          Close
+        </Button>
+        <Button
+          primary
+          type="submit"
+          loading={isSubmitting}
+          disabled={isSubmitting || !canSubmit}
+        >
+          Send
         </Button>
       </Modal.Actions>
     </Modal>

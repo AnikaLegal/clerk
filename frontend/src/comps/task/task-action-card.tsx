@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Card, List } from 'semantic-ui-react'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
-import { CancelTaskModal, ReassignTaskModal } from 'comps/task'
+import { CancelTaskModal, ReassignTaskModal, QuestionModal } from 'comps/task'
 
 export interface ModalProps extends TaskActionProps {
   onClose: () => void
@@ -98,6 +98,13 @@ export const TaskActionCard = ({
       text: 'Reassign the task',
       when: () => perms.is_coordinator_or_better && task.is_open,
       modal: ReassignTaskModal,
+    },
+    {
+      id: 'question',
+      icon: 'question',
+      text: 'Ask a question',
+      when: () => perms.is_paralegal_or_better && task.is_open,
+      modal: QuestionModal,
     },
   ]
 
