@@ -4,6 +4,7 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { FIELD_TYPES } from 'comps/field-component'
 import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
+import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
 import React, { useMemo, useState } from 'react'
 import {
@@ -253,6 +254,15 @@ export const TaskBody = ({
   )
 }
 
+const getIsOverdue = (task: Task): boolean => {
+  if (task.due_at) {
+    const now = moment().startOf('day')
+    const due_at = moment(task.due_at, 'DD/MM/YYYY')
+    return now.isAfter(due_at)
+  }
+  return false
+}
+
 export const TaskHeader = ({
   task,
   setTask,
@@ -263,6 +273,7 @@ export const TaskHeader = ({
 }: TaskHeaderProps) => {
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
   const statusLabels = useMemo(() => choiceToMap(choices.status), [])
+  const isOverdue = getIsOverdue(task)
 
   const statusColor: SemanticCOLORS =
     (task.status === status.started && 'blue') ||
@@ -278,11 +289,8 @@ export const TaskHeader = ({
         {task.due_at && <Header.Subheader>Due {task.due_at}</Header.Subheader>}
       </Header>
       <span>
-        {task.is_urgent && (
-          <Label color="red">
-            Urgent
-          </Label>
-        )}
+        {task.is_urgent && <Label color="red">Urgent</Label>}
+        {isOverdue && <Label color="red">Overdue</Label>}
         <Label color={statusColor}>
           Status
           <Label.Detail>{statusLabels.get(task.status)}</Label.Detail>
