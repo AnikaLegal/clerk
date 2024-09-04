@@ -82,7 +82,7 @@ const App = () => {
     }
     if (task.due_at) {
       const now = moment().startOf('day')
-      const due_at = moment(task.due_at, 'DD/MM/YY')
+      const due_at = moment(task.due_at, 'DD/MM/YYYY')
       const days = due_at.diff(now, 'days')
       if (days <= 7) {
         if (days >= 3) {
