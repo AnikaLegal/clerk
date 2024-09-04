@@ -1,20 +1,21 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Attach debugger",
-        "type": "python",
-        "request": "attach",
-        "django": true,
-        "justMyCode": false,
-        "pathMappings": [
-          {
-            "localRoot": "${workspaceFolder}/app",
-            "remoteRoot": "/app"
-          }
-        ],
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach debugger",
+      "type": "debugpy",
+      "request": "attach",
+      "django": true,
+      "justMyCode": false,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/app",
+          "remoteRoot": "/app"
+        }
+      ],
+      "connect": {
         "port": 8123,
-        "host": "127.0.0.1",
-      }
-    ]
-  }
+      },
+    }
+  ]
+}
