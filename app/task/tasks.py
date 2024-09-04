@@ -233,7 +233,7 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
             if not Task.objects.filter(
                 issue=event.issue, template=template, owner=user
             ).exists():
-                due_at = (now + timedelta(days=template.due_in)) if template.due_in else None
+                due_at = (now + timedelta(days=template.due_in)).date() if template.due_in else None
                 task = Task.objects.create(
                     issue=event.issue,
                     template=template,

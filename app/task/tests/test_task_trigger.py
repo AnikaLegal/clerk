@@ -168,5 +168,5 @@ def test_task_template__due_date_set_correctly(
     assert Task.objects.count() == 1
     task = Task.objects.first()
     assert (
-        task.due_at.date() == (task.created_at + timedelta(days=template.due_in)).date()
+        task.due_at == (task.created_at + timedelta(days=template.due_in)).date()
     )

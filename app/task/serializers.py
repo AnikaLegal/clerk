@@ -139,7 +139,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     owner = TaskListUserSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
     created_at = LocalDateField(read_only=True)
-    due_at = LocalDateField()
+    due_at = serializers.DateField(read_only=True)
     closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
@@ -185,7 +185,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(read_only=True)
 
     created_at = LocalDateField(read_only=True)
-    due_at = LocalDateField()
+    due_at = serializers.DateField()
     closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
 

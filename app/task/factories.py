@@ -68,8 +68,7 @@ class TaskFactory(TimestampedModelFactory):
     due_at = factory.Maybe(
         factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
         yes_declaration=factory.Faker(
-            "date_time_between",
-            tzinfo=timezone.utc,
+            "date_between",
             start_date="-1w",
             end_date="+2w",
         ),

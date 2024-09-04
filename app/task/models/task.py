@@ -40,7 +40,7 @@ class Task(TimestampedModel):
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
-    due_at = models.DateTimeField(blank=True, null=True, default=None)
+    due_at = models.DateField(blank=True, null=True, default=None)
     closed_at = models.DateTimeField(blank=True, null=True, default=None)
     is_urgent = models.BooleanField(default=False)
 
