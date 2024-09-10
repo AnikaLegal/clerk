@@ -1,8 +1,7 @@
-env/
-venv/
-docs/
-infra/
-scripts/
 .github/
-node_modules/
+app/.venv/
 build/
+docs/
+env/
+frontend/node_modules/
+infra/
