@@ -1,7 +1,6 @@
 import json
 
 import pytest
-from django.core import management
 from django.db import transaction
 from django.test import RequestFactory
 from django.urls import reverse
@@ -31,8 +30,6 @@ def blog_list_page():
         list_page.add_child(instance=blog_page)
         blog_page.save_revision().publish()
 
-    management.call_command("wagtail_update_index")
-
     return list_page
 
 
@@ -46,6 +43,7 @@ SEARCH_TESTS = [
 
 
 @pytest.mark.django_db
+@pytest.mark.enable_signals
 @pytest.mark.parametrize("query, expected_titles", SEARCH_TESTS)
 def test_blog_list_search(blog_list_page, query, expected_titles):
     factory = RequestFactory()
