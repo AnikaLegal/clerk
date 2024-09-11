@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from wagtail.contrib.redirects.models import Redirect
-from wagtail.core.models import Page
+from wagtail.models import Page
 from web.models import WebRedirect
 
 

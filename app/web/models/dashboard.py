@@ -1,6 +1,5 @@
 from django.db import models
-from wagtail.admin.edit_handlers import FieldPanel
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.admin.panels import FieldPanel
 
 
 class DashboardItem(models.Model):
@@ -17,6 +16,6 @@ class DashboardItem(models.Model):
     panels = [
         FieldPanel("title"),
         FieldPanel("link"),
-        ImageChooserPanel("icon"),
+        FieldPanel("icon"),
         FieldPanel("description"),
     ]

@@ -1,8 +1,8 @@
-from wagtail.core import blocks
-from wagtail.core.models import Page
-from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import StreamFieldPanel
-from .mixins import RICH_TEXT_FEATURES, NotFoundMixin
+from wagtail import blocks
+from wagtail.models import Page
+from wagtail.fields import StreamField
+from wagtail.admin.panels import FieldPanel
+from .mixins import NotFoundMixin
 
 
 class ResourceListPage(NotFoundMixin, Page):
@@ -18,9 +18,10 @@ class ResourcePage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
-        ]
+            ("paragraph", blocks.RichTextBlock()),
+        ],
+        use_json_field=True
     )
     content_panels = Page.content_panels + [
-        StreamFieldPanel("body"),
+        FieldPanel("body"),
     ]

@@ -4,8 +4,8 @@ Clerk specific Wagtail stuff
 
 from django import template
 
-from wagtail.core.templatetags.wagtailcore_tags import pageurl
-from wagtail.core.models import Page, Site
+from wagtail.templatetags.wagtailcore_tags import pageurl
+from wagtail.models import Page, Site
 
 
 register = template.Library()

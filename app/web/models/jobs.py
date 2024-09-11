@@ -2,17 +2,11 @@ import os
 from django.conf import settings
 
 from django.db import models
-from wagtail.core import blocks
-from wagtail.core.models import Page
-from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import (
-    FieldPanel,
-    StreamFieldPanel,
-    PrivacyModalPanel,
-)
+from wagtail import blocks
+from wagtail.models import Page
+from wagtail.fields import StreamField
+from wagtail.admin.panels import FieldPanel
 from wagtail.images.blocks import ImageChooserBlock
-
-from .mixins import RICH_TEXT_FEATURES
 
 
 ICONS_DIR = os.path.join(
@@ -55,15 +49,15 @@ class JobPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
-        ]
+        ],
+        use_json_field=True
     )
     promote_panels = [FieldPanel("slug")]
-    settings_panels = [PrivacyModalPanel()]
     content_panels = Page.content_panels + [
         FieldPanel("icon", heading="Icon"),
         FieldPanel("closing_date", heading="Application closing date"),
         FieldPanel("search_description", heading="Short description"),
-        StreamFieldPanel("body", heading="Long description"),
+        FieldPanel("body", heading="Long description"),
     ]
