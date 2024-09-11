@@ -1,14 +1,13 @@
 import json
 
 import pytest
-from django.urls import reverse
-from django.test import RequestFactory
+from django.core import management
 from django.db import transaction
-
-from webhooks.models import WebflowContact
-from web.models import RootPage, BlogListPage, BlogPage
-
+from django.test import RequestFactory
+from django.urls import reverse
 from utils.signals import DisableSignals
+from web.models import BlogListPage, BlogPage, RootPage
+from webhooks.models import WebflowContact
 
 
 @pytest.fixture
@@ -31,6 +30,8 @@ def blog_list_page():
         blog_page = BlogPage(**page_datum)
         list_page.add_child(instance=blog_page)
         blog_page.save_revision().publish()
+
+    management.call_command("wagtail_update_index")
 
     return list_page
 
