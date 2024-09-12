@@ -1,21 +1,20 @@
 import io
+from datetime import timezone
 from uuid import uuid4
 
 import factory
-from faker import Faker
+from accounts.models import User
+from core.models import Client, FileUpload, Issue, IssueNote, Person, Tenancy
+from core.models.issue import CaseStage, CaseTopic
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
-from django.utils import timezone
-
-from accounts.models import User
-from emails.models import Email, EmailTemplate, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
-from core.models.issue import CaseStage, CaseTopic
+from emails.models import Email, EmailAttachment, EmailTemplate
+from faker import Faker
 from notify.models import (
-    Notification,
     NOTIFY_TOPIC_CHOICES,
-    NotifyEvent,
+    Notification,
     NotifyChannel,
+    NotifyEvent,
     NotifyTarget,
 )
 

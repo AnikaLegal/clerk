@@ -1,5 +1,7 @@
+from datetime import timezone
+
 import factory
-from django.utils import timezone
+
 from office.models import Closure, ClosureTemplate
 
 
