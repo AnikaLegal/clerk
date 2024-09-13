@@ -61,14 +61,10 @@ dev-dependencies = [
 # can safely use a later django version. We should find a replacement for
 # drf-openapi-tester anyway as it has been archived and is no longer being
 # updated which is likely why its dependencies haven't been updated.
-override-dependencies = [
-  "django>=5",
-]
+override-dependencies = ["django>=5"]
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "ignore::UserWarning",
-    #"ignore::django.utils.deprecation.RemovedInDjango50Warning",
-    #"ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
+    "ignore::django.utils.deprecation.RemovedInDjango60Warning",
 ]
-addopts = "--reuse-db --ds=clerk.settings.test"
+addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"
