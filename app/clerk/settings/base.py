@@ -110,6 +110,10 @@ TEMPLATES = [
     }
 ]
 
+SILENCED_SYSTEM_CHECKS = [
+    "wagtailadmin.W004", # The AWS_S3_FILE_OVERWRITE setting is set to True
+]
+
 
 # Database
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
