@@ -111,7 +111,7 @@ TEMPLATES = [
 ]
 
 SILENCED_SYSTEM_CHECKS = [
-    "wagtailadmin.W004", # The AWS_S3_FILE_OVERWRITE setting is set to True
+    "wagtailadmin.W004",  # The AWS_S3_FILE_OVERWRITE setting is set to True
 ]
 
 
@@ -183,7 +183,6 @@ EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
 LANGUAGE_CODE = "en"
 TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
