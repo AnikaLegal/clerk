@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-./manage.py runserver 0.0.0.0:8000
+python -Xfrozen_modules=off manage.py runserver 0.0.0.0:8000

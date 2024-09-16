@@ -2,67 +2,69 @@
 name = "clerk"
 version = "0.1.0"
 description = ""
-requires-python = "==3.10.3"
+requires-python = "==3.12.5"
 authors = [
     { name = "Matt Segal", email = "matt.segal@anikalegal.com" },
     { name = "Luca Vari", email = "luca.vari@anikalegal.com" },
 ]
 dependencies = [
-    "awscli>=1.34.13",
-    "beautifulsoup4>=4.9.3",
-    "black>=24.8.0",
-    "boto3>=1.35.13",
-    "django-cleanup>=8.1.0",
-    "django-cors-headers==3.11.0",
-    "django-override-storage>=0.3.2",
-    "django-q>=1.3.9",
-    "django-storages>=1.14.4",
-    "django-webpack-loader==1.4.1",
-    "django>=4",
-    "djangorestframework==3.13.1",
-    "drf-openapi-tester>=2.3.3",
-    "faker>=28.4.1",
-    "flake8>=7.1.1",
-    "freezegun>=1.5.1",
-    "gunicorn>=23.0.0",
-    "html-sanitizer==1.9.3",
-    "isort>=5.13.2",
-    "lxml[html-clean]==5.2.2",
-    "mailchimp3==3.0.16",
-    "msal==1.16.0",
-    "openapi-spec-validator>=0.5.7",
-    "pillow>=9.5.0",
-    "psycopg2-binary>=2.9.9",
-    "pygments>=2.18.0",
-    "pytest-django>=4.9.0",
-    "pytest-factoryboy>=2.7.0",
-    "requests==2.32.3",
-    "responses>=0.23.1",
-    "sendgrid>=6.11.0",
-    "sentry-sdk>=2.13.0",
-    "social-auth-app-django==5.0.0",
-    "twilio==7.5.0",
-    "tzdata>=2024.1",
-    "wagtail-localize>=1.4",
-    "wagtail==2.16.1",
-    "whitenoise>=6.7.0",
+    "awscli",
+    "beautifulsoup4",
+    "black",
+    "boto3",
+    "django-cleanup",
+    "django-cors-headers",
+    "django-override-storage",
+    "django-q2",
+    "django-storages",
+    "django-webpack-loader",
+    "django",
+    "djangorestframework",
+    "drf-openapi-tester",
+    "faker",
+    "flake8",
+    "freezegun",
+    "gunicorn",
+    "html-sanitizer",
+    "isort",
+    "mailchimp3",
+    "msal",
+    "openapi-spec-validator",
+    "pillow",
+    "psycopg2-binary",
+    "pygments",
+    "pytest-django",
+    "pytest-factoryboy",
+    "requests",
+    "responses",
+    "sendgrid",
+    "sentry-sdk",
+    "social-auth-app-django",
+    "twilio",
+    "tzdata",
+    "wagtail-localize",
+    "wagtail",
+    "whitenoise",
 ]
 
 [tool.uv]
 dev-dependencies = [
-    "debugpy>=1.8.5",
-    "django-browser-reload>=1.15.0",
-    "django-debug-toolbar>=4.3.0",
-    "django-extensions>=3.2.3",
-    "ipython>=8.27.0",
+    "debugpy",
+    "django-browser-reload",
+    "django-debug-toolbar",
+    "django-extensions",
+    "ipython",
     "setuptools",
-    "watchdog[watchmedo]>=5.0.2",
+    "watchdog[watchmedo]",
 ]
+# Our dependency on drf-openapi-tester limits django to version >=3 & <=4 but we
+# can safely use a later django version. We should find a replacement for
+# drf-openapi-tester anyway as it has been archived and is no longer being
+# updated which is likely why its dependencies haven't been updated.
+override-dependencies = ["django>=5"]
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "ignore::UserWarning",
-    "ignore::django.utils.deprecation.RemovedInDjango50Warning",
-    "ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
+    "ignore::django.utils.deprecation.RemovedInDjango60Warning",
 ]
-addopts = "--reuse-db --ds=clerk.settings.test"
+addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"

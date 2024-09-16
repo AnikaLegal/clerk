@@ -1,6 +1,7 @@
 """
 Django settings for clerk project.
 """
+
 import os
 
 IS_PROD = False
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
-    "wagtail.contrib.modeladmin",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     "wagtail.images",
     "wagtail.search",
     "wagtail.admin",
-    "wagtail.core",
+    "wagtail",
     "wagtail_localize",
     "wagtail_localize.locales",
     "modelcluster",
@@ -108,6 +108,10 @@ TEMPLATES = [
             ],
         },
     }
+]
+
+SILENCED_SYSTEM_CHECKS = [
+    "wagtailadmin.W004",  # The AWS_S3_FILE_OVERWRITE setting is set to True
 ]
 
 
@@ -179,7 +183,6 @@ EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
 LANGUAGE_CODE = "en"
 TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
@@ -196,18 +199,23 @@ WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
     ("zh-hant", "Chinese (Traditional)"),
 ]
 
-
 # Enable iPython for shell_plus
 SHELL_PLUS = "ipython"
 
-
-# Static files
+# Media storage & static files
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
-STATICFILES_STORAGE = "whitenoise.storage.ManifestStaticFilesStorage"
 STATICFILES_DIRS = [
     ("webpack_bundles", "/build/bundles/"),
 ]
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.ManifestStaticFilesStorage",
+    },
+}
 
 # Webpack loader
 WEBPACK_LOADER = {
@@ -219,13 +227,10 @@ WEBPACK_LOADER = {
     }
 }
 
-
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 
-# Media storage
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = "public-read"
