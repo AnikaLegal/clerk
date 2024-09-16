@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            """ALTER TABLE social_auth_usersocialauth
+            """ALTER TABLE IF EXISTS social_auth_usersocialauth
                  ALTER COLUMN extra_data SET DATA TYPE jsonb
                  USING
                    extra_data::jsonb;"""
