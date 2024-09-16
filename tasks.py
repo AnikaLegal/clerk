@@ -206,11 +206,12 @@ def superuser(c, email):
 S3_PROD = "anika-clerk"
 S3_TEST = "anika-clerk-test"
 SYNC_DIRS = [
+    "action-documents",
+    "documents", # wagtail
+    "email-attachments",
+    "file-uploads",
     "images",
     "original_images",
-    "file-uploads",
-    "action-documents",
-    "email-attachments",
 ]
 
 
