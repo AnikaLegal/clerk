@@ -53,6 +53,7 @@ dev-dependencies = [
     "django-browser-reload",
     "django-debug-toolbar",
     "django-extensions",
+    "django-querycount",
     "ipython",
     "setuptools",
     "watchdog[watchmedo]",

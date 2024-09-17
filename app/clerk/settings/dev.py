@@ -49,3 +49,11 @@ CLERK_BASE_URL = "http://localhost:8000"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
 
 WEBPACK_LOADER["DEFAULT"]["CACHE"] = False
+
+MIDDLEWARE += [
+    "querycount.middleware.QueryCountMiddleware",
+]
+
+QUERYCOUNT = {
+    "DISPLAY_DUPLICATES": None,
+}

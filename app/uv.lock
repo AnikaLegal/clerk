@@ -324,6 +324,7 @@ dev = [
     { name = "django-browser-reload" },
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
+    { name = "django-querycount" },
     { name = "ipython" },
     { name = "setuptools" },
     { name = "watchdog", extra = ["watchmedo"] },
@@ -376,6 +377,7 @@ dev = [
     { name = "django-browser-reload" },
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
+    { name = "django-querycount" },
     { name = "ipython" },
     { name = "setuptools" },
     { name = "watchdog", extras = ["watchmedo"] },
@@ -606,6 +608,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/9d/ae/434a0554fd26fb382
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c5/1d/155a16f9858a033d61889245fbc5a7679d448d4159016f72adf4a41b9e25/django_q2-1.7.2-py3-none-any.whl", hash = "sha256:3c480d8afd90a87006404b208a49766d370d5fc864a8dd1d3a0221ec22b12bc0", size = 103215 },
 ]
+
+[[package]]
+name = "django-querycount"
+version = "0.8.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/fe/ca8acf0ec02d26736500ce0e8b4979b0bb169340a23d34420b06ae5df982/django-querycount-0.8.3.tar.gz", hash = "sha256:0782484e8a1bd29498fa0195a67106e47cdcc98fafe80cebb1991964077cb694", size = 6739 }
 
 [[package]]
 name = "django-storages"
