@@ -264,15 +264,41 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "root": {"level": "INFO", "handlers": ["console", "file"]},
+    "formatters": {
+        "default": {
+            "format": "{asctime} - {levelname} - {name} - {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
-        "console": {"level": "INFO", "class": "logging.StreamHandler"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
             "filename": "/var/log/django.log",
+            "formatter": "default",
         },
     },
     "loggers": {
+        "django": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "django.server": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "django-q": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
         "django.db.backends": {
             "level": "ERROR",
             "handlers": ["console", "file"],
