@@ -1,15 +1,14 @@
-import factory
-from faker import Faker
-from django.utils import timezone
+from datetime import timezone
 from random import randint
 
-from core.factories import TimestampedModelFactory, IssueFactory, UserFactory
+import factory
+from core.factories import IssueFactory, TimestampedModelFactory, UserFactory
 from core.models.issue_event import EventType
-from task.models import TaskTrigger, TaskTemplate, Task
-from task.models.trigger import TriggerTopic, TasksCaseRole
-from task.models.template import TaskType
+from faker import Faker
+from task.models import Task, TaskTemplate, TaskTrigger
 from task.models.task import TaskStatus
-
+from task.models.template import TaskType
+from task.models.trigger import TasksCaseRole, TriggerTopic
 
 fake = Faker()
 

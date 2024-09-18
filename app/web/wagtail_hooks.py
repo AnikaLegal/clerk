@@ -1,9 +1,9 @@
 from django.utils.html import format_html
 from django.templatetags.static import static
 
-from wagtail.core import hooks
-
-from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
+from wagtail import hooks
+from wagtail.snippets.models import register_snippet
+from wagtail.snippets.views.snippets import SnippetViewSet
 
 from .models import ExternalNews, DashboardItem
 
@@ -15,10 +15,10 @@ def global_admin_css():
     )
 
 
-class ExternalNewsAdmin(ModelAdmin):
+class ExternalNewsAdmin(SnippetViewSet):
     model = ExternalNews
     menu_label = "External News"
-    menu_icon = "pick"
+    icon = "pick"
     menu_order = 201
     add_to_settings_menu = False
     exclude_from_explorer = False
@@ -29,13 +29,13 @@ class ExternalNewsAdmin(ModelAdmin):
     search_fields = ("title",)
 
 
-modeladmin_register(ExternalNewsAdmin)
+register_snippet(ExternalNewsAdmin)
 
 
-class DashboardItemAdmin(ModelAdmin):
+class DashboardItemAdmin(SnippetViewSet):
     model = DashboardItem
     menu_label = "Paralegal Dashboard"
-    menu_icon = "group"
+    icon = "group"
     menu_order = 200
     add_to_settings_menu = False
     exclude_from_explorer = False
@@ -43,4 +43,4 @@ class DashboardItemAdmin(ModelAdmin):
     search_fields = ("title",)
 
 
-modeladmin_register(DashboardItemAdmin)
+register_snippet(DashboardItemAdmin)

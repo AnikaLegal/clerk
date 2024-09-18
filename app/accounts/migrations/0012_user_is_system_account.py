@@ -13,7 +13,7 @@ def _set_coordinator_as_system_account(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("accounts", "0010_alter_university_options"),
+        ("accounts", "0011_alter_social_auth_usersocialauth_extra_data"),
     ]
 
     operations = [

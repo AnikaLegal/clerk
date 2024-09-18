@@ -13,6 +13,7 @@ class Blacklist(TimestampedModel):
         constraints = [
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_email_and_phone_not_null",
-                check=(~Q(email__isnull=True, phone__isnull=True)),
+                condition=(~Q(email__isnull=True, phone__isnull=True)),
+                violation_error_message="An email or phone number must be provided"
             )
         ]
