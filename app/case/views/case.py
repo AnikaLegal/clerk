@@ -58,7 +58,7 @@ def case_inbox_page_view(request):
     is_open = Q(is_open=True)
     is_inbox = is_unassigned & is_open
     issues = (
-        Issue.objects.select_related("client")
+        Issue.objects.select_related("client", "tenancy__agent", "tenancy__landlord")
         .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
         .filter(is_inbox)
         .order_by("created_at")
@@ -73,7 +73,7 @@ def case_inbox_page_view(request):
 def case_review_page_view(request):
     """Page where coordinators can see existing cases for them to review"""
     issues = (
-        Issue.objects.select_related("client")
+        Issue.objects.select_related("client", "tenancy__agent", "tenancy__landlord")
         .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
         .filter(is_open=True)
         .annotate(next_review=Max("issuenote__event"))
@@ -138,7 +138,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
     def get_queryset(self):
         user = self.request.user
         queryset = (
-            Issue.objects.select_related("client", "tenancy")
+            Issue.objects.select_related("client", "tenancy__agent", "tenancy__landlord")
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
         )
