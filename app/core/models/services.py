@@ -5,39 +5,48 @@ from .issue import Issue
 from .timestamped import TimestampedModel
 
 
-class LegalServiceType(models.TextChoices):
-    DISCRETE = "DISCRETE", "Discrete legal service"
-    ONGOING = "ONGOING", "Ongoing legal service"
+class ServiceCategory(models.TextChoices):
+    DISCRETE = "DISCRETE", "Discrete service"
+    ONGOING = "ONGOING", "Ongoing service"
 
 
-class DiscreteLegalServiceSubtype(models.TextChoices):
-    ADVICE = "ADVICE", "Legal advice"
-    TASK = "TASK", "Legal task"
-    INFORMATION = "INFORMATION", "Information"  # TODO: Use "Legal information"
-    REFERRAL = (
-        "REFERRAL",
-        "Referral",
-    )  # TODO: what does S/W mean? see whiteboard images.
+class DiscreteServiceType(models.TextChoices):
+    LEGAL_ADVICE = "LEGAL_ADVICE", "Legal advice"
+    LEGAL_TASK = "LEGAL_TASK", "Legal task"
+    GENERAL_INFORMATION = "GENERAL_INFORMATION", "Information"
+    GENERAL_REFERRAL_SIMPLE = (
+        "GENERAL_REFERRAL_SIMPLE",
+        "Referral (Simple)",
+    )
+    GENERAL_REFERRAL_FACILITATED = (
+        "GENERAL_REFERRAL_FACILITATED",
+        "Referral (Facilitated)",
+    )
 
 
-class OngoingLegalServiceSubtype(models.TextChoices):
-    CASEWORK = "CASEWORK", "Ongoing legal casework"
-    COURT_REPRESENTATION = "COURT_REPRESENTATION", "Court or tribunal representation"
-    OTHER_REPRESENTATION = "OTHER_REPRESENTATION", "Other representation services"
+class OngoingServiceType(models.TextChoices):
+    LEGAL_SUPPORT = (
+        "LEGAL_SUPPORT",
+        "Legal support",
+    )
+    REPRESENTATION_COURT_TRIBUNAL = (
+        "REPRESENTATION_COURT_TRIBUNAL",
+        "Court or tribunal representation",
+    )
+    REPRESENTATION_OTHER = "REPRESENTATION_OTHER", "Other representation"
 
 
-class LegalService(TimestampedModel):
+class Service(TimestampedModel):
     """
-    The legal services provided relating to a specific issue.
+    The services provided relating to a specific issue.
     """
 
-    type = models.CharField(max_length=32, choices=LegalServiceType.choices)
-    sub_type = models.CharField(
-        max_length=32,
-        choices=DiscreteLegalServiceSubtype.choices
-        + OngoingLegalServiceSubtype.choices,
+    category = models.CharField(max_length=32, choices=ServiceCategory)
+    type = models.CharField(
+        max_length=64,
+        choices=DiscreteServiceType.choices + OngoingServiceType.choices,
     )
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    started_at = models.DateTimeField(default=timezone.now)
-    finished_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateField(default=timezone.now)
+    finished_at = models.DateField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
