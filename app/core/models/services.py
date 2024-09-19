@@ -50,3 +50,21 @@ class Service(TimestampedModel):
     started_at = models.DateField(default=timezone.now)
     finished_at = models.DateField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_service_type_by_category",
+                condition=(
+                    (
+                        models.Q(category=ServiceCategory.DISCRETE)
+                        & models.Q(type__in=DiscreteServiceType)
+                    )
+                    | (
+                        models.Q(category=ServiceCategory.ONGOING)
+                        & models.Q(type__in=OngoingServiceType)
+                    )
+                ),
+                violation_error_message="Service type does not belong to that service category",
+            )
+        ]
