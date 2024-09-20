@@ -44,14 +44,14 @@ interface ServiceTableProps {
 export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
   args,
 }) => {
-  const servicesResult = api.useGetCaseServicesQuery({
+  const result = api.useGetCaseServicesQuery({
     ...args,
     category: 'DISCRETE',
   })
-  if (servicesResult.isLoading) {
+  if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (servicesResult.data.length == 0) {
+  if (result.data.length == 0) {
     return <p>No discrete services</p>
   }
   return (
@@ -65,7 +65,7 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {servicesResult.data.map(({ id, type, started_at, count, note }) => (
+        {result.data.map(({ id, type, started_at, count, note }) => (
           <Table.Row key={id}>
             <Table.Cell>{DISCRETE_TYPE_LABELS.get(type)}</Table.Cell>
             <Table.Cell>{started_at}</Table.Cell>
@@ -81,14 +81,14 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
 export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
   args,
 }) => {
-  const servicesResult = api.useGetCaseServicesQuery({
+  const result = api.useGetCaseServicesQuery({
     ...args,
     category: 'ONGOING',
   })
-  if (servicesResult.isLoading) {
+  if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (servicesResult.data.length == 0) {
+  if (result.data.length == 0) {
     return <p>No ongoing services</p>
   }
   return (
@@ -102,16 +102,14 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {servicesResult.data.map(
-          ({ id, type, started_at, finished_at, note }) => (
-            <Table.Row key={id}>
-              <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
-              <Table.Cell>{started_at}</Table.Cell>
-              <Table.Cell>{finished_at}</Table.Cell>
-              <Table.Cell>{note}</Table.Cell>
-            </Table.Row>
-          )
-        )}
+        {result.data.map(({ id, type, started_at, finished_at, note }) => (
+          <Table.Row key={id}>
+            <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
+            <Table.Cell>{started_at}</Table.Cell>
+            <Table.Cell>{finished_at}</Table.Cell>
+            <Table.Cell>{note}</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table>
   )
