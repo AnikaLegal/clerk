@@ -14,6 +14,6 @@ from .issue import (
 )
 from .notification import NotificationSerializer
 from .person import PersonSearchRequestSerializer, PersonSerializer
-from .service import ServiceSerializer
+from .service import ServiceSerializer, ServiceSearchSerializer
 from .tenancy import TenancySerializer
 from .user import ParalegalSerializer, UserCreateSerializer, UserSerializer

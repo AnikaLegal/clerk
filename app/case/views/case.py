@@ -17,6 +17,7 @@ from case.serializers import (
     IssueSearchSerializer,
     IssueSerializer,
     ServiceSerializer,
+    ServiceSearchSerializer,
     TenancySerializer,
 )
 from case.utils import ClerkPaginator, render_react_page
@@ -281,6 +282,16 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         if request.method == "GET":
             queryset = issue.service_set.all()
             queryset = queryset.order_by("-started_at")
+
+            serializer = ServiceSearchSerializer(
+                data=self.request.query_params, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            terms = serializer.validated_data
+            for key, value in terms.items():
+                if value is not None:
+                    queryset = queryset.filter(**{key: value})
+
             data = self.get_serializer(queryset, many=True).data
             return Response(data)
         elif request.method == "PATCH":

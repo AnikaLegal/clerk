@@ -36,3 +36,13 @@ class ServiceSerializer(serializers.ModelSerializer):
                     {"type": error_message + ", ".join(DiscreteServiceType)}
                 )
         return data
+
+
+class ServiceSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = (
+            "category",
+            "type",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}
