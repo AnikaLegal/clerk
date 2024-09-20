@@ -268,14 +268,14 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
 
     @action(
         detail=True,
-        methods=["GET", "POST", "PATCH"],
+        methods=["GET", "POST"],
         url_path="services",
-        url_name="services",
+        url_name="service-list",
         serializer_class=ServiceSerializer,
     )
-    def services(self, request, pk):
+    def service_list(self, request, pk):
         """
-        Case services.
+        List & create case services.
         """
         issue = self.get_object()
 
@@ -294,18 +294,33 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
 
             data = self.get_serializer(queryset, many=True).data
             return Response(data)
-        elif request.method == "PATCH":
-            id = request.data.get("id")
-            if not id:
-                raise ParseError(detail={"id": ["This field is required."]})
-            instance = get_object_or_404(issue.service_set, id=id)
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
         else:
             data = {**request.data, "issue_id": issue.pk}
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=["GET", "PATCH"],
+        url_path="services/(?P<service_pk>[^/.]+)",
+        url_name="service-detail",
+        serializer_class=ServiceSerializer,
+    )
+    def service_detail(self, request, pk, service_pk):
+        """
+        Get & update a particular case service.
+        """
+        issue = self.get_object()
+
+        if request.method == "GET":
+            instance = get_object_or_404(issue.service_set, pk=service_pk)
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        else:
+            instance = get_object_or_404(issue.service_set, pk=service_pk)
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
