@@ -245,7 +245,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.BasicAuthentication",
         "clerk.auth.CsrfExemptSessionAuthentication",
-    )
+    ),
+    "DATE_FORMAT": "%d/%m/%Y",
+    "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
 }
 
 ONE_HUNDRED_YEARS = 100 * 365 * 24 * 60 * 60  # seconds
