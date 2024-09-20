@@ -1,9 +1,9 @@
 import React from 'react'
 import { Container, Header, Loader } from 'semantic-ui-react'
 
+import { useGetCaseDocumentsQuery, useGetCaseQuery } from 'api'
+import { CASE_TABS, CaseHeader } from 'comps/case-header'
 import { mount } from 'utils'
-import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { useGetCaseQuery, useGetCaseDocumentsQuery } from 'api'
 
 interface DjangoContext {
   case_pk: string
