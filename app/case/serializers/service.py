@@ -17,6 +17,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "type",
             "started_at",
             "finished_at",
+            "count",
             "notes",
         )
 
