@@ -182,3 +182,10 @@ const parseError = (error: any) => {
     return String(error)
   }
 }
+
+export const choiceToMap = (choices: string[][]): Map<string, string> => {
+  return choices.reduce(function (map, entry) {
+    map.set(entry[0], entry[1])
+    return map
+  }, new Map())
+}

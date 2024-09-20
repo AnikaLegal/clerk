@@ -1,12 +1,12 @@
 from core.models import Issue, IssueNote
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
+from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from microsoft.service import get_case_folder_info
 from rest_framework import status
 from rest_framework.decorators import action, api_view
-from rest_framework.exceptions import ParseError
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,8 +16,8 @@ from case.serializers import (
     IssueNoteSerializer,
     IssueSearchSerializer,
     IssueSerializer,
-    ServiceSerializer,
     ServiceSearchSerializer,
+    ServiceSerializer,
     TenancySerializer,
 )
 from case.utils import ClerkPaginator, render_react_page
@@ -108,11 +108,31 @@ def case_detail_documents_page_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "document-list", context)
 
 
+@api_view(["GET"])
+@paralegal_or_better_required
+def case_detail_services_page_view(request, pk):
+    """
+    The services related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+        "choices": {
+            "category": ServiceCategory.choices,
+            "type_discrete": DiscreteServiceType.choices,
+            "type_ongoing": OngoingServiceType.choices,
+        },
+    }
+    return render_react_page(request, f"Case {issue.fileref}", "service-list", context)
+
+
 def get_detail_urls(issue: Issue):
     return {
         "detail": reverse("case-detail", args=(issue.pk,)),
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
+        "services": reverse("case-services", args=(issue.pk,)),
     }
 
 
@@ -313,14 +333,13 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         Get & update a particular case service.
         """
         issue = self.get_object()
+        service = get_object_or_404(issue.service_set, pk=service_pk)
 
         if request.method == "GET":
-            instance = get_object_or_404(issue.service_set, pk=service_pk)
-            serializer = self.get_serializer(instance)
+            serializer = self.get_serializer(service)
             return Response(serializer.data)
         else:
-            instance = get_object_or_404(issue.service_set, pk=service_pk)
-            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer = self.get_serializer(service, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)

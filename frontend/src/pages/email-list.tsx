@@ -20,6 +20,7 @@ interface DjangoContext {
     detail: string
     email: string
     docs: string
+    services: string
   }
 }
 
