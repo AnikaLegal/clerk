@@ -48,8 +48,11 @@ class Service(TimestampedModel):
     )
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
     started_at = models.DateField(default=timezone.now)
-    finished_at = models.DateField(null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
+
+    # Category specific fields.
+    count = models.IntegerField(null=True, blank=True)
+    finished_at = models.DateField(null=True, blank=True)
 
     class Meta:
         constraints = [
