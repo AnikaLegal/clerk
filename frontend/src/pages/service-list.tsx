@@ -2,7 +2,7 @@ import React from 'react'
 import { Container, Header, Loader, Table } from 'semantic-ui-react'
 
 import api, { GetCaseServicesApiArg } from 'api'
-import { CASE_TABS, CaseHeader } from 'comps/case-header'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { choiceToMap, mount } from 'utils'
 
 interface DjangoContext {
@@ -12,12 +12,7 @@ interface DjangoContext {
     type_discrete: string[][]
     type_ongoing: string[][]
   }
-  urls: {
-    detail: string
-    email: string
-    docs: string
-    services: string
-  }
+  urls: CaseTabUrls
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_discrete)
@@ -35,9 +30,9 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
       <Header as="h2">Discrete services</Header>
-      <DiscreteCaseServiceTable args={{ id: case_id }}/>
+      <DiscreteCaseServiceTable args={{ id: case_id }} />
       <Header as="h2">Ongoing services</Header>
-      <OngoingCaseServiceTable args={{ id: case_id }}/>
+      <OngoingCaseServiceTable args={{ id: case_id }} />
     </Container>
   )
 }
@@ -54,7 +49,7 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
     category: 'DISCRETE',
   })
   if (servicesResult.isLoading) {
-    return <Loader active inline='centered' />
+    return <Loader active inline="centered" />
   }
   if (servicesResult.data.length == 0) {
     return <p>No discrete services</p>
@@ -91,7 +86,7 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
     category: 'ONGOING',
   })
   if (servicesResult.isLoading) {
-    return <Loader active inline='centered' />
+    return <Loader active inline="centered" />
   }
   if (servicesResult.data.length == 0) {
     return <p>No ongoing services</p>
@@ -107,18 +102,19 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {servicesResult.data.map(({ id, type, started_at, finished_at, note }) => (
-          <Table.Row key={id}>
-            <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
-            <Table.Cell>{started_at}</Table.Cell>
-            <Table.Cell>{finished_at}</Table.Cell>
-            <Table.Cell>{note}</Table.Cell>
-          </Table.Row>
-        ))}
+        {servicesResult.data.map(
+          ({ id, type, started_at, finished_at, note }) => (
+            <Table.Row key={id}>
+              <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
+              <Table.Cell>{started_at}</Table.Cell>
+              <Table.Cell>{finished_at}</Table.Cell>
+              <Table.Cell>{note}</Table.Cell>
+            </Table.Row>
+          )
+        )}
       </Table.Body>
     </Table>
   )
 }
-
 
 mount(App)

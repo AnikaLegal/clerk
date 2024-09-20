@@ -11,10 +11,17 @@ export const CASE_TABS = {
   SERVICES: 'SERVICES',
 }
 
+export interface CaseTabUrls {
+  detail: string
+  email: string
+  docs: string
+  services: string
+}
+
 interface CaseHeaderProps {
   issue: Issue
   activeTab: string
-  urls: { [key: string]: string }
+  urls: CaseTabUrls
 }
 
 export const CaseHeader: React.FC<CaseHeaderProps> = ({
