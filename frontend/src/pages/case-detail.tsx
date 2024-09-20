@@ -1,46 +1,46 @@
 import React, { useState } from 'react'
 import {
-  Container,
-  Header,
-  Dropdown,
-  Segment,
-  List,
-  Feed,
   Checkbox,
+  Container,
+  Dropdown,
+  Feed,
+  Header,
+  List,
+  Segment,
 } from 'semantic-ui-react'
 
-import { TableForm } from 'comps/table-form'
 import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
+import { TableForm } from 'comps/table-form'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
 import {
-  useGetCaseQuery,
-  useGetPeopleQuery,
-  useUpdateTenancyMutation,
-  useUpdateCaseMutation,
+  Issue,
   IssueUpdate,
   TenancyCreate,
-  Issue,
+  useGetCaseQuery,
+  useGetPeopleQuery,
+  useUpdateCaseMutation,
+  useUpdateTenancyMutation,
 } from 'api'
+import { CASE_TABS, CaseHeader } from 'comps/case-header'
 import { TimelineNote } from 'comps/timeline-item'
-import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { mount, getAPIErrorMessage } from 'utils'
 import { URLS } from 'consts'
 import {
-  FilenoteForm,
-  ReviewForm,
-  ReopenForm,
-  PerformanceForm,
-  CloseForm,
-  EligibilityForm,
   AssignForm,
-  OutcomeForm,
-  ProgressForm,
+  CloseForm,
   ConflictForm,
+  EligibilityForm,
+  FilenoteForm,
+  OutcomeForm,
+  PerformanceForm,
+  ProgressForm,
+  ReopenForm,
+  ReviewForm,
 } from 'forms'
-import { UserPermission, CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps, UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   user: UserPermission
