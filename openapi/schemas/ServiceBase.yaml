@@ -25,4 +25,4 @@ required:
   - started_at
   - finished_at
   - count
-  - notes
+  - note

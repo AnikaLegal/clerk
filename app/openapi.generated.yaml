@@ -1684,7 +1684,7 @@ components:
         - started_at
         - finished_at
         - count
-        - notes
+        - note
     Service:
       allOf:
         - $ref: "#/components/schemas/ServiceBase"

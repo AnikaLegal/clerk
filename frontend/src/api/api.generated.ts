@@ -872,7 +872,7 @@ export type ServiceBase = {
   started_at: string
   finished_at: string | null
   count: number | null
-  note?: string | null
+  note: string | null
 }
 export type Service = ServiceBase & {
   id: number
