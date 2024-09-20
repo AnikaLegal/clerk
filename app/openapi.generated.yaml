@@ -195,6 +195,64 @@ paths:
                 required:
                   - sharepoint_url
                   - documents
+  /clerk/api/case/{id}/services/:
+    get:
+      operationId: getCaseServices
+      parameters:
+        - name: id
+          description: Entity ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: category
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: type
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createCaseService
+      parameters:
+        - name: id
+          description: Entity ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/email/{id}/:
     get:
       operationId: getEmailThreads
@@ -1598,6 +1656,48 @@ components:
         - id
         - size
         - is_file
+    ServiceBase:
+      type: object
+      properties:
+        issue_id:
+          type: string
+          format: uuid
+        category:
+          type: string
+        type:
+          type: string
+        started_at:
+          type: string
+        finished_at:
+          type: string
+          nullable: true
+        count:
+          type: number
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required:
+        - issue_id
+        - category
+        - type
+        - started_at
+        - finished_at
+        - count
+        - notes
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/ServiceBase"
+        - type: object
+          properties:
+            id:
+              type: integer
+          required:
+            - id
+    ServiceCreate:
+      allOf:
+        - $ref: "#/components/schemas/ServiceBase"
+        - type: object
     EmailCreate:
       type: object
       properties:

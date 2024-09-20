@@ -1,0 +1,57 @@
+get:
+  operationId: getCaseServices
+  parameters:
+    - name: id
+      description: Entity ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: category
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: type
+      in: query
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/Service.yaml
+post:
+  operationId: createCaseService
+  parameters:
+    - name: id
+      description: Entity ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/ServiceCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Service.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

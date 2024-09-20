@@ -1,0 +1,28 @@
+type: object
+properties:
+  issue_id:
+    type: string
+    format: uuid
+  category:
+    type: string
+  type:
+    type: string
+  started_at:
+    type: string
+  finished_at:
+    type: string
+    nullable: true
+  count:
+    type: number
+    nullable: true
+  note:
+    type: string
+    nullable: true
+required:
+  - issue_id
+  - category
+  - type
+  - started_at
+  - finished_at
+  - count
+  - notes

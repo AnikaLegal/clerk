@@ -13,6 +13,8 @@ paths:
     $ref: paths/case-note.yaml
   /clerk/api/case/{id}/docs/:
     $ref: paths/case-docs.yaml
+  /clerk/api/case/{id}/services/:
+    $ref: paths/case-services-list.yaml
   /clerk/api/email/{id}/:
     $ref: paths/email-list.yaml
   /clerk/api/email/{id}/create/:

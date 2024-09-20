@@ -42,6 +42,25 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/docs/` }),
     }),
+    getCaseServices: build.query<
+      GetCaseServicesApiResponse,
+      GetCaseServicesApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/services/`,
+        params: { category: queryArg.category, type: queryArg['type'] },
+      }),
+    }),
+    createCaseService: build.mutation<
+      CreateCaseServiceApiResponse,
+      CreateCaseServiceApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/services/`,
+        method: 'POST',
+        body: queryArg.serviceCreate,
+      }),
+    }),
     getEmailThreads: build.query<
       GetEmailThreadsApiResponse,
       GetEmailThreadsApiArg
@@ -399,6 +418,22 @@ export type GetCaseDocumentsApiResponse =
 export type GetCaseDocumentsApiArg = {
   /** Entity ID */
   id: string
+}
+export type GetCaseServicesApiResponse =
+  /** status 200 Successful response. */ Service[]
+export type GetCaseServicesApiArg = {
+  /** Entity ID */
+  id: string
+  category?: string
+  type?: string
+}
+export type CreateCaseServiceApiResponse =
+  /** status 201 Successful response. */ Service
+export type CreateCaseServiceApiArg = {
+  /** Entity ID */
+  id: string
+  /** Successful response. */
+  serviceCreate: ServiceCreate
 }
 export type GetEmailThreadsApiResponse =
   /** status 200 Successful response. */ EmailThread[]
@@ -830,6 +865,19 @@ export type SharepointDocument = {
   size: number
   is_file: boolean
 }
+export type ServiceBase = {
+  issue_id: string
+  category: string
+  type: string
+  started_at: string
+  finished_at: string | null
+  count: number | null
+  note?: string | null
+}
+export type Service = ServiceBase & {
+  id: number
+}
+export type ServiceCreate = ServiceBase & object
 export type EmailCreate = {
   issue: string
   to_address: string
@@ -935,6 +983,8 @@ export const {
   useUpdateCaseMutation,
   useCreateCaseNoteMutation,
   useGetCaseDocumentsQuery,
+  useGetCaseServicesQuery,
+  useCreateCaseServiceMutation,
   useGetEmailThreadsQuery,
   useCreateEmailMutation,
   useGetEmailQuery,
