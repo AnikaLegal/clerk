@@ -1,5 +1,11 @@
 import React from 'react'
-import { Container, Header, Loader, Table } from 'semantic-ui-react'
+import {
+  Container,
+  Header,
+  Loader,
+  Segment,
+  Table
+} from 'semantic-ui-react'
 
 import api, { GetCaseServicesApiArg } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
@@ -30,9 +36,13 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
       <Header as="h2">Discrete services</Header>
-      <DiscreteCaseServiceTable args={{ id: case_id }} />
+      <Segment basic>
+        <DiscreteCaseServiceTable args={{ id: case_id }} />
+      </Segment>
       <Header as="h2">Ongoing services</Header>
-      <OngoingCaseServiceTable args={{ id: case_id }} />
+      <Segment basic>
+        <OngoingCaseServiceTable args={{ id: case_id }} />
+      </Segment>
     </Container>
   )
 }
@@ -52,7 +62,11 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
     return <Loader active inline="centered" />
   }
   if (result.data.length == 0) {
-    return <p>No discrete services</p>
+    return (
+      <Segment textAlign="center" secondary>
+        <p>No discrete services exist for this case.</p>
+      </Segment>
+    )
   }
   return (
     <Table celled fixed>
@@ -89,7 +103,11 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
     return <Loader active inline="centered" />
   }
   if (result.data.length == 0) {
-    return <p>No ongoing services</p>
+    return (
+      <Segment textAlign="center" secondary>
+        <p>No ongoing services exist for this case.</p>
+      </Segment>
+    )
   }
   return (
     <Table celled fixed>
