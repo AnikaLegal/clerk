@@ -1674,7 +1674,7 @@ components:
         count:
           type: number
           nullable: true
-        note:
+        notes:
           type: string
           nullable: true
       required:
@@ -1684,7 +1684,7 @@ components:
         - started_at
         - finished_at
         - count
-        - note
+        - notes
     Service:
       allOf:
         - $ref: "#/components/schemas/ServiceBase"

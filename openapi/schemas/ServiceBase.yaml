@@ -15,7 +15,7 @@ properties:
   count:
     type: number
     nullable: true
-  note:
+  notes:
     type: string
     nullable: true
 required:
@@ -25,4 +25,4 @@ required:
   - started_at
   - finished_at
   - count
-  - note
+  - notes
