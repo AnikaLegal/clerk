@@ -79,12 +79,12 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {result.data.map(({ id, type, started_at, count, note }) => (
+        {result.data.map(({ id, type, started_at, count, notes }) => (
           <Table.Row key={id}>
             <Table.Cell>{DISCRETE_TYPE_LABELS.get(type)}</Table.Cell>
             <Table.Cell>{started_at}</Table.Cell>
             <Table.Cell>{count}</Table.Cell>
-            <Table.Cell>{note}</Table.Cell>
+            <Table.Cell>{notes}</Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
@@ -120,12 +120,12 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {result.data.map(({ id, type, started_at, finished_at, note }) => (
+        {result.data.map(({ id, type, started_at, finished_at, notes }) => (
           <Table.Row key={id}>
             <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
             <Table.Cell>{started_at}</Table.Cell>
             <Table.Cell>{finished_at}</Table.Cell>
-            <Table.Cell>{note}</Table.Cell>
+            <Table.Cell>{notes}</Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
