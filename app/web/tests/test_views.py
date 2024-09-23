@@ -1,14 +1,12 @@
 import json
 
 import pytest
-from django.urls import reverse
-from django.test import RequestFactory
 from django.db import transaction
-
-from webhooks.models import WebflowContact
-from web.models import RootPage, BlogListPage, BlogPage
-
+from django.test import RequestFactory
+from django.urls import reverse
 from utils.signals import DisableSignals
+from web.models import BlogListPage, BlogPage, RootPage
+from webhooks.models import WebflowContact
 
 
 @pytest.fixture
@@ -45,6 +43,7 @@ SEARCH_TESTS = [
 
 
 @pytest.mark.django_db
+@pytest.mark.enable_signals
 @pytest.mark.parametrize("query, expected_titles", SEARCH_TESTS)
 def test_blog_list_search(blog_list_page, query, expected_titles):
     factory = RequestFactory()
