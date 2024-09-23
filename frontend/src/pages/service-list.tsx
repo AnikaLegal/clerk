@@ -15,14 +15,14 @@ interface DjangoContext {
   case_pk: string
   choices: {
     category: string[][]
-    type_discrete: string[][]
-    type_ongoing: string[][]
+    type_DISCRETE: string[][]
+    type_ONGOING: string[][]
   }
   urls: CaseTabUrls
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_discrete)
-const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ongoing)
+const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_DISCRETE)
+const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ONGOING)
 
 const App = () => {
   const case_id = CONTEXT.case_pk
