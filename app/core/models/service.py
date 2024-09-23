@@ -47,7 +47,7 @@ class Service(TimestampedModel):
         choices=DiscreteServiceType.choices + OngoingServiceType.choices,
     )
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    started_at = models.DateField(default=timezone.now)
+    started_at = models.DateField()
     notes = models.TextField(null=True, blank=True)
 
     # Category specific fields.
