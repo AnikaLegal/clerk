@@ -189,3 +189,16 @@ export const choiceToMap = (choices: string[][]): Map<string, string> => {
     return map
   }, new Map())
 }
+
+interface OptionItem {
+  key: string
+  text: string
+  value: string
+}
+
+export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
+  choices.map(([value, label]) => ({
+    key: label,
+    text: label,
+    value: value,
+  }))

@@ -93,7 +93,17 @@ def case_detail_page_view(request, pk):
     The details of a given case.
     """
     issue = get_object_or_404(Issue, pk=pk)
-    context = {"case_pk": pk, "urls": get_detail_urls(issue)}
+    context = {
+        "case_pk": pk,
+        "choices": {
+            "service": {
+                "category": ServiceCategory.choices,
+                "type_DISCRETE": DiscreteServiceType.choices,
+                "type_ONGOING": OngoingServiceType.choices,
+            },
+        },
+        "urls": get_detail_urls(issue),
+    }
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
 
 

@@ -38,18 +38,21 @@ import {
   ProgressForm,
   ReopenForm,
   ReviewForm,
+  ServiceForm,
 } from 'forms'
-import { CaseDetailFormProps, UserPermission } from 'types'
+import { CaseDetailFormProps, CaseFormChoices, UserPermission } from 'types'
 import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
-  user: UserPermission
   case_pk: string
+  choices: CaseFormChoices
   urls: CaseTabUrls
+  user: UserPermission
 }
 
 const {
   case_pk,
+  choices,
   urls,
   user: permissions,
 } = (window as any).REACT_CONTEXT as DjangoContext
@@ -186,7 +189,11 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
+            <ActiveForm
+              choices={choices}
+              issue={issue}
+              onCancel={() => setActiveFormId(null)}
+            />
           )}
           {!activeFormId && (
             <React.Fragment>
@@ -468,6 +475,7 @@ const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   eligibility: EligibilityForm,
   assign: AssignForm,
   progress: ProgressForm,
+  service: ServiceForm,
   close: CloseForm,
   reopen: ReopenForm,
   outcome: OutcomeForm,
@@ -522,6 +530,12 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     icon: 'chart line',
     text: 'Progress the case status',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
+  },
+  {
+    id: 'service',
+    icon: 'balance scale',
+    text: 'Add a service',
+    when: (perms, issue) => perms.is_paralegal_or_better,
   },
   {
     id: 'close',
