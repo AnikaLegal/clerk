@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 from .issue import Issue
 from .timestamped import TimestampedModel
@@ -38,7 +37,7 @@ class OngoingServiceType(models.TextChoices):
 
 class Service(TimestampedModel):
     """
-    The services provided relating to a specific issue.
+    A unit of legal or non-legal work relating to a specific issue.
     """
 
     category = models.CharField(max_length=32, choices=ServiceCategory)
@@ -51,23 +50,11 @@ class Service(TimestampedModel):
     notes = models.TextField(null=True, blank=True)
 
     # Category specific fields.
-    count = models.IntegerField(null=True, blank=True)
+    count = models.IntegerField(default=1)
     finished_at = models.DateField(null=True, blank=True)
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                name="%(app_label)s_%(class)s_service_type_by_category",
-                condition=(
-                    (
-                        models.Q(category=ServiceCategory.DISCRETE)
-                        & models.Q(type__in=DiscreteServiceType)
-                    )
-                    | (
-                        models.Q(category=ServiceCategory.ONGOING)
-                        & models.Q(type__in=OngoingServiceType)
-                    )
-                ),
-                violation_error_message="Service type does not belong to that service category",
-            )
-        ]
+    def save(self, *args, **kwargs):
+        # Ensure count is always one for ongoing services.
+        if self.category == ServiceCategory.ONGOING:
+            self.count = 1
+        return super().save(*args, **kwargs)
