@@ -97,6 +97,7 @@ export const ServiceForm: React.FC<CaseDetailFormProps> = ({
                 onChange={(e, data) => {
                   handleChange(e, data)
                   setFieldValue('type', '')
+                  setFieldValue('count', 1)
                 }}
                 style={{ marginBottom: '1rem' }}
               />
