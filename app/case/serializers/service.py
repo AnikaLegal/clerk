@@ -24,6 +24,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     issue_id = serializers.UUIDField()
 
     def validate(self, data):
+        # Type must belong to a set of choices depending on the category value.
         category = data.get("category")
         type = data.get("type")
         if category and type:
@@ -36,6 +37,22 @@ class ServiceSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {"type": error_message + ", ".join(DiscreteServiceType)}
                 )
+
+        # Count is required for discrete services.
+        count = data.get("count")
+        if category == ServiceCategory.DISCRETE and not count:
+            raise serializers.ValidationError(
+                {"count": self.fields["count"].error_messages["required"]}
+            )
+
+        # Finish must be after start date.
+        started_at = data.get("started_at")
+        finished_at = data.get("finished_at")
+        if started_at and finished_at and finished_at < started_at:
+            raise serializers.ValidationError(
+                {"finished_at": "Finish date must be after the start date"}
+            )
+
         return data
 
 
