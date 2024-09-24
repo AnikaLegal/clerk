@@ -202,3 +202,23 @@ export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
     text: label,
     value: value,
   }))
+
+/* A helper function to remove "empty" attributes from an object preserving type info.
+ */
+type Entry<T> = { [K in keyof T]: [K, T[K]] }[keyof T]
+
+export const filterEmpty = <T extends {}, V = Entry<T>>(obj: T): V =>
+  filterObject(
+    obj,
+    ([, v]) =>
+      !(
+        (typeof v === 'string' && !v.length) ||
+        v === null ||
+        typeof v === 'undefined'
+      )
+  )
+
+export const filterObject = <T extends {}, V = Entry<T>>(
+  obj: T,
+  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
+): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
