@@ -333,7 +333,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
 
     @action(
         detail=True,
-        methods=["GET", "PATCH"],
+        methods=["GET", "PATCH", "DELETE"],
         url_path="services/(?P<service_pk>[^/.]+)",
         url_name="service-detail",
         serializer_class=ServiceSerializer,
@@ -345,11 +345,14 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         issue = self.get_object()
         service = get_object_or_404(issue.service_set, pk=service_pk)
 
-        if request.method == "GET":
-            serializer = self.get_serializer(service)
-            return Response(serializer.data)
-        else:
+        if request.method == "DELETE":
+            service.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        elif request.method == "PATCH":
             serializer = self.get_serializer(service, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            return Response(serializer.data)
+        else:
+            serializer = self.get_serializer(service)
             return Response(serializer.data)
