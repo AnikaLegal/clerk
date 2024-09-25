@@ -253,6 +253,87 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/case/{id}/services/{service_id}/:
+    get:
+      operationId: getCaseService
+      parameters:
+        - name: id
+          description: Case ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: service_id
+          description: Service ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    patch:
+      operationId: updateCaseService
+      parameters:
+        - name: id
+          description: Case ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: service_id
+          description: Service ID
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteCaseService
+      parameters:
+        - name: id
+          description: Case ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: service_id
+          description: Service ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/email/{id}/:
     get:
       operationId: getEmailThreads

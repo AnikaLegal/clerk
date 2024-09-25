@@ -61,6 +61,33 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.serviceCreate,
       }),
     }),
+    getCaseService: build.query<
+      GetCaseServiceApiResponse,
+      GetCaseServiceApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/services/${queryArg.serviceId}/`,
+      }),
+    }),
+    updateCaseService: build.mutation<
+      UpdateCaseServiceApiResponse,
+      UpdateCaseServiceApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/services/${queryArg.serviceId}/`,
+        method: 'PATCH',
+        body: queryArg.serviceCreate,
+      }),
+    }),
+    deleteCaseService: build.mutation<
+      DeleteCaseServiceApiResponse,
+      DeleteCaseServiceApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/${queryArg.id}/services/${queryArg.serviceId}/`,
+        method: 'DELETE',
+      }),
+    }),
     getEmailThreads: build.query<
       GetEmailThreadsApiResponse,
       GetEmailThreadsApiArg
@@ -434,6 +461,32 @@ export type CreateCaseServiceApiArg = {
   id: string
   /** Successful response. */
   serviceCreate: ServiceCreate
+}
+export type GetCaseServiceApiResponse =
+  /** status 200 Successful response. */ Service
+export type GetCaseServiceApiArg = {
+  /** Case ID */
+  id: string
+  /** Service ID */
+  serviceId: number
+}
+export type UpdateCaseServiceApiResponse =
+  /** status 200 Successful response. */ Service
+export type UpdateCaseServiceApiArg = {
+  /** Case ID */
+  id: string
+  /** Service ID */
+  serviceId: number
+  /** Successful response. */
+  serviceCreate: ServiceCreate
+}
+export type DeleteCaseServiceApiResponse =
+  /** status 204 The specific resource was deleted successfully */ void
+export type DeleteCaseServiceApiArg = {
+  /** Case ID */
+  id: string
+  /** Service ID */
+  serviceId: number
 }
 export type GetEmailThreadsApiResponse =
   /** status 200 Successful response. */ EmailThread[]
@@ -985,6 +1038,9 @@ export const {
   useGetCaseDocumentsQuery,
   useGetCaseServicesQuery,
   useCreateCaseServiceMutation,
+  useGetCaseServiceQuery,
+  useUpdateCaseServiceMutation,
+  useDeleteCaseServiceMutation,
   useGetEmailThreadsQuery,
   useCreateEmailMutation,
   useGetEmailQuery,
