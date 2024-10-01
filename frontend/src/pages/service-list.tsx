@@ -15,7 +15,7 @@ import {
   Table,
 } from 'semantic-ui-react'
 
-import api, { Issue, ServiceCreate } from 'api'
+import api, { Issue, Service, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { Formik, FormikHelpers } from 'formik'
 import {
@@ -68,11 +68,19 @@ interface ServiceProps {
   choices: CaseFormServiceChoices
 }
 
+interface ServiceTableProps {
+  issue: Issue
+  fields: React.ReactNode
+}
+
 export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Discrete,
     count: 1,
   } as ServiceCreate
+  const fields: React.ReactNode = (
+    <FormikDiscreteServiceFields choices={choices} />
+  )
 
   return (
     <>
@@ -87,53 +95,19 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
               size="tiny"
               issue={issue}
               initialValues={initialValues}
-              fields={<FormikDiscreteServiceFields choices={choices} />}
+              fields={fields}
             >
               Add discrete service
             </AddServiceButton>
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <DiscreteServicesTable issue={issue} />
+      <DiscreteServicesTable issue={issue} fields={fields} />
     </>
   )
 }
 
-export const OngoingServices = ({ issue, choices }: ServiceProps) => {
-  const initialValues = {
-    category: ServiceCategory.Ongoing,
-  } as ServiceCreate
-
-  return (
-    <>
-      <Grid>
-        <Grid.Row>
-          <Grid.Column style={{ flexGrow: '1' }}>
-            <Header as="h2">Ongoing services</Header>
-          </Grid.Column>
-          <Grid.Column style={{ width: 'auto' }}>
-            <AddServiceButton
-              floated="right"
-              size="tiny"
-              issue={issue}
-              initialValues={initialValues}
-              fields={<FormikOngoingServiceFields choices={choices} />}
-            >
-              Add ongoing service
-            </AddServiceButton>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-      <OngoingServicesTable issue={issue} />
-    </>
-  )
-}
-
-interface ServiceTableProps {
-  issue: Issue
-}
-
-export const DiscreteServicesTable = ({ issue }: ServiceTableProps) => {
+export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
     category: ServiceCategory.Discrete,
@@ -160,14 +134,19 @@ export const DiscreteServicesTable = ({ issue }: ServiceTableProps) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {result.data.map(({ id, type, started_at, count, notes }) => (
-          <Table.Row key={id}>
-            <Table.Cell>{DISCRETE_TYPE_LABELS.get(type)}</Table.Cell>
-            <Table.Cell>{started_at}</Table.Cell>
-            <Table.Cell>{count}</Table.Cell>
-            <Table.Cell>{notes}</Table.Cell>
+        {result.data.map((service) => (
+          <Table.Row key={service.id}>
+            <Table.Cell>{DISCRETE_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{service.started_at}</Table.Cell>
+            <Table.Cell>{service.count}</Table.Cell>
+            <Table.Cell>{service.notes}</Table.Cell>
             <Table.Cell collapsing>
-              <ServiceActionIcons caseId={issue.id} serviceId={id} />
+              <ServiceActionIcons
+                issue={issue}
+                service={service}
+                fields={fields}
+                editLabel="Update discrete service"
+              />
             </Table.Cell>
           </Table.Row>
         ))}
@@ -176,7 +155,40 @@ export const DiscreteServicesTable = ({ issue }: ServiceTableProps) => {
   )
 }
 
-export const OngoingServicesTable = ({ issue }: ServiceTableProps) => {
+export const OngoingServices = ({ issue, choices }: ServiceProps) => {
+  const initialValues = {
+    category: ServiceCategory.Ongoing,
+  } as ServiceCreate
+  const fields: React.ReactNode = (
+    <FormikOngoingServiceFields choices={choices} />
+  )
+
+  return (
+    <>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column style={{ flexGrow: '1' }}>
+            <Header as="h2">Ongoing services</Header>
+          </Grid.Column>
+          <Grid.Column style={{ width: 'auto' }}>
+            <AddServiceButton
+              floated="right"
+              size="tiny"
+              issue={issue}
+              initialValues={initialValues}
+              fields={fields}
+            >
+              Add ongoing service
+            </AddServiceButton>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <OngoingServicesTable issue={issue} fields={fields} />
+    </>
+  )
+}
+
+export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
     category: ServiceCategory.Ongoing,
@@ -203,14 +215,19 @@ export const OngoingServicesTable = ({ issue }: ServiceTableProps) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {result.data.map(({ id, type, started_at, finished_at, notes }) => (
-          <Table.Row key={id}>
-            <Table.Cell>{ONGOING_TYPE_LABELS.get(type)}</Table.Cell>
-            <Table.Cell>{started_at}</Table.Cell>
-            <Table.Cell>{finished_at}</Table.Cell>
-            <Table.Cell>{notes}</Table.Cell>
+        {result.data.map((service) => (
+          <Table.Row key={service.id}>
+            <Table.Cell>{ONGOING_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{service.started_at}</Table.Cell>
+            <Table.Cell>{service.finished_at}</Table.Cell>
+            <Table.Cell>{service.notes}</Table.Cell>
             <Table.Cell collapsing>
-              <ServiceActionIcons caseId={issue.id} serviceId={id} />
+              <ServiceActionIcons
+                issue={issue}
+                service={service}
+                fields={fields}
+                editLabel="Update ongoing service"
+              />
             </Table.Cell>
           </Table.Row>
         ))}
@@ -220,16 +237,51 @@ export const OngoingServicesTable = ({ issue }: ServiceTableProps) => {
 }
 
 export const ServiceActionIcons = ({
-  caseId,
-  serviceId,
+  issue,
+  service,
+  fields,
+  editLabel,
 }: {
-  caseId: string
-  serviceId: number
+  issue: Issue
+  service: Service
+  fields: React.ReactNode
+  editLabel: string
 }) => {
+  return (
+    <>
+      <EditServiceIcon
+        link
+        name="pencil"
+        issue={issue}
+        service={service}
+        fields={fields}
+        label={editLabel}
+      />
+      <DeleteServiceIcon
+        link
+        name="trash alternate outline"
+        issue={issue}
+        service={service}
+      />
+    </>
+  )
+}
+
+export interface DeleteServiceIconProps {
+  issue: Issue
+  service: Service
+}
+
+export const DeleteServiceIcon = ({
+  issue,
+  service,
+  ...props
+}: DeleteServiceIconProps & IconProps) => {
+  const [open, setOpen] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
   const handleDelete = () => {
-    deleteService({ id: caseId, serviceId: serviceId })
+    deleteService({ id: issue.id, serviceId: service.id })
       .unwrap()
       .then(() => {
         enqueueSnackbar('Service deleted', { variant: 'success' })
@@ -243,40 +295,94 @@ export const ServiceActionIcons = ({
 
   return (
     <>
-      <Icon link name="pencil" />
-      <DeleteServiceIconWithConfirmation handleDelete={handleDelete} />
-    </>
-  )
-}
-
-export interface DeleteServiceIconProps {
-  handleDelete: () => void
-}
-
-export const DeleteServiceIconWithConfirmation = ({
-  handleDelete,
-  ...props
-}: DeleteServiceIconProps & IconProps) => {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <>
       <DeleteServiceModal
         open={open}
         setOpen={setOpen}
         handleDelete={handleDelete}
       />
-      <Icon
-        {...props}
-        link
-        name="trash alternate outline"
-        onClick={() => setOpen(true)}
-      />
+      <Icon {...props} onClick={() => setOpen(true)} />
     </>
   )
 }
 
-export interface AddServiceProps {
+export const DeleteServiceModal = ({ open, setOpen, handleDelete }) => {
+  return (
+    <Modal size="tiny" open={open} onClose={() => setOpen(false)}>
+      <Modal.Header>Delete service</Modal.Header>
+      <Modal.Content>
+        Are you sure you want to delete the service?
+      </Modal.Content>
+      <Modal.Actions>
+        <Button primary negative onClick={handleDelete}>
+          Delete service
+        </Button>
+        <Button onClick={() => setOpen(false)}>Close</Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+export interface EditServiceIconProps {
+  issue: Issue
+  service: Service
+  fields: React.ReactNode
+  label: string
+}
+
+export const EditServiceIcon = ({
+  issue,
+  service,
+  fields,
+  label,
+  ...props
+}: EditServiceIconProps & IconProps) => {
+  const [open, setOpen] = useState(false)
+  const [updateService] = api.useUpdateCaseServiceMutation()
+
+  const handleSubmit = (
+    values: ServiceCreate,
+    { setSubmitting, setErrors }: FormikHelpers<ServiceCreate>
+  ) => {
+    updateService({
+      id: issue.id,
+      serviceId: service.id,
+      serviceCreate: values,
+    })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Service updated', { variant: 'success' })
+        setOpen(false)
+      })
+      .catch((e) => {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update service'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
+
+  return (
+    <>
+      <ServiceModal
+        open={open}
+        setOpen={setOpen}
+        fields={fields}
+        initialValues={service}
+        handleSubmit={handleSubmit}
+        children={label}
+      />
+      <Icon {...props} onClick={() => setOpen(true)} />
+    </>
+  )
+}
+
+export interface AddServiceButtonProps {
   issue: Issue
   initialValues: ServiceCreate
   fields: React.ReactNode
@@ -289,39 +395,8 @@ export const AddServiceButton = ({
   children,
   fields,
   ...props
-}: AddServiceProps & ButtonProps) => {
+}: AddServiceButtonProps & ButtonProps) => {
   const [open, setOpen] = useState(false)
-
-  return (
-    <>
-      <AddServiceModal
-        issue={issue}
-        open={open}
-        setOpen={setOpen}
-        fields={fields}
-        initialValues={initialValues}
-        children={children}
-      />
-      <Button {...props} onClick={() => setOpen(true)}>
-        {children}
-      </Button>
-    </>
-  )
-}
-
-export interface AddServiceModalProps {
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export const AddServiceModal = ({
-  issue,
-  open,
-  setOpen,
-  initialValues,
-  fields,
-  children,
-}: AddServiceModalProps & AddServiceProps) => {
   const [createService] = api.useCreateCaseServiceMutation()
 
   const handleSubmit = (
@@ -349,6 +424,41 @@ export const AddServiceModal = ({
   }
 
   return (
+    <>
+      <ServiceModal
+        open={open}
+        setOpen={setOpen}
+        fields={fields}
+        initialValues={initialValues}
+        handleSubmit={handleSubmit}
+        children={children}
+      />
+      <Button {...props} onClick={() => setOpen(true)}>
+        {children}
+      </Button>
+    </>
+  )
+}
+
+export interface ServiceModalProps
+  extends Omit<AddServiceButtonProps, 'issue'> {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  handleSubmit: (
+    values: ServiceCreate,
+    helpers: FormikHelpers<ServiceCreate>
+  ) => void
+}
+
+export const ServiceModal = ({
+  open,
+  setOpen,
+  initialValues,
+  fields,
+  handleSubmit,
+  children,
+}: ServiceModalProps) => {
+  return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
       {({ handleSubmit, errors, resetForm }) => {
         return (
@@ -371,7 +481,7 @@ export const AddServiceModal = ({
               </Form>
             </Modal.Content>
             <Modal.Actions>
-              <Button type="submit" onClick={() => handleSubmit()}>
+              <Button primary type="submit" onClick={() => handleSubmit()}>
                 {children}
               </Button>
               <Button
@@ -387,23 +497,6 @@ export const AddServiceModal = ({
         )
       }}
     </Formik>
-  )
-}
-
-export const DeleteServiceModal = ({ open, setOpen, handleDelete }) => {
-  return (
-    <Modal size="tiny" open={open} onClose={() => setOpen(false)}>
-      <Modal.Header>Delete service</Modal.Header>
-      <Modal.Content>
-        Are you sure you want to delete the service?
-      </Modal.Content>
-      <Modal.Actions>
-        <Button primary negative onClick={handleDelete}>
-          Delete service
-        </Button>
-        <Button onClick={() => setOpen(false)}>Close</Button>
-      </Modal.Actions>
-    </Modal>
   )
 }
 
