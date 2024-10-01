@@ -145,7 +145,6 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
                 issue={issue}
                 service={service}
                 fields={fields}
-                editLabel="Update discrete service"
               />
             </Table.Cell>
           </Table.Row>
@@ -226,7 +225,6 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
                 issue={issue}
                 service={service}
                 fields={fields}
-                editLabel="Update ongoing service"
               />
             </Table.Cell>
           </Table.Row>
@@ -240,12 +238,10 @@ export const ServiceActionIcons = ({
   issue,
   service,
   fields,
-  editLabel,
 }: {
   issue: Issue
   service: Service
   fields: React.ReactNode
-  editLabel: string
 }) => {
   return (
     <>
@@ -255,7 +251,7 @@ export const ServiceActionIcons = ({
         issue={issue}
         service={service}
         fields={fields}
-        label={editLabel}
+        label={"Update " + service.category.toLowerCase() + " service"}
       />
       <DeleteServiceIcon
         link
