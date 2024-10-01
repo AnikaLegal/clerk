@@ -251,7 +251,7 @@ export const ServiceActionIcons = ({
         issue={issue}
         service={service}
         fields={fields}
-        label={"Update " + service.category.toLowerCase() + " service"}
+        label={'Update ' + service.category.toLowerCase() + ' service'}
       />
       <DeleteServiceIcon
         link
