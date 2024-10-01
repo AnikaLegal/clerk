@@ -14,7 +14,9 @@ import {
 import { ServiceCreate, useCreateCaseServiceMutation } from 'api'
 import DateInput from 'comps/date-input'
 import { TextArea } from 'comps/textarea'
-import { CaseDetailFormProps, CaseFormChoices } from 'types'
+import {
+  CaseDetailFormProps, CaseFormServiceChoices
+} from 'types'
 import {
   choiceToOptions,
   filterEmpty,
@@ -71,7 +73,7 @@ export const ServiceForm = ({
               onSubmit={handleSubmit}
               error={Object.keys(errors).length > 0}
             >
-              <FormikServiceFields choices={choices} />
+              <FormikServiceFields choices={choices.service} />
               <FormikServiceErrorMessages />
               <Button
                 loading={isSubmitting}
@@ -109,7 +111,7 @@ export const FormikServiceErrorMessages = () => {
 export const FormikServiceFields = ({
   choices,
 }: {
-  choices: CaseFormChoices
+  choices: CaseFormServiceChoices
 }) => {
   const [category, setCategory] = useState<string>()
   const { setFieldValue, isSubmitting } = useFormikContext<ServiceCreate>()
@@ -123,7 +125,7 @@ export const FormikServiceFields = ({
         name="category"
         loading={isSubmitting}
         placeholder="Service category"
-        options={choiceToOptions(choices.service.category)}
+        options={choiceToOptions(choices.category)}
         onChange={(e, data) => {
           setCategory(data.value)
           setFieldValue('category', data.value)
@@ -148,7 +150,7 @@ export const FormikServiceFields = ({
 export const FormikDiscreteServiceFields = ({
   choices,
 }: {
-  choices: CaseFormChoices
+  choices: CaseFormServiceChoices
 }) => {
   const { setFieldValue, isSubmitting, values } =
     useFormikContext<ServiceCreate>()
@@ -163,7 +165,9 @@ export const FormikDiscreteServiceFields = ({
         name="type"
         loading={isSubmitting}
         placeholder="Service type"
-        options={choiceToOptions(choices.service['type_' + values.category])}
+        options={choiceToOptions(
+          choices['type_' + values.category.toUpperCase()]
+        )}
         onChange={handleChange}
       />
       <DateInput
@@ -200,7 +204,7 @@ export const FormikDiscreteServiceFields = ({
 export const FormikOngoingServiceFields = ({
   choices,
 }: {
-  choices: CaseFormChoices
+  choices: CaseFormServiceChoices
 }) => {
   const { setFieldValue, isSubmitting, values } =
     useFormikContext<ServiceCreate>()
@@ -216,7 +220,9 @@ export const FormikOngoingServiceFields = ({
         name="type"
         loading={isSubmitting}
         placeholder="Service type"
-        options={choiceToOptions(choices.service['type_' + values.category])}
+        options={choiceToOptions(
+          choices['type_' + values.category.toUpperCase()]
+        )}
         onChange={handleChange}
       />
       <DateInput

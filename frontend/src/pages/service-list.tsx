@@ -1,23 +1,41 @@
-import React from 'react'
+import { enqueueSnackbar } from 'notistack'
+import React, { useState } from 'react'
 import {
+  Button,
+  ButtonProps,
   Container,
+  Form,
+  Grid,
   Header,
+  Icon,
+  IconProps,
   Loader,
+  Modal,
   Segment,
-  Table
+  Table,
 } from 'semantic-ui-react'
 
-import api, { GetCaseServicesApiArg } from 'api'
+import api, { Issue, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
-import { choiceToMap, mount } from 'utils'
+import { Formik, FormikHelpers } from 'formik'
+import {
+  FormikDiscreteServiceFields,
+  FormikOngoingServiceFields,
+  FormikServiceErrorMessages,
+  ServiceCategory,
+} from 'forms/case-service'
+import { CaseFormServiceChoices } from 'types'
+import {
+  choiceToMap,
+  filterEmpty,
+  getAPIErrorMessage,
+  getAPIFormErrors,
+  mount,
+} from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: {
-    category: string[][]
-    type_DISCRETE: string[][]
-    type_ONGOING: string[][]
-  }
+  choices: CaseFormServiceChoices
   urls: CaseTabUrls
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -25,38 +43,100 @@ const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_DISCRETE)
 const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ONGOING)
 
 const App = () => {
-  const case_id = CONTEXT.case_pk
+  const caseId = CONTEXT.case_pk
   const urls = CONTEXT.urls
 
-  const caseResult = api.useGetCaseQuery({ id: case_id })
+  const caseResult = api.useGetCaseQuery({ id: caseId })
   if (caseResult.isFetching) return null
 
   const issue = caseResult.data!.issue
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
-      <Header as="h2">Discrete services</Header>
       <Segment basic>
-        <DiscreteCaseServiceTable args={{ id: case_id }} />
+        <DiscreteServices issue={issue} choices={CONTEXT.choices} />
       </Segment>
-      <Header as="h2">Ongoing services</Header>
       <Segment basic>
-        <OngoingCaseServiceTable args={{ id: case_id }} />
+        <OngoingServices issue={issue} choices={CONTEXT.choices} />
       </Segment>
     </Container>
   )
 }
 
-interface ServiceTableProps {
-  args: GetCaseServicesApiArg
+interface ServiceProps {
+  issue: Issue
+  choices: CaseFormServiceChoices
 }
 
-export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
-  args,
-}) => {
+export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
+  const initialValues = {
+    category: ServiceCategory.Discrete,
+    count: 1,
+  } as ServiceCreate
+
+  return (
+    <>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column style={{ flexGrow: '1' }}>
+            <Header as="h2">Discrete services</Header>
+          </Grid.Column>
+          <Grid.Column style={{ width: 'auto' }}>
+            <AddServiceButton
+              floated="right"
+              size="tiny"
+              issue={issue}
+              initialValues={initialValues}
+              fields={<FormikDiscreteServiceFields choices={choices} />}
+            >
+              Add discrete service
+            </AddServiceButton>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <DiscreteServicesTable issue={issue} />
+    </>
+  )
+}
+
+export const OngoingServices = ({ issue, choices }: ServiceProps) => {
+  const initialValues = {
+    category: ServiceCategory.Ongoing,
+  } as ServiceCreate
+
+  return (
+    <>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column style={{ flexGrow: '1' }}>
+            <Header as="h2">Ongoing services</Header>
+          </Grid.Column>
+          <Grid.Column style={{ width: 'auto' }}>
+            <AddServiceButton
+              floated="right"
+              size="tiny"
+              issue={issue}
+              initialValues={initialValues}
+              fields={<FormikOngoingServiceFields choices={choices} />}
+            >
+              Add ongoing service
+            </AddServiceButton>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <OngoingServicesTable issue={issue} />
+    </>
+  )
+}
+
+interface ServiceTableProps {
+  issue: Issue
+}
+
+export const DiscreteServicesTable = ({ issue }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
-    ...args,
-    category: 'DISCRETE',
+    id: issue.id,
+    category: ServiceCategory.Discrete,
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />
@@ -69,13 +149,14 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
     )
   }
   return (
-    <Table celled fixed>
+    <Table celled>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Type</Table.HeaderCell>
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>Count</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
+          <Table.HeaderCell></Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -85,6 +166,9 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
             <Table.Cell>{started_at}</Table.Cell>
             <Table.Cell>{count}</Table.Cell>
             <Table.Cell>{notes}</Table.Cell>
+            <Table.Cell collapsing>
+              <ServiceActionIcons caseId={issue.id} serviceId={id} />
+            </Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
@@ -92,12 +176,10 @@ export const DiscreteCaseServiceTable: React.FC<ServiceTableProps> = ({
   )
 }
 
-export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
-  args,
-}) => {
+export const OngoingServicesTable = ({ issue }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
-    ...args,
-    category: 'ONGOING',
+    id: issue.id,
+    category: ServiceCategory.Ongoing,
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />
@@ -110,13 +192,14 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
     )
   }
   return (
-    <Table celled fixed>
+    <Table celled>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Type</Table.HeaderCell>
           <Table.HeaderCell>Start date</Table.HeaderCell>
           <Table.HeaderCell>Finish date</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
+          <Table.HeaderCell></Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -126,10 +209,201 @@ export const OngoingCaseServiceTable: React.FC<ServiceTableProps> = ({
             <Table.Cell>{started_at}</Table.Cell>
             <Table.Cell>{finished_at}</Table.Cell>
             <Table.Cell>{notes}</Table.Cell>
+            <Table.Cell collapsing>
+              <ServiceActionIcons caseId={issue.id} serviceId={id} />
+            </Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
     </Table>
+  )
+}
+
+export const ServiceActionIcons = ({
+  caseId,
+  serviceId,
+}: {
+  caseId: string
+  serviceId: number
+}) => {
+  const [deleteService] = api.useDeleteCaseServiceMutation()
+
+  const handleDelete = () => {
+    deleteService({ id: caseId, serviceId: serviceId })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Service deleted', { variant: 'success' })
+      })
+      .catch((e) => {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to delete service'), {
+          variant: 'error',
+        })
+      })
+  }
+
+  return (
+    <>
+      <Icon link name="pencil" />
+      <DeleteServiceIconWithConfirmation handleDelete={handleDelete} />
+    </>
+  )
+}
+
+export interface DeleteServiceIconProps {
+  handleDelete: () => void
+}
+
+export const DeleteServiceIconWithConfirmation = ({
+  handleDelete,
+  ...props
+}: DeleteServiceIconProps & IconProps) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <DeleteServiceModal
+        open={open}
+        setOpen={setOpen}
+        handleDelete={handleDelete}
+      />
+      <Icon
+        {...props}
+        link
+        name="trash alternate outline"
+        onClick={() => setOpen(true)}
+      />
+    </>
+  )
+}
+
+export interface AddServiceProps {
+  issue: Issue
+  initialValues: ServiceCreate
+  fields: React.ReactNode
+  children: React.ReactText
+}
+
+export const AddServiceButton = ({
+  issue,
+  initialValues,
+  children,
+  fields,
+  ...props
+}: AddServiceProps & ButtonProps) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <AddServiceModal
+        issue={issue}
+        open={open}
+        setOpen={setOpen}
+        fields={fields}
+        initialValues={initialValues}
+        children={children}
+      />
+      <Button {...props} onClick={() => setOpen(true)}>
+        {children}
+      </Button>
+    </>
+  )
+}
+
+export interface AddServiceModalProps {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const AddServiceModal = ({
+  issue,
+  open,
+  setOpen,
+  initialValues,
+  fields,
+  children,
+}: AddServiceModalProps & AddServiceProps) => {
+  const [createService] = api.useCreateCaseServiceMutation()
+
+  const handleSubmit = (
+    values: ServiceCreate,
+    { setSubmitting, setErrors }: FormikHelpers<ServiceCreate>
+  ) => {
+    createService({ id: issue.id, serviceCreate: filterEmpty(values) })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Service created', { variant: 'success' })
+        setOpen(false)
+      })
+      .catch((e) => {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create service'), {
+          variant: 'error',
+        })
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
+
+  return (
+    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+      {({ handleSubmit, errors, resetForm }) => {
+        return (
+          <Modal
+            size="tiny"
+            open={open}
+            onClose={() => {
+              resetForm()
+              setOpen(false)
+            }}
+          >
+            <Modal.Header>{children}</Modal.Header>
+            <Modal.Content>
+              <Form
+                onSubmit={handleSubmit}
+                error={Object.keys(errors).length > 0}
+              >
+                {fields}
+                <FormikServiceErrorMessages />
+              </Form>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button type="submit" onClick={() => handleSubmit()}>
+                {children}
+              </Button>
+              <Button
+                onClick={() => {
+                  resetForm()
+                  setOpen(false)
+                }}
+              >
+                Close
+              </Button>
+            </Modal.Actions>
+          </Modal>
+        )
+      }}
+    </Formik>
+  )
+}
+
+export const DeleteServiceModal = ({ open, setOpen, handleDelete }) => {
+  return (
+    <Modal size="tiny" open={open} onClose={() => setOpen(false)}>
+      <Modal.Header>Delete service</Modal.Header>
+      <Modal.Content>
+        Are you sure you want to delete the service?
+      </Modal.Content>
+      <Modal.Actions>
+        <Button primary negative onClick={handleDelete}>
+          Delete service
+        </Button>
+        <Button onClick={() => setOpen(false)}>Close</Button>
+      </Modal.Actions>
+    </Modal>
   )
 }
 

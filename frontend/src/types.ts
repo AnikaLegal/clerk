@@ -10,11 +10,13 @@ export interface UserPermission {
 }
 
 export interface CaseFormChoices {
-  service: {
-    category: string[][]
-    type_DISCRETE: string[][]
-    type_ONGOING: string[][]
-  }
+  service: CaseFormServiceChoices
+}
+
+export interface CaseFormServiceChoices {
+  category: string[][]
+  type_DISCRETE: string[][]
+  type_ONGOING: string[][]
 }
 
 export interface CaseDetailFormProps {
