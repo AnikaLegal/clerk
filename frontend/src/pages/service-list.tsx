@@ -251,7 +251,6 @@ export const ServiceActionIcons = ({
         issue={issue}
         service={service}
         fields={fields}
-        label={'Update ' + service.category.toLowerCase() + ' service'}
       />
       <DeleteServiceIcon
         link
@@ -322,14 +321,12 @@ export interface EditServiceIconProps {
   issue: Issue
   service: Service
   fields: React.ReactNode
-  label: string
 }
 
 export const EditServiceIcon = ({
   issue,
   service,
   fields,
-  label,
   ...props
 }: EditServiceIconProps & IconProps) => {
   const [open, setOpen] = useState(false)
@@ -371,7 +368,7 @@ export const EditServiceIcon = ({
         fields={fields}
         initialValues={service}
         handleSubmit={handleSubmit}
-        children={label}
+        label={'Update ' + service.category.toLowerCase() + ' service'}
       />
       <Icon {...props} onClick={() => setOpen(true)} />
     </>
@@ -427,7 +424,7 @@ export const AddServiceButton = ({
         fields={fields}
         initialValues={initialValues}
         handleSubmit={handleSubmit}
-        children={children}
+        label={children}
       />
       <Button {...props} onClick={() => setOpen(true)}>
         {children}
@@ -436,14 +433,16 @@ export const AddServiceButton = ({
   )
 }
 
-export interface ServiceModalProps
-  extends Omit<AddServiceButtonProps, 'issue'> {
+export interface ServiceModalProps {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  initialValues: ServiceCreate
+  fields: React.ReactNode
   handleSubmit: (
     values: ServiceCreate,
     helpers: FormikHelpers<ServiceCreate>
   ) => void
+  label: React.ReactText
 }
 
 export const ServiceModal = ({
@@ -452,7 +451,7 @@ export const ServiceModal = ({
   initialValues,
   fields,
   handleSubmit,
-  children,
+  label,
 }: ServiceModalProps) => {
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
@@ -466,7 +465,7 @@ export const ServiceModal = ({
               setOpen(false)
             }}
           >
-            <Modal.Header>{children}</Modal.Header>
+            <Modal.Header>{label}</Modal.Header>
             <Modal.Content>
               <Form
                 onSubmit={handleSubmit}
@@ -478,7 +477,7 @@ export const ServiceModal = ({
             </Modal.Content>
             <Modal.Actions>
               <Button primary type="submit" onClick={() => handleSubmit()}>
-                {children}
+                {label}
               </Button>
               <Button
                 onClick={() => {
