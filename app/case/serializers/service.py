@@ -50,7 +50,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         finished_at = data.get("finished_at")
         if started_at and finished_at and finished_at < started_at:
             raise serializers.ValidationError(
-                {"finished_at": "Date must be after the start date"}
+                {"finished_at": "Finish date must be after the start date"}
             )
 
         return data
