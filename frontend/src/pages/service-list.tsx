@@ -140,7 +140,7 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing>
+            <Table.Cell collapsing textAlign="center">
               <ServiceActionIcons
                 issue={issue}
                 service={service}
@@ -220,7 +220,7 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing>
+            <Table.Cell collapsing textAlign="center">
               <ServiceActionIcons
                 issue={issue}
                 service={service}
@@ -243,35 +243,6 @@ export const ServiceActionIcons = ({
   service: Service
   fields: React.ReactNode
 }) => {
-  return (
-    <>
-      <EditServiceIcon
-        link
-        name="pencil"
-        issue={issue}
-        service={service}
-        fields={fields}
-      />
-      <DeleteServiceIcon
-        link
-        name="trash alternate outline"
-        issue={issue}
-        service={service}
-      />
-    </>
-  )
-}
-
-export interface DeleteServiceIconProps {
-  issue: Issue
-  service: Service
-}
-
-export const DeleteServiceIcon = ({
-  issue,
-  service,
-  ...props
-}: DeleteServiceIconProps & IconProps) => {
   const [open, setOpen] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
@@ -288,32 +259,29 @@ export const DeleteServiceIcon = ({
       })
   }
 
+  if (open) {
+    return (
+      <>
+        <Button negative onClick={handleDelete} size="mini">
+          Confirm delete
+        </Button>
+        <Button size="mini" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+      </>
+    )
+  }
   return (
     <>
-      <DeleteServiceModal
-        open={open}
-        setOpen={setOpen}
-        handleDelete={handleDelete}
+      <EditServiceIcon
+        link
+        name="pencil"
+        issue={issue}
+        service={service}
+        fields={fields}
       />
-      <Icon {...props} onClick={() => setOpen(true)} />
+      <Icon link name="trash alternate outline" onClick={() => setOpen(true)} />
     </>
-  )
-}
-
-export const DeleteServiceModal = ({ open, setOpen, handleDelete }) => {
-  return (
-    <Modal size="tiny" open={open} onClose={() => setOpen(false)}>
-      <Modal.Header>Delete service</Modal.Header>
-      <Modal.Content>
-        Are you sure you want to delete the service?
-      </Modal.Content>
-      <Modal.Actions>
-        <Button primary negative onClick={handleDelete}>
-          Delete service
-        </Button>
-        <Button onClick={() => setOpen(false)}>Close</Button>
-      </Modal.Actions>
-    </Modal>
   )
 }
 
