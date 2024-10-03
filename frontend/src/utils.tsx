@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, RefObject } from 'react'
 import { hydrate, render } from 'react-dom'
 import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
@@ -222,3 +222,25 @@ export const filterObject = <T extends {}, V = Entry<T>>(
   obj: T,
   fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
 ): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
+
+export const useClickOutside = (
+  ref: RefObject<HTMLElement | undefined>,
+  callback: () => void,
+  addEventListener = true
+) => {
+  const handleClick = (event: MouseEvent) => {
+    if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
+      callback()
+    }
+  }
+
+  useEffect(() => {
+    if (addEventListener) {
+      document.addEventListener('click', handleClick)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
+  })
+}

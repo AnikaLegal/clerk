@@ -1,5 +1,5 @@
 import { enqueueSnackbar } from 'notistack'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -31,6 +31,7 @@ import {
   getAPIErrorMessage,
   getAPIFormErrors,
   mount,
+  useClickOutside,
 } from 'utils'
 
 interface DjangoContext {
@@ -246,6 +247,9 @@ export const ServiceActionIcons = ({
   const [open, setOpen] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
+  const ref = useRef<HTMLDivElement>(null)
+  useClickOutside(ref, () => setOpen(false), open)
+
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
       .unwrap()
@@ -261,14 +265,14 @@ export const ServiceActionIcons = ({
 
   if (open) {
     return (
-      <>
+      <div ref={ref}>
         <Button negative onClick={handleDelete} size="mini">
           Confirm delete
         </Button>
         <Button size="mini" onClick={() => setOpen(false)}>
           Cancel
         </Button>
-      </>
+      </div>
     )
   }
   return (
