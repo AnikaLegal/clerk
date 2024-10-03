@@ -362,12 +362,13 @@ export const AddServiceButton = ({
 
   const handleSubmit = (
     values: ServiceCreate,
-    { setSubmitting, setErrors }: FormikHelpers<ServiceCreate>
+    { setSubmitting, setErrors, resetForm }: FormikHelpers<ServiceCreate>
   ) => {
     createService({ id: issue.id, serviceCreate: filterEmpty(values) })
       .unwrap()
       .then(() => {
         enqueueSnackbar('Service created', { variant: 'success' })
+        resetForm()
         setOpen(false)
       })
       .catch((e) => {
