@@ -214,14 +214,14 @@ export const useClickOutside = (
   callback: () => void,
   addEventListener = true
 ) => {
-  const handleClick = (event: MouseEvent) => {
-    const element: HTMLElement = event.target as HTMLElement
-    if (element.isConnected && ref.current && !ref.current.contains(element)) {
-      callback()
-    }
-  }
-
   useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      const element: HTMLElement = event.target as HTMLElement
+      if (ref.current && !ref.current.contains(element)) {
+        callback()
+      }
+    }
+
     if (addEventListener) {
       document.addEventListener('click', handleClick)
     }

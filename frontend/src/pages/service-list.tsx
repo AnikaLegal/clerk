@@ -284,7 +284,14 @@ export const ServiceActionIcons = ({
         service={service}
         fields={fields}
       />
-      <Icon link name="trash alternate outline" onClick={() => setOpen(true)} />
+      <Icon
+        link
+        name="trash alternate outline"
+        onClick={(e: Event) => {
+          setOpen(true)
+          e.stopPropagation()
+        }}
+      />
     </>
   )
 }
