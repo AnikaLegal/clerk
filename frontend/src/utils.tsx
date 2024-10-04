@@ -229,7 +229,8 @@ export const useClickOutside = (
   addEventListener = true
 ) => {
   const handleClick = (event: MouseEvent) => {
-    if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
+    const element: HTMLElement = event.target as HTMLElement
+    if (element.isConnected && ref.current && !ref.current.contains(element)) {
       callback()
     }
   }

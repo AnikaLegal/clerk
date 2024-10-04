@@ -247,7 +247,7 @@ export const ServiceActionIcons = ({
   const [open, setOpen] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef(null)
   useClickOutside(ref, () => setOpen(false), open)
 
   const handleDelete = () => {
