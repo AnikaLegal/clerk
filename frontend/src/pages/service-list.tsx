@@ -269,15 +269,16 @@ export const ServiceActionIcons = ({
   if (open) {
     return (
       <div ref={ref}>
-        <Button negative onClick={handleDelete} size="mini">
+        <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-        <Button size="mini" onClick={() => setOpen(false)}>
+        <Button compact size="mini" onClick={() => setOpen(false)}>
           Cancel
         </Button>
       </div>
     )
   }
+
   return (
     <>
       <EditServiceIcon
