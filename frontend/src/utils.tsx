@@ -105,20 +105,6 @@ export const debouncePromise = (delay) => {
 export const waitSeconds = (delay: number) =>
   new Promise((resolve) => setTimeout(() => resolve(null), delay * 1000))
 
-export const useOutsideClick = (ref, onClickOutside) => {
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        onClickOutside()
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [ref])
-}
-
 export interface ErrorResult {
   data?: ErrorType
   status?: number
