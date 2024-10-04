@@ -14,9 +14,7 @@ import {
 import { ServiceCreate, useCreateCaseServiceMutation } from 'api'
 import DateInput from 'comps/date-input'
 import { TextArea } from 'comps/textarea'
-import {
-  CaseDetailFormProps, CaseFormServiceChoices
-} from 'types'
+import { CaseDetailFormProps, CaseFormServiceChoices } from 'types'
 import {
   choiceToOptions,
   filterEmpty,
@@ -66,7 +64,10 @@ export const ServiceForm = ({
         Record a unit of work to facilitate the collection of consistent and
         comparable data.
       </p>
-      <Formik initialValues={{} as ServiceCreate} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={{ started_at: '', finished_at: '' } as ServiceCreate}
+        onSubmit={handleSubmit}
+      >
         {({ values, handleSubmit, isSubmitting, errors }) => {
           return (
             <Form
@@ -158,8 +159,7 @@ export const FormikDiscreteServiceFields = ({
 
   return (
     <>
-      <Field
-        as={Dropdown}
+      <Dropdown
         fluid
         selection
         name="type"
@@ -169,6 +169,7 @@ export const FormikDiscreteServiceFields = ({
           choices['type_' + values.category.toUpperCase()]
         )}
         onChange={handleChange}
+        value={values.type}
       />
       <DateInput
         name="started_at"
@@ -213,8 +214,7 @@ export const FormikOngoingServiceFields = ({
 
   return (
     <>
-      <Field
-        as={Dropdown}
+      <Dropdown
         fluid
         selection
         name="type"
@@ -224,6 +224,7 @@ export const FormikOngoingServiceFields = ({
           choices['type_' + values.category.toUpperCase()]
         )}
         onChange={handleChange}
+        value={values.type}
       />
       <DateInput
         name="started_at"

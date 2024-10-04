@@ -78,6 +78,7 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Discrete,
     count: 1,
+    started_at: '',
   } as ServiceCreate
   const fields: React.ReactNode = (
     <FormikDiscreteServiceFields choices={choices} />
@@ -158,6 +159,8 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
 export const OngoingServices = ({ issue, choices }: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Ongoing,
+    started_at: '',
+    finished_at: '',
   } as ServiceCreate
   const fields: React.ReactNode = (
     <FormikOngoingServiceFields choices={choices} />
