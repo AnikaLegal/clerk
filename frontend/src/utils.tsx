@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, RefObject } from 'react'
 import { hydrate, render } from 'react-dom'
 import { Converter, setFlavor } from 'showdown'
 import xss from 'xss'
@@ -105,20 +105,6 @@ export const debouncePromise = (delay) => {
 export const waitSeconds = (delay: number) =>
   new Promise((resolve) => setTimeout(() => resolve(null), delay * 1000))
 
-export const useOutsideClick = (ref, onClickOutside) => {
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        onClickOutside()
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [ref])
-}
-
 export interface ErrorResult {
   data?: ErrorType
   status?: number
@@ -181,4 +167,67 @@ const parseError = (error: any) => {
   } else {
     return String(error)
   }
+}
+
+export const choiceToMap = (choices: string[][]): Map<string, string> => {
+  return choices.reduce(function (map, entry) {
+    map.set(entry[0], entry[1])
+    return map
+  }, new Map())
+}
+
+interface OptionItem {
+  key: string
+  text: string
+  value: string
+}
+
+export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
+  choices.map(([value, label]) => ({
+    key: label,
+    text: label,
+    value: value,
+  }))
+
+/* A helper function to remove "empty" attributes from an object preserving type info.
+ */
+type Entry<T> = { [K in keyof T]: [K, T[K]] }[keyof T]
+
+export const filterEmpty = <T extends {}, V = Entry<T>>(obj: T): V =>
+  filterObject(
+    obj,
+    ([, v]) =>
+      !(
+        (typeof v === 'string' && !v.length) ||
+        v === null ||
+        typeof v === 'undefined'
+      )
+  )
+
+export const filterObject = <T extends {}, V = Entry<T>>(
+  obj: T,
+  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
+): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
+
+export const useClickOutside = (
+  ref: RefObject<HTMLElement | undefined>,
+  callback: () => void,
+  addEventListener = true
+) => {
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      const element: HTMLElement = event.target as HTMLElement
+      if (ref.current && !ref.current.contains(element)) {
+        callback()
+      }
+    }
+
+    if (addEventListener) {
+      document.addEventListener('click', handleClick)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
+  })
 }

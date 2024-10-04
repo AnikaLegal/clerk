@@ -42,6 +42,21 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteEmailAttachment: {
       invalidatesTags: [{ type: 'EMAIL' }],
     },
+    getCaseServices: {
+      providesTags: [{ type: 'SERVICE' }],
+    },
+    getCaseService: {
+      providesTags: [{ type: 'SERVICE' }],
+    },
+    createCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    updateCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    deleteCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
   },
 })
 

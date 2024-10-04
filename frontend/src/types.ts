@@ -9,7 +9,19 @@ export interface UserPermission {
   is_paralegal_or_better: boolean
 }
 
+export interface CaseFormChoices {
+  service: CaseFormServiceChoices
+}
+
+export interface CaseFormServiceChoices {
+  category: string[][]
+  type_DISCRETE: string[][]
+  type_ONGOING: string[][]
+}
+
 export interface CaseDetailFormProps {
+  choices: CaseFormChoices
   issue: Issue
   onCancel: () => void
 }
+

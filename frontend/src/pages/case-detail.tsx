@@ -1,59 +1,58 @@
 import React, { useState } from 'react'
 import {
-  Container,
-  Header,
-  Dropdown,
-  Segment,
-  List,
-  Feed,
   Checkbox,
+  Container,
+  Dropdown,
+  Feed,
+  Header,
+  List,
+  Segment,
 } from 'semantic-ui-react'
 
-import { TableForm } from 'comps/table-form'
 import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
+import { TableForm } from 'comps/table-form'
 import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
 import {
-  useGetCaseQuery,
-  useGetPeopleQuery,
-  useUpdateTenancyMutation,
-  useUpdateCaseMutation,
+  Issue,
   IssueUpdate,
   TenancyCreate,
-  Issue,
+  useGetCaseQuery,
+  useGetPeopleQuery,
+  useUpdateCaseMutation,
+  useUpdateTenancyMutation,
 } from 'api'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { TimelineNote } from 'comps/timeline-item'
-import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { mount, getAPIErrorMessage } from 'utils'
 import { URLS } from 'consts'
 import {
-  FilenoteForm,
-  ReviewForm,
-  ReopenForm,
-  PerformanceForm,
-  CloseForm,
-  EligibilityForm,
   AssignForm,
-  OutcomeForm,
-  ProgressForm,
+  CloseForm,
   ConflictForm,
+  EligibilityForm,
+  FilenoteForm,
+  OutcomeForm,
+  PerformanceForm,
+  ProgressForm,
+  ReopenForm,
+  ReviewForm,
+  ServiceForm,
 } from 'forms'
-import { UserPermission, CaseDetailFormProps } from 'types'
+import { CaseDetailFormProps, CaseFormChoices, UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
-  user: UserPermission
   case_pk: string
-  urls: {
-    detail: string
-    email: string
-    docs: string
-  }
+  choices: CaseFormChoices
+  urls: CaseTabUrls
+  user: UserPermission
 }
 
 const {
   case_pk,
+  choices,
   urls,
   user: permissions,
 } = (window as any).REACT_CONTEXT as DjangoContext
@@ -190,7 +189,11 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
+            <ActiveForm
+              choices={choices}
+              issue={issue}
+              onCancel={() => setActiveFormId(null)}
+            />
           )}
           {!activeFormId && (
             <React.Fragment>
@@ -214,7 +217,9 @@ const App = () => {
                   ['Street address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
                   Started: tenancy.started,
-                  ['Client on lease?']: tenancy.is_on_lease ? tenancy.is_on_lease.display : "",
+                  ['Client on lease?']: tenancy.is_on_lease
+                    ? tenancy.is_on_lease.display
+                    : '',
                 }}
               />
               {tenancy.landlord ? (
@@ -366,7 +371,9 @@ const EntityCard: React.FC<EntityCardProps> = ({
         <tbody>
           {Object.entries(tableData).map(([title, text]) => (
             <tr key={title}>
-              <td className="four wide">{title[0].toUpperCase() + title.slice(1).toLowerCase()}</td>
+              <td className="four wide">
+                {title[0].toUpperCase() + title.slice(1).toLowerCase()}
+              </td>
               <td>{text}</td>
             </tr>
           ))}
@@ -376,10 +383,7 @@ const EntityCard: React.FC<EntityCardProps> = ({
   </div>
 )
 
-const CurrentCircumstancesCard = ({
-  initialIssue,
-  updateCase,
-}) => {
+const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Weekly rent',
@@ -411,10 +415,7 @@ const CurrentCircumstancesCard = ({
   )
 }
 
-const OtherInformationCard = ({
-  initialIssue,
-  updateCase,
-}) => {
+const OtherInformationCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Referrer type',
@@ -439,12 +440,7 @@ const OtherInformationCard = ({
   )
 }
 
-const TableFormCard = ({
-  header,
-  fields,
-  initialIssue,
-  updateCase,
-}) => {
+const TableFormCard = ({ header, fields, initialIssue, updateCase }) => {
   const [issue, setIssue] = useState<Issue>(initialIssue)
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateCase({
@@ -471,7 +467,6 @@ const TableFormCard = ({
   )
 }
 
-
 const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   filenote: FilenoteForm,
   review: ReviewForm,
@@ -480,6 +475,7 @@ const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   eligibility: EligibilityForm,
   assign: AssignForm,
   progress: ProgressForm,
+  service: ServiceForm,
   close: CloseForm,
   reopen: ReopenForm,
   outcome: OutcomeForm,
@@ -534,6 +530,12 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     icon: 'chart line',
     text: 'Progress the case status',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
+  },
+  {
+    id: 'service',
+    icon: 'balance scale',
+    text: 'Add a service',
+    when: (perms, issue) => perms.is_paralegal_or_better,
   },
   {
     id: 'close',

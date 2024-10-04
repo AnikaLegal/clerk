@@ -1,17 +1,13 @@
 import React from 'react'
 import { Container, Header, Loader } from 'semantic-ui-react'
 
+import { useGetCaseDocumentsQuery, useGetCaseQuery } from 'api'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { mount } from 'utils'
-import { CaseHeader, CASE_TABS } from 'comps/case-header'
-import { useGetCaseQuery, useGetCaseDocumentsQuery } from 'api'
 
 interface DjangoContext {
   case_pk: string
-  urls: {
-    detail: string
-    email: string
-    docs: string
-  }
+  urls: CaseTabUrls
 }
 
 const { case_pk, urls } = (window as any).REACT_CONTEXT as DjangoContext
