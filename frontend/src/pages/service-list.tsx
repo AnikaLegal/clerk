@@ -247,11 +247,11 @@ export const ServiceActionIcons = ({
   service: Service
   fields: React.ReactNode
 }) => {
-  const [open, setOpen] = useState(false)
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
   const ref = useRef(null)
-  useClickOutside(ref, () => setOpen(false), open)
+  useClickOutside(ref, () => setShowConfirmDelete(false), showConfirmDelete)
 
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
@@ -266,37 +266,31 @@ export const ServiceActionIcons = ({
       })
   }
 
-  if (open) {
-    return (
-      <div ref={ref}>
+  /* We mess around with the display CSS property below to get the click outside
+   * functionality that we want.
+   */
+  return (
+    <div ref={ref}>
+      <div style={{ display: showConfirmDelete ? 'none' : 'inherit' }}>
+        <EditServiceIcon
+          link
+          name="pencil"
+          issue={issue}
+          service={service}
+          fields={fields}
+        />
+        <Icon
+          link
+          name="trash alternate outline"
+          onClick={() => setShowConfirmDelete(true)}
+        />
+      </div>
+      <div style={{ display: showConfirmDelete ? 'inherit' : 'none' }}>
         <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-        <Button compact size="mini" onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
       </div>
-    )
-  }
-
-  return (
-    <>
-      <EditServiceIcon
-        link
-        name="pencil"
-        issue={issue}
-        service={service}
-        fields={fields}
-      />
-      <Icon
-        link
-        name="trash alternate outline"
-        onClick={(e: Event) => {
-          setOpen(true)
-          e.stopPropagation()
-        }}
-      />
-    </>
+    </div>
   )
 }
 
