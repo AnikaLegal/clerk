@@ -23,6 +23,15 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     issue_id = serializers.UUIDField()
 
+    def to_internal_value(self, data):
+        # Convert empty strings to null for date field. This is just a
+        # convenience so we don't have to do it on the frontend.
+        for field in ("finished_at",):
+            if field in data and data[field] == "":
+                data[field] = None
+
+        return super(ServiceSerializer, self).to_internal_value(data)
+
     def validate(self, data):
         # Type must belong to a set of choices depending on the category value.
         category = data.get("category")
