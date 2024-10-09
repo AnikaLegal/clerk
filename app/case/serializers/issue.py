@@ -96,8 +96,8 @@ class IssueSerializer(serializers.ModelSerializer):
         )
         return fields
 
-    def validate_stage(self, stage):
-        if stage == CaseStage.CLOSED and self.instance:
+    def validate(self, data):
+        if data.get("stage") == CaseStage.CLOSED and self.instance:
             query = Q(
                 issue_id=self.instance.id,
                 category=ServiceCategory.ONGOING,
@@ -107,7 +107,8 @@ class IssueSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Cannot close case with unfinished ongoing services"
                 )
-        return stage
+
+        return data
 
     def validate_paralegal_id(self, paralegal: User):
         return paralegal.id if paralegal else None
