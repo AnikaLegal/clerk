@@ -24,6 +24,7 @@ import {
   FormikServiceErrorMessages,
   ServiceCategory,
 } from 'forms/case-service'
+import styled from 'styled-components'
 import { CaseFormServiceChoices } from 'types'
 import {
   choiceToMap,
@@ -271,7 +272,7 @@ export const ServiceActionIcons = ({
    */
   return (
     <div ref={ref}>
-      <div style={{ display: showConfirmDelete ? 'none' : 'inherit' }}>
+      <DisplayDiv $show={!showConfirmDelete}>
         <EditServiceIcon
           link
           name="pencil"
@@ -284,12 +285,12 @@ export const ServiceActionIcons = ({
           name="trash alternate outline"
           onClick={() => setShowConfirmDelete(true)}
         />
-      </div>
-      <div style={{ display: showConfirmDelete ? 'inherit' : 'none' }}>
+      </DisplayDiv>
+      <DisplayDiv $show={showConfirmDelete}>
         <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-      </div>
+      </DisplayDiv>
     </div>
   )
 }
@@ -472,5 +473,9 @@ export const ServiceModal = ({
     </Formik>
   )
 }
+
+const DisplayDiv = styled.div`
+  display: ${(props: { $show: boolean }) => (props.$show ? 'inherit' : 'none')};
+`
 
 mount(App)
