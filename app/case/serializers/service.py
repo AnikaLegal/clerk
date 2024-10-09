@@ -4,6 +4,7 @@ from core.models.service import (
     Service,
     ServiceCategory,
 )
+from core.models import Issue
 from rest_framework import serializers
 
 
@@ -60,6 +61,12 @@ class ServiceSerializer(serializers.ModelSerializer):
         if started_at and finished_at and finished_at < started_at:
             raise serializers.ValidationError(
                 {"finished_at": "Finish date must be after the start date"}
+            )
+
+        issue_id = data.get("issue_id")
+        if issue_id and Issue.objects.filter(id=issue_id, is_open=False).exists():
+            raise serializers.ValidationError(
+                "Cannot add a service to a case that is closed"
             )
 
         return data

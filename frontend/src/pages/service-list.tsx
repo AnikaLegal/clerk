@@ -92,17 +92,19 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Discrete services</Header>
           </Grid.Column>
-          <Grid.Column style={{ width: 'auto' }}>
-            <AddServiceButton
-              floated="right"
-              size="tiny"
-              issue={issue}
-              initialValues={initialValues}
-              fields={fields}
-            >
-              Add discrete service
-            </AddServiceButton>
-          </Grid.Column>
+          {issue.is_open && (
+            <Grid.Column style={{ width: 'auto' }}>
+              <AddServiceButton
+                floated="right"
+                size="tiny"
+                issue={issue}
+                initialValues={initialValues}
+                fields={fields}
+              >
+                Add discrete service
+              </AddServiceButton>
+            </Grid.Column>
+          )}
         </Grid.Row>
       </Grid>
       <DiscreteServicesTable issue={issue} fields={fields} />
@@ -133,7 +135,7 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>Count</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          <Table.HeaderCell></Table.HeaderCell>
+          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -143,13 +145,15 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing textAlign="center">
-              <ServiceActionIcons
-                issue={issue}
-                service={service}
-                fields={fields}
-              />
-            </Table.Cell>
+            {issue.is_open && (
+              <Table.Cell collapsing textAlign="center">
+                <ServiceActionIcons
+                  issue={issue}
+                  service={service}
+                  fields={fields}
+                />
+              </Table.Cell>
+            )}
           </Table.Row>
         ))}
       </Table.Body>
@@ -174,17 +178,19 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Ongoing services</Header>
           </Grid.Column>
-          <Grid.Column style={{ width: 'auto' }}>
-            <AddServiceButton
-              floated="right"
-              size="tiny"
-              issue={issue}
-              initialValues={initialValues}
-              fields={fields}
-            >
-              Add ongoing service
-            </AddServiceButton>
-          </Grid.Column>
+          {issue.is_open && (
+            <Grid.Column style={{ width: 'auto' }}>
+              <AddServiceButton
+                floated="right"
+                size="tiny"
+                issue={issue}
+                initialValues={initialValues}
+                fields={fields}
+              >
+                Add ongoing service
+              </AddServiceButton>
+            </Grid.Column>
+          )}
         </Grid.Row>
       </Grid>
       <OngoingServicesTable issue={issue} fields={fields} />
@@ -215,7 +221,7 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Start date</Table.HeaderCell>
           <Table.HeaderCell>Finish date</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          <Table.HeaderCell></Table.HeaderCell>
+          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -225,13 +231,15 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing textAlign="center">
-              <ServiceActionIcons
-                issue={issue}
-                service={service}
-                fields={fields}
-              />
-            </Table.Cell>
+            {issue.is_open && (
+              <Table.Cell collapsing textAlign="center">
+                <ServiceActionIcons
+                  issue={issue}
+                  service={service}
+                  fields={fields}
+                />
+              </Table.Cell>
+            )}
           </Table.Row>
         ))}
       </Table.Body>
