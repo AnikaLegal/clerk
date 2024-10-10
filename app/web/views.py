@@ -203,37 +203,17 @@ BOARD = [
 
 ADVISORS = [
     {
-        "image": "web/img/photos/advisors/brendan-lacota.png",
-        "name": "Brendan Lacota",
-        "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
+        "image": "web/img/photos/advisors/madeleine-dupuche.png",
+        "name": "Madeleine Dupuche",
+        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
         "brags": [
-            """Brendan is a leader in designing innovative ways to provide
-            community services. With over a decade's experience in both the
-            community and private sectors, Brendan advises on the intersection
-            of service design, evaluation, project governance, stakeholder
-            engagement, and technology.""",
-            """Brendan currently leads ANZ's flagship social impact programs
-            throughout Australia, Pacific, and New Zealand as well as providing
-            independent consulting services for not-for-profit and for-purpose
-            entities.""",
-        ],
-    },
-    {
-        "image": "web/img/photos/advisors/alan-peckham.png",
-        "name": "Alan Peckham",
-        "title": """Consultant, Former Chief Administrative Officer at Herbert
-        Smith Freehills""",
-        "brags": [
-            """Alan has spent over 25 years working in the legal sector as a
-            practitioner and in a range of executive roles, most recently as
-            Chief Administrative Officer at Herbert Smith Freehills. Alan has
-            been sharing his operations experience and expertise with our
-            team.""",
-            """Alan is also a senior advisor to TILT Legal, a legal tech
-            consultancy that helps legal teams reinvent themselves by using
-            cutting edge technology / AI, and sits on the Advisory Board of
-            Pickering Pearce, a strategy consulting firm that provides
-            innovative and independent advice to law firms around the world.""",
+            """Madeleine is an experienced strategy and education leader whose
+            purpose and career have centred on supporting the creation of a
+            legal profession that accurately reflects the community it serves.""",
+            """Madeleine practised as a solicitor in Melbourne and London before
+            teaching across the continuum of legal education for over 20 years,
+            including at law school, in practical legal training and in
+            continuing professional development.""",
         ],
     },
     {
@@ -254,23 +234,10 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/madeleine-dupuche.png",
-        "name": "Madeleine Dupuche",
-        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
-        "brags": [
-            """Madeleine is an experienced strategy and education leader whose
-            purpose and career have centred on supporting the creation of a
-            legal profession that accurately reflects the community it serves.""",
-            """Madeleine practised as a solicitor in Melbourne and London before
-            teaching across the continuum of legal education for over 20 years,
-            including at law school, in practical legal training and in
-            continuing professional development.""",
-        ],
-    },
-    {
         "image": "web/img/photos/advisors/helga-svendsen.png",
         "name": "Helga Svendsen FAICD",
-        "title": "Host of Take on Board podcast, Leadership & Executive Coach & Non Executive Director",
+        "title": """Host of Take on Board podcast, Leadership & Executive Coach &
+        Non Executive Director""",
         "brags": [
             """Helga specialises in strategy and planning, governance and
             stakeholder engagement. Building on her extensive leadership roles
@@ -283,7 +250,41 @@ ADVISORS = [
             Secretary of the Australian Services Union and Facilitator at
             Sustainability Victoria. She has also founded two group coaching
             programs for women - Board KickStarter and Board Accelerator to
-            encourage women into, and on, Boards."""
+            encourage women into, and on, Boards.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/brendan-lacota.png",
+        "name": "Brendan Lacota",
+        "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
+        "brags": [
+            """Brendan is a leader in designing innovative ways to provide
+            community services. With over a decade's experience in both the
+            community and private sectors, Brendan advises on the intersection
+            of service design, evaluation, project governance, stakeholder
+            engagement, and technology.""",
+            """Brendan currently leads ANZ's flagship social impact programs
+            throughout Australia, Pacific, and New Zealand as well as providing
+            independent consulting services for not-for-profit and for-purpose
+            entities.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/alan-peckham.png",
+        "name": "Alan Peckham",
+        "title": """Head of Legal at Australian Institute of Company Directors
+        and former Chief Administrative Officer at Herbert Smith Freehills""",
+        "brags": [
+            """Alan has spent over 25 years working in the legal sector as a
+            practitioner and in a range of executive roles, most recently as
+            Chief Administrative Officer at Herbert Smith Freehills. Alan has
+            been sharing his operations experience and expertise with our
+            team.""",
+            """Alan is also a senior advisor to TILT Legal, a legal tech
+            consultancy that helps legal teams reinvent themselves by using
+            cutting edge technology / AI, and sits on the Advisory Board of
+            Pickering Pearce, a strategy consulting firm that provides
+            innovative and independent advice to law firms around the world.""",
         ],
     },
 ]
