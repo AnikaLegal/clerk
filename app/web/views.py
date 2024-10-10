@@ -254,15 +254,36 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/matt.png",
-        "name": "Matthew Segal",
-        "title": "Technical Advisor and full-stack software developer",
+        "image": "web/img/photos/advisors/madeleine-dupuche.png",
+        "name": "Madeleine Dupuche",
+        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
         "brags": [
-            """Matt previously led our Technology portfolio, which improved our
-            technical infrastructure. He now provides strategic advice and
-            shares his extensive expertise with our team.""",
-            """Matt is a full-stack software developer with experience in
-            eCommerce, disease modelling, fintech and online media.""",
+            """Madeleine is an experienced strategy and education leader whose
+            purpose and career have centred on supporting the creation of a
+            legal profession that accurately reflects the community it serves.""",
+            """Madeleine practised as a solicitor in Melbourne and London before
+            teaching across the continuum of legal education for over 20 years,
+            including at law school, in practical legal training and in
+            continuing professional development.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/helga-svendsen.png",
+        "name": "Helga Svendsen FAICD",
+        "title": "Host of Take on Board podcast, Leadership & Executive Coach & Non Executive Director",
+        "brags": [
+            """Helga specialises in strategy and planning, governance and
+            stakeholder engagement. Building on her extensive leadership roles
+            in government, not-for-profit and membership organisations, Helga is
+            a dynamic facilitator, coach, trainer and speaker.""",
+            """Helga has held a number of chair and board roles, including the
+            Royal Women's Hospital and Social Housing Australia. Initially
+            trained and practising as a lawyer, her previous roles include Chief
+            Executive Officer of Hotham Mission Asylum Seeker Project, Assistant
+            Secretary of the Australian Services Union and Facilitator at
+            Sustainability Victoria. She has also founded two group coaching
+            programs for women - Board KickStarter and Board Accelerator to
+            encourage women into, and on, Boards."""
         ],
     },
 ]
@@ -344,17 +365,6 @@ TEAM_MEMBERS = [
             """Luca is a software developer with extensive experience working
             with large national institutions in the cultural and heritage
             sector.""",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/lucy.png",
-        "name": "Lucy Majstorovic",
-        "title": "Partnerships & Fundraising Lead",
-        "brags": [
-            """Lucy supports our Partnership and Fundraising team, working with
-            our trusted partners to maximise Anika’s impact.""",
-            """Lucy previously worked in consumer goods, where she gained
-            experience in relationship management, marketing and analytics""",
         ],
     },
 ]
