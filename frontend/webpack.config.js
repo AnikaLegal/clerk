@@ -18,7 +18,10 @@ const config = {
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin(),
-    new BundleTracker({ filename: '/build/webpack-stats.json' }),
+    new BundleTracker({
+      path: '/build',
+      filename: 'webpack-stats.json',
+    }),
   ],
   resolve: {
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],

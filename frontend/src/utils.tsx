@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, RefObject } from 'react'
-import { hydrate, render } from 'react-dom'
-import { Converter, setFlavor } from 'showdown'
-import xss from 'xss'
-import styled from 'styled-components'
-import slackifyMarkdown from 'slackify-markdown'
-import { Provider } from 'react-redux'
-import { SnackbarProvider } from 'notistack'
-
-import { ErrorBoundary } from 'comps/error-boundary'
-import { store } from 'api/store'
 import { Error as ErrorType } from 'api'
+import { store } from 'api/store'
+import { ErrorBoundary } from 'comps/error-boundary'
+import { SnackbarProvider } from 'notistack'
+import React, { RefObject, useEffect, useRef } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { Converter, setFlavor } from 'showdown'
+import slackifyMarkdown from 'slackify-markdown'
+import styled from 'styled-components'
+import xss from 'xss'
 
 const converter = new Converter()
 setFlavor('github')
@@ -47,8 +46,8 @@ export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
 }
 
 export const mount = (App: React.ComponentType) => {
-  const root = document.getElementById('app')
-  const rootComponent = (
+  const domNode = document.getElementById('app')
+  const reactNode = (
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
         <ErrorBoundary>
@@ -60,10 +59,9 @@ export const mount = (App: React.ComponentType) => {
     </Provider>
   )
 
-  if (root.hasChildNodes()) {
-    hydrate(rootComponent, root)
-  } else {
-    render(rootComponent, root)
+  if (!domNode.hasChildNodes()) {
+    const root = createRoot(domNode)
+    root.render(reactNode)
   }
 }
 
