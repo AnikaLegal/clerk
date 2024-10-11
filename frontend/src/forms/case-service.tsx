@@ -101,7 +101,7 @@ export const FormikServiceErrorMessages = () => {
     <>
       {Object.entries(errors).map(([k, v]) => (
         <Message error key={k}>
-          <div className="header">{k}</div>
+          {k != 'non_field_errors' && <div className="header">{k}</div>}
           <p>{v}</p>
         </Message>
       ))}

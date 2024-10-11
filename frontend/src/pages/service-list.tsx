@@ -24,6 +24,7 @@ import {
   FormikServiceErrorMessages,
   ServiceCategory,
 } from 'forms/case-service'
+import styled from 'styled-components'
 import { CaseFormServiceChoices } from 'types'
 import {
   choiceToMap,
@@ -91,17 +92,19 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Discrete services</Header>
           </Grid.Column>
-          <Grid.Column style={{ width: 'auto' }}>
-            <AddServiceButton
-              floated="right"
-              size="tiny"
-              issue={issue}
-              initialValues={initialValues}
-              fields={fields}
-            >
-              Add discrete service
-            </AddServiceButton>
-          </Grid.Column>
+          {issue.is_open && (
+            <Grid.Column style={{ width: 'auto' }}>
+              <AddServiceButton
+                floated="right"
+                size="tiny"
+                issue={issue}
+                initialValues={initialValues}
+                fields={fields}
+              >
+                Add discrete service
+              </AddServiceButton>
+            </Grid.Column>
+          )}
         </Grid.Row>
       </Grid>
       <DiscreteServicesTable issue={issue} fields={fields} />
@@ -132,7 +135,7 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>Count</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          <Table.HeaderCell></Table.HeaderCell>
+          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -142,13 +145,15 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing textAlign="center">
-              <ServiceActionIcons
-                issue={issue}
-                service={service}
-                fields={fields}
-              />
-            </Table.Cell>
+            {issue.is_open && (
+              <Table.Cell collapsing textAlign="center">
+                <ServiceActionIcons
+                  issue={issue}
+                  service={service}
+                  fields={fields}
+                />
+              </Table.Cell>
+            )}
           </Table.Row>
         ))}
       </Table.Body>
@@ -173,17 +178,19 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Ongoing services</Header>
           </Grid.Column>
-          <Grid.Column style={{ width: 'auto' }}>
-            <AddServiceButton
-              floated="right"
-              size="tiny"
-              issue={issue}
-              initialValues={initialValues}
-              fields={fields}
-            >
-              Add ongoing service
-            </AddServiceButton>
-          </Grid.Column>
+          {issue.is_open && (
+            <Grid.Column style={{ width: 'auto' }}>
+              <AddServiceButton
+                floated="right"
+                size="tiny"
+                issue={issue}
+                initialValues={initialValues}
+                fields={fields}
+              >
+                Add ongoing service
+              </AddServiceButton>
+            </Grid.Column>
+          )}
         </Grid.Row>
       </Grid>
       <OngoingServicesTable issue={issue} fields={fields} />
@@ -214,7 +221,7 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Start date</Table.HeaderCell>
           <Table.HeaderCell>Finish date</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          <Table.HeaderCell></Table.HeaderCell>
+          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -224,13 +231,15 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>{service.notes}</Table.Cell>
-            <Table.Cell collapsing textAlign="center">
-              <ServiceActionIcons
-                issue={issue}
-                service={service}
-                fields={fields}
-              />
-            </Table.Cell>
+            {issue.is_open && (
+              <Table.Cell collapsing textAlign="center">
+                <ServiceActionIcons
+                  issue={issue}
+                  service={service}
+                  fields={fields}
+                />
+              </Table.Cell>
+            )}
           </Table.Row>
         ))}
       </Table.Body>
@@ -247,11 +256,11 @@ export const ServiceActionIcons = ({
   service: Service
   fields: React.ReactNode
 }) => {
-  const [open, setOpen] = useState(false)
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
   const ref = useRef(null)
-  useClickOutside(ref, () => setOpen(false), open)
+  useClickOutside(ref, () => setShowConfirmDelete(false), showConfirmDelete)
 
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
@@ -266,37 +275,31 @@ export const ServiceActionIcons = ({
       })
   }
 
-  if (open) {
-    return (
-      <div ref={ref}>
+  /* We mess around with the display CSS property below to get the click outside
+   * functionality that we want.
+   */
+  return (
+    <div ref={ref}>
+      <DisplayDiv $show={!showConfirmDelete}>
+        <EditServiceIcon
+          link
+          name="pencil"
+          issue={issue}
+          service={service}
+          fields={fields}
+        />
+        <Icon
+          link
+          name="trash alternate outline"
+          onClick={() => setShowConfirmDelete(true)}
+        />
+      </DisplayDiv>
+      <DisplayDiv $show={showConfirmDelete}>
         <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-        <Button compact size="mini" onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
-      </div>
-    )
-  }
-
-  return (
-    <>
-      <EditServiceIcon
-        link
-        name="pencil"
-        issue={issue}
-        service={service}
-        fields={fields}
-      />
-      <Icon
-        link
-        name="trash alternate outline"
-        onClick={(e: Event) => {
-          setOpen(true)
-          e.stopPropagation()
-        }}
-      />
-    </>
+      </DisplayDiv>
+    </div>
   )
 }
 
@@ -478,5 +481,9 @@ export const ServiceModal = ({
     </Formik>
   )
 }
+
+const DisplayDiv = styled.div`
+  display: ${(props: { $show: boolean }) => (props.$show ? 'inherit' : 'none')};
+`
 
 mount(App)

@@ -4,6 +4,7 @@ from core.models.service import (
     Service,
     ServiceCategory,
 )
+from core.models import Issue
 from rest_framework import serializers
 
 
@@ -22,6 +23,15 @@ class ServiceSerializer(serializers.ModelSerializer):
         )
 
     issue_id = serializers.UUIDField()
+
+    def to_internal_value(self, data):
+        # Convert empty strings to null for date field. This is just a
+        # convenience so we don't have to do it on the frontend.
+        for field in ("finished_at",):
+            if field in data and data[field] == "":
+                data[field] = None
+
+        return super(ServiceSerializer, self).to_internal_value(data)
 
     def validate(self, data):
         # Type must belong to a set of choices depending on the category value.
@@ -51,6 +61,12 @@ class ServiceSerializer(serializers.ModelSerializer):
         if started_at and finished_at and finished_at < started_at:
             raise serializers.ValidationError(
                 {"finished_at": "Finish date must be after the start date"}
+            )
+
+        issue_id = data.get("issue_id")
+        if issue_id and Issue.objects.filter(id=issue_id, is_open=False).exists():
+            raise serializers.ValidationError(
+                "Cannot add a service to a case that is closed"
             )
 
         return data
