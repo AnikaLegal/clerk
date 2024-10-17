@@ -305,7 +305,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
     )
     def service_list(self, request, pk):
         """
-        List & create case services.
+        List or create case services.
         """
         issue = self.get_object()
 
@@ -340,7 +340,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
     )
     def service_detail(self, request, pk, service_pk):
         """
-        Get & update a particular case service.
+        Get, update or delete a particular case service.
         """
         issue = self.get_object()
         service = get_object_or_404(issue.service_set, pk=service_pk)
