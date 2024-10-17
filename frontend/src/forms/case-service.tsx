@@ -1,3 +1,6 @@
+import { ServiceCreate, useCreateCaseServiceMutation } from 'api'
+import DateInput from 'comps/date-input'
+import { RichTextArea } from 'comps/rich-text'
 import { Field, Formik, FormikHelpers, useFormikContext } from 'formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -10,17 +13,8 @@ import {
   Message,
   Segment,
 } from 'semantic-ui-react'
-
-import { ServiceCreate, useCreateCaseServiceMutation } from 'api'
-import DateInput from 'comps/date-input'
-import { TextArea } from 'comps/textarea'
 import { CaseDetailFormProps, CaseFormServiceChoices } from 'types'
-import {
-  choiceToOptions,
-  filterEmpty,
-  getAPIErrorMessage,
-  getAPIFormErrors,
-} from 'utils'
+import { choiceToOptions, filterEmpty, getAPIFormErrors } from 'utils'
 
 export enum ServiceCategory {
   Discrete = 'DISCRETE',
@@ -44,9 +38,7 @@ export const ServiceForm = ({
         enqueueSnackbar('Service created', { variant: 'success' })
       })
       .catch((e) => {
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create service'), {
-          variant: 'error',
-        })
+        enqueueSnackbar('Failed to create service', { variant: 'error' })
         const requestErrors = getAPIFormErrors(e)
         if (requestErrors) {
           setErrors(requestErrors)
@@ -75,18 +67,20 @@ export const ServiceForm = ({
               error={Object.keys(errors).length > 0}
             >
               <FormikServiceFields choices={choices.service} />
-              <FormikServiceErrorMessages />
-              <Button
-                loading={isSubmitting}
-                disabled={isSubmitting || !values.category}
-                positive
-                type="submit"
-              >
-                Create service
-              </Button>
-              <Button disabled={isSubmitting} onClick={onCancel}>
-                Close
-              </Button>
+              <div style={{ marginTop: '1rem' }}>
+                <FormikServiceErrorMessages />
+                <Button
+                  loading={isSubmitting}
+                  disabled={isSubmitting || !values.category}
+                  positive
+                  type="submit"
+                >
+                  Create service
+                </Button>
+                <Button disabled={isSubmitting} onClick={onCancel}>
+                  Close
+                </Button>
+              </div>
             </Form>
           )
         }}
@@ -190,13 +184,13 @@ export const FormikDiscreteServiceFields = ({
         value={values.count}
         style={{ marginBottom: '1rem' }}
       />
-      <TextArea
+      <RichTextArea
         disabled={isSubmitting}
-        rows={2}
         placeholder="Notes"
-        onChange={(e) => setFieldValue('notes', e.target.value)}
-        value={values.notes}
-        style={{ marginBottom: '1rem' }}
+        onUpdate={({ editor }) =>
+          setFieldValue('notes', editor.isEmpty ? '' : editor.getHTML())
+        }
+        initialContent={values.notes}
       />
     </>
   )
@@ -209,7 +203,6 @@ export const FormikOngoingServiceFields = ({
 }) => {
   const { setFieldValue, isSubmitting, values } =
     useFormikContext<ServiceCreate>()
-
   const handleChange = (e, { name, value }) => setFieldValue(name, value, false)
 
   return (
@@ -243,13 +236,13 @@ export const FormikOngoingServiceFields = ({
         onChange={handleChange}
         value={values.finished_at}
       />
-      <TextArea
+      <RichTextArea
         disabled={isSubmitting}
-        rows={2}
         placeholder="Notes"
-        onChange={(e) => setFieldValue('notes', e.target.value)}
-        value={values.notes}
-        style={{ marginBottom: '1rem' }}
+        onUpdate={({ editor }) =>
+          setFieldValue('notes', editor.isEmpty ? '' : editor.getHTML())
+        }
+        initialContent={values.notes}
       />
     </>
   )

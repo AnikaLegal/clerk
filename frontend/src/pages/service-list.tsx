@@ -34,6 +34,7 @@ import {
   mount,
   useClickOutside,
 } from 'utils'
+import { RichTextDisplay } from 'comps/rich-text/rich-text-display'
 
 interface DjangoContext {
   case_pk: string
@@ -144,7 +145,9 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{DISCRETE_TYPE_LABELS.get(service.type)}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
-            <Table.Cell>{service.notes}</Table.Cell>
+            <Table.Cell>
+              <RichTextDisplay content={service.notes} />
+            </Table.Cell>
             {issue.is_open && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
@@ -230,7 +233,9 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{ONGOING_TYPE_LABELS.get(service.type)}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
-            <Table.Cell>{service.notes}</Table.Cell>
+            <Table.Cell>
+              <RichTextDisplay content={service.notes} />
+            </Table.Cell>
             {issue.is_open && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
@@ -365,7 +370,7 @@ export interface AddServiceButtonProps {
   issue: Issue
   initialValues: ServiceCreate
   fields: React.ReactNode
-  children: React.ReactText
+  children: string | number
 }
 
 export const AddServiceButton = ({
@@ -429,7 +434,7 @@ export interface ServiceModalProps {
     values: ServiceCreate,
     helpers: FormikHelpers<ServiceCreate>
   ) => void
-  label: React.ReactText
+  label: string | number
 }
 
 export const ServiceModal = ({
@@ -441,7 +446,11 @@ export const ServiceModal = ({
   label,
 }: ServiceModalProps) => {
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      enableReinitialize
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+    >
       {({ handleSubmit, errors, resetForm }) => {
         return (
           <Modal
@@ -482,8 +491,8 @@ export const ServiceModal = ({
   )
 }
 
-const DisplayDiv = styled.div`
-  display: ${(props: { $show: boolean }) => (props.$show ? 'inherit' : 'none')};
+const DisplayDiv = styled.div<{ $show: boolean }>`
+  display: ${(props) => (props.$show ? 'inherit' : 'none')};
 `
 
 mount(App)
