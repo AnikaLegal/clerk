@@ -49,7 +49,7 @@ def case_list_page_view(request):
             ],
         },
     }
-    return render_react_page(request, f"Cases", "case-list", context)
+    return render_react_page(request, "Cases", "case-list", context)
 
 
 @api_view(["GET"])
