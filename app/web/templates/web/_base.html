@@ -166,9 +166,8 @@
                 </p>
             </div>
         </div>
-        {% get_cookie "dismiss_footer_banner_bonds_report" as dismiss_footer_banner %}
-        {% slugurl 'broken-bonds' as report_url %}
-        {% if false and request.path != report_url and not dismiss_footer_banner %}
+        {% get_cookie "dismiss_footer_banner_giving_day" as dismiss_footer_banner %}
+        {% if not dismiss_footer_banner %}
         <div id="footer-banner">
             <div class="footer-banner-contents">
                 <div class="footer-banner-image">
@@ -176,17 +175,15 @@
                 </div>
                 <div class="footer-banner-text">
                     <div class="footer-banner-header">
-                        Report: Broken Bonds - Renters tied up by unfair bond
-                        claims
+                        Stand up for housing justice.
+                        Donate to Anika Legal's Giving Day. 
                     </div>
                     <div class="footer-banner-subheading">
-                        We've delved deep into the data surrounding rental bond
-                        disputes, and their impact on Victorian renters. Read
-                        the full report today.
+                        All donations will be matched by our sponsors.
                     </div>
                 </div>
                 <div class="footer-banner-action">
-                    <a href="{{ report_url }}"><button>Read the report here</button></a>
+                    <a href="https://anikagivingday2024.raiselysite.com/"><button>Donate</button></a>
                 </div>
             </div>
             <div class="footer-banner-close">
@@ -206,7 +203,7 @@
     </script>
     <script>
         function dismissFooterBanner() {
-            document.cookie = "dismiss_footer_banner_bonds_report=true; max-age=604800; Path=/";
+            document.cookie = "dismiss_footer_banner_giving_day=true; max-age=604800; Path=/";
             document.getElementById("footer-banner").style.display = "none";
         }
     </script>
