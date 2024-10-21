@@ -976,6 +976,7 @@ before the final footer.
 
 #footer-banner {
   width: 100%;
+  max-width: 100%;
   position: fixed;
   bottom: 0;
   background-color: var(--blue-dark);
@@ -987,38 +988,37 @@ before the final footer.
   flex-flow: row nowrap;
   align-items: center;
   min-height: 100%;
+  flex: 1
 }
 .footer-banner-image {
-  flex: 1 1 35%;
-  align-self: stretch;
-  clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
+  flex: 1 1 30%;
 }
 .footer-banner-image img {
   max-width: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
+  max-height: 100%;
+  clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
 }
 .footer-banner-text {
-  flex: 1 0 45%;
+  flex: 1 1 55%;
   color: white;
   padding: 1rem;
   padding-left: 2rem;
   line-height: 1;
 }
 .footer-banner-action {
-  flex: 1 0 20%;
+  flex: 1 0 15%;
   color: white;
   text-align: center;
   margin: auto;
   width: 50%;
 }
 .footer-banner-header {
-  font-size: xx-large;
+  font-size: xxx-large;
 }
 .footer-banner-subheading {
   padding-top: 1rem;
   line-height: 1;
+  font-size: x-large;
 }
 .footer-banner-action > a > button {
   display: revert;
@@ -1026,7 +1026,8 @@ before the final footer.
   box-shadow: none;
   background-color: beige;
   color: var(--dark-0);
-  font-size: medium;
+  font-size: larger;
+  min-width: 60%;
 }
 .footer-banner-close {
   padding: 0.5rem;
