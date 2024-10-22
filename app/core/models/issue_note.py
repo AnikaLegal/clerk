@@ -47,16 +47,9 @@ class IssueNote(TimestampedModel):
         NoteType.ELIGIBILITY_CHECK_SUCCESS,
         NoteType.ELIGIBILITY_CHECK_FAILURE,
     ]
-    COORDINATOR_NOTE_TYPES = [
-        NoteType.PARALEGAL,
+    COORDINATOR_NOTE_TYPES = PARALEGAL_NOTE_TYPES + [
         NoteType.REVIEW,
         NoteType.PERFORMANCE,
-        NoteType.EVENT,
-        NoteType.EMAIL,
-        NoteType.CONFLICT_CHECK_SUCCESS,
-        NoteType.CONFLICT_CHECK_FAILURE,
-        NoteType.ELIGIBILITY_CHECK_SUCCESS,
-        NoteType.ELIGIBILITY_CHECK_FAILURE,
     ]
 
     # The case that this note is for
