@@ -44,7 +44,7 @@ def test_case_service_create_api(superuser_client: APIClient, superuser: User):
     assert response.status_code == 201, response.json()
     response_data = ServiceSerializer(response.json()).data
 
-    # Compare the response and request date with each other.
+    # Compare response and request data.
     assert response_data["id"] is not None
     for field_name in filter(lambda f: f != "id", ServiceSerializer.Meta.fields):
         assert request_data[field_name] == response_data[field_name]
