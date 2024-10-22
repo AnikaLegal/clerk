@@ -46,7 +46,12 @@ def _get_text(type: ServiceChangeType, service: ServiceDict, user: User):
         case ServiceChangeType.DELETE:
             verb = "deleted"
     category = service["category"].lower()
-    text = f"{name} {verb} a {category} service:\n" + _get_service_text(service)
+    indefinite_article = "an" if category[0] in ("a", "e", "i", "o", "u") else "a"
+
+    text = (
+        f"{name} {verb} {indefinite_article} {category} service:\n"
+        + _get_service_text(service)
+    )
     return text
 
 
