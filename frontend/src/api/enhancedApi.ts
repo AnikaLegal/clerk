@@ -49,7 +49,7 @@ const enhancedApi = generatedApi.enhanceEndpoints({
       providesTags: [{ type: 'SERVICE' }],
     },
     createCaseService: {
-      invalidatesTags: [{ type: 'SERVICE' }],
+      invalidatesTags: [{ type: 'SERVICE' }, { type: 'CASE' }],
     },
     updateCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],

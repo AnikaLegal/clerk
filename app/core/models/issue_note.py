@@ -87,7 +87,7 @@ class IssueNote(TimestampedModel):
     content_object = GenericForeignKey()
 
     def get_text(self):
-        if self.note_type == NoteType.EVENT:
+        if self.note_type == NoteType.EVENT and self.content_object:
             return self.content_object.get_text()
         else:
             return self.text
