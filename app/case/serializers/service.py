@@ -33,10 +33,10 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         return super(ServiceSerializer, self).to_internal_value(data)
 
-    def validate(self, data):
+    def validate(self, attrs):
         # Type must belong to a set of choices depending on the category value.
-        category = data.get("category")
-        type = data.get("type")
+        category = attrs.get("category")
+        type = attrs.get("type")
         if category and type:
             error_message = f"When category is {category}, type must be one of: "
             if category == ServiceCategory.ONGOING and type not in OngoingServiceType:
@@ -49,27 +49,27 @@ class ServiceSerializer(serializers.ModelSerializer):
                 )
 
         # Count is required for discrete services.
-        count = data.get("count")
+        count = attrs.get("count")
         if category == ServiceCategory.DISCRETE and not count:
             raise serializers.ValidationError(
                 {"count": self.fields["count"].error_messages["required"]}
             )
 
         # Finish must be after start date.
-        started_at = data.get("started_at")
-        finished_at = data.get("finished_at")
+        started_at = attrs.get("started_at")
+        finished_at = attrs.get("finished_at")
         if started_at and finished_at and finished_at < started_at:
             raise serializers.ValidationError(
                 {"finished_at": "Finish date must be after the start date"}
             )
 
-        issue_id = data.get("issue_id")
+        issue_id = attrs.get("issue_id")
         if issue_id and Issue.objects.filter(id=issue_id, is_open=False).exists():
             raise serializers.ValidationError(
                 "Cannot add a service to a case that is closed"
             )
 
-        return data
+        return attrs
 
 
 class ServiceSearchSerializer(serializers.ModelSerializer):
