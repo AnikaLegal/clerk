@@ -25,15 +25,16 @@ class ServiceChangeType(Enum):
 logger = logging.getLogger(__file__)
 
 
-def update_timeline(type: ServiceChangeType, service: ServiceDict, user: User):
-    try:
-        IssueNote.objects.create(
-            issue_id=service["issue_id"],
-            note_type=NoteType.EVENT,
-            text=_get_text(type, service, user),
-        )
-    except Exception as e:
-        logger.exception(e)
+def update_timeline(
+    type: ServiceChangeType, service: ServiceDict, user_id: int
+) -> bool:
+    user = User.objects.get(id=user_id)
+    IssueNote.objects.create(
+        issue_id=service["issue_id"],
+        note_type=NoteType.EVENT,
+        text=_get_text(type, service, user),
+    )
+    return True
 
 
 def _get_text(type: ServiceChangeType, service: ServiceDict, user: User):
