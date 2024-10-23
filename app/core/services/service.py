@@ -26,13 +26,14 @@ logger = logging.getLogger(__file__)
 
 
 def update_timeline(
-    type: ServiceChangeType, service: ServiceDict, user_id: int
+    type: ServiceChangeType, service: ServiceDict, user_id: int, created_at: str
 ) -> bool:
     user = User.objects.get(id=user_id)
     IssueNote.objects.create(
         issue_id=service["issue_id"],
         note_type=NoteType.EVENT,
         text=_get_text(type, service, user),
+        created_at=created_at,
     )
     return True
 
@@ -65,11 +66,11 @@ def _get_service_text(service: ServiceDict):
     finished_at = service.get("finished_at")
 
     if type in DiscreteServiceType:
-        type_display = DiscreteServiceType[type].label
+        type_label = DiscreteServiceType[type].label
     else:
-        type_display = OngoingServiceType[type].label
+        type_label = OngoingServiceType[type].label
 
-    text = f"- Type: {type_display}\n"
+    text = f"- Type: {type_label}\n"
 
     match category:
         case ServiceCategory.DISCRETE:
