@@ -316,7 +316,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
 
         if request.method == "GET":
             queryset = issue.service_set.all()
-            queryset = queryset.order_by("-started_at")
+            queryset = queryset.order_by("-started_at", "-modified_at")
 
             serializer = ServiceSearchSerializer(
                 data=self.request.query_params, partial=True
