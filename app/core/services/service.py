@@ -14,6 +14,7 @@ class ServiceDict(TypedDict):
     started_at: str
     finished_at: NotRequired[str]
     count: NotRequired[int]
+    notes: NotRequired[str]
 
 
 class ServiceChangeType(Enum):
@@ -64,6 +65,7 @@ def _get_service_text(service: ServiceDict):
 
     count = service.get("count")
     finished_at = service.get("finished_at")
+    notes = service.get("notes")
 
     if type in DiscreteServiceType:
         type_label = DiscreteServiceType[type].label
@@ -81,5 +83,8 @@ def _get_service_text(service: ServiceDict):
             text += f"- Start date: {started_at}\n"
             if finished_at:
                 text += f"- Finish date: {finished_at}\n"
+
+    if notes:
+        text += f"- Notes: {notes}\n"
 
     return text
