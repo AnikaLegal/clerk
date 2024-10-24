@@ -1,10 +1,19 @@
 from accounts.models import User
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.template.loader import render_to_string
+from rest_framework import serializers
 
 from .issue_note import IssueNote
-from .service import Service, ServiceCategory, DiscreteServiceType, OngoingServiceType
+from .service import Service, ServiceCategory
 from .timestamped import TimestampedModel
+
+
+class _ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = "__all__"
 
 
 class EventType(models.TextChoices):
@@ -23,6 +32,15 @@ class ServiceEvent(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="+")
     issue_notes = GenericRelation(IssueNote)
 
+    # We need to save the details of the service at the point in time the event
+    # occurred so we use the appropriate values when we generate the text for
+    # this event (see get_text method)
+    service_at_event = models.JSONField(encoder=DjangoJSONEncoder)
+
+    def save(self, *args, **kwargs):
+        self.service_at_event = _ServiceSerializer(self.service).data
+        return super().save(*args, **kwargs)
+
     def get_text(self) -> str:
         name = self.user.get_full_name()
         match self.event_type:
@@ -35,31 +53,21 @@ class ServiceEvent(TimestampedModel):
             case _:
                 raise Exception(f"Unhandled event type: {self.event_type}")
 
-        service = self.service
+        serializer = _ServiceSerializer(data=self.service_at_event)
+        serializer.is_valid(raise_exception=True)
+        service = Service(**serializer.validated_data)
+
         category_lower = service.category.lower()
         indefinite_article = (
             "an" if category_lower[0] in ("a", "e", "i", "o", "u") else "a"
         )
-        text = f"{name} {verb} {indefinite_article} {category_lower} service:\n"
 
-        type = service.type
-        if type in DiscreteServiceType:
-            type_label = DiscreteServiceType[type].label
-        else:
-            type_label = OngoingServiceType[type].label
-        text += f"- Type: {type_label}\n"
-
-        match service.category:
-            case ServiceCategory.DISCRETE:
-                text += f"- Date: {service.started_at}\n"
-                if service.count:
-                    text += f"- Count: {service.count}\n"
-            case ServiceCategory.ONGOING:
-                text += f"- Start date: {service.started_at}\n"
-                if service.finished_at:
-                    text += f"- Finish date: {service.finished_at}\n"
-
-        if service.notes:
-            text += f"- Notes: {service.notes}\n"
-
-        return text
+        context = {
+            "intro": f"{name} {verb} {indefinite_article} {category_lower} service:",
+            "service": service,
+            "categories": {
+                "discrete": ServiceCategory.DISCRETE,
+                "ongoing": ServiceCategory.ONGOING,
+            },
+        }
+        return render_to_string("case/service_event.html", context)
