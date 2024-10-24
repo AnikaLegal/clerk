@@ -53,13 +53,6 @@ class Service(TimestampedModel):
     count = models.IntegerField(default=1)
     finished_at = models.DateField(null=True, blank=True)
 
-    # Internal status fields.
-
-    # Used for soft delete. We want to keep the service around because we use it
-    # to dynamically supply the text for associated issue notes. See the
-    # ServiceEvent model.
-    is_deleted = models.BooleanField(default=False)
-
     def save(self, *args, **kwargs):
         # Ensure count is always one for ongoing services.
         if self.category == ServiceCategory.ONGOING:

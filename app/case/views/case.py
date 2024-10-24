@@ -1,11 +1,10 @@
+from core.events.service import (
+    on_service_create,
+    on_service_update,
+)
 from core.models import Issue, IssueNote
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
-from core.events.service import (
-    on_service_create,
-    on_service_delete,
-    on_service_update,
-)
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -315,9 +314,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         issue = self.get_object()
 
         if request.method == "GET":
-            queryset = issue.service_set.exclude(is_deleted=True)
-            queryset = queryset.order_by("-started_at", "-modified_at")
-
+            queryset = issue.service_set.order_by("-started_at", "-modified_at")
             serializer = ServiceSearchSerializer(
                 data=self.request.query_params, partial=True
             )
@@ -349,14 +346,10 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         Get, update or delete a particular case service.
         """
         issue = self.get_object()
-        service = get_object_or_404(
-            issue.service_set.exclude(is_deleted=True), pk=service_pk
-        )
+        service = get_object_or_404(issue.service_set, pk=service_pk)
 
         if request.method == "DELETE":
-            service.is_deleted = True
-            service.save()
-            on_service_delete(service=service, user=request.user)
+            service.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         elif request.method == "PATCH":
             serializer = self.get_serializer(service, data=request.data, partial=True)

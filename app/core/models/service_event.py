@@ -19,7 +19,6 @@ class _ServiceSerializer(serializers.ModelSerializer):
 class EventType(models.TextChoices):
     CREATE = "CREATE", "Service created"
     UPDATE = "UPDATE", "Service updated"
-    DELETE = "DELETE", "Service deleted"
 
 
 class ServiceEvent(TimestampedModel):
@@ -48,8 +47,6 @@ class ServiceEvent(TimestampedModel):
                 verb = "added"
             case EventType.UPDATE:
                 verb = "updated"
-            case EventType.DELETE:
-                verb = "deleted"
             case _:
                 raise Exception(f"Unhandled event type: {self.event_type}")
 
