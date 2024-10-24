@@ -9,7 +9,7 @@ import { Provider } from 'react-redux'
 import { Converter, setFlavor } from 'showdown'
 import slackifyMarkdown from 'slackify-markdown'
 import styled from 'styled-components'
-import xss from 'xss'
+import xss, { OnTagAttrHandler } from 'xss'
 
 const theme = createTheme({
   fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
@@ -32,10 +32,25 @@ export const markdownToSlackyMarkdown = (markdownText) => {
   return slackyMarkdown
 }
 
+/* It is safe to allow the HTML class attribute. See
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#safe-sinks
+ * We allow this for styling.
+ */
+const ignoreTagAttrHandler: OnTagAttrHandler = (
+  tag,
+  name,
+  value,
+  isWhiteAttr
+) => {
+  if (name == 'class') {
+    return `${name}="${value}"`
+  }
+}
+
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText)
   // Sanitise HTML removing <script> tags and the like.
-  return xss(html)
+  return xss(html, { onIgnoreTagAttr: ignoreTagAttrHandler })
 }
 
 // Skips first update
