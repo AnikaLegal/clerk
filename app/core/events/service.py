@@ -1,41 +1,15 @@
-import logging
-
 from accounts.models import User
-from core.services.service import ServiceChangeType, ServiceDict, update_timeline
-from django.utils import timezone
-from django_q.tasks import async_task, result
-
-logger = logging.getLogger(__name__)
+from core.models import Service
+from core.models.service_event import ServiceEvent, EventType
 
 
-def on_service_create(service: ServiceDict, user: User):
-    handle_service_change(
-        type=ServiceChangeType.CREATE,
-        service=service,
-        user=user,
-    )
+def on_service_create(service: Service, user: User):
+    ServiceEvent.objects.create(event_type=EventType.CREATE, service=service, user=user)
 
 
-def on_service_update(service: ServiceDict, user: User):
-    handle_service_change(
-        type=ServiceChangeType.UPDATE,
-        service=service,
-        user=user,
-    )
+def on_service_update(service: Service, user: User):
+    ServiceEvent.objects.create(event_type=EventType.UPDATE, service=service, user=user)
 
 
-def on_service_delete(service: ServiceDict, user: User):
-    handle_service_change(
-        type=ServiceChangeType.DELETE,
-        service=service,
-        user=user,
-    )
-
-
-def handle_service_change(type: ServiceChangeType, service: ServiceDict, user: User):
-    # Wait on the result for a little bit so we can update the frontend UI
-    # immediately. We could, of course, just run the task synchronously, i.e.
-    # without using async_task, but then if the task fails it is difficult to
-    # rerun the same task again.
-    task_id = async_task(update_timeline, type, service, user.pk, str(timezone.now()))
-    result(task_id, wait=2000)
+def on_service_delete(service: Service, user: User):
+    ServiceEvent.objects.create(event_type=EventType.DELETE, service=service, user=user)

@@ -315,7 +315,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         issue = self.get_object()
 
         if request.method == "GET":
-            queryset = issue.service_set.all()
+            queryset = issue.service_set.exclude(is_deleted=True)
             queryset = queryset.order_by("-started_at", "-modified_at")
 
             serializer = ServiceSearchSerializer(
@@ -333,8 +333,8 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
             data = {**request.data, "issue_id": issue.pk}
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            on_service_create(service=dict(serializer.data), user=request.user)
+            service = serializer.save()
+            on_service_create(service=service, user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
@@ -349,18 +349,20 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         Get, update or delete a particular case service.
         """
         issue = self.get_object()
-        service = get_object_or_404(issue.service_set, pk=service_pk)
+        service = get_object_or_404(
+            issue.service_set.exclude(is_deleted=True), pk=service_pk
+        )
 
         if request.method == "DELETE":
-            data = self.get_serializer(service).data
-            service.delete()
-            on_service_delete(service=dict(data), user=request.user)
+            service.is_deleted = True
+            service.save()
+            on_service_delete(service=service, user=request.user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         elif request.method == "PATCH":
             serializer = self.get_serializer(service, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            on_service_update(service=dict(serializer.data), user=request.user)
+            service = serializer.save()
+            on_service_update(service=service, user=request.user)
             return Response(serializer.data)
         else:
             serializer = self.get_serializer(service)

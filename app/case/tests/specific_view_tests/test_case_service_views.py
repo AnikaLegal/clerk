@@ -104,7 +104,8 @@ def test_case_service_delete_api(superuser_client: APIClient):
     response = superuser_client.delete(url)
 
     assert response.status_code == 204
-    assert Service.objects.count() == 0
+    # We use soft deletes.
+    assert Service.objects.exclude(is_deleted=True).count() == 0
 
     schema_tester.validate_response(response=response)
 

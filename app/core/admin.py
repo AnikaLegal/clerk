@@ -11,6 +11,7 @@ from .models import (
     IssueEvent,
     IssueNote,
     Service,
+    ServiceEvent,
     Person,
     Submission,
     Tenancy,
@@ -153,11 +154,32 @@ class TenancyAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    ordering = ("-created_at",)
     list_display = (
         "id",
         "category",
         "type",
         "started_at",
         "finished_at",
+        "is_deleted",
     )
+    ordering = ("-created_at",)
+    readonly_fields = ("is_deleted",)
+
+
+@admin.register(ServiceEvent)
+class ServiceEventAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "event_type",
+        "service_link",
+        "user_link",
+    )
+
+    @admin_link("service", "Service")
+    def service_link(self, service):
+        return service.id if service else None
+
+    @admin_link("user", "User")
+    def user_link(self, user):
+        return user.get_full_name()
