@@ -228,25 +228,3 @@ export const filterObject = <T extends {}, V = Entry<T>>(
   obj: T,
   fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
 ): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
-
-export const useClickOutside = (
-  ref: RefObject<HTMLElement | undefined>,
-  callback: () => void,
-  addEventListener = true
-) => {
-  useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
-        callback()
-      }
-    }
-
-    if (addEventListener) {
-      document.addEventListener('click', handleClick)
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClick)
-    }
-  })
-}

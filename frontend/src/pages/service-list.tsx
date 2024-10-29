@@ -1,5 +1,16 @@
+import { useClickOutside } from '@mantine/hooks'
+import api, { Issue, Service, ServiceCreate } from 'api'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
+import { RichTextDisplay } from 'comps/rich-text/rich-text-display'
+import { Formik, FormikHelpers } from 'formik'
+import {
+  FormikDiscreteServiceFields,
+  FormikOngoingServiceFields,
+  FormikServiceErrorMessages,
+  ServiceCategory,
+} from 'forms/case-service'
 import { enqueueSnackbar } from 'notistack'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -14,17 +25,6 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-
-import api, { Issue, Service, ServiceCreate } from 'api'
-import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
-import { Formik, FormikHelpers } from 'formik'
-import {
-  FormikDiscreteServiceFields,
-  FormikOngoingServiceFields,
-  FormikServiceErrorMessages,
-  ServiceCategory,
-} from 'forms/case-service'
-import styled from 'styled-components'
 import { CaseFormServiceChoices } from 'types'
 import {
   choiceToMap,
@@ -32,9 +32,7 @@ import {
   getAPIErrorMessage,
   getAPIFormErrors,
   mount,
-  useClickOutside,
 } from 'utils'
-import { RichTextDisplay } from 'comps/rich-text/rich-text-display'
 
 interface DjangoContext {
   case_pk: string
@@ -263,9 +261,7 @@ export const ServiceActionIcons = ({
 }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
-
-  const ref = useRef(null)
-  useClickOutside(ref, () => setShowConfirmDelete(false), showConfirmDelete)
+  const ref = useClickOutside(() => setShowConfirmDelete(false))
 
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
@@ -280,31 +276,30 @@ export const ServiceActionIcons = ({
       })
   }
 
-  /* We mess around with the display CSS property below to get the click outside
-   * functionality that we want.
-   */
-  return (
-    <div ref={ref}>
-      <DisplayDiv $show={!showConfirmDelete}>
-        <EditServiceIcon
-          link
-          name="pencil"
-          issue={issue}
-          service={service}
-          fields={fields}
-        />
-        <Icon
-          link
-          name="trash alternate outline"
-          onClick={() => setShowConfirmDelete(true)}
-        />
-      </DisplayDiv>
-      <DisplayDiv $show={showConfirmDelete}>
+  if (showConfirmDelete) {
+    return (
+      <div ref={ref}>
         <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-      </DisplayDiv>
-    </div>
+      </div>
+    )
+  }
+  return (
+    <>
+      <EditServiceIcon
+        link
+        name="pencil"
+        issue={issue}
+        service={service}
+        fields={fields}
+      />
+      <Icon
+        link
+        name="trash alternate outline"
+        onClick={() => setShowConfirmDelete(true)}
+      />
+    </>
   )
 }
 
@@ -490,9 +485,5 @@ export const ServiceModal = ({
     </Formik>
   )
 }
-
-const DisplayDiv = styled.div<{ $show: boolean }>`
-  display: ${(props) => (props.$show ? 'inherit' : 'none')};
-`
 
 mount(App)
