@@ -1,4 +1,8 @@
-import { ServiceCreate, useCreateCaseServiceMutation } from 'api'
+import api, {
+  ServiceCreate,
+  useAppDispatch,
+  useCreateCaseServiceMutation,
+} from 'api'
 import DateInput from 'comps/date-input'
 import { RichTextArea } from 'comps/rich-text'
 import { Field, Formik, FormikHelpers, useFormikContext } from 'formik'
@@ -27,6 +31,7 @@ export const ServiceForm = ({
   choices,
 }: CaseDetailFormProps) => {
   const [createService] = useCreateCaseServiceMutation()
+  const dispatch = useAppDispatch()
 
   const handleSubmit = (
     values: ServiceCreate,
@@ -35,6 +40,9 @@ export const ServiceForm = ({
     createService({ id: issue.id, serviceCreate: filterEmpty(values) })
       .unwrap()
       .then(() => {
+        /* Invalidate the case tag so that the file note that is created when a
+         * service is created is displayed on the timeline */
+        dispatch(api.util.invalidateTags(['CASE']))
         enqueueSnackbar('Service created', { variant: 'success' })
       })
       .catch((e) => {
