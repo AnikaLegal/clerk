@@ -1,2 +1,3 @@
 import { RichTextArea } from './rich-text-area'
-export { RichTextArea }
+import { RichTextDisplay } from './rich-text-display'
+export { RichTextArea, RichTextDisplay }

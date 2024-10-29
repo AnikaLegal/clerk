@@ -1,7 +1,7 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import api, { Issue, Service, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
-import { RichTextDisplay } from 'comps/rich-text/rich-text-display'
+import { RichTextDisplay } from 'comps/rich-text'
 import { Formik, FormikHelpers } from 'formik'
 import {
   FormikDiscreteServiceFields,
