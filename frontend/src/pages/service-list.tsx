@@ -1,4 +1,4 @@
-import { useClickOutside } from '@mantine/hooks'
+import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import api, { Issue, Service, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { RichTextDisplay } from 'comps/rich-text/rich-text-display'
@@ -261,7 +261,17 @@ export const ServiceActionIcons = ({
 }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
-  const ref = useClickOutside(() => setShowConfirmDelete(false))
+
+  /* Handle a situation where a click event does not trigger due to element
+   * resizing when attempting to click an action icon on another row of the same
+   * table when a confirm delete button is already showing. This delays the
+   * element resize which allows the click event to trigger. This feels nasty and
+   * probably is and I presume it might not always work but gets the job done
+   * most of the time */
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    setShowConfirmDelete(false)
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
 
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
