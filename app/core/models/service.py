@@ -53,6 +53,12 @@ class Service(TimestampedModel):
     count = models.IntegerField(default=1)
     finished_at = models.DateField(null=True, blank=True)
 
+    # Internal status fields
+
+    # We use soft deletes for services so it is easier to handle service related
+    # file notes.
+    is_deleted = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         # Ensure count is always one for ongoing services.
         if self.category == ServiceCategory.ONGOING:
