@@ -1,15 +1,19 @@
-import React, { useEffect, useRef, RefObject } from 'react'
-import { hydrate, render } from 'react-dom'
-import { Converter, setFlavor } from 'showdown'
-import xss from 'xss'
-import styled from 'styled-components'
-import slackifyMarkdown from 'slackify-markdown'
-import { Provider } from 'react-redux'
-import { SnackbarProvider } from 'notistack'
-
-import { ErrorBoundary } from 'comps/error-boundary'
-import { store } from 'api/store'
+import { createTheme, MantineProvider } from '@mantine/core'
 import { Error as ErrorType } from 'api'
+import { store } from 'api/store'
+import { ErrorBoundary } from 'comps/error-boundary'
+import { SnackbarProvider } from 'notistack'
+import React, { RefObject, useEffect, useRef } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { Converter, setFlavor } from 'showdown'
+import slackifyMarkdown from 'slackify-markdown'
+import styled from 'styled-components'
+import xss, { OnTagAttrHandler } from 'xss'
+
+const theme = createTheme({
+  fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
+})
 
 const converter = new Converter()
 setFlavor('github')
@@ -28,10 +32,25 @@ export const markdownToSlackyMarkdown = (markdownText) => {
   return slackyMarkdown
 }
 
+/* It is safe to allow the HTML class attribute. See
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#safe-sinks
+ * We allow this for styling.
+ */
+const ignoreTagAttrHandler: OnTagAttrHandler = (
+  tag,
+  name,
+  value,
+  isWhiteAttr
+) => {
+  if (name == 'class') {
+    return `${name}="${value}"`
+  }
+}
+
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText)
   // Sanitise HTML removing <script> tags and the like.
-  return xss(html)
+  return xss(html, { onIgnoreTagAttr: ignoreTagAttrHandler })
 }
 
 // Skips first update
@@ -47,23 +66,24 @@ export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
 }
 
 export const mount = (App: React.ComponentType) => {
-  const root = document.getElementById('app')
-  const rootComponent = (
+  const domNode = document.getElementById('app')
+  const reactNode = (
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
-        <ErrorBoundary>
-          <FadeInOnLoad>
-            <App />
-          </FadeInOnLoad>
-        </ErrorBoundary>
+        <MantineProvider theme={theme}>
+          <ErrorBoundary>
+            <FadeInOnLoad>
+              <App />
+            </FadeInOnLoad>
+          </ErrorBoundary>
+        </MantineProvider>
       </SnackbarProvider>
     </Provider>
   )
 
-  if (root.hasChildNodes()) {
-    hydrate(rootComponent, root)
-  } else {
-    render(rootComponent, root)
+  if (!domNode.hasChildNodes()) {
+    const root = createRoot(domNode)
+    root.render(reactNode)
   }
 }
 
@@ -208,25 +228,3 @@ export const filterObject = <T extends {}, V = Entry<T>>(
   obj: T,
   fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
 ): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
-
-export const useClickOutside = (
-  ref: RefObject<HTMLElement | undefined>,
-  callback: () => void,
-  addEventListener = true
-) => {
-  useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
-        callback()
-      }
-    }
-
-    if (addEventListener) {
-      document.addEventListener('click', handleClick)
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClick)
-    }
-  })
-}

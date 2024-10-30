@@ -1,5 +1,16 @@
+import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
+import api, { Issue, Service, ServiceCreate } from 'api'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
+import { RichTextDisplay } from 'comps/rich-text'
+import { Formik, FormikHelpers } from 'formik'
+import {
+  FormikDiscreteServiceFields,
+  FormikOngoingServiceFields,
+  FormikServiceErrorMessages,
+  ServiceCategory,
+} from 'forms/case-service'
 import { enqueueSnackbar } from 'notistack'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -14,17 +25,6 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-
-import api, { Issue, Service, ServiceCreate } from 'api'
-import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
-import { Formik, FormikHelpers } from 'formik'
-import {
-  FormikDiscreteServiceFields,
-  FormikOngoingServiceFields,
-  FormikServiceErrorMessages,
-  ServiceCategory,
-} from 'forms/case-service'
-import styled from 'styled-components'
 import { CaseFormServiceChoices } from 'types'
 import {
   choiceToMap,
@@ -32,7 +32,6 @@ import {
   getAPIErrorMessage,
   getAPIFormErrors,
   mount,
-  useClickOutside,
 } from 'utils'
 
 interface DjangoContext {
@@ -144,7 +143,9 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{DISCRETE_TYPE_LABELS.get(service.type)}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
-            <Table.Cell>{service.notes}</Table.Cell>
+            <Table.Cell>
+              <RichTextDisplay content={service.notes} />
+            </Table.Cell>
             {issue.is_open && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
@@ -230,7 +231,9 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{ONGOING_TYPE_LABELS.get(service.type)}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
-            <Table.Cell>{service.notes}</Table.Cell>
+            <Table.Cell>
+              <RichTextDisplay content={service.notes} />
+            </Table.Cell>
             {issue.is_open && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
@@ -259,8 +262,16 @@ export const ServiceActionIcons = ({
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteService] = api.useDeleteCaseServiceMutation()
 
-  const ref = useRef(null)
-  useClickOutside(ref, () => setShowConfirmDelete(false), showConfirmDelete)
+  /* Handle a situation where a click event does not trigger due to element
+   * resizing when attempting to click an action icon on another row of the same
+   * table when a confirm delete button is already showing. This delays the
+   * element resize which allows the click event to trigger. This feels nasty and
+   * probably is and I presume it might not always work but gets the job done
+   * most of the time */
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    setShowConfirmDelete(false)
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
 
   const handleDelete = () => {
     deleteService({ id: issue.id, serviceId: service.id })
@@ -275,31 +286,30 @@ export const ServiceActionIcons = ({
       })
   }
 
-  /* We mess around with the display CSS property below to get the click outside
-   * functionality that we want.
-   */
-  return (
-    <div ref={ref}>
-      <DisplayDiv $show={!showConfirmDelete}>
-        <EditServiceIcon
-          link
-          name="pencil"
-          issue={issue}
-          service={service}
-          fields={fields}
-        />
-        <Icon
-          link
-          name="trash alternate outline"
-          onClick={() => setShowConfirmDelete(true)}
-        />
-      </DisplayDiv>
-      <DisplayDiv $show={showConfirmDelete}>
+  if (showConfirmDelete) {
+    return (
+      <div ref={ref}>
         <Button negative compact size="mini" onClick={handleDelete}>
           Confirm delete
         </Button>
-      </DisplayDiv>
-    </div>
+      </div>
+    )
+  }
+  return (
+    <>
+      <EditServiceIcon
+        link
+        name="pencil"
+        issue={issue}
+        service={service}
+        fields={fields}
+      />
+      <Icon
+        link
+        name="trash alternate outline"
+        onClick={() => setShowConfirmDelete(true)}
+      />
+    </>
   )
 }
 
@@ -365,7 +375,7 @@ export interface AddServiceButtonProps {
   issue: Issue
   initialValues: ServiceCreate
   fields: React.ReactNode
-  children: React.ReactText
+  children: string | number
 }
 
 export const AddServiceButton = ({
@@ -429,7 +439,7 @@ export interface ServiceModalProps {
     values: ServiceCreate,
     helpers: FormikHelpers<ServiceCreate>
   ) => void
-  label: React.ReactText
+  label: string | number
 }
 
 export const ServiceModal = ({
@@ -441,7 +451,11 @@ export const ServiceModal = ({
   label,
 }: ServiceModalProps) => {
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      enableReinitialize
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+    >
       {({ handleSubmit, errors, resetForm }) => {
         return (
           <Modal
@@ -481,9 +495,5 @@ export const ServiceModal = ({
     </Formik>
   )
 }
-
-const DisplayDiv = styled.div`
-  display: ${(props: { $show: boolean }) => (props.$show ? 'inherit' : 'none')};
-`
 
 mount(App)

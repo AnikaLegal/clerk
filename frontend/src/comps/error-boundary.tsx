@@ -22,7 +22,7 @@ export const logException = (error) => {
 }
 
 export class ErrorBoundary extends React.Component<
-  { noRender?: boolean },
+  { noRender?: boolean, children?: React.ReactNode | undefined },
   { hasError: boolean }
 > {
   constructor(props) {
