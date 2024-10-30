@@ -1,5 +1,6 @@
 from core.events.service import (
     on_service_create,
+    on_service_delete,
     on_service_update,
 )
 from core.models import Issue, IssueNote
@@ -356,6 +357,7 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
             # related file notes.
             service.is_deleted = True
             service.save()
+            on_service_delete(service=service, user=request.user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         elif request.method == "PATCH":
             serializer = self.get_serializer(service, data=request.data, partial=True)
