@@ -314,7 +314,8 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         issue = self.get_object()
 
         if request.method == "GET":
-            queryset = issue.service_set.order_by("-started_at", "-modified_at")
+            queryset = issue.service_set.exclude(is_deleted=True)
+            queryset = queryset.order_by("-started_at", "-modified_at")
             serializer = ServiceSearchSerializer(
                 data=self.request.query_params, partial=True
             )
@@ -346,10 +347,15 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         Get, update or delete a particular case service.
         """
         issue = self.get_object()
-        service = get_object_or_404(issue.service_set, pk=service_pk)
+        service = get_object_or_404(
+            issue.service_set.exclude(is_deleted=True), pk=service_pk
+        )
 
         if request.method == "DELETE":
-            service.delete()
+            # NOTE: we use soft deletes. This eases the handling of service
+            # related file notes.
+            service.is_deleted = True
+            service.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         elif request.method == "PATCH":
             serializer = self.get_serializer(service, data=request.data, partial=True)
