@@ -160,6 +160,7 @@ class ServiceAdmin(admin.ModelAdmin):
         "type",
         "started_at",
         "finished_at",
+        "is_deleted",
     )
     ordering = ("-created_at",)
 
