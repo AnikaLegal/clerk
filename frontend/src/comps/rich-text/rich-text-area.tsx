@@ -28,7 +28,7 @@ export const RichTextArea = ({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      CustomLink.configure({
+      CustomLink.extend({ inclusive: false }).configure({
         defaultProtocol: 'https',
       }),
       Placeholder.configure({ placeholder: placeholder }),
