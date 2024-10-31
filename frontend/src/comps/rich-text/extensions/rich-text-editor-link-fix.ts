@@ -4,6 +4,7 @@ import { MultiToken, tokenize } from 'linkifyjs'
 export const CustomLink = Link.extend({
     addCommands() {
         return {
+            ...this.parent?.(),
             /* The tiptap link extension uses a default protocol if a link is
              * entered without a protocol. This does not happen for links entered
              * via the mantine RichTextEditor.Link component (we use in this in
