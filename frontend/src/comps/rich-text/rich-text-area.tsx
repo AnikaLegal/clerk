@@ -1,10 +1,11 @@
 import { useFocusWithin } from '@mantine/hooks'
-import { Link, RichTextEditor } from '@mantine/tiptap'
+import { RichTextEditor } from '@mantine/tiptap'
 import Placeholder from '@tiptap/extension-placeholder'
 import { ParseOptions } from '@tiptap/pm/model'
-import { EditorEvents, useEditor, BubbleMenu } from '@tiptap/react'
+import { BubbleMenu, EditorEvents, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { CSSProperties, useEffect } from 'react'
+import { CustomLink } from './extensions/rich-text-editor-link-fix'
 
 import '@mantine/core/styles.css'
 import '@mantine/tiptap/styles.css'
@@ -27,7 +28,7 @@ export const RichTextArea = ({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Link.configure({
+      CustomLink.configure({
         defaultProtocol: 'https',
       }),
       Placeholder.configure({ placeholder: placeholder }),
