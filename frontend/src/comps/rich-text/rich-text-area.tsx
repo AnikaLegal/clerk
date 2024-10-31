@@ -30,6 +30,9 @@ export const RichTextArea = ({
       StarterKit,
       CustomLink.extend({ inclusive: false }).configure({
         defaultProtocol: 'https',
+        HTMLAttributes: {
+          target: null,
+        },
       }),
       Placeholder.configure({ placeholder: placeholder }),
     ],

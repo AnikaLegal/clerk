@@ -23,7 +23,14 @@ const GlobalStyles = createGlobalStyle`
 
 export const RichTextDisplay = ({ content }: RichTextDisplayProps) => {
   const editor = useEditor({
-    extensions: [StarterKit, Link],
+    extensions: [
+      StarterKit,
+      Link.configure({
+        HTMLAttributes: {
+          target: null,
+        },
+      }),
+    ],
     editable: false,
   })
 
