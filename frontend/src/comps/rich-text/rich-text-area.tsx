@@ -33,6 +33,7 @@ export const RichTextArea = ({
         HTMLAttributes: {
           target: null,
         },
+        openOnClick: false,
       }),
       Placeholder.configure({ placeholder: placeholder }),
     ],
