@@ -239,12 +239,9 @@ AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each oth
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-# Disable CSRF
-# FIXME: Remove this once users can log in and fetch a token - or if you figure out a smarter way to do this.
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BasicAuthentication",
-        "clerk.auth.CsrfExemptSessionAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DATE_FORMAT": "%d/%m/%Y",
     "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
