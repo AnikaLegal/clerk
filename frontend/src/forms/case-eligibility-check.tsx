@@ -118,7 +118,7 @@ export const EligibilityForm: React.FC<CaseDetailFormProps> = ({
               positive
               type="submit"
             >
-              Create record
+              Create note
             </Button>
             <Button disabled={isSubmitting} onClick={onCancel}>
               Close
