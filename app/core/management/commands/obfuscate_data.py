@@ -1,4 +1,5 @@
 import logging
+from random import randint
 
 from accounts.models import CaseGroups, User
 from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
+from emails.models import Email
 from mimesis import Generic
 from mimesis.locales import Locale
 from utils.signals import disable_signals, restore_signals
@@ -26,11 +28,12 @@ class Command(BaseCommand):
         disable_signals()
 
         clients = Client.objects.all()
+        emails = Email.objects.all()
         issues = Issue.objects.all()
-        people = Person.objects.all()
-        tenancies = Tenancy.objects.all()
         notes = IssueNote.objects.exclude(note_type=NoteType.EVENT)
+        people = Person.objects.all()
         services = Service.objects.all()
+        tenancies = Tenancy.objects.all()
 
         # Obfuscate any user that isn't a lawyer, admin or superuser. We want to
         # keep the accounts unchanged for users in those groups so they can be
@@ -72,7 +75,7 @@ class Command(BaseCommand):
 
         for i in issues:
             if i.outcome_notes:
-                i.outcome_notes = generic.text.text(quantity=3)
+                i.outcome_notes = generic.text.text(quantity=2)
 
             prefix = i.topic.upper()
             i.answers = {
@@ -85,6 +88,26 @@ class Command(BaseCommand):
         for n in notes:
             n.text = generic.text.text(quantity=3)
             n.save()
+
+        for e in emails:
+            e.received_data = None
+            e.subject = generic.text.title()
+            e.text = generic.text.text(quantity=randint(1, 10))
+            e.html = ""
+
+            # This could be smarter and attempt to match the sender related user
+            # or the client with the to/from address and use the same obfuscated
+            # email but it's unclear if that is actually useful.
+            if e.from_address:
+                e.from_address = generic.person.email(domains=email_domains)
+            if e.to_address:
+                e.to_address = generic.person.email(domains=email_domains)
+            e.cc_addresses = [
+                generic.person.email(domains=email_domains) for _ in e.cc_addresses
+            ]
+            e.save()
+
+        # TODO: email attachments
 
         for s in services:
             if s.notes:
