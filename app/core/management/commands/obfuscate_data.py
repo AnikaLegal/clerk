@@ -1,7 +1,7 @@
 import logging
 
 from accounts.models import CaseGroups, User
-from core.models import Client, FileUpload, Issue, IssueNote, Person, Tenancy
+from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
 from core.models.issue_note import NoteType
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -30,6 +30,7 @@ class Command(BaseCommand):
         people = Person.objects.all()
         tenancies = Tenancy.objects.all()
         notes = IssueNote.objects.exclude(note_type=NoteType.EVENT)
+        services = Service.objects.all()
 
         # Obfuscate any user that isn't a lawyer, admin or superuser. We want to
         # keep the accounts unchanged for users in those groups so they can be
@@ -84,6 +85,11 @@ class Command(BaseCommand):
         for n in notes:
             n.text = generic.text.text(quantity=3)
             n.save()
+
+        for s in services:
+            if s.notes:
+                s.notes = generic.text.sentence()
+                s.save()
 
         # Replace uploaded files
         FileUpload.objects.update(file="file-uploads/do-your-best.png")
