@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
-from emails.models import Email
+from emails.models import Email, EmailAttachment
 from mimesis import Generic
 from mimesis.locales import Locale
 from utils.signals import disable_signals, restore_signals
@@ -107,12 +107,15 @@ class Command(BaseCommand):
             ]
             e.save()
 
-        # TODO: email attachments
-
         for s in services:
             if s.notes:
                 s.notes = generic.text.sentence()
                 s.save()
+
+        # Replace files attached to emails
+        EmailAttachment.objects.update(
+            file="email-attachments/do-your-best.png", content_type="image/png"
+        )
 
         # Replace uploaded files
         FileUpload.objects.update(file="file-uploads/do-your-best.png")
