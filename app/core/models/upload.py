@@ -2,6 +2,8 @@ import hashlib
 import os
 import uuid
 
+from django.conf import settings
+from django.core.files.storage import storages
 from django.db import models
 
 from .issue import Issue
@@ -32,5 +34,7 @@ class FileUpload(TimestampedModel):
     UPLOAD_KEY = "file-uploads"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    file = models.FileField(upload_to=get_s3_key)
+    file = models.FileField(
+        upload_to=get_s3_key, storage=storages[settings.FILE_UPLOAD_STORAGE]
+    )
     issue = models.ForeignKey(Issue, on_delete=models.SET_NULL, null=True, blank=True)

@@ -208,9 +208,18 @@ STATIC_ROOT = "/static/"
 STATICFILES_DIRS = [
     ("webpack_bundles", "/build/bundles/"),
 ]
+
+FILE_UPLOAD_STORAGE = "file_upload"
+
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
+    },
+    FILE_UPLOAD_STORAGE: {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "querystring_expire": 7 * 24 * 60 * 60, # 604,800 seconds = 7 days
+        },
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.ManifestStaticFilesStorage",
