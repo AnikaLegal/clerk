@@ -87,7 +87,6 @@ class SharepointState(models.TextChoices):
     UPLOADED = "UPLOADED", "Uploaded"
 
 
-# FIXME: Configure so S3 bucket cannot be publicly read from?
 class EmailAttachment(models.Model):
     UPLOAD_KEY = "email-attachments"
 
