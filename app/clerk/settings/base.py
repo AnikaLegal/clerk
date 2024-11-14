@@ -231,9 +231,7 @@ WEBPACK_LOADER = {
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 
-AWS_S3_SECURE_URLS = False
-AWS_QUERYSTRING_AUTH = False
-AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = True
 AWS_REGION_NAME = "ap-southeast-2"
 AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each other
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
