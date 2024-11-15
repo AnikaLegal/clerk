@@ -218,7 +218,7 @@ STORAGES = {
     FILE_UPLOAD_STORAGE: {
         "BACKEND": "storages.backends.s3.S3Storage",
         "OPTIONS": {
-            "querystring_expire": 7 * 24 * 60 * 60, # 604,800 seconds = 7 days
+            "querystring_expire": 7 * 24 * 60 * 60,  # 604,800 seconds = 7 days
         },
     },
     "staticfiles": {
