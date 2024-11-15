@@ -9,6 +9,8 @@ ALLOWED_HOSTS = ["*"]
 DATABASES["default"]["name"] = "test"
 MEDIA_ROOT = os.path.join(BASE_DIR, "test_media")
 
+FILE_UPLOAD_STORAGE = "default"
+
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
