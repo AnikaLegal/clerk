@@ -239,6 +239,7 @@ WEBPACK_LOADER = {
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
+WAGTAILDOCS_SERVE_METHOD = "serve_view"
 
 AWS_QUERYSTRING_AUTH = True
 AWS_REGION_NAME = "ap-southeast-2"
