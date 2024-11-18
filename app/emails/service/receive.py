@@ -119,7 +119,7 @@ def parse_received_data(email_data: dict) -> dict | None:
 
     # Try find the issue from to_addr.
     user, domain = to_addr.split("@")
-    if not domain == settings.EMAIL_DOMAIN:
+    if domain != settings.EMAIL_DOMAIN:
         logger.exception(f"Incorrect domain in to address {to_addr}")
         return None
 
