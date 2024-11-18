@@ -158,7 +158,7 @@ def get_text(issue: Issue):
         if referrer:
             ref_str += f" / {referrer}"
     else:
-        ref_str = f"*Referral type*: no info available."
+        ref_str = "*Referral type*: no info available."
 
     topic = issue.topic.lower()
     text = (
