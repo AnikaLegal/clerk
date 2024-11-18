@@ -25,8 +25,7 @@ EMAIL_RECEIVE_RULES = (
 @sentry_task
 def receive_email_task(email_pk: int):
     """
-    Ingests an received emails and attempts to associate them with related issues.
-    Run as a scheduled task.
+    Ingests a received email and attempts to associate it with a case.
     """
     email = Email.objects.get(pk=email_pk)
     for rule, msg in EMAIL_RECEIVE_RULES:
