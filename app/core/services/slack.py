@@ -100,7 +100,7 @@ def send_email_alert_slack(email_pk: str):
         send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, msg)
 
     Email.objects.filter(pk=email_pk).update(is_alert_sent=True)
-    logger.info("Alert sent sucessfully for Email<%s>", email_pk)
+    logger.info("Alert sent successfully for Email<%s>", email_pk)
 
 
 @sentry_task
