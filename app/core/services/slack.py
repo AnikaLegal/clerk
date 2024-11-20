@@ -84,7 +84,7 @@ def send_email_alert_slack(email_pk: str):
     case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
     msg = (
         "*New Email Notification*\n"
-        f"A new email has been received for case <{case_url}|{issue.fileref}> .\n"
+        f"A new email has been received for case <{case_url}|{issue.fileref}>.\n"
         f"You can view this case's emails here: <{case_email_url}|here>.\n"
     )
 
@@ -119,7 +119,7 @@ def send_email_failure_alert_slack(email_pk: str):
     case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
     msg = (
         "*Email Delivery Failed*\n"
-        f"An email failed to send for case <{case_url}|{issue.fileref}> .\n"
+        f"An email failed to send for case <{case_url}|{issue.fileref}>.\n"
         f"You can view this case's emails here: <{case_email_url}|here>.\n"
         "Please try again or send via the coordinator's inbox.\n"
     )
