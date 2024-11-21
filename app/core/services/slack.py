@@ -121,7 +121,7 @@ def send_email_failure_alert_slack(email_pk: str):
         "*Email Delivery Failed*\n"
         f"An email failed to send for case <{case_url}|{issue.fileref}>.\n"
         f"You can view this case's emails here: <{case_email_url}|here>.\n"
-        "Please try again or send via the coordinator's inbox.\n"
+        "Please check you have the correct email address and try again. If it fails a second time, please post on #caseteam and ask Leads to help you send the email from the coordinator's inbox."
     )
 
     alert_sent = False
