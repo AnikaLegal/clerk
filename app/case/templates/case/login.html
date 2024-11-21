@@ -1,7 +1,7 @@
 {% extends "case/_base.html" %} 
 {% block title %}Login{% endblock %} 
 {% block content %}
-<div class="ui container center aligned">
+<div class="ui container center aligned login">
     <h1 class="ui header">
         Welcome to Clerk
         <div class="sub header">
@@ -14,5 +14,12 @@
             Log in
         </button>
     </a>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="ui compact message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

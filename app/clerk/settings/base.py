@@ -156,12 +156,10 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.get_username",
     # Associates the current social details with another user account with a similar email address.
     "social_core.pipeline.social_auth.associate_by_email",
-    "social_core.pipeline.user.create_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
-    # Ensure new users can access the Wagtail CMS
-    "accounts.social_auth.set_new_user_as_cms_editor",
+    "accounts.social_auth.confirm_user_setup",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {
