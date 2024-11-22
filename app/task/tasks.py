@@ -74,12 +74,13 @@ def handle_task_save(task_pk: int):
     # This is a somewhat unusual way of getting & using a single task. We do it
     # because it is convenient.
     tasks = Task.objects.filter(pk=task_pk)
+    task = None
     try:
         task = tasks.first()
-        if task.is_notify_pending and not task.is_system_update:
+        if task and task.is_notify_pending and not task.is_system_update:
             notify_of_assignment([task.pk])
     finally:
-        if task.is_notify_pending or task.is_system_update:
+        if task and (task.is_notify_pending or task.is_system_update):
             tasks.update(is_notify_pending=False, is_system_update=False)
 
 
@@ -230,10 +231,11 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
 
         now = timezone.now()
         for template in trigger.templates.all():
-            if not Task.objects.filter(
-                issue=event.issue, template=template, owner=user
-            ).exists():
-                due_at = (now + timedelta(days=template.due_in)).date() if template.due_in else None
+            query = Q(issue=event.issue, template=template, owner=user)
+            if not Task.objects.filter(query).exists():
+                due_at = None
+                if template.due_in:
+                    due_at = (now + timedelta(days=template.due_in)).date()
                 task = Task.objects.create(
                     issue=event.issue,
                     template=template,

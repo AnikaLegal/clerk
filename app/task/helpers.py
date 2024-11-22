@@ -3,7 +3,7 @@ from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
 
 
-def is_user_assigned_to_issue(issue: Issue, user: User) -> bool:
+def is_user_assigned_to_issue(issue: Issue, user: User | None) -> bool:
     """
     True if the supplied user is assigned as the paralegal or lawyer on the
     supplied issue.
