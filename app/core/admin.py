@@ -1,19 +1,20 @@
+from core.services.slack import send_issue_slack
 from django.contrib import admin
 from django.contrib.messages import constants as messages
 from django_q.tasks import async_task
-
-from core.services.slack import send_issue_slack
 from utils.admin import admin_link, dict_to_json_html
 
 from .models import (
     Client,
     FileUpload,
     Issue,
+    IssueEvent,
     IssueNote,
+    Service,
+    ServiceEvent,
     Person,
     Submission,
     Tenancy,
-    IssueEvent,
 )
 
 
@@ -149,3 +150,35 @@ class TenancyAdmin(admin.ModelAdmin):
     @admin_link("agent", "Agent")
     def agent_link(self, agent):
         return agent.full_name
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "category",
+        "type",
+        "started_at",
+        "finished_at",
+        "is_deleted",
+    )
+    ordering = ("-created_at",)
+
+
+@admin.register(ServiceEvent)
+class ServiceEventAdmin(admin.ModelAdmin):
+    ordering = ("-created_at",)
+    list_display = (
+        "id",
+        "event_type",
+        "service_link",
+        "user_link",
+    )
+
+    @admin_link("service", "Service")
+    def service_link(self, service):
+        return service.id if service else None
+
+    @admin_link("user", "User")
+    def user_link(self, user):
+        return user.get_full_name()

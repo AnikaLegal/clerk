@@ -1,22 +1,23 @@
-from rest_framework import serializers
+from accounts.models import User
+from core.models import Issue, IssueNote, Service
+from core.models.issue import CaseStage, EmploymentType, ReferrerType
+from core.models.service import ServiceCategory
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-
-from core.models import Issue, IssueNote
-from core.models.issue import EmploymentType, ReferrerType, CaseStage
-from accounts.models import User
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .user import UserSerializer
 from .client import ClientSerializer
-from .tenancy import TenancySerializer
-from .person import PersonSerializer
 from .fields import (
-    LocalTimeField,
     LocalDateField,
+    LocalTimeField,
     TextChoiceField,
     TextChoiceListField,
 )
+from .person import PersonSerializer
+from .tenancy import TenancySerializer
+from .user import UserSerializer
 
 
 class IssueSerializer(serializers.ModelSerializer):
@@ -106,6 +107,20 @@ class IssueSerializer(serializers.ModelSerializer):
                 "Cannot progress the case stage without an assigned lawyer & paralegal."
             )
         return stage
+
+    def validate(self, attrs):
+        if attrs.get("stage") == CaseStage.CLOSED and self.instance:
+            query = Q(
+                issue_id=self.instance.id,
+                category=ServiceCategory.ONGOING,
+                finished_at__isnull=True,
+            )
+            if Service.objects.filter(query).exists():
+                raise serializers.ValidationError(
+                    "Cannot close case with unfinished ongoing services"
+                )
+
+        return attrs
 
     def validate_paralegal_id(self, paralegal: User):
         return paralegal.id if paralegal else None

@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6", "dom"],
+    "lib": [
+      "es5",
+      "es6",
+      "dom"
+    ],
     "jsx": "react",
     "target": "es6",
     "module": "commonjs",
@@ -10,7 +14,8 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "baseUrl": "src"
-
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*"
+  ]
 }

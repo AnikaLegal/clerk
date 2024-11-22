@@ -1,9 +1,10 @@
 from .account import AccountSearchSerializer, AccountSortSerializer
 from .client import ClientSerializer
+from .documents import DocumentTemplateSerializer
 from .email import (
-    EmailTemplateSerializer,
     EmailAttachmentSerializer,
     EmailSerializer,
+    EmailTemplateSerializer,
     EmailThreadSerializer,
 )
 from .issue import (
@@ -12,8 +13,8 @@ from .issue import (
     IssueSearchSerializer,
     IssueSerializer,
 )
-from .documents import DocumentTemplateSerializer
 from .notification import NotificationSerializer
-from .person import PersonSerializer, PersonSearchRequestSerializer
+from .person import PersonSearchRequestSerializer, PersonSerializer
+from .service import ServiceSerializer, ServiceSearchSerializer
 from .tenancy import TenancySerializer
-from .user import UserSerializer, UserCreateSerializer, ParalegalSerializer
+from .user import ParalegalSerializer, UserCreateSerializer, UserSerializer

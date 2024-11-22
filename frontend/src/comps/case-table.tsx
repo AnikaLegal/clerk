@@ -74,7 +74,7 @@ interface TableField {
 const FIELDS: TableField[] = [
   {
     name: 'fileref',
-    label: 'File Ref',
+    label: 'File ref',
     getValue: (issue) => <a href={issue.url}>{issue.fileref}</a>,
   },
   { name: 'topic', label: 'Topic', getValue: (issue) => issue.topic_display },
@@ -108,7 +108,7 @@ const FIELDS: TableField[] = [
   },
   {
     name: 'next_review',
-    label: 'Next Review Due',
+    label: 'Next review due',
     getValue: (issue) => issue.next_review || '-',
     getColor: getNextReviewColor,
   },
@@ -124,7 +124,7 @@ const FIELDS: TableField[] = [
   },
   {
     name: 'provided_legal_services',
-    label: 'Advice',
+    label: 'Advice?',
     getValue: (issue) =>
       issue.provided_legal_services ? (
         <Icon name="check" color="green" />
@@ -139,7 +139,7 @@ const FIELDS: TableField[] = [
   },
   {
     name: 'is_conflict_check',
-    label: 'Conflict Check Performed',
+    label: 'Conflict check performed?',
     getValue: (issue) =>
       issue.is_conflict_check ? (
         <Icon name="check" color="green" />
@@ -149,7 +149,7 @@ const FIELDS: TableField[] = [
   },
   {
     name: 'is_eligibility_check',
-    label: 'Eligibility Check Performed',
+    label: 'Eligibility check performed?',
     getValue: (issue) =>
       issue.is_eligibility_check ? (
         <Icon name="check" color="green" />

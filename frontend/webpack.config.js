@@ -4,6 +4,7 @@ const webpack = require('webpack')
 const BundleTracker = require('webpack-bundle-tracker')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const entry = glob
   .sync('./src/pages/*.{js,jsx,ts,tsx}')
@@ -18,7 +19,8 @@ const config = {
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin(),
-    new BundleTracker({ 
+    new CssMinimizerPlugin(),
+    new BundleTracker({
       path: '/build',
       filename: 'webpack-stats.json',
     }),
@@ -39,7 +41,7 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'style-loader', 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
     ],
   },
@@ -71,6 +73,11 @@ module.exports = (env, argv) => {
       splitChunks: {
         chunks: 'all',
       },
+      minimizer: [
+        `...`,
+        new CssMinimizerPlugin(),
+      ],
+      minimize: true,
     }
   }
   return config

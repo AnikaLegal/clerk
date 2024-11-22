@@ -99,7 +99,7 @@ const App = () => {
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Permissions</Table.HeaderCell>
-              <Table.HeaderCell>Active</Table.HeaderCell>
+              <Table.HeaderCell>Active?</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>

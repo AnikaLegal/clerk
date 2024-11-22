@@ -47,8 +47,7 @@ class IssueNote(TimestampedModel):
         NoteType.EVENT,
         NoteType.PARALEGAL,
     ]
-    COORDINATOR_NOTE_TYPES = [
-        *PARALEGAL_NOTE_TYPES,
+    COORDINATOR_NOTE_TYPES = PARALEGAL_NOTE_TYPES + [
         NoteType.REVIEW,
         NoteType.PERFORMANCE,
     ]

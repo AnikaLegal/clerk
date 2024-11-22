@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("core", "0072_alter_issueevent_event_type"),
+        ("core", "0075_alter_issueevent_event_type"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

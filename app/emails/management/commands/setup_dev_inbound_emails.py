@@ -4,7 +4,7 @@ from emails.api import set_inbound_parse_url
 
 
 class Command(BaseCommand):
-    help = "Set up inbound parse settings for dev environemnt."
+    help = "Set up inbound parse settings for dev environment."
 
     def add_arguments(self, parser):
         parser.add_argument(

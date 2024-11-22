@@ -11,10 +11,12 @@ from core.models import (
     IssueEvent,
     IssueNote,
     Person,
+    Service,
     Tenancy,
 )
 from core.models.issue import CaseStage, CaseTopic
 from core.models.issue_event import EventType
+from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save, pre_save
 from emails.models import Email, EmailAttachment, EmailTemplate
@@ -223,3 +225,39 @@ class NotificationFactory(factory.django.DjangoModelFactory):
     )
     raw_text = factory.Faker("sentence")
     message_text = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
+class ServiceFactory(TimestampedModelFactory):
+    class Meta:
+        model = Service
+
+    category = factory.Faker("random_element", elements=ServiceCategory)
+    type = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.DISCRETE),
+        yes_declaration=factory.Faker("random_element", elements=DiscreteServiceType),
+        no_declaration=factory.Faker("random_element", elements=OngoingServiceType),
+    )
+    issue = factory.SubFactory(IssueFactory)
+    started_at = factory.Faker("date_between", start_date="-2M", end_date="-1w")
+    notes = factory.Faker("paragraph")
+
+    # Yikes!
+    # If service is discrete the finished_at always None.
+    # If service is ongoing then 50/50 chance of None or date from started_at to now.
+    finished_at = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.ONGOING),
+        yes_declaration=factory.Maybe(
+            factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
+            yes_declaration=factory.Faker(
+                "past_date", start_date=factory.SelfAttribute("..started_at")
+            ),
+            no_declaration=None,
+        ),
+        no_declaration=None,
+    )
+    count = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.DISCRETE),
+        yes_declaration=factory.Faker("pyint", min_value=1, max_value=3),
+        no_declaration=1,
+    )

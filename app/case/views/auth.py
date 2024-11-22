@@ -1,11 +1,11 @@
 from urllib.parse import urlparse
-from rest_framework import permissions
 
-from django.shortcuts import resolve_url
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import resolve_url
+from rest_framework import permissions
 
 
 def login_required(view):
@@ -90,9 +90,12 @@ def _is_not_infinite_redirect(path, resolved_login_url):
     )
 
 
-class ParalegalOrBetterObjectPermission(permissions.BasePermission):
+class ParalegalOrBetterObjectPermission(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        return request.user.is_paralegal_or_better
+        return (
+            super().has_permission(request, view)
+            and request.user.is_paralegal_or_better
+        )
 
     def has_object_permission(self, request, view, obj):
         """
@@ -107,28 +110,32 @@ class ParalegalOrBetterObjectPermission(permissions.BasePermission):
             return True
 
 
-class CoordinatorOrBetterPermission(permissions.BasePermission):
+class CoordinatorOrBetterPermission(permissions.IsAuthenticated):
     """
     Coordinators or better required.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_coordinator_or_better
+        return (
+            super().has_permission(request, view)
+            and request.user.is_coordinator_or_better
+        )
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)
 
 
-class CoordinatorOrBetterCanWritePermission(permissions.BasePermission):
+class CoordinatorOrBetterCanWritePermission(permissions.IsAuthenticated):
     """
     Coordinators or better can write, any paralegal.
     """
 
     def has_permission(self, request, view):
+        has_permission = super().has_permission(request, view)
         if request.method in permissions.SAFE_METHODS:
-            return request.user.is_paralegal_or_better
+            return has_permission and request.user.is_paralegal_or_better
         else:
-            return request.user.is_coordinator_or_better
+            return has_permission and request.user.is_coordinator_or_better
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)

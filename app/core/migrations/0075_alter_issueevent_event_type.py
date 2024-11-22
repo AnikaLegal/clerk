@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0071_alter_issue_outcome_notes"),
+        ("core", "0074_alter_serviceevent_event_type"),
     ]
 
     operations = [

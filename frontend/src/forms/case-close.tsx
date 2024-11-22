@@ -1,22 +1,22 @@
-import React, { useState } from 'react'
-import { Formik } from 'formik'
-import {
-  Header,
-  Form,
-  Button,
-  Message,
-  Segment,
-  Dropdown,
-  Checkbox,
-} from 'semantic-ui-react'
-import * as Yup from 'yup'
-import { useSnackbar } from 'notistack'
-
-import { CaseDetailFormProps } from 'types/case'
-import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation } from 'api'
+import api, { Service } from 'api'
 import { TextArea } from 'comps/textarea'
 import { OUTCOMES } from 'consts'
+import { Formik } from 'formik'
+import { enqueueSnackbar } from 'notistack'
+import React, { useState } from 'react'
+import {
+  Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  Header,
+  Message,
+  Segment,
+} from 'semantic-ui-react'
+import { CaseDetailFormProps } from 'types/case'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
+import * as Yup from 'yup'
+import { ServiceCategory } from './case-service'
 
 const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   key: k,
@@ -35,8 +35,18 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
   onCancel,
 }) => {
   const [isSuccess, setSuccess] = useState(false)
-  const [updateCase] = useUpdateCaseMutation()
-  const { enqueueSnackbar } = useSnackbar()
+  const [updateCase] = api.useUpdateCaseMutation()
+
+  const servicesResult = api.useGetCaseServicesQuery({
+    id: issue.id,
+    category: ServiceCategory.Ongoing,
+  })
+  const isLoadingServices = servicesResult.isLoading
+
+  const findUnfinishedServices = (service: Service) =>
+    service.finished_at === null
+  const hasUnfinishedServices =
+    servicesResult.data?.find(findUnfinishedServices) !== undefined
 
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
@@ -82,7 +92,7 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}
-            error={Object.keys(errors).length > 0}
+            error={Object.keys(errors).length > 0 || hasUnfinishedServices}
           >
             <Dropdown
               fluid
@@ -121,16 +131,22 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
                 disabled={isSubmitting}
               />
             </div>
-
             {Object.entries(errors).map(([k, v]) => (
               <Message error key={k}>
-                <div className="header">{k}</div>
-                <p>{v as string}</p>
+                {k != 'non_field_errors' && <div className="header">{k}</div>}
+                <p>{v}</p>
               </Message>
             ))}
+            {!isLoadingServices && hasUnfinishedServices && (
+              <Message error>
+                <p>Cannot close case with unfinished ongoing services</p>
+              </Message>
+            )}
             <Button
-              loading={isSubmitting}
-              disabled={isSubmitting}
+              loading={isSubmitting || isLoadingServices}
+              disabled={
+                isSubmitting || isLoadingServices || hasUnfinishedServices
+              }
               positive
               type="submit"
             >

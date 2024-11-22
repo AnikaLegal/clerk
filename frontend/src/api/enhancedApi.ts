@@ -48,6 +48,21 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     createTaskComment: {
       invalidatesTags: [{ type: 'TASK_COMMENT' }],
     },
+    getCaseServices: {
+      providesTags: [{ type: 'SERVICE' }],
+    },
+    getCaseService: {
+      providesTags: [{ type: 'SERVICE' }],
+    },
+    createCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    updateCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    deleteCaseService: {
+      invalidatesTags: [{ type: 'SERVICE' }],
+    },
   },
 })
 

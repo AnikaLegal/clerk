@@ -58,7 +58,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
 }) => (
   <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
     <div className={`field ${errors.full_name && 'error'}`}>
-      <label>Full Name</label>
+      <label>Full name</label>
       <Input
         placeholder="Jane Doe"
         value={values.full_name}

@@ -3,24 +3,20 @@ import {
   Button,
   Container,
   Header,
-  Table,
-  Label,
   Icon,
+  Label,
+  Table,
 } from 'semantic-ui-react'
 
-import { mount } from 'utils'
-import { CaseHeader, CASE_TABS } from 'comps/case-header'
 import { useGetCaseQuery, useGetEmailThreadsQuery } from 'api'
+import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
+import { mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
   draft_url: string
   case_email_address: string
-  urls: {
-    detail: string
-    email: string
-    docs: string
-  }
+  urls: CaseTabUrls
 }
 
 const { case_pk, case_email_address, urls, draft_url } = (window as any)
@@ -33,10 +29,10 @@ const App = () => {
   if (caseResult.isLoading || threadResult.isLoading) return null
 
   const issue = caseResult.data!.issue
-
-  const { error } = threadResult
-  const notFound = error && 'status' in error && error.status === 404
-  const emailThreads = notFound ? [] : threadResult.data
+  const emailThreads =
+    threadResult.isError && threadResult.error.status === 404
+      ? []
+      : threadResult.data
 
   return (
     <Container>

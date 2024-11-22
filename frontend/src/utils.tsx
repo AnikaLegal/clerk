@@ -1,15 +1,19 @@
+import { createTheme, MantineProvider } from '@mantine/core'
+import { Error as ErrorType } from 'api'
+import { store } from 'api/store'
+import { ErrorBoundary } from 'comps/error-boundary'
+import { SnackbarProvider } from 'notistack'
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Converter, setFlavor } from 'showdown'
-import xss from 'xss'
-import styled from 'styled-components'
-import slackifyMarkdown from 'slackify-markdown'
 import { Provider } from 'react-redux'
-import { SnackbarProvider } from 'notistack'
+import { Converter, setFlavor } from 'showdown'
+import slackifyMarkdown from 'slackify-markdown'
+import styled from 'styled-components'
+import xss, { OnTagAttrHandler } from 'xss'
 
-import { ErrorBoundary } from 'comps/error-boundary'
-import { store } from 'api/store'
-import { Error as ErrorType } from 'api'
+const theme = createTheme({
+  fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
+})
 
 const converter = new Converter()
 setFlavor('github')
@@ -28,10 +32,25 @@ export const markdownToSlackyMarkdown = (markdownText) => {
   return slackyMarkdown
 }
 
+/* It is safe to allow the HTML class attribute. See
+ * https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#safe-sinks
+ * We allow this for styling.
+ */
+const ignoreTagAttrHandler: OnTagAttrHandler = (
+  tag,
+  name,
+  value,
+  isWhiteAttr
+) => {
+  if (name == 'class') {
+    return `${name}="${value}"`
+  }
+}
+
 export const markdownToHtml = (markdownText) => {
   const html = converter.makeHtml(markdownText)
   // Sanitise HTML removing <script> tags and the like.
-  return xss(html)
+  return xss(html, { onIgnoreTagAttr: ignoreTagAttrHandler })
 }
 
 // Skips first update
@@ -47,22 +66,24 @@ export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
 }
 
 export const mount = (App: React.ComponentType) => {
-  const container = document.getElementById('app')
-  const rootComponent = (
+  const domNode = document.getElementById('app')
+  const reactNode = (
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
-        <ErrorBoundary>
-          <FadeInOnLoad>
-            <App />
-          </FadeInOnLoad>
-        </ErrorBoundary>
+        <MantineProvider theme={theme}>
+          <ErrorBoundary>
+            <FadeInOnLoad>
+              <App />
+            </FadeInOnLoad>
+          </ErrorBoundary>
+        </MantineProvider>
       </SnackbarProvider>
     </Provider>
   )
 
-  if (!container.hasChildNodes()) {
-    const root = createRoot(container)
-    root.render(rootComponent)
+  if (!domNode.hasChildNodes()) {
+    const root = createRoot(domNode)
+    root.render(reactNode)
   }
   /*
   else {
@@ -124,20 +145,6 @@ export const debouncePromise = (delay) => {
 // Wait n seconds
 export const waitSeconds = (delay: number) =>
   new Promise((resolve) => setTimeout(() => resolve(null), delay * 1000))
-
-export const useOutsideClick = (ref, onClickOutside) => {
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        onClickOutside()
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [ref])
-}
 
 export interface ErrorResult {
   data?: ErrorType
@@ -222,3 +229,23 @@ export const choiceToOptions = (choices: string[][]): Array<OptionItem> =>
     text: label,
     value: value,
   }))
+
+/* A helper function to remove "empty" attributes from an object preserving type info.
+ */
+type Entry<T> = { [K in keyof T]: [K, T[K]] }[keyof T]
+
+export const filterEmpty = <T extends {}, V = Entry<T>>(obj: T): V =>
+  filterObject(
+    obj,
+    ([, v]) =>
+      !(
+        (typeof v === 'string' && !v.length) ||
+        v === null ||
+        typeof v === 'undefined'
+      )
+  )
+
+export const filterObject = <T extends {}, V = Entry<T>>(
+  obj: T,
+  fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
+): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
