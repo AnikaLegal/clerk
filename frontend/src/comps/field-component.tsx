@@ -2,7 +2,7 @@ import React from 'react'
 import DateInput from 'comps/date-input'
 import { Input, Dropdown, InputOnChangeData } from 'semantic-ui-react'
 import { MarkdownTextArea } from 'comps/markdown-editor'
-import { RichTextEditor, EditorEvents } from 'comps/richtext-editor'
+import { RichTextEditor, EditorEvents } from 'comps/rich-text'
 
 export const FIELD_TYPES = {
   TEXT: 'TEXT',
@@ -170,7 +170,7 @@ const RichTextField = ({
   isSubmitting,
 }: FieldComponentProps) => (
   <RichTextEditor
-    content={value}
+    initialContent={value}
     placeholder={placeholder}
     disabled={isSubmitting}
     onBlur={({ editor, event, transaction }: EditorEvents['blur']) =>
