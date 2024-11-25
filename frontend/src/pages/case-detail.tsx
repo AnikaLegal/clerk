@@ -531,12 +531,14 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     text: 'Progress the case status',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
   },
+  /*
   {
     id: 'service',
     icon: 'balance scale',
     text: 'Add a service',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
   },
+  */
   {
     id: 'close',
     icon: 'times circle outline',
