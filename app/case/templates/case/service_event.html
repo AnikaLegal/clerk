@@ -1,0 +1,40 @@
+<div>
+  <span>{{ intro }}</span>
+  <table class="ui definition table small very compact">
+    <tbody>
+      <tr>
+        <td class="three wide">Type</td>
+        <td>{{ service.get_type_display }}</td>
+      </tr>
+      {% if service.category == categories.discrete %}
+        <tr>
+          <td class="three wide">Date</td>
+          <td>{{ service.started_at|date:'d/m/Y' }}</td>
+        </tr>
+        {% if service.count %}
+          <tr>
+            <td class="three wide">Count</td>
+            <td>{{ service.count }}</td>
+          </tr>
+        {% endif %}
+      {% else %}
+        <tr>
+          <td class="three wide">Start date</td>
+          <td>{{ service.started_at|date:'d/m/Y' }}</td>
+        </tr>
+        {% if service.finished_at %}
+          <tr>
+            <td class="three wide">Finish date</td>
+            <td>{{ service.finished_at|date:'d/m/Y' }}</td>
+          </tr>
+        {% endif %}
+      {% endif %}
+      {% if service.notes %}
+        <tr>
+          <td class="three wide">Notes</td>
+          <td>{{ service.notes|safe }}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>

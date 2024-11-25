@@ -8,12 +8,20 @@ export const CASE_TABS = {
   DETAIL: 'DETAIL',
   EMAIL: 'EMAIL',
   DOCUMENTS: 'DOCUMENTS',
+  SERVICES: 'SERVICES',
+}
+
+export interface CaseTabUrls {
+  detail: string
+  email: string
+  docs: string
+  services: string
 }
 
 interface CaseHeaderProps {
   issue: Issue
   activeTab: string
-  urls: { [key: string]: string }
+  urls: CaseTabUrls
 }
 
 export const CaseHeader: React.FC<CaseHeaderProps> = ({
@@ -35,17 +43,17 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           <br />
           {issue.paralegal ? (
             <span>
-              Assigned to{" "}
+              Assigned to{' '}
               <a href={issue.paralegal.url}>{issue.paralegal.full_name}</a>
-              {", "}
+              {', '}
             </span>
           ) : (
             'Not assigned, '
           )}
           {issue.lawyer ? (
             <span>
-              supervised by{" "}
-              <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>{" "}
+              supervised by{' '}
+              <a href={issue.lawyer.url}>{issue.lawyer.full_name}</a>{' '}
             </span>
           ) : (
             'not supervised '
@@ -118,6 +126,13 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         >
           <i className="folder open outline icon"></i>
           Documents
+        </a>
+        <a
+          href={urls.services}
+          className={`item ${activeTab === CASE_TABS.SERVICES ? 'active' : ''}`}
+        >
+          <i className="balance scale icon"></i>
+          Services
         </a>
       </div>
     </>

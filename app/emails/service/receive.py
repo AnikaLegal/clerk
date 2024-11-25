@@ -25,8 +25,7 @@ EMAIL_RECEIVE_RULES = (
 @sentry_task
 def receive_email_task(email_pk: int):
     """
-    Ingests an received emails and attempts to associate them with related issues.
-    Run as a scheduled task.
+    Ingests a received email and attempts to associate it with a case.
     """
     email = Email.objects.get(pk=email_pk)
     for rule, msg in EMAIL_RECEIVE_RULES:
@@ -36,7 +35,8 @@ def receive_email_task(email_pk: int):
 
     parsed_data = None
     try:
-        parsed_data = parse_received_data(email.received_data)
+        if email.received_data:
+            parsed_data = parse_received_data(email.received_data)
     except Exception:
         pass
 
@@ -81,7 +81,7 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict):
             )
 
 
-def parse_received_data(email_data: dict) -> dict:
+def parse_received_data(email_data: dict) -> dict | None:
     """
     Returns the parsed email data as a dict or None
     data is in format: {
@@ -119,15 +119,15 @@ def parse_received_data(email_data: dict) -> dict:
 
     # Try find the issue from to_addr.
     user, domain = to_addr.split("@")
-    if not domain == settings.EMAIL_DOMAIN:
+    if domain != settings.EMAIL_DOMAIN:
         logger.exception(f"Incorrect domain in to address {to_addr}")
-        return
+        return None
 
     try:
         user_parts = user.split(".")
         issue_prefix = user_parts[-1]
         parsed_data["issue"] = Issue.objects.get(id__startswith=issue_prefix)
-    except:
+    except Exception:
         logger.exception(f"Could not parse email address {to_addr}")
         return None
 

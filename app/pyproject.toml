@@ -28,6 +28,7 @@ dependencies = [
     "html-sanitizer",
     "isort",
     "mailchimp3",
+    "mimesis",
     "msal",
     "openapi-spec-validator",
     "pillow",

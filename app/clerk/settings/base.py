@@ -156,12 +156,10 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.get_username",
     # Associates the current social details with another user account with a similar email address.
     "social_core.pipeline.social_auth.associate_by_email",
-    "social_core.pipeline.user.create_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
-    # Ensure new users can access the Wagtail CMS
-    "accounts.social_auth.set_new_user_as_cms_editor",
+    "accounts.social_auth.confirm_user_setup",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -239,13 +237,12 @@ AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each oth
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-# Disable CSRF
-# FIXME: Remove this once users can log in and fetch a token - or if you figure out a smarter way to do this.
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BasicAuthentication",
-        "clerk.auth.CsrfExemptSessionAuthentication",
-    )
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DATE_FORMAT": "%d/%m/%Y",
+    "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
 }
 
 ONE_HUNDRED_YEARS = 100 * 365 * 24 * 60 * 60  # seconds
