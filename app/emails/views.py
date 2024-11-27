@@ -80,6 +80,14 @@ def events_email_view(request):
             if event_type == "delivered":
                 email.state = EmailState.DELIVERED
             elif event_type in ["bounce", "dropped", "spamreport"]:
+                # NOTE: rudimentary handling of duplicate events.
+                if email.state == EmailState.DELIVERY_FAILURE:
+                    logger.info(
+                        "Skipping duplicate email event %s for email with sendgrid ID %s",
+                        event_type,
+                        sendgrid_id,
+                    )
+                    continue
                 email.state = EmailState.DELIVERY_FAILURE
 
             email.sendgrid_id = sendgrid_id
