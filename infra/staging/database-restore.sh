@@ -4,16 +4,33 @@ HOST='13.55.250.149'
 PROJECT='staging'
 RESTORE_DIR="/srv/restore/clerk_test/$(date +%s)"
 
+if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
+    echo -e "\n>>> Error: Clerk private key not found in CLERK_PRIVATE_SSH_KEY"
+    exit 1
+fi
+echo -e "\n>>> Updating staging environment on Clerk EC2 instance at $HOST"
+
+echo -e "\n>>> Setting up SSH"
+mkdir ~/.ssh
+echo -e "$CLERK_PRIVATE_SSH_KEY" > ~/.ssh/private.key
+chmod 600 ~/.ssh/private.key
+cat >> ~/.ssh/config <<END
+Host ec2
+  HostName $HOST
+  User root
+  IdentityFile ~/.ssh/private.key
+  StrictHostKeyChecking no
+END
+
 echo -e "\n>>> Copying staging compose & env file to clerk at $HOST"
-ssh -o StrictHostKeyChecking=no root@$HOST /bin/bash << EOF
+ssh ec2 /bin/bash <<EOF
     set -e
     mkdir -p ${RESTORE_DIR}
 EOF
-scp -o StrictHostKeyChecking=no docker/docker-compose.staging.yml root@${HOST}:$RESTORE_DIR
-scp -o StrictHostKeyChecking=no env/staging.env root@${HOST}:$RESTORE_DIR
+scp docker/docker-compose.staging.yml env/staging.env ec2:$RESTORE_DIR
 
 echo -e "\n>>> SSHing into clerk at $HOST."
-ssh -o StrictHostKeyChecking=no root@$HOST /bin/bash << EOF
+ssh ec2 /bin/bash <<EOF
     set -e
     cd ${RESTORE_DIR}
     docker pull anikalaw/clerk:staging
