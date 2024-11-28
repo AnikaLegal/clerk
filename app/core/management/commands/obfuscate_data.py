@@ -1,10 +1,13 @@
 import logging
+import os
+from io import BytesIO
 from random import randint
 
 from accounts.models import CaseGroups, User
 from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
 from core.models.issue_note import NoteType
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
@@ -112,12 +115,19 @@ class Command(BaseCommand):
                 s.notes = generic.text.sentence()
                 s.save()
 
+        file_name = "sample.pdf"
+        email_attachment = os.path.join(EmailAttachment.UPLOAD_KEY, file_name)
+        file_upload = os.path.join(FileUpload.UPLOAD_KEY, file_name)
+
+        bytes = generic.binaryfile.document()
+        default_storage.save(email_attachment, BytesIO(bytes))
+        default_storage.save(file_upload, BytesIO(bytes))
+
         # Replace files attached to emails
         EmailAttachment.objects.update(
-            file="email-attachments/do-your-best.png", content_type="image/png"
+            file=email_attachment, content_type="application/pdf"
         )
-
         # Replace uploaded files
-        FileUpload.objects.update(file="file-uploads/do-your-best.png")
+        FileUpload.objects.update(file=file_upload)
 
         restore_signals()
