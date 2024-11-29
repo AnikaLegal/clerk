@@ -20,21 +20,21 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - | gunzip | \
 echo -e "\nRunning migrations"
 ./manage.py migrate
 
-echo -e "\nSetting all Slack messages to send to test alerts channel."
+echo -e "\nSetting all Slack messages to send to test alerts channel"
 SHELL_CMD="space=chr(32);\
 c=SlackChannel.objects.get(name=f'Test{space}Alerts');\
 SlackMessage.objects.all().update(channel=c);\
 SlackUser.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "$SHELL_CMD"
 
-echo -e "\nDeleting all Scheduled tasks."
+echo -e "\nDeleting all Scheduled tasks"
 SHELL_CMD="Success.objects.all().delete();\
 Failure.objects.all().delete();\
 Schedule.objects.all().delete();\
 OrmQ.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "$SHELL_CMD"
 
-echo -e "\nObfuscating all personally identifiable information."
+echo -e "\nObfuscating all personally identifiable information"
 ./manage.py obfuscate_data
 
-echo -e "\nDatabase restore finished."
+echo -e "\nDatabase restore finished"
