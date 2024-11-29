@@ -13,17 +13,17 @@ S3_PATH="$S3_BUCKET/$BACKUP_FILE"
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]
 then
-    echo -e "\n>>> Error: Clerk private key not found in CLERK_PRIVATE_SSH_KEY."
+    echo -e "\n>>> Error: Clerk private key not found in CLERK_PRIVATE_SSH_KEY"
     exit 1
 fi
 
-echo -e "\n>>> Backing up Postgres DB on Clerk EC2 instance at $HOST."
+echo -e "\n>>> Backing up Postgres DB on Clerk EC2 instance at $HOST"
 
-echo -e "\n>>> Setting up private key."
+echo -e "\n>>> Setting up private key"
 echo -e "$CLERK_PRIVATE_SSH_KEY" > private.key
 chmod 600 private.key
 
-echo -e "\n>>> SSH into Clerk EC2 instance at $HOST."
+echo -e "\n>>> SSH into Clerk EC2 instance at $HOST"
 ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
     set -e
     cd /srv/backups
@@ -38,4 +38,4 @@ ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash << EOF
     echo "$TIME Removed local database dump to prevent clutter"
 EOF
 
-echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST."
+echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST"
