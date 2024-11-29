@@ -273,7 +273,6 @@ dependencies = [
     { name = "html-sanitizer" },
     { name = "isort" },
     { name = "mailchimp3" },
-    { name = "mimesis" },
     { name = "msal" },
     { name = "openapi-spec-validator" },
     { name = "pillow" },
@@ -327,7 +326,6 @@ requires-dist = [
     { name = "html-sanitizer" },
     { name = "isort" },
     { name = "mailchimp3" },
-    { name = "mimesis" },
     { name = "msal" },
     { name = "openapi-spec-validator" },
     { name = "pillow" },
@@ -1038,15 +1036,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/ff/0ffefdcac38932a54d2b5eed4e0ba8a408f215002cd178ad1df0f2806ff8/mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325", size = 9658 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e", size = 7350 },
-]
-
-[[package]]
-name = "mimesis"
-version = "18.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5d/f1/33fb02aa19271a5a2334d24a597047399744a3f1e8c97be31053887260b4/mimesis-18.0.0.tar.gz", hash = "sha256:7d7c76ecd680ae48afe8dc4413ef1ef1ee7ef20e16f9f9cb42892add642fc1b2", size = 4681287 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/c8/0b91996ce5337bb877300d0a0e86df17ab72da573625348dcb6cd92c3c41/mimesis-18.0.0-py3-none-any.whl", hash = "sha256:a51854a5ce63ebf2bd6a98e8841412e04cede38593be7e16d1d712848e6273df", size = 4734674 },
 ]
 
 [[package]]
