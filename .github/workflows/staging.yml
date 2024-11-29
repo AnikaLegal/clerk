@@ -1,16 +1,16 @@
-name: Backup
+name: Staging
 on:
   workflow_dispatch:
   schedule:
-    # Backup our Postgres DB nightly at 2AM AEST (4PM UTC)
-    - cron: "0 16 * * *"
+    # Update staging environment at 0415 AEST (18:15 UTC) each Saturday 
+    - cron: "15 18 * * SAT"
 jobs:
-  backup:
+  update_staging:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Run backup script
-      run: ./infra/backup.sh
+      run: ./infra/staging/database-restore.sh
       shell: bash
       env:
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
