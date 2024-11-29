@@ -9,7 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Run backup script
+
+      # Setup transcrypt so that we can read secrets
+    - name: Checkout transcrypt
+      uses: actions/checkout@v4
+      with:
+        repository: elasticdog/transcrypt
+        path: transcrypt
+
+    - name: Initialise transcrypt
+      run: ./transcrypt/transcrypt -c aes-256-cbc -p '${{ secrets.TRANSCRYPT_PASSWORD }}' --yes
+
+    - name: Update staging
       run: ./infra/staging/database-restore.sh
       shell: bash
       env:
