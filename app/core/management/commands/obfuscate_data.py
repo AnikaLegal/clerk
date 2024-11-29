@@ -27,7 +27,7 @@ class Command(BaseCommand):
         self.stdout.write("\nObfuscating personal information...")
         disable_signals()
 
-        fake = Faker('en_AU')
+        fake = Faker("en_AU")
 
         clients = Client.objects.all()
         emails = Email.objects.all()
@@ -46,27 +46,27 @@ class Command(BaseCommand):
             | Q(is_superuser=True)
         ).distinct()
 
-        for t in tenancies:
+        for t in tenancies.iterator():
             t.address = fake.street_address()
             t.suburb = fake.city()
             t.postcode = fake.postcode()
             t.save()
 
-        for u in users:
+        for u in users.iterator():
             u.email = fake.unique.email()
-            u.username = u.email # Username same as fake email.
+            u.username = u.email  # Username same as fake email.
             u.first_name = fake.first_name()
             u.last_name = fake.last_name()
             u.save()
 
-        for p in people:
+        for p in people.iterator():
             p.full_name = fake.name()
             p.email = fake.email()
             p.address = fake.address()
             p.phone_number = fake.phone_number()
             p.save()
 
-        for c in clients:
+        for c in clients.iterator():
             c.first_name = fake.first_name()
             c.last_name = fake.last_name()
             if c.preferred_name:
@@ -75,7 +75,7 @@ class Command(BaseCommand):
             c.phone_number = fake.phone_number()
             c.save()
 
-        for i in issues:
+        for i in issues.iterator():
             if i.outcome_notes:
                 i.outcome_notes = " ".join(fake.sentences())
 
@@ -87,11 +87,11 @@ class Command(BaseCommand):
             }
             i.save()
 
-        for n in notes:
+        for n in notes.iterator():
             n.text = " ".join(fake.sentences())
             n.save()
 
-        for e in emails:
+        for e in emails.iterator():
             e.received_data = None
             e.subject = fake.sentence()
             e.text = "\n\n".join(fake.paragraphs())
@@ -104,12 +104,10 @@ class Command(BaseCommand):
                 e.from_address = fake.email()
             if e.to_address:
                 e.to_address = fake.email()
-            e.cc_addresses = [
-                fake.email() for _ in e.cc_addresses
-            ]
+            e.cc_addresses = [fake.email() for _ in e.cc_addresses]
             e.save()
 
-        for s in services:
+        for s in services.iterator():
             if s.notes:
                 s.notes = " ".join(fake.sentences())
                 s.save()
@@ -118,7 +116,7 @@ class Command(BaseCommand):
         email_attachment = os.path.join(EmailAttachment.UPLOAD_KEY, file_name)
         file_upload = os.path.join(FileUpload.UPLOAD_KEY, file_name)
 
-        bytes = fake.image(image_format='pdf')
+        bytes = fake.image(image_format="pdf")
         default_storage.save(email_attachment, BytesIO(bytes))
         default_storage.save(file_upload, BytesIO(bytes))
 
@@ -126,6 +124,7 @@ class Command(BaseCommand):
         EmailAttachment.objects.update(
             file=email_attachment, content_type="application/pdf"
         )
+
         # Replace uploaded files
         FileUpload.objects.update(file=file_upload)
 
