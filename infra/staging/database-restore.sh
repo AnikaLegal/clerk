@@ -20,6 +20,7 @@ Host ec2
   User root
   IdentityFile ~/.ssh/private.key
   StrictHostKeyChecking no
+  ServerAliveInterval 60
 END
 
 echo -e "\n>>> Copying staging compose & env file to clerk at $HOST"
