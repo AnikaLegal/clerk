@@ -203,28 +203,5 @@ def superuser(c, email):
     run(c, f"./manage.py createsuperuser --no-input --username {email} --email {email}")
 
 
-S3_PROD = "anika-clerk"
-S3_TEST = "anika-clerk-test"
-SYNC_DIRS = [
-    "action-documents",
-    "documents", # wagtail
-    "email-attachments",
-    "file-uploads",
-    "images",
-    "original_images",
-]
-
-
-@task
-def sync_s3(c):
-    """
-    Sync S3 assets from prod to test
-    FIXME: Improve upon public read status.
-    """
-    for sync_dir in SYNC_DIRS:
-        cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
-
-
 def run(c, cmd: str, service="web"):
     c.run(f"{COMPOSE} run --rm {service} {cmd}", pty=True)

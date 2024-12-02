@@ -1,8 +1,10 @@
 #!/bin/bash
 # Sync prod backups to staging.
 echo -e "\nSync AWS S3 assets"
+aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-test/action-documents
+aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-test/documents
 aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-test/images
-aws s3 sync s3://anika-clerk/original_images/ s3://anika-clerk-test/original_images/
+aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-test/original_images
 
 echo -e "\nRestoring database from S3 backups"
 S3_BUCKET=s3://anika-database-backups
