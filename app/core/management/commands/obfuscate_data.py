@@ -112,6 +112,8 @@ class Command(BaseCommand):
                 s.notes = " ".join(fake.sentences())
                 s.save()
 
+        # Save sample files to storage (AWS S3) to use for email attachments &
+        # uploaded files.
         file_name = "sample.pdf"
         email_attachment = os.path.join(EmailAttachment.UPLOAD_KEY, file_name)
         file_upload = os.path.join(FileUpload.UPLOAD_KEY, file_name)
@@ -120,12 +122,12 @@ class Command(BaseCommand):
         default_storage.save(email_attachment, BytesIO(bytes))
         default_storage.save(file_upload, BytesIO(bytes))
 
-        # Replace files attached to emails
+        # Replace files attached to emails.
         EmailAttachment.objects.update(
             file=email_attachment, content_type="application/pdf"
         )
 
-        # Replace uploaded files
+        # Replace uploaded files.
         FileUpload.objects.update(file=file_upload)
 
         restore_signals()
