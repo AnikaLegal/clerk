@@ -173,7 +173,7 @@ def test(
 
 @task
 def obfuscate(c):
-    """Obfuscate personally identifiable info from prod"""
+    """Obfuscate personally identifiable info"""
     run(c, "./manage.py obfuscate_data")
 
 
@@ -184,11 +184,9 @@ def reset(c):
 
 
 @task()
-def restore(c, no_obfuscate=False):
-    """Restore and obfuscate local database from production backups"""
+def restore(c):
+    """Restore local database from staging backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
-    if not no_obfuscate:
-        obfuscate(c)
 
 
 @task

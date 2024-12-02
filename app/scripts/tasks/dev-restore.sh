@@ -5,10 +5,11 @@ export PGPORT=5432
 export PGDATABASE=postgres
 export PGUSER=postgres
 export PGPASSWORD=password
-BACKUP_BUCKET_NAME="anika-database-backups"
+
+BACKUP_BUCKET_NAME="anika-database-backups-test"
 S3_BUCKET="s3://${BACKUP_BUCKET_NAME}"
 
-echo -e "\nRestoring database from production backups."
+echo -e "\nRestoring database from staging backups"
 ./manage.py reset_db --close-sessions --noinput
 
 echo -e "\nRestoring database from S3 backups at ${S3_BUCKET}"
@@ -23,7 +24,7 @@ echo -e "\nFound dump $DUMP_NAME"
 
 . /app/scripts/tasks/dev-post-reset.sh
 
-echo -e "\nSetting all Slack messages to send to test alerts channel."
+echo -e "\nSetting all Slack messages to send to test alerts channel"
 SHELL_CMD="space=chr(32);\
 c=SlackChannel.objects.get(name=f'Test{space}Alerts');\
 SlackMessage.objects.all().update(channel=c);\

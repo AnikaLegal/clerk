@@ -22,3 +22,14 @@ jobs:
       shell: bash
       env:
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
+  backup:
+    runs-on: ubuntu-latest
+    needs: update_staging
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run backup script
+      run: ./infra/staging/backup.sh
+      shell: bash
+      env:
+        CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
