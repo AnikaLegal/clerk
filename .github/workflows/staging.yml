@@ -1,9 +1,6 @@
 name: Staging
 on:
   workflow_dispatch:
-  schedule:
-    # Update staging environment at 0415 AEST (18:15 UTC) each Saturday 
-    - cron: "15 18 * * SAT"
 jobs:
   update_staging:
     runs-on: ubuntu-latest
