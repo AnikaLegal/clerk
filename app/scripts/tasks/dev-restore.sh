@@ -13,16 +13,17 @@ BACKUP_BUCKET_NAME="anika-database-backups-test"
 S3_BUCKET="s3://${BACKUP_BUCKET_NAME}"
 
 echo -e "\nRestoring database from staging backups at ${S3_BUCKET}"
-DUMP_NAME=$( \
-    aws s3 ls ${S3_BUCKET} | \
-    sort | grep postgres_clerk | \
-    tail -n 1 | \
-    awk '{{print $4}}'
-)
+DUMP_NAME=$(aws s3 ls ${S3_BUCKET} |
+    sort |
+    grep postgres_clerk |
+    tail -n 1 |
+    awk '{{print $4}}')
 echo -e "\nFound backup $DUMP_NAME"
 
 ./manage.py reset_db --close-sessions --noinput
-! aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - | gunzip | pg_restore -d $PGDATABASE --no-owner
+! aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - |
+    gunzip |
+    pg_restore -d $PGDATABASE --no-owner
 
 . /app/scripts/tasks/dev-post-reset.sh
 
