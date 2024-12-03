@@ -1,5 +1,8 @@
 #!/bin/bash
-set -e
+
+set -o errexit
+set -o pipefail
+
 export PGHOST=clerk_db
 export PGPORT=5432
 export PGDATABASE=postgres
@@ -10,8 +13,6 @@ BACKUP_BUCKET_NAME="anika-database-backups-test"
 S3_BUCKET="s3://${BACKUP_BUCKET_NAME}"
 
 echo -e "\nRestoring database from staging backups"
-./manage.py reset_db --close-sessions --noinput
-
 echo -e "\nRestoring database from S3 backups at ${S3_BUCKET}"
 DUMP_NAME=$( \
     aws s3 ls ${S3_BUCKET} | \
@@ -20,6 +21,8 @@ DUMP_NAME=$( \
     awk '{{print $4}}'
 )
 echo -e "\nFound dump $DUMP_NAME"
+
+./manage.py reset_db --close-sessions --noinput
 ! aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - | gunzip | pg_restore -d $PGDATABASE --no-owner
 
 . /app/scripts/tasks/dev-post-reset.sh
