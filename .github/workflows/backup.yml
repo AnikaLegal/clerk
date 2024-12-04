@@ -14,3 +14,5 @@ jobs:
       shell: bash
       env:
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ vars.AWS_BACKUP_USER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKUP_USER_SECRET_ACCESS_KEY }}

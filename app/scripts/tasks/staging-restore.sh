@@ -15,7 +15,6 @@ LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
 echo -e "\nFound backup $LATEST_BACKUP"
 
 aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
-    gunzip |
     pg_restore \
         --clean \
         --dbname $PGDATABASE \

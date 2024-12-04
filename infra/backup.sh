@@ -6,8 +6,8 @@
 set -e
 HOST='13.55.250.149'
 TIME=$(date "+%s")
-S3_BUCKET=s3://anika-database-backups
-BACKUP_FILE="postgres_clerk_production_${TIME}.sql.gz"
+S3_BUCKET='s3://anika-database-backups'
+BACKUP_FILE="postgres_clerk_production_${TIME}.sql"
 S3_PATH="$S3_BUCKET/$BACKUP_FILE"
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
@@ -18,22 +18,11 @@ fi
 echo -e "\n>>> Backing up Postgres DB on Clerk EC2 instance at $HOST"
 
 echo -e "\n>>> Setting up private key"
-echo -e "$CLERK_PRIVATE_SSH_KEY" > private.key
+echo -e "$CLERK_PRIVATE_SSH_KEY" >private.key
 chmod 600 private.key
 
-echo -e "\n>>> SSH into Clerk EC2 instance at $HOST"
-ssh -o StrictHostKeyChecking=no -i private.key root@$HOST /bin/bash <<EOF
-    set -e
-    cd /srv/backups
-
-    pg_dump --format=custom | gzip > $BACKUP_FILE
-    echo "$TIME Created local database dump: $BACKUP_FILE"
-
-    aws s3 cp $BACKUP_FILE $S3_PATH
-    echo "$TIME Copied local database dump to S3: $S3_PATH"
-    
-    rm $BACKUP_FILE
-    echo "$TIME Removed local database dump to prevent clutter"
-EOF
-
+echo -e "\n>>> Streaming backup from Clerk EC2 instance at $HOST"
+ssh -T -o StrictHostKeyChecking=no -i private.key root@$HOST \
+    'pg_dump --dbname=clerk --format=custom' |
+    aws s3 cp - $S3_PATH
 echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST"
