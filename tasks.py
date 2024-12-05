@@ -64,7 +64,9 @@ def logs(c, service_name):
 @task
 def ssh(c):
     """SSH into prod"""
-    print(f"ssh root@{HOST}")
+    cmd = f"ssh root@{HOST}"
+    print(cmd)
+    c.run(cmd, pty=True)
 
 
 @task
