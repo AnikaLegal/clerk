@@ -1,21 +1,21 @@
 import logging
+import os
+from io import BytesIO
 from random import randint
 
 from accounts.models import CaseGroups, User
 from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
 from core.models.issue_note import NoteType
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 from emails.models import Email, EmailAttachment
-from mimesis import Generic
-from mimesis.locales import Locale
 from utils.signals import disable_signals, restore_signals
+from faker import Faker
 
 logger = logging.getLogger(__name__)
-generic = Generic(locale=Locale.EN_AU)
-email_domains = ["example.com", "example.org", "example.edu"]
 
 
 class Command(BaseCommand):
@@ -26,6 +26,8 @@ class Command(BaseCommand):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
         self.stdout.write("\nObfuscating personal information...")
         disable_signals()
+
+        fake = Faker("en_AU")
 
         clients = Client.objects.all()
         emails = Email.objects.all()
@@ -44,80 +46,88 @@ class Command(BaseCommand):
             | Q(is_superuser=True)
         ).distinct()
 
-        for t in tenancies:
-            t.address = generic.address.address()
-            t.suburb = generic.address.city()
-            t.postcode = generic.address.postal_code()
+        for t in tenancies.iterator():
+            t.address = fake.street_address()
+            t.suburb = fake.city()
+            t.postcode = fake.postcode()
             t.save()
 
-        for u in users:
-            u.email = generic.person.email(domains=email_domains, unique=True)
+        for u in users.iterator():
+            u.email = fake.unique.email()
             u.username = u.email  # Username same as fake email.
-            u.first_name = generic.person.first_name()
-            u.last_name = generic.person.last_name()
+            u.first_name = fake.first_name()
+            u.last_name = fake.last_name()
             u.save()
 
-        for p in people:
-            p.full_name = generic.person.full_name()
-            p.email = generic.person.email(domains=email_domains)
-            p.phone_number = generic.person.phone_number()
-            p.address = generic.address.address()
+        for p in people.iterator():
+            p.full_name = fake.name()
+            p.email = fake.email()
+            p.address = fake.address()
+            p.phone_number = fake.phone_number()
             p.save()
 
-        for c in clients:
-            c.first_name = generic.person.first_name()
-            c.last_name = generic.person.last_name()
+        for c in clients.iterator():
+            c.first_name = fake.first_name()
+            c.last_name = fake.last_name()
             if c.preferred_name:
-                c.preferred_name = generic.person.first_name()
-            c.email = generic.person.email(domains=email_domains)
-            c.phone_number = generic.person.phone_number()
+                c.preferred_name = fake.first_name()
+            c.email = fake.email()
+            c.phone_number = fake.phone_number()
             c.save()
 
-        for i in issues:
+        for i in issues.iterator():
             if i.outcome_notes:
-                i.outcome_notes = generic.text.text(quantity=2)
+                i.outcome_notes = " ".join(fake.sentences())
 
             prefix = i.topic.upper()
             i.answers = {
-                f"{prefix}_FOO": generic.text.text(quantity=3),
-                f"{prefix}_BAR": generic.text.text(quantity=3),
-                f"{prefix}_BAZ": generic.text.text(quantity=3),
+                f"{prefix}_FOO": " ".join(fake.sentences()),
+                f"{prefix}_BAR": " ".join(fake.sentences()),
+                f"{prefix}_BAZ": " ".join(fake.sentences()),
             }
             i.save()
 
-        for n in notes:
-            n.text = generic.text.text(quantity=3)
+        for n in notes.iterator():
+            n.text = " ".join(fake.sentences())
             n.save()
 
-        for e in emails:
+        for e in emails.iterator():
             e.received_data = None
-            e.subject = generic.text.title()
-            e.text = generic.text.text(quantity=randint(1, 10))
+            e.subject = fake.sentence()
+            e.text = "\n\n".join(fake.paragraphs())
             e.html = ""
 
             # This could be smarter and attempt to match the sender related user
             # or the client with the to/from address and use the same obfuscated
             # email but it's unclear if that is actually useful.
             if e.from_address:
-                e.from_address = generic.person.email(domains=email_domains)
+                e.from_address = fake.email()
             if e.to_address:
-                e.to_address = generic.person.email(domains=email_domains)
-            e.cc_addresses = [
-                generic.person.email(domains=email_domains) for _ in e.cc_addresses
-            ]
+                e.to_address = fake.email()
+            e.cc_addresses = [fake.email() for _ in e.cc_addresses]
             e.save()
 
-        for s in services:
+        for s in services.iterator():
             if s.notes:
-                s.notes = generic.text.sentence()
+                s.notes = " ".join(fake.sentences())
                 s.save()
 
-        # Replace files attached to emails
+        # Save sample files to storage (AWS S3) to use for email attachments &
+        # uploaded files.
+        file_name = "sample.pdf"
+        email_attachment = os.path.join(EmailAttachment.UPLOAD_KEY, file_name)
+        file_upload = os.path.join(FileUpload.UPLOAD_KEY, file_name)
+
+        bytes = fake.image(image_format="pdf")
+        default_storage.save(email_attachment, BytesIO(bytes))
+        default_storage.save(file_upload, BytesIO(bytes))
+
+        # Replace files attached to emails.
         EmailAttachment.objects.update(
-            file="email-attachments/do-your-best.png", content_type="image/png"
+            file=email_attachment, content_type="application/pdf"
         )
 
-        # Replace uploaded files
-        FileUpload.objects.update(file="file-uploads/do-your-best.png")
+        # Replace uploaded files.
+        FileUpload.objects.update(file=file_upload)
 
         restore_signals()

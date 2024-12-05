@@ -109,7 +109,7 @@ wheels = [
 
 [[package]]
 name = "awscli"
-version = "1.34.18"
+version = "1.36.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
@@ -119,9 +119,9 @@ dependencies = [
     { name = "rsa" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/5c/47d8c37f44194d7ab3c266890b5d3c425455db919c154f6b119614eb9357/awscli-1.34.18.tar.gz", hash = "sha256:779a1a25d6c3044bce62c8bd88a2daa29425b169a2f7cc027f405abe2e40acbf", size = 1826697 }
+sdist = { url = "https://files.pythonhosted.org/packages/8d/e9/85378362711627deaabc50c5826fd770f30e5929afaa7ed1af77965afaa4/awscli-1.36.12.tar.gz", hash = "sha256:97d045bcfceafed74f0b697334432dfa723ce752f2b1b20ab2a2b194d558c9e0", size = 1832999 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/16/d81da4fb57d464beef9491cd7765af4876f0f39f550768d71ea6a28a9645/awscli-1.34.18-py3-none-any.whl", hash = "sha256:96aa2cbd680d9f3a6963fd36130dc5cc10b6e8b39f499115aa1d020782c9da29", size = 4519780 },
+    { url = "https://files.pythonhosted.org/packages/a3/a9/1a002bad23dcd82efaf3bea3e3860b8b54e75ff5dfe62367b3ae79769d43/awscli-1.36.12-py3-none-any.whl", hash = "sha256:7ced75838de8e7b21db4488b8fcd57d142375fdb87ec43ae4f40f53dee7ab479", size = 4536034 },
 ]
 
 [[package]]
@@ -172,16 +172,16 @@ wheels = [
 
 [[package]]
 name = "botocore"
-version = "1.35.18"
+version = "1.35.71"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/cf/e3fb940cd5c79199bb3514f294a243c7ce33f652c9b1b0eac37aaeba999b/botocore-1.35.18.tar.gz", hash = "sha256:e59da8b91ab06683d2725b6cbbb0383b30c68a241c3c63363f4c5bff59b3c0c0", size = 12748441 }
+sdist = { url = "https://files.pythonhosted.org/packages/77/7b/c3f9babe738d5efeb96bd5b250bafcd733c2fd5d8650d8986daa86ee45a1/botocore-1.35.71.tar.gz", hash = "sha256:f9fa058e0393660c3fe53c1e044751beb64b586def0bd2212448a7c328b0cbba", size = 13238393 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5d/48/1d81b4a661c76a60800d0cf0f87020c6acedc60fd0cf4690edeefd197ee2/botocore-1.35.18-py3-none-any.whl", hash = "sha256:1027083aeb1fe74057273410fd768e018e22f85adfbd717b5a69f578f7812b80", size = 12537061 },
+    { url = "https://files.pythonhosted.org/packages/63/49/b821048ae671518c00064a936ca08ab4ef7a715d866c3f0331688febeedd/botocore-1.35.71-py3-none-any.whl", hash = "sha256:fc46e7ab1df3cef66dfba1633f4da77c75e07365b36f03bd64a3793634be8fc1", size = 13034516 },
 ]
 
 [[package]]
@@ -273,7 +273,6 @@ dependencies = [
     { name = "html-sanitizer" },
     { name = "isort" },
     { name = "mailchimp3" },
-    { name = "mimesis" },
     { name = "msal" },
     { name = "openapi-spec-validator" },
     { name = "pillow" },
@@ -327,7 +326,6 @@ requires-dist = [
     { name = "html-sanitizer" },
     { name = "isort" },
     { name = "mailchimp3" },
-    { name = "mimesis" },
     { name = "msal" },
     { name = "openapi-spec-validator" },
     { name = "pillow" },
@@ -1038,15 +1036,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/ff/0ffefdcac38932a54d2b5eed4e0ba8a408f215002cd178ad1df0f2806ff8/mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325", size = 9658 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e", size = 7350 },
-]
-
-[[package]]
-name = "mimesis"
-version = "18.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5d/f1/33fb02aa19271a5a2334d24a597047399744a3f1e8c97be31053887260b4/mimesis-18.0.0.tar.gz", hash = "sha256:7d7c76ecd680ae48afe8dc4413ef1ef1ee7ef20e16f9f9cb42892add642fc1b2", size = 4681287 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/c8/0b91996ce5337bb877300d0a0e86df17ab72da573625348dcb6cd92c3c41/mimesis-18.0.0-py3-none-any.whl", hash = "sha256:a51854a5ce63ebf2bd6a98e8841412e04cede38593be7e16d1d712848e6273df", size = 4734674 },
 ]
 
 [[package]]
