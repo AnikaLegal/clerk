@@ -3,8 +3,8 @@
 This wiki is used for Anika Legal course documenation. Hosted in AWS EC2.
 
 - Domain: wiki.anikalegal.com
-- IP: 3.24.123.148
-- Private key: clerk.pem
+- IP: 13.211.81.43
+- Private key: wiki.pem (see Bitwarden)
 
 [Bookstack Documentation](https://www.bookstackapp.com/docs/)
 
@@ -34,7 +34,7 @@ MAIL_PASSWORD=SG.**********
 # Ensure app stores uploaded files in S3, not locally
 # https://www.bookstackapp.com/docs/admin/upload-config/
 STORAGE_TYPE=s3
-STORAGE_S3_KEY=AKIA**********
+STORAGE_S3_KEY=AKIAUZ6OTSVMX2RTJOXB
 STORAGE_S3_SECRET=**********
 STORAGE_S3_BUCKET=anika-bookstack
 STORAGE_S3_REGION=ap-southeast-2
