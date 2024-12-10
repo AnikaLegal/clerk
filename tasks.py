@@ -64,7 +64,9 @@ def logs(c, service_name):
 @task
 def ssh(c):
     """SSH into prod"""
-    print(f"ssh root@{HOST}")
+    cmd = f"ssh root@{HOST}"
+    print(cmd)
+    c.run(cmd, pty=True)
 
 
 @task
@@ -173,7 +175,7 @@ def test(
 
 @task
 def obfuscate(c):
-    """Obfuscate personally identifiable info from prod"""
+    """Obfuscate personally identifiable info"""
     run(c, "./manage.py obfuscate_data")
 
 
@@ -184,11 +186,9 @@ def reset(c):
 
 
 @task()
-def restore(c, no_obfuscate=False):
-    """Restore and obfuscate local database from production backups"""
+def restore(c):
+    """Restore local database from staging backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
-    if not no_obfuscate:
-        obfuscate(c)
 
 
 @task
@@ -201,29 +201,6 @@ def migrate(c):
 def superuser(c, email):
     """Create superuser for local development & testing"""
     run(c, f"./manage.py createsuperuser --no-input --username {email} --email {email}")
-
-
-S3_PROD = "anika-clerk"
-S3_TEST = "anika-clerk-test"
-SYNC_DIRS = [
-    "action-documents",
-    "documents", # wagtail
-    "email-attachments",
-    "file-uploads",
-    "images",
-    "original_images",
-]
-
-
-@task
-def sync_s3(c):
-    """
-    Sync S3 assets from prod to test
-    FIXME: Improve upon public read status.
-    """
-    for sync_dir in SYNC_DIRS:
-        cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
 
 
 def run(c, cmd: str, service="web"):
