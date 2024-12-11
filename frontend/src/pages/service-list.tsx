@@ -25,7 +25,7 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { CaseFormServiceChoices } from 'types'
+import { CaseFormServiceChoices } from 'types/case'
 import {
   choiceToMap,
   filterEmpty,
