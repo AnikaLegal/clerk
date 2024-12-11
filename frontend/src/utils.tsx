@@ -1,4 +1,5 @@
 import { createTheme, MantineProvider } from '@mantine/core'
+import { ModalsProvider } from '@mantine/modals'
 import { Error as ErrorType } from 'api'
 import { store } from 'api/store'
 import { ErrorBoundary } from 'comps/error-boundary'
@@ -71,11 +72,13 @@ export const mount = (App: React.ComponentType) => {
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
         <MantineProvider theme={theme}>
-          <ErrorBoundary>
-            <FadeInOnLoad>
-              <App />
-            </FadeInOnLoad>
-          </ErrorBoundary>
+          <ModalsProvider>
+            <ErrorBoundary>
+              <FadeInOnLoad>
+                <App />
+              </FadeInOnLoad>
+            </ErrorBoundary>
+          </ModalsProvider>
         </MantineProvider>
       </SnackbarProvider>
     </Provider>

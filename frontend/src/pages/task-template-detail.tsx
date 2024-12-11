@@ -1,10 +1,11 @@
+import { modals } from '@mantine/modals'
+import api, { TaskTrigger } from 'api'
+import { Formik } from 'formik'
+import { TaskTemplateForm } from 'forms/task-template'
+import { useSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
-import { Formik } from 'formik'
-import api, { TaskTrigger } from 'api'
-import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { TaskTemplateForm } from 'forms/task-template'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   choices: {
@@ -34,27 +35,30 @@ const App = () => {
   const handleDelete = (e) => {
     e.preventDefault()
 
-    const isDelete = confirm(
-      'Are you sure you want to delete this notification template?'
-    )
-    if (!isDelete) return
-
-    deleteTaskTrigger({ id: CONTEXT.task_trigger_pk })
-      .unwrap()
-      .then(() => {
-        window.location.href = CONTEXT.list_url
-      })
-      .catch((err) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(
-            err,
-            'Failed to delete this notification template'
-          ),
-          {
-            variant: 'error',
-          }
-        )
-      })
+    modals.openConfirmModal({
+      title: 'Are you sure you want to delete this notification template?',
+      centered: true,
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => {
+        deleteTaskTrigger({ id: CONTEXT.task_trigger_pk })
+          .unwrap()
+          .then(() => {
+            window.location.href = CONTEXT.list_url
+          })
+          .catch((err) => {
+            enqueueSnackbar(
+              getAPIErrorMessage(
+                err,
+                'Failed to delete this notification template'
+              ),
+              {
+                variant: 'error',
+              }
+            )
+          })
+      },
+    })
   }
 
   return (

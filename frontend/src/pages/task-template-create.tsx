@@ -1,10 +1,10 @@
-import { TaskTemplate, useCreateTaskTriggerMutation } from 'api'
+import { useCreateTaskTriggerMutation } from 'api'
 import { Formik } from 'formik'
 import { TaskTemplateForm } from 'forms/task-template'
 import { useSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
-import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import { getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   choices: {

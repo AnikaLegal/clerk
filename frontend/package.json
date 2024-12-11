@@ -16,6 +16,7 @@
     "@babel/plugin-transform-runtime": "^7.25.9",
     "@mantine/core": "^7.14.1",
     "@mantine/hooks": "^7.14.1",
+    "@mantine/modals": "^7.14.1",
     "@mantine/tiptap": "^7.14.1",
     "@reduxjs/toolkit": "^2.3.0",
     "@sentry/browser": "^8.39.0",
