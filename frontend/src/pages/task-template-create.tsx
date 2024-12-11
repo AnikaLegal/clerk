@@ -1,10 +1,10 @@
+import { TaskTemplate, useCreateTaskTriggerMutation } from 'api'
+import { Formik } from 'formik'
+import { TaskTemplateForm } from 'forms/task-template'
+import { useSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
-import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { Formik } from 'formik'
-import { useCreateTaskTriggerMutation } from 'api'
-import { TaskTemplateForm } from 'forms/task-template'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   choices: {
@@ -41,10 +41,9 @@ const App = () => {
               window.location.href = template.url
             })
             .catch((e) => {
-              enqueueSnackbar(
-                getAPIErrorMessage(e, 'Failed to create a new task template'),
-                { variant: 'error' }
-              )
+              enqueueSnackbar('Failed to create a new task template', {
+                variant: 'error',
+              })
               const requestErrors = getAPIFormErrors(e)
               if (requestErrors) {
                 setErrors(requestErrors)
