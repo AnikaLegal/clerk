@@ -36,9 +36,9 @@ const App = () => {
     e.preventDefault()
 
     modals.openConfirmModal({
-      title: 'Are you sure you want to delete this notification template?',
+      title: 'Are you sure you want to delete this task template?',
       centered: true,
-      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      labels: { confirm: 'Delete task template', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: () => {
         deleteTaskTrigger({ id: CONTEXT.task_trigger_pk })
