@@ -1,3 +1,4 @@
+import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import { TaskTemplate } from 'api'
 import {
   EditorEvents,
@@ -11,7 +12,7 @@ import {
   Formik,
   FormikHelpers,
   FormikProps,
-  useField
+  useField,
 } from 'formik'
 import React, { useState } from 'react'
 import {
@@ -22,6 +23,8 @@ import {
   Form,
   Grid,
   Header,
+  Icon,
+  IconProps,
   Input,
   InputProps,
   Modal,
@@ -48,13 +51,13 @@ const RichTextField = ({
   label,
   ...props
 }: { name: string; label: string } & RichTextEditorProps) => {
-  const [field, meta, helpers] = useField(name)
+  const [, meta, helpers] = useField(name)
 
-  const handleBlur = ({ editor, event, transaction }: EditorEvents['blur']) => {
+  const handleUpdate = ({ editor, transaction }: EditorEvents['update']) => {
     if (editor) {
       helpers.setValue(editor.getHTML())
-      if (props.onBlur) {
-        props.onBlur({ editor, event, transaction })
+      if (props.onUpdate) {
+        props.onUpdate({ editor, transaction })
       }
     }
   }
@@ -64,8 +67,8 @@ const RichTextField = ({
       <label>{label}</label>
       <RichTextEditor
         {...props}
-        initialContent={field.value}
-        onBlur={handleBlur}
+        initialContent={meta.initialValue}
+        onUpdate={handleUpdate}
       />
       <ErrorMessage name={name} />
     </div>
@@ -114,14 +117,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   create,
   onDelete,
   choices,
-  formik: {
-    values,
-    errors,
-    handleChange,
-    handleSubmit,
-    isSubmitting,
-    setFieldValue,
-  },
+  formik: { values, errors, handleSubmit, isSubmitting },
 }) => {
   const [showEventStage, setShowEventStage] = useState<boolean>(
     values.event === 'STAGE'
@@ -174,14 +170,14 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         {(arrayHelpers) => {
           return (
             <>
-              <Grid style={{ marginBottom: '0.25rem' }}>
+              <Grid>
                 <Grid.Row columns={2} style={{ alignItems: 'center' }}>
                   <Grid.Column>
                     <Header as="h3">Tasks</Header>
                   </Grid.Column>
                   <Grid.Column>
                     {!showAddTask && (
-                      <AddTaskTemplate
+                      <AddTaskTemplateButton
                         floated="right"
                         size="mini"
                         type="button"
@@ -189,12 +185,13 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                         choices={choices}
                       >
                         Add task
-                      </AddTaskTemplate>
+                      </AddTaskTemplateButton>
                     )}
                   </Grid.Column>
                 </Grid.Row>
               </Grid>
               <TaskTemplateTable
+                arrayHelpers={arrayHelpers}
                 templates={values.templates}
                 choices={choices}
               />
@@ -227,11 +224,13 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
 }
 
 interface TaskTemplateTableProps {
+  arrayHelpers: FieldArrayRenderProps
   templates: TaskTemplate[]
   choices: any
 }
 
 export const TaskTemplateTable = ({
+  arrayHelpers,
   templates,
   choices,
 }: TaskTemplateTableProps) => {
@@ -266,7 +265,14 @@ export const TaskTemplateTable = ({
             <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
             <Table.Cell>{template.due_in}</Table.Cell>
             <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
-            <Table.Cell collapsing textAlign="center"></Table.Cell>
+            <Table.Cell collapsing textAlign="center">
+              <TaskTemplateActionIcons
+                templates={templates}
+                index={index}
+                arrayHelpers={arrayHelpers}
+                choices={choices}
+              />
+            </Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
@@ -274,18 +280,133 @@ export const TaskTemplateTable = ({
   )
 }
 
-export interface AddTaskTemplateProps {
+export interface TaskTemplateActionIconProps {
+  templates: TaskTemplate[]
+  index: number
+  arrayHelpers: FieldArrayRenderProps
+  choices: any
+}
+
+export const TaskTemplateActionIcons = ({
+  templates,
+  index,
+  arrayHelpers,
+  choices,
+}: TaskTemplateActionIconProps) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+
+  /* Handle a situation where a click event does not trigger due to element
+   * resizing when attempting to click an action icon on another row of the same
+   * table when a confirm delete button is already showing. This delays the
+   * element resize which allows the click event to trigger. This feels nasty and
+   * probably is and I presume it might not always work but gets the job done
+   * most of the time */
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    setShowConfirmDelete(false)
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
+
+  if (showConfirmDelete) {
+    return (
+      <div ref={ref}>
+        <Button
+          negative
+          compact
+          size="mini"
+          onClick={() => arrayHelpers.remove(index)}
+        >
+          Confirm delete
+        </Button>
+      </div>
+    )
+  }
+  return (
+    <>
+      <EditTaskTemplateIcon
+        link
+        name="pencil"
+        templates={templates}
+        index={index}
+        choices={choices}
+        arrayHelpers={arrayHelpers}
+      />
+      <Icon
+        link
+        name="trash alternate outline"
+        onClick={() => setShowConfirmDelete(true)}
+      />
+      {templates.length > 1 && (
+        <>
+          <Icon
+            link
+            name="arrow up"
+            onClick={() => arrayHelpers.move(index, index - 1)}
+            disabled={index == 0}
+          />
+          <Icon
+            link
+            name="arrow down"
+            onClick={() => arrayHelpers.move(index, index + 1)}
+            disabled={index == templates.length - 1}
+          />
+        </>
+      )}
+    </>
+  )
+}
+
+export interface EditTaskTemplateIconProps {
+  templates: TaskTemplate[]
+  index: number
+  choices: any
+  arrayHelpers: FieldArrayRenderProps
+}
+
+export const EditTaskTemplateIcon = ({
+  templates,
+  index,
+  choices,
+  arrayHelpers,
+  ...props
+}: EditTaskTemplateIconProps & IconProps) => {
+  const [open, setOpen] = useState(false)
+
+  const handleSubmit = (
+    template: TaskTemplate,
+    { resetForm }: FormikHelpers<TaskTemplate>
+  ) => {
+    arrayHelpers.replace(index, template)
+    resetForm()
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <TaskTemplateModal
+        initialValues={templates[index]}
+        choices={choices}
+        open={open}
+        setOpen={setOpen}
+        handleSubmit={handleSubmit}
+        label="Update task"
+      />
+      <Icon {...props} onClick={() => setOpen(true)} />
+    </>
+  )
+}
+
+export interface AddTaskTemplateButtonProps {
   choices: any
   arrayHelpers: FieldArrayRenderProps
   children: string | number
 }
 
-export const AddTaskTemplate = ({
+export const AddTaskTemplateButton = ({
   choices,
   arrayHelpers,
   children,
   ...props
-}: AddTaskTemplateProps & ButtonProps) => {
+}: AddTaskTemplateButtonProps & ButtonProps) => {
   const [open, setOpen] = useState(false)
 
   const handleSubmit = (
@@ -341,7 +462,11 @@ export const TaskTemplateModal = ({
   choices,
 }: TaskTemplateModalProps) => {
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      enableReinitialize
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+    >
       {({ handleSubmit, errors, resetForm }) => {
         const closeHandler = () => {
           resetForm()
