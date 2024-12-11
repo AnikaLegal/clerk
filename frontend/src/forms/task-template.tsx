@@ -1,24 +1,34 @@
-import React, { useState } from 'react'
-import { FormikProps, ErrorMessage, FieldArray, useField } from 'formik'
+import { TaskTemplate } from 'api'
 import {
-  Accordion,
+  EditorEvents,
+  RichTextEditor,
+  RichTextEditorProps,
+} from 'comps/rich-text'
+import {
+  ErrorMessage,
+  FieldArray,
+  FieldArrayRenderProps,
+  Formik,
+  FormikHelpers,
+  FormikProps,
+  useField
+} from 'formik'
+import React, { useState } from 'react'
+import {
   Button,
+  ButtonProps,
   Dropdown,
   DropdownProps,
   Form,
   Grid,
   Header,
-  Icon,
   Input,
   InputProps,
+  Modal,
+  Segment,
+  Table,
 } from 'semantic-ui-react'
-import { choiceToOptions, choiceToMap } from 'utils'
-import {
-  RichTextEditor,
-  RichTextEditorProps,
-  EditorEvents,
-} from 'comps/richtext-editor'
-import { TaskTemplate } from 'api'
+import { choiceToMap, choiceToOptions } from 'utils'
 
 interface TaskTemplateFormProps {
   create?: boolean
@@ -54,7 +64,7 @@ const RichTextField = ({
       <label>{label}</label>
       <RichTextEditor
         {...props}
-        content={field.value || ''}
+        initialContent={field.value}
         onBlur={handleBlur}
       />
       <ErrorMessage name={name} />
@@ -100,28 +110,6 @@ const DropdownField = ({
   )
 }
 
-const TemplateHeaderText = ({
-  index,
-  type,
-  name,
-}: {
-  index: number
-  type: string | undefined
-  name: string | undefined
-}) => {
-  let header = `${index + 1}.`
-  if (type) {
-    header += ' ' + type
-  }
-  if (name) {
-    if (type) {
-      header += ' -'
-    }
-    header += ' ' + name
-  }
-  return <span>{`${header}`}</span>
-}
-
 export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   create,
   onDelete,
@@ -135,25 +123,10 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
     setFieldValue,
   },
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number>(-1)
   const [showEventStage, setShowEventStage] = useState<boolean>(
     values.event === 'STAGE'
   )
-  const taskTypes = choiceToMap(choices.task_type)
-
-  const handleAccordionClick = (e, titleProps) => {
-    const { index } = titleProps
-    const newIndex = activeIndex === index ? -1 : index
-    setActiveIndex(newIndex)
-  }
-
-  // By default, show an empty template input area when creating a template.
-  if (values.templates) {
-    if (values.templates.length == 0) {
-      values.templates.push({} as TaskTemplate)
-      setActiveIndex(0)
-    }
-  }
+  const [showAddTask, setShowAddTask] = useState(false)
 
   return (
     <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
@@ -180,7 +153,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         }}
         disabled={isSubmitting}
       />
-
       {showEventStage && (
         <DropdownField
           name="event_stage"
@@ -190,7 +162,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
           disabled={isSubmitting}
         />
       )}
-
       <DropdownField
         name="tasks_assignment_role"
         label="Assignment role"
@@ -198,129 +169,40 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         options={choiceToOptions(choices.tasks_assignment_role)}
         disabled={isSubmitting}
       />
+
       <FieldArray name="templates">
-        {(arrayHelpers) => (
-          <div>
-            <Grid style={{ marginBottom: '0.25rem' }}>
-              <Grid.Row columns={2} style={{ alignItems: 'center' }}>
-                <Grid.Column>
-                  <Header as="h2">Tasks</Header>
-                </Grid.Column>
-                <Grid.Column>
-                  <Button
-                    floated="right"
-                    size="mini"
-                    type="button"
-                    onClick={() => {
-                      /* NOTE: The push function doesn't update synchronously so
-                       * to have confidence that the index is for the last item in
-                       * the array (i.e. the one we are about to push), we set
-                       * the index before the push */
-                      setActiveIndex(values.templates?.length || 0)
-                      arrayHelpers.push({})
-                    }}
-                  >
-                    Add task
-                  </Button>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-            {values.templates && values.templates.length > 0 && (
-              <Accordion fluid styled>
-                {values.templates.map(
-                  (template: TaskTemplate, index: number) => (
-                    <div key={index}>
-                      <Accordion.Title
-                        active={activeIndex === index}
-                        index={index}
-                        onClick={handleAccordionClick}
+        {(arrayHelpers) => {
+          return (
+            <>
+              <Grid style={{ marginBottom: '0.25rem' }}>
+                <Grid.Row columns={2} style={{ alignItems: 'center' }}>
+                  <Grid.Column>
+                    <Header as="h3">Tasks</Header>
+                  </Grid.Column>
+                  <Grid.Column>
+                    {!showAddTask && (
+                      <AddTaskTemplate
+                        floated="right"
+                        size="mini"
+                        type="button"
+                        arrayHelpers={arrayHelpers}
+                        choices={choices}
                       >
-                        <Icon
-                          name={
-                            activeIndex === index
-                              ? 'chevron up'
-                              : 'chevron down'
-                          }
-                          style={{ marginTop: '5px', marginRight: '1rem' }}
-                        />
-                        <TemplateHeaderText
-                          index={index}
-                          type={taskTypes.get(template.type)}
-                          name={template.name}
-                        />
-                        <div style={{ float: 'right' }}>
-                          <Icon
-                            name="delete"
-                            link
-                            style={{ marginTop: '5px' }}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              arrayHelpers.remove(index)
-                              setActiveIndex(
-                                activeIndex === index ? -1 : activeIndex - 1
-                              )
-                            }}
-                          />
-                        </div>
-                      </Accordion.Title>
-                      <Accordion.Content active={activeIndex === index}>
-                        <DropdownField
-                          name={`templates.${index}.type`}
-                          label="Task type"
-                          placeholder="Select the task type"
-                          options={choiceToOptions(choices.task_type)}
-                          disabled={isSubmitting}
-                          value={template.type || ''}
-                        />
-                        <InputField
-                          name={`templates.${index}.name`}
-                          label="Task name"
-                          disabled={isSubmitting}
-                          placeholder="Provide more specific task information"
-                          value={template.name || ''}
-                        />
-                        <InputField
-                          type="number"
-                          name={`templates.${index}.due_in`}
-                          label="Due in"
-                          disabled={isSubmitting}
-                          placeholder="The number of days from when the task is assigned until it is due"
-                          value={template.due_in || ''}
-                          onChange={(e, { value }) => {
-                            setFieldValue(
-                              `templates.${index}.due_in`,
-                              value !== '' ? value : null
-                            )
-                          }}
-                        />
-                        <DropdownField
-                          name={`templates.${index}.is_urgent`}
-                          label="Urgent?"
-                          placeholder="Is the task urgent?"
-                          options={[
-                            { key: 'yes', text: 'Yes', value: true },
-                            { key: 'no', text: 'No', value: false },
-                          ]}
-                          disabled={isSubmitting}
-                          value={template.is_urgent || false}
-                        />
-                        <RichTextField
-                          name={`templates.${index}.description`}
-                          label="Task description"
-                          disabled={isSubmitting}
-                          placeholder="Describe the task in detail"
-                          content={template.description || ''}
-                        />
-                      </Accordion.Content>
-                    </div>
-                  )
-                )}
-              </Accordion>
-            )}
-          </div>
-        )}
+                        Add task
+                      </AddTaskTemplate>
+                    )}
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
+              <TaskTemplateTable
+                templates={values.templates}
+                choices={choices}
+              />
+            </>
+          )
+        }}
       </FieldArray>
+
       <Button
         primary
         type="submit"
@@ -341,5 +223,180 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         </Button>
       )}
     </Form>
+  )
+}
+
+interface TaskTemplateTableProps {
+  templates: TaskTemplate[]
+  choices: any
+}
+
+export const TaskTemplateTable = ({
+  templates,
+  choices,
+}: TaskTemplateTableProps) => {
+  const typeLabels = choiceToMap(choices.task_type)
+
+  if (templates.length == 0) {
+    return (
+      <Segment textAlign="center" secondary>
+        <p>No tasks</p>
+      </Segment>
+    )
+  }
+  return (
+    <Table celled>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell></Table.HeaderCell>
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Type</Table.HeaderCell>
+          <Table.HeaderCell>Due In</Table.HeaderCell>
+          <Table.HeaderCell>Urgent?</Table.HeaderCell>
+          <Table.HeaderCell></Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {templates.map((template, index) => (
+          <Table.Row key={template.id}>
+            <Table.Cell collapsing textAlign="center">
+              {index + 1}.
+            </Table.Cell>
+            <Table.Cell>{template.name}</Table.Cell>
+            <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
+            <Table.Cell>{template.due_in}</Table.Cell>
+            <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
+            <Table.Cell collapsing textAlign="center"></Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  )
+}
+
+export interface AddTaskTemplateProps {
+  choices: any
+  arrayHelpers: FieldArrayRenderProps
+  children: string | number
+}
+
+export const AddTaskTemplate = ({
+  choices,
+  arrayHelpers,
+  children,
+  ...props
+}: AddTaskTemplateProps & ButtonProps) => {
+  const [open, setOpen] = useState(false)
+
+  const handleSubmit = (
+    template: TaskTemplate,
+    { resetForm }: FormikHelpers<TaskTemplate>
+  ) => {
+    arrayHelpers.push(template)
+    resetForm()
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <TaskTemplateModal
+        initialValues={{
+          type: '',
+          name: '',
+          due_in: null,
+          is_urgent: false,
+          description: '',
+        }}
+        choices={choices}
+        open={open}
+        setOpen={setOpen}
+        handleSubmit={handleSubmit}
+        label={children}
+      />
+      <Button {...props} onClick={() => setOpen(true)}>
+        {children}
+      </Button>
+    </>
+  )
+}
+
+export interface TaskTemplateModalProps {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  initialValues: TaskTemplate
+  handleSubmit: (
+    values: TaskTemplate,
+    helpers: FormikHelpers<TaskTemplate>
+  ) => void
+  label: string | number
+  choices: any
+}
+
+export const TaskTemplateModal = ({
+  open,
+  setOpen,
+  initialValues,
+  handleSubmit,
+  label,
+  choices,
+}: TaskTemplateModalProps) => {
+  return (
+    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+      {({ handleSubmit, errors, resetForm }) => {
+        const closeHandler = () => {
+          resetForm()
+          setOpen(false)
+        }
+        return (
+          <Modal size="large" open={open} onClose={closeHandler}>
+            <Modal.Header>{label}</Modal.Header>
+            <Modal.Content>
+              <Form
+                onSubmit={handleSubmit}
+                error={Object.keys(errors).length > 0}
+              >
+                <DropdownField
+                  name="type"
+                  label="Task type"
+                  placeholder="Select the task type"
+                  options={choiceToOptions(choices.task_type)}
+                />
+                <InputField
+                  name="name"
+                  label="Task name"
+                  placeholder="Provide more specific task information"
+                />
+                <InputField
+                  name="due_in"
+                  type="number"
+                  label="Due in"
+                  placeholder="The number of days from when the task is assigned until it is due"
+                />
+                <DropdownField
+                  name="is_urgent"
+                  label="Urgent?"
+                  placeholder="Is the task urgent?"
+                  options={[
+                    { key: 'yes', text: 'Yes', value: true },
+                    { key: 'no', text: 'No', value: false },
+                  ]}
+                />
+                <RichTextField
+                  name="description"
+                  label="Task description"
+                  placeholder="Describe the task in detail"
+                />
+              </Form>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button primary type="submit" onClick={() => handleSubmit()}>
+                {label}
+              </Button>
+              <Button onClick={closeHandler}>Close</Button>
+            </Modal.Actions>
+          </Modal>
+        )
+      }}
+    </Formik>
   )
 }

@@ -13,7 +13,7 @@ import { CustomLink } from './extensions/rich-text-editor-link-fix'
 import '@mantine/core/styles.css'
 import '@mantine/tiptap/styles.css'
 
-interface RichTextEditorProps {
+export interface RichTextEditorProps {
   initialContent?: string
   disabled?: boolean
   placeholder?: string
