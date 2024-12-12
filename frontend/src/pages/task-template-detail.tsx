@@ -33,8 +33,8 @@ const App = () => {
     return null
   }
 
-  const handleDelete = (e) => {
-    e.preventDefault()
+  const handleDelete = (event) => {
+    event.preventDefault()
 
     modals.openConfirmModal({
       title: 'Are you sure you want to delete this task template?',
@@ -47,10 +47,10 @@ const App = () => {
           .then(() => {
             window.location.href = CONTEXT.list_url
           })
-          .catch((err) => {
+          .catch((e) => {
             enqueueSnackbar(
               getAPIErrorMessage(
-                err,
+                e,
                 'Failed to delete this notification template'
               ),
               {
@@ -73,7 +73,7 @@ const App = () => {
       <Formik
         initialValues={taskTriggerResult.data || ({} as TaskTriggerCreate)}
         validationSchema={TaskTriggerSchema}
-        onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+        onSubmit={(values, { setSubmitting, setErrors }) => {
           let updateData = values
           if (!values.event) {
             updateData = { ...values, event_stage: '' }
