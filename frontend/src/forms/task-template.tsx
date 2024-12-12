@@ -11,7 +11,6 @@ import {
   FieldArrayRenderProps,
   Formik,
   FormikHelpers,
-  FormikProps,
   useField,
 } from 'formik'
 import React, { useState } from 'react'
@@ -32,23 +31,31 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { choiceToMap, choiceToOptions } from 'utils'
-import { schema } from 'webpack-dev-server'
 import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
-export const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> =
-  Yup.object({
-    name: Yup.string().required(),
-    topic: Yup.string().required(),
-    event: Yup.string().required(),
-    tasks_assignment_role: Yup.string().required(),
-    templates: Yup.array(),
-    event_stage: Yup.string().when('event', {
-      is: 'STAGE',
-      then: (schema) => schema.required(),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-  })
+
+const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> = Yup.object({
+  name: Yup.string().required(),
+  topic: Yup.string().required(),
+  event: Yup.string().required(),
+  tasks_assignment_role: Yup.string().required(),
+  templates: Yup.array(),
+  event_stage: Yup.string().when('event', {
+    is: 'STAGE',
+    then: (schema) => schema.required(),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+})
+
+const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
+  id: Yup.number().notRequired(),
+  name: Yup.string().required(),
+  type: Yup.string().required(),
+  due_in: Yup.number().notRequired(),
+  is_urgent: Yup.boolean(),
+  description: Yup.string().optional(),
+})
 
 const RichTextField = ({
   name,
@@ -504,6 +511,7 @@ export const TaskTemplateModal = ({
       enableReinitialize
       initialValues={initialValues}
       onSubmit={handleSubmit}
+      validationSchema={TaskTemplateSchema}
     >
       {({ handleSubmit, errors, resetForm }) => {
         const closeHandler = () => {
