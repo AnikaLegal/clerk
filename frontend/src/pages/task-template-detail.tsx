@@ -1,8 +1,9 @@
 import { modals } from '@mantine/modals'
-import api, { TaskTrigger } from 'api'
+import api, { TaskTrigger, TaskTriggerCreate } from 'api'
 import { Formik } from 'formik'
 import { TaskTemplateForm } from 'forms/task-template'
 import { useSnackbar } from 'notistack'
+import { TaskTriggerSchema } from 'pages/task-template-create'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
@@ -70,7 +71,8 @@ const App = () => {
         </Header.Subheader>
       </Header>
       <Formik
-        initialValues={taskTriggerResult.data || ({} as TaskTrigger)}
+        initialValues={taskTriggerResult.data || ({} as TaskTriggerCreate)}
+        validationSchema={TaskTriggerSchema}
         onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
           let updateData = values
           if (!values.event) {

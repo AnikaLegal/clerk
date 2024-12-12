@@ -1,10 +1,24 @@
-import { useCreateTaskTriggerMutation } from 'api'
+import { TaskTriggerCreate, useCreateTaskTriggerMutation } from 'api'
 import { Formik } from 'formik'
 import { TaskTemplateForm } from 'forms/task-template'
 import { useSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
 import { getAPIFormErrors, mount } from 'utils'
+import * as Yup from 'yup'
+
+Yup.setLocale({ mixed: { required: 'This field is required.' } })
+export const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> = Yup.object({
+  name: Yup.string().required(),
+  topic: Yup.string().required(),
+  event: Yup.string().required(),
+  tasks_assignment_role: Yup.string().required(),
+  templates: Yup.array(),
+  event_stage: Yup.string().when('event', {
+    is: 'STAGE',
+    then: (schema) => schema.required(),
+  }),
+})
 
 interface DjangoContext {
   choices: {
@@ -34,6 +48,7 @@ const App = () => {
           tasks_assignment_role: '',
           templates: [],
         }}
+        validationSchema={TaskTriggerSchema}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           createTaskTrigger({ taskTriggerCreate: values })
             .unwrap()

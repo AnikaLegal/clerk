@@ -1,9 +1,10 @@
-from rest_framework import serializers
-from django.urls import reverse
-
 from case.serializers import IssueSerializer, UserSerializer
 from case.serializers.fields import LocalDateField
-from .models import Task, TaskComment, TaskTrigger, TaskTemplate
+from core.models.issue_event import EventType
+from django.urls import reverse
+from rest_framework import serializers
+
+from .models import Task, TaskComment, TaskTemplate, TaskTrigger
 
 
 class TaskTemplateSerializer(serializers.ModelSerializer):
@@ -82,6 +83,16 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
             template.save()
 
         return super().update(instance, validated_data)
+
+    def validate(self, attrs):
+        event = attrs.get("event")
+        event_stage = attrs.get("event_stage")
+        if event == EventType.STAGE and not event_stage:
+            raise serializers.ValidationError(
+                {"event_stage": self.fields["event_stage"].error_messages["required"]}
+            )
+
+        return attrs
 
 
 class TaskListIssueSerializer(IssueSerializer):
