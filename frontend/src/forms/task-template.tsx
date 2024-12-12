@@ -153,7 +153,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
         <DropdownField
           name="event_stage"
           label="Trigger stage"
-          placeholder="Event is triggered when this stage is reached"
+          placeholder="Select which event stage will trigger task creation"
           options={choiceToOptions(choices.event_stage)}
           disabled={isSubmitting}
         />
@@ -239,7 +239,7 @@ export const TaskTemplateTable = ({
   if (templates.length == 0) {
     return (
       <Segment textAlign="center" secondary>
-        <p>No tasks</p>
+        <p>No tasks found.</p>
       </Segment>
     )
   }
@@ -247,7 +247,6 @@ export const TaskTemplateTable = ({
     <Table celled>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell></Table.HeaderCell>
           <Table.HeaderCell>Name</Table.HeaderCell>
           <Table.HeaderCell>Type</Table.HeaderCell>
           <Table.HeaderCell>Due In</Table.HeaderCell>
@@ -258,9 +257,6 @@ export const TaskTemplateTable = ({
       <Table.Body>
         {templates.map((template, index) => (
           <Table.Row key={template.id}>
-            <Table.Cell collapsing textAlign="center">
-              {index + 1}.
-            </Table.Cell>
             <Table.Cell>{template.name}</Table.Cell>
             <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
             <Table.Cell>{template.due_in}</Table.Cell>
@@ -313,7 +309,11 @@ export const TaskTemplateActionIcons = ({
           negative
           compact
           size="mini"
-          onClick={() => arrayHelpers.remove(index)}
+          onClick={(event) => {
+            event.preventDefault()
+            arrayHelpers.remove(index)
+            setShowConfirmDelete(false)
+          }}
         >
           Confirm delete
         </Button>
