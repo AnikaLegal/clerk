@@ -1,5 +1,5 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
-import { TaskTemplate } from 'api'
+import { TaskTemplate, TaskTriggerCreate } from 'api'
 import {
   EditorEvents,
   RichTextEditor,
@@ -32,19 +32,23 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { choiceToMap, choiceToOptions } from 'utils'
+import { schema } from 'webpack-dev-server'
+import * as Yup from 'yup'
 
-interface TaskTemplateFormProps {
-  create?: boolean
-  onDelete?: (e: any) => void
-  choices: {
-    topic: string[][]
-    event: string[][]
-    event_stage: string[][]
-    tasks_assignment_role: string[][]
-    task_type: string[][]
-  }
-  formik: FormikProps<any>
-}
+Yup.setLocale({ mixed: { required: 'This field is required.' } })
+export const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> =
+  Yup.object({
+    name: Yup.string().required(),
+    topic: Yup.string().required(),
+    event: Yup.string().required(),
+    tasks_assignment_role: Yup.string().required(),
+    templates: Yup.array(),
+    event_stage: Yup.string().when('event', {
+      is: 'STAGE',
+      then: (schema) => schema.required(),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+  })
 
 const RichTextField = ({
   name,
@@ -113,113 +117,147 @@ const DropdownField = ({
   )
 }
 
+interface TaskTemplateFormProps {
+  create?: boolean
+  onDelete?: (e: any) => void
+  choices: {
+    topic: string[][]
+    event: string[][]
+    event_stage: string[][]
+    tasks_assignment_role: string[][]
+    task_type: string[][]
+  }
+  initialValues: TaskTriggerCreate
+  onSubmit: (
+    values: TaskTriggerCreate,
+    formikHelpers: FormikHelpers<TaskTriggerCreate>
+  ) => void | Promise<any>
+}
+
 export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   create,
   onDelete,
   choices,
-  formik: { values, errors, handleSubmit, isSubmitting },
+  initialValues,
+  onSubmit,
 }) => {
   const [showEventStage, setShowEventStage] = useState<boolean>(
-    values.event === 'STAGE'
+    initialValues.event === 'STAGE'
   )
-  const [showAddTask, setShowAddTask] = useState(false)
-
   return (
-    <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
-      <InputField
-        name="name"
-        label="Name"
-        placeholder="Describe the task template"
-        disabled={isSubmitting}
-      />
-      <DropdownField
-        name="topic"
-        label="Case type"
-        placeholder="Select a case type"
-        options={choiceToOptions(choices.topic)}
-        disabled={isSubmitting}
-      />
-      <DropdownField
-        name="event"
-        label="Trigger event"
-        placeholder="Select which event will trigger task creation"
-        options={choiceToOptions(choices.event)}
-        onChange={(e, { value }) => {
-          setShowEventStage(value === 'STAGE')
-        }}
-        disabled={isSubmitting}
-      />
-      {showEventStage && (
-        <DropdownField
-          name="event_stage"
-          label="Trigger stage"
-          placeholder="Select which event stage will trigger task creation"
-          options={choiceToOptions(choices.event_stage)}
-          disabled={isSubmitting}
-        />
-      )}
-      <DropdownField
-        name="tasks_assignment_role"
-        label="Assignment role"
-        placeholder="Select the role of the user to which the task(s) should be assigned"
-        options={choiceToOptions(choices.tasks_assignment_role)}
-        disabled={isSubmitting}
-      />
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={TaskTriggerSchema}
+    >
+      {({
+        handleSubmit,
+        errors,
+        isSubmitting,
+        values,
+        setFieldValue,
+        setFieldTouched,
+      }) => (
+        <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+          <InputField
+            name="name"
+            label="Name"
+            placeholder="Describe the task template"
+            disabled={isSubmitting}
+          />
+          <DropdownField
+            name="topic"
+            label="Case type"
+            placeholder="Select a case type"
+            options={choiceToOptions(choices.topic)}
+            disabled={isSubmitting}
+          />
+          <DropdownField
+            name="event"
+            label="Trigger event"
+            placeholder="Select which event will trigger task creation"
+            options={choiceToOptions(choices.event)}
+            onChange={(e, { value }) => {
+              const isStage = value === 'STAGE'
+              setShowEventStage(isStage)
+              if (!isStage) {
+                setFieldValue('event_stage', null)
+              }
+              setFieldTouched('event_stage', false)
+            }}
+            disabled={isSubmitting}
+          />
+          {showEventStage && (
+            <DropdownField
+              name="event_stage"
+              label="Trigger stage"
+              placeholder="Select which event stage will trigger task creation"
+              options={choiceToOptions(choices.event_stage)}
+              disabled={isSubmitting}
+            />
+          )}
+          <DropdownField
+            name="tasks_assignment_role"
+            label="Assignment role"
+            placeholder="Select the role of the user to which the task(s) should be assigned"
+            options={choiceToOptions(choices.tasks_assignment_role)}
+            disabled={isSubmitting}
+          />
 
-      <FieldArray name="templates">
-        {(arrayHelpers) => {
-          return (
-            <>
-              <Grid>
-                <Grid.Row columns={2} style={{ alignItems: 'center' }}>
-                  <Grid.Column>
-                    <Header as="h3">Tasks</Header>
-                  </Grid.Column>
-                  <Grid.Column>
-                    {!showAddTask && (
-                      <AddTaskTemplateButton
-                        floated="right"
-                        size="mini"
-                        type="button"
-                        arrayHelpers={arrayHelpers}
-                        choices={choices}
-                      >
-                        Add task
-                      </AddTaskTemplateButton>
-                    )}
-                  </Grid.Column>
-                </Grid.Row>
-              </Grid>
-              <TaskTemplateTable
-                arrayHelpers={arrayHelpers}
-                templates={values.templates}
-                choices={choices}
-              />
-            </>
-          )
-        }}
-      </FieldArray>
+          <FieldArray name="templates">
+            {(arrayHelpers) => {
+              return (
+                <>
+                  <Grid>
+                    <Grid.Row columns={2} style={{ alignItems: 'center' }}>
+                      <Grid.Column>
+                        <Header as="h3">Tasks</Header>
+                      </Grid.Column>
+                      <Grid.Column>
+                        <AddTaskTemplateButton
+                          floated="right"
+                          size="mini"
+                          type="button"
+                          arrayHelpers={arrayHelpers}
+                          choices={choices}
+                        >
+                          Add task
+                        </AddTaskTemplateButton>
+                      </Grid.Column>
+                    </Grid.Row>
+                  </Grid>
+                  <TaskTemplateTable
+                    arrayHelpers={arrayHelpers}
+                    templates={values.templates}
+                    choices={choices}
+                  />
+                </>
+              )
+            }}
+          </FieldArray>
 
-      <Button
-        primary
-        type="submit"
-        disabled={isSubmitting}
-        loading={isSubmitting}
-        style={{ marginTop: '1rem' }}
-      >
-        {create ? 'Create task template' : 'Update task template'}
-      </Button>
-      {!create && onDelete && (
-        <Button
-          color="red"
-          disabled={isSubmitting}
-          loading={isSubmitting}
-          onClick={onDelete}
-        >
-          Delete
-        </Button>
+          <Button
+            primary
+            type="submit"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+            style={{ marginTop: '1rem' }}
+          >
+            {create ? 'Create task template' : 'Update task template'}
+          </Button>
+          {!create && onDelete && (
+            <Button
+              color="red"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              onClick={onDelete}
+            >
+              Delete
+            </Button>
+          )}
+        </Form>
       )}
-    </Form>
+    </Formik>
   )
 }
 
@@ -480,16 +518,16 @@ export const TaskTemplateModal = ({
                 onSubmit={handleSubmit}
                 error={Object.keys(errors).length > 0}
               >
+                <InputField
+                  name="name"
+                  label="Task name"
+                  placeholder="Provide more specific task information"
+                />
                 <DropdownField
                   name="type"
                   label="Task type"
                   placeholder="Select the task type"
                   options={choiceToOptions(choices.task_type)}
-                />
-                <InputField
-                  name="name"
-                  label="Task name"
-                  placeholder="Provide more specific task information"
                 />
                 <InputField
                   name="due_in"

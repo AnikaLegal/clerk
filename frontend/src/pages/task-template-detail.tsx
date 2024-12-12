@@ -1,9 +1,8 @@
 import { modals } from '@mantine/modals'
-import api, { TaskTrigger, TaskTriggerCreate } from 'api'
-import { Formik } from 'formik'
+import api, { TaskTriggerCreate } from 'api'
+import { FormikHelpers } from 'formik'
 import { TaskTemplateForm } from 'forms/task-template'
-import { useSnackbar } from 'notistack'
-import { TaskTriggerSchema } from 'pages/task-template-create'
+import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
@@ -22,7 +21,6 @@ interface DjangoContext {
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const { enqueueSnackbar } = useSnackbar()
   const [updateTaskTrigger] = api.useUpdateTaskTriggerMutation()
   const [deleteTaskTrigger] = api.useDeleteTaskTriggerMutation()
 
@@ -33,9 +31,35 @@ const App = () => {
     return null
   }
 
+  const handleSubmit = (
+    values: TaskTriggerCreate,
+    helpers: FormikHelpers<TaskTriggerCreate>
+  ) => {
+    updateTaskTrigger({
+      id: CONTEXT.task_trigger_pk,
+      taskTriggerCreate: values,
+    })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Updated task template', {
+          variant: 'success',
+        })
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to update task template'),
+          { variant: 'error' }
+        )
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          helpers.setErrors(requestErrors)
+        }
+      })
+      .finally(() => helpers.setSubmitting(false))
+  }
+
   const handleDelete = (event) => {
     event.preventDefault()
-
     modals.openConfirmModal({
       title: 'Are you sure you want to delete this task template?',
       centered: true,
@@ -70,46 +94,12 @@ const App = () => {
           <a href={CONTEXT.list_url}>Back to task templates</a>
         </Header.Subheader>
       </Header>
-      <Formik
-        initialValues={taskTriggerResult.data || ({} as TaskTriggerCreate)}
-        validationSchema={TaskTriggerSchema}
-        onSubmit={(values, { setSubmitting, setErrors }) => {
-          let updateData = values
-          if (!values.event) {
-            updateData = { ...values, event_stage: '' }
-          }
-          updateTaskTrigger({
-            id: CONTEXT.task_trigger_pk,
-            taskTriggerCreate: updateData,
-          })
-            .unwrap()
-            .then(() => {
-              enqueueSnackbar('Updated task template', {
-                variant: 'success',
-              })
-              setSubmitting(false)
-            })
-            .catch((e) => {
-              enqueueSnackbar(
-                getAPIErrorMessage(e, 'Failed to update task template'),
-                { variant: 'error' }
-              )
-              const requestErrors = getAPIFormErrors(e)
-              if (requestErrors) {
-                setErrors(requestErrors)
-              }
-              setSubmitting(false)
-            })
-        }}
-      >
-        {(formik) => (
-          <TaskTemplateForm
-            formik={formik}
-            choices={CONTEXT.choices}
-            onDelete={handleDelete}
-          />
-        )}
-      </Formik>
+      <TaskTemplateForm
+        initialValues={taskTriggerResult.data}
+        choices={CONTEXT.choices}
+        onSubmit={handleSubmit}
+        onDelete={handleDelete}
+      />
     </Container>
   )
 }
