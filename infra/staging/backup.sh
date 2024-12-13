@@ -8,7 +8,7 @@ HOST='13.55.250.149'
 TIME=$(date "+%s")
 S3_BUCKET='s3://anika-database-backups-test'
 BACKUP_FILE="postgres_clerk_staging_${TIME}.sql"
-S3_PATH="$S3_BUCKET/$BACKUP_FILE"
+CLIENT_FILE="client_info_clerk_staging_${TIME}.csv"
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
     echo -e "\n>>> Error: Clerk private key not found in CLERK_PRIVATE_SSH_KEY"
@@ -24,5 +24,11 @@ chmod 600 private.key
 echo -e "\n>>> Streaming backup from Clerk EC2 instance at $HOST"
 ssh -T -o StrictHostKeyChecking=no -i private.key root@$HOST \
     'pg_dump --dbname=clerk-test --format=custom' |
-    aws s3 cp - $S3_PATH
+    aws s3 cp - "$S3_BUCKET/$BACKUP_FILE"
+
+echo -e "\n>>> Exporting client info from Clerk EC2 instance at $HOST"
+ssh -T -o StrictHostKeyChecking=no -i private.key root@$HOST \
+    './manage.py export_client_info' |
+    aws s3 cp - "$S3_BUCKET/$CLIENT_FILE"
+
 echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST"
