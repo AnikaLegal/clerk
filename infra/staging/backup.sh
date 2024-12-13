@@ -10,7 +10,6 @@ HOST='13.55.250.149'
 TIME=$(date "+%s")
 S3_BUCKET='s3://anika-database-backups-test'
 BACKUP_FILE="postgres_clerk_staging_${TIME}.sql"
-CLIENT_FILE="client_info_clerk_staging_${TIME}.csv"
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
     echo -e "\n>>> Error: Clerk private key not found in CLERK_PRIVATE_SSH_KEY"
