@@ -3,7 +3,9 @@
 # SSH into our Clerk EC2 instance
 # Backup the Postgres DB and upload to S3
 #
-set -e
+set -o errexit
+set -o pipefail
+
 HOST='13.55.250.149'
 TIME=$(date "+%s")
 S3_BUCKET='s3://anika-database-backups-test'
@@ -25,10 +27,5 @@ echo -e "\n>>> Streaming backup from Clerk EC2 instance at $HOST"
 ssh -T -o StrictHostKeyChecking=no -i private.key root@$HOST \
     'pg_dump --dbname=clerk-test --format=custom' |
     aws s3 cp - "$S3_BUCKET/$BACKUP_FILE"
-
-echo -e "\n>>> Exporting client info from Clerk EC2 instance at $HOST"
-ssh -T -o StrictHostKeyChecking=no -i private.key root@$HOST \
-    './manage.py export_client_info' |
-    aws s3 cp - "$S3_BUCKET/$CLIENT_FILE"
 
 echo -e "\n>>> Finished backing up Postgres DB on Clerk EC2 instance at $HOST"
