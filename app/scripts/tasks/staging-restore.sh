@@ -4,9 +4,17 @@
 set -o errexit
 set -o pipefail
 
-echo -e "\nRestoring database from S3 backups"
-S3_BUCKET="s3://anika-database-backups"
+# NOTE: check before blowing the database away!
+if [[ $PGDATABASE != "clerk-test" ]]; then
+    echo -e "\n>>> Error: unexpected PGDATABASE $PGDATABASE"
+    exit 1
+fi
 
+echo -e "\nResetting database"
+./manage.py reset_db --dbname "$PGDATABASE" --close-sessions --no-input
+
+echo -e "\nRestoring database from backup"
+S3_BUCKET="s3://anika-database-backups"
 LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
     sort |
     grep postgres_clerk |
