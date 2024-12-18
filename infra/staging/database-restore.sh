@@ -27,7 +27,7 @@ echo -e "\n>>> Downloading clerk:staging Docker image on host $HOST"
 docker pull anikalaw/clerk:staging
 
 echo -e "\n>>> Resetting clerk-test database on host $HOST"
-ssh $HOST /bin/bash <<EOF
+ssh root@$HOST /bin/bash <<EOF
   set -o errexit
   set -o pipefail
   psql -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'clerk-test';"
