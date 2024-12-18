@@ -22,16 +22,29 @@ jobs:
       shell: bash
       env:
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
+
   backup:
     runs-on: ubuntu-latest
     needs: update_staging
     steps:
     - uses: actions/checkout@v4
 
+      # Setup transcrypt so that we can read secrets
+    - name: Checkout transcrypt
+      uses: actions/checkout@v4
+      with:
+        repository: elasticdog/transcrypt
+        path: transcrypt
+
+    - name: Initialise transcrypt
+      run: ./transcrypt/transcrypt -c aes-256-cbc -p '${{ secrets.TRANSCRYPT_PASSWORD }}' --yes
+
     - name: Run backup script
-      run: ./infra/staging/backup.sh
+      run: ./infra/backup.sh
       shell: bash
       env:
-        CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
         AWS_ACCESS_KEY_ID: ${{ vars.AWS_BACKUP_USER_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKUP_USER_SECRET_ACCESS_KEY }}
+        CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
+        COMPOSE_SUFFIX: staging
+        S3_BUCKET: s3://anika-database-backups-test
