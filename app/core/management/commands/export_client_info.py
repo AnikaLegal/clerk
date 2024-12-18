@@ -32,6 +32,6 @@ class Command(BaseCommand):
             .order_by("-created_at")
         )
         writer = csv.DictWriter(sys.stdout, fieldnames=fields)
-        header = dict(zip(fields, [ re.sub('^\w+__', '', x) for x in fields ]))
+        header = dict(zip(fields, [ re.sub(r'^\w+__', '', x) for x in fields ]))
         writer.writerow(header)
         writer.writerows(values.iterator())
