@@ -10,9 +10,6 @@ if [[ $PGDATABASE != "clerk-test" ]]; then
     exit 1
 fi
 
-echo -e "\nResetting database"
-./manage.py reset_db --dbname "$PGDATABASE" --close-sessions --no-input
-
 echo -e "\nRestoring database from backup"
 S3_BUCKET="s3://anika-database-backups"
 LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
