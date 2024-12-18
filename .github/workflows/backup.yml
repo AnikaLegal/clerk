@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
+    - name: Checkout transcrypt
+      uses: actions/checkout@v4
       with:
         repository: elasticdog/transcrypt
         path: transcrypt
