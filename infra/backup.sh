@@ -22,6 +22,9 @@ fi
 DB_FILE="postgres_clerk_${COMPOSE_SUFFIX}_${TIME}.sql"
 DB_PATH="$S3_BUCKET/$DB_FILE"
 
+CLIENT_FILE="client_info_${COMPOSE_SUFFIX}_${TIME}.csv"
+CLIENT_PATH="$S3_BUCKET/$CLIENT_FILE"
+
 echo -e "\n>>> Setting up SSH"
 mkdir ~/.ssh
 echo -e "$CLERK_PRIVATE_SSH_KEY" >~/.ssh/id_ed25519
@@ -35,10 +38,18 @@ echo -e "\n>>> Setting up Docker context"
 docker context create remote --docker "host=ssh://root@${HOST}"
 docker context use remote
 
+# Database backup
 echo -e "\n>>> Streaming database backup from host $HOST to $DB_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
     run --no-deps --rm web pg_dump --format=custom |
     aws s3 cp - $DB_PATH
+
+# Disaster recovery
+echo -e "\n>>> Streaming client info from host $HOST to $CLIENT_PATH"
+docker compose --project-name task \
+    --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
+    run --no-deps --rm web python manage.py export_client_info |
+    aws s3 cp - $CLIENT_PATH
 
 echo -e "\n>>> Finished backup"
