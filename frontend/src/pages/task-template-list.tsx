@@ -40,9 +40,9 @@ const App = () => {
               <Table.HeaderCell>Name</Table.HeaderCell>
               <Table.HeaderCell>Topic</Table.HeaderCell>
               <Table.HeaderCell>Event</Table.HeaderCell>
-              <Table.HeaderCell>Event Stage</Table.HeaderCell>
-              <Table.HeaderCell>Assignment Role</Table.HeaderCell>
-              <Table.HeaderCell>Date Created</Table.HeaderCell>
+              <Table.HeaderCell>Event stage</Table.HeaderCell>
+              <Table.HeaderCell>Assignment role</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>

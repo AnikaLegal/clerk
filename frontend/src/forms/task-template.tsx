@@ -294,7 +294,7 @@ export const TaskTemplateTable = ({
         <Table.Row>
           <Table.HeaderCell>Name</Table.HeaderCell>
           <Table.HeaderCell>Type</Table.HeaderCell>
-          <Table.HeaderCell>Due In</Table.HeaderCell>
+          <Table.HeaderCell>Due in</Table.HeaderCell>
           <Table.HeaderCell>Urgent?</Table.HeaderCell>
           <Table.HeaderCell></Table.HeaderCell>
         </Table.Row>
