@@ -1,7 +1,6 @@
 import logging
 import os
 from io import BytesIO
-from random import randint
 
 from accounts.models import CaseGroups, User
 from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
@@ -12,8 +11,8 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 from emails.models import Email, EmailAttachment
-from utils.signals import disable_signals, restore_signals
 from faker import Faker
+from utils.signals import disable_signals, restore_signals
 
 logger = logging.getLogger(__name__)
 
