@@ -2,7 +2,6 @@ from django.db import models
 from core.models import TimestampedModel
 from core.models.issue import CaseTopic, CaseStage
 from core.models.issue_event import EventType
-from django.db.models import Q
 
 
 class TriggerTopic(CaseTopic):

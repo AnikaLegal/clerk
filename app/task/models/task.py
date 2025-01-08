@@ -43,6 +43,7 @@ class Task(TimestampedModel):
     due_at = models.DateField(blank=True, null=True, default=None)
     closed_at = models.DateTimeField(blank=True, null=True, default=None)
     is_urgent = models.BooleanField(default=False)
+    is_approval_required = models.BooleanField(default=False)
 
     # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)

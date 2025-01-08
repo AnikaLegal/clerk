@@ -25,6 +25,7 @@ class TaskTemplate(TimestampedModel):
     due_in = models.IntegerField(blank=True, null=True, default=None)
 
     is_urgent = models.BooleanField(default=False)
+    is_approval_required = models.BooleanField(default=False)
     trigger = models.ForeignKey(
         TaskTrigger,
         on_delete=models.CASCADE,
