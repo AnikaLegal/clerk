@@ -39,7 +39,7 @@ if [ -n "$decrypt_file" ]; then
     read -r -s -p $'Enter Clerk offline backup passphrase:\n' passphrase
 
     echo "Decrypting backup file $decrypt_file"
-    output="${decrypt_file%.data}.sql"
+    output="${decrypt_file%.data}"
     gpg --no-symkey-cache --output "${output}" --pinentry-mode=loopback \
         --passphrase "${passphrase}" --decrypt "$decrypt_file"
 else
@@ -51,20 +51,42 @@ else
     # Read required secret. Passphrase in Anika BitWarden.
     read -r -s -p $'Enter Clerk offline backup passphrase:\n' passphrase
 
-    # Get the backup from the AWS prod backup bucket.
-    echo "Downloading latest backup..."
-    backup_file_name=$(
+    # Get the db backup from the AWS prod backup bucket.
+    echo "Finding latest database backup..."
+    db_backup_file=$(
         aws s3 ls ${s3_bucket} |
-            sort | grep postgres_clerk |
+            sort |
+            grep postgres_clerk |
             tail -n 1 |
             awk '{{print $4}}'
     )
 
-    echo "Encrypting backup file $backup_file_name"
-    cd "$(dirname "$0")"
-    output="${backup_file_name%.sql}.data"
-    ! aws s3 cp ${s3_bucket}/${backup_file_name} - |
-        gpg --no-symkey-cache --output "${output}" --pinentry-mode=loopback \
-            --passphrase "${passphrase}" --symmetric --cipher-algo AES256 -
+    echo "Encrypting database backup file $db_backup_file"
+    ! aws s3 cp ${s3_bucket}/${db_backup_file} - |
+        gpg --no-symkey-cache \
+            --output "${db_backup_file}.data" \
+            --pinentry-mode=loopback \
+            --passphrase "${passphrase}" \
+            --symmetric \
+            --cipher-algo AES256 -
+
+    # Get the client info backup from the AWS prod backup bucket.
+    echo "Finding latest client info backup..."
+    client_info_file=$(
+        aws s3 ls ${s3_bucket} |
+            sort |
+            grep client_info |
+            tail -n 1 |
+            awk '{{print $4}}'
+    )
+
+    echo "Encrypting client info backup file $client_info_file"
+    ! aws s3 cp ${s3_bucket}/${client_info_file} - |
+        gpg --no-symkey-cache \
+            --output "${client_info_file}.data" \
+            --pinentry-mode=loopback \
+            --passphrase "${passphrase}" \
+            --symmetric \
+            --cipher-algo AES256 -
 fi
 exit 0
