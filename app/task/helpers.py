@@ -1,16 +1,6 @@
-from accounts.models import User, CaseGroups
+from accounts.models import CaseGroups
 from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
-
-
-def is_user_assigned_to_issue(issue: Issue, user: User | None) -> bool:
-    """
-    True if the supplied user is assigned as the paralegal or lawyer on the
-    supplied issue.
-    """
-    return (issue.lawyer_id and issue.lawyer == user) or (
-        issue.paralegal_id and issue.paralegal == user
-    )
 
 
 def is_lawyer_acting_as_paralegal(issue: Issue) -> bool:
