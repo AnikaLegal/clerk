@@ -195,9 +195,18 @@ class TaskSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(read_only=True)
 
     created_at = LocalDateField(read_only=True)
-    due_at = serializers.DateField()
+    due_at = serializers.DateField(allow_null=True)
     closed_at = LocalDateField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
+
+    def to_internal_value(self, data):
+        # Convert empty strings to null for date field. This is just a
+        # convenience so we don't have to do it on the frontend.
+        for field in ("due_at",):
+            if field in data and data[field] == "":
+                data[field] = None
+
+        return super(TaskSerializer, self).to_internal_value(data)
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
