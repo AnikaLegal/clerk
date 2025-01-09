@@ -17,6 +17,7 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
             "description",
             "due_in",
             "is_urgent",
+            "is_approval_required",
         )
 
     id = serializers.IntegerField(required=False)
@@ -137,6 +138,8 @@ class TaskListSerializer(serializers.ModelSerializer):
             "due_at",
             "closed_at",
             "is_urgent",
+            "is_approval_required",
+            "is_approved",
             "days_open",
             "url",
         )
@@ -176,6 +179,8 @@ class TaskSerializer(serializers.ModelSerializer):
             "due_at",
             "closed_at",
             "is_urgent",
+            "is_approval_required",
+            "is_approved",
             "days_open",
             "url",
         )

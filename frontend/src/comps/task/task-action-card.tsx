@@ -75,21 +75,24 @@ export const TaskActionCard = ({
       icon: 'stop circle outline',
       text: 'Stop the task',
       when: () =>
-        perms.is_paralegal_or_better && task.status === status.started,
+        perms.is_paralegal_or_better &&
+        task.status === status.started,
       action: () => handleChange('status', status.stopped),
     },
     {
       id: 'finish',
       icon: 'check',
       text: 'Finish the task',
-      when: () => perms.is_paralegal_or_better && task.is_open,
+      when: () => perms.is_paralegal_or_better && task.is_open &&
+        (!task.is_approval_required || task.is_approved),
       action: () => handleChange('status', status.finished),
     },
     {
       id: 'cancel',
       icon: 'close',
       text: 'Cancel the task',
-      when: () => perms.is_paralegal_or_better && task.is_open,
+      when: () => perms.is_paralegal_or_better && task.is_open &&
+        (!task.is_approval_required || task.is_approved),
       modal: CancelTaskModal,
     },
     {

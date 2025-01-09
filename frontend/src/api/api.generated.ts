@@ -1261,7 +1261,9 @@ export type TaskList = {
   created_at: string;
   due_at?: string | null;
   closed_at: string | null;
-  is_urgent?: boolean;
+  is_urgent: boolean;
+  is_approval_required: boolean;
+  is_approved: boolean;
   days_open: number;
   url: string;
   issue: {
@@ -1281,6 +1283,8 @@ export type TaskBase = {
   description: string;
   due_at: string | null;
   is_urgent: boolean;
+  is_approval_required: boolean;
+  is_approved: boolean;
 };
 export type Task = TaskBase & {
   id: number;
@@ -1323,6 +1327,7 @@ export type TaskTemplate = {
   description?: string;
   due_in: number | null;
   is_urgent: boolean;
+  is_approval_required: boolean;
 };
 export type TaskTriggerBase = {
   name: string;

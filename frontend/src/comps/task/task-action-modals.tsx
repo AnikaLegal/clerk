@@ -80,7 +80,6 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
   return (
     <Modal
       as="Form"
-      centered={false}
       className="form"
       open={open}
       onClose={handleClose}
@@ -149,7 +148,6 @@ export const ReassignTaskModal: React.FC<ModalProps> = ({
   return (
     <Modal
       as="Form"
-      centered={false}
       className="form"
       open={open}
       onClose={onClose}
@@ -249,7 +247,6 @@ export const QuestionModal: React.FC<ModalProps> = ({
   return (
     <Modal
       as="Form"
-      centered={false}
       className="form"
       open={open}
       onClose={handleClose}

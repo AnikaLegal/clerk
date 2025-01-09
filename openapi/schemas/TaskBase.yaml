@@ -9,8 +9,14 @@ properties:
     nullable: true
   is_urgent:
     type: boolean
+  is_approval_required:
+    type: boolean
+  is_approved:
+    type: boolean
 required:
   - name
   - description
   - due_at
   - is_urgent
+  - is_approval_required
+  - is_approved

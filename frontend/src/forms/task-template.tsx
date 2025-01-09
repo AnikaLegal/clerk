@@ -54,6 +54,7 @@ const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
   type: Yup.string().required(),
   due_in: Yup.number().notRequired(),
   is_urgent: Yup.boolean(),
+  is_approval_required: Yup.boolean(),
   description: Yup.string().optional(),
 })
 
@@ -284,7 +285,7 @@ export const TaskTemplateTable = ({
   if (templates.length == 0) {
     return (
       <Segment textAlign="center" secondary>
-        <p>No tasks found.</p>
+        <p>No tasks.</p>
       </Segment>
     )
   }
@@ -296,6 +297,7 @@ export const TaskTemplateTable = ({
           <Table.HeaderCell>Type</Table.HeaderCell>
           <Table.HeaderCell>Due in</Table.HeaderCell>
           <Table.HeaderCell>Urgent?</Table.HeaderCell>
+          <Table.HeaderCell>Approval required?</Table.HeaderCell>
           <Table.HeaderCell></Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -306,6 +308,7 @@ export const TaskTemplateTable = ({
             <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
             <Table.Cell>{template.due_in}</Table.Cell>
             <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
+            <Table.Cell>{template.is_approval_required ? 'Yes' : 'No'}</Table.Cell>
             <Table.Cell collapsing textAlign="center">
               <TaskTemplateActionIcons
                 templates={templates}
@@ -471,6 +474,7 @@ export const AddTaskTemplateButton = ({
           name: '',
           due_in: null,
           is_urgent: false,
+          is_approval_required: false,
           description: '',
         }}
         choices={choices}
@@ -547,6 +551,15 @@ export const TaskTemplateModal = ({
                   name="is_urgent"
                   label="Urgent?"
                   placeholder="Is the task urgent?"
+                  options={[
+                    { key: 'yes', text: 'Yes', value: true },
+                    { key: 'no', text: 'No', value: false },
+                  ]}
+                />
+                <DropdownField
+                  name="is_approval_required"
+                  label="Approval required?"
+                  placeholder="Does the task require approval?"
                   options={[
                     { key: 'yes', text: 'Yes', value: true },
                     { key: 'no', text: 'No', value: false },

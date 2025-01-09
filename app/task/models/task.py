@@ -38,6 +38,7 @@ class Task(TimestampedModel):
     # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
 
     # We use these two flags to handle sending notifications when the assignee
     # changes. The flags operate as follows:

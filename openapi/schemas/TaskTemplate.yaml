@@ -13,8 +13,11 @@ properties:
     nullable: true
   is_urgent:
     type: boolean
+  is_approval_required:
+    type: boolean
 required:
   - type
   - name
   - due_in
   - is_urgent
+  - is_approval_required

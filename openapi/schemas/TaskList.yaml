@@ -22,6 +22,10 @@ properties:
     nullable: true
   is_urgent:
     type: boolean
+  is_approval_required:
+    type: boolean
+  is_approved:
+    type: boolean
   days_open:
     type: integer
   url:
@@ -64,6 +68,9 @@ required:
   - is_suspended
   - created_at
   - closed_at
+  - is_urgent
+  - is_approval_required
+  - is_approved
   - days_open
   - url
   - issue

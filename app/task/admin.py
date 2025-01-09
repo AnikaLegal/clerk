@@ -15,6 +15,7 @@ class TaskTemplateInline(admin.TabularInline):
         "description",
         "due_in",
         "is_urgent",
+        "is_approval_required",
         "_order",
     )
     formfield_overrides = {
@@ -46,6 +47,7 @@ class TaskTemplateAdmin(admin.ModelAdmin):
         "description",
         "due_in",
         "is_urgent",
+        "is_approval_required",
     )
 
 
@@ -73,6 +75,7 @@ class TaskAdmin(admin.ModelAdmin):
         "status",
         "due_at",
         "is_urgent",
+        "is_approval_required",
         "is_open",
         "is_suspended",
     )

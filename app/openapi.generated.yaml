@@ -2464,6 +2464,10 @@ components:
           nullable: true
         is_urgent:
           type: boolean
+        is_approval_required:
+          type: boolean
+        is_approved:
+          type: boolean
         days_open:
           type: integer
         url:
@@ -2506,6 +2510,9 @@ components:
         - is_suspended
         - created_at
         - closed_at
+        - is_urgent
+        - is_approval_required
+        - is_approved
         - days_open
         - url
         - issue
@@ -2522,11 +2529,17 @@ components:
           nullable: true
         is_urgent:
           type: boolean
+        is_approval_required:
+          type: boolean
+        is_approved:
+          type: boolean
       required:
         - name
         - description
         - due_at
         - is_urgent
+        - is_approval_required
+        - is_approved
     TaskCreate:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2645,11 +2658,14 @@ components:
           nullable: true
         is_urgent:
           type: boolean
+        is_approval_required:
+          type: boolean
       required:
         - type
         - name
         - due_in
         - is_urgent
+        - is_approval_required
     TaskTriggerBase:
       type: object
       properties:
