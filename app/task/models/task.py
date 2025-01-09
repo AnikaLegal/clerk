@@ -1,14 +1,15 @@
+from accounts.models import User
+from core.models import Issue, TimestampedModel
+from django.conf import settings
 from django.db import models
 from django.db.models import functions
 from django.urls import reverse
-from django.conf import settings
 from django.utils import timezone
 
-from accounts.models import User
-from core.models import TimestampedModel, Issue
-from .template import TaskTemplate, TaskType
-from .comment import TaskComment, CommentType
 from .attachment import TaskAttachment
+from .comment import CommentType, TaskComment
+from .template import TaskTemplate, TaskType
+from .trigger import TasksCaseRole
 
 
 class TaskStatus(models.TextChoices):
@@ -22,18 +23,7 @@ class TaskStatus(models.TextChoices):
     NOT_DONE = "NOT_DONE", "Not done"
 
 
-class OwnerRole(models.TextChoices):
-    """
-    Used to keep track of the previous ownership role of tasks when their owner
-    is removed from a case.
-    """
-
-    PARALEGAL = "PARALEGAL", "Paralegal"
-    LAWYER = "LAWYER", "Lawyer"
-
-
 class Task(TimestampedModel):
-
     type = models.CharField(max_length=32, choices=TaskType.choices)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
@@ -66,23 +56,22 @@ class Task(TimestampedModel):
     # The issue to which the task relates.
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
 
-    # The original assignee.
-    owner = models.ForeignKey(
-        User, on_delete=models.PROTECT, blank=True, null=True, related_name="+"
-    )
-    # Internal field used to handle task ownership & assignment when users are
-    # removed from & assigned back to a case. TODO: explain.
-    prev_owner_role = models.CharField(
-        max_length=32, choices=OwnerRole.choices, default=None, blank=True, null=True
-    )
-
-    # The current assignee.
+    # The user the task is assigned to.
     assigned_to = models.ForeignKey(
         User,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="+",
+    )
+    # The role of the user the task is assigned to.
+    # TODO: explain some more.
+    assignee_role = models.CharField(
+        max_length=32,
+        choices=TasksCaseRole.choices,
+        default=None,
+        blank=True,
+        null=True,
     )
 
     # If the task was created by the system then this refers to the template
@@ -92,24 +81,19 @@ class Task(TimestampedModel):
     )
 
     def save(self, *args, **kwargs):
-        # As a convenience, set the owner as the assignee if the task does not
-        # have one.
-        if self.owner and not self.assigned_to:
-            self.assigned_to = self.owner
-
         # Set internal status flag to indicate if a notification is potentially
         # required.
         try:
             prev_task = Task.objects.get(pk=self.pk)
         except Task.DoesNotExist:
             prev_task = None
-        self.is_notify_pending = self.assigned_to_id is not None and (
-            prev_task is None or prev_task.assigned_to_id != self.assigned_to_id
+        self.is_notify_pending = self.assigned_to is not None and (
+            prev_task is None or prev_task.assigned_to != self.assigned_to
         )
 
         # Set some internal status flags.
         self.is_open = self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
-        self.is_suspended = not self.owner and self.prev_owner_role is not None
+        self.is_suspended = not self.assigned_to
 
         # Set the closed date when the task is first closed and clear the closed
         # date if the task is reopened.

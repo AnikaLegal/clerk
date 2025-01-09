@@ -12,8 +12,6 @@ allOf:
         type: string
       issue:
         $ref: ./Issue.yaml
-      owner:
-        $ref: ./User.yaml
       assigned_to:
         $ref: ./User.yaml
       is_open:
@@ -33,7 +31,6 @@ allOf:
       - type
       - status
       - issue
-      - owner
       - assigned_to
       - is_open
       - is_suspended

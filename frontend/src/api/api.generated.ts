@@ -433,7 +433,6 @@ const injectedRtkApi = api.injectEndpoints({
           is_open: queryArg.isOpen,
           is_suspended: queryArg.isSuspended,
           issue: queryArg.issue,
-          owner: queryArg.owner,
           assigned_to: queryArg.assignedTo,
           issue__topic: queryArg.issueTopic,
           my_tasks: queryArg.myTasks,
@@ -915,7 +914,6 @@ export type GetTasksApiArg = {
   isOpen?: string;
   isSuspended?: string;
   issue?: string;
-  owner?: string;
   assignedTo?: string;
   issueTopic?: string;
   myTasks?: string;
@@ -1272,11 +1270,6 @@ export type TaskList = {
     fileref: string;
     url: string;
   };
-  owner: {
-    id: number;
-    full_name: string;
-    url: string;
-  };
   assigned_to: {
     id: number;
     full_name: string;
@@ -1295,7 +1288,6 @@ export type Task = TaskBase & {
   status: string;
   url: string;
   issue: Issue;
-  owner: User;
   assigned_to: User;
   is_open: boolean;
   is_suspended: boolean;
@@ -1307,7 +1299,6 @@ export type TaskCreate = TaskBase & {
   type: string;
   status: string;
   issue_id: string;
-  owner_id: number;
   assigned_to_id: number;
 };
 export type TaskCommentBase = {

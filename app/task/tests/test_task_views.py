@@ -1,14 +1,11 @@
-from unittest.mock import patch
-
 import pytest
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
-
 from accounts.models import User
 from case.middleware import annotate_group_access
-from task.factories import TaskFactory
-from core.factories import UserFactory
 from conftest import schema_tester
+from core.factories import UserFactory
+from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
+from task.factories import TaskFactory
 
 
 @pytest.mark.django_db
@@ -34,8 +31,7 @@ def test_task_list_view__as_paralegal_with_no_access_to_task(
     paralegal_group,
 ):
     """
-    Paralegal users can fetch tasks but no results because they're not the owner
-    or assigned.
+    Paralegal users can fetch tasks but no results because they're not assigned.
     """
     user.groups.set([paralegal_group])
     annotate_group_access(user)
@@ -63,7 +59,7 @@ def test_task_list_view__as_paralegal_with_no_access_to_issue(
     annotate_group_access(user)
     url = reverse("task-api-list")
 
-    TaskFactory(owner=user, issue__paralegal=UserFactory())
+    TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
 
     response = user_client.get(url)
     assert response.status_code == 200
@@ -100,17 +96,17 @@ def test_task_list_view__as_paralegal_with_access(
     paralegal_group,
 ):
     """
-    Paralegal users can fetch tasks and see results when they're the owner of
+    Paralegal users can fetch tasks and see results when they're the assigned to
     the task and assigned to the issue.
     """
     user.groups.set([paralegal_group])
     annotate_group_access(user)
     url = reverse("task-api-list")
 
-    task = TaskFactory(owner=user, issue__paralegal=user)
+    task = TaskFactory(assigned_to=user, issue__paralegal=user)
 
     # Other tasks but no access.
-    TaskFactory(owner=user, issue__paralegal=UserFactory())
+    TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=user)
     TaskFactory()
 
@@ -135,8 +131,8 @@ def test_task_list_view__as_coordinator(
     annotate_group_access(user)
     url = reverse("task-api-list")
 
-    TaskFactory(owner=user, issue__paralegal=user)
-    TaskFactory(owner=user, issue__paralegal=UserFactory())
+    TaskFactory(assigned_to=user, issue__paralegal=user)
+    TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=user)
     TaskFactory()
 

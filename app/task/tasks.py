@@ -1,23 +1,21 @@
 import logging
-from utils.sentry import sentry_task
-from django.db.models import Q
-from django.db import transaction
-from django.utils import timezone
 from datetime import timedelta
-
 
 from accounts.models import User
 from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
+from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
 from task.models import Task, TaskTrigger
 from task.models.trigger import TasksCaseRole, TriggerTopic
+from utils.sentry import sentry_task
 
 from .helpers import (
+    is_lawyer_acting_as_paralegal,
     is_user_added,
     is_user_changed,
     is_user_removed,
-    is_user_assigned_to_issue,
-    is_lawyer_acting_as_paralegal,
 )
 from .notify import notify_of_assignment
 
@@ -37,10 +35,6 @@ def handle_event_save(event_pk: int):
     notify_tasks: set[int] = set()
 
     if is_user_removed(event):
-        reverted_tasks = maybe_revert_tasks(event)
-        logger.info("Reverted task(s): %s", reverted_tasks)
-        notify_tasks.update(reverted_tasks)
-
         # We don't notify when tasks are suspended.
         suspended_tasks = maybe_suspend_tasks(event)
         logger.info("Suspended task(s): %s", suspended_tasks)
@@ -84,43 +78,17 @@ def handle_task_save(task_pk: int):
             tasks.update(is_notify_pending=False, is_system_update=False)
 
 
-def maybe_revert_tasks(event: IssueEvent) -> list[int]:
-    """
-    Revert tasks assigned to but not owned by the user being removed from the
-    case back to their owner.
-    """
-    assert is_user_removed(event)
-
-    issue = event.issue
-    prev_user = event.prev_user
-
-    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
-        Q(assigned_to=prev_user) & ~Q(owner=prev_user)
-    )
-    for task in tasks:
-        task.assigned_to = task.owner
-        task.is_system_update = True
-        task.save()
-
-        text = f"This task was reassigned back to {task.owner} because {prev_user} was removed from the case."
-        task.add_comment(text)
-
-    return [task.pk for task in tasks]
-
-
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     """
-    Suspend tasks owned by the user being removed from the case.
+    Suspend tasks assigned to the user being removed from the case.
     """
     assert is_user_removed(event)
 
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = Task.objects.filter(issue=issue, is_open=True, owner=prev_user)
+    tasks = Task.objects.filter(issue=issue, is_open=True, assigned_to=prev_user)
     for task in tasks:
-        task.prev_owner_role = event.event_type
-        task.owner = None
         task.assigned_to = None
         task.is_system_update = True
         task.save()
@@ -133,7 +101,7 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
 
 def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     """
-    Update task ownership/assignee if the case lawyer or paralegal changes.
+    Update task assignee if the case lawyer or paralegal changes.
     """
     assert is_user_changed(event)
 
@@ -141,26 +109,11 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     prev_user = event.prev_user
     next_user = event.next_user
 
-    # Don't update the tasks for a user that is still active on the case i.e.
-    # they are still set as the lawyer or paralegal. This handles the presumably
-    # rare edge case where the lawyer is acting as the paralegal & then the
-    # paralegal is changed. We cannot determine which tasks belong to their role
-    # as the lawyer & which to their role as paralegal so we do nothing.
-    if is_user_assigned_to_issue(issue, prev_user):
-        logger.info(
-            "Not reassigning tasks as User<%s> still assigned to another role on case",
-            prev_user.pk,
-        )
-        return []
-
-    tasks = Task.objects.filter(issue=issue, is_open=True).filter(
-        Q(owner=prev_user) | Q(assigned_to=prev_user)
+    tasks = Task.objects.filter(
+        issue=issue, is_open=True, assigned_to=prev_user, assignee_role=event.event_type
     )
     for task in tasks:
-        if task.owner == prev_user:
-            task.owner = next_user
-        if task.assigned_to == prev_user:
-            task.assigned_to = next_user
+        task.assigned_to = next_user
         task.is_system_update = True
         task.save()
 
@@ -181,12 +134,10 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
     next_user = event.next_user
 
     tasks = Task.objects.filter(
-        issue=issue, is_suspended=True, prev_owner_role=event.event_type
+        issue=issue, is_suspended=True, assignee_role=event.event_type
     )
     for task in tasks:
-        task.owner = next_user
         task.assigned_to = next_user
-        task.prev_owner_role = None
         task.is_system_update = True
         task.save()
 
@@ -231,7 +182,7 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
 
         now = timezone.now()
         for template in trigger.templates.all():
-            query = Q(issue=event.issue, template=template, owner=user)
+            query = Q(issue=event.issue, template=template, assigned_to=user)
             if not Task.objects.filter(query).exists():
                 due_at = None
                 if template.due_in:
@@ -242,10 +193,11 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
                     type=template.type,
                     name=template.name,
                     description=template.description,
-                    due_at=due_at,
                     is_urgent=template.is_urgent,
                     is_approval_required=template.is_approval_required,
-                    owner=user,
+                    due_at=due_at,
+                    assigned_to=user,
+                    assignee_role=role,
                     is_system_update=True,
                 )
                 task_pks.append(task.pk)

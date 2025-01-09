@@ -71,7 +71,6 @@ def task_detail_page_view(request, pk):
 
 
 class TaskApiViewset(ModelViewSet):
-
     def get_serializer_class(self):
         if self.action == "list":
             return TaskListSerializer
@@ -95,7 +94,7 @@ class TaskApiViewset(ModelViewSet):
 
         queryset = Task.objects.all()
         queryset = Task.annotate_with_days_open(queryset)
-        queryset = queryset.select_related("issue", "owner", "assigned_to")
+        queryset = queryset.select_related("issue", "assigned_to")
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("comments", "attachments")
@@ -105,10 +104,10 @@ class TaskApiViewset(ModelViewSet):
 
         # Permissions.
         if user.is_paralegal:
-            queryset = queryset.filter(Q(owner=user) | Q(assigned_to=user))
-            # Double check: Even if they are the owner or assigned to a task
-            # paralegals should only be able to see the tasks related to cases
-            # of which they are the assigned paralegal.
+            queryset = queryset.filter(Q(assigned_to=user))
+            # Double check: Even if they are assigned to a task, paralegals
+            # should only be able to see the tasks related to cases of which
+            # they are the assigned paralegal.
             queryset = queryset.filter(issue__paralegal=user)
         elif not user.is_coordinator_or_better:
             # No permissions if you're not a paralegal or coordinator+.
@@ -133,9 +132,6 @@ class TaskApiViewset(ModelViewSet):
                     for part in parts:
                         q_filter = (
                             Q(name__icontains=part)
-                            | Q(owner__first_name__icontains=part)
-                            | Q(owner__last_name__icontains=part)
-                            | Q(owner__email__icontains=part)
                             | Q(assigned_to__first_name__icontains=part)
                             | Q(assigned_to__last_name__icontains=part)
                             | Q(assigned_to__email__icontains=part)
@@ -148,10 +144,7 @@ class TaskApiViewset(ModelViewSet):
                     queryset = queryset.filter(query)
                 elif key == "my_tasks":
                     if value:
-                        query = Q(owner=self.request.user) | Q(
-                            assigned_to=self.request.user
-                        )
-                        queryset = queryset.filter(query)
+                        queryset = queryset.filter(Q(assigned_to=self.request.user))
                 else:
                     queryset = queryset.filter(**{key: value})
 

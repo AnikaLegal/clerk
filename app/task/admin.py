@@ -68,8 +68,8 @@ class TaskAdmin(admin.ModelAdmin):
         "id",
         "type",
         "name",
-        "owner_link",
         "assigned_to_link",
+        "assignee_role",
         "status",
         "due_at",
         "is_urgent",
@@ -81,12 +81,7 @@ class TaskAdmin(admin.ModelAdmin):
         "is_system_update",
         "is_open",
         "is_suspended",
-        "prev_owner_role",
     )
-
-    @admin_link("owner", "Owner")
-    def owner_link(self, user):
-        return user if user else None
 
     @admin_link("assigned_to", "Assigned To")
     def assigned_to_link(self, user):

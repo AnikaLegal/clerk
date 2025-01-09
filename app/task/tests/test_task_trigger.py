@@ -54,7 +54,9 @@ def test_task_trigger__tasks_assigned_correctly(
     role,
     django_capture_on_commit_callbacks,
 ):
-    """ """
+    """
+    Test task triggers assign created tasks to the correct user.
+    """
     user = UserFactory()
     kwargs = {field_name: user}
     issue = IssueFactory(**kwargs)
@@ -65,7 +67,7 @@ def test_task_trigger__tasks_assigned_correctly(
         event.save()
 
     assert (
-        Task.objects.filter(issue=issue, assigned_to=user, owner=user).count()
+        Task.objects.filter(issue=issue, assigned_to=user).count()
         == trigger.templates.count()
     )
 
@@ -135,7 +137,6 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
         Task.objects.filter(
             issue=issue,
             assigned_to=lawyer,
-            owner=lawyer,
             template__in=lawyer_trigger.templates.all(),
         ).count()
         == lawyer_trigger.templates.count()
@@ -144,7 +145,6 @@ def test_task_trigger__tasks_assigned_correctly_with_multiple_triggers(
         Task.objects.filter(
             issue=issue,
             assigned_to=paralegal,
-            owner=paralegal,
             template__in=paralegal_trigger.templates.all(),
         ).count()
         == paralegal_trigger.templates.count()
@@ -167,6 +167,4 @@ def test_task_template__due_date_set_correctly(
 
     assert Task.objects.count() == 1
     task = Task.objects.first()
-    assert (
-        task.due_at == (task.created_at + timedelta(days=template.due_in)).date()
-    )
+    assert task.due_at == (task.created_at + timedelta(days=template.due_in)).date()

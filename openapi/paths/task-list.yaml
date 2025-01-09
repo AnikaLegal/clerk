@@ -36,11 +36,6 @@ get:
       schema:
         type: string
       required: false
-    - name: owner
-      in: query
-      schema:
-        type: string
-      required: false
     - name: assigned_to
       in: query
       schema:

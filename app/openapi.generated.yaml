@@ -1343,11 +1343,6 @@ paths:
           schema:
             type: string
           required: false
-        - name: owner
-          in: query
-          schema:
-            type: string
-          required: false
         - name: assigned_to
           in: query
           schema:
@@ -2489,19 +2484,6 @@ components:
             - topic
             - fileref
             - url
-        owner:
-          type: object
-          properties:
-            id:
-              type: integer
-            full_name:
-              type: string
-            url:
-              type: string
-          required:
-            - id
-            - full_name
-            - url
         assigned_to:
           type: object
           properties:
@@ -2527,7 +2509,6 @@ components:
         - days_open
         - url
         - issue
-        - owner
         - assigned_to
     TaskBase:
       type: object
@@ -2558,15 +2539,12 @@ components:
             issue_id:
               type: string
               format: uuid
-            owner_id:
-              type: number
             assigned_to_id:
               type: number
           required:
             - type
             - status
             - issue_id
-            - owner_id
             - assigned_to_id
     Task:
       allOf:
@@ -2583,8 +2561,6 @@ components:
               type: string
             issue:
               $ref: "#/components/schemas/Issue"
-            owner:
-              $ref: "#/components/schemas/User"
             assigned_to:
               $ref: "#/components/schemas/User"
             is_open:
@@ -2604,7 +2580,6 @@ components:
             - type
             - status
             - issue
-            - owner
             - assigned_to
             - is_open
             - is_suspended

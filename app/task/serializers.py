@@ -130,7 +130,6 @@ class TaskListSerializer(serializers.ModelSerializer):
             "name",
             "status",
             "issue",
-            "owner",
             "assigned_to",
             "is_open",
             "is_suspended",
@@ -147,7 +146,6 @@ class TaskListSerializer(serializers.ModelSerializer):
         )
 
     issue = TaskListIssueSerializer(read_only=True)
-    owner = TaskListUserSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
     created_at = LocalDateField(read_only=True)
     due_at = serializers.DateField(read_only=True)
@@ -170,8 +168,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "issue_id",
             "issue",
-            "owner_id",
-            "owner",
             "assigned_to_id",
             "assigned_to",
             "is_open",
@@ -190,8 +186,6 @@ class TaskSerializer(serializers.ModelSerializer):
 
     issue_id = serializers.UUIDField(write_only=True)
     issue = IssueSerializer(read_only=True)
-    owner_id = serializers.IntegerField(write_only=True)
-    owner = UserSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField(write_only=True)
     assigned_to = UserSerializer(read_only=True)
 
@@ -212,7 +206,6 @@ class TaskSearchSerializer(serializers.ModelSerializer):
             "is_suspended",
             "is_urgent",
             "issue",
-            "owner",
             "assigned_to",
             "issue__topic",
             "q",

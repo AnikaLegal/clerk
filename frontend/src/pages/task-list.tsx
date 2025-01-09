@@ -108,7 +108,7 @@ const App = () => {
       <Form>
         <Form.Field>
           <Input
-            placeholder="Search by file ref, task name, owner or assignee"
+            placeholder="Search by file ref, task name or assignee"
             value={query || ''}
             onChange={(e) => setQuery(e.target.value)}
             loading={isLoading}
@@ -162,6 +162,8 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
+            </Form.Group>
+            <Form.Group widths='equal'>
               <Form.Field>
                 <Dropdown
                   fluid
@@ -173,8 +175,6 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('type', value)}
                 />
               </Form.Field>
-            </Form.Group>
-            <Form.Group widths='equal'>
               <Form.Field>
                 <Dropdown
                   fluid
@@ -203,23 +203,6 @@ const App = () => {
                   loading={userResults.isLoading}
                 />
               </Form.Field>
-              <Form.Field>
-                <Dropdown
-                  clearable
-                  fluid
-                  search
-                  selection
-                  value={filter.owner || ''}
-                  placeholder="Owner"
-                  options={users.map((u) => ({
-                    key: u.id,
-                    value: u.id,
-                    text: u.email,
-                  }))}
-                  onChange={(e, { value }) => updateFilter('owner', value)}
-                  loading={userResults.isLoading}
-                />
-              </Form.Field>
             </Form.Group>
           </>
         )}
@@ -233,7 +216,6 @@ const App = () => {
               <Table.HeaderCell>Task Name</Table.HeaderCell>
               <Table.HeaderCell>Task Type</Table.HeaderCell>
               <Table.HeaderCell>Assigned To</Table.HeaderCell>
-              <Table.HeaderCell>Owner</Table.HeaderCell>
               <Table.HeaderCell>Task Status</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Due Date</Table.HeaderCell>
@@ -260,11 +242,6 @@ const App = () => {
                     <a href={task.assigned_to.url}>
                       {task.assigned_to.full_name}
                     </a>
-                  )}
-                </Table.Cell>
-                <Table.Cell>
-                  {task.owner && (
-                    <a href={task.owner.url}>{task.owner.full_name}</a>
                   )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>

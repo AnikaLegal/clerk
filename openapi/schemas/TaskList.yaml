@@ -42,19 +42,6 @@ properties:
       - topic
       - fileref
       - url
-  owner:
-    type: object
-    properties:
-      id:
-        type: integer
-      full_name:
-        type: string
-      url:
-        type: string
-    required:
-      - id
-      - full_name
-      - url
   assigned_to:
     type: object
     properties:
@@ -80,5 +67,4 @@ required:
   - days_open
   - url
   - issue
-  - owner
   - assigned_to

@@ -36,10 +36,11 @@ class TaskTemplateFactory(TimestampedModelFactory):
     trigger = factory.SubFactory(TaskTriggerFactory, templates=[])
     due_in = factory.Maybe(
         factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
-        yes_declaration=factory.Faker("pyint", min_value=1, max_value=14),
+        yes_declaration=factory.Faker("pyint", min_value=1, max_value=28),
         no_declaration=None,
     )
     is_urgent = factory.Faker("random_element", elements=[True, False])
+    is_approval_required = factory.Faker("random_element", elements=[True, False])
 
 
 class TaskFactory(TimestampedModelFactory):
@@ -54,11 +55,11 @@ class TaskFactory(TimestampedModelFactory):
     status = factory.Faker(
         "random_element", elements=[c[0] for c in TaskStatus.choices]
     )
-    owner = factory.SubFactory(UserFactory)
-    assigned_to = factory.SelfAttribute("owner")
+    assigned_to = factory.SubFactory(UserFactory)
+    assignee_role = TasksCaseRole.PARALEGAL
     issue = factory.SubFactory(
         IssueFactory,
-        paralegal=factory.SelfAttribute("..owner"),
+        paralegal=factory.SelfAttribute("..assigned_to"),
         lawyer=factory.SubFactory(UserFactory),
     )
     created_at = factory.Faker(
@@ -73,7 +74,9 @@ class TaskFactory(TimestampedModelFactory):
         ),
         no_declaration=None,
     )
+
     is_urgent = factory.Faker("boolean", chance_of_getting_true=10)
+    is_approval_required = factory.Faker("boolean", chance_of_getting_true=20)
     is_open = factory.LazyAttribute(
         lambda self: self.status not in [TaskStatus.DONE, TaskStatus.NOT_DONE]
     )
