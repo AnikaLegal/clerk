@@ -1,4 +1,4 @@
-import { useFocusTrap, useFocusWithin, useMergedRef } from '@mantine/hooks'
+import { useFocusWithin } from '@mantine/hooks'
 import { RichTextEditor } from '@mantine/tiptap'
 import Placeholder from '@tiptap/extension-placeholder'
 import { ParseOptions } from '@tiptap/pm/model'
@@ -60,14 +60,15 @@ export const RichTextArea = ({
     onBlur ? editor?.on('blur', onBlur) : editor?.off('blur')
   }, [editor, onBlur])
 
+  useEffect(() => {
+    if (editor && autoFocus) {
+      editor.commands.focus()
+    }
+  }, [editor, autoFocus])
+
   /* Emulate semantic-ui-react focus styling to match other components for
    * the time being */
-  const focusTrapRef = useFocusTrap(autoFocus)
-  const { ref: focusWithinRef, focused } = useFocusWithin()
-  const ref = useMergedRef(
-    focusTrapRef,
-    focusWithinRef,
-  );
+  const { ref, focused } = useFocusWithin()
 
   const focusedStyle: CSSProperties = {
     outline: '1px solid #85b7d9',
