@@ -61,8 +61,8 @@ export const RichTextArea = ({
   }, [editor, onBlur])
 
   useEffect(() => {
-    if (editor && autoFocus) {
-      editor.commands.focus()
+    if (autoFocus) {
+      editor?.commands.focus()
     }
   }, [editor, autoFocus])
 
