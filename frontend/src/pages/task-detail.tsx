@@ -14,9 +14,8 @@ import {
   Grid,
   Header,
   Label,
-  List,
   Segment,
-  SemanticCOLORS,
+  SemanticCOLORS
 } from 'semantic-ui-react'
 import { Model, ModelChoices, UserPermission } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
