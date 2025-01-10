@@ -1,11 +1,5 @@
-import api, { TaskCommentCreate, User } from 'api'
-import {
-  EditorExtensions,
-  Placeholder,
-  resetEditor,
-  RichTextCommentEditor,
-  useEditor,
-} from 'comps/richtext-editor'
+import api, { User } from 'api'
+import { EditorEvents, RichTextArea } from 'comps/rich-text'
 import { ModalProps } from 'comps/task/task-action-card'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
@@ -23,25 +17,25 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
   const [canSubmit, setCanSubmit] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [createComment] = api.useCreateTaskCommentMutation()
+  const [text, setText] = useState<string>('')
 
-  const editor = useEditor({ extensions: [...EditorExtensions, Placeholder] })
+  useEffect(() => {
+    setCanSubmit(text != '')
+  }, [text])
 
-  const handleClose = () => {
-    resetEditor(editor)
-    onClose()
+  const handleUpdate = ({ editor }: EditorEvents['update']) => {
+    if (editor) {
+      setText(editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML())
+    }
   }
 
   const handleSubmit = (e) => {
     e.stopPropagation()
     setIsSubmitting(true)
 
-    const values: TaskCommentCreate = {
-      text: editor.getHTML(),
-    }
-
     Promise.all([
       update({ status: status.cancelled }),
-      createComment({ id: task.id, taskCommentCreate: values }),
+      createComment({ id: task.id, taskCommentCreate: { text: text } }),
     ])
       .then((results) => {
         enqueueSnackbar('Cancelled task', { variant: 'success' })
@@ -53,30 +47,15 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
         })
       })
     setIsSubmitting(false)
-    handleClose()
+    onClose()
   }
-
-  useEffect(() => {
-    if (editor && open) {
-      editor.commands.focus()
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (editor) {
-      const handleEditorUpdate = () => {
-        setCanSubmit(!editor.isEmpty && editor.getText().trim() != '')
-      }
-      editor.on('update', handleEditorUpdate)
-    }
-  }, [editor])
 
   return (
     <Modal
       as="Form"
       className="form"
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       onSubmit={(e) => handleSubmit(e)}
       size="tiny"
     >
@@ -84,11 +63,11 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
       <Modal.Content>
         <Form.Field required>
           <label>Briefly explain why the task was not completed</label>
-          <RichTextCommentEditor editor={editor} />
+          <RichTextArea autoFocus onUpdate={handleUpdate} />
         </Form.Field>
       </Modal.Content>
       <Modal.Actions>
-        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
+        <Button type="button" onClick={onClose} disabled={isSubmitting}>
           Close
         </Button>
         <Button
@@ -197,11 +176,16 @@ export const QuestionModal: React.FC<ModalProps> = ({
   const [canSubmit, setCanSubmit] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [userId, setUserId] = useState<number>()
+  const [text, setText] = useState<string>('')
 
-  const userResults = api.useGetUsersQuery({ isActive: true })
+  useEffect(() => {
+    setCanSubmit(text != '')
+  }, [text])
 
   const paralegal = task.issue.paralegal
   const lawyer = task.issue.lawyer
+
+  const userResults = api.useGetUsersQuery({ isActive: true })
 
   const caseUserOptions: User[] = [paralegal, lawyer]
     .filter((u) => u)
@@ -214,36 +198,25 @@ export const QuestionModal: React.FC<ModalProps> = ({
     .filter(({ full_name }) => full_name)
     .sort((a, b) => a.full_name.localeCompare(b.full_name))
 
-  const handleClose = () => {
-    setUserId(null)
-    resetEditor(editor)
-    onClose()
-  }
-
   const handleSubmit = (e) => {
     e.stopPropagation()
     setIsSubmitting(true)
     setIsSubmitting(false)
-    handleClose()
+    onClose()
   }
 
-  const editor = useEditor({ extensions: EditorExtensions })
-
-  const handleUpdates = () => {
-    setCanSubmit(userId && !editor.isEmpty && editor.getText().trim() != '')
+  const handleUpdate = ({ editor }: EditorEvents['update']) => {
+    if (editor) {
+      setText(editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML())
+    }
   }
-  useEffect(handleUpdates, [editor, userId])
-
-  useEffect(() => {
-    if (editor) editor.on('update', handleUpdates)
-  }, [editor, userId])
 
   return (
     <Modal
       as="Form"
       className="form"
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       onSubmit={(e) => handleSubmit(e)}
       size="tiny"
     >
@@ -258,7 +231,6 @@ export const QuestionModal: React.FC<ModalProps> = ({
             loading={userResults.isLoading}
             onChange={(e, { value }) => setUserId(value as number)}
             openOnFocus={false}
-            searchInput={{ autoFocus: true }}
             value={userId || lawyer?.id || ''}
             options={[...caseUserOptions, ...otherUserOptions].map((u) => ({
               key: u.id,
@@ -273,11 +245,11 @@ export const QuestionModal: React.FC<ModalProps> = ({
         </Form.Field>
         <Form.Field required>
           <label>Question</label>
-          <RichTextCommentEditor editor={editor} />
+          <RichTextArea autoFocus onUpdate={handleUpdate} />
         </Form.Field>
       </Modal.Content>
       <Modal.Actions>
-        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
+        <Button type="button" onClick={onClose} disabled={isSubmitting}>
           Close
         </Button>
         <Button
