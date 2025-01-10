@@ -83,8 +83,8 @@ class PersonFactory(TimestampedModelFactory):
 
     full_name = factory.Faker("name")
     email = factory.Faker("ascii_email")
-    address = factory.Faker("address")
-    phone_number = factory.Faker("phone_number")
+    address = factory.Faker("address", locale='en_AU')
+    phone_number = factory.Faker("phone_number", locale='en_AU')
 
 
 @factory.django.mute_signals(post_save)
@@ -94,7 +94,9 @@ class TenancyFactory(TimestampedModelFactory):
 
     agent = factory.SubFactory(PersonFactory)
     landlord = factory.SubFactory(PersonFactory)
-    address = factory.Faker("address")
+    address = factory.Faker("street_address", locale='en_AU')
+    suburb = factory.Faker("city", locale='en_AU')
+    postcode = factory.Faker("postcode", locale='en_AU')
     started = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1y", end_date="-2y"
     )
