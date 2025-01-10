@@ -190,11 +190,11 @@ export const QuestionModal: React.FC<ModalProps> = ({
   const caseUserOptions: User[] = [paralegal, lawyer]
     .filter((u) => u)
     .filter(({ full_name }) => full_name)
-    .filter(({ id }) => id !== task.assigned_to.id)
+    .filter(({ id }) => id !== task.assigned_to?.id)
 
   const otherUserOptions: User[] = (userResults.data || [])
     .filter(({ id }) => !caseUserOptions.find((u) => id === u.id))
-    .filter(({ id }) => id !== task.assigned_to.id)
+    .filter(({ id }) => id !== task.assigned_to?.id)
     .filter(({ full_name }) => full_name)
     .sort((a, b) => a.full_name.localeCompare(b.full_name))
 
