@@ -3,7 +3,7 @@ import { TaskComment } from 'api'
 import { Segment, Comment, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import styled from 'styled-components'
-import { RichTextDisplay } from 'comps/richtext-editor'
+import { RichTextDisplay } from 'comps/rich-text'
 
 const FullWidthCommentGroup = styled(Comment.Group)`
   && {
