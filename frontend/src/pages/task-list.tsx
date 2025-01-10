@@ -1,4 +1,3 @@
-import { IconUrgent } from '@tabler/icons-react'
 import api, { GetTasksApiArg, TaskList } from 'api'
 import { FadeTransition } from 'comps/transitions'
 import moment from 'moment'
@@ -125,7 +124,7 @@ const App = () => {
         </Label>
         {showAdvancedSearch && (
           <>
-            <Form.Group widths='equal'>
+            <Form.Group widths="equal">
               {CONTEXT.user.is_coordinator_or_better && (
                 <Form.Field>
                   <Dropdown
@@ -163,7 +162,7 @@ const App = () => {
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Group widths='equal'>
+            <Form.Group widths="equal">
               <Form.Field>
                 <Dropdown
                   fluid
@@ -213,12 +212,12 @@ const App = () => {
             <Table.Row>
               <Table.HeaderCell>Fileref</Table.HeaderCell>
               <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Task Name</Table.HeaderCell>
-              <Table.HeaderCell>Task Type</Table.HeaderCell>
-              <Table.HeaderCell>Assigned To</Table.HeaderCell>
-              <Table.HeaderCell>Task Status</Table.HeaderCell>
+              <Table.HeaderCell>Task name</Table.HeaderCell>
+              <Table.HeaderCell>Task type</Table.HeaderCell>
+              <Table.HeaderCell>Assigned to</Table.HeaderCell>
+              <Table.HeaderCell>Task status</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
-              <Table.HeaderCell>Due Date</Table.HeaderCell>
+              <Table.HeaderCell>Due date</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -251,13 +250,9 @@ const App = () => {
                   textAlign="center"
                 >
                   {task.is_urgent ? (
-                    <span className="icon-tada">
-                      <IconUrgent stroke={1.25} />
-                    </span>
-                  ) : task.due_at ? (
-                    task.due_at
+                    <span className="icon-tada">URGENT</span>
                   ) : (
-                    '-'
+                    task.due_at || '-'
                   )}
                 </Table.Cell>
               </Table.Row>
