@@ -93,7 +93,8 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        text = f"This task was suspended because {prev_user} was removed from the case."
+        prev_name = prev_user.get_full_name()
+        text = f"This task was suspended because {prev_name} was removed from the case."
         task.add_comment(text)
 
     return [task.pk for task in tasks]
@@ -117,7 +118,9 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        text = f"This task was reassigned from {prev_user} to {next_user} because the case user was changed."
+        prev_name = prev_user.get_full_name()
+        next_name = next_user.get_full_name()
+        text = f"This task was reassigned from {prev_name} to {next_name} because the case user was changed."
         task.add_comment(text)
 
     return [task.pk for task in tasks]
@@ -141,7 +144,8 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        text = f"This task was resumed because {next_user} was added to the case."
+        next_name = next_user.get_full_name()
+        text = f"This task was resumed because {next_name} was added to the case."
         task.add_comment(text)
 
     return [task.pk for task in tasks]
