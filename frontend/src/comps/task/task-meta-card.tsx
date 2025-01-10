@@ -14,16 +14,21 @@ export const TaskMetaCard = ({
 
   return (
     <Card fluid>
+      <Card.Content header="Task information" />
       <Card.Content>
         <Grid>
           <Grid.Row columns={2}>
             <Grid.Column>
-              <Header sub>Status</Header>
-              {statusMap.get(task.status)}
+              <Header sub>Assigned To</Header>
+              {task.assigned_to ? (
+                <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
+              ) : (
+                '-'
+              )}
             </Grid.Column>
             <Grid.Column>
-              <Header sub>Days Open</Header>
-              {task.days_open}
+              <Header sub>Status</Header>
+              {statusMap.get(task.status)}
             </Grid.Column>
           </Grid.Row>
           <Grid.Row columns={2}>
@@ -32,18 +37,18 @@ export const TaskMetaCard = ({
               {task.created_at}
             </Grid.Column>
             <Grid.Column>
+              <Header sub>Date Due</Header>
+              {task.due_at || '-'}
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row columns={2}>
+            <Grid.Column>
               <Header sub>Date Closed</Header>
               {task.closed_at || '-'}
             </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={1}>
             <Grid.Column>
-              <Header sub>Assigned To</Header>
-              {task.assigned_to ? (
-                <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
-              ) : (
-                '-'
-              )}
+              <Header sub>Days Open</Header>
+              {task.days_open}
             </Grid.Column>
           </Grid.Row>
         </Grid>

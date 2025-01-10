@@ -64,7 +64,7 @@ export const TaskActionCard = ({
     },
     {
       id: 'start',
-      icon: 'play circle outline',
+      icon: 'play',
       text: 'Start the task',
       when: () =>
         perms.is_paralegal_or_better && task.status === status.stopped,
@@ -72,7 +72,7 @@ export const TaskActionCard = ({
     },
     {
       id: 'stop',
-      icon: 'stop circle outline',
+      icon: 'stop',
       text: 'Stop the task',
       when: () =>
         perms.is_paralegal_or_better &&
@@ -113,6 +113,7 @@ export const TaskActionCard = ({
 
   return (
     <Card fluid>
+      <Card.Content header="Task actions" />
       <Card.Content>
         <List verticalAlign="middle" selection>
           {options

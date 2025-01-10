@@ -14,6 +14,7 @@ import {
   Grid,
   Header,
   Label,
+  List,
   Segment,
   SemanticCOLORS,
 } from 'semantic-ui-react'
@@ -114,19 +115,19 @@ export const TaskDetail = ({
           </Segment>
         </Grid.Column>
         <Grid.Column>
-          <TaskActionCard
-            task={task}
-            setTask={setTask}
-            update={update}
-            perms={perms}
-            status={status}
-          />
           <TaskMetaCard
             choices={choices}
             perms={perms}
             setTask={setTask}
             task={task}
             update={update}
+          />
+          <TaskActionCard
+            task={task}
+            setTask={setTask}
+            update={update}
+            perms={perms}
+            status={status}
           />
         </Grid.Column>
       </Grid.Row>
@@ -162,7 +163,9 @@ export const TaskBody = ({
           </Grid.Column>
           {perms.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
-              <Button onClick={toggleEditMode}>Edit</Button>
+              <Button onClick={toggleEditMode} size="tiny">
+                Edit
+              </Button>
             </Grid.Column>
           )}
         </Grid.Row>
@@ -296,20 +299,17 @@ export const TaskHeader = ({
       <Header as="h1">
         {task.name}
         <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
-        {task.due_at && <Header.Subheader>Due {task.due_at}</Header.Subheader>}
       </Header>
       <span>
-        {task.is_open && task.is_urgent && <Label color="red">Urgent</Label>}
-        {task.is_open && isOverdue && <Label color="red">Overdue</Label>}
         {task.is_approved ? (
           <Label color="green">Approved</Label>
         ) : (
-          task.is_approval_required && <Label color="red">Approval required</Label>
+          task.is_approval_required && (
+            <Label color="blue">Requires approval</Label>
+          )
         )}
-        <Label color={statusColor}>
-          Status
-          <Label.Detail>{statusLabels.get(task.status)}</Label.Detail>
-        </Label>
+        {task.is_open && task.is_urgent && <Label color="red">Urgent</Label>}
+        {task.is_open && isOverdue && <Label color="red">Overdue</Label>}
       </span>
     </>
   )
