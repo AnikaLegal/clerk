@@ -6,16 +6,10 @@ import {
   RichTextCommentEditor,
   useEditor,
 } from 'comps/richtext-editor'
-import { ModalProps, TaskModal } from 'comps/task/task-action-card'
+import { ModalProps } from 'comps/task/task-action-card'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState, useRef } from 'react'
-import {
-  Button,
-  Dropdown,
-  DropdownItemProps,
-  Form,
-  Modal,
-} from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react'
+import { Button, Dropdown, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 
 export const CancelTaskModal: React.FC<ModalProps> = ({
@@ -255,7 +249,7 @@ export const QuestionModal: React.FC<ModalProps> = ({
     >
       <Modal.Header>Ask a question about this task</Modal.Header>
       <Modal.Content>
-        <Form.Field>
+        <Form.Field required>
           <label>To</label>
           <Dropdown
             fluid
@@ -265,7 +259,7 @@ export const QuestionModal: React.FC<ModalProps> = ({
             onChange={(e, { value }) => setUserId(value as number)}
             openOnFocus={false}
             searchInput={{ autoFocus: true }}
-            value={userId || ''}
+            value={userId || lawyer?.id || ''}
             options={[...caseUserOptions, ...otherUserOptions].map((u) => ({
               key: u.id,
               value: u.id,
@@ -277,7 +271,7 @@ export const QuestionModal: React.FC<ModalProps> = ({
             }))}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field required>
           <label>Question</label>
           <RichTextCommentEditor editor={editor} />
         </Form.Field>
