@@ -343,11 +343,11 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
 
   return (
     <>
+      <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
       <RichTextCommentEditor
         onSubmit={handleSubmit}
         placeholder="Leave a comment…"
       />
-      <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
     </>
   )
 }
