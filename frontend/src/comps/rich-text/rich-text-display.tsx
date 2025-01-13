@@ -11,13 +11,12 @@ interface RichTextDisplayProps {
   content?: string
 }
 
-/* An internal element of the text editor has padding, which we don't want, that
- * we cannot manipulate with component styling. This is a convenient way to
- * address that.
- */
+/* An internal element of the text editor has padding, which we mostly don't
+ * want, that we cannot manipulate with component styling. This is a convenient
+ * way to address that. */
 const GlobalStyles = createGlobalStyle`
   .rich-text-display .tiptap.ProseMirror {
-    padding: 0;
+    padding: 0.5rem 0 0 0;
   }
 `
 

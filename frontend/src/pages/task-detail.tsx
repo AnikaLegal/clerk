@@ -1,7 +1,9 @@
 import api, { Task, TaskCommentCreate, TaskCreate } from 'api'
 import { AutoForm, getFormSchema, getModelInitialValues } from 'comps/auto-form'
 import { CaseSummaryCard } from 'comps/case-summary-card'
+import { CommentInput } from 'comps/comment'
 import { FIELD_TYPES } from 'comps/field-component'
+import { Editor, RichTextDisplay } from 'comps/rich-text'
 import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
 import moment from 'moment'
@@ -15,19 +17,12 @@ import {
   Header,
   Label,
   Segment,
-  SemanticCOLORS
+  SemanticCOLORS,
 } from 'semantic-ui-react'
 import { Model, ModelChoices, UserPermission } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 import * as Yup from 'yup'
-
-import {
-  Editor,
-  resetEditor,
-  RichTextCommentEditor,
-  RichTextDisplay,
-} from 'comps/richtext-editor'
 
 interface DjangoContext {
   choices: {
@@ -331,7 +326,7 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
       })
         .then((instance) => {
           enqueueSnackbar('Added comment', { variant: 'success' })
-          resetEditor(editor)
+          editor.commands.clearContent()
         })
         .catch((err) => {
           enqueueSnackbar(getAPIErrorMessage(err, 'Failed to add comment'), {
@@ -344,10 +339,7 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
   return (
     <>
       <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
-      <RichTextCommentEditor
-        onSubmit={handleSubmit}
-        placeholder="Leave a comment…"
-      />
+      <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
     </>
   )
 }
