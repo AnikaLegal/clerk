@@ -160,18 +160,18 @@ main {
   }
 }
 
-.icon-pulse {
+.animation-pulse {
   animation: pulse-keyframes 2s ease infinite;
   animation-fill-mode: both;
 }
 
-.icon-pulse,
-.icon-tada {
+.animation-pulse,
+.animation-tada {
   display: block;
   transition: all 0.15s ease 0s;
 }
 
-.icon-tada {
+.animation-tada {
   animation: tada-keyframes 3s ease infinite;
   animation-fill-mode: both;
 }

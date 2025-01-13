@@ -250,7 +250,7 @@ const App = () => {
                   textAlign="center"
                 >
                   {task.is_urgent ? (
-                    <span className="icon-tada">URGENT</span>
+                    <span className="animation-tada">URGENT</span>
                   ) : (
                     task.due_at || '-'
                   )}
