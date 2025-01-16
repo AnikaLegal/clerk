@@ -342,16 +342,17 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/kawshi.png",
-        "name": "Kawshalya Manisegaran",
-        "title": "Lawyer and Clinical Programs Lead",
+        "image": "web/img/photos/team/emily.png",
+        "name": "Emily Southwell",
+        "title": "Supervising Lawyer",
         "brags": [
-            """Kawshalya is a lawyer, supporting our paralegals to deliver much
-            needed legal services to Victorian renters.""",
-            """Kawshalya has considerable experience as a lawyer, specialising
-            in transport infrastructure projects. She previously worked at PwC
-            in their Infrastructure team, and at MinterEllison in their
-            Projects, Infrastructure and Construction team.""",
+            """Emily is a lawyer, supporting our case team to deliver
+            much-needed legal services to Victorian renters.""",
+            """Emily brings a wealth of diverse experiences to Anika Legal. She
+            has previously worked as a Coroner's Solicitor at the Coroner's
+            Court of Victoria and has significant expertise in policy
+            development, particularly in the areas of justice and Aboriginal
+            affairs.""",
         ],
     },
     {
