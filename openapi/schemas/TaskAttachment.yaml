@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./TaskAttachmentBase.yaml
+  - type: object
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      url:
+        type: string
+      content_type:
+        type: string
+    required:
+      - id
+      - name
+      - url
+      - content_type

@@ -1492,6 +1492,75 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/task/{id}/attachments/:
+    get:
+      operationId: getTaskAttachments
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TaskAttachment"
+    post:
+      operationId: createTaskAttachment
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TaskAttachmentCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskAttachment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/task/{id}/attachments/{attachment_id}/:
+    delete:
+      operationId: deleteTaskAttachment
+      parameters:
+        - name: id
+          description: Task ID
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: attachment_id
+          description: Attachment ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/template-task/:
     get:
       operationId: getTaskTriggers
@@ -2642,6 +2711,42 @@ components:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
         - type: object
+    TaskAttachmentBase:
+      type: object
+      properties:
+        comment_id:
+          type: number
+          nullable: true
+      required:
+        - comment_id
+    TaskAttachment:
+      allOf:
+        - $ref: "#/components/schemas/TaskAttachmentBase"
+        - type: object
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+            url:
+              type: string
+            content_type:
+              type: string
+          required:
+            - id
+            - name
+            - url
+            - content_type
+    TaskAttachmentCreate:
+      allOf:
+        - $ref: "#/components/schemas/TaskAttachmentBase"
+        - type: object
+          properties:
+            file:
+              type: string
+              format: binary
+          required:
+            - file
     TaskTemplate:
       type: object
       properties:

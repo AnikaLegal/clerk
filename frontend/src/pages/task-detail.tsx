@@ -1,5 +1,8 @@
-import api, { Task, TaskCommentCreate, TaskCreate } from 'api'
+import { FileButton } from '@mantine/core'
+import { useClickOutside } from '@mantine/hooks'
+import api, { Task, TaskAttachment, TaskCommentCreate, TaskCreate } from 'api'
 import { AutoForm, getFormSchema, getModelInitialValues } from 'comps/auto-form'
+import { DiscreteButton } from 'comps/button'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
 import { FIELD_TYPES } from 'comps/field-component'
@@ -11,13 +14,16 @@ import { enqueueSnackbar } from 'notistack'
 import React, { useMemo, useState } from 'react'
 import {
   Button,
+  ButtonProps,
   Divider,
   Form,
   Grid,
   Header,
+  Icon,
   Label,
+  List,
+  Popup,
   Segment,
-  SemanticCOLORS,
 } from 'semantic-ui-react'
 import { Model, ModelChoices, UserPermission } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
@@ -86,7 +92,10 @@ export const TaskDetail = ({
           width={8}
           style={{ marginRight: '6rem', marginLeft: '6rem' }}
         >
-          <Segment basic style={{ paddingTop: '0' }}>
+          <Segment
+            basic
+            style={{ marginBottom: '0', paddingTop: '0', paddingBottom: '0' }}
+          >
             <TaskBody
               task={task}
               setTask={setTask}
@@ -96,7 +105,7 @@ export const TaskDetail = ({
               status={status}
             />
           </Segment>
-          <Segment basic>
+          <Segment basic style={{ marginTop: '0' }}>
             <Divider />
             <Header as="h4">Comments</Header>
             <TaskComments
@@ -138,7 +147,6 @@ export const TaskBody = ({
   status,
 }: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
-  const typeLabels = useMemo(() => choiceToMap(choices.type), [])
   const toggleEditMode = () => setEditMode(!isEditMode)
 
   if (!isEditMode) {
@@ -172,6 +180,16 @@ export const TaskBody = ({
             </Form>
           </Grid.Column>
         </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <List floated="right" horizontal>
+              <List.Item>
+                <TaskAttachmentButton task={task} />
+              </List.Item>
+            </List>
+          </Grid.Column>
+        </Grid.Row>
+        <TaskAttachments task={task} />
       </Grid>
     )
   }
@@ -279,14 +297,7 @@ export const TaskHeader = ({
   status,
 }: TaskHeaderProps) => {
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])
-  const statusLabels = useMemo(() => choiceToMap(choices.status), [])
   const isOverdue = getIsOverdue(task)
-
-  const statusColor: SemanticCOLORS =
-    (task.status === status.started && 'blue') ||
-    (task.status === status.finished && 'green') ||
-    (task.status === status.cancelled && 'red') ||
-    'grey'
 
   return (
     <>
@@ -341,6 +352,205 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
       <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
     </>
+  )
+}
+
+interface TaskAttachmentButtonProps {
+  task: Task
+}
+
+export const TaskAttachmentButton = ({ task }: TaskAttachmentButtonProps) => {
+  const [createTaskAttachment] = api.useCreateTaskAttachmentMutation()
+
+  const handleChange = (files: File[]) => {
+    if (files.length > 0) {
+      for (const file of files) {
+        // TODO: would be nice if this could be typed.
+        const values = new FormData()
+        values.set('file', file)
+        values.set('comment_id', '')
+
+        createTaskAttachment({
+          id: task.id,
+          taskAttachmentCreate: values as any,
+        })
+          .unwrap()
+          .then((instance) => {
+            enqueueSnackbar('Added attachment', { variant: 'success' })
+          })
+          .catch((err) => {
+            enqueueSnackbar(
+              getAPIErrorMessage(err, 'Failed to add attachment'),
+              {
+                variant: 'error',
+              }
+            )
+          })
+      }
+    }
+  }
+
+  return (
+    <FileButton onChange={handleChange} multiple>
+      {(props) => (
+        <Popup
+          mouseEnterDelay={1000}
+          trigger={<Icon link name="attach" onClick={props.onClick} />}
+        >
+          Attach files
+        </Popup>
+      )}
+    </FileButton>
+  )
+}
+
+interface TaskAttachmentsProps {
+  task: Task
+}
+
+export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
+  const [showAttachments, setShowAttachments] = useState(true)
+  const [deleteTaskAttachment] = api.useDeleteTaskAttachmentMutation()
+
+  const attachmentResult = api.useGetTaskAttachmentsQuery({ id: task.id })
+  const attachments = attachmentResult.data || []
+
+  if (attachments.length === 0) {
+    return null
+  }
+
+  const handleDelete = (attachment: TaskAttachment) => {
+    deleteTaskAttachment({
+      id: task.id,
+      attachmentId: attachment.id,
+    })
+      .unwrap()
+      .then((instance) => {
+        enqueueSnackbar('Removed attachment', { variant: 'success' })
+      })
+      .catch((err) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(err, 'Failed to remove attachment'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+  }
+
+  return (
+    <>
+      <Grid.Row style={{ paddingTop: '0' }}>
+        <Grid.Column>
+          <TaskAttachmentToggleButton
+            open={showAttachments}
+            onClick={() => setShowAttachments(!showAttachments)}
+          />
+        </Grid.Column>
+      </Grid.Row>
+      {showAttachments && (
+        <TaskAttachmentGroup
+          attachments={attachments}
+          onDelete={handleDelete}
+        />
+      )}
+    </>
+  )
+}
+
+interface TaskAttachmentToggleButtonProps {
+  open: boolean
+}
+
+export const TaskAttachmentToggleButton = ({
+  open,
+  ...props
+}: TaskAttachmentToggleButtonProps | ButtonProps) => {
+  return (
+    <DiscreteButton icon {...props}>
+      <span>
+        <Icon name={open ? 'caret down' : 'caret right'} />
+        <span>Attachments</span>
+      </span>
+    </DiscreteButton>
+  )
+}
+
+interface TaskAttachmentGroupProps {
+  attachments: TaskAttachment[]
+  onDelete?: (TaskAttachment) => void
+}
+export const TaskAttachmentGroup = ({
+  attachments,
+  onDelete,
+}: TaskAttachmentGroupProps) => {
+  return attachments.map((attachment) => {
+    return (
+      <Grid.Row
+        key={attachment.id}
+        style={{ paddingTop: '0', paddingBottom: '0.5rem' }}
+      >
+        <Grid.Column>
+          <TaskAttachmentGroupItem
+            attachment={attachment}
+            onDelete={onDelete}
+          />
+        </Grid.Column>
+      </Grid.Row>
+    )
+  })
+}
+
+interface TaskAttachmentGroupItemProps {
+  attachment: TaskAttachment
+  onDelete?: (TaskAttachment) => void
+}
+export const TaskAttachmentGroupItem = ({
+  attachment,
+  onDelete,
+}: TaskAttachmentGroupItemProps) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const ref = useClickOutside(() => setShowConfirmDelete(false))
+
+  const handleDelete = (event) => {
+    event.stopPropagation()
+    onDelete(attachment)
+  }
+
+  return (
+    <Segment
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        padding: '0.5rem',
+        borderRadius: 'var(--mantine-radius-default)',
+      }}
+    >
+      <div style={{ flexGrow: '0' }}>
+        <Icon name="attach" />
+      </div>
+      <a href={attachment.url} download style={{ flexGrow: '1' }}>
+        {attachment.name.split('/').slice(-1)}
+      </a>
+      <div style={{ flexGrow: '0' }}>
+        {showConfirmDelete ? (
+          <div ref={ref}>
+            <Button negative compact size="mini" onClick={handleDelete}>
+              Confirm delete
+            </Button>
+          </div>
+        ) : (
+          <Icon
+            link
+            name="trash alternate outline"
+            onClick={() => {
+              setShowConfirmDelete(true)
+            }}
+          />
+        )}
+      </div>
+    </Segment>
   )
 }
 

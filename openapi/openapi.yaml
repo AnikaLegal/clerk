@@ -73,6 +73,10 @@ paths:
     $ref: paths/task-detail.yaml
   /clerk/api/task/{id}/comments/:
     $ref: paths/task-comments-list.yaml
+  /clerk/api/task/{id}/attachments/:
+    $ref: paths/task-attachments-list.yaml
+  /clerk/api/task/{id}/attachments/{attachment_id}/:
+    $ref: paths/task-attachments-detail.yaml
   /clerk/api/template-task/:
     $ref: paths/task-trigger-list.yaml
   /clerk/api/template-task/{id}/:

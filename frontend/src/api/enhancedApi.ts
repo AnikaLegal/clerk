@@ -42,12 +42,6 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteEmailAttachment: {
       invalidatesTags: [{ type: 'EMAIL' }],
     },
-    getTaskComments: {
-      providesTags: [{ type: 'TASK_COMMENT' }],
-    },
-    createTaskComment: {
-      invalidatesTags: [{ type: 'TASK_COMMENT' }],
-    },
     getCaseServices: {
       providesTags: [{ type: 'SERVICE' }],
     },
@@ -62,6 +56,21 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    getTaskComments: {
+      providesTags: [{ type: 'TASK_COMMENT' }],
+    },
+    createTaskComment: {
+      invalidatesTags: [{ type: 'TASK_COMMENT' }],
+    },
+    getTaskAttachments: {
+      providesTags: [{ type: 'TASK_ATTACHMENT' }],
+    },
+    createTaskAttachment: {
+      invalidatesTags: [{ type: 'TASK_ATTACHMENT' }],
+    },
+    deleteTaskAttachment: {
+      invalidatesTags: [{ type: 'TASK_ATTACHMENT' }],
     },
   },
 })

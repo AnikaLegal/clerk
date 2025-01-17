@@ -1,25 +1,29 @@
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import api_view, action
+from core.models.issue import CaseTopic
+from django.db.models import Prefetch, Q, QuerySet
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Q, QuerySet
-from django.urls import reverse
-from django.http import Http404
-
-from case.views.auth import (
-    paralegal_or_better_required,
-    CoordinatorOrBetterPermission,
-    ParalegalOrBetterObjectPermission,
-)
-from case.utils.react import render_react_page
-from core.models.issue import CaseTopic
-from task.models.task import Task, TaskType, TaskStatus
+from rest_framework.viewsets import ModelViewSet
+from task.models.attachment import TaskAttachment
 from task.models.comment import CommentType
+from task.models.task import Task, TaskStatus, TaskType
 from task.serializers import (
-    TaskSerializer,
+    TaskAttachmentSerializer,
+    TaskCommentSerializer,
     TaskListSerializer,
     TaskSearchSerializer,
-    TaskCommentSerializer,
+    TaskSerializer,
+)
+
+from case.utils.react import render_react_page
+from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    ParalegalOrBetterObjectPermission,
+    paralegal_or_better_required,
 )
 
 # TODO:
@@ -76,6 +80,8 @@ class TaskApiViewset(ModelViewSet):
             return TaskListSerializer
         elif self.action == "comments_view":
             return TaskCommentSerializer
+        elif self.action == "attachments_view":
+            return TaskAttachmentSerializer
         return TaskSerializer
 
     def get_permissions(self):
@@ -97,7 +103,12 @@ class TaskApiViewset(ModelViewSet):
         queryset = queryset.select_related("issue", "assigned_to")
 
         if self.action == "retrieve":
-            queryset = queryset.prefetch_related("comments", "attachments")
+            queryset = queryset.prefetch_related("comments").prefetch_related(
+                Prefetch(
+                    "attachments",
+                    queryset=TaskAttachment.objects.filter(comment_id__isnull=True),
+                )
+            )
         elif self.action == "list":
             queryset = queryset.order_by("-is_urgent", "due_at", "-days_open")
             queryset = self.search_queryset(queryset)
@@ -158,7 +169,7 @@ class TaskApiViewset(ModelViewSet):
     )
     def comments_view(self, request, pk):
         """
-        View task comments.
+        Task comments.
         """
         task = self.get_object()
 
@@ -179,3 +190,39 @@ class TaskApiViewset(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=201)
+
+    @action(
+        detail=True,
+        methods=["GET", "POST"],
+        url_path="attachments",
+        url_name="attachments",
+    )
+    def attachments_view(self, request, pk):
+        """
+        task attachments.
+        """
+        task = self.get_object()
+
+        if request.method == "GET":
+            queryset = task.attachments.all()
+            queryset = queryset.order_by("created_at")
+            data = TaskAttachmentSerializer(queryset, many=True).data
+            return Response(data)
+        else:
+            request.data["task_id"] = task.pk
+            serializer = TaskAttachmentSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=201)
+
+    @action(
+        detail=True,
+        methods=["DELETE"],
+        url_name="attachment-delete",
+        url_path="attachments/(?P<attachment_id>[0-9]+)",
+    )
+    def attachment_delete(self, request, pk, attachment_id):
+        task = self.get_object()
+        attachment = get_object_or_404(task.attachments, pk=attachment_id)
+        attachment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

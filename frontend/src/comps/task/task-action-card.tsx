@@ -80,9 +80,9 @@ export const TaskActionCard = ({
       action: () => handleChange('status', status.stopped),
     },
     {
-      id: 'finish',
+      id: 'complete',
       icon: 'check',
-      text: 'Finish the task',
+      text: 'Complete the task',
       when: () => perms.is_paralegal_or_better && task.is_open &&
         (!task.is_approval_required || task.is_approved),
       action: () => handleChange('status', status.finished),

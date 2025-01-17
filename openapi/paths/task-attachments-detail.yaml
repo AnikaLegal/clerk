@@ -1,0 +1,22 @@
+delete:
+  operationId: deleteTaskAttachment
+  parameters:
+    - name: id
+      description: Task ID
+      in: path
+      required: true
+      schema:
+        type: number
+    - name: attachment_id
+      description: Attachment ID
+      in: path
+      required: true
+      schema:
+        type: number
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

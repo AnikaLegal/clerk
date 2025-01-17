@@ -4,7 +4,7 @@ from core.models.issue_event import EventType
 from django.urls import reverse
 from rest_framework import serializers
 
-from .models import Task, TaskComment, TaskTemplate, TaskTrigger
+from .models import Task, TaskAttachment, TaskComment, TaskTemplate, TaskTrigger
 
 
 class TaskTemplateSerializer(serializers.ModelSerializer):
@@ -67,7 +67,7 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
 
         ids = {x["id"] for x in to_update}
         for template in instance.templates.all():
-            if not template.id in ids:
+            if template.id not in ids:
                 to_delete.append(template.id)
 
         # Do the required operations.
@@ -205,8 +205,7 @@ class TaskSerializer(serializers.ModelSerializer):
         for field in ("due_at",):
             if field in data and data[field] == "":
                 data[field] = None
-
-        return super(TaskSerializer, self).to_internal_value(data)
+        return super().to_internal_value(data)
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
@@ -250,3 +249,34 @@ class TaskCommentSerializer(serializers.ModelSerializer):
     creator_id = serializers.IntegerField(write_only=True)
     creator = TaskListUserSerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
+
+
+class TaskAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskAttachment
+        fields = (
+            "id",
+            "task_id",
+            "comment_id",
+            "content_type",
+            "created_at",
+            "file",
+            "name",
+            "url",
+        )
+
+    task_id = serializers.IntegerField()
+    comment_id = serializers.IntegerField(allow_null=True)
+    content_type = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    file = serializers.FileField(write_only=True)
+    name = serializers.CharField(source="file.name", read_only=True)
+    url = serializers.URLField(source="file.url", read_only=True)
+
+    def create(self, validated_data):
+        file = validated_data["file"]
+        data = {
+            **validated_data,
+            "content_type": file.content_type,
+        }
+        return super().create(data)

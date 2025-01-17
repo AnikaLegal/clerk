@@ -480,6 +480,33 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.taskCommentCreate,
       }),
     }),
+    getTaskAttachments: build.query<
+      GetTaskAttachmentsApiResponse,
+      GetTaskAttachmentsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/attachments/`,
+      }),
+    }),
+    createTaskAttachment: build.mutation<
+      CreateTaskAttachmentApiResponse,
+      CreateTaskAttachmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/attachments/`,
+        method: "POST",
+        body: queryArg.taskAttachmentCreate,
+      }),
+    }),
+    deleteTaskAttachment: build.mutation<
+      DeleteTaskAttachmentApiResponse,
+      DeleteTaskAttachmentApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/attachments/${queryArg.attachmentId}/`,
+        method: "DELETE",
+      }),
+    }),
     getTaskTriggers: build.query<
       GetTaskTriggersApiResponse,
       GetTaskTriggersApiArg
@@ -953,6 +980,27 @@ export type CreateTaskCommentApiArg = {
   /** Successful response. */
   taskCommentCreate: TaskCommentCreate;
 };
+export type GetTaskAttachmentsApiResponse =
+  /** status 200 Successful response. */ TaskAttachment[];
+export type GetTaskAttachmentsApiArg = {
+  /** Entity ID */
+  id: number;
+};
+export type CreateTaskAttachmentApiResponse =
+  /** status 201 Successful response. */ TaskAttachment;
+export type CreateTaskAttachmentApiArg = {
+  /** Entity ID */
+  id: number;
+  /** Successful response. */
+  taskAttachmentCreate: TaskAttachmentCreate;
+};
+export type DeleteTaskAttachmentApiResponse = unknown;
+export type DeleteTaskAttachmentApiArg = {
+  /** Task ID */
+  id: number;
+  /** Attachment ID */
+  attachmentId: number;
+};
 export type GetTaskTriggersApiResponse =
   /** status 200 Successful response. */ TaskTrigger[];
 export type GetTaskTriggersApiArg = void;
@@ -1320,6 +1368,18 @@ export type TaskComment = TaskCommentBase & {
   created_at: string;
 };
 export type TaskCommentCreate = TaskCommentBase & object;
+export type TaskAttachmentBase = {
+  comment_id: number | null;
+};
+export type TaskAttachment = TaskAttachmentBase & {
+  id: number;
+  name: string;
+  url: string;
+  content_type: string;
+};
+export type TaskAttachmentCreate = TaskAttachmentBase & {
+  file: Blob;
+};
 export type TaskTemplate = {
   id?: number;
   type: string;
@@ -1401,6 +1461,9 @@ export const {
   useDeleteTaskMutation,
   useGetTaskCommentsQuery,
   useCreateTaskCommentMutation,
+  useGetTaskAttachmentsQuery,
+  useCreateTaskAttachmentMutation,
+  useDeleteTaskAttachmentMutation,
   useGetTaskTriggersQuery,
   useCreateTaskTriggerMutation,
   useGetTaskTriggerQuery,

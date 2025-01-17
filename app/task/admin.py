@@ -108,3 +108,18 @@ class TaskCommentAdmin(admin.ModelAdmin):
     @admin_link("creator", "Creator")
     def creator_link(self, user):
         return user if user else None
+
+
+@admin.register(TaskAttachment)
+class TaskAttachmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "file",
+        "content_type",
+        "created_at",
+        "task_link",
+    )
+
+    @admin_link("task", "Task")
+    def task_link(self, task):
+        return task if task else None
