@@ -1,9 +1,10 @@
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { Card, List } from 'semantic-ui-react'
+import { Button, Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
 import { CancelTaskModal, ReassignTaskModal, QuestionModal } from 'comps/task'
+import { TextButton } from 'comps/button'
 
 export interface ModalProps extends TaskActionProps {
   onClose: () => void
@@ -16,9 +17,10 @@ interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
 
 interface TaskOptionBase {
   id: string
-  icon: string
+  icon: SemanticICONS
   text: string
-  when: () => boolean
+  showWhen: () => boolean
+  disableWhen?: () => boolean
 }
 interface TaskActionOption extends TaskOptionBase {
   action: () => void
@@ -59,14 +61,14 @@ export const TaskActionCard = ({
       id: 'reopen',
       icon: 'undo',
       text: 'Reopen the task',
-      when: () => perms.is_paralegal_or_better && !task.is_open,
+      showWhen: () => perms.is_paralegal_or_better && !task.is_open,
       action: () => handleChange('status', status.stopped),
     },
     {
       id: 'start',
       icon: 'play',
       text: 'Start the task',
-      when: () =>
+      showWhen: () =>
         perms.is_paralegal_or_better && task.status === status.stopped,
       action: () => handleChange('status', status.started),
     },
@@ -74,39 +76,38 @@ export const TaskActionCard = ({
       id: 'stop',
       icon: 'stop',
       text: 'Stop the task',
-      when: () =>
-        perms.is_paralegal_or_better &&
-        task.status === status.started,
+      showWhen: () =>
+        perms.is_paralegal_or_better && task.status === status.started,
       action: () => handleChange('status', status.stopped),
     },
     {
       id: 'complete',
       icon: 'check',
       text: 'Complete the task',
-      when: () => perms.is_paralegal_or_better && task.is_open &&
-        (!task.is_approval_required || task.is_approved),
+      showWhen: () => perms.is_paralegal_or_better && task.is_open,
+      disableWhen: () => task.is_approval_required && !task.is_approved,
       action: () => handleChange('status', status.finished),
     },
     {
       id: 'cancel',
       icon: 'close',
       text: 'Cancel the task',
-      when: () => perms.is_paralegal_or_better && task.is_open &&
-        (!task.is_approval_required || task.is_approved),
+      showWhen: () => perms.is_paralegal_or_better && task.is_open,
+      disableWhen: () => task.is_approval_required && !task.is_approved,
       modal: CancelTaskModal,
     },
     {
       id: 'reassign',
       icon: 'user',
       text: 'Reassign the task',
-      when: () => perms.is_coordinator_or_better && task.is_open,
+      showWhen: () => perms.is_coordinator_or_better && task.is_open,
       modal: ReassignTaskModal,
     },
     {
       id: 'question',
       icon: 'question',
       text: 'Ask a question',
-      when: () => perms.is_paralegal_or_better && task.is_open,
+      showWhen: () => perms.is_paralegal_or_better && task.is_open,
       modal: QuestionModal,
     },
   ]
@@ -117,7 +118,7 @@ export const TaskActionCard = ({
       <Card.Content>
         <List verticalAlign="middle" selection>
           {options
-            .filter((o) => o.when())
+            .filter((o) => o.showWhen())
             .map((option) =>
               option.action ? (
                 <TaskAction key={option.id} option={option} />
@@ -140,13 +141,18 @@ export const TaskActionCard = ({
 }
 
 export const TaskAction = ({ option }: { option: TaskOption }) => {
+  const disabled = option.disableWhen && option.disableWhen()
   return (
-    <List.Item key={option.id} onClick={option.action}>
+    <List.Item key={option.id}>
       <List.Content>
-        <div className="header">
-          <i className={`${option.icon} icon`}></i>
-          {option.text}
-        </div>
+        <List.Header>
+          <TextButton icon disabled={disabled} onClick={option.action}>
+            <span>
+              <Icon name={option.icon} />
+              {option.text}
+            </span>
+          </TextButton>
+        </List.Header>
       </List.Content>
     </List.Item>
   )
@@ -154,15 +160,20 @@ export const TaskAction = ({ option }: { option: TaskOption }) => {
 
 export const TaskModal = ({ option, ...props }: TaskModalProps) => {
   const [open, setOpen] = useState(false)
+  const disabled = option.disableWhen && option.disableWhen()
 
   return (
     <>
-      <List.Item key={option.id} onClick={() => setOpen(true)}>
+      <List.Item key={option.id}>
         <List.Content>
-          <div className="header">
-            <i className={`${option.icon} icon`}></i>
-            {option.text}
-          </div>
+          <List.Header>
+            <TextButton icon disabled={disabled} onClick={() => setOpen(true)}>
+              <span>
+                <Icon name={option.icon} />
+                {option.text}
+              </span>
+            </TextButton>
+          </List.Header>
         </List.Content>
       </List.Item>
       <option.modal
