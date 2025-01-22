@@ -4,6 +4,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from .models import Task, TaskAttachment, TaskComment, TaskTemplate, TaskTrigger
+from .models.task import TaskStatus
 
 
 class TaskTemplateSerializer(serializers.ModelSerializer):
@@ -197,6 +198,8 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
+    is_approval_required = serializers.BooleanField(read_only=True)
+    is_approved = serializers.BooleanField(read_only=True)
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a
@@ -205,6 +208,20 @@ class TaskSerializer(serializers.ModelSerializer):
             if field in data and data[field] == "":
                 data[field] = None
         return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        instance: Task | None = self.instance
+        request = self.context.get("request", None)
+        if instance and request and request.user.is_paralegal:
+            status = attrs.get("status")
+            if (
+                status in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+                and instance.is_approval_required
+                and not instance.is_approved
+            ):
+                raise serializers.ValidationError("Approval is required")
+
+        return super().to_internal_value(attrs)
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
