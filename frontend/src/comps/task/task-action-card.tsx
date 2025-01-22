@@ -1,10 +1,10 @@
+import { TextButton } from 'comps/button'
+import { CancelTaskModal, QuestionModal, ReassignTaskModal } from 'comps/task'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { Button, Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
+import { Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
-import { CancelTaskModal, ReassignTaskModal, QuestionModal } from 'comps/task'
-import { TextButton } from 'comps/button'
 
 export interface ModalProps extends TaskActionProps {
   onClose: () => void
@@ -32,22 +32,13 @@ interface TaskModalOption extends TaskOptionBase {
 }
 type TaskOption = TaskActionOption | TaskModalOption
 
-interface TaskModalProps extends TaskActionProps {
-  option: TaskOption
-}
-
-export const TaskActionCard = ({
-  perms,
-  setTask,
-  status,
-  task,
-  update,
-}: TaskActionProps) => {
+export const TaskActionCard = (props: TaskActionProps) => {
   const handleChange = (name: string, value: any) => {
-    update({ [name]: value })
+    props
+      .update({ [name]: value })
       .then((instance) => {
         enqueueSnackbar('Updated task', { variant: 'success' })
-        setTask(instance)
+        props.setTask(instance)
       })
       .catch((e) => {
         enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task'), {
@@ -56,7 +47,11 @@ export const TaskActionCard = ({
       })
   }
 
-  const options: TaskOption[] = [
+  const perms = props.perms
+  const task = props.task
+  const status = props.status
+
+  const managementOptions: TaskOption[] = [
     {
       id: 'reopen',
       icon: 'undo',
@@ -96,13 +91,9 @@ export const TaskActionCard = ({
       disableWhen: () => task.is_approval_required && !task.is_approved,
       modal: CancelTaskModal,
     },
-    {
-      id: 'reassign',
-      icon: 'user',
-      text: 'Reassign the task',
-      showWhen: () => perms.is_coordinator_or_better && task.is_open,
-      modal: ReassignTaskModal,
-    },
+  ]
+
+  const adminOptions: TaskOption[] = [
     {
       id: 'question',
       icon: 'question',
@@ -110,33 +101,47 @@ export const TaskActionCard = ({
       showWhen: () => perms.is_paralegal_or_better && task.is_open,
       modal: QuestionModal,
     },
+    {
+      id: 'reassign',
+      icon: 'user',
+      text: 'Reassign the task',
+      showWhen: () => perms.is_coordinator_or_better && task.is_open,
+      modal: ReassignTaskModal,
+    },
   ]
 
   return (
     <Card fluid>
       <Card.Content header="Task actions" />
-      <Card.Content>
-        <List verticalAlign="middle" selection>
-          {options
-            .filter((o) => o.showWhen())
-            .map((option) =>
-              option.action ? (
-                <TaskAction key={option.id} option={option} />
-              ) : (
-                <TaskModal
-                  key={option.id}
-                  option={option}
-                  task={task}
-                  setTask={setTask}
-                  update={update}
-                  perms={perms}
-                  status={status}
-                />
-              )
-            )}
-        </List>
-      </Card.Content>
+      <TaskActionCardContent options={managementOptions} {...props} />
+      <TaskActionCardContent options={adminOptions} {...props} />
     </Card>
+  )
+}
+
+interface TaskActionCardContentProps extends TaskActionProps {
+  options: TaskOption[]
+}
+export const TaskActionCardContent = (props: TaskActionCardContentProps) => {
+  const visibleOptions = props.options.filter((option) => option.showWhen())
+
+  if (visibleOptions.length < 1) {
+    return null
+  }
+  return (
+    <Card.Content>
+      <List verticalAlign="middle" selection>
+        {visibleOptions
+          .filter((o) => o.showWhen())
+          .map((option) =>
+            option.action ? (
+              <TaskAction key={option.id} option={option} />
+            ) : (
+              <TaskModal key={option.id} option={option} {...props} />
+            )
+          )}
+      </List>
+    </Card.Content>
   )
 }
 
@@ -158,6 +163,9 @@ export const TaskAction = ({ option }: { option: TaskOption }) => {
   )
 }
 
+interface TaskModalProps extends TaskActionProps {
+  option: TaskOption
+}
 export const TaskModal = ({ option, ...props }: TaskModalProps) => {
   const [open, setOpen] = useState(false)
   const disabled = option.disableWhen && option.disableWhen()
