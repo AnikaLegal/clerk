@@ -1,3 +1,4 @@
+import moment from 'moment'
 import React, { useMemo } from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
 import { TaskDetailProps } from 'types/task'
@@ -34,7 +35,7 @@ export const TaskMetaCard = ({
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Date Created</Header>
-              {task.created_at}
+              {moment(task.created_at).format('DD/MM/YYYY')}
             </Grid.Column>
             <Grid.Column>
               <Header sub>Date Due</Header>
@@ -44,7 +45,9 @@ export const TaskMetaCard = ({
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Date Closed</Header>
-              {task.closed_at || '-'}
+              {task.closed_at
+                ? moment(task.closed_at).format('DD/MM/YYYY')
+                : '-'}
             </Grid.Column>
             <Grid.Column>
               <Header sub>Days Open</Header>

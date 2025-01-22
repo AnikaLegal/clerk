@@ -244,7 +244,9 @@ const App = () => {
                   )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
-                <Table.Cell>{task.created_at}</Table.Cell>
+                <Table.Cell>
+                  {moment(task.created_at).format('DD/MM/YYYY')}
+                </Table.Cell>
                 <Table.Cell
                   className={getDueDateColor(task)}
                   textAlign="center"

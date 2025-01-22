@@ -1,5 +1,4 @@
 from case.serializers import IssueSerializer, UserSerializer
-from case.serializers.fields import LocalDateField
 from core.models.issue_event import EventType
 from django.urls import reverse
 from rest_framework import serializers
@@ -39,7 +38,7 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
         )
 
     templates = TaskTemplateSerializer(many=True)
-    created_at = LocalDateField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
 
     def get_url(self, obj):
@@ -150,9 +149,9 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     issue = TaskListIssueSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
-    created_at = LocalDateField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(read_only=True)
-    closed_at = LocalDateField(read_only=True)
+    closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
 
@@ -194,9 +193,9 @@ class TaskSerializer(serializers.ModelSerializer):
     assigned_to_id = serializers.IntegerField(write_only=True)
     assigned_to = UserSerializer(read_only=True)
 
-    created_at = LocalDateField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(allow_null=True)
-    closed_at = LocalDateField(read_only=True)
+    closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
 
     def to_internal_value(self, data):

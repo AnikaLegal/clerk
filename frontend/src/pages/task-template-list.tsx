@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import { Button, Container, Header, Table } from 'semantic-ui-react'
 import { useSnackbar } from 'notistack'
+import React from 'react'
+import { Button, Container, Header, Table } from 'semantic-ui-react'
 
-import { mount, choiceToMap } from 'utils'
-import { FadeTransition } from 'comps/transitions'
 import { useGetTaskTriggersQuery } from 'api'
+import { FadeTransition } from 'comps/transitions'
+import moment from 'moment'
+import { choiceToMap, mount } from 'utils'
 
 interface DjangoContext {
   create_url: string
@@ -59,8 +60,12 @@ const App = () => {
                 <Table.Cell>{TOPIC_LABELS.get(t.topic)}</Table.Cell>
                 <Table.Cell>{EVENT_LABELS.get(t.event)}</Table.Cell>
                 <Table.Cell>{EVENT_STAGE_LABELS.get(t.event_stage)}</Table.Cell>
-                <Table.Cell>{ROLES_LABELS.get(t.tasks_assignment_role)}</Table.Cell>
-                <Table.Cell>{t.created_at}</Table.Cell>
+                <Table.Cell>
+                  {ROLES_LABELS.get(t.tasks_assignment_role)}
+                </Table.Cell>
+                <Table.Cell>
+                  {moment(t.created_at).format('DD/MM/YYYY')}
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
