@@ -52,9 +52,11 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "url",
             "is_admin_or_better",
+            "is_lawyer_or_better",
             "is_coordinator_or_better",
             "is_paralegal_or_better",
             "is_admin",
+            "is_lawyer",
             "is_coordinator",
             "is_paralegal",
             "is_ms_account_set_up",
@@ -68,9 +70,11 @@ class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     groups = serializers.SerializerMethodField()
     is_admin_or_better = serializers.BooleanField(read_only=True)
+    is_lawyer_or_better = serializers.BooleanField(read_only=True)
     is_coordinator_or_better = serializers.BooleanField(read_only=True)
     is_paralegal_or_better = serializers.BooleanField(read_only=True)
     is_admin = serializers.BooleanField(read_only=True)
+    is_lawyer = serializers.BooleanField(read_only=True)
     is_coordinator = serializers.BooleanField(read_only=True)
     is_paralegal = serializers.BooleanField(read_only=True)
     is_ms_account_set_up = serializers.SerializerMethodField()

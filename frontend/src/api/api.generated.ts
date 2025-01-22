@@ -1053,9 +1053,11 @@ export type User = UserCreate & {
   groups: string[];
   url: string;
   is_admin_or_better: boolean;
+  is_lawyer_or_better: boolean;
   is_coordinator_or_better: boolean;
   is_paralegal_or_better: boolean;
   is_admin: boolean;
+  is_lawyer: boolean;
   is_coordinator: boolean;
   is_paralegal: boolean;
   is_ms_account_set_up: boolean;

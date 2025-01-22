@@ -20,9 +20,10 @@ export interface ModelChoices {
 export interface UserPermission {
   is_admin: boolean
   is_admin_or_better: boolean
+  is_lawyer: boolean
+  is_lawyer_or_better: boolean
   is_coordinator: boolean
   is_coordinator_or_better: boolean
   is_paralegal: boolean
   is_paralegal_or_better: boolean
 }
-
