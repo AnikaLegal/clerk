@@ -1,7 +1,8 @@
 from case.serializers import IssueSerializer, UserSerializer
 from core.models.issue_event import EventType
 from django.urls import reverse
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
+
 
 from .models import Task, TaskAttachment, TaskComment, TaskTemplate, TaskTrigger
 from .models.task import TaskStatus
@@ -198,8 +199,6 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
-    is_approval_required = serializers.BooleanField(read_only=True)
-    is_approved = serializers.BooleanField(read_only=True)
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a
@@ -209,18 +208,42 @@ class TaskSerializer(serializers.ModelSerializer):
                 data[field] = None
         return super().to_internal_value(data)
 
-    def validate(self, attrs):
-        instance: Task | None = self.instance
+    def validate_is_approval_required(self, value):
+        # Only lawyers or better can adjust task approvals.
         request = self.context.get("request", None)
-        if instance and request and request.user.is_paralegal:
-            status = attrs.get("status")
+        if request and not request.user.is_lawyer_or_better:
+            raise exceptions.PermissionDenied()
+        return value
+
+    def validate_is_approved(self, value):
+        # Only lawyers or better can adjust task approvals.
+        request = self.context.get("request", None)
+        if request and not request.user.is_lawyer_or_better:
+            raise exceptions.PermissionDenied()
+        return value
+
+    def validate_status(self, value):
+        # Only privileged users can finish a task when approval is required but
+        # not yet given.
+        request = self.context.get("request", None)
+        if request and request.user.is_paralegal:
+            instance: Task | None = self.instance
             if (
-                status in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+                value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+                and instance
                 and instance.is_approval_required
                 and not instance.is_approved
             ):
-                raise serializers.ValidationError("Approval is required")
+                raise exceptions.PermissionDenied(detail="Approval is required")
+        return value
 
+    def validate(self, attrs):
+        # Paralegals can only change the task status.
+        request = self.context.get("request", None)
+        if request and request.user.is_paralegal:
+            keys = [x for x in attrs.keys() if x not in ["status"]]
+            if len(keys) > 0:
+                raise exceptions.PermissionDenied()
         return super().to_internal_value(attrs)
 
 
