@@ -1,35 +1,34 @@
 import logging
 from typing import Optional
 
-from django.http import Http404
+from accounts.models import CaseGroups, User
 from django.contrib.auth.models import Group
-from django.db.models import QuerySet, Q
-from rest_framework.decorators import api_view, action
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, ListModelMixin, RetrieveModelMixin
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q, QuerySet
+from django.http import Http404
 from django.urls import reverse
 from django_q.tasks import async_task
-from django.core.exceptions import PermissionDenied
+from microsoft.service import get_user_permissions
+from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from rest_framework.decorators import action, api_view
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-from accounts.models import User, CaseGroups
-from case.utils.react import render_react_page
-from case.views.auth import (
-    paralegal_or_better_required,
-    coordinator_or_better_required,
-    ParalegalOrBetterObjectPermission,
-    CoordinatorOrBetterPermission,
-)
 from case.serializers import (
     AccountSearchSerializer,
     AccountSortSerializer,
-    UserSerializer,
-    UserCreateSerializer,
     IssueSerializer,
-    IssueNoteSerializer,
+    UserCreateSerializer,
+    UserSerializer,
 )
-from microsoft.service import get_user_permissions
-from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from case.utils.react import render_react_page
+from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    ParalegalOrBetterObjectPermission,
+    coordinator_or_better_required,
+    paralegal_or_better_required,
+)
 
 logger = logging.getLogger(__name__)
 
