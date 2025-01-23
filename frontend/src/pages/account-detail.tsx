@@ -1,11 +1,11 @@
 import {
   GetCasesApiArg,
   GetCasesApiResponse,
-  useGetCasesQuery,
-  useGetUserQuery,
-  useGetNotesQuery,
   GetNotesApiArg,
   GetNotesApiResponse,
+  useGetCasesQuery,
+  useGetNotesQuery,
+  useGetUserQuery,
   User,
   UserCreate,
   useUpdateUserMutation,
@@ -56,7 +56,6 @@ export const AccountDetailPage = ({ data }: { data: User }) => {
       userCreate: values as UserCreate,
     }).unwrap()
 
-  const isLawyerAccount = account.groups.includes('Lawyer')
   const showTabs =
     CONTEXT.user.is_coordinator_or_better ||
     CONTEXT.account_id === CONTEXT.current_user_id
@@ -65,7 +64,7 @@ export const AccountDetailPage = ({ data }: { data: User }) => {
 
   if (showTabs) {
     // Show the lawyer tab for lawyer accounts only.
-    if (isLawyerAccount) {
+    if (account.is_lawyer) {
       tabPanes.push({
         menuItem: 'Lawyer cases',
         render: () => <LawyerCasesTab account={account} />,
