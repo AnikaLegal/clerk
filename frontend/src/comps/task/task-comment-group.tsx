@@ -25,13 +25,15 @@ export const TaskCommentGroup = ({
         <Segment key={comment.id}>
           <Comment>
             <Comment.Content>
-              {comment.creator && (
+              {comment.type == 'USER' ? (
                 <Comment.Author as="a" href={comment.creator.url}>
                   {comment.creator.full_name}
                 </Comment.Author>
+              ) : (
+                <Comment.Author as="span">Task Update</Comment.Author>
               )}
               <Comment.Metadata>
-                <div>{moment(comment.created_at).fromNow()}</div>
+                <div>{moment(comment.created_at).format("DD/MM/YY [at] h:mmA")}</div>
               </Comment.Metadata>
               <RichTextDisplay content={comment.text} />
             </Comment.Content>
