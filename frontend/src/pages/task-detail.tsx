@@ -118,13 +118,7 @@ export const TaskDetail = ({
           </Segment>
         </Grid.Column>
         <Grid.Column>
-          <TaskMetaCard
-            choices={choices}
-            perms={perms}
-            setTask={setTask}
-            task={task}
-            update={update}
-          />
+          <TaskMetaCard choices={choices} task={task} />
           <TaskActionCard
             task={task}
             setTask={setTask}

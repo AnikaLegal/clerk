@@ -1,16 +1,16 @@
+import { Task } from 'api'
 import moment from 'moment'
 import React, { useMemo } from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
-import { TaskDetailProps } from 'types/task'
+import { ModelChoices } from 'types/global'
 import { choiceToMap } from 'utils'
 
-export const TaskMetaCard = ({
-  choices,
-  perms,
-  setTask,
-  task,
-  update,
-}: TaskDetailProps) => {
+interface TaskMetaCardProps {
+  choices: ModelChoices
+  task: Task
+}
+
+export const TaskMetaCard = ({ choices, task }: TaskMetaCardProps) => {
   const statusMap = useMemo(() => choiceToMap(choices.status), [])
 
   return (
