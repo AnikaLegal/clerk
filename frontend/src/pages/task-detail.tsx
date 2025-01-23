@@ -157,7 +157,11 @@ export const TaskBody = ({
           </Grid.Column>
           {user.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
-              <Button onClick={toggleEditMode} size="tiny" disabled={!task.is_open}>
+              <Button
+                onClick={toggleEditMode}
+                size="tiny"
+                disabled={!task.is_open}
+              >
                 Edit
               </Button>
             </Grid.Column>
@@ -235,21 +239,31 @@ export const TaskBody = ({
       name: 'is_urgent',
     },
     {
-      label: 'Approval required?',
-      type: FIELD_TYPES.BOOL,
-      name: 'is_approval_required',
-    },
-    {
-      label: 'Approved?',
-      type: FIELD_TYPES.BOOL,
-      name: 'is_approved',
-    },
-    {
       label: 'Description',
       type: FIELD_TYPES.RICHTEXT,
       name: 'description',
     },
   ]
+
+  /* Only include the approvals fields in the UI if the user has the privileges
+   * to change them. */
+  if (user.is_lawyer_or_better) {
+    fields.splice(
+      -1,
+      0,
+      {
+        label: 'Approval required?',
+        type: FIELD_TYPES.BOOL,
+        name: 'is_approval_required',
+      },
+      {
+        label: 'Approved?',
+        type: FIELD_TYPES.BOOL,
+        name: 'is_approved',
+      }
+    )
+  }
+
   const schema = getFormSchema(fields)
 
   return (
