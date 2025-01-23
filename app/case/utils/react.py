@@ -2,15 +2,18 @@ import json
 
 from django.shortcuts import render
 from django.conf import settings
+from django.urls import reverse
 
 
 def render_react_page(request, title, react_page_name, react_context, public=False):
+
     react_context.update(
         {
             "user": {
                 "id": request.user.id,
                 "full_name": request.user.get_full_name(),
                 "email": request.user.email,
+                "url": reverse("account-detail", args=(request.user.pk,)),
                 "is_admin": request.user.is_admin,
                 "is_lawyer": request.user.is_lawyer,
                 "is_coordinator": request.user.is_coordinator,
