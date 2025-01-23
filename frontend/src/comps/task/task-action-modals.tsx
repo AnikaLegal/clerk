@@ -6,14 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Dropdown, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 
-export const CancelTaskModal: React.FC<ModalProps> = ({
-  task,
-  setTask,
-  update,
-  status,
-  open,
-  onClose,
-}) => {
+export const CancelTaskModal = (props: ModalProps) => {
   const [canSubmit, setCanSubmit] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [createComment] = api.useCreateTaskCommentMutation()
@@ -23,39 +16,58 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
     setCanSubmit(text != '')
   }, [text])
 
+  const handleClose = () => {
+    setText('')
+    props.onClose()
+  }
+
   const handleUpdate = ({ editor }: EditorEvents['update']) => {
     if (editor) {
-      setText(editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML())
+      setText(
+        editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML()
+      )
     }
   }
 
-  const handleSubmit = (e) => {
-    e.stopPropagation()
-    setIsSubmitting(true)
+  const handleSubmit = (event) => {
+    event.stopPropagation()
 
-    Promise.all([
-      update({ status: status.cancelled }),
-      createComment({ id: task.id, taskCommentCreate: { text: text } }),
-    ])
-      .then((results) => {
-        enqueueSnackbar('Cancelled task', { variant: 'success' })
-        setTask(results[0])
+    setIsSubmitting(true)
+    props
+      .update({ status: props.status.cancelled })
+      .then((instance) => {
+        props.setTask(instance)
+        createComment({
+          id: props.task.id,
+          taskCommentCreate: { text: text, creator_id: props.user.id },
+        })
+          .then((instance) => {})
+          .catch((e) => {
+            enqueueSnackbar(
+              getAPIErrorMessage(e, 'Cancelled task but failed to add comment'),
+              {
+                variant: 'error',
+              }
+            )
+          })
       })
       .catch((e) => {
         enqueueSnackbar(getAPIErrorMessage(e, 'Failed to cancel task'), {
           variant: 'error',
         })
       })
-    setIsSubmitting(false)
-    onClose()
+      .finally(() => {
+        setIsSubmitting(false)
+      })
+    handleClose()
   }
 
   return (
     <Modal
       as="Form"
       className="form"
-      open={open}
-      onClose={onClose}
+      open={props.open}
+      onClose={handleClose}
       onSubmit={(e) => handleSubmit(e)}
       size="tiny"
     >
@@ -67,7 +79,7 @@ export const CancelTaskModal: React.FC<ModalProps> = ({
         </Form.Field>
       </Modal.Content>
       <Modal.Actions>
-        <Button type="button" onClick={onClose} disabled={isSubmitting}>
+        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
           Close
         </Button>
         <Button
