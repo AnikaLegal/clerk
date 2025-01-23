@@ -157,7 +157,7 @@ export const TaskBody = ({
           </Grid.Column>
           {user.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
-              <Button onClick={toggleEditMode} size="tiny">
+              <Button onClick={toggleEditMode} size="tiny" disabled={!task.is_open}>
                 Edit
               </Button>
             </Grid.Column>
