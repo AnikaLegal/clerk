@@ -11,7 +11,7 @@ import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
 import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -25,7 +25,7 @@ import {
   Popup,
   Segment,
 } from 'semantic-ui-react'
-import { Model, ModelChoices, UserPermission } from 'types/global'
+import { Model, UserInfo } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 import * as Yup from 'yup'
@@ -38,7 +38,7 @@ interface DjangoContext {
   status: TaskStatus
   task_pk: number
   list_url: string
-  user: UserPermission
+  user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
@@ -50,32 +50,30 @@ export interface TaskHeaderProps extends TaskDetailProps {
 }
 
 const App = () => {
-  const taskResult = api.useGetTaskQuery({ id: CONTEXT.task_pk })
-  if (taskResult.isLoading) return null
-  return (
-    <TaskDetail
-      data={taskResult.data}
-      choices={CONTEXT.choices}
-      perms={CONTEXT.user}
-      status={CONTEXT.status}
-    />
-  )
-}
-
-export const TaskDetail = ({
-  data,
-  choices,
-  perms,
-  status,
-}: {
-  data: Task
-  choices: ModelChoices
-  perms: UserPermission
-  status: TaskStatus
-}) => {
-  const [task, setTask] = useState<Task>(data)
+  const [getTask] = api.useLazyGetTaskQuery()
   const [updateTask] = api.useUpdateTaskMutation()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [task, setTask] = useState<Task>()
 
+  const loadTask = () => {
+    setIsLoading(true)
+    getTask({ id: CONTEXT.task_pk })
+      .unwrap()
+      .then((instance) => {
+        setTask(instance)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+  useEffect(() => loadTask(), [])
+
+  if (isLoading) {
+    return null
+  }
+  const choices = CONTEXT.choices
+  const user = CONTEXT.user
+  const status = CONTEXT.status
   const update = (values: Model) =>
     updateTask({
       id: task.id,
@@ -101,7 +99,7 @@ export const TaskDetail = ({
               setTask={setTask}
               update={update}
               choices={choices}
-              perms={perms}
+              user={user}
               status={status}
             />
           </Segment>
@@ -113,7 +111,7 @@ export const TaskDetail = ({
               setTask={setTask}
               update={update}
               choices={choices}
-              perms={perms}
+              user={user}
             />
           </Segment>
         </Grid.Column>
@@ -123,7 +121,7 @@ export const TaskDetail = ({
             task={task}
             setTask={setTask}
             update={update}
-            perms={perms}
+            user={user}
             status={status}
           />
         </Grid.Column>
@@ -137,7 +135,7 @@ export const TaskBody = ({
   setTask,
   update,
   choices,
-  perms,
+  user,
   status,
 }: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
@@ -153,11 +151,11 @@ export const TaskBody = ({
               setTask={setTask}
               update={update}
               choices={choices}
-              perms={perms}
+              user={user}
               status={status}
             />
           </Grid.Column>
-          {perms.is_coordinator_or_better && (
+          {user.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
               <Button onClick={toggleEditMode} size="tiny">
                 Edit
@@ -287,7 +285,7 @@ export const TaskHeader = ({
   setTask,
   update,
   choices,
-  perms,
+  user,
   status,
 }: TaskHeaderProps) => {
   const typeLabels = useMemo(() => choiceToMap(choices.type), [])

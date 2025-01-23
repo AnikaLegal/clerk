@@ -47,7 +47,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       })
   }
 
-  const perms = props.perms
+  const perms = props.user
   const task = props.task
   const status = props.status
 

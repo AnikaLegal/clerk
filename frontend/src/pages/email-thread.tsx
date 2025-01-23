@@ -11,13 +11,13 @@ import {
   Issue,
   EmailAttachment,
 } from 'api'
-import { UserPermission } from 'types/global'
+import { UserInfo } from 'types/global'
 
 interface DjangoContext {
   case_pk: string
   thread_slug: string
   case_email_list_url: string
-  user: UserPermission
+  user: UserInfo
 }
 
 const { case_pk, thread_slug, case_email_list_url, user } = (window as any)

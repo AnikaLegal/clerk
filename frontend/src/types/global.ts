@@ -17,7 +17,10 @@ export interface ModelChoices {
   [fieldName: string]: [string, string][]
 }
 
-export interface UserPermission {
+export interface UserInfo {
+  id: number
+  full_name: string
+  email: string
   is_admin: boolean
   is_admin_or_better: boolean
   is_lawyer: boolean

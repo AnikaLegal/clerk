@@ -41,14 +41,14 @@ import {
   ServiceForm,
 } from 'forms'
 import { CaseDetailFormProps, CaseFormChoices } from 'types/case'
-import { UserPermission } from 'types/global'
+import { UserInfo } from 'types/global'
 import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
   choices: CaseFormChoices
   urls: CaseTabUrls
-  user: UserPermission
+  user: UserInfo
 }
 
 const {
@@ -486,7 +486,7 @@ interface CaseFormOption {
   id: string
   icon: string
   text: string
-  when: (perms: UserPermission, issue: Issue) => boolean
+  when: (perms: UserInfo, issue: Issue) => boolean
 }
 
 const CASE_FORM_OPTIONS: CaseFormOption[] = [

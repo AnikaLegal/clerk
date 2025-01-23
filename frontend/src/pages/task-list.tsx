@@ -12,7 +12,7 @@ import {
   Table,
   SemanticCOLORS,
 } from 'semantic-ui-react'
-import { UserPermission } from 'types/global'
+import { UserInfo } from 'types/global'
 import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
 
 interface DjangoContext {
@@ -23,7 +23,7 @@ interface DjangoContext {
     case_topic: string[][]
     my_tasks: string[][]
   }
-  user: UserPermission
+  user: UserInfo
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
