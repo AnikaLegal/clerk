@@ -6,8 +6,6 @@ allOf:
         type: integer
       task_id:
         type: number
-      type:
-        type: string
       creator:
         type: object
         properties:
@@ -26,6 +24,5 @@ allOf:
     required:
       - id
       - task_id
-      - type
       - creator
       - created_at

@@ -2679,6 +2679,11 @@ components:
       properties:
         text:
           type: string
+        type:
+          type: string
+          enum:
+            - USER
+            - SYSTEM
       required:
         - text
     TaskComment:
@@ -2690,8 +2695,6 @@ components:
               type: integer
             task_id:
               type: number
-            type:
-              type: string
             creator:
               type: object
               properties:
@@ -2710,13 +2713,16 @@ components:
           required:
             - id
             - task_id
-            - type
             - creator
             - created_at
     TaskCommentCreate:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
         - type: object
+          properties:
+            creator_id:
+              type: number
+              nullable: true
     TaskAttachmentBase:
       type: object
       properties:

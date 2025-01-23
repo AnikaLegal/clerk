@@ -312,7 +312,7 @@ export const TaskHeader = ({
   )
 }
 
-export const TaskComments = ({ task }: TaskDetailProps) => {
+export const TaskComments = ({ task, user }: TaskDetailProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
   const commentResult = api.useGetTaskCommentsQuery({ id: task.id })
@@ -322,6 +322,7 @@ export const TaskComments = ({ task }: TaskDetailProps) => {
     if (!editor.isEmpty && editor.getText().trim() != '') {
       const values: TaskCommentCreate = {
         text: editor.getHTML(),
+        creator_id: user.id,
       }
       createTaskComment({
         id: task.id,

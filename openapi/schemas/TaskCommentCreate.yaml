@@ -1,3 +1,8 @@
 allOf:
   - $ref: ./TaskCommentBase.yaml
   - type: object
+    properties:
+      creator_id:
+        type: number
+        nullable: true
+

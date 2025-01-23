@@ -183,8 +183,6 @@ class TaskApiViewset(ModelViewSet):
             data = {
                 **request.data,
                 "task_id": task.pk,
-                "creator_id": self.request.user.pk,
-                "type": CommentType.USER,
             }
             serializer = TaskCommentSerializer(data=data)
             serializer.is_valid(raise_exception=True)

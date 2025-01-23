@@ -21,7 +21,7 @@ class TaskComment(TimestampedModel):
         related_name="comments",
         related_query_name="comment",
     )
-    type = models.CharField(max_length=32, choices=CommentType.choices)
+    type = models.CharField(max_length=32, choices=CommentType.choices, default=CommentType.USER)
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     text = models.TextField(blank=True, default="")
 

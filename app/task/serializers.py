@@ -285,7 +285,7 @@ class TaskCommentSerializer(serializers.ModelSerializer):
         )
 
     task_id = serializers.IntegerField()
-    creator_id = serializers.IntegerField(write_only=True)
+    creator_id = serializers.IntegerField(allow_null=True, required=False)
     creator = TaskListUserSerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 

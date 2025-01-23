@@ -1357,11 +1357,11 @@ export type TaskCreate = TaskBase & {
 };
 export type TaskCommentBase = {
   text: string;
+  type?: "USER" | "SYSTEM";
 };
 export type TaskComment = TaskCommentBase & {
   id: number;
   task_id: number;
-  type: string;
   creator: {
     id: number;
     full_name: string;
@@ -1369,7 +1369,9 @@ export type TaskComment = TaskCommentBase & {
   };
   created_at: string;
 };
-export type TaskCommentCreate = TaskCommentBase & object;
+export type TaskCommentCreate = TaskCommentBase & {
+  creator_id?: number | null;
+};
 export type TaskAttachmentBase = {
   comment_id: number | null;
 };
