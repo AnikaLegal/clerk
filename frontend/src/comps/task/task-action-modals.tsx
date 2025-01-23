@@ -95,30 +95,36 @@ export const CancelTaskModal = (props: ModalProps) => {
   )
 }
 
-export const ReassignTaskModal: React.FC<ModalProps> = ({
+export const ReassignTaskModal = ({
   task,
   setTask,
   update,
   status,
   open,
   onClose,
-}) => {
+}: ModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [userId, setUserId] = useState<number>()
 
   const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
-  const users = userResults.data || []
+  const users: User[] = userResults.data?.filter(
+    ({ id, is_coordinator_or_better }) =>
+      id == task.assigned_to?.id ||
+      id == task.issue.paralegal?.id ||
+      is_coordinator_or_better
+  )
 
-  const handleSubmit = (e) => {
-    e.stopPropagation()
+  const handleSubmit = (event) => {
+    event.stopPropagation()
+
     setIsSubmitting(true)
     update({ assigned_to_id: userId })
       .then((instance) => {
         enqueueSnackbar('Updated task', { variant: 'success' })
         setTask(instance)
       })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to update this task'), {
+      .catch((e) => {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task'), {
           variant: 'error',
         })
       })
@@ -148,11 +154,13 @@ export const ReassignTaskModal: React.FC<ModalProps> = ({
             loading={userResults.isLoading}
             onChange={(e, { value }) => setUserId(value as number)}
             openOnFocus={false}
-            options={users.map((u) => ({
-              key: u.id,
-              value: u.id,
-              text: u.email,
-            }))}
+            options={
+              users?.map((u) => ({
+                key: u.id,
+                value: u.id,
+                text: u.email,
+              })) || []
+            }
             search
             searchInput={{ autoFocus: true }}
             selection
