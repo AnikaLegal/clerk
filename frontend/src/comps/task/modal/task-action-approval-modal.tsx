@@ -45,7 +45,7 @@ export const RequestApprovalModal = (props: ModalProps) => {
       <Modal.Content>
         <Form.Field>
           <label>Requesting approval from</label>
-          <Form.Input readOnly>{lawyer.full_name}</Form.Input>
+          <Form.Input readOnly>{lawyer?.full_name}</Form.Input>
         </Form.Field>
         <Form.Field required>
           <label>Briefly explain what you are requesting approval for</label>
