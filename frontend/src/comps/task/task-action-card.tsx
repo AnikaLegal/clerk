@@ -151,15 +151,13 @@ export const TaskActionCardContent = (props: TaskActionCardContentProps) => {
   return (
     <Card.Content>
       <List verticalAlign="middle" selection>
-        {visibleOptions
-          .filter((o) => o.showWhen())
-          .map((option) =>
-            option.action ? (
-              <TaskAction key={option.id} option={option} />
-            ) : (
-              <TaskModal key={option.id} option={option} {...props} />
-            )
-          )}
+        {visibleOptions.map((option) =>
+          option.action ? (
+            <TaskAction key={option.id} option={option} />
+          ) : (
+            <TaskModal key={option.id} option={option} {...props} />
+          )
+        )}
       </List>
     </Card.Content>
   )
