@@ -23,9 +23,7 @@ export const CancelTaskModal = (props: ModalProps) => {
 
   const handleUpdate = ({ editor }: EditorEvents['update']) => {
     if (editor) {
-      setText(
-        editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML()
-      )
+      setText(editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML())
     }
   }
 
