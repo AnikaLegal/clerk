@@ -1,5 +1,10 @@
 import { TextButton } from 'comps/button'
-import { CancelTaskModal, QuestionModal, ReassignTaskModal } from 'comps/task'
+import {
+  CancelTaskModal,
+  QuestionModal,
+  ReassignTaskModal,
+  RequestApprovalModal,
+} from 'comps/task'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
@@ -76,19 +81,34 @@ export const TaskActionCard = (props: TaskActionProps) => {
       action: () => handleChange('status', status.stopped),
     },
     {
+      id: 'approve',
+      icon: 'thumbs up',
+      text: 'Get approval',
+      showWhen: () =>
+        perms.is_paralegal &&
+        task.is_open &&
+        task.is_approval_required &&
+        !task.is_approved,
+      modal: RequestApprovalModal,
+    },
+    {
       id: 'complete',
       icon: 'check',
       text: 'Complete the task',
-      showWhen: () => perms.is_paralegal_or_better && task.is_open,
-      disableWhen: () => task.is_approval_required && !task.is_approved,
+      showWhen: () =>
+        perms.is_paralegal_or_better &&
+        task.is_open &&
+        (!task.is_approval_required || task.is_approved),
       action: () => handleChange('status', status.finished),
     },
     {
       id: 'cancel',
       icon: 'close',
       text: 'Cancel the task',
-      showWhen: () => perms.is_paralegal_or_better && task.is_open,
-      disableWhen: () => task.is_approval_required && !task.is_approved,
+      showWhen: () =>
+        perms.is_paralegal_or_better &&
+        task.is_open &&
+        (!task.is_approval_required || task.is_approved),
       modal: CancelTaskModal,
     },
   ]
