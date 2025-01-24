@@ -209,24 +209,24 @@ class TaskSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def validate_is_approval_required(self, value):
-        # Only lawyers or better can adjust task approvals.
+        # Only lawyers can adjust task approvals.
         request = self.context.get("request", None)
-        if request and not request.user.is_lawyer_or_better:
+        if request and not request.user.is_lawyer:
             raise exceptions.PermissionDenied()
         return value
 
     def validate_is_approved(self, value):
-        # Only lawyers or better can adjust task approvals.
+        # Only lawyers can adjust task approvals.
         request = self.context.get("request", None)
-        if request and not request.user.is_lawyer_or_better:
+        if request and not request.user.is_lawyer:
             raise exceptions.PermissionDenied()
         return value
 
     def validate_status(self, value):
-        # Only privileged users can finish a task when approval is required but
-        # not yet given.
+        # Only lawyers can finish a task when approval is required but not yet
+        # given.
         request = self.context.get("request", None)
-        if request and request.user.is_paralegal:
+        if request and not request.user.is_lawyer:
             instance: Task | None = self.instance
             if (
                 value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
