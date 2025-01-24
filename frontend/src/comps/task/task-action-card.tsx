@@ -85,7 +85,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'thumbs up',
       text: 'Get approval',
       showWhen: () =>
-        perms.is_paralegal &&
+        !perms.is_lawyer &&
         task.is_open &&
         task.is_approval_required &&
         !task.is_approved,
@@ -98,7 +98,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       showWhen: () =>
         perms.is_paralegal_or_better &&
         task.is_open &&
-        (!task.is_approval_required || task.is_approved),
+        (perms.is_lawyer || !task.is_approval_required || task.is_approved),
       action: () => handleChange('status', status.finished),
     },
     {
@@ -108,7 +108,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       showWhen: () =>
         perms.is_paralegal_or_better &&
         task.is_open &&
-        (!task.is_approval_required || task.is_approved),
+        (perms.is_lawyer || !task.is_approval_required || task.is_approved),
       modal: CancelTaskModal,
     },
   ]
