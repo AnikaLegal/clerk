@@ -33,30 +33,30 @@ export const CancelTaskModal = (props: ModalProps) => {
     setIsSubmitting(true)
     props
       .update({ status: props.status.cancelled })
-      .then((instance) => {
-        props.setTask(instance)
+      .then((task) => {
+        props.setTask(task)
         createComment({
           id: props.task.id,
           taskCommentCreate: { text: text, creator_id: props.user.id },
         })
-          .then((instance) => {})
-          .catch((e) => {
+          .then((comment) =>
+            enqueueSnackbar('Cancelled task', { variant: 'success' })
+          )
+          .catch((e) =>
             enqueueSnackbar(
               getAPIErrorMessage(e, 'Cancelled task but failed to add comment'),
               {
                 variant: 'error',
               }
             )
-          })
+          )
       })
       .catch((e) => {
         enqueueSnackbar(getAPIErrorMessage(e, 'Failed to cancel task'), {
           variant: 'error',
         })
       })
-      .finally(() => {
-        setIsSubmitting(false)
-      })
+      .finally(() => setIsSubmitting(false))
     handleClose()
   }
 
