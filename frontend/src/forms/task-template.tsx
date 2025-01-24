@@ -1,31 +1,21 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import { TaskTemplate, TaskTriggerCreate } from 'api'
 import {
-  EditorEvents,
-  RichTextEditor,
-  RichTextEditorProps,
-} from 'comps/rich-text'
-import {
-  ErrorMessage,
   FieldArray,
   FieldArrayRenderProps,
   Formik,
   FormikHelpers,
-  useField,
 } from 'formik'
+import { DropdownField, InputField, RichTextField } from 'forms/formik'
 import React, { useState } from 'react'
 import {
   Button,
   ButtonProps,
-  Dropdown,
-  DropdownProps,
   Form,
   Grid,
   Header,
   Icon,
   IconProps,
-  Input,
-  InputProps,
   Modal,
   Segment,
   Table,
@@ -57,73 +47,6 @@ const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
   is_approval_required: Yup.boolean(),
   description: Yup.string().optional(),
 })
-
-const RichTextField = ({
-  name,
-  label,
-  ...props
-}: { name: string; label: string } & RichTextEditorProps) => {
-  const [, meta, helpers] = useField(name)
-
-  const handleUpdate = ({ editor, transaction }: EditorEvents['update']) => {
-    if (editor) {
-      helpers.setValue(editor.getHTML())
-      if (props.onUpdate) {
-        props.onUpdate({ editor, transaction })
-      }
-    }
-  }
-
-  return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
-      <label>{label}</label>
-      <RichTextEditor
-        {...props}
-        initialContent={meta.initialValue}
-        onUpdate={handleUpdate}
-      />
-      <ErrorMessage name={name} />
-    </div>
-  )
-}
-
-const InputField = ({
-  name,
-  label,
-  ...props
-}: { name: string; label: string } & InputProps) => {
-  const [field, meta] = useField(name)
-
-  return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
-      <label>{label}</label>
-      <Input {...field} {...props} />
-      <ErrorMessage name={name} />
-    </div>
-  )
-}
-
-const DropdownField = ({
-  name,
-  label,
-  ...props
-}: { name: string; label: string } & DropdownProps) => {
-  const [field, meta, helpers] = useField(name)
-  const handleChange = (e, data) => {
-    helpers.setValue(data.value)
-    if (props.onChange) {
-      props.onChange(e, data)
-    }
-  }
-
-  return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
-      <label>{label}</label>
-      <Dropdown fluid selection {...field} {...props} onChange={handleChange} />
-      <ErrorMessage name={name} />
-    </div>
-  )
-}
 
 interface TaskTemplateFormProps {
   create?: boolean
@@ -308,7 +231,9 @@ export const TaskTemplateTable = ({
             <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
             <Table.Cell>{template.due_in}</Table.Cell>
             <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
-            <Table.Cell>{template.is_approval_required ? 'Yes' : 'No'}</Table.Cell>
+            <Table.Cell>
+              {template.is_approval_required ? 'Yes' : 'No'}
+            </Table.Cell>
             <Table.Cell collapsing textAlign="center">
               <TaskTemplateActionIcons
                 templates={templates}
