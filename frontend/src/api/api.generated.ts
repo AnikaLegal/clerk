@@ -1331,10 +1331,10 @@ export type TaskList = {
 export type TaskBase = {
   name: string;
   description: string;
-  due_at: string | null;
-  is_urgent: boolean;
-  is_approval_required: boolean;
-  is_approved: boolean;
+  due_at?: string | null;
+  is_urgent?: boolean;
+  is_approval_required?: boolean;
+  is_approved?: boolean;
 };
 export type Task = TaskBase & {
   id: number;
@@ -1351,7 +1351,7 @@ export type Task = TaskBase & {
 };
 export type TaskCreate = TaskBase & {
   type: string;
-  status: string;
+  status?: string;
   issue_id: string;
   assigned_to_id: number;
 };

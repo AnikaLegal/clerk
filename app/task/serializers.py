@@ -196,7 +196,7 @@ class TaskSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(read_only=True)
 
     created_at = serializers.DateTimeField(read_only=True)
-    due_at = serializers.DateField(allow_null=True)
+    due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
 

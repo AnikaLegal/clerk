@@ -16,7 +16,3 @@ properties:
 required:
   - name
   - description
-  - due_at
-  - is_urgent
-  - is_approval_required
-  - is_approved

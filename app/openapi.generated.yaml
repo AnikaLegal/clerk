@@ -2611,10 +2611,6 @@ components:
       required:
         - name
         - description
-        - due_at
-        - is_urgent
-        - is_approval_required
-        - is_approved
     TaskCreate:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2631,7 +2627,6 @@ components:
               type: number
           required:
             - type
-            - status
             - issue_id
             - assigned_to_id
     Task:

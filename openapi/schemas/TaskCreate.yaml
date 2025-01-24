@@ -13,6 +13,5 @@ allOf:
         type: number
     required:
       - type
-      - status
       - issue_id
       - assigned_to_id
