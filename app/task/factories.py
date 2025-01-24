@@ -61,6 +61,8 @@ class TaskFactory(TimestampedModelFactory):
         IssueFactory,
         paralegal=factory.SelfAttribute("..assigned_to"),
         lawyer=factory.SubFactory(UserFactory),
+        is_alert_sent=True,
+        is_welcome_email_sent=True,
     )
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2M"
