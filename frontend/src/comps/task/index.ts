@@ -6,7 +6,7 @@ import {
   ReassignTaskModal,
   QuestionModal,
   RequestApprovalModal,
-} from './task-action-modals'
+} from './modal'
 export {
   TaskActionCard,
   TaskCommentGroup,
