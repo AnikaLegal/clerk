@@ -12,7 +12,7 @@ import { CustomLink } from './extensions/rich-text-editor-link-fix'
 import '@mantine/core/styles.css'
 import '@mantine/tiptap/styles.css'
 
-interface RichTextAreaProps {
+export interface RichTextAreaProps {
   autoFocus?: boolean
   children?: React.ReactNode
   disabled?: boolean
