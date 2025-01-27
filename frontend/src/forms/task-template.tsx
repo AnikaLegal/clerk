@@ -6,7 +6,7 @@ import {
   Formik,
   FormikHelpers,
 } from 'formik'
-import { DropdownField, InputField, RichTextField } from 'forms/formik'
+import { DropdownField, InputField, RichTextEditorField } from 'forms/formik'
 import React, { useState } from 'react'
 import {
   Button,
@@ -490,7 +490,7 @@ export const TaskTemplateModal = ({
                     { key: 'no', text: 'No', value: false },
                   ]}
                 />
-                <RichTextField
+                <RichTextEditorField
                   name="description"
                   label="Task description"
                   placeholder="Describe the task in detail"

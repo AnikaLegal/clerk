@@ -1,21 +1,17 @@
-import {
-    EditorEvents,
-    RichTextEditor,
-    RichTextEditorProps,
-} from 'comps/rich-text';
-import { ErrorMessage, useField } from 'formik';
-import React from 'react';
+import { EditorEvents, RichTextArea, RichTextAreaProps } from 'comps/rich-text'
+import { ErrorMessage, useField } from 'formik'
+import React from 'react'
 
-export const RichTextField = ({
+export const RichTextAreaField = ({
   name,
   label,
   ...props
-}: { name: string; label: string } & RichTextEditorProps) => {
+}: { name: string; label: string } & RichTextAreaProps) => {
   const [, meta, helpers] = useField(name)
 
   const handleUpdate = ({ editor, transaction }: EditorEvents['update']) => {
     if (editor) {
-      helpers.setValue(editor.getHTML())
+      helpers.setValue(editor.getText() != '' ? editor.getHTML() : '')
       if (props.onUpdate) {
         props.onUpdate({ editor, transaction })
       }
@@ -25,7 +21,7 @@ export const RichTextField = ({
   return (
     <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
       <label>{label}</label>
-      <RichTextEditor
+      <RichTextArea
         {...props}
         initialContent={meta.initialValue}
         onUpdate={handleUpdate}
