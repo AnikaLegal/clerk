@@ -49,6 +49,7 @@ export const QuestionModal = (props: ModalProps) => {
           variant: 'error',
         })
       )
+    helpers.resetForm()
     props.onClose()
   }
 
@@ -107,7 +108,8 @@ const UserDropdownField = (props: ModalProps) => {
   let users = userResults.data ? [...userResults.data] : []
 
   /* Exclude the current user.
-  /* Exclude the supervising lawyer (for now, we add them back below)
+  /* Exclude the supervising lawyer if they are present (we add back irrespective
+   * below).
    * Include only coordinators plus.
    */
   users = users.filter(
@@ -121,13 +123,9 @@ const UserDropdownField = (props: ModalProps) => {
    */
   users = users.sort((a, b) => a.full_name.localeCompare(b.full_name))
 
-  /* Add the supervising lawyer back as the first item.
+  /* Add the supervising lawyer as the first item.
    */
-  if (
-    lawyer &&
-    !userResults.isLoading &&
-    !users.find((user) => user.id == lawyer.id)
-  ) {
+  if (lawyer && !userResults.isLoading) {
     users.unshift(lawyer)
   }
 
@@ -140,6 +138,7 @@ const UserDropdownField = (props: ModalProps) => {
 
   return (
     <DropdownField
+      search
       name="assigned_to_id"
       label="To"
       options={userOptions}
