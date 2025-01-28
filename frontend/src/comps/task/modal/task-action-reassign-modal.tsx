@@ -10,6 +10,16 @@ import * as Yup from 'yup'
 
 const QuestionSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   assigned_to_id: Yup.number().required(),
+  /* Below not strictly necessary but prevents type error */
+  description: Yup.string().notRequired(),
+  issue_id: Yup.string().notRequired(),
+  name: Yup.string().notRequired(),
+  type: Yup.string().notRequired(),
+  due_at: Yup.string().notRequired(),
+  is_approval_required: Yup.boolean().notRequired(),
+  is_approved: Yup.boolean().notRequired(),
+  is_urgent: Yup.boolean().notRequired(),
+  status: Yup.string().notRequired(),
 })
 
 export const ReassignTaskModal = (props: ModalProps) => {
