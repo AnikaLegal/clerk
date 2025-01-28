@@ -1,93 +1,120 @@
-import api, { User } from 'api'
+import api, { TaskCreate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
+import { Formik, FormikHelpers } from 'formik'
+import { DropdownField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState } from 'react'
-import { Button, Dropdown, Form, Modal } from 'semantic-ui-react'
+import React from 'react'
+import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
+import * as Yup from 'yup'
+
+const QuestionSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
+  assigned_to_id: Yup.number().required(),
+})
 
 export const ReassignTaskModal = (props: ModalProps) => {
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [userId, setUserId] = useState<number>()
+  const [createTask] = api.useCreateTaskMutation()
 
-  const assignee = props.task.assigned_to
-  const paralegal = props.task.issue.paralegal
+  const initialValues = {
+    assigned_to_id: props.task.assigned_to?.id,
+  }
 
-  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
-  const users: User[] = userResults.data?.filter(
-    ({ id, is_coordinator_or_better }) =>
-      id == assignee?.id || id == paralegal?.id || is_coordinator_or_better
-  )
-
-  const handleSubmit = (event) => {
-    event.stopPropagation()
-
-    setIsSubmitting(true)
+  const handleSubmit = (
+    values: TaskCreate,
+    helpers: FormikHelpers<TaskCreate>
+  ) => {
     props
-      .update({ assigned_to_id: userId })
+      .update(values)
       .then((instance) => {
-        enqueueSnackbar('Updated task', { variant: 'success' })
+        enqueueSnackbar('Reassigned task', { variant: 'success' })
         props.setTask(instance)
       })
       .catch((e) => {
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task'), {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to reassign task'), {
           variant: 'error',
         })
       })
-    setIsSubmitting(false)
+    helpers.resetForm()
     props.onClose()
   }
 
-  useEffect(() => {
-    setUserId(props.task.assigned_to?.id)
-  }, [open])
+  return (
+    <Formik
+      enableReinitialize
+      isInitialValid={false}
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={QuestionSchema}
+    >
+      {(formik) => {
+        const closeHandler = () => {
+          formik.resetForm()
+          props.onClose()
+        }
+
+        return (
+          <Modal size="tiny" open={props.open} onClose={closeHandler}>
+            <Modal.Header>Reassign the task</Modal.Header>
+            <Modal.Content>
+              <Form
+                onSubmit={formik.handleSubmit}
+                error={Object.keys(formik.errors).length > 0}
+              >
+                <UserDropdownField {...props} />
+              </Form>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                primary
+                type="submit"
+                onClick={() => formik.handleSubmit()}
+                disabled={!formik.isValid}
+              >
+                Reassign task
+              </Button>
+              <Button onClick={closeHandler}>Close</Button>
+            </Modal.Actions>
+          </Modal>
+        )
+      }}
+    </Formik>
+  )
+}
+
+const UserDropdownField = (props: ModalProps) => {
+  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
+  let users = userResults.data ? [...userResults.data] : []
+
+  /* Only include:
+   * - The current assignee.
+   * - The case paralegal.
+   * - All coordinators plus.
+   * You can't assign to another paralegal user as they cannot access the case
+   * or task. You need to reassign the case to that paralegal and the associated
+   * tasks will be reassigned automatically.
+   */
+  const assignee = props.task.assigned_to
+  const paralegal = props.task.issue.paralegal
+  users = users.filter(
+    (user) =>
+      user.id == assignee?.id ||
+      user.id == paralegal?.id ||
+      user.is_coordinator_or_better
+  )
+
+  const userOptions = users.map((u) => ({
+    key: u.id,
+    value: u.id,
+    text: u.email,
+  }))
 
   return (
-    <Modal
-      as="Form"
-      className="form"
-      open={props.open}
-      onClose={props.onClose}
-      onSubmit={(e) => handleSubmit(e)}
-      size="tiny"
-    >
-      <Modal.Header>Reassign the task</Modal.Header>
-      <Modal.Content>
-        <Form.Field required>
-          <label>Assign To</label>
-          <Dropdown
-            fluid
-            loading={userResults.isLoading}
-            onChange={(e, { value }) => setUserId(value as number)}
-            openOnFocus={false}
-            options={
-              users?.map((u) => ({
-                key: u.id,
-                value: u.id,
-                text: u.email,
-              })) || []
-            }
-            search
-            searchInput={{ autoFocus: true }}
-            selection
-            value={userId || ''}
-          />
-        </Form.Field>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button type="button" onClick={props.onClose} disabled={isSubmitting}>
-          Close
-        </Button>
-        <Button
-          primary
-          type="submit"
-          loading={isSubmitting}
-          disabled={
-            isSubmitting || !userId || userId === props.task.assigned_to?.id
-          }
-        >
-          Reassign task
-        </Button>
-      </Modal.Actions>
-    </Modal>
+    <DropdownField
+      search
+      name="assigned_to_id"
+      label="Reassign to"
+      options={userOptions}
+      loading={userResults.isLoading}
+    />
   )
 }
