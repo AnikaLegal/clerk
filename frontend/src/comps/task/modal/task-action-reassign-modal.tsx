@@ -110,9 +110,10 @@ const UserDropdownField = (props: ModalProps) => {
 
   return (
     <DropdownField
-      search
       name="assigned_to_id"
       label="Reassign to"
+      required
+      search
       options={userOptions}
       loading={userResults.isLoading}
     />

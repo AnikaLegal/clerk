@@ -77,9 +77,9 @@ export const QuestionModal = (props: ModalProps) => {
               >
                 <UserDropdownField {...props} />
                 <RichTextAreaField
+                  required
                   name="description"
                   label="Question"
-                  required
                 />
               </Form>
             </Modal.Content>
@@ -138,9 +138,10 @@ const UserDropdownField = (props: ModalProps) => {
 
   return (
     <DropdownField
-      search
       name="assigned_to_id"
       label="To"
+      required
+      search
       options={userOptions}
       loading={userResults.isLoading}
     />
