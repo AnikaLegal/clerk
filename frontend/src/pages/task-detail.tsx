@@ -247,7 +247,7 @@ export const TaskBody = ({
 
   /* Only include the approvals fields in the UI if the user has the privileges
    * to change them. */
-  if (user.is_lawyer_or_better) {
+  if (user.is_lawyer) {
     fields.splice(
       -1,
       0,
