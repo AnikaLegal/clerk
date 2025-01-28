@@ -1,12 +1,19 @@
-import { ErrorMessage, useField } from 'formik';
-import React from 'react';
-import { Dropdown, DropdownProps } from 'semantic-ui-react';
+import { ErrorMessage, useField } from 'formik'
+import React from 'react'
+import { Dropdown, DropdownProps, Form } from 'semantic-ui-react'
+
+interface DropdownFieldProps extends DropdownProps {
+  name: string
+  label: string
+  required?: boolean
+}
 
 export const DropdownField = ({
   name,
   label,
+  required,
   ...props
-}: { name: string; label: string } & DropdownProps) => {
+}: DropdownFieldProps) => {
   const [field, meta, helpers] = useField(name)
   const handleChange = (e, data) => {
     helpers.setValue(data.value)
@@ -16,10 +23,10 @@ export const DropdownField = ({
   }
 
   return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
+    <Form.Field error={meta.touched && meta.error} required={required}>
       <label>{label}</label>
       <Dropdown fluid selection {...field} {...props} onChange={handleChange} />
       <ErrorMessage name={name} />
-    </div>
+    </Form.Field>
   )
 }

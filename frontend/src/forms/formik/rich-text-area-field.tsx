@@ -1,12 +1,20 @@
 import { EditorEvents, RichTextArea, RichTextAreaProps } from 'comps/rich-text'
 import { ErrorMessage, useField } from 'formik'
 import React from 'react'
+import { Form } from 'semantic-ui-react'
+
+interface RichTextAreaFieldProps extends RichTextAreaProps {
+  name: string
+  label: string
+  required?: boolean
+}
 
 export const RichTextAreaField = ({
   name,
   label,
+  required,
   ...props
-}: { name: string; label: string } & RichTextAreaProps) => {
+}: RichTextAreaFieldProps) => {
   const [, meta, helpers] = useField(name)
 
   const handleUpdate = ({ editor, transaction }: EditorEvents['update']) => {
@@ -19,7 +27,7 @@ export const RichTextAreaField = ({
   }
 
   return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
+    <Form.Field error={meta.touched && meta.error} required={required}>
       <label>{label}</label>
       <RichTextArea
         {...props}
@@ -27,6 +35,6 @@ export const RichTextAreaField = ({
         onUpdate={handleUpdate}
       />
       <ErrorMessage name={name} />
-    </div>
+    </Form.Field>
   )
 }

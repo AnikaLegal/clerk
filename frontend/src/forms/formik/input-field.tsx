@@ -1,19 +1,26 @@
 import { ErrorMessage, useField } from 'formik'
 import React from 'react'
-import { Input, InputProps } from 'semantic-ui-react'
+import { Form, Input, InputProps } from 'semantic-ui-react'
+
+interface InputFieldProps extends InputProps {
+  name: string
+  label: string
+  required?: boolean
+}
 
 export const InputField = ({
   name,
   label,
+  required,
   ...props
-}: { name: string; label: string } & InputProps) => {
+}: InputFieldProps) => {
   const [field, meta] = useField(name)
 
   return (
-    <div className={`field ${meta.touched && meta.error ? 'error' : ''}`}>
+    <Form.Field error={meta.touched && meta.error} required={required}>
       <label>{label}</label>
       <Input {...field} {...props} />
       <ErrorMessage name={name} />
-    </div>
+    </Form.Field>
   )
 }
