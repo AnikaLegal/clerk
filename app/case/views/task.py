@@ -77,10 +77,11 @@ class TaskApiViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return TaskListSerializer
-        elif self.action == "attachments_view":
+        elif self.action == "attachments":
             return TaskAttachmentSerializer
-        elif self.action == "comments_view":
+        elif self.action == "comments":
             return TaskCommentSerializer
+
         return TaskSerializer
 
     def get_permissions(self):
@@ -163,10 +164,8 @@ class TaskApiViewset(ModelViewSet):
     @action(
         detail=True,
         methods=["GET", "POST"],
-        url_path="comments",
-        url_name="comments",
     )
-    def comments_view(self, request, pk):
+    def comments(self, request, pk):
         """
         Task comments.
         """
@@ -186,15 +185,13 @@ class TaskApiViewset(ModelViewSet):
             serializer = TaskCommentSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data, status=201)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
         methods=["GET", "POST"],
-        url_path="attachments",
-        url_name="attachments",
     )
-    def attachments_view(self, request, pk):
+    def attachments(self, request, pk):
         """
         task attachments.
         """
@@ -210,12 +207,11 @@ class TaskApiViewset(ModelViewSet):
             serializer = TaskAttachmentSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data, status=201)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
         methods=["DELETE"],
-        url_name="attachment-delete",
         url_path="attachments/(?P<attachment_id>[0-9]+)",
     )
     def attachment_delete(self, request, pk, attachment_id):
