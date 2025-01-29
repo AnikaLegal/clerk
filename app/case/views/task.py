@@ -77,6 +77,10 @@ class TaskApiViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return TaskListSerializer
+        elif self.action == "attachments_view":
+            return TaskAttachmentSerializer
+        elif self.action == "comments_view":
+            return TaskCommentSerializer
         return TaskSerializer
 
     def get_permissions(self):
