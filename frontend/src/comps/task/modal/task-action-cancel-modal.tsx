@@ -77,9 +77,6 @@ export const CancelTaskModal = (props: ModalProps) => {
         </Form.Field>
       </Modal.Content>
       <Modal.Actions>
-        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
-          Close
-        </Button>
         <Button
           primary
           type="submit"
@@ -87,6 +84,9 @@ export const CancelTaskModal = (props: ModalProps) => {
           disabled={isSubmitting || !canSubmit}
         >
           Cancel task
+        </Button>
+        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
+          Close
         </Button>
       </Modal.Actions>
     </Modal>
