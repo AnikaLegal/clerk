@@ -10,6 +10,7 @@ import * as Yup from 'yup'
 
 const QuestionSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   assigned_to_id: Yup.number().required(),
+  related_task_id: Yup.number().required(),
   description: Yup.string().min(1).required(),
   issue_id: Yup.string().required(),
   name: Yup.string().required(),
@@ -26,10 +27,12 @@ export const QuestionModal = (props: ModalProps) => {
   const [createTask] = api.useCreateTaskMutation()
 
   const initialValues = {
-    type: 'OTHER',
+    type: 'QUESTION',
     name: `Question from ${props.user.full_name}`,
     issue_id: props.task.issue.id,
     assigned_to_id: props.task.issue.lawyer?.id,
+    related_task_id: props.task.id,
+    description: '',
   }
 
   const handleSubmit = (

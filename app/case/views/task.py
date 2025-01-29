@@ -9,8 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.models.attachment import TaskAttachment
-from task.models.comment import CommentType
-from task.models.task import Task, TaskStatus, TaskType
+from task.models.task import Task, TaskStatus, TaskTemplateType, TaskType
 from task.serializers import (
     TaskAttachmentSerializer,
     TaskCommentSerializer,
@@ -45,7 +44,7 @@ def task_list_page_view(request):
                 ("false", "All tasks"),
             ],
             "status": TaskStatus.choices,
-            "type": TaskType.choices,
+            "type": TaskTemplateType.choices + TaskType.choices,
         },
     }
     return render_react_page(request, "Tasks", "task-list", context)
@@ -60,7 +59,7 @@ def task_detail_page_view(request, pk):
     context = {
         "choices": {
             "status": TaskStatus.choices,
-            "type": TaskType.choices,
+            "type": TaskTemplateType.choices + TaskType.choices,
         },
         "status": {
             "stopped": TaskStatus.NOT_STARTED,

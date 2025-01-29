@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 
 from task.models.trigger import TaskTrigger, TriggerTopic, TasksCaseRole
-from task.models.template import TaskType
+from task.models.template import TaskTemplateType
 from core.models.issue_event import EventType
 from core.models.issue import CaseStage
 from task.serializers import TaskTriggerSerializer
@@ -40,7 +40,7 @@ def template_task_create_page_view(request):
             "event": EventType.choices,
             "event_stage": CaseStage.CHOICES,
             "tasks_assignment_role": TasksCaseRole.choices,
-            "task_type": TaskType.choices,
+            "task_type": TaskTemplateType.choices,
         },
     }
     return render_react_page(request, "Task Templates", "task-template-create", context)
@@ -60,7 +60,7 @@ def template_task_detail_page_view(request, pk):
             "event": EventType.choices,
             "event_stage": CaseStage.CHOICES,
             "tasks_assignment_role": TasksCaseRole.choices,
-            "task_type": TaskType.choices,
+            "task_type": TaskTemplateType.choices,
         },
         "list_url": reverse("template-task-list"),
         "task_trigger_pk": pk,

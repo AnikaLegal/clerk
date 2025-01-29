@@ -1,6 +1,7 @@
 from accounts.models import User
 from core.models import Issue, TimestampedModel
 from django.conf import settings
+from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 from django.db.models import functions
 from django.urls import reverse
@@ -8,8 +9,17 @@ from django.utils import timezone
 
 from .attachment import TaskAttachment
 from .comment import CommentType, TaskComment
-from .template import TaskTemplate, TaskType
+from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
+
+
+class TaskType(models.TextChoices):
+    """
+    The type of the task.
+    """
+
+    QUESTION = "QUESTION", "Answer a question"
+    APPROVAL_REQUEST = "APPROVAL_REQUEST", "Review request for approval"
 
 
 class TaskStatus(models.TextChoices):
@@ -24,7 +34,9 @@ class TaskStatus(models.TextChoices):
 
 
 class Task(TimestampedModel):
-    type = models.CharField(max_length=32, choices=TaskType.choices)
+    type = models.CharField(
+        max_length=32, choices=TaskTemplateType.choices + TaskType.choices
+    )
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
     status = models.CharField(
@@ -81,6 +93,16 @@ class Task(TimestampedModel):
         TaskTemplate, on_delete=models.SET_NULL, blank=True, null=True
     )
 
+    # The originating task if this task is a question or approval request.
+    related_task = models.ForeignKey(
+        "self", on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    @property
+    def url(self):
+        if self.pk:
+            return settings.CLERK_BASE_URL + reverse("task-detail", args=(self.pk,))
+
     def save(self, *args, **kwargs):
         # Set internal status flag to indicate if a notification is potentially
         # required.
@@ -107,11 +129,6 @@ class Task(TimestampedModel):
 
         super().save(*args, **kwargs)
 
-    @property
-    def url(self):
-        if self.pk:
-            return settings.CLERK_BASE_URL + reverse("task-detail", args=(self.pk,))
-
     # Convenience method used to add a comment related to the task instance.
     def add_comment(
         self, text: str, type: CommentType = CommentType.SYSTEM
@@ -123,10 +140,11 @@ class Task(TimestampedModel):
         )
 
     # Convenience method used to add an attachment related to the task instance.
-    def add_attachment(self, file: str) -> TaskAttachment:
+    def add_attachment(self, file: UploadedFile) -> TaskAttachment:
         return TaskAttachment.objects.create(
             task=self,
             file=file,
+            content_type=file.content_type,
         )
 
     @staticmethod

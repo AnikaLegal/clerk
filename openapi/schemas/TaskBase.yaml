@@ -4,6 +4,9 @@ properties:
     type: string
   description:
     type: string
+  related_task_id:
+    type: number
+    nullable: true
   due_at:
     type: string
     nullable: true

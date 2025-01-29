@@ -5,7 +5,7 @@ from rest_framework import serializers, exceptions
 
 
 from .models import Task, TaskAttachment, TaskComment, TaskTemplate, TaskTrigger
-from .models.task import TaskStatus
+from .models.task import TaskStatus, TaskType
 
 
 class TaskTemplateSerializer(serializers.ModelSerializer):
@@ -174,6 +174,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "issue",
             "assigned_to_id",
             "assigned_to",
+            "related_task_id",
             "is_open",
             "is_suspended",
             "created_at",
@@ -184,6 +185,8 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_approved",
             "days_open",
             "url",
+            "is_approval_request",
+            "is_question",
         )
         read_only_fields = (
             "is_open",
@@ -194,11 +197,41 @@ class TaskSerializer(serializers.ModelSerializer):
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField(write_only=True)
     assigned_to = UserSerializer(read_only=True)
-
+    related_task_id = serializers.IntegerField(allow_null=True, required=False)
     created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
+
+    is_approval_request = serializers.SerializerMethodField(read_only=True)
+    is_question = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_approval_request(self, obj):
+        return obj.type == TaskType.APPROVAL_REQUEST
+
+    def get_is_question(self, obj):
+        return obj.type == TaskType.QUESTION
+
+    def create(self, validated_data):
+        # Paralegals can only create approval requests or questions.
+        request = self.context.get("request", None)
+        if request and request.user.is_paralegal:
+            type = validated_data.get("type", None)
+            if type is None or type not in [
+                TaskType.APPROVAL_REQUEST,
+                TaskType.QUESTION,
+            ]:
+                raise exceptions.PermissionDenied()
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Paralegals can only change the task status.
+        request = self.context.get("request", None)
+        if request and request.user.is_paralegal:
+            keys = [x for x in validated_data.keys() if x not in ["status"]]
+            if len(keys) > 0:
+                raise exceptions.PermissionDenied()
+        return super().update(instance, validated_data)
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a
@@ -236,15 +269,6 @@ class TaskSerializer(serializers.ModelSerializer):
             ):
                 raise exceptions.PermissionDenied(detail="Approval is required")
         return value
-
-    def validate(self, attrs):
-        # Paralegals can only change the task status.
-        request = self.context.get("request", None)
-        if request and request.user.is_paralegal:
-            keys = [x for x in attrs.keys() if x not in ["status"]]
-            if len(keys) > 0:
-                raise exceptions.PermissionDenied()
-        return super().to_internal_value(attrs)
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):

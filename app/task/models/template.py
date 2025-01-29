@@ -3,7 +3,7 @@ from core.models import TimestampedModel
 from .trigger import TaskTrigger
 
 
-class TaskType(models.TextChoices):
+class TaskTemplateType(models.TextChoices):
     """
     The type of the task.
     """
@@ -18,7 +18,7 @@ class TaskType(models.TextChoices):
 
 
 class TaskTemplate(TimestampedModel):
-    type = models.CharField(max_length=32, choices=TaskType.choices)
+    type = models.CharField(max_length=32, choices=TaskTemplateType.choices)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=True, default="")
     # Number of days from when the task is assigned until it is due.

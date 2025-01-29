@@ -20,6 +20,7 @@ const QuestionSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   is_approved: Yup.boolean().notRequired(),
   is_urgent: Yup.boolean().notRequired(),
   status: Yup.string().notRequired(),
+  related_task_id: Yup.number().notRequired(),
 })
 
 export const ReassignTaskModal = (props: ModalProps) => {
@@ -105,11 +106,12 @@ const UserDropdownField = (props: ModalProps) => {
    */
   const assignee = props.task.assigned_to
   const paralegal = props.task.issue.paralegal
-  users = users.filter(
-    (user) =>
-      user.id == assignee?.id ||
-      user.id == paralegal?.id ||
-      user.is_coordinator_or_better
+  users = users.filter((user) =>
+    user.id == assignee?.id ||
+    user.id == paralegal?.id ||
+    props.task.is_approval_request
+      ? user.is_lawyer
+      : user.is_coordinator_or_better
   )
 
   const userOptions = users.map((u) => ({

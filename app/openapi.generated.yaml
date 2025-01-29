@@ -2599,6 +2599,9 @@ components:
           type: string
         description:
           type: string
+        related_task_id:
+          type: number
+          nullable: true
         due_at:
           type: string
           nullable: true
@@ -2657,6 +2660,10 @@ components:
               nullable: true
             days_open:
               type: integer
+            is_approval_request:
+              type: boolean
+            is_question:
+              type: boolean
           required:
             - id
             - url
@@ -2669,6 +2676,8 @@ components:
             - created_at
             - closed_at
             - days_open
+            - is_approval_request
+            - is_question
     TaskCommentBase:
       type: object
       properties:

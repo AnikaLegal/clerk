@@ -1331,6 +1331,7 @@ export type TaskList = {
 export type TaskBase = {
   name: string;
   description: string;
+  related_task_id?: number | null;
   due_at?: string | null;
   is_urgent?: boolean;
   is_approval_required?: boolean;
@@ -1348,6 +1349,8 @@ export type Task = TaskBase & {
   created_at: string;
   closed_at: string | null;
   days_open: number;
+  is_approval_request: boolean;
+  is_question: boolean;
 };
 export type TaskCreate = TaskBase & {
   type: string;

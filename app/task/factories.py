@@ -7,7 +7,7 @@ from core.models.issue_event import EventType
 from faker import Faker
 from task.models import Task, TaskTemplate, TaskTrigger
 from task.models.task import TaskStatus
-from task.models.template import TaskType
+from task.models.template import TaskTemplateType
 from task.models.trigger import TasksCaseRole, TriggerTopic
 
 fake = Faker()
@@ -30,7 +30,7 @@ class TaskTemplateFactory(TimestampedModelFactory):
     class Meta:
         model = TaskTemplate
 
-    type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
+    type = factory.Faker("random_element", elements=[c[0] for c in TaskTemplateType.choices])
     name = factory.Faker("text", max_nb_chars=45)
     description = factory.Faker("paragraph")
     trigger = factory.SubFactory(TaskTriggerFactory, templates=[])
@@ -47,7 +47,7 @@ class TaskFactory(TimestampedModelFactory):
     class Meta:
         model = Task
 
-    type = factory.Faker("random_element", elements=[c[0] for c in TaskType.choices])
+    type = factory.Faker("random_element", elements=[c[0] for c in TaskTemplateType.choices])
     name = factory.Faker("text", max_nb_chars=45)
     description = "\n\n".join(
         [fake.text(max_nb_chars=randint(100, 200)) for _ in range(randint(2, 5))]
