@@ -91,7 +91,7 @@ export const RequestApprovalModal = (props: ModalProps) => {
                 primary
                 type="submit"
                 onClick={() => formik.handleSubmit()}
-                disabled={!formik.isValid}
+                disabled={formik.isSubmitting || !formik.isValid}
               >
                 Request approval
               </Button>

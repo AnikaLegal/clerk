@@ -79,7 +79,7 @@ export const ReassignTaskModal = (props: ModalProps) => {
                 primary
                 type="submit"
                 onClick={() => formik.handleSubmit()}
-                disabled={!formik.isValid}
+                disabled={formik.isSubmitting || !formik.isValid}
               >
                 Reassign task
               </Button>
