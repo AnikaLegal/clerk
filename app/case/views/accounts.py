@@ -79,7 +79,9 @@ class AccountApiViewset(
             or self.action == "retrieve"
             or self.action == "get_account_detail_permissions"
         ):
-            permission_classes = [ParalegalOrBetterObjectPermission]
+            permission_classes = [
+                CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
+            ]
         else:
             permission_classes = [CoordinatorOrBetterPermission]
 

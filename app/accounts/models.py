@@ -57,11 +57,7 @@ class User(AbstractUser):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return (
-            user.is_coordinator_or_better
-            or self.id == user.id
-            or self.is_system_account
-        )
+        return self.id == user.id or self.is_system_account
 
     def __str__(self):
         return self.email
