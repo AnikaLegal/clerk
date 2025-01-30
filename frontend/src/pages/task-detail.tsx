@@ -224,11 +224,6 @@ export const TaskBody = ({
       name: 'type',
     },
     {
-      label: 'Status',
-      type: FIELD_TYPES.SINGLE_CHOICE,
-      name: 'status',
-    },
-    {
       label: 'Due date',
       type: FIELD_TYPES.DATE,
       name: 'due_at',

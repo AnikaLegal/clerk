@@ -16,6 +16,7 @@ from task.serializers import (
     TaskListSerializer,
     TaskSearchSerializer,
     TaskSerializer,
+    TaskStatusChangeSerializer,
 )
 
 from case.utils.react import render_react_page
@@ -215,3 +216,14 @@ class TaskApiViewset(ModelViewSet):
         attachment = get_object_or_404(task.attachments, pk=attachment_id)
         attachment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["PATCH"], serializer_class=TaskStatusChangeSerializer)
+    def status_change(self, request, pk):
+        task = self.get_object()
+
+        serializer = self.get_serializer(instance=task, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        data = TaskSerializer(instance=task).data
+        return Response(data)

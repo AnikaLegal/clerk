@@ -97,6 +97,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_question",
         )
         read_only_fields = (
+            "status",
             "is_open",
             "is_suspended",
         )
@@ -161,21 +162,6 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         if request and not request.user.is_lawyer:
             raise exceptions.PermissionDenied()
-        return value
-
-    def validate_status(self, value):
-        # Only lawyers can finish a task when approval is required but not yet
-        # given.
-        request = self.context.get("request", None)
-        if request and not request.user.is_lawyer:
-            instance: Task | None = self.instance
-            if (
-                value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
-                and instance
-                and instance.is_approval_required
-                and not instance.is_approved
-            ):
-                raise exceptions.PermissionDenied(detail="Approval is required")
         return value
 
 

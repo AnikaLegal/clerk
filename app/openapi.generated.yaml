@@ -1561,6 +1561,34 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/task/{id}/status_change/:
+    patch:
+      operationId: updateTaskStatus
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskStatusUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/template-task/:
     get:
       operationId: getTaskTriggers
@@ -2763,6 +2791,13 @@ components:
               format: binary
           required:
             - file
+    TaskStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
     TaskTemplate:
       type: object
       properties:

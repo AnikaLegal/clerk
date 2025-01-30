@@ -1,3 +1,4 @@
+import { useUpdateTaskStatusMutation, TaskStatusUpdate } from 'api'
 import { TextButton } from 'comps/button'
 import {
   CancelTaskModal,
@@ -38,15 +39,17 @@ interface TaskModalOption extends TaskOptionBase {
 type TaskOption = TaskActionOption | TaskModalOption
 
 export const TaskActionCard = (props: TaskActionProps) => {
-  const handleChange = (name: string, value: any) => {
-    props
-      .update({ [name]: value })
-      .then((instance) => {
-        enqueueSnackbar('Updated task', { variant: 'success' })
-        props.setTask(instance)
+  const [updateTaskStatus] = useUpdateTaskStatusMutation()
+
+  const updateStatusHandler = (values: TaskStatusUpdate) => {
+    updateTaskStatus({ id: props.task.id, taskStatusUpdate: values })
+      .unwrap()
+      .then((task) => {
+        props.setTask(task)
+        enqueueSnackbar('Updated task status', { variant: 'success' })
       })
       .catch((e) => {
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task'), {
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task status'), {
           variant: 'error',
         })
       })
@@ -62,7 +65,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'undo',
       text: 'Reopen the task',
       showWhen: () => perms.is_paralegal_or_better && !task.is_open,
-      action: () => handleChange('status', status.stopped),
+      action: () => updateStatusHandler({ status: status.stopped }),
     },
     {
       id: 'start',
@@ -70,7 +73,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       text: 'Start the task',
       showWhen: () =>
         perms.is_paralegal_or_better && task.status === status.stopped,
-      action: () => handleChange('status', status.started),
+      action: () => updateStatusHandler({ status: status.started }),
     },
     {
       id: 'stop',
@@ -78,7 +81,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       text: 'Stop the task',
       showWhen: () =>
         perms.is_paralegal_or_better && task.status === status.started,
-      action: () => handleChange('status', status.stopped),
+      action: () => updateStatusHandler({ status: status.stopped }),
     },
     {
       id: 'approve',
@@ -99,7 +102,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
         perms.is_paralegal_or_better &&
         task.is_open &&
         (perms.is_lawyer || !task.is_approval_required || task.is_approved),
-      action: () => handleChange('status', status.finished),
+      action: () => updateStatusHandler({ status: status.finished }),
     },
     {
       id: 'cancel',

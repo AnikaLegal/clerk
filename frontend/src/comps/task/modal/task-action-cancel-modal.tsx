@@ -1,94 +1,88 @@
-import api from 'api'
-import { EditorEvents, RichTextArea } from 'comps/rich-text'
+import api, { TaskStatusUpdate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
+import { Formik, FormikHelpers } from 'formik'
+import { RichTextAreaField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
+import * as Yup from 'yup'
 
 export const CancelTaskModal = (props: ModalProps) => {
-  const [canSubmit, setCanSubmit] = useState<boolean>(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [createComment] = api.useCreateTaskCommentMutation()
-  const [text, setText] = useState<string>('')
+  const [updateTaskStatus] = api.useUpdateTaskStatusMutation()
 
-  useEffect(() => {
-    setCanSubmit(text != '')
-  }, [text])
+  const schema: Yup.ObjectSchema<TaskStatusUpdate> = Yup.object({
+    status: Yup.string().required(),
+    comment: Yup.string().min(1).required(),
+  })
 
-  const handleClose = () => {
-    setText('')
+  const initialValues = {
+    status: props.status.cancelled,
+  }
+
+  const handleSubmit = (
+    values: TaskStatusUpdate,
+    helpers: FormikHelpers<TaskStatusUpdate>
+  ) => {
+    updateTaskStatus({ id: props.task.id, taskStatusUpdate: values })
+      .unwrap()
+      .then((task) => {
+        props.setTask(task)
+        enqueueSnackbar('Updated task status', { variant: 'success' })
+      })
+      .catch((e) =>
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task status'), {
+          variant: 'error',
+        })
+      )
+    helpers.resetForm()
     props.onClose()
   }
 
-  const handleUpdate = ({ editor }: EditorEvents['update']) => {
-    if (editor) {
-      setText(editor.isEmpty || editor.getText() == '' ? '' : editor.getHTML())
-    }
-  }
-
-  const handleSubmit = (event) => {
-    event.stopPropagation()
-
-    setIsSubmitting(true)
-    props
-      .update({ status: props.status.cancelled })
-      .then((task) => {
-        props.setTask(task)
-        createComment({
-          id: props.task.id,
-          taskCommentCreate: { text: text, creator_id: props.user.id },
-        })
-          .then((comment) =>
-            enqueueSnackbar('Cancelled task', { variant: 'success' })
-          )
-          .catch((e) =>
-            enqueueSnackbar(
-              getAPIErrorMessage(e, 'Cancelled task but failed to add comment'),
-              {
-                variant: 'error',
-              }
-            )
-          )
-      })
-      .catch((e) => {
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to cancel task'), {
-          variant: 'error',
-        })
-      })
-      .finally(() => setIsSubmitting(false))
-    handleClose()
-  }
-
   return (
-    <Modal
-      as="Form"
-      className="form"
-      open={props.open}
-      onClose={handleClose}
-      onSubmit={(e) => handleSubmit(e)}
-      size="tiny"
+    <Formik
+      enableReinitialize
+      isInitialValid={false}
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={schema}
     >
-      <Modal.Header>Cancel the task</Modal.Header>
-      <Modal.Content>
-        <Form.Field required>
-          <label>Briefly explain why the task was not completed</label>
-          <RichTextArea autoFocus onUpdate={handleUpdate} />
-        </Form.Field>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button
-          primary
-          type="submit"
-          loading={isSubmitting}
-          disabled={isSubmitting || !canSubmit}
-        >
-          Cancel task
-        </Button>
-        <Button type="button" onClick={handleClose} disabled={isSubmitting}>
-          Close
-        </Button>
-      </Modal.Actions>
-    </Modal>
+      {(formik) => {
+        const closeHandler = () => {
+          formik.resetForm()
+          props.onClose()
+        }
+
+        return (
+          <Modal size="tiny" open={props.open} onClose={closeHandler}>
+            <Modal.Header>Cancel the task</Modal.Header>
+            <Modal.Content>
+              <Form
+                onSubmit={formik.handleSubmit}
+                error={Object.keys(formik.errors).length > 0}
+              >
+                <RichTextAreaField
+                  autoFocus
+                  required
+                  name="comment"
+                  label="Briefly explain why the task was not completed"
+                />
+              </Form>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                primary
+                type="submit"
+                onClick={() => formik.handleSubmit()}
+                disabled={formik.isSubmitting || !formik.isValid}
+              >
+                Cancel task
+              </Button>
+              <Button onClick={closeHandler}>Close</Button>
+            </Modal.Actions>
+          </Modal>
+        )
+      }}
+    </Formik>
   )
 }
