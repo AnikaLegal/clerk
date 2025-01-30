@@ -98,6 +98,7 @@ class TaskApiViewset(ModelViewSet):
         queryset = Task.objects.all()
         queryset = Task.annotate_with_days_open(queryset)
         queryset = queryset.select_related("issue", "assigned_to")
+        queryset = queryset.prefetch_related("assigned_to__groups")
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("comments").prefetch_related(
