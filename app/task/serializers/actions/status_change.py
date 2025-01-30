@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from task.models import Task
@@ -10,14 +11,33 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "status",
+            "comment",
         )
 
-    def update(self, instance, validated_data):
+    comment = serializers.CharField(required=False)
+
+    @transaction.atomic
+    def update(self, instance: Task, validated_data):
+        # Check required permissions.
         request = self.context.get("request", None)
         if request and not request.user.is_paralegal_or_better:
             raise PermissionDenied()
-        instance = super().update(instance, validated_data)
-        return instance
+
+        comment = validated_data.pop("comment", None)
+        if comment:
+            instance.add_comment(comment)
+
+        return super().update(instance, validated_data)
+
+    def validate(self, attrs):
+        # Require explanatory comment if the task is not done.
+        status = attrs.get("status")
+        comment = attrs.get("comment")
+        if status == TaskStatus.NOT_DONE and not comment:
+            raise serializers.ValidationError(
+                {"comment": self.fields["comment"].error_messages["required"]}
+            )
+        return attrs
 
     def validate_status(self, value):
         # Only lawyers can finish a task when approval is required but not yet

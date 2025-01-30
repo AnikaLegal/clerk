@@ -1407,6 +1407,7 @@ export type TaskAttachmentCreate = TaskAttachmentBase & {
 };
 export type TaskStatusUpdate = {
   status: string;
+  comment?: string;
 };
 export type TaskTemplate = {
   id?: number;

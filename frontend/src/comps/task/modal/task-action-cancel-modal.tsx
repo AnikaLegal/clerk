@@ -5,7 +5,7 @@ import { RichTextAreaField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
-import { getAPIErrorMessage } from 'utils'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 export const CancelTaskModal = (props: ModalProps) => {
@@ -29,14 +29,19 @@ export const CancelTaskModal = (props: ModalProps) => {
       .then((task) => {
         props.setTask(task)
         enqueueSnackbar('Updated task status', { variant: 'success' })
+        helpers.resetForm()
+        props.onClose()
       })
-      .catch((e) =>
+      .catch((e) => {
         enqueueSnackbar(getAPIErrorMessage(e, 'Failed to update task status'), {
           variant: 'error',
         })
-      )
-    helpers.resetForm()
-    props.onClose()
+        const errors = getAPIFormErrors(e)
+        if (errors) {
+          helpers.setErrors(errors)
+        }
+      })
+      .finally(() => helpers.setSubmitting(false))
   }
 
   return (

@@ -72,6 +72,9 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteTaskAttachment: {
       invalidatesTags: [{ type: 'TASK_ATTACHMENT' }],
     },
+    updateTaskStatus: {
+      invalidatesTags: [{ type: 'TASK_COMMENT' }],
+    },
   },
 })
 
