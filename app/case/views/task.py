@@ -84,13 +84,20 @@ class TaskApiViewset(ModelViewSet):
 
     def get_permissions(self):
         if self.action == "list":
-            # Anyone can try look at the list
             permission_classes = [IsAuthenticated]
-        else:
-            # But for other stuff you need to be a coordinator+ or have object permission
+        elif (
+            self.action == "retrieve"
+            or self.action == "attachments"
+            or self.action == "attachment_delete"
+            or self.action == "comments"
+            or self.action == "status_change"
+        ):
             permission_classes = [
                 CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
             ]
+        else:
+            permission_classes = [CoordinatorOrBetterPermission]
+
         return [p() for p in permission_classes]
 
     def get_queryset(self):

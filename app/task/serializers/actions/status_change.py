@@ -18,15 +18,9 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance: Task, validated_data):
-        # Check required permissions.
-        request = self.context.get("request", None)
-        if request and not request.user.is_paralegal_or_better:
-            raise PermissionDenied()
-
         comment = validated_data.pop("comment", None)
         if comment:
             instance.add_comment(comment)
-
         return super().update(instance, validated_data)
 
     def validate(self, attrs):
@@ -45,10 +39,11 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         if request and not request.user.is_lawyer:
             instance: Task | None = self.instance
-            if not instance or (
-                value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
+            if (
+                instance
                 and instance.is_approval_required
                 and not instance.is_approved
+                and value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
             ):
                 raise PermissionDenied(detail="Approval is required")
         return value
