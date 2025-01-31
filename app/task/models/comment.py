@@ -21,12 +21,11 @@ class TaskComment(TimestampedModel):
         related_name="comments",
         related_query_name="comment",
     )
-    type = models.CharField(max_length=32, choices=CommentType.choices, default=CommentType.USER)
+    type = models.CharField(
+        max_length=32, choices=CommentType.choices, default=CommentType.USER
+    )
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     text = models.TextField(blank=True, default="")
-
-    class Meta:
-        verbose_name = "comment"
 
     # Convenience method used to add an attachment related to the comment instance.
     def add_attachment(self, file: str) -> TaskAttachment:
@@ -35,3 +34,6 @@ class TaskComment(TimestampedModel):
             comment=self,
             file=file,
         )
+
+    class Meta:
+        verbose_name = "comment"
