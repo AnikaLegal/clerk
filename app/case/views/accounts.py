@@ -50,9 +50,6 @@ def account_detail_page_view(request, pk):
         user = User.objects.get(pk=pk)
     except User.DoesNotExist:
         raise Http404()
-    # Check whether the user has access permissions.
-    if not user.check_permission(request.user):
-        raise PermissionDenied()
 
     name = user.get_full_name()
     context = {

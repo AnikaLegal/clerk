@@ -1,0 +1,12 @@
+type: object
+properties:
+  id:
+    type: integer
+  task_id:
+    type: number
+  created_at:
+    type: string
+required:
+  - id
+  - task_id
+  - created_at

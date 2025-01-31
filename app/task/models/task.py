@@ -1,14 +1,11 @@
 from accounts.models import User
 from core.models import Issue, TimestampedModel
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 from django.db.models import functions
 from django.urls import reverse
 from django.utils import timezone
 
-from .attachment import TaskAttachment
-from .comment import CommentType, TaskComment
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
 
@@ -128,24 +125,6 @@ class Task(TimestampedModel):
                 self.closed_at = timezone.now()
 
         super().save(*args, **kwargs)
-
-    # Convenience method used to add a comment related to the task instance.
-    def add_comment(
-        self, text: str, type: CommentType = CommentType.SYSTEM
-    ) -> TaskComment:
-        return TaskComment.objects.create(
-            task=self,
-            type=type,
-            text=text,
-        )
-
-    # Convenience method used to add an attachment related to the task instance.
-    def add_attachment(self, file: UploadedFile) -> TaskAttachment:
-        return TaskAttachment.objects.create(
-            task=self,
-            file=file,
-            content_type=file.content_type,
-        )
 
     @staticmethod
     def annotate_with_days_open(

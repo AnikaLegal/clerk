@@ -8,9 +8,10 @@ from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from task.models.attachment import TaskAttachment
+from task.models import TaskAttachment
 from task.models.task import Task, TaskStatus, TaskTemplateType, TaskType
 from task.serializers import (
+    TaskActivitySerializer,
     TaskAttachmentSerializer,
     TaskCommentSerializer,
     TaskListSerializer,
@@ -87,6 +88,7 @@ class TaskApiViewset(ModelViewSet):
             permission_classes = [IsAuthenticated]
         elif (
             self.action == "retrieve"
+            or self.action == "activity"
             or self.action == "attachments"
             or self.action == "attachment_delete"
             or self.action == "comments"
@@ -167,30 +169,34 @@ class TaskApiViewset(ModelViewSet):
 
         return queryset
 
-    @action(
-        detail=True, methods=["GET", "POST"], serializer_class=TaskCommentSerializer
-    )
+    @action(detail=True, methods=["GET"], serializer_class=TaskActivitySerializer)
+    def activity(self, request, pk):
+        """
+        Task activity.
+        """
+        task = self.get_object()
+
+        queryset = task.activities.all()
+        queryset = queryset.select_related("content_type")
+        queryset = queryset.order_by("created_at")
+        data = self.get_serializer(queryset, many=True).data
+        return Response(data)
+
+    @action(detail=True, methods=["POST"], serializer_class=TaskCommentSerializer)
     def comments(self, request, pk):
         """
         Task comments.
         """
         task = self.get_object()
+        data = {
+            **request.data,
+            "task_id": task.pk,
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        if request.method == "GET":
-            queryset = task.comments.all()
-            queryset = queryset.select_related("creator")
-            queryset = queryset.order_by("created_at")
-            data = self.get_serializer(queryset, many=True).data
-            return Response(data)
-        else:
-            data = {
-                **request.data,
-                "task_id": task.pk,
-            }
-            serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True, methods=["GET", "POST"], serializer_class=TaskAttachmentSerializer

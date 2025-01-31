@@ -20,7 +20,8 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
     def update(self, instance: Task, validated_data):
         comment = validated_data.pop("comment", None)
         if comment:
-            instance.add_comment(comment)
+            # TODO: create event.
+            pass
         return super().update(instance, validated_data)
 
     def validate(self, attrs):

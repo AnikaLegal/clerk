@@ -1,13 +1,9 @@
-from django.db import models
-
 from accounts.models import User
 from core.models import TimestampedModel
-from .attachment import TaskAttachment
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models, transaction
 
-
-class CommentType(models.TextChoices):
-    SYSTEM = "SYSTEM", "System generated"
-    USER = "USER", "User created"
+from .activity import TaskActivity
 
 
 class TaskComment(TimestampedModel):
@@ -21,19 +17,14 @@ class TaskComment(TimestampedModel):
         related_name="comments",
         related_query_name="comment",
     )
-    type = models.CharField(
-        max_length=32, choices=CommentType.choices, default=CommentType.USER
-    )
-    creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    text = models.TextField(blank=True, default="")
+    activity = GenericRelation(TaskActivity)
+    creator = models.ForeignKey(User, on_delete=models.PROTECT)
+    text = models.TextField()
 
-    # Convenience method used to add an attachment related to the comment instance.
-    def add_attachment(self, file: str) -> TaskAttachment:
-        return TaskAttachment.objects.create(
-            task=self.task,
-            comment=self,
-            file=file,
-        )
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        TaskActivity.objects.create(content_object=self)
 
     class Meta:
         verbose_name = "comment"

@@ -57,12 +57,6 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],
     },
-    getTaskComments: {
-      providesTags: [{ type: 'TASK_COMMENT' }],
-    },
-    createTaskComment: {
-      invalidatesTags: [{ type: 'TASK_COMMENT' }],
-    },
     getTaskAttachments: {
       providesTags: [{ type: 'TASK_ATTACHMENT' }],
     },
@@ -72,8 +66,14 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteTaskAttachment: {
       invalidatesTags: [{ type: 'TASK_ATTACHMENT' }],
     },
+    getTaskActivity: {
+      providesTags: [{ type: 'TASK_ACTIVITY' }],
+    },
     updateTaskStatus: {
-      invalidatesTags: [{ type: 'TASK_COMMENT' }],
+      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
+    },
+    createTaskComment: {
+      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
     },
   },
 })

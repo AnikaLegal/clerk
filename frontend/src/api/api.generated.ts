@@ -462,12 +462,12 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    getTaskComments: build.query<
-      GetTaskCommentsApiResponse,
-      GetTaskCommentsApiArg
+    getTaskActivity: build.query<
+      GetTaskActivityApiResponse,
+      GetTaskActivityApiArg
     >({
       query: (queryArg) => ({
-        url: `/clerk/api/task/${queryArg.id}/comments/`,
+        url: `/clerk/api/task/${queryArg.id}/activity/`,
       }),
     }),
     createTaskComment: build.mutation<
@@ -976,9 +976,9 @@ export type DeleteTaskApiArg = {
   /** Entity ID */
   id: number;
 };
-export type GetTaskCommentsApiResponse =
-  /** status 200 Successful response. */ TaskComment[];
-export type GetTaskCommentsApiArg = {
+export type GetTaskActivityApiResponse =
+  /** status 200 Successful response. */ TaskActivity[];
+export type GetTaskActivityApiArg = {
   /** Entity ID */
   id: number;
 };
@@ -1378,7 +1378,6 @@ export type TaskCreate = TaskBase & {
 };
 export type TaskCommentBase = {
   text: string;
-  type?: "USER" | "SYSTEM";
 };
 export type TaskComment = TaskCommentBase & {
   id: number;
@@ -1390,8 +1389,19 @@ export type TaskComment = TaskCommentBase & {
   };
   created_at: string;
 };
+export type TaskEvent = {
+  id: number;
+  task_id: number;
+  created_at: string;
+};
+export type TaskActivity = {
+  id: number;
+  task_id: number;
+  created_at: string;
+  data: TaskComment | TaskEvent;
+};
 export type TaskCommentCreate = TaskCommentBase & {
-  creator_id?: number | null;
+  creator_id: number;
 };
 export type TaskAttachmentBase = {
   comment_id: number | null;
@@ -1488,7 +1498,7 @@ export const {
   useGetTaskQuery,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
-  useGetTaskCommentsQuery,
+  useGetTaskActivityQuery,
   useCreateTaskCommentMutation,
   useGetTaskAttachmentsQuery,
   useCreateTaskAttachmentMutation,

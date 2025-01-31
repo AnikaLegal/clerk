@@ -4,5 +4,6 @@ allOf:
     properties:
       creator_id:
         type: number
-        nullable: true
+    required:
+    - creator_id
 

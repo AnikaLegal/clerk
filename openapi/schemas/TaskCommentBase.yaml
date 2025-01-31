@@ -2,8 +2,5 @@ type: object
 properties:
   text:
     type: string
-  type:
-    type: string
-    enum: ["USER", "SYSTEM"]
 required:
   - text

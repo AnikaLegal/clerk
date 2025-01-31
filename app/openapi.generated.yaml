@@ -1446,9 +1446,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/task/{id}/comments/:
+  /clerk/api/task/{id}/activity/:
     get:
-      operationId: getTaskComments
+      operationId: getTaskActivity
       parameters:
         - description: Entity ID
           in: path
@@ -1464,7 +1464,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TaskComment"
+                  $ref: "#/components/schemas/TaskActivity"
+  /clerk/api/task/{id}/comments/:
     post:
       operationId: createTaskComment
       parameters:
@@ -2711,11 +2712,6 @@ components:
       properties:
         text:
           type: string
-        type:
-          type: string
-          enum:
-            - USER
-            - SYSTEM
       required:
         - text
     TaskComment:
@@ -2747,6 +2743,37 @@ components:
             - task_id
             - creator
             - created_at
+    TaskEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        task_id:
+          type: number
+        created_at:
+          type: string
+      required:
+        - id
+        - task_id
+        - created_at
+    TaskActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+        task_id:
+          type: number
+        created_at:
+          type: string
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/TaskComment"
+            - $ref: "#/components/schemas/TaskEvent"
+      required:
+        - id
+        - task_id
+        - created_at
+        - data
     TaskCommentCreate:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
@@ -2754,7 +2781,8 @@ components:
           properties:
             creator_id:
               type: number
-              nullable: true
+          required:
+            - creator_id
     TaskAttachmentBase:
       type: object
       properties:

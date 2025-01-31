@@ -1,11 +1,11 @@
-import pytest
 from unittest.mock import patch
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
 
+import pytest
 from accounts.models import User
-from core.factories import UserFactory, IssueFactory
+from core.factories import UserFactory
 from microsoft.service import MicrosoftUserPermissions
+from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -13,19 +13,19 @@ def test_account_details_view__as_paralegal(
     paralegal_user_client: APIClient,
 ):
     """
-    Paralegal users can only view their own details page.
+    Paralegal users can retrieve their own account.
     """
     assert User.objects.count() == 1
     user = User.objects.first()
 
-    url = reverse("account-detail", kwargs=dict(pk=user.pk))
+    url = reverse("account-api-detail", args=(user.pk,))
     response = paralegal_user_client.get(url)
     assert response.status_code == 200
 
     user = UserFactory()
     assert User.objects.count() == 2
 
-    url = reverse("account-detail", kwargs=dict(pk=user.pk))
+    url = reverse("account-api-detail", args=(user.pk,))
     response = paralegal_user_client.get(url)
     assert response.status_code == 403
 

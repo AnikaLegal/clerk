@@ -7,7 +7,7 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
 import { FIELD_TYPES } from 'comps/field-component'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
-import { TaskActionCard, TaskCommentGroup, TaskMetaCard } from 'comps/task'
+import { TaskActionCard, TaskActivityGroup, TaskMetaCard } from 'comps/task'
 import { Formik } from 'formik'
 import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
@@ -105,8 +105,8 @@ const App = () => {
           </Segment>
           <Segment basic style={{ marginTop: '0' }}>
             <Divider />
-            <Header as="h4">Comments</Header>
-            <TaskComments
+            <Header as="h4">Activity</Header>
+            <TaskActivity
               task={task}
               setTask={setTask}
               update={update}
@@ -321,11 +321,11 @@ export const TaskHeader = ({
   )
 }
 
-export const TaskComments = ({ task, user }: TaskDetailProps) => {
+export const TaskActivity = ({ task, user }: TaskDetailProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
-  const commentResult = api.useGetTaskCommentsQuery({ id: task.id })
-  const comments = commentResult.data || []
+  const activityResult = api.useGetTaskActivityQuery({ id: task.id })
+  const activities = activityResult.data || []
 
   const handleSubmit = (editor: Editor) => {
     if (!editor.isEmpty && editor.getText().trim() != '') {
@@ -336,7 +336,7 @@ export const TaskComments = ({ task, user }: TaskDetailProps) => {
       createTaskComment({
         id: task.id,
         taskCommentCreate: values,
-      })
+      }).unwrap()
         .then((instance) => {
           enqueueSnackbar('Added comment', { variant: 'success' })
           editor.commands.clearContent()
@@ -351,7 +351,7 @@ export const TaskComments = ({ task, user }: TaskDetailProps) => {
 
   return (
     <>
-      <TaskCommentGroup comments={comments} loading={commentResult.isLoading} />
+      <TaskActivityGroup activities={activities} loading={activityResult.isLoading} />
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
     </>
   )

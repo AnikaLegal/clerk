@@ -95,7 +95,6 @@ class TaskAdmin(admin.ModelAdmin):
 class TaskCommentAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "type",
         "text",
         "task_link",
         "creator_link",

@@ -1,0 +1,17 @@
+type: object
+properties:
+  id:
+    type: integer
+  task_id:
+    type: number
+  created_at:
+    type: string
+  data:
+    oneOf:
+      - $ref: ./TaskComment.yaml
+      - $ref: ./TaskEvent.yaml
+required:
+  - id
+  - task_id
+  - created_at
+  - data
