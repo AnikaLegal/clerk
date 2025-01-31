@@ -54,7 +54,7 @@ class IssueEvent(TimestampedModel):
     @staticmethod
     @transaction.atomic
     def maybe_generate_event(issue: Issue, prev_issue: Issue | None):
-        assert prev_issue == None or issue.pk == prev_issue.pk
+        assert prev_issue is None or issue.pk == prev_issue.pk
         create_kwargs_list = []
         event_types = []
 
