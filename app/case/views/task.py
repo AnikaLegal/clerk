@@ -111,7 +111,7 @@ class TaskApiViewset(ModelViewSet):
         queryset = queryset.prefetch_related("assigned_to__groups")
 
         if self.action == "retrieve":
-            queryset = queryset.prefetch_related("comments").prefetch_related(
+            queryset = queryset.prefetch_related("activities").prefetch_related(
                 Prefetch(
                     "attachments",
                     queryset=TaskAttachment.objects.filter(comment_id__isnull=True),

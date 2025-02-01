@@ -1,7 +1,8 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
-from task.models import Task
+from task.models import Task, TaskEvent
+from task.models.event import TaskEventType
 from task.models.task import TaskStatus
 
 
@@ -18,10 +19,7 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance: Task, validated_data):
-        comment = validated_data.pop("comment", None)
-        if comment:
-            # TODO: create event.
-            pass
+        self.create_event(instance, validated_data)
         return super().update(instance, validated_data)
 
     def validate(self, attrs):
@@ -48,3 +46,14 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
             ):
                 raise PermissionDenied(detail="Approval is required")
         return value
+
+    def create_event(self, instance, validated_data):
+        request = self.context.get("request", None)
+        if request:
+            TaskEvent.create_status_change(
+                task=instance,
+                user=request.user,
+                prev_status=instance.status,
+                next_status=validated_data.get("status"),
+                note=validated_data.pop("comment", None),
+            )

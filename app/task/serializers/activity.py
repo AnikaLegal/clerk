@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from task.models import TaskActivity, TaskComment
+from task.models import TaskActivity, TaskComment, TaskEvent
+
 from .comment import TaskCommentSerializer
+from .event import TaskEventSerializer
 
 
 class TaskActivitySerializer(serializers.ModelSerializer):
@@ -8,8 +10,10 @@ class TaskActivitySerializer(serializers.ModelSerializer):
         def to_representation(self, value):
             if isinstance(value, TaskComment):
                 serializer = TaskCommentSerializer(value)
+            elif isinstance(value, TaskEvent):
+                serializer = TaskEventSerializer(value)
             else:
-                raise Exception("Unexpected type of tagged object")
+                raise Exception("Unexpected type of data object")
             return serializer.data
 
     created_at = serializers.DateTimeField(read_only=True)
@@ -28,4 +32,3 @@ class TaskActivitySerializer(serializers.ModelSerializer):
             "data",
             "type",
         )
-

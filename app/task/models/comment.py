@@ -14,8 +14,7 @@ class TaskComment(TimestampedModel):
     task = models.ForeignKey(
         "task.Task",
         on_delete=models.CASCADE,
-        related_name="comments",
-        related_query_name="comment",
+        related_name="+",
     )
     activity = GenericRelation(TaskActivity)
     creator = models.ForeignKey(User, on_delete=models.PROTECT)
