@@ -1,8 +1,15 @@
 from django.contrib import admin
-from django.forms import Textarea
 from django.db import models
-
-from task.models import Task, TaskTrigger, TaskTemplate, TaskComment, TaskAttachment
+from django.forms import Textarea
+from task.models import (
+    Task,
+    TaskActivity,
+    TaskAttachment,
+    TaskComment,
+    TaskEvent,
+    TaskTemplate,
+    TaskTrigger,
+)
 from utils.admin import admin_link
 
 
@@ -91,6 +98,23 @@ class TaskAdmin(admin.ModelAdmin):
         return user if user else None
 
 
+@admin.register(TaskActivity)
+class TaskActivityAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "task_link",
+        "created_at",
+    )
+
+    @admin_link("task", "Task")
+    def task_link(self, task):
+        return task if task else None
+
+    @admin_link("user", "User")
+    def user_link(self, user):
+        return user if user else None
+
+
 @admin.register(TaskComment)
 class TaskCommentAdmin(admin.ModelAdmin):
     list_display = (
@@ -98,6 +122,7 @@ class TaskCommentAdmin(admin.ModelAdmin):
         "text",
         "task_link",
         "creator_link",
+        "created_at",
     )
 
     @admin_link("task", "Task")
@@ -107,6 +132,26 @@ class TaskCommentAdmin(admin.ModelAdmin):
     @admin_link("creator", "Creator")
     def creator_link(self, user):
         return user if user else None
+
+
+@admin.register(TaskEvent)
+class TaskEventAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "type",
+        "task_link",
+        "user_link",
+        "created_at",
+    )
+
+    @admin_link("task", "Task")
+    def task_link(self, task):
+        return task if task else None
+
+    @admin_link("user", "User")
+    def user_link(self, user):
+        return user if user else None
+
 
 
 @admin.register(TaskAttachment)
