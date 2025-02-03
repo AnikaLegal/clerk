@@ -324,6 +324,8 @@ export const TaskHeader = ({
 export const TaskActivity = ({ task, user }: TaskDetailProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
+  /* TODO: handle errors.
+  */
   const activityResult = api.useGetTaskActivityQuery({ id: task.id })
   const activities = activityResult.data || []
 
