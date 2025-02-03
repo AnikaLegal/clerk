@@ -1391,13 +1391,22 @@ export type TaskComment = TaskCommentBase & {
 };
 export type TaskEvent = {
   id: number;
+  type: string;
   task_id: number;
+  user?: {
+    id: number;
+    full_name: string;
+    url: string;
+  } | null;
   created_at: string;
+  desc_html: string;
+  note_html: string;
 };
 export type TaskActivity = {
   id: number;
   task_id: number;
   created_at: string;
+  type: string;
   data: TaskComment | TaskEvent;
 };
 export type TaskCommentCreate = TaskCommentBase & {

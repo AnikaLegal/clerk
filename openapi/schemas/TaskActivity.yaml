@@ -6,6 +6,8 @@ properties:
     type: number
   created_at:
     type: string
+  type:
+    type: string
   data:
     oneOf:
       - $ref: ./TaskComment.yaml
@@ -14,4 +16,5 @@ required:
   - id
   - task_id
   - created_at
+  - type
   - data

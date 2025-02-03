@@ -1,6 +1,7 @@
 from accounts.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
+from django.urls import reverse
 from django.utils import timezone
 
 from .activity import TaskActivity
@@ -34,7 +35,7 @@ class TaskEvent(models.Model):
         related_name="+",
     )
     data = models.JSONField()
-    note = models.TextField(null=True)
+    note_html = models.TextField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     @transaction.atomic
@@ -42,7 +43,7 @@ class TaskEvent(models.Model):
         super().save(*args, **kwargs)
         TaskActivity.objects.create(content_object=self)
 
-    def get_html(self):
+    def get_desc_html(self):
         html = ""
         if self.type == TaskEventType.STATUS_CHANGE:
             html = self._get_status_change_html()
@@ -50,6 +51,7 @@ class TaskEvent(models.Model):
 
     def _get_status_change_html(self):
         user = self.user
+        user_url = reverse("account-detail", args=(user.id,))
 
         prev_status = self.data.get("prev_status")
         prev_status = TaskStatus[prev_status].label
@@ -57,10 +59,11 @@ class TaskEvent(models.Model):
         next_status = self.data.get("next_status")
         next_status = TaskStatus[next_status].label
 
-        html = f"{user.first_name} changed status from {prev_status} to {next_status}"
-        if self.note:
-            html += f" with comment: {self.note}"
-        return html
+        return (
+            f'<a href="{user_url}">{user.first_name}</a> '
+            + f"changed status from <strong>{prev_status}</strong> "
+            + f"to <strong>{next_status}</strong>"
+        )
 
     @staticmethod
     def create_status_change(task, user, prev_status, next_status, note=None):
@@ -72,5 +75,5 @@ class TaskEvent(models.Model):
                 "prev_status": prev_status,
                 "next_status": next_status,
             },
-            note=note,
+            note_html=note,
         )

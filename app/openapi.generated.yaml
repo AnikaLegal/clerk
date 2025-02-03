@@ -2748,14 +2748,37 @@ components:
       properties:
         id:
           type: integer
+        type:
+          type: string
         task_id:
           type: number
+        user:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            full_name:
+              type: string
+            url:
+              type: string
+          required:
+            - id
+            - full_name
+            - url
         created_at:
+          type: string
+        desc_html:
+          type: string
+        note_html:
           type: string
       required:
         - id
+        - type
         - task_id
         - created_at
+        - desc_html
+        - note_html
     TaskActivity:
       type: object
       properties:
@@ -2765,6 +2788,8 @@ components:
           type: number
         created_at:
           type: string
+        type:
+          type: string
         data:
           oneOf:
             - $ref: "#/components/schemas/TaskComment"
@@ -2773,6 +2798,7 @@ components:
         - id
         - task_id
         - created_at
+        - type
         - data
     TaskCommentCreate:
       allOf:

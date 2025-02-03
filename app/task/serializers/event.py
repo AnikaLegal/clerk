@@ -13,14 +13,14 @@ class TaskEventSerializer(serializers.ModelSerializer):
             "task_id",
             "user",
             "created_at",
-            "html",
-            "note",
+            "desc_html",
+            "note_html",
         )
 
     task_id = serializers.IntegerField()
     user = TaskListUserSerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
-    html = serializers.SerializerMethodField(read_only=True)
+    desc_html = serializers.SerializerMethodField(read_only=True)
 
-    def get_html(self, obj):
-        return obj.get_html()
+    def get_desc_html(self, obj):
+        return obj.get_desc_html()
