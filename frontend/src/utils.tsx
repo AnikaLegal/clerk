@@ -9,12 +9,21 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { Converter, setFlavor } from 'showdown'
 import slackifyMarkdown from 'slackify-markdown'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import xss, { OnTagAttrHandler } from 'xss'
 
 const theme = createTheme({
   fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
 })
+
+/* An internal element of the rich text editor has padding, which we don't want,
+ * that we cannot manipulate with component styling. This is a convenient way to
+ * address that. */
+const GlobalStyles = createGlobalStyle`
+  .rich-text-display .tiptap.ProseMirror {
+    padding: 0;
+  }
+`
 
 const converter = new Converter()
 setFlavor('github')
@@ -70,6 +79,7 @@ export const mount = (App: React.ComponentType) => {
   const domNode = document.getElementById('app')
   const reactNode = (
     <Provider store={store}>
+      <GlobalStyles />
       <SnackbarProvider maxSnack={3}>
         <MantineProvider theme={theme}>
           <ModalsProvider>
