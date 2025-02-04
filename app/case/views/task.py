@@ -178,7 +178,7 @@ class TaskApiViewset(ModelViewSet):
 
         queryset = task.activities.all()
         queryset = queryset.select_related("content_type")
-        queryset = queryset.order_by("created_at")
+        queryset = queryset.order_by("-created_at")
         data = self.get_serializer(queryset, many=True).data
         return Response(data)
 

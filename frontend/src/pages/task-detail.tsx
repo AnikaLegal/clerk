@@ -353,8 +353,8 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
 
   return (
     <>
-      <TaskActivityGroup activities={activities} loading={activityResult.isLoading} />
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
+      <TaskActivityGroup activities={activities} loading={activityResult.isLoading} />
     </>
   )
 }
