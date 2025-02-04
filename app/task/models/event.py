@@ -76,8 +76,8 @@ class TaskEvent(models.Model):
 
         return (
             self._get_user_anchor_tag(self.user)
-            + f"changed status from <strong>{prev_status}</strong> "
-            + f"to <strong>{next_status}</strong>"
+            + f" changed the status from <strong>{prev_status}</strong>"
+            + f" to <strong>{next_status}</strong>"
         )
 
     def _get_suspend_html(self):
