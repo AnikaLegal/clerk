@@ -7,7 +7,7 @@ from core.models.issue_event import EventType
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from task.models import Task, TaskTrigger
+from task.models import Task, TaskTrigger, TaskEvent
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
@@ -65,17 +65,15 @@ def handle_event_save(event_pk: int):
 
 @sentry_task
 def handle_task_save(task_pk: int):
-    # This is a somewhat unusual way of getting & using a single task. We do it
-    # because it is convenient.
-    tasks = Task.objects.filter(pk=task_pk)
-    task = None
+    task = Task.objects.get(pk=task_pk)
     try:
-        task = tasks.first()
         if task and task.is_notify_pending and not task.is_system_update:
             notify_of_assignment([task.pk])
     finally:
         if task and (task.is_notify_pending or task.is_system_update):
-            tasks.update(is_notify_pending=False, is_system_update=False)
+            task.is_notify_pending = False
+            task.is_system_update = False
+            task.save()
 
 
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
@@ -93,9 +91,7 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        prev_name = prev_user.get_full_name()
-        text = f"This task was suspended because {prev_name} was removed from the case."
-        # TODO: add event.
+        TaskEvent.create_suspend(task=task, prev_user=prev_user)
 
     return [task.pk for task in tasks]
 
@@ -118,10 +114,7 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        prev_name = prev_user.get_full_name()
-        next_name = next_user.get_full_name()
-        text = f"This task was reassigned from {prev_name} to {next_name} because the case user was changed."
-        # TODO: add event.
+        TaskEvent.create_reassign(task=task, prev_user=prev_user, next_user=next_user)
 
     return [task.pk for task in tasks]
 
@@ -144,9 +137,7 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        next_name = next_user.get_full_name()
-        text = f"This task was resumed because {next_name} was added to the case."
-        # TODO: add event.
+        TaskEvent.create_resume(task=task, next_user=next_user)
 
     return [task.pk for task in tasks]
 
