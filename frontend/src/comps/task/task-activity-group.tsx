@@ -1,6 +1,13 @@
 import React from 'react'
 import { TaskActivity, TaskComment, TaskEvent } from 'api'
-import { Segment, Comment, Loader, Label } from 'semantic-ui-react'
+import {
+  Segment,
+  Comment,
+  Loader,
+  Label,
+  Icon,
+  SemanticCOLORS,
+} from 'semantic-ui-react'
 import moment from 'moment'
 import styled from 'styled-components'
 import { RichTextDisplay } from 'comps/rich-text'
@@ -53,15 +60,19 @@ export const TaskCommentSegment = ({
   activity,
   comment,
 }: TaskCommentSegmentProps) => {
+  const color: SemanticCOLORS = 'blue'
   return (
     <Segment key={activity.id}>
-      <Label attached="top">
+      <Label attached="top" color={color}>
         <a href={comment.creator.url} style={{ opacity: 'inherit' }}>
           {comment.creator.full_name}
         </a>
         <Label.Detail>
           {moment(comment.created_at).format('DD/MM/YY [at] h:mmA')}
         </Label.Detail>
+      </Label>
+      <Label attached="top right" color={color}>
+        Comment
       </Label>
       <RichTextDisplay content={comment.text} />
     </Segment>
@@ -79,16 +90,14 @@ export const TaskEventSegment = ({
 }: TaskEventSegmentProps) => {
   return (
     <Segment key={activity.id}>
-      <span>
-        <RichTextDisplay
-          style={{ display: 'inline-block' }}
-          content={event.desc_html}
-        />
-        <span style={{ padding: '0rem 0.5rem' }}>·</span>
-        <span style={{ fontSize: '0.85rem', opacity: '0.8' }}>
+      <Label attached="top">
+        Task Update
+        <Label.Detail>
           {moment(event.created_at).format('DD/MM/YY [at] h:mmA')}
-        </span>
-      </span>
+        </Label.Detail>
+      </Label>
+      <Label attached="top right">Event</Label>
+      <RichTextDisplay content={event.desc_html} />
       {event.note_html && (
         <RichTextDisplay
           style={{ marginTop: '0.5rem' }}
