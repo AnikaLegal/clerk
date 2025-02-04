@@ -77,7 +77,7 @@ class TaskEvent(models.Model):
         return (
             self._get_user_anchor_tag(self.user)
             + f" changed the status from <strong>{prev_status}</strong>"
-            + f" to <strong>{next_status}</strong>"
+            + f" to <strong>{next_status}</strong>."
         )
 
     def _get_suspend_html(self):
@@ -87,7 +87,7 @@ class TaskEvent(models.Model):
         return (
             "This task was suspended because "
             + self._get_user_anchor_tag(prev_user)
-            + " was removed from the case"
+            + " was removed from the case."
         )
 
     def _get_reassign_html(self):
@@ -102,7 +102,7 @@ class TaskEvent(models.Model):
             + self._get_user_anchor_tag(prev_user)
             + " to "
             + self._get_user_anchor_tag(next_user)
-            + " because the case user was changed"
+            + " because the case user was changed."
         )
 
     def _get_resume_html(self):
@@ -112,7 +112,7 @@ class TaskEvent(models.Model):
         return (
             "This task was resumed because "
             + self._get_user_anchor_tag(next_user)
-            + " was added to the case"
+            + " was added to the case."
         )
 
     def _get_user_anchor_tag(self, user: User):
