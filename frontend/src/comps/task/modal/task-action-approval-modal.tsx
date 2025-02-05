@@ -113,14 +113,14 @@ const UserDropdownField = (props: ModalProps) => {
   /* Exclude the current user.
   /* Exclude the supervising lawyer if they are present (we add back irrespective
    * below).
-   * Include only coordinators plus.
+   * Include only lawyers.
    */
   users = users.filter(
     (user) =>
       user.id != props.user.id &&
       lawyer &&
       user.id != lawyer.id &&
-      user.is_coordinator_or_better
+      user.is_lawyer
   )
   /* Sort by full name.
    */

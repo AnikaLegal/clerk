@@ -111,7 +111,7 @@ const UserDropdownField = (props: ModalProps) => {
     user.id == paralegal?.id ||
     props.task.is_approval_request
       ? user.is_lawyer
-      : user.is_coordinator_or_better
+      : user.is_system_account || user.is_coordinator_or_better
   )
 
   const userOptions = users.map((u) => ({
