@@ -80,6 +80,11 @@ urlpatterns = [
         case.case_detail_services_page_view,
         name="case-services",
     ),
+    re_path(
+        f"^cases/{UUID_PK}/tasks/$",
+        case.case_detail_tasks_page_view,
+        name="case-tasks",
+    ),
     # Email
     re_path(
         f"^cases/email/{UUID_PK}/$",

@@ -139,12 +139,29 @@ def case_detail_services_page_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "service-list", context)
 
 
+@api_view(["GET"])
+@paralegal_or_better_required
+def case_detail_tasks_page_view(request, pk):
+    """
+    The tasks related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+        "choices": {
+        },
+    }
+    return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
+
+
 def get_detail_urls(issue: Issue):
     return {
         "detail": reverse("case-detail", args=(issue.pk,)),
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
         "services": reverse("case-services", args=(issue.pk,)),
+        "tasks": reverse("case-tasks", args=(issue.pk,)),
     }
 
 

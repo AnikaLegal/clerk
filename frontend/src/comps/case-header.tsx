@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header } from 'semantic-ui-react'
+import { Header, Icon } from 'semantic-ui-react'
 
 import { Issue } from 'api'
 import { MarkdownAsHtmlDisplay } from 'utils'
@@ -9,6 +9,7 @@ export const CASE_TABS = {
   EMAIL: 'EMAIL',
   DOCUMENTS: 'DOCUMENTS',
   SERVICES: 'SERVICES',
+  TASKS: 'TASKS',
 }
 
 export interface CaseTabUrls {
@@ -16,6 +17,7 @@ export interface CaseTabUrls {
   email: string
   docs: string
   services: string
+  tasks: string
 }
 
 interface CaseHeaderProps {
@@ -133,6 +135,13 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         >
           <i className="balance scale icon"></i>
           Services
+        </a>
+        <a
+          href={urls.tasks}
+          className={`item ${activeTab === CASE_TABS.TASKS ? 'active' : ''}`}
+        >
+          <Icon name="check square outline" />
+          Tasks
         </a>
       </div>
     </>
