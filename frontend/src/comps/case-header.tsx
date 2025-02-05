@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Icon, Menu } from 'semantic-ui-react'
+import { Header, Icon, Label, Menu, Segment } from 'semantic-ui-react'
 
 import { Issue } from 'api'
 import { MarkdownAsHtmlDisplay } from 'utils'
@@ -40,7 +40,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       <Header as="h1">
         {issue.topic_display} case for {issue.client.full_name} ({issue.fileref}
         )
-        <div className="sub header">
+        <Header.Subheader>
           Created {issue.created_at}
           <br />
           {issue.paralegal ? (
@@ -61,48 +61,51 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             'not supervised '
           )}
           {actionstepUrl && <a href={actionstepUrl}>view in Actionstep</a>}
-        </div>
+        </Header.Subheader>
       </Header>
       <span id="case-status" hx-swap-oob="true">
         {issue.is_open ? (
-          <div className="ui blue label">Case open</div>
+          <Label color="blue">Case open</Label>
         ) : (
-          <div className="ui green label">Case closed</div>
+          <Label color="green">Case closed</Label>
         )}
         {issue.provided_legal_services ? (
-          <div className="ui green label">Legal services provided</div>
+          <Label color="green">Legal services provided</Label>
         ) : (
-          <div className="ui blue label">Legal services not provided</div>
+          <Label color="blue">Legal services not provided</Label>
         )}
 
-        <div className="ui grey label">
+        <Label color="grey">
           Stage
           {issue.stage ? (
-            <div className="detail">{issue.stage_display}</div>
+            <Label.Detail>{issue.stage_display}</Label.Detail>
           ) : (
-            <div className="detail">-</div>
+            <Label.Detail>-</Label.Detail>
           )}
-        </div>
+        </Label>
 
-        <div className="ui grey label">
+        <Label color="grey">
           Outcome
           {issue.outcome ? (
-            <div className="detail">{issue.outcome_display}</div>
+            <Label.Detail>{issue.outcome_display}</Label.Detail>
           ) : (
-            <div className="detail">-</div>
+            <Label.Detail>-</Label.Detail>
           )}
-        </div>
+        </Label>
+
         {!issue.is_open && issue.outcome_notes && (
-          <div className="ui segment padded">
-            <div className="ui top attached label green">Outcome notes</div>
+          <Segment padded>
+            <Label attached="top" color="green">
+              Outcome notes
+            </Label>
             <p style={{ marginBottom: 0 }}>{issue.outcome_notes}</p>
-          </div>
+          </Segment>
         )}
         {issue.client.notes && (
-          <div className="ui segment padded">
-            <div className="ui top attached label">Client notes</div>
+          <Segment padded>
+            <Label attached="top">Client notes</Label>
             <MarkdownAsHtmlDisplay markdown={issue.client.notes} />
-          </div>
+          </Segment>
         )}
       </span>
       <Menu attached="top" tabular>
