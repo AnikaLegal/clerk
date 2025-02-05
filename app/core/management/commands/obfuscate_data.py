@@ -13,6 +13,7 @@ from django.db.models import Q
 from emails.models import Email, EmailAttachment
 from faker import Faker
 from utils.signals import disable_signals, restore_signals
+from task.models import TaskAttachment, TaskComment
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class Command(BaseCommand):
         people = Person.objects.all()
         services = Service.objects.all()
         tenancies = Tenancy.objects.all()
+        comments = TaskComment.objects.all()
 
         # Obfuscate any user that isn't a lawyer, admin or superuser. We want to
         # keep the accounts unchanged for users in those groups so they can be
@@ -112,15 +114,20 @@ class Command(BaseCommand):
                 s.notes = " ".join(fake.sentences())
                 s.save()
 
+        for c in comments.iterator():
+            c.text = " ".join(fake.sentences())
+
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
         file_name = "sample.pdf"
         email_attachment = os.path.join(EmailAttachment.UPLOAD_KEY, file_name)
         file_upload = os.path.join(FileUpload.UPLOAD_KEY, file_name)
+        task_attachment = os.path.join(TaskAttachment.UPLOAD_KEY, file_name)
 
         bytes = fake.image(image_format="pdf")
         default_storage.save(email_attachment, BytesIO(bytes))
         default_storage.save(file_upload, BytesIO(bytes))
+        default_storage.save(task_attachment, BytesIO(bytes))
 
         # Replace files attached to emails.
         EmailAttachment.objects.update(
@@ -129,5 +136,9 @@ class Command(BaseCommand):
 
         # Replace uploaded files.
         FileUpload.objects.update(file=file_upload)
+
+        TaskAttachment.objects.update(
+            file=task_attachment, content_type="application/pdf"
+        )
 
         restore_signals()
