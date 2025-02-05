@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Icon } from 'semantic-ui-react'
+import { Header, Icon, Menu } from 'semantic-ui-react'
 
 import { Issue } from 'api'
 import { MarkdownAsHtmlDisplay } from 'utils'
@@ -105,45 +105,48 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           </div>
         )}
       </span>
-      <div className="ui top attached tabular menu">
-        <a
+      <Menu attached="top" tabular>
+        <Menu.Item
+          as="a"
           href={urls.detail}
-          className={`item ${activeTab === CASE_TABS.DETAIL ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.DETAIL}
         >
-          <i className="clipboard outline icon"></i>
+          <Icon name="clipboard outline" />
           Details
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.email}
-          className={`item ${activeTab === CASE_TABS.EMAIL ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.EMAIL}
         >
-          <i className="envelope outline icon"></i>
+          <Icon name="envelope outline" />
           Email
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.docs}
-          className={`item ${
-            activeTab === CASE_TABS.DOCUMENTS ? 'active' : ''
-          }`}
+          active={activeTab === CASE_TABS.DOCUMENTS}
         >
-          <i className="folder open outline icon"></i>
+          <Icon name="folder open outline" />
           Documents
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.services}
-          className={`item ${activeTab === CASE_TABS.SERVICES ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.SERVICES}
         >
-          <i className="balance scale icon"></i>
+          <Icon name="balance scale" />
           Services
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.tasks}
-          className={`item ${activeTab === CASE_TABS.TASKS ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.TASKS}
         >
           <Icon name="check square outline" />
           Tasks
-        </a>
-      </div>
+        </Menu.Item>
+      </Menu>
     </>
   )
 }
