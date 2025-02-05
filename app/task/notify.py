@@ -1,10 +1,16 @@
 import logging
-from django.db.models import QuerySet
 
 from accounts.models import User
-from task.models import Task
-from slack.services import get_slack_user_by_email, send_slack_direct_message
+from django.conf import settings
+from django.db.models import QuerySet
 from django.template.loader import render_to_string
+from slack.services import (
+    get_slack_user_by_email,
+    send_slack_direct_message,
+    send_slack_message,
+)
+from task.helpers import get_coordinators_user
+from task.models import Task
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +46,10 @@ def get_assignment_notify_text(tasks: QuerySet[Task]) -> str:
 
 
 def notify_user(user: User, text: str) -> None:
-    email = user.email
-    slack_user = get_slack_user_by_email(email)
-    if slack_user:
-        send_slack_direct_message(text, slack_user["id"])
+    coordinators = get_coordinators_user()
+    if user == coordinators:
+        send_slack_message(settings.SLACK_MESSAGE.COORDINATOR_TASK, text)
+    else:
+        slack_user = get_slack_user_by_email(user.email)
+        if slack_user:
+            send_slack_direct_message(text, slack_user["id"])

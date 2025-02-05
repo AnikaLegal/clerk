@@ -8,6 +8,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from task.helpers import get_coordinators_user
 from task.models import TaskAttachment
 from task.models.task import Task, TaskStatus, TaskTemplateType, TaskType
 from task.serializers import (
@@ -138,7 +139,10 @@ class TaskApiViewset(ModelViewSet):
         """
         Filter queryset by search terms in query params.
         """
-        serializer = TaskSearchSerializer(data=self.request.query_params, partial=True)
+        request = self.request
+        user = request.user
+
+        serializer = TaskSearchSerializer(data=request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         terms = serializer.validated_data
 
@@ -163,7 +167,11 @@ class TaskApiViewset(ModelViewSet):
                     queryset = queryset.filter(query)
                 elif key == "my_tasks":
                     if value:
-                        queryset = queryset.filter(Q(assigned_to=self.request.user))
+                        q_filter = Q(assigned_to=user)
+                        if user.is_coordinator:
+                            coordinators_user = get_coordinators_user()
+                            q_filter |= Q(assigned_to=coordinators_user)
+                        queryset = queryset.filter(q_filter)
                 else:
                     queryset = queryset.filter(**{key: value})
 

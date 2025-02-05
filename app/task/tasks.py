@@ -7,7 +7,8 @@ from core.models.issue_event import EventType
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from task.models import Task, TaskTrigger, TaskEvent
+from task.helpers import get_coordinators_user
+from task.models import Task, TaskEvent, TaskTrigger
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
@@ -206,6 +207,6 @@ def get_user_by_role(issue: Issue, role: TasksCaseRole) -> User | None:
     if role == TasksCaseRole.LAWYER:
         return issue.lawyer
     if role == TasksCaseRole.COORDINATOR:
-        # TODO: move this elsewhere.
-        return User.objects.get(email="coordinators@anikalegal.com")
+        user = get_coordinators_user()
+        return user
     return None

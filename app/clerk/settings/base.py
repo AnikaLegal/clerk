@@ -310,6 +310,7 @@ LOGGING = {
 class SlackMessage:
     ACTIONSTEP_CREATE = "actionstep-create"
     CLIENT_INTAKE = "client-intake"
+    COORDINATOR_TASK = "coordinator-task"
     LANDING_FORM = "landing-form"
     WEEKLY_REPORT = "weekly-report"
 

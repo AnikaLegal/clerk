@@ -1,6 +1,23 @@
 from accounts.models import CaseGroups
 from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
+from accounts.models import User
+
+
+def get_coordinators_user() -> User:
+    """
+    Get or create the user to which we assign coordinator tasks.
+    """
+    user, _ = User.objects.get_or_create(
+        email="coordinators@anikalegal.com",
+        defaults={
+            "username": "coordinators@anikalegal.com",
+            "first_name": "Paralegal",
+            "last_name": "Coordinators",
+            "is_system_account": True,
+        },
+    )
+    return user
 
 
 def is_lawyer_acting_as_paralegal(issue: Issue) -> bool:
