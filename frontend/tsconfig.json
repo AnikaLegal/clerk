@@ -3,6 +3,7 @@
     "lib": [
       "es5",
       "es6",
+      "ES2024",
       "dom"
     ],
     "jsx": "react",
