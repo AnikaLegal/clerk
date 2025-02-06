@@ -16,6 +16,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from task.models.task import TaskStatus, TaskTemplateType
 
 from case.serializers import (
     IssueNoteSerializer,
@@ -33,6 +34,7 @@ from case.views.auth import (
     login_required,
     paralegal_or_better_required,
 )
+
 
 @api_view(["GET"])
 @login_required
@@ -150,6 +152,8 @@ def case_detail_tasks_page_view(request, pk):
         "case_pk": pk,
         "urls": get_detail_urls(issue),
         "choices": {
+            "status": TaskStatus.choices,
+            "type": TaskTemplateType.choices,
         },
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
