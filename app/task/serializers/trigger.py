@@ -36,17 +36,15 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
         return trigger
 
     def update(self, instance, validated_data):
-        to_add = []
         to_delete = []
         to_update = []
 
         # Determine whether we need to add, delete or update any templates based
         # on the incoming nested templates data.
-        for data in validated_data.pop("templates"):
+        templates = validated_data.pop("templates")
+        for data in templates:
             if "id" in data:
                 to_update.append(data)
-            else:
-                to_add.append(data)
 
         ids = {x["id"] for x in to_update}
         for template in instance.templates.all():
@@ -57,14 +55,19 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
         for id in to_delete:
             instance.templates.all().get(id=id).delete()
 
-        for data in to_add:
-            TaskTemplate.objects.create(trigger=instance, **data)
+        for data in templates:
+            if "id" not in data:
+                template = TaskTemplate.objects.create(trigger=instance, **data)
+                data["id"] = template.pk
 
         for data in to_update:
             template = instance.templates.all().get(id=data["id"])
             for attr, value in data.items():
                 setattr(template, attr, value)
             template.save()
+
+        # Set the template order to be the same as the incoming data.
+        instance.set_tasktemplate_order([x["id"] for x in templates])
 
         return super().update(instance, validated_data)
 
