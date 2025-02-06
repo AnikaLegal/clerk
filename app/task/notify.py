@@ -21,10 +21,11 @@ def notify_of_assignment(task_pks: list[int]) -> None:
     assert tasks.exists()
     logger.info("Notifying assignment of task(s): %s", task_pks)
 
-    for task in tasks.distinct("assigned_to").exclude(assigned_to__isnull=True):
-        user = task.assigned_to
-        tasks_by_user = tasks.filter(assigned_to=user.pk)
-        notify_user_of_assignment(user, tasks_by_user)
+    for task in tasks.distinct("assigned_to"):
+        if task.assigned_to:
+            user = task.assigned_to
+            tasks_by_user = tasks.filter(assigned_to=user.pk)
+            notify_user_of_assignment(user, tasks_by_user)
 
 
 def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
