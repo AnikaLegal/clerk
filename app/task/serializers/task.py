@@ -133,15 +133,6 @@ class TaskSerializer(serializers.ModelSerializer):
                 raise exceptions.PermissionDenied()
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        # Paralegals can only change the task status.
-        request = self.context.get("request", None)
-        if request and request.user.is_paralegal:
-            keys = [x for x in validated_data.keys() if x not in ["status"]]
-            if len(keys) > 0:
-                raise exceptions.PermissionDenied()
-        return super().update(instance, validated_data)
-
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a
         # convenience so we don't have to do it on the frontend.
