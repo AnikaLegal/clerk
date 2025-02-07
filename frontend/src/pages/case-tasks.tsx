@@ -1,6 +1,8 @@
 import api, { Issue, TaskCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
+import { TaskDueDateTableCell } from 'comps/task'
 import { FormikHelpers } from 'formik'
+import moment from 'moment'
 import React, { useState } from 'react'
 import {
   Button,
@@ -8,12 +10,12 @@ import {
   Container,
   Grid,
   Header,
+  Icon,
   Loader,
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { mount, choiceToMap } from 'utils'
-import moment from 'moment'
+import { choiceToMap, mount } from 'utils'
 
 export interface CaseTasksChoices {
   status: string[][]
@@ -118,44 +120,44 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
     )
   }
 
-  // TODO: handle unassigned tasks.
-  // Beware of users with the same name but different ids.
-  const tasksByUserName = Object.entries(
-    Object.groupBy(result.data, ({ assigned_to }) => assigned_to?.id)
-  ).map(([key, values]) => {
-    return { name: values[0].assigned_to.full_name, tasks: values }
-  })
-
   return (
     <Table celled structured>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>Assigned To</Table.HeaderCell>
-          <Table.HeaderCell>Task name</Table.HeaderCell>
+          <Table.HeaderCell>Name</Table.HeaderCell>
           <Table.HeaderCell>Type</Table.HeaderCell>
+          <Table.HeaderCell>Assigned To</Table.HeaderCell>
           <Table.HeaderCell>Status</Table.HeaderCell>
+          <Table.HeaderCell>Open?</Table.HeaderCell>
           <Table.HeaderCell>Created</Table.HeaderCell>
           <Table.HeaderCell>Due date</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {tasksByUserName.map(({ name, tasks }) => (
-          <>
-            {tasks.map((task, index) => (
-              <Table.Row>
-                {index == 0 && (
-                  <Table.Cell rowSpan={tasks.length}>{name}</Table.Cell>
-                )}
-                <Table.Cell>{task.name}</Table.Cell>
-                <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
-                <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
-                <Table.Cell>
-                  {moment(task.created_at).format('DD/MM/YYYY')}
-                </Table.Cell>
-                <Table.Cell>{task.due_at}</Table.Cell>
-              </Table.Row>
-            ))}
-          </>
+        {result.data.map((task) => (
+          <Table.Row>
+            <Table.Cell>
+              <a href={task.url}>{task.name}</a>
+            </Table.Cell>
+            <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
+            <Table.Cell>
+              {task.assigned_to && (
+                <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
+              )}
+            </Table.Cell>
+            <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+            <Table.Cell textAlign="center">
+              {task.is_open ? (
+                <Icon name="check" color="green" />
+              ) : (
+                <Icon name="close" color="yellow" />
+              )}
+            </Table.Cell>
+            <Table.Cell>
+              {moment(task.created_at).format('DD/MM/YYYY')}
+            </Table.Cell>
+            <TaskDueDateTableCell task={task} />
+          </Table.Row>
         ))}
       </Table.Body>
     </Table>

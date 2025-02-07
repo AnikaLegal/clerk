@@ -1,4 +1,5 @@
 import api, { GetTasksApiArg, TaskList } from 'api'
+import { TaskDueDateTableCell } from 'comps/task'
 import { FadeTransition } from 'comps/transitions'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -7,11 +8,10 @@ import {
   Dropdown,
   Form,
   Header,
+  Icon,
   Input,
   Label,
-  Table,
-  SemanticCOLORS,
-  Icon,
+  Table
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
 import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
@@ -74,29 +74,6 @@ const App = () => {
 
   const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const users = userResults.data ?? []
-
-  const getDueDateColor = (task: TaskList): SemanticCOLORS => {
-    if (task.is_urgent) {
-      return 'red'
-    }
-    if (task.due_at) {
-      const now = moment().startOf('day')
-      const due_at = moment(task.due_at, 'DD/MM/YYYY')
-      const days = due_at.diff(now, 'days')
-      if (days <= 7) {
-        if (days >= 3) {
-          return 'green'
-        } else if (days >= 2) {
-          return 'yellow'
-        } else if (days >= 1) {
-          return 'orange'
-        } else {
-          return 'red'
-        }
-      }
-    }
-    return null
-  }
 
   return (
     <Container>
@@ -249,16 +226,7 @@ const App = () => {
                 <Table.Cell>
                   {moment(task.created_at).format('DD/MM/YYYY')}
                 </Table.Cell>
-                <Table.Cell
-                  className={getDueDateColor(task)}
-                  textAlign="center"
-                >
-                  {task.is_urgent ? (
-                    <span className="animation-tada">URGENT</span>
-                  ) : (
-                    task.due_at || '-'
-                  )}
-                </Table.Cell>
+                <TaskDueDateTableCell task={task} />
               </Table.Row>
             ))}
           </Table.Body>
