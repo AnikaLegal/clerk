@@ -460,6 +460,7 @@ export const TaskTemplateModal = ({
             setConfirmationOpen(true)
           } else {
             setOpen(false)
+            formik.resetForm()
           }
         }
         return (
