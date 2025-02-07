@@ -1,5 +1,6 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import { TaskTemplate, TaskTriggerCreate } from 'api'
+import { DiscardChangesConfirmationModal } from 'comps/modal'
 import {
   FieldArray,
   FieldArrayRenderProps,
@@ -435,6 +436,8 @@ export const TaskTemplateModal = ({
   label,
   choices,
 }: TaskTemplateModalProps) => {
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
+
   return (
     <Formik
       enableReinitialize
@@ -442,68 +445,91 @@ export const TaskTemplateModal = ({
       onSubmit={handleSubmit}
       validationSchema={TaskTemplateSchema}
     >
-      {({ handleSubmit, errors, resetForm }) => {
-        const closeHandler = () => {
-          resetForm()
+      {(formik) => {
+        const confirmDiscardHandler = () => {
+          setConfirmationOpen(false)
           setOpen(false)
+          formik.resetForm()
+        }
+        const cancelDiscardHandler = () => {
+          setConfirmationOpen(false)
+        }
+
+        const closeHandler = () => {
+          if (formik.dirty) {
+            setConfirmationOpen(true)
+          } else {
+            setOpen(false)
+          }
         }
         return (
-          <Modal size="large" open={open} onClose={closeHandler}>
-            <Modal.Header>{label}</Modal.Header>
-            <Modal.Content>
-              <Form
-                onSubmit={handleSubmit}
-                error={Object.keys(errors).length > 0}
-              >
-                <InputField
-                  name="name"
-                  label="Task name"
-                  placeholder="Provide more specific task information"
-                />
-                <DropdownField
-                  name="type"
-                  label="Task type"
-                  placeholder="Select the task type"
-                  options={choiceToOptions(choices.task_type)}
-                />
-                <InputField
-                  name="due_in"
-                  type="number"
-                  label="Due in"
-                  placeholder="The number of days from when the task is assigned until it is due"
-                />
-                <DropdownField
-                  name="is_urgent"
-                  label="Urgent?"
-                  placeholder="Is the task urgent?"
-                  options={[
-                    { key: 'yes', text: 'Yes', value: true },
-                    { key: 'no', text: 'No', value: false },
-                  ]}
-                />
-                <DropdownField
-                  name="is_approval_required"
-                  label="Approval required?"
-                  placeholder="Does the task require approval?"
-                  options={[
-                    { key: 'yes', text: 'Yes', value: true },
-                    { key: 'no', text: 'No', value: false },
-                  ]}
-                />
-                <RichTextEditorField
-                  name="description"
-                  label="Task description"
-                  placeholder="Describe the task in detail"
-                />
-              </Form>
-            </Modal.Content>
-            <Modal.Actions>
-              <Button primary type="submit" onClick={() => handleSubmit()}>
-                {label}
-              </Button>
-              <Button onClick={closeHandler}>Close</Button>
-            </Modal.Actions>
-          </Modal>
+          <>
+            <DiscardChangesConfirmationModal
+              open={confirmationOpen}
+              onConfirm={confirmDiscardHandler}
+              onCancel={cancelDiscardHandler}
+            />
+            <Modal size="large" open={open} onClose={closeHandler}>
+              <Modal.Header>{label}</Modal.Header>
+              <Modal.Content>
+                <Form
+                  onSubmit={formik.handleSubmit}
+                  error={Object.keys(formik.errors).length > 0}
+                >
+                  <InputField
+                    name="name"
+                    label="Task name"
+                    placeholder="Provide more specific task information"
+                  />
+                  <DropdownField
+                    name="type"
+                    label="Task type"
+                    placeholder="Select the task type"
+                    options={choiceToOptions(choices.task_type)}
+                  />
+                  <InputField
+                    name="due_in"
+                    type="number"
+                    label="Due in"
+                    placeholder="The number of days from when the task is assigned until it is due"
+                  />
+                  <DropdownField
+                    name="is_urgent"
+                    label="Urgent?"
+                    placeholder="Is the task urgent?"
+                    options={[
+                      { key: 'yes', text: 'Yes', value: true },
+                      { key: 'no', text: 'No', value: false },
+                    ]}
+                  />
+                  <DropdownField
+                    name="is_approval_required"
+                    label="Approval required?"
+                    placeholder="Does the task require approval?"
+                    options={[
+                      { key: 'yes', text: 'Yes', value: true },
+                      { key: 'no', text: 'No', value: false },
+                    ]}
+                  />
+                  <RichTextEditorField
+                    name="description"
+                    label="Task description"
+                    placeholder="Describe the task in detail"
+                  />
+                </Form>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button
+                  primary
+                  type="submit"
+                  onClick={() => formik.handleSubmit()}
+                >
+                  {label}
+                </Button>
+                <Button onClick={closeHandler}>Close</Button>
+              </Modal.Actions>
+            </Modal>
+          </>
         )
       }}
     </Formik>
