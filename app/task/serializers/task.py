@@ -170,11 +170,9 @@ class TaskSearchSerializer(serializers.ModelSerializer):
             "assigned_to",
             "issue__topic",
             "q",
-            "my_tasks",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
     issue__topic = serializers.CharField(required=False)
     # Special case searches.
     q = serializers.CharField(required=False)  # General query.
-    my_tasks = serializers.BooleanField(required=False)

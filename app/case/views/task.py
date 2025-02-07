@@ -1,3 +1,4 @@
+from accounts.models import CaseGroups
 from core.models.issue import CaseTopic
 from django.db.models import Prefetch, Q, QuerySet
 from django.http import Http404
@@ -41,10 +42,6 @@ def task_list_page_view(request):
             "is_open": [
                 ("true", "Open"),
                 ("false", "Closed"),
-            ],
-            "my_tasks": [
-                ("true", "My tasks"),
-                ("false", "All tasks"),
             ],
             "status": TaskStatus.choices,
             "type": TaskTemplateType.choices + TaskType.choices,
@@ -140,8 +137,6 @@ class TaskApiViewset(ModelViewSet):
         Filter queryset by search terms in query params.
         """
         request = self.request
-        user = request.user
-
         serializer = TaskSearchSerializer(data=request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         terms = serializer.validated_data
@@ -165,10 +160,9 @@ class TaskApiViewset(ModelViewSet):
                         else:
                             query = q_filter
                     queryset = queryset.filter(query)
-                elif key == "my_tasks":
-                    if value:
-                        q_filter = Q(assigned_to=user)
-                        if user.is_coordinator:
+                elif key == "assigned_to":
+                        q_filter = Q(assigned_to=value)
+                        if value.groups.filter(name=CaseGroups.COORDINATOR).exists():
                             coordinators_user = get_coordinators_user()
                             q_filter |= Q(assigned_to=coordinators_user)
                         queryset = queryset.filter(q_filter)

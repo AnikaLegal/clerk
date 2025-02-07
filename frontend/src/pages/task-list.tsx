@@ -21,7 +21,6 @@ interface DjangoContext {
     status: string[][]
     is_open: string[][]
     case_topic: string[][]
-    my_tasks: string[][]
   }
   user: UserInfo
 }
@@ -37,7 +36,7 @@ const App = () => {
   const [query, setQuery] = useState<string>()
   const [filter, setFilter] = useState<GetTasksApiArg>({
     isOpen: 'true',
-    myTasks: 'true',
+    assignedTo: CONTEXT.user.id,
   })
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
@@ -125,20 +124,6 @@ const App = () => {
         {showAdvancedSearch && (
           <>
             <Form.Group widths="equal">
-              {CONTEXT.user.is_coordinator_or_better && (
-                <Form.Field>
-                  <Dropdown
-                    clearable
-                    fluid
-                    search
-                    selection
-                    value={filter.myTasks || ''}
-                    placeholder="My tasks?"
-                    options={choiceToOptions(CONTEXT.choices.my_tasks)}
-                    onChange={(e, { value }) => updateFilter('myTasks', value)}
-                  />
-                </Form.Field>
-              )}
               <Form.Field>
                 <Dropdown
                   fluid
@@ -152,6 +137,25 @@ const App = () => {
               </Form.Field>
               <Form.Field>
                 <Dropdown
+                  clearable
+                  fluid
+                  search
+                  selection
+                  value={filter.assignedTo || ''}
+                  placeholder="Assignee"
+                  options={users.map((u) => ({
+                    key: u.id,
+                    value: u.id,
+                    text: u.email,
+                  }))}
+                  onChange={(e, { value }) => updateFilter('assignedTo', value)}
+                  loading={userResults.isLoading}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group widths="equal">
+              <Form.Field>
+                <Dropdown
                   fluid
                   selection
                   clearable
@@ -161,8 +165,6 @@ const App = () => {
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
-            </Form.Group>
-            <Form.Group widths="equal">
               <Form.Field>
                 <Dropdown
                   fluid
@@ -183,23 +185,6 @@ const App = () => {
                   placeholder="Task Status"
                   options={choiceToOptions(CONTEXT.choices.status)}
                   onChange={(e, { value }) => updateFilter('status', value)}
-                />
-              </Form.Field>
-              <Form.Field>
-                <Dropdown
-                  clearable
-                  fluid
-                  search
-                  selection
-                  value={filter.assignedTo || ''}
-                  placeholder="Assignee"
-                  options={users.map((u) => ({
-                    key: u.id,
-                    value: u.id,
-                    text: u.email,
-                  }))}
-                  onChange={(e, { value }) => updateFilter('assignedTo', value)}
-                  loading={userResults.isLoading}
                 />
               </Form.Field>
             </Form.Group>

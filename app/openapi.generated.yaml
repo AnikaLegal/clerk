@@ -1346,14 +1346,9 @@ paths:
         - name: assigned_to
           in: query
           schema:
-            type: string
+            type: number
           required: false
         - name: issue__topic
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: my_tasks
           in: query
           schema:
             type: string
