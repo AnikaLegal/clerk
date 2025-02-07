@@ -11,6 +11,7 @@ import {
   Label,
   Table,
   SemanticCOLORS,
+  Icon,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
 import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
@@ -195,12 +196,21 @@ const App = () => {
         <Table celled>
           <Table.Header>
             <Table.Row>
+              <Table.HeaderCell colSpan={2} textAlign="center">
+                Case
+              </Table.HeaderCell>
+              <Table.HeaderCell colSpan={7} textAlign="center">
+                Task
+              </Table.HeaderCell>
+            </Table.Row>
+            <Table.Row>
               <Table.HeaderCell>Fileref</Table.HeaderCell>
               <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Task name</Table.HeaderCell>
-              <Table.HeaderCell>Task type</Table.HeaderCell>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Type</Table.HeaderCell>
               <Table.HeaderCell>Assigned to</Table.HeaderCell>
-              <Table.HeaderCell>Task status</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+              <Table.HeaderCell>Open?</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Due date</Table.HeaderCell>
             </Table.Row>
@@ -229,6 +239,13 @@ const App = () => {
                   )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+                <Table.Cell textAlign="center">
+                  {task.is_open ? (
+                    <Icon name="check" color="green" />
+                  ) : (
+                    <Icon name="close" color="yellow" />
+                  )}
+                </Table.Cell>
                 <Table.Cell>
                   {moment(task.created_at).format('DD/MM/YYYY')}
                 </Table.Cell>
