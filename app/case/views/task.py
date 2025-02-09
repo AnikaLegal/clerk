@@ -116,7 +116,7 @@ class TaskApiViewset(ModelViewSet):
                 )
             )
         elif self.action == "list":
-            queryset = queryset.order_by("-is_urgent", "due_at", "-days_open")
+            queryset = self.sort_queryset(queryset)
             queryset = self.search_queryset(queryset)
 
         # Permissions.
@@ -131,6 +131,10 @@ class TaskApiViewset(ModelViewSet):
             queryset = queryset.none()
 
         return queryset
+
+
+    def sort_queryset(self, queryset: QuerySet[Task]) -> QuerySet[Task]:
+        return queryset.order_by("-is_urgent", "due_at", "-days_open")
 
     def search_queryset(self, queryset: QuerySet[Task]) -> QuerySet[Task]:
         """
