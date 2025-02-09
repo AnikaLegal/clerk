@@ -9,6 +9,7 @@ from task.models import (
     TaskEvent,
     TaskTemplate,
     TaskTrigger,
+    TaskGroup,
 )
 from utils.admin import admin_link
 
@@ -153,7 +154,6 @@ class TaskEventAdmin(admin.ModelAdmin):
         return user if user else None
 
 
-
 @admin.register(TaskAttachment)
 class TaskAttachmentAdmin(admin.ModelAdmin):
     list_display = (
@@ -167,3 +167,11 @@ class TaskAttachmentAdmin(admin.ModelAdmin):
     @admin_link("task", "Task")
     def task_link(self, task):
         return task if task else None
+
+@admin.register(TaskGroup)
+class TaskGroupAdmin(admin.ModelAdmin):
+    model = TaskGroup
+    list_display = (
+        "id",
+        "name",
+    )

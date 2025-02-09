@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from task.helpers import get_coordinators_user
-from task.models import Task, TaskEvent, TaskTrigger
+from task.models import Task, TaskEvent, TaskGroup, TaskTrigger
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
@@ -177,15 +177,20 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
             break
 
         now = timezone.now()
+        group = TaskGroup.objects.create(name=trigger.name)
+
         for template in trigger.templates.all():
             query = Q(issue=event.issue, template=template, assigned_to=user)
             if not Task.objects.filter(query).exists():
                 due_at = None
                 if template.due_in:
                     due_at = (now + timedelta(days=template.due_in)).date()
+
                 task = Task.objects.create(
                     issue=event.issue,
                     template=template,
+                    group=group,
+                    group_order=template._order,
                     type=template.type,
                     name=template.name,
                     description=template.description,
@@ -197,6 +202,9 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
                     is_system_update=True,
                 )
                 task_pks.append(task.pk)
+
+        if not task_pks:
+            group.delete()
 
     return task_pks
 

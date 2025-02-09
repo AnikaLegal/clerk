@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
+from .group import TaskGroup
 
 
 class TaskType(models.TextChoices):
@@ -34,7 +35,7 @@ class Task(TimestampedModel):
     type = models.CharField(
         max_length=32, choices=TaskTemplateType.choices + TaskType.choices
     )
-    name = models.CharField(max_length=64)
+    name = models.TextField()
     description = models.TextField(blank=True, default="")
     status = models.CharField(
         max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
@@ -90,9 +91,14 @@ class Task(TimestampedModel):
         TaskTemplate, on_delete=models.SET_NULL, blank=True, null=True
     )
 
+    group = models.ForeignKey(
+        TaskGroup, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    group_order = models.IntegerField(default=-1)
+
     # The originating task if this task is a question or approval request.
     related_task = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True
+        "self", on_delete=models.PROTECT, blank=True, null=True
     )
 
     @property
