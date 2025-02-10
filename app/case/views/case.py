@@ -143,7 +143,7 @@ def case_detail_services_page_view(request, pk):
 
 @api_view(["GET"])
 @paralegal_or_better_required
-def case_detail_tasks_page_view(request, pk):
+def case_detail_task_list_page_view(request, pk):
     """
     The tasks related to a case.
     """
@@ -155,8 +155,27 @@ def case_detail_tasks_page_view(request, pk):
             "status": TaskStatus.choices,
             "type": TaskTemplateType.choices,
         },
+        "create_url": reverse("case-task-create", args=(pk,)),
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
+
+
+@api_view(["GET"])
+@coordinator_or_better_required
+def case_detail_task_create_page_view(request, pk):
+    """
+    Create a task related to a case.
+    """
+    get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "choices": {
+            "status": TaskStatus.choices,
+            "type": TaskTemplateType.choices,
+        },
+        "list_url": reverse("case-task-list", args=(pk,)),
+    }
+    return render_react_page(request, "Create task", "task-create", context)
 
 
 def get_detail_urls(issue: Issue):
@@ -165,7 +184,7 @@ def get_detail_urls(issue: Issue):
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
         "services": reverse("case-services", args=(issue.pk,)),
-        "tasks": reverse("case-tasks", args=(issue.pk,)),
+        "tasks": reverse("case-task-list", args=(issue.pk,)),
     }
 
 

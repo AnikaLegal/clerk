@@ -6,9 +6,5 @@ allOf:
         type: string
       status:
         type: string
-      issue_id:
-        type: string
-        format: uuid
     required:
       - type
-      - issue_id

@@ -102,10 +102,11 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_suspended",
         )
 
-    issue_id = serializers.UUIDField(write_only=True)
+    issue_id = serializers.UUIDField()
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
+
     related_task_id = serializers.IntegerField(allow_null=True, required=False)
     created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(allow_null=True, required=False)

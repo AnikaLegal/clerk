@@ -132,7 +132,6 @@ class TaskApiViewset(ModelViewSet):
 
         return queryset
 
-
     def sort_queryset(self, queryset: QuerySet[Task]) -> QuerySet[Task]:
         return queryset.order_by("-is_urgent", "due_at", "-days_open")
 
@@ -165,13 +164,13 @@ class TaskApiViewset(ModelViewSet):
                             query = q_filter
                     queryset = queryset.filter(query)
                 elif key == "assigned_to":
-                        q_filter = Q(assigned_to=value)
-                        # Coordinator users are also displayed tasks assigned to
-                        # coordinators when filtering by their own tasks.
-                        if value.groups.filter(name=CaseGroups.COORDINATOR).exists():
-                            coordinators_user = get_coordinators_user()
-                            q_filter |= Q(assigned_to=coordinators_user)
-                        queryset = queryset.filter(q_filter)
+                    q_filter = Q(assigned_to=value)
+                    # Coordinator users are also displayed tasks assigned to
+                    # coordinators when filtering by their own tasks.
+                    if value.groups.filter(name=CaseGroups.COORDINATOR).exists():
+                        coordinators_user = get_coordinators_user()
+                        q_filter |= Q(assigned_to=coordinators_user)
+                    queryset = queryset.filter(q_filter)
                 else:
                     queryset = queryset.filter(**{key: value})
 

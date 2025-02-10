@@ -136,6 +136,7 @@ export const TaskBody = ({
   status,
 }: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
+  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const toggleEditMode = () => setEditMode(!isEditMode)
 
   if (!isEditMode) {
@@ -187,6 +188,27 @@ export const TaskBody = ({
     )
   }
 
+  const users = userResults.data || []
+
+  /* Only include:
+   * - The current assignee.
+   * - The case paralegal.
+   * - All coordinators plus.
+   * You can't assign to another paralegal user as they cannot access the case
+   * or task. You need to reassign the case to that paralegal and the associated
+   * tasks will be reassigned automatically.
+   */
+  const userOptions = users
+    .filter(
+      (u) =>
+        u.id == task.assigned_to?.id ||
+        u.id == task.issue.paralegal?.id ||
+        (task.is_approval_request
+          ? u.is_lawyer_or_better
+          : u.is_system_account || u.is_coordinator_or_better)
+    )
+    .map((u) => [u.id, u.email])
+
   const submitHandler = (values: Model, { setSubmitting, setErrors }: any) => {
     update(values)
       .then((instance) => {
@@ -209,9 +231,18 @@ export const TaskBody = ({
 
   return (
     <TaskForm
-      task={task}
+      initialValues={{
+        name: task.name,
+        description: task.description,
+        assigned_to_id: task.assigned_to_id,
+        type: task.type,
+        status: '',
+        issue_id: task.issue_id,
+        is_urgent: task.is_urgent,
+        is_approval_required: task.is_approval_required,
+      }}
       user={user}
-      choices={choices}
+      choices={{ ...choices, assigned_to_id: userOptions }}
       onSubmit={submitHandler}
       onCancel={toggleEditMode}
       submitButtonText="Update"

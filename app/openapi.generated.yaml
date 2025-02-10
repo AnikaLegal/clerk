@@ -2623,8 +2623,12 @@ components:
           type: string
         description:
           type: string
+        issue_id:
+          type: string
+          format: uuid
         assigned_to_id:
           type: number
+          nullable: true
         related_task_id:
           type: number
           nullable: true
@@ -2640,6 +2644,7 @@ components:
       required:
         - name
         - description
+        - issue_id
         - assigned_to_id
     TaskCreate:
       allOf:
@@ -2650,12 +2655,8 @@ components:
               type: string
             status:
               type: string
-            issue_id:
-              type: string
-              format: uuid
           required:
             - type
-            - issue_id
     Task:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2673,6 +2674,7 @@ components:
               $ref: "#/components/schemas/Issue"
             assigned_to:
               $ref: "#/components/schemas/User"
+              nullable: true
             is_open:
               type: boolean
             is_suspended:

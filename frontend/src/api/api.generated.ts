@@ -1347,7 +1347,8 @@ export type TaskList = {
 export type TaskBase = {
   name: string;
   description: string;
-  assigned_to_id: number;
+  issue_id: string;
+  assigned_to_id: number | null;
   related_task_id?: number | null;
   due_at?: string | null;
   is_urgent?: boolean;
@@ -1372,7 +1373,6 @@ export type Task = TaskBase & {
 export type TaskCreate = TaskBase & {
   type: string;
   status?: string;
-  issue_id: string;
 };
 export type TaskCommentBase = {
   text: string;

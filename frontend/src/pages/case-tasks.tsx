@@ -1,12 +1,10 @@
-import api, { Issue, TaskCreate } from 'api'
+import api, { Issue } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { TaskDueDateTableCell } from 'comps/task'
-import { FormikHelpers } from 'formik'
 import moment from 'moment'
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Button,
-  ButtonProps,
   Container,
   Grid,
   Header,
@@ -25,6 +23,7 @@ export interface CaseTasksChoices {
 interface DjangoContext {
   case_pk: string
   choices: CaseTasksChoices
+  create_url: string
   urls: CaseTabUrls
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -63,40 +62,14 @@ export const CaseTasks = ({ issue }: CaseTasksProps) => {
           </Grid.Column>
           {issue.is_open && (
             <Grid.Column style={{ width: 'auto' }}>
-              <AddTaskButton floated="right" size="tiny" issue={issue}>
-                Add task
-              </AddTaskButton>
+              <a href={CONTEXT.create_url}>
+                <Button primary>Add a task</Button>
+              </a>
             </Grid.Column>
           )}
         </Grid.Row>
       </Grid>
       <CaseTasksTable issue={issue} />
-    </>
-  )
-}
-
-export interface AddTaskButtonProps {
-  issue: Issue
-  children: string | number
-}
-
-export const AddTaskButton = ({
-  issue,
-  children,
-  ...props
-}: AddTaskButtonProps & ButtonProps) => {
-  const [open, setOpen] = useState(false)
-
-  const handleSubmit = (
-    values: TaskCreate,
-    { setSubmitting, setErrors, resetForm }: FormikHelpers<TaskCreate>
-  ) => {}
-
-  return (
-    <>
-      <Button {...props} onClick={() => setOpen(true)}>
-        {children}
-      </Button>
     </>
   )
 }
