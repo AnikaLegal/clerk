@@ -166,6 +166,8 @@ class TaskApiViewset(ModelViewSet):
                     queryset = queryset.filter(query)
                 elif key == "assigned_to":
                         q_filter = Q(assigned_to=value)
+                        # Coordinator users are also displayed tasks assigned to
+                        # coordinators when filtering by their own tasks.
                         if value.groups.filter(name=CaseGroups.COORDINATOR).exists():
                             coordinators_user = get_coordinators_user()
                             q_filter |= Q(assigned_to=coordinators_user)
