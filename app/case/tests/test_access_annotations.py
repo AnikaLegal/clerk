@@ -2,6 +2,7 @@
 Check to ensure middleware is annotating user models with the correct
 authorization booleans. Used downstream by view permission checks.
 """
+
 import pytest
 from django.contrib.auth.models import Group
 
@@ -85,24 +86,19 @@ def test_group_or_better_annotations(
     lawyer_group: Group,
 ):
     """
-    Ensure is_paralegal_or_better, is_coordinator_or_better, is_admin_or_better
-    are set correctly by group access annotator.
+    Ensure is_paralegal_or_better, is_coordinator_or_better,
+    is_lawyer_or_better, is_admin_or_better are set correctly by group access
+    annotator.
     """
     assert not getattr(user, "is_paralegal_or_better", None)
     assert not getattr(user, "is_coordinator_or_better", None)
+    assert not getattr(user, "is_lawyer_or_better", None)
     assert not getattr(user, "is_admin_or_better", None)
 
     annotate_group_access(user)
     assert not user.is_paralegal_or_better
     assert not user.is_coordinator_or_better
-    assert not user.is_admin_or_better
-
-    # Set the user to only be in lawyer group.
-    # Lawyers get no annotations (for now).
-    user.groups.set([lawyer_group])
-    annotate_group_access(user)
-    assert not user.is_paralegal_or_better
-    assert not user.is_coordinator_or_better
+    assert not user.is_lawyer_or_better
     assert not user.is_admin_or_better
 
     # Set the user to only be in paralegal group.
@@ -110,6 +106,7 @@ def test_group_or_better_annotations(
     annotate_group_access(user)
     assert user.is_paralegal_or_better
     assert not user.is_coordinator_or_better
+    assert not user.is_lawyer_or_better
     assert not user.is_admin_or_better
 
     # Set the user to only be in coordinator group.
@@ -117,6 +114,15 @@ def test_group_or_better_annotations(
     annotate_group_access(user)
     assert user.is_paralegal_or_better
     assert user.is_coordinator_or_better
+    assert not user.is_lawyer_or_better
+    assert not user.is_admin_or_better
+
+    # Set the user to only be in lawyer group.
+    user.groups.set([lawyer_group])
+    annotate_group_access(user)
+    assert user.is_paralegal_or_better
+    assert user.is_coordinator_or_better
+    assert user.is_lawyer_or_better
     assert not user.is_admin_or_better
 
     # Set the user to only be in admin group.
@@ -125,13 +131,15 @@ def test_group_or_better_annotations(
     annotate_group_access(user)
     assert user.is_paralegal_or_better
     assert user.is_coordinator_or_better
+    assert user.is_lawyer_or_better
     assert user.is_admin_or_better
 
-    # Set the user to be in all three groups.
+    # Set the user to be in all groups.
     # Expect all permissions to apply.
-    user.groups.set([paralegal_group, coordinator_group, admin_group])
+    user.groups.set([paralegal_group, coordinator_group, lawyer_group, admin_group])
     assert user.is_paralegal_or_better
     assert user.is_coordinator_or_better
+    assert user.is_lawyer_or_better
     assert user.is_admin_or_better
 
     # Set the user to be a superuser in no groups.
@@ -141,4 +149,5 @@ def test_group_or_better_annotations(
     user.save()
     assert user.is_paralegal_or_better
     assert user.is_coordinator_or_better
+    assert user.is_lawyer_or_better
     assert user.is_admin_or_better
