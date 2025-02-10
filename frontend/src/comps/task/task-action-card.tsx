@@ -3,7 +3,6 @@ import { TextButton } from 'comps/button'
 import {
   CancelTaskModal,
   QuestionModal,
-  ReassignTaskModal,
   RequestApprovalModal,
 } from 'comps/task'
 import { enqueueSnackbar } from 'notistack'
@@ -123,13 +122,6 @@ export const TaskActionCard = (props: TaskActionProps) => {
       text: 'Ask a question',
       showWhen: () => perms.is_paralegal_or_better && task.is_open,
       modal: QuestionModal,
-    },
-    {
-      id: 'reassign',
-      icon: 'user',
-      text: 'Reassign the task',
-      showWhen: () => perms.is_coordinator_or_better && task.is_open,
-      modal: ReassignTaskModal,
     },
   ]
 

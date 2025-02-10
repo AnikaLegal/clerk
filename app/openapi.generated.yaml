@@ -2623,6 +2623,8 @@ components:
           type: string
         description:
           type: string
+        assigned_to_id:
+          type: number
         related_task_id:
           type: number
           nullable: true
@@ -2638,6 +2640,7 @@ components:
       required:
         - name
         - description
+        - assigned_to_id
     TaskCreate:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2650,12 +2653,9 @@ components:
             issue_id:
               type: string
               format: uuid
-            assigned_to_id:
-              type: number
           required:
             - type
             - issue_id
-            - assigned_to_id
     Task:
       allOf:
         - $ref: "#/components/schemas/TaskBase"

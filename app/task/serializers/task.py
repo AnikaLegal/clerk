@@ -104,7 +104,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     issue_id = serializers.UUIDField(write_only=True)
     issue = IssueSerializer(read_only=True)
-    assigned_to_id = serializers.IntegerField(write_only=True)
+    assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
     related_task_id = serializers.IntegerField(allow_null=True, required=False)
     created_at = serializers.DateTimeField(read_only=True)

@@ -9,9 +9,6 @@ allOf:
       issue_id:
         type: string
         format: uuid
-      assigned_to_id:
-        type: number
     required:
       - type
       - issue_id
-      - assigned_to_id

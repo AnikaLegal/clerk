@@ -4,6 +4,8 @@ properties:
     type: string
   description:
     type: string
+  assigned_to_id:
+    type: number
   related_task_id:
     type: number
     nullable: true
@@ -19,3 +21,4 @@ properties:
 required:
   - name
   - description
+  - assigned_to_id

@@ -1,4 +1,4 @@
-import { Task } from 'api'
+import { Task, useGetUsersQuery } from 'api'
 import { AutoForm, getFormSchema, getModelInitialValues } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { Formik } from 'formik'
@@ -25,6 +25,28 @@ export const TaskForm = ({
   submitButtonText,
   cancelButtonText,
 }: TaskFormProps) => {
+  const userResults = useGetUsersQuery({ isActive: true, sort: 'email' })
+  let users = userResults.data || []
+
+  /* Only include:
+   * - The current assignee.
+   * - The case paralegal.
+   * - All coordinators plus.
+   * You can't assign to another paralegal user as they cannot access the case
+   * or task. You need to reassign the case to that paralegal and the associated
+   * tasks will be reassigned automatically.
+   */
+  const userOptions = users
+    .filter(
+      (u) =>
+        u.id == task.assigned_to?.id ||
+        u.id == task.issue.paralegal?.id ||
+        (task.is_approval_request
+          ? u.is_lawyer_or_better
+          : u.is_system_account || u.is_coordinator_or_better)
+    )
+    .map((u) => [u.id, u.email])
+
   const fields = [
     {
       label: 'Name',
@@ -37,6 +59,12 @@ export const TaskForm = ({
       schema: Yup.string().required('Required'),
       type: FIELD_TYPES.SINGLE_CHOICE,
       name: 'type',
+    },
+    {
+      label: 'Assigned To',
+      schema: Yup.string().required('Required'),
+      type: FIELD_TYPES.SINGLE_CHOICE,
+      name: 'assigned_to_id',
     },
     {
       label: 'Due date',
@@ -77,7 +105,7 @@ export const TaskForm = ({
       {(formik) => (
         <AutoForm
           fields={fields}
-          choices={choices}
+          choices={{ ...choices, assigned_to_id: userOptions }}
           formik={formik}
           onCancel={onCancel}
           submitText={submitButtonText}
