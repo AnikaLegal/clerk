@@ -6,8 +6,13 @@ from accounts.models import CaseGroups
 
 ADMIN_GROUPS = [CaseGroups.ADMIN]
 LAWYER_GROUPS = [CaseGroups.ADMIN, CaseGroups.LAWYER]
-COORDINATOR_GROUPS = [CaseGroups.ADMIN, CaseGroups.COORDINATOR]
-PARALEGAL_GROUPS = [CaseGroups.ADMIN, CaseGroups.COORDINATOR, CaseGroups.PARALEGAL]
+COORDINATOR_GROUPS = [CaseGroups.ADMIN, CaseGroups.LAWYER, CaseGroups.COORDINATOR]
+PARALEGAL_GROUPS = [
+    CaseGroups.ADMIN,
+    CaseGroups.LAWYER,
+    CaseGroups.COORDINATOR,
+    CaseGroups.PARALEGAL,
+]
 
 
 def annotate_group_access(user):
@@ -27,9 +32,11 @@ def annotate_group_access(user):
 
     # User's best permission is this permission
     user.is_admin = CaseGroups.ADMIN in group_names and not _is_superuser
-    user.is_lawyer = CaseGroups.LAWYER in group_names and not _is_superuser
-    user.is_coordinator = CaseGroups.COORDINATOR in group_names and not (
+    user.is_lawyer = CaseGroups.LAWYER in group_names and not (
         _is_admin_or_better or _is_superuser
+    )
+    user.is_coordinator = CaseGroups.COORDINATOR in group_names and not (
+        _is_lawyer_or_better or _is_superuser
     )
     user.is_paralegal = (CaseGroups.PARALEGAL in group_names) and not (
         _is_coordinator_or_better or _is_superuser
