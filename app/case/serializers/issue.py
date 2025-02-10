@@ -99,10 +99,15 @@ class IssueSerializer(serializers.ModelSerializer):
 
     def validate_stage(self, stage: str):
         issue: Issue = self.instance
-        if stage != CaseStage.UNSTARTED and None in [
-            issue.paralegal_id,
-            issue.lawyer_id,
-        ]:
+        if (
+            stage != CaseStage.UNSTARTED
+            and stage != CaseStage.CLOSED
+            and None
+            in [
+                issue.paralegal_id,
+                issue.lawyer_id,
+            ]
+        ):
             raise ValidationError(
                 "Cannot progress the case stage without an assigned lawyer & paralegal."
             )
