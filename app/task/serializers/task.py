@@ -2,7 +2,7 @@ from case.serializers import IssueSerializer, UserSerializer
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
-from task.models.task import TaskStatus, TaskType
+from task.models.task import TaskType
 
 
 class TaskListIssueSerializer(IssueSerializer):
