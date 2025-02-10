@@ -1,14 +1,12 @@
 import { FileButton } from '@mantine/core'
 import { useClickOutside } from '@mantine/hooks'
 import api, { Task, TaskAttachment, TaskCommentCreate, TaskCreate } from 'api'
-import { AutoForm, getFormSchema, getModelInitialValues } from 'comps/auto-form'
 import { DiscreteButton } from 'comps/button'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
-import { FIELD_TYPES } from 'comps/field-component'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
 import { TaskActionCard, TaskActivityGroup, TaskMetaCard } from 'comps/task'
-import { Formik } from 'formik'
+import { TaskForm } from 'forms'
 import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -28,7 +26,6 @@ import {
 import { Model, UserInfo } from 'types/global'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
-import * as Yup from 'yup'
 
 interface DjangoContext {
   choices: {
@@ -190,7 +187,7 @@ export const TaskBody = ({
     )
   }
 
-  const submit = (values: Model, { setSubmitting, setErrors }: any) => {
+  const submitHandler = (values: Model, { setSubmitting, setErrors }: any) => {
     update(values)
       .then((instance) => {
         enqueueSnackbar('Updated task', { variant: 'success' })
@@ -210,73 +207,15 @@ export const TaskBody = ({
       })
   }
 
-  const fields = [
-    {
-      label: 'Name',
-      schema: Yup.string().required('Required'),
-      type: FIELD_TYPES.TEXT,
-      name: 'name',
-    },
-    {
-      label: 'Type',
-      schema: Yup.string().required('Required'),
-      type: FIELD_TYPES.SINGLE_CHOICE,
-      name: 'type',
-    },
-    {
-      label: 'Due date',
-      type: FIELD_TYPES.DATE,
-      name: 'due_at',
-    },
-    {
-      label: 'Urgent?',
-      type: FIELD_TYPES.BOOL,
-      name: 'is_urgent',
-    },
-    {
-      label: 'Description',
-      type: FIELD_TYPES.RICHTEXT,
-      name: 'description',
-    },
-  ]
-
-  /* Only include the approvals fields in the UI if the user has the privileges
-   * to change them. */
-  if (user.is_lawyer) {
-    fields.splice(
-      -1,
-      0,
-      {
-        label: 'Approval required?',
-        type: FIELD_TYPES.BOOL,
-        name: 'is_approval_required',
-      },
-      {
-        label: 'Approved?',
-        type: FIELD_TYPES.BOOL,
-        name: 'is_approved',
-      }
-    )
-  }
-
-  const schema = getFormSchema(fields)
-
   return (
-    <Formik
-      initialValues={getModelInitialValues(fields, task)}
-      validationSchema={schema}
-      onSubmit={submit}
-    >
-      {(formik) => (
-        <AutoForm
-          fields={fields}
-          choices={choices}
-          formik={formik}
-          onCancel={toggleEditMode}
-          submitText="Update"
-        />
-      )}
-    </Formik>
+    <TaskForm
+      task={task}
+      user={user}
+      choices={choices}
+      onSubmit={submitHandler}
+      onCancel={toggleEditMode}
+      submitButtonText="Update"
+    />
   )
 }
 
@@ -325,7 +264,7 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
   /* TODO: handle errors.
-  */
+   */
   const activityResult = api.useGetTaskActivityQuery({ id: task.id })
   const activities = activityResult.data || []
 
@@ -338,7 +277,8 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
       createTaskComment({
         id: task.id,
         taskCommentCreate: values,
-      }).unwrap()
+      })
+        .unwrap()
         .then((instance) => {
           enqueueSnackbar('Added comment', { variant: 'success' })
           editor.commands.clearContent()
@@ -354,7 +294,10 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
   return (
     <>
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
-      <TaskActivityGroup activities={activities} loading={activityResult.isLoading} />
+      <TaskActivityGroup
+        activities={activities}
+        loading={activityResult.isLoading}
+      />
     </>
   )
 }

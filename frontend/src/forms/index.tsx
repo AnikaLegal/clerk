@@ -11,7 +11,9 @@ import { ReopenForm } from './case-reopen'
 import { ReviewForm } from './case-review-note'
 import { ServiceForm } from './case-service'
 import { DocumentTemplateForm } from './doc-template'
+import { TaskForm } from './task'
 import { TenancyForm } from './tenancy'
+
 export {
   AccountForm,
   AssignForm,
@@ -26,5 +28,6 @@ export {
   ReopenForm,
   ReviewForm,
   ServiceForm,
-  TenancyForm
+  TaskForm,
+  TenancyForm,
 }
