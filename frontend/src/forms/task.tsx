@@ -48,8 +48,7 @@ export const TaskForm = ({
       type: FIELD_TYPES.BOOL,
       name: 'is_urgent',
     },
-    /* Only include the approvals fields in the UI if the user has the privileges
-     * to change them. */
+    /* Only include in the UI if the user has the privileges to change. */
     ...(user.is_lawyer_or_better
       ? [
           {
