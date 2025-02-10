@@ -101,6 +101,7 @@ const ChoiceField =
   }) => (
     <Dropdown
       fluid
+      search
       selection
       multiple={multiple}
       value={value}
