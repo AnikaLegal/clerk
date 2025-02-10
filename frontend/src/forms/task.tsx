@@ -48,31 +48,23 @@ export const TaskForm = ({
       type: FIELD_TYPES.BOOL,
       name: 'is_urgent',
     },
+    /* Only include the approvals fields in the UI if the user has the privileges
+     * to change them. */
+    ...(user.is_lawyer_or_better
+      ? [
+          {
+            label: 'Approval required?',
+            type: FIELD_TYPES.BOOL,
+            name: 'is_approval_required',
+          },
+        ]
+      : []),
     {
       label: 'Description',
       type: FIELD_TYPES.RICHTEXT,
       name: 'description',
     },
   ]
-
-  /* Only include the approvals fields in the UI if the user has the privileges
-   * to change them. */
-  if (user.is_lawyer) {
-    fields.splice(
-      -1,
-      0,
-      {
-        label: 'Approval required?',
-        type: FIELD_TYPES.BOOL,
-        name: 'is_approval_required',
-      },
-      {
-        label: 'Approved?',
-        type: FIELD_TYPES.BOOL,
-        name: 'is_approved',
-      }
-    )
-  }
 
   const schema = getFormSchema(fields)
   const initialValues = getModelInitialValues(fields, task)
