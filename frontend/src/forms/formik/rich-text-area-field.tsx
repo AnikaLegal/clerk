@@ -3,7 +3,7 @@ import { ErrorMessage, useField } from 'formik'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 
-interface RichTextAreaFieldProps extends RichTextAreaProps {
+export interface RichTextAreaFieldProps extends RichTextAreaProps {
   name: string
   label: string
   required?: boolean

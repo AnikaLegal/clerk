@@ -2,7 +2,7 @@ import { ErrorMessage, useField } from 'formik'
 import React from 'react'
 import { Form, Input, InputProps } from 'semantic-ui-react'
 
-interface InputFieldProps extends InputProps {
+export interface InputFieldProps extends InputProps {
   name: string
   label: string
   required?: boolean

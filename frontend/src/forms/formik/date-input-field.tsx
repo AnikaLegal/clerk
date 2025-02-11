@@ -1,20 +1,29 @@
 import { ErrorMessage, useField } from 'formik'
 import React from 'react'
-import { Dropdown, DropdownProps, Form } from 'semantic-ui-react'
+import { Form } from 'semantic-ui-react'
+import DateInput from 'comps/date-input'
+import { DateInputProps } from 'comps/date-input'
 
-export interface DropdownFieldProps extends DropdownProps {
+export interface DateInputFieldProps
+  extends Omit<DateInputProps, 'value' | 'onChange'> {
   name: string
   label: string
   required?: boolean
 }
 
-export const DropdownField = ({
+export const DateInputField = ({
   name,
   label,
   required,
   ...props
-}: DropdownFieldProps) => {
+}: DateInputFieldProps) => {
   const [field, meta, helpers] = useField(name)
+
+  const handleBlur = (e) => {
+    if (props.onBlur) {
+      props.onBlur(e)
+    }
+  }
   const handleChange = (e, data) => {
     helpers.setValue(data.value)
     if (props.onChange) {
@@ -25,7 +34,13 @@ export const DropdownField = ({
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
       <label>{label}</label>
-      <Dropdown fluid selection {...field} {...props} onChange={handleChange} />
+      <DateInput
+        {...field}
+        {...props}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        autoComplete="off"
+      />
       <ErrorMessage name={name} />
     </Form.Field>
   )
