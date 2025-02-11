@@ -92,12 +92,14 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
       }) => (
         <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
           <InputField
+            required
             name="name"
             label="Name"
             placeholder="Describe the task template"
             disabled={isSubmitting}
           />
           <DropdownField
+            required
             name="topic"
             label="Case type"
             placeholder="Select a case type"
@@ -105,6 +107,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             disabled={isSubmitting}
           />
           <DropdownField
+            required
             name="event"
             label="Trigger event"
             placeholder="Select which event will trigger task creation"
@@ -121,6 +124,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
           />
           {showEventStage && (
             <DropdownField
+              required
               name="event_stage"
               label="Trigger stage"
               placeholder="Select which event stage will trigger task creation"
@@ -129,6 +133,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             />
           )}
           <DropdownField
+            required
             name="tasks_assignment_role"
             label="Assignment role"
             placeholder="Select the role of the user to which the task(s) should be assigned"
