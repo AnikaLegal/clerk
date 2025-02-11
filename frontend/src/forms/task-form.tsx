@@ -1,5 +1,5 @@
 import { TaskCreate, useGetUsersQuery } from 'api'
-import { FormikProps, FormikHelpers } from 'formik'
+import { FormikProps } from 'formik'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'

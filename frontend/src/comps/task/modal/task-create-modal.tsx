@@ -1,12 +1,12 @@
 import api, { Issue, TaskCreate } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
-import { Formik, FormikHelpers } from 'formik'
+import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Button, Modal } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { getAPIErrorMessage, filterEmpty } from 'utils'
+import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
