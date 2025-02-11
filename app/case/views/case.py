@@ -155,27 +155,8 @@ def case_detail_task_list_page_view(request, pk):
             "status": TaskStatus.choices,
             "type": TaskTemplateType.choices,
         },
-        "create_url": reverse("case-task-create", args=(pk,)),
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
-
-
-@api_view(["GET"])
-@coordinator_or_better_required
-def case_detail_task_create_page_view(request, pk):
-    """
-    Create a task related to a case.
-    """
-    get_object_or_404(Issue, pk=pk)
-    context = {
-        "case_pk": pk,
-        "choices": {
-            "status": TaskStatus.choices,
-            "type": TaskTemplateType.choices,
-        },
-        "list_url": reverse("case-task-list", args=(pk,)),
-    }
-    return render_react_page(request, "Create task", "task-create", context)
 
 
 def get_detail_urls(issue: Issue):

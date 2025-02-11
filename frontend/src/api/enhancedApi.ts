@@ -57,6 +57,12 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],
     },
+    getTasks: {
+      providesTags: [{ type: 'TASKS' }],
+    },
+    createTask: {
+      invalidatesTags: [{ type: 'TASKS' }],
+    },
     getTaskAttachments: {
       providesTags: [{ type: 'TASK_ATTACHMENT' }],
     },

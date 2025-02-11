@@ -6,6 +6,8 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
 import { TaskActionCard, TaskActivityGroup, TaskMetaCard } from 'comps/task'
+import { TaskCreateSchema } from 'comps/task/modal/task-create-modal'
+import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
@@ -136,7 +138,6 @@ export const TaskBody = ({
   status,
 }: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
-  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const toggleEditMode = () => setEditMode(!isEditMode)
 
   if (!isEditMode) {
@@ -188,65 +189,88 @@ export const TaskBody = ({
     )
   }
 
-  const users = userResults.data || []
-
-  /* Only include:
-   * - The current assignee.
-   * - The case paralegal.
-   * - All coordinators plus.
-   * You can't assign to another paralegal user as they cannot access the case
-   * or task. You need to reassign the case to that paralegal and the associated
-   * tasks will be reassigned automatically.
-   */
-  const userOptions = users
-    .filter(
-      (u) =>
-        u.id == task.assigned_to?.id ||
-        u.id == task.issue.paralegal?.id ||
-        (task.is_approval_request
-          ? u.is_lawyer_or_better
-          : u.is_system_account || u.is_coordinator_or_better)
-    )
-    .map((u) => [u.id, u.email])
-
-  const submitHandler = (values: Model, { setSubmitting, setErrors }: any) => {
+  const submitHandler = (
+    values: TaskCreate,
+    { setSubmitting, setErrors }
+  ) => {
+    if (!user.is_lawyer_or_better) {
+      values = {
+        ...values,
+        is_approved: undefined,
+        is_approval_required: undefined,
+      }
+    }
     update(values)
       .then((instance) => {
         enqueueSnackbar('Updated task', { variant: 'success' })
         setTask(instance)
         toggleEditMode()
-        setSubmitting(false)
       })
       .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, `Failed to update this task`), {
+        enqueueSnackbar(getAPIErrorMessage(err, `Failed to update task`), {
           variant: 'error',
         })
         const requestErrors = getAPIFormErrors(err)
         if (requestErrors) {
           setErrors(requestErrors)
         }
-        setSubmitting(false)
       })
+      .finally(setSubmitting(false))
+  }
+
+  const initialValues = {
+    name: task.name,
+    description: task.description,
+    assigned_to_id: task.assigned_to_id,
+    type: task.type,
+    issue_id: task.issue_id,
+    is_urgent: task.is_urgent,
+    is_approval_required: task.is_approval_required,
   }
 
   return (
-    <TaskForm
-      initialValues={{
-        name: task.name,
-        description: task.description,
-        assigned_to_id: task.assigned_to_id,
-        type: task.type,
-        status: '',
-        issue_id: task.issue_id,
-        is_urgent: task.is_urgent,
-        is_approval_required: task.is_approval_required,
-      }}
-      user={user}
-      choices={{ ...choices, assigned_to_id: userOptions }}
+    <Formik
+      enableReinitialize
+      isInitialValid={false}
+      initialValues={initialValues}
       onSubmit={submitHandler}
-      onCancel={toggleEditMode}
-      submitButtonText="Update"
-    />
+      validationSchema={TaskCreateSchema}
+    >
+      {(formik) => {
+        return (
+          <Grid>
+            <Grid.Row>
+              <Grid.Column>
+                <TaskForm
+                  formik={formik}
+                  choices={{ type: choices.type }}
+                  user={user}
+                />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column>
+                <Button
+                  primary
+                  disabled={formik.isSubmitting}
+                  loading={formik.isSubmitting}
+                  onClick={formik.submitForm}
+                >
+                  Update task
+                </Button>
+                <Button
+                  disabled={formik.isSubmitting}
+                  loading={formik.isSubmitting}
+                  onClick={toggleEditMode}
+                >
+                  Cancel
+                </Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        )
+      }}
+    </Formik>
   )
 }
 

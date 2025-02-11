@@ -1,8 +1,9 @@
 import api, { Issue } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { TaskDueDateTableCell } from 'comps/task'
+import { CreateTaskModal } from 'comps/task/modal'
 import moment from 'moment'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -13,6 +14,7 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
+import { UserInfo } from 'types/global'
 import { choiceToMap, mount } from 'utils'
 
 export interface CaseTasksChoices {
@@ -23,8 +25,8 @@ export interface CaseTasksChoices {
 interface DjangoContext {
   case_pk: string
   choices: CaseTasksChoices
-  create_url: string
   urls: CaseTabUrls
+  user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const TYPE_LABELS = choiceToMap(CONTEXT.choices.type)
@@ -42,7 +44,7 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.TASKS} urls={urls} />
       <Segment basic>
-        <CaseTasks issue={issue} />
+        <CaseTasks issue={issue} user={CONTEXT.user} choices={CONTEXT.choices}/>
       </Segment>
     </Container>
   )
@@ -50,11 +52,22 @@ const App = () => {
 
 export interface CaseTasksProps {
   issue: Issue
+  user: UserInfo
+  choices: CaseTasksChoices
 }
 
-export const CaseTasks = ({ issue }: CaseTasksProps) => {
+export const CaseTasks = ({ issue, choices, user }: CaseTasksProps) => {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
+      <CreateTaskModal
+        issue={issue}
+        open={open}
+        onClose={() => setOpen(false)}
+        choices={{ type: choices.type }}
+        user={user}
+      />
       <Grid>
         <Grid.Row>
           <Grid.Column style={{ flexGrow: '1' }}>
@@ -62,9 +75,9 @@ export const CaseTasks = ({ issue }: CaseTasksProps) => {
           </Grid.Column>
           {issue.is_open && (
             <Grid.Column style={{ width: 'auto' }}>
-              <a href={CONTEXT.create_url}>
-                <Button primary>Add a task</Button>
-              </a>
+              <Button primary onClick={() => setOpen(true)}>
+                Add a task
+              </Button>
             </Grid.Column>
           )}
         </Grid.Row>
