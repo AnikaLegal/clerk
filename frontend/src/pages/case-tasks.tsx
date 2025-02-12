@@ -73,7 +73,7 @@ export const CaseTasks = ({ issue, choices, user }: CaseTasksProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Case tasks</Header>
           </Grid.Column>
-          {issue.is_open && (
+          {issue.is_open && user.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
               <Button primary onClick={() => setOpen(true)}>
                 Add a task
