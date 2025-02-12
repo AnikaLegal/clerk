@@ -176,12 +176,22 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
             logger.info("Not creating tasks as lawyer is acting as paralegal")
             break
 
-        now = timezone.now()
-        group = TaskGroup.objects.create(name=trigger.name)
-
+        # Look for existing tasks related to the same issue, assigned to the
+        # same user and created using the same template. This could happen if
+        # the trigger was activated twice e.g. the case stage was set back to a
+        # previously used stage that was set to activate a task trigger.
+        templates = []
         for template in trigger.templates.all():
             query = Q(issue=event.issue, template=template, assigned_to=user)
             if not Task.objects.filter(query).exists():
+                templates.append(template)
+
+        # Create the tasks based on the templates.
+        if templates:
+            now = timezone.now()
+            group = TaskGroup.objects.create(name=trigger.name)
+
+            for template in templates:
                 due_at = None
                 if template.due_in:
                     due_at = (now + timedelta(days=template.due_in)).date()
@@ -202,9 +212,6 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
                     is_system_update=True,
                 )
                 task_pks.append(task.pk)
-
-        if not task_pks:
-            group.delete()
 
     return task_pks
 
