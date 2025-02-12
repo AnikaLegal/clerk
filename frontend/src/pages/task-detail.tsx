@@ -165,7 +165,7 @@ export const TaskBody = ({
                 size="tiny"
                 disabled={!task.is_open}
               >
-                Edit
+                Edit task
               </Button>
             </Grid.Column>
           )}
