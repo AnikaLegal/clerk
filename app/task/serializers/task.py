@@ -92,7 +92,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "closed_at",
             "is_urgent",
             "is_approval_required",
-            "is_approved",
             "days_open",
             "url",
         )
@@ -100,6 +99,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "status",
             "is_open",
             "is_suspended",
+            "is_approved",
         )
 
     issue_id = serializers.UUIDField()
@@ -132,13 +132,6 @@ class TaskSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def validate_is_approval_required(self, value):
-        # Only lawyers can adjust task approvals.
-        request = self.context.get("request", None)
-        if request and not request.user.is_lawyer_or_better:
-            raise exceptions.PermissionDenied()
-        return value
-
-    def validate_is_approved(self, value):
         # Only lawyers can adjust task approvals.
         request = self.context.get("request", None)
         if request and not request.user.is_lawyer_or_better:
