@@ -1,8 +1,5 @@
-import {
-  CancelTaskModal,
-  QuestionModal,
-  RequestApprovalModal,
-} from './modal'
+import { TaskCreateSchema } from 'comps/task/modal/create-task-modal'
+import { CancelTaskModal, QuestionModal, RequestApprovalModal } from './modal'
 import { TaskActionCard } from './task-action-card'
 import { TaskActivityGroup } from './task-activity-group'
 import { TaskDueDateTableCell } from './task-due-date-table-cell'
@@ -13,7 +10,7 @@ export {
   RequestApprovalModal,
   TaskActionCard,
   TaskActivityGroup,
+  TaskCreateSchema,
   TaskDueDateTableCell,
-  TaskMetaCard
+  TaskMetaCard,
 }
-

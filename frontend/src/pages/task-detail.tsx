@@ -5,8 +5,12 @@ import { DiscreteButton } from 'comps/button'
 import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
-import { TaskActionCard, TaskActivityGroup, TaskMetaCard } from 'comps/task'
-import { TaskCreateSchema } from 'comps/task/modal/create-task-modal'
+import {
+  TaskActionCard,
+  TaskActivityGroup,
+  TaskCreateSchema,
+  TaskMetaCard,
+} from 'comps/task'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import moment from 'moment'
@@ -189,10 +193,7 @@ export const TaskBody = ({
     )
   }
 
-  const submitHandler = (
-    values: TaskCreate,
-    { setSubmitting, setErrors }
-  ) => {
+  const submitHandler = (values: TaskCreate, { setSubmitting, setErrors }) => {
     if (!user.is_lawyer_or_better) {
       values = {
         ...values,
