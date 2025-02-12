@@ -1366,8 +1366,6 @@ export type Task = TaskBase & {
   created_at: string;
   closed_at: string | null;
   days_open: number;
-  is_approval_request: boolean;
-  is_question: boolean;
 };
 export type TaskCreate = TaskBase & {
   type: string;

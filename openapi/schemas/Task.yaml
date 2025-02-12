@@ -26,10 +26,6 @@ allOf:
         nullable: true
       days_open:
         type: integer
-      is_approval_request:
-        type: boolean
-      is_question:
-        type: boolean
     required:
       - id
       - url
@@ -42,5 +38,3 @@ allOf:
       - created_at
       - closed_at
       - days_open
-      - is_approval_request
-      - is_question

@@ -95,8 +95,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_approved",
             "days_open",
             "url",
-            "is_approval_request",
-            "is_question",
         )
         read_only_fields = (
             "status",
@@ -112,15 +110,6 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
-
-    is_approval_request = serializers.SerializerMethodField(read_only=True)
-    is_question = serializers.SerializerMethodField(read_only=True)
-
-    def get_is_approval_request(self, obj):
-        return obj.type == TaskType.APPROVAL_REQUEST
-
-    def get_is_question(self, obj):
-        return obj.type == TaskType.QUESTION
 
     def create(self, validated_data):
         # Paralegals can only create approval requests or questions.
