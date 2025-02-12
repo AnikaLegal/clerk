@@ -11,7 +11,7 @@ import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
 
-export const TaskCreateSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
+export const CreateTaskSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   assigned_to_id: Yup.number().required(),
   issue_id: Yup.string().required(),
   name: Yup.string().required(),
@@ -85,7 +85,7 @@ export const CreateTaskModal = ({
       isInitialValid={false}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      validationSchema={TaskCreateSchema}
+      validationSchema={CreateTaskSchema}
     >
       {(formik) => {
         const confirmDiscardHandler = () => {

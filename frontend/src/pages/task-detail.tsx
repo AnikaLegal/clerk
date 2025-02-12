@@ -8,7 +8,7 @@ import { Editor, RichTextDisplay } from 'comps/rich-text'
 import {
   TaskActionCard,
   TaskActivityGroup,
-  TaskCreateSchema,
+  CreateTaskSchema,
   TaskMetaCard,
 } from 'comps/task'
 import { Formik } from 'formik'
@@ -235,7 +235,7 @@ export const TaskBody = ({
       isInitialValid={false}
       initialValues={initialValues}
       onSubmit={submitHandler}
-      validationSchema={TaskCreateSchema}
+      validationSchema={CreateTaskSchema}
     >
       {(formik) => {
         return (
