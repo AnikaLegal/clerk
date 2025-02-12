@@ -145,14 +145,14 @@ class TaskSerializer(serializers.ModelSerializer):
     def validate_is_approval_required(self, value):
         # Only lawyers can adjust task approvals.
         request = self.context.get("request", None)
-        if request and not request.user.is_lawyer:
+        if request and not request.user.is_lawyer_or_better:
             raise exceptions.PermissionDenied()
         return value
 
     def validate_is_approved(self, value):
         # Only lawyers can adjust task approvals.
         request = self.context.get("request", None)
-        if request and not request.user.is_lawyer:
+        if request and not request.user.is_lawyer_or_better:
             raise exceptions.PermissionDenied()
         return value
 
