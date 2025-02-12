@@ -11,7 +11,7 @@ import {
   Icon,
   Input,
   Label,
-  Table
+  Table,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
 import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
@@ -138,7 +138,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.issueTopic || ''}
-                  placeholder="Case Topic"
+                  placeholder="Case topic"
                   options={choiceToOptions(CONTEXT.choices.case_topic)}
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
@@ -149,8 +149,12 @@ const App = () => {
                   selection
                   clearable
                   value={filter.type || ''}
-                  placeholder="Task Type"
-                  options={choiceToOptions(CONTEXT.choices.type)}
+                  placeholder="Task type"
+                  options={choiceToOptions(
+                    CONTEXT.choices.type.sort((a, b) =>
+                      a[1].localeCompare(b[1])
+                    )
+                  )}
                   onChange={(e, { value }) => updateFilter('type', value)}
                 />
               </Form.Field>
@@ -160,7 +164,7 @@ const App = () => {
                   selection
                   clearable
                   value={filter.status || ''}
-                  placeholder="Task Status"
+                  placeholder="Task status"
                   options={choiceToOptions(CONTEXT.choices.status)}
                   onChange={(e, { value }) => updateFilter('status', value)}
                 />
