@@ -75,7 +75,7 @@ class TaskEvent(models.Model):
         next_status = TaskStatus[next_status].label
 
         return (
-            self._get_user_anchor_tag(self.user)
+            _get_user_anchor_tag(self.user)
             + f" changed the status from <strong>{prev_status}</strong>"
             + f" to <strong>{next_status}</strong>."
         )
@@ -86,7 +86,7 @@ class TaskEvent(models.Model):
 
         return (
             "This task was suspended because "
-            + self._get_user_anchor_tag(prev_user)
+            + _get_user_anchor_tag(prev_user)
             + " was removed from the case."
         )
 
@@ -99,9 +99,9 @@ class TaskEvent(models.Model):
 
         return (
             "This task was reassigned from "
-            + self._get_user_anchor_tag(prev_user)
+            + _get_user_anchor_tag(prev_user)
             + " to "
-            + self._get_user_anchor_tag(next_user)
+            + _get_user_anchor_tag(next_user)
             + " because the case user was changed."
         )
 
@@ -111,13 +111,9 @@ class TaskEvent(models.Model):
 
         return (
             "This task was resumed because "
-            + self._get_user_anchor_tag(next_user)
+            + _get_user_anchor_tag(next_user)
             + " was added to the case."
         )
-
-    def _get_user_anchor_tag(self, user: User):
-        user_url = reverse("account-detail", args=(user.pk,))
-        return f'<a href="{user_url}">{user.first_name}</a>'
 
     @staticmethod
     def create_status_change(
@@ -168,3 +164,7 @@ class TaskEvent(models.Model):
                 "next_user_id": next_user.pk,
             },
         )
+
+def _get_user_anchor_tag(user: User):
+    user_url = reverse("account-detail", args=(user.pk,))
+    return f'<a href="{user_url}">{user.first_name}</a>'
