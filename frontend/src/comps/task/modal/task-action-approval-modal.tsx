@@ -118,7 +118,7 @@ const UserDropdownField = (props: ModalProps) => {
       user.id != props.user.id &&
       lawyer &&
       user.id != lawyer.id &&
-      user.is_lawyer
+      user.is_lawyer_or_better
   )
   /* Sort by full name.
    */
