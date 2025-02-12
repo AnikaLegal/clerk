@@ -14,11 +14,16 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
             "comment",
         )
 
+    # NOTE: This field is not part of the Task model.
     comment = serializers.CharField(required=False)
 
     @transaction.atomic
-    def update(self, instance: Task, validated_data):
-        self.create_event(instance, validated_data)
+    def update(self, instance, validated_data):
+        status = validated_data.get("status")
+        # NOTE: Remove the comment field as it's not part of the Task model.
+        comment = validated_data.pop("comment", None)
+        self.create_event(instance, status, comment)
+
         return super().update(instance, validated_data)
 
     def validate(self, attrs):
@@ -46,13 +51,13 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
                     raise PermissionDenied(detail="Approval is required")
         return value
 
-    def create_event(self, instance, validated_data):
+    def create_event(self, instance, status, comment):
         request = self.context.get("request", None)
         if request:
             TaskEvent.create_status_change(
                 task=instance,
                 user=request.user,
                 prev_status=instance.status,
-                next_status=validated_data.get("status"),
-                note=validated_data.pop("comment", None),
+                next_status=status,
+                note=comment,
             )
