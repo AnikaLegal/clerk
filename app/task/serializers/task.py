@@ -1,4 +1,5 @@
-from accounts.models import CaseGroups, User
+from accounts.models import User
+from case.middleware import COORDINATOR_GROUPS
 from case.serializers import IssueSerializer, UserSerializer
 from django.db.models import Q
 from django.urls import reverse
@@ -166,13 +167,7 @@ class TaskSerializer(serializers.ModelSerializer):
         assigned_to_id = attrs.get("assigned_to_id", None)
         if assigned_to_id:
             q_filter = Q(id=assigned_to_id) & Q(
-                Q(
-                    groups__name__in=[
-                        CaseGroups.COORDINATOR,
-                        CaseGroups.LAWYER,
-                        CaseGroups.ADMIN,
-                    ]
-                )
+                Q(groups__name__in=COORDINATOR_GROUPS)
                 | Q(is_superuser=True)
                 | Q(is_system_account=True)
             )
