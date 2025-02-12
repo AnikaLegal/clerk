@@ -60,7 +60,7 @@ const UserDropdownField = ({ values, ...props }: UserDropdownFieldProps) => {
   const userResult = useGetUsersQuery({ isActive: true, sort: 'email' })
 
   if (issueResult.isLoading || userResult.isLoading) {
-    return <DropdownField loading={true} {...props} />
+    return <DropdownField loading {...props} />
   }
   const issue = issueResult.data.issue
   const users = userResult.data
@@ -78,7 +78,8 @@ const UserDropdownField = ({ values, ...props }: UserDropdownFieldProps) => {
       (u) =>
         u.id == values.assigned_to_id ||
         u.id == issue.paralegal?.id ||
-        u.is_coordinator_or_better
+        u.is_coordinator_or_better ||
+        u.is_system_account
     )
     .map((u) => ({
       key: u.id,
