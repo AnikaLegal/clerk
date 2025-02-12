@@ -96,11 +96,6 @@ class Task(TimestampedModel):
     )
     group_order = models.IntegerField(default=-1)
 
-    # The originating task if this task is a question or approval request.
-    related_task = models.ForeignKey(
-        "self", on_delete=models.PROTECT, blank=True, null=True
-    )
-
     @property
     def url(self):
         if self.pk:

@@ -1349,7 +1349,6 @@ export type TaskBase = {
   description: string;
   issue_id: string;
   assigned_to_id: number | null;
-  related_task_id?: number | null;
   due_at?: string | null;
   is_urgent?: boolean;
   is_approval_required?: boolean;

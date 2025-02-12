@@ -10,9 +10,6 @@ properties:
   assigned_to_id:
     type: number
     nullable: true
-  related_task_id:
-    type: number
-    nullable: true
   due_at:
     type: string
     nullable: true

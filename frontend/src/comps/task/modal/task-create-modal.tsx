@@ -23,7 +23,6 @@ export const TaskCreateSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   is_approved: Yup.boolean().notRequired(),
   is_urgent: Yup.boolean().notRequired(),
   status: Yup.string().notRequired(),
-  related_task_id: Yup.number().notRequired(),
 })
 
 interface CreateTaskModalProps {

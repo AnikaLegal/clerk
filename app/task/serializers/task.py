@@ -85,7 +85,6 @@ class TaskSerializer(serializers.ModelSerializer):
             "issue",
             "assigned_to_id",
             "assigned_to",
-            "related_task_id",
             "is_open",
             "is_suspended",
             "created_at",
@@ -109,8 +108,6 @@ class TaskSerializer(serializers.ModelSerializer):
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
-
-    related_task_id = serializers.IntegerField(allow_null=True, required=False)
     created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)

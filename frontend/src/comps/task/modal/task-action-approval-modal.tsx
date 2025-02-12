@@ -10,7 +10,6 @@ import * as Yup from 'yup'
 
 const RequestApprovalSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   assigned_to_id: Yup.number().required(),
-  related_task_id: Yup.number().required(),
   description: Yup.string().default(undefined).min(1).required(),
   issue_id: Yup.string().required(),
   name: Yup.string().required(),
@@ -31,7 +30,6 @@ export const RequestApprovalModal = (props: ModalProps) => {
     name: `Approval request from ${props.user.full_name}`,
     issue_id: props.task.issue.id,
     assigned_to_id: props.task.issue.lawyer?.id,
-    related_task_id: props.task.id,
     description: '',
   }
 
