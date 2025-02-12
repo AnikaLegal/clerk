@@ -1,4 +1,4 @@
-import { TaskCreate, useGetUsersQuery } from 'api'
+import { TaskCreate, useGetCaseQuery, useGetUsersQuery } from 'api'
 import { FormikProps } from 'formik'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
@@ -39,7 +39,7 @@ export const TaskForm = ({ formik, user, choices }: TaskFormProps) => {
         search
         name="assigned_to_id"
         label="Assigned To"
-        initialValues={formik.initialValues}
+        values={formik.values}
       />
       <DateInputField name="due_at" label="Due date" dateFormat="DD/MM/YYYY" />
       <BooleanField name="is_urgent" label="Urgent?" />
@@ -52,15 +52,18 @@ export const TaskForm = ({ formik, user, choices }: TaskFormProps) => {
 }
 
 interface UserDropdownFieldProps extends DropdownFieldProps {
-  initialValues: TaskCreate
+  values: TaskCreate
 }
 
-const UserDropdownField = ({
-  initialValues,
-  ...props
-}: UserDropdownFieldProps) => {
-  const userResults = useGetUsersQuery({ isActive: true, sort: 'email' })
-  const users = userResults.data || []
+const UserDropdownField = ({ values, ...props }: UserDropdownFieldProps) => {
+  const issueResult = useGetCaseQuery({ id: values.issue_id })
+  const userResult = useGetUsersQuery({ isActive: true, sort: 'email' })
+
+  if (issueResult.isLoading || userResult.isLoading) {
+    return <DropdownField loading={true} {...props} />
+  }
+  const issue = issueResult.data.issue
+  const users = userResult.data
 
   /* Only include:
    * - The current assignee.
@@ -69,29 +72,19 @@ const UserDropdownField = ({
    * You can't assign to another paralegal user as they cannot access the case
    * or task. You need to reassign the case to that paralegal and the associated
    * tasks will be reassigned automatically.
+   */
   const userOptions = users
     .filter(
       (u) =>
-        u.id == task.assigned_to?.id ||
-        u.id == task.issue.paralegal?.id ||
-        (task.is_approval_request
-          ? u.is_lawyer_or_better
-          : u.is_system_account || u.is_coordinator_or_better)
+        u.id == values.assigned_to_id ||
+        u.id == issue.paralegal?.id ||
+        u.is_coordinator_or_better
     )
-    .map((u) => [u.id, u.email])
-   */
+    .map((u) => ({
+      key: u.id,
+      value: u.id,
+      text: u.email,
+    }))
 
-  const userOptions = users.map((u) => ({
-    key: u.id,
-    value: u.id,
-    text: u.email,
-  }))
-
-  return (
-    <DropdownField
-      options={userOptions}
-      loading={userResults.isLoading}
-      {...props}
-    />
-  )
+  return <DropdownField options={userOptions} {...props} />
 }

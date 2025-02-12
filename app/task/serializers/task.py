@@ -1,4 +1,6 @@
+from accounts.models import CaseGroups, User
 from case.serializers import IssueSerializer, UserSerializer
+from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
@@ -155,6 +157,35 @@ class TaskSerializer(serializers.ModelSerializer):
         if request and not request.user.is_lawyer:
             raise exceptions.PermissionDenied()
         return value
+
+    def validate(self, attrs):
+        # Tasks can only be assigned to:
+        # - Users with coordinator or greater permissions.
+        # - Users assigned as the paralegal on the related case.
+        # - Users designated as "system" accounts.
+        assigned_to_id = attrs.get("assigned_to_id", None)
+        if assigned_to_id:
+            q_filter = Q(id=assigned_to_id) & Q(
+                Q(
+                    groups__name__in=[
+                        CaseGroups.COORDINATOR,
+                        CaseGroups.LAWYER,
+                        CaseGroups.ADMIN,
+                    ]
+                )
+                | Q(is_superuser=True)
+                | Q(is_system_account=True)
+            )
+            issue_id = attrs.get("issue_id", None)
+            if issue_id:
+                q_filter |= Q(issue__id=issue_id) & Q(issue__paralegal=assigned_to_id)
+
+            if not User.objects.filter(q_filter).exists():
+                raise exceptions.ValidationError(
+                    {"assigned_to_id": "User does not have access to the case."}
+                )
+
+        return attrs
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
