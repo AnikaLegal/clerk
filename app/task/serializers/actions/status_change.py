@@ -36,7 +36,7 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
         # Only lawyers can finish a task when approval is required but not yet
         # given.
         request = self.context.get("request", None)
-        if request and not request.user.is_lawyer:
+        if request and not request.user.is_lawyer_or_better:
             instance: Task | None = self.instance
             if (
                 instance
