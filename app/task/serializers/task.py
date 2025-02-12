@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
-from task.models.task import TaskType
 
 
 class TaskListIssueSerializer(IssueSerializer):
@@ -110,18 +109,6 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
-
-    def create(self, validated_data):
-        # Paralegals can only create approval requests or questions.
-        request = self.context.get("request", None)
-        if request and request.user.is_paralegal:
-            type = validated_data.get("type", None)
-            if type is None or type not in [
-                TaskType.APPROVAL_REQUEST,
-                TaskType.QUESTION,
-            ]:
-                raise exceptions.PermissionDenied()
-        return super().create(validated_data)
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a
