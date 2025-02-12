@@ -2,7 +2,6 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 from task.models import Task, TaskEvent
-from task.models.event import TaskEventType
 from task.models.task import TaskStatus
 
 
@@ -33,18 +32,18 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_status(self, value):
-        # Only lawyers can finish a task when approval is required but not yet
+        # Only lawyers+ can finish a task when approval is required but not yet
         # given.
-        request = self.context.get("request", None)
-        if request and not request.user.is_lawyer_or_better:
-            instance: Task | None = self.instance
-            if (
-                instance
-                and instance.is_approval_required
-                and not instance.is_approved
-                and value in [TaskStatus.DONE, TaskStatus.NOT_DONE]
-            ):
-                raise PermissionDenied(detail="Approval is required")
+        if value in [TaskStatus.DONE, TaskStatus.NOT_DONE]:
+            request = self.context.get("request", None)
+            if request and not request.user.is_lawyer_or_better:
+                instance: Task | None = self.instance
+                if (
+                    instance
+                    and instance.is_approval_required
+                    and not instance.is_approved
+                ):
+                    raise PermissionDenied(detail="Approval is required")
         return value
 
     def create_event(self, instance, validated_data):
