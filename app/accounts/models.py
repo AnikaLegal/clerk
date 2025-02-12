@@ -8,13 +8,13 @@ class CaseGroups:
     # Can see everything, add coordinators, paralegals from users
     ADMIN = "Admin"
     # Can see everything, add paralegals
+    LAWYER = "Lawyer"
+    # Can see everything, add paralegals
     COORDINATOR = "Coordinator"
     # Can see assigned cases
     PARALEGAL = "Paralegal"
-    # No special permissions
-    LAWYER = "Lawyer"
 
-    GROUPS = [ADMIN, COORDINATOR, PARALEGAL]
+    GROUPS = [ADMIN, LAWYER, COORDINATOR, PARALEGAL]
 
 
 class University(models.Model):
