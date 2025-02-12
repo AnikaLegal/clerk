@@ -224,7 +224,7 @@ const parseError = (error: any) => {
 }
 
 export const choiceToMap = (choices: string[][]): Map<string, string> => {
-  return choices.reduce(function (map, entry) {
+  return choices.reduce((map, entry) => {
     map.set(entry[0], entry[1])
     return map
   }, new Map())
