@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment
-from task.models.task import Task, TaskStatus, TaskTemplateType, TaskType
+from task.models.task import Task, TaskStatus, TaskType
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -19,6 +19,9 @@ from task.serializers import (
     TaskListSerializer,
     TaskSearchSerializer,
     TaskSerializer,
+)
+from task.serializers.actions import (
+    TaskCreateRequestSerializer,
     TaskStatusChangeSerializer,
 )
 
@@ -44,7 +47,7 @@ def task_list_page_view(request):
                 ("false", "Closed"),
             ],
             "status": TaskStatus.choices,
-            "type": TaskTemplateType.choices + TaskType.choices,
+            "type": TaskType,
         },
     }
     return render_react_page(request, "Tasks", "task-list", context)
@@ -59,7 +62,7 @@ def task_detail_page_view(request, pk):
     context = {
         "choices": {
             "status": TaskStatus.choices,
-            "type": TaskTemplateType.choices + TaskType.choices,
+            "type": TaskType,
         },
         "status": {
             "stopped": TaskStatus.NOT_STARTED,
@@ -91,6 +94,7 @@ class TaskApiViewset(ModelViewSet):
             or self.action == "attachment_delete"
             or self.action == "comments"
             or self.action == "status_change"
+            or self.action == "request"
         ):
             permission_classes = [
                 CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
@@ -247,3 +251,17 @@ class TaskApiViewset(ModelViewSet):
 
         data = TaskSerializer(instance=task).data
         return Response(data)
+
+    @action(detail=True, methods=["POST"], serializer_class=TaskCreateRequestSerializer)
+    def request(self, request, pk):
+        task = self.get_object()
+        data = {
+            **request.data,
+            "issue_id": task.issue_id,
+            "request_task_id": task.pk,
+        }
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

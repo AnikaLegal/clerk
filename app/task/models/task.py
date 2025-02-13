@@ -11,13 +11,16 @@ from .trigger import TasksCaseRole
 from .group import TaskGroup
 
 
-class TaskType(models.TextChoices):
+class RequestTaskType(models.TextChoices):
     """
-    The type of the task.
+    The possible types of request tasks.
     """
 
-    QUESTION = "QUESTION", "Answer a question"
-    APPROVAL_REQUEST = "APPROVAL_REQUEST", "Review request for approval"
+    QUESTION = "QUESTION", "Question"
+    APPROVAL = "APPROVAL", "Approval request"
+
+
+TaskType = list(TaskTemplateType.choices) + list(RequestTaskType.choices)
 
 
 class TaskStatus(models.TextChoices):
@@ -32,9 +35,7 @@ class TaskStatus(models.TextChoices):
 
 
 class Task(TimestampedModel):
-    type = models.CharField(
-        max_length=32, choices=TaskTemplateType.choices + TaskType.choices
-    )
+    type = models.CharField(max_length=32, choices=TaskType)
     name = models.TextField()
     description = models.TextField(blank=True, default="")
     status = models.CharField(
@@ -95,6 +96,10 @@ class Task(TimestampedModel):
         TaskGroup, on_delete=models.SET_NULL, blank=True, null=True
     )
     group_order = models.IntegerField(default=-1)
+
+    request_task = models.ForeignKey(
+        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="requests"
+    )
 
     @property
     def url(self):

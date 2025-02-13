@@ -1,4 +1,3 @@
-from .actions.status_change import TaskStatusChangeSerializer
 from .activity import TaskActivitySerializer
 from .attachment import TaskAttachmentSerializer
 from .comment import TaskCommentSerializer
