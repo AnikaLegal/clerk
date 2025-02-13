@@ -15,7 +15,7 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
         )
 
     # NOTE: This field is not part of the Task model.
-    comment = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False, write_only=True)
 
     @transaction.atomic
     def update(self, instance, validated_data):
