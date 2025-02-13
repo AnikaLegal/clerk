@@ -1,0 +1,8 @@
+allOf:
+  - $ref: ./TaskRequestBase.yaml
+  - type: object
+    properties:
+      id:
+        type: integer
+    required:
+      - id

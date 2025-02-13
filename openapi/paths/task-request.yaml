@@ -1,5 +1,5 @@
-patch:
-  operationId: updateTaskStatus
+post:
+  operationId: createTaskRequest
   parameters:
     - description: Entity ID
       in: path
@@ -12,14 +12,14 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/TaskStatusUpdate.yaml
+          $ref: ../schemas/TaskRequestCreate.yaml
   responses:
-    "200":
+    "201":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/Task.yaml
+            $ref: ../schemas/TaskRequest.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

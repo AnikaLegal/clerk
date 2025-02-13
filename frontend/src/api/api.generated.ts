@@ -516,6 +516,16 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.taskStatusUpdate,
       }),
     }),
+    createTaskRequest: build.mutation<
+      CreateTaskRequestApiResponse,
+      CreateTaskRequestApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/request/`,
+        method: "POST",
+        body: queryArg.taskRequestCreate,
+      }),
+    }),
     getTaskTriggers: build.query<
       GetTaskTriggersApiResponse,
       GetTaskTriggersApiArg
@@ -1014,8 +1024,14 @@ export type UpdateTaskStatusApiResponse =
 export type UpdateTaskStatusApiArg = {
   /** Entity ID */
   id: number;
-  /** Successful response. */
   taskStatusUpdate: TaskStatusUpdate;
+};
+export type CreateTaskRequestApiResponse =
+  /** status 201 Successful response. */ TaskRequest;
+export type CreateTaskRequestApiArg = {
+  /** Entity ID */
+  id: number;
+  taskRequestCreate: TaskRequestCreate;
 };
 export type GetTaskTriggersApiResponse =
   /** status 200 Successful response. */ TaskTrigger[];
@@ -1423,6 +1439,16 @@ export type TaskStatusUpdate = {
   status: string;
   comment?: string;
 };
+export type TaskRequestBase = object;
+export type TaskRequest = TaskRequestBase & {
+  id: number;
+};
+export type TaskRequestCreate = TaskRequestBase & {
+  type: "APPROVAL" | "QUESTION";
+  name: string;
+  description: string;
+  assigned_to_id: number;
+};
 export type TaskTemplate = {
   id?: number;
   type: string;
@@ -1508,6 +1534,7 @@ export const {
   useCreateTaskAttachmentMutation,
   useDeleteTaskAttachmentMutation,
   useUpdateTaskStatusMutation,
+  useCreateTaskRequestMutation,
   useGetTaskTriggersQuery,
   useCreateTaskTriggerMutation,
   useGetTaskTriggerQuery,
