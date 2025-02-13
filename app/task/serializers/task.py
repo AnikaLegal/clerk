@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
+from task.models.template import TaskTemplateType
 
 
 class TaskListIssueSerializer(IssueSerializer):
@@ -102,6 +103,7 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
     issue_id = serializers.UUIDField()
+    type = serializers.ChoiceField(choices=TaskTemplateType.choices)
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
