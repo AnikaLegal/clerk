@@ -6,7 +6,7 @@ import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Button, Modal } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { getAPIErrorMessage } from 'utils'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
@@ -56,7 +56,10 @@ export const CreateTaskModal = ({
     description: '',
   }
 
-  const handleSubmit = (values: TaskCreate, { setSubmitting, resetForm }) => {
+  const handleSubmit = (
+    values: TaskCreate,
+    { setSubmitting, setErrors, resetForm }
+  ) => {
     if (!user.is_lawyer_or_better) {
       values = {
         ...values,
@@ -71,11 +74,15 @@ export const CreateTaskModal = ({
         resetForm()
         onClose()
       })
-      .catch((e) =>
+      .catch((e) => {
         enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create task'), {
           variant: 'error',
         })
-      )
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          setErrors(requestErrors)
+        }
+      })
       .finally(setSubmitting(false))
   }
 
