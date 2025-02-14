@@ -9,7 +9,7 @@ import { Form } from 'semantic-ui-react'
 
 export interface RichTextEditorFieldProps extends RichTextEditorProps {
   name: string
-  label: string
+  label?: string
   required?: boolean
 }
 
@@ -32,7 +32,7 @@ export const RichTextEditorField = ({
 
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <RichTextEditor
         {...props}
         initialContent={meta.initialValue}

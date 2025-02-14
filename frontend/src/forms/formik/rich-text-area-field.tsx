@@ -5,7 +5,7 @@ import { Form } from 'semantic-ui-react'
 
 export interface RichTextAreaFieldProps extends RichTextAreaProps {
   name: string
-  label: string
+  label?: string
   required?: boolean
 }
 
@@ -28,7 +28,7 @@ export const RichTextAreaField = ({
 
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <RichTextArea
         {...props}
         initialContent={meta.initialValue}

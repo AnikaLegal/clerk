@@ -7,7 +7,7 @@ import { DateInputProps } from 'comps/date-input'
 export interface DateInputFieldProps
   extends Omit<DateInputProps, 'value' | 'onChange'> {
   name: string
-  label: string
+  label?: string
   required?: boolean
 }
 
@@ -33,7 +33,7 @@ export const DateInputField = ({
 
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <DateInput
         {...field}
         {...props}

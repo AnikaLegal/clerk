@@ -4,7 +4,7 @@ import { DropdownItemProps } from 'semantic-ui-react'
 
 export interface BooleanFieldProps extends Omit<DropdownFieldProps, 'options'> {
   name: string
-  label: string
+  label?: string
   required?: boolean
 }
 

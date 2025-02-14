@@ -4,7 +4,7 @@ import { Dropdown, DropdownProps, Form } from 'semantic-ui-react'
 
 export interface DropdownFieldProps extends DropdownProps {
   name: string
-  label: string
+  label?: string
   required?: boolean
 }
 
@@ -24,7 +24,7 @@ export const DropdownField = ({
 
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <Dropdown fluid selection {...field} {...props} onChange={handleChange} />
       <ErrorMessage name={name} />
     </Form.Field>
