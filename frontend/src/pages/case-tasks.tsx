@@ -44,7 +44,11 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.TASKS} urls={urls} />
       <Segment basic>
-        <CaseTasks issue={issue} user={CONTEXT.user} choices={CONTEXT.choices}/>
+        <CaseTasks
+          issue={issue}
+          user={CONTEXT.user}
+          choices={CONTEXT.choices}
+        />
       </Segment>
     </Container>
   )
@@ -98,7 +102,7 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
   if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (result.data.length == 0) {
+  if (!result.data || result.data.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No tasks exist for this case.</p>
