@@ -1,4 +1,4 @@
-import api, { TaskCreate } from 'api'
+import api, { Task, TaskCreate, TaskRequestCreate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
@@ -7,37 +7,37 @@ import { getAPIErrorMessage } from 'utils'
 import { DropdownField, RichTextAreaField } from 'forms/formik'
 import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup'
+import { UserInfo } from 'types/global'
 
-const RequestApprovalSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
-  assigned_to_id: Yup.number().required(),
-  description: Yup.string().default(undefined).min(1).required(),
-  issue_id: Yup.string().required(),
+const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
+  type: Yup.string().equals(['APPROVAL']).required(),
   name: Yup.string().required(),
-  type: Yup.string().required(),
-  /* Below not strictly necessary but prevents type error */
-  due_at: Yup.string().notRequired(),
-  is_approval_required: Yup.boolean().notRequired(),
-  is_approved: Yup.boolean().notRequired(),
-  is_urgent: Yup.boolean().notRequired(),
-  status: Yup.string().notRequired(),
+  description: Yup.string().default(undefined).min(1).required(),
+  assigned_to_id: Yup.number().required(),
 })
 
-export const RequestApprovalModal = (props: ModalProps) => {
-  const [createTask] = api.useCreateTaskMutation()
+export const RequestApprovalModal = ({
+  task,
+  user,
+  open,
+  onClose,
+}: ModalProps) => {
+  const [createTaskRequest] = api.useCreateTaskRequestMutation()
 
-  const initialValues = {
-    type: 'APPROVAL_REQUEST',
-    name: `Approval request from ${props.user.full_name}`,
-    issue_id: props.task.issue.id,
-    assigned_to_id: props.task.issue.lawyer?.id,
+  const issue = task.issue
+
+  const initialValues: TaskRequestCreate = {
+    type: 'APPROVAL',
+    name: `Approval request from ${user.full_name}`,
     description: '',
+    assigned_to_id: issue.lawyer?.id,
   }
 
   const handleSubmit = (
-    values: TaskCreate,
-    helpers: FormikHelpers<TaskCreate>
+    values: TaskRequestCreate,
+    helpers: FormikHelpers<TaskRequestCreate>
   ) => {
-    createTask({ taskCreate: values })
+    createTaskRequest({ id: task.id, taskRequestCreate: values })
       .unwrap()
       .then(() =>
         enqueueSnackbar('Created approval request', { variant: 'success' })
@@ -51,7 +51,7 @@ export const RequestApprovalModal = (props: ModalProps) => {
         )
       )
     helpers.resetForm()
-    props.onClose()
+    onClose()
   }
 
   return (
@@ -60,23 +60,22 @@ export const RequestApprovalModal = (props: ModalProps) => {
       isInitialValid={false}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      validationSchema={RequestApprovalSchema}
+      validationSchema={ApprovalRequestSchema}
     >
       {(formik) => {
         const closeHandler = () => {
           formik.resetForm()
-          props.onClose()
+          onClose()
         }
 
         return (
-          <Modal size="tiny" open={props.open} onClose={closeHandler}>
+          <Modal size="tiny" open={open} onClose={closeHandler}>
             <Modal.Header>Request approval for this task</Modal.Header>
             <Modal.Content>
               <Form
                 onSubmit={formik.handleSubmit}
                 error={Object.keys(formik.errors).length > 0}
               >
-                <UserDropdownField {...props} />
                 <RichTextAreaField
                   required
                   name="description"
@@ -99,52 +98,5 @@ export const RequestApprovalModal = (props: ModalProps) => {
         )
       }}
     </Formik>
-  )
-}
-
-const UserDropdownField = (props: ModalProps) => {
-  const userResults = api.useGetUsersQuery({ isActive: true })
-  const lawyer = props.task.issue.lawyer
-
-  let users = userResults.data ? [...userResults.data] : []
-
-  /* Exclude the current user.
-  /* Exclude the supervising lawyer if they are present (we add back irrespective
-   * below).
-   * Include only lawyers.
-   */
-  users = users.filter(
-    (user) =>
-      user.id != props.user.id &&
-      lawyer &&
-      user.id != lawyer.id &&
-      user.is_lawyer_or_better
-  )
-  /* Sort by full name.
-   */
-  users = users.sort((a, b) => a.full_name.localeCompare(b.full_name))
-
-  /* Add the supervising lawyer as the first item.
-   */
-  if (lawyer && !userResults.isLoading) {
-    users.unshift(lawyer)
-  }
-
-  const userOptions = users.map((u) => ({
-    key: u.id,
-    value: u.id,
-    text: u.full_name || u.email,
-    description: (lawyer && u.id === lawyer.id && 'Case Lawyer') || '',
-  }))
-
-  return (
-    <DropdownField
-      name="assigned_to_id"
-      label="To"
-      required
-      search
-      options={userOptions}
-      loading={userResults.isLoading}
-    />
   )
 }
