@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .activity import TaskActivity
-from .task import Task, TaskStatus
+from .task import Task, TaskStatus, RequestTaskType
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ class TaskEventType(models.TextChoices):
     """
 
     REASSIGN = "REASSIGN"
+    REQUEST = "REQUEST"
     RESUME = "RESUME"
     STATUS_CHANGE = "STATUS_CHANGE"
     SUSPEND = "SUSPEND"
@@ -61,6 +62,8 @@ class TaskEvent(models.Model):
                 html = self._get_reassign_html()
             elif self.type == TaskEventType.RESUME:
                 html = self._get_resume_html()
+            elif self.type == TaskEventType.REQUEST:
+                html = self._get_request_html()
         except Exception:
             logger.exception(
                 "Could not generate description for TaskEvent<%s>", self.pk
@@ -115,6 +118,18 @@ class TaskEvent(models.Model):
             + " was added to the case."
         )
 
+    def _get_request_html(self):
+        request_task_id = self.data.get("request_task_id")
+        request_task = Task.objects.get(id=request_task_id)
+
+        if request_task.type == RequestTaskType.APPROVAL:
+            return (
+                _get_user_anchor_tag(self.user)
+                + " submitted an "
+                + f'<a href="{request_task.url}">approval request</a>'
+                + " for this task."
+            )
+
     @staticmethod
     def create_status_change(
         task: Task,
@@ -164,6 +179,18 @@ class TaskEvent(models.Model):
                 "next_user_id": next_user.pk,
             },
         )
+
+    @staticmethod
+    def create_request(task: Task, user: User, request_task: Task):
+        return TaskEvent.objects.create(
+            type=TaskEventType.REQUEST,
+            task=task,
+            user=user,
+            data={
+                "request_task_id": request_task.pk,
+            },
+        )
+
 
 def _get_user_anchor_tag(user: User):
     user_url = reverse("account-detail", args=(user.pk,))

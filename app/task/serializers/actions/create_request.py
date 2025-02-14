@@ -1,6 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
-from task.models import Task
+from task.models import Task, TaskEvent
 from task.models.task import RequestTaskType
 
 
@@ -24,13 +24,16 @@ class TaskCreateRequestSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        self.create_event()
-        return super().create(validated_data)
+        instance: Task = super().create(validated_data)
+        self.create_event(instance)
+        return instance
 
     def validate(self, attrs):
         return attrs
 
-    def create_event(self):
+    def create_event(self, task):
         request = self.context.get("request", None)
         if request:
-            pass
+            TaskEvent.create_request(
+                task=task.requesting_task, user=request.user, request_task=task
+            )
