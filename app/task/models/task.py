@@ -104,7 +104,7 @@ class Task(TimestampedModel):
     @property
     def url(self):
         if self.pk:
-            return settings.CLERK_BASE_URL + reverse("task-detail", args=(self.pk,))
+            return reverse("task-detail", args=(self.pk,))
 
     def save(self, *args, **kwargs):
         # Set internal status flag to indicate if a notification is potentially
