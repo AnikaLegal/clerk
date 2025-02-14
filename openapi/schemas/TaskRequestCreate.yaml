@@ -2,19 +2,4 @@ allOf:
   - $ref: ./TaskRequestBase.yaml
   - type: object
     properties:
-      type:
-        type: string
-        enum:
-          - APPROVAL
-          - QUESTION
-      name:
-        type: string
-      description:
-        type: string
-      assigned_to_id:
-        type: number
     required:
-      - type
-      - name
-      - description
-      - assigned_to_id

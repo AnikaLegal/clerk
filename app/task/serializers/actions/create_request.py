@@ -12,15 +12,15 @@ class TaskCreateRequestSerializer(serializers.ModelSerializer):
             "type",
             "name",
             "description",
-            "issue_id",
             "assigned_to_id",
+            "issue_id",
             "request_task_id",
         )
 
     type = serializers.ChoiceField(choices=RequestTaskType.choices)
-    issue_id = serializers.UUIDField()
     assigned_to_id = serializers.IntegerField()
-    request_task_id = serializers.IntegerField()
+    issue_id = serializers.UUIDField(write_only=True)
+    request_task_id = serializers.IntegerField(write_only=True)
 
     @transaction.atomic
     def create(self, validated_data):

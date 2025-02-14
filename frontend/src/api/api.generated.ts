@@ -1439,16 +1439,16 @@ export type TaskStatusUpdate = {
   status: string;
   comment?: string;
 };
-export type TaskRequestBase = object;
-export type TaskRequest = TaskRequestBase & {
-  id: number;
-};
-export type TaskRequestCreate = TaskRequestBase & {
+export type TaskRequestBase = {
   type: "APPROVAL" | "QUESTION";
   name: string;
   description: string;
   assigned_to_id: number;
 };
+export type TaskRequest = TaskRequestBase & {
+  id: number;
+};
+export type TaskRequestCreate = TaskRequestBase & object;
 export type TaskTemplate = {
   id?: number;
   type: string;
