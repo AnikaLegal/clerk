@@ -1,6 +1,7 @@
 from accounts.models import User
 from case.middleware import COORDINATOR_GROUPS
 from case.serializers import IssueSerializer, UserSerializer
+from core.models import Issue
 from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
@@ -125,9 +126,15 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         if request and not request.user.is_lawyer_or_better:
             raise exceptions.PermissionDenied()
+
         return value
 
     def validate(self, attrs):
+        self._check_assigned_to_user_can_access_issue(attrs)
+        self._check_issue_has_supervisor_when_approval_required(attrs)
+        return attrs
+
+    def _check_assigned_to_user_can_access_issue(self, attrs):
         # Tasks can only be assigned to:
         # - Users with coordinator or greater permissions.
         # - Users assigned as the paralegal on the related case.
@@ -148,7 +155,17 @@ class TaskSerializer(serializers.ModelSerializer):
                     {"assigned_to_id": "User does not have access to the case."}
                 )
 
-        return attrs
+    def _check_issue_has_supervisor_when_approval_required(self, attrs):
+        is_approval_required = attrs.get("is_approval_required", None)
+        if is_approval_required:
+            issue_id = attrs.get("issue_id", None)
+            if (
+                issue_id
+                and not Issue.objects.filter(id=issue_id, lawyer__isnull=False).exists()
+            ):
+                raise exceptions.ValidationError(
+                    {"is_approval_required": "No case supervisor to approve task."}
+                )
 
 
 class TaskSearchSerializer(serializers.ModelSerializer):
