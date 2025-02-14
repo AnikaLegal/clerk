@@ -18,7 +18,7 @@ class TaskCreateRequestSerializer(serializers.ModelSerializer):
         )
 
     type = serializers.ChoiceField(choices=RequestTaskType.choices)
-    assigned_to_id = serializers.IntegerField()
+    assigned_to_id = serializers.IntegerField(required=True)
     issue_id = serializers.UUIDField(write_only=True)
     requesting_task_id = serializers.IntegerField(write_only=True)
 
