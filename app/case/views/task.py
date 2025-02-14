@@ -258,7 +258,7 @@ class TaskApiViewset(ModelViewSet):
         data = {
             **request.data,
             "issue_id": task.issue_id,
-            "request_task_id": task.pk,
+            "requesting_task_id": task.pk,
         }
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)

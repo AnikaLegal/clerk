@@ -97,7 +97,7 @@ class Task(TimestampedModel):
     )
     group_order = models.IntegerField(default=-1)
 
-    request_task = models.ForeignKey(
+    requesting_task = models.ForeignKey(
         "self", on_delete=models.CASCADE, blank=True, null=True, related_name="requests"
     )
 
