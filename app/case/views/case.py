@@ -16,7 +16,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from task.models.task import TaskStatus, TaskTemplateType
+from task.models.task import TaskStatus, TaskType
 
 from case.serializers import (
     IssueNoteSerializer,
@@ -153,7 +153,7 @@ def case_detail_task_list_page_view(request, pk):
         "urls": get_detail_urls(issue),
         "choices": {
             "status": TaskStatus.choices,
-            "type": TaskTemplateType.choices,
+            "type": TaskType,
         },
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
