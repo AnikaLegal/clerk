@@ -1,13 +1,12 @@
-import api, { Task, TaskCreate, TaskRequestCreate } from 'api'
+import api, { TaskRequestCreate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
-import { DropdownField, RichTextAreaField } from 'forms/formik'
+import { RichTextAreaField } from 'forms/formik'
 import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup'
-import { UserInfo } from 'types/global'
 
 const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
   type: Yup.string().equals(['APPROVAL']).required(),
@@ -25,7 +24,6 @@ export const RequestApprovalModal = ({
   const [createTaskRequest] = api.useCreateTaskRequestMutation()
 
   const issue = task.issue
-
   const initialValues: TaskRequestCreate = {
     type: 'APPROVAL',
     name: `Approval request from ${user.full_name}`,
@@ -70,17 +68,18 @@ export const RequestApprovalModal = ({
 
         return (
           <Modal size="tiny" open={open} onClose={closeHandler}>
-            <Modal.Header>Request approval for this task</Modal.Header>
+            <Modal.Header>Request approval to close this task</Modal.Header>
             <Modal.Content>
+              <p>
+                This task requires approval to close. Briefly explain what you
+                need approved including links to relevant documents or draft
+                emails:
+              </p>
               <Form
                 onSubmit={formik.handleSubmit}
                 error={Object.keys(formik.errors).length > 0}
               >
-                <RichTextAreaField
-                  required
-                  name="description"
-                  label="Briefly explain what you are requesting approval for"
-                />
+                <RichTextAreaField name="description" />
               </Form>
             </Modal.Content>
             <Modal.Actions>
