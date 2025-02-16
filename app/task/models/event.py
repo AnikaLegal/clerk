@@ -51,6 +51,10 @@ class TaskEvent(models.Model):
         super().save(*args, **kwargs)
         TaskActivity.objects.create(content_object=self)
 
+    #
+    # TODO: Perhaps tidy this by moving event creation & generating HTML from
+    # the model to separate functions elsewhere?
+    #
     def get_desc_html(self):
         html = ""
         try:
