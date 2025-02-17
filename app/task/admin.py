@@ -84,6 +84,7 @@ class TaskAdmin(admin.ModelAdmin):
         "due_at",
         "is_urgent",
         "is_approval_required",
+        "is_approved",
         "is_open",
         "is_suspended",
     )
