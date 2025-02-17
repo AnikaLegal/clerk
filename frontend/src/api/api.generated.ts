@@ -1345,6 +1345,7 @@ export type TaskList = {
   closed_at: string | null;
   is_urgent: boolean;
   is_approval_required: boolean;
+  is_approval_pending: boolean;
   is_approved: boolean;
   days_open: number;
   url: string;
@@ -1440,13 +1441,12 @@ export type TaskStatusUpdate = {
   status: string;
   comment?: string;
 };
-export type TaskRequestBase = {
+export type TaskRequestCreate = {
   type: "APPROVAL" | "QUESTION";
   name: string;
   description: string;
   assigned_to_id: number;
 };
-export type TaskRequestCreate = TaskRequestBase & object;
 export type TaskTemplate = {
   id?: number;
   type: string;

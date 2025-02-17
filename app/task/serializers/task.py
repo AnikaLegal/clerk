@@ -53,6 +53,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "closed_at",
             "is_urgent",
             "is_approval_required",
+            "is_approval_pending",
             "is_approved",
             "days_open",
             "url",
@@ -69,9 +70,13 @@ class TaskListSerializer(serializers.ModelSerializer):
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
+    is_approval_pending = serializers.SerializerMethodField(read_only=True)
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
+
+    def get_is_approval_pending(self, obj):
+        return obj.is_approval_pending
 
 
 class TaskSerializer(serializers.ModelSerializer):

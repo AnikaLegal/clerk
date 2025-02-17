@@ -24,6 +24,8 @@ properties:
     type: boolean
   is_approval_required:
     type: boolean
+  is_approval_pending:
+    type: boolean
   is_approved:
     type: boolean
   days_open:
@@ -70,6 +72,7 @@ required:
   - closed_at
   - is_urgent
   - is_approval_required
+  - is_approval_pending
   - is_approved
   - days_open
   - url

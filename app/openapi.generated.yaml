@@ -2591,6 +2591,8 @@ components:
           type: boolean
         is_approval_required:
           type: boolean
+        is_approval_pending:
+          type: boolean
         is_approved:
           type: boolean
         days_open:
@@ -2637,6 +2639,7 @@ components:
         - closed_at
         - is_urgent
         - is_approval_required
+        - is_approval_pending
         - is_approved
         - days_open
         - url
@@ -2871,7 +2874,7 @@ components:
           type: string
       required:
         - status
-    TaskRequestBase:
+    TaskRequestCreate:
       type: object
       properties:
         type:
@@ -2890,12 +2893,6 @@ components:
         - name
         - description
         - assigned_to_id
-    TaskRequestCreate:
-      allOf:
-        - $ref: "#/components/schemas/TaskRequestBase"
-        - type: object
-          properties: null
-          required: null
     TaskTemplate:
       type: object
       properties:

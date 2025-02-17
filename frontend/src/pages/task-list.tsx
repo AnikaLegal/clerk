@@ -1,5 +1,6 @@
 import api, { GetTasksApiArg, TaskList } from 'api'
 import { TaskDueDateTableCell } from 'comps/task'
+import { TaskApprovalTableCell } from 'comps/task/task-approval-table-cell'
 import { FadeTransition } from 'comps/transitions'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -191,6 +192,7 @@ const App = () => {
               <Table.HeaderCell>Type</Table.HeaderCell>
               <Table.HeaderCell>Assigned to</Table.HeaderCell>
               <Table.HeaderCell>Status</Table.HeaderCell>
+              <Table.HeaderCell>Approval?</Table.HeaderCell>
               <Table.HeaderCell>Open?</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Due date</Table.HeaderCell>
@@ -220,6 +222,7 @@ const App = () => {
                   )}
                 </Table.Cell>
                 <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+                <TaskApprovalTableCell task={task} />
                 <Table.Cell textAlign="center">
                   {task.is_open ? (
                     <Icon name="check" color="green" />
