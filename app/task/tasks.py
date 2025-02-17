@@ -41,18 +41,17 @@ def handle_event_save(event_pk: int):
         # We don't notify when tasks are suspended.
         suspended_tasks = maybe_suspend_tasks(event)
         logger.info("Suspended task(s): %s", suspended_tasks)
-
     elif is_user_changed(event):
         reassigned_tasks = maybe_reassign_tasks(event)
         logger.info("Reassigned task(s): %s", reassigned_tasks)
         notify_tasks.update(reassigned_tasks)
-
     else:
         if is_user_added(event):
             resumed_tasks = maybe_resume_tasks(event)
             logger.info("Resumed task(s): %s", resumed_tasks)
             notify_tasks.update(resumed_tasks)
         elif is_case_closed(event):
+            # We don't notify when tasks are cancelled.
             cancelled_tasks = maybe_cancel_tasks(event)
             logger.info("Cancelled task(s): %s", cancelled_tasks)
 
@@ -155,9 +154,7 @@ def maybe_cancel_tasks(event: IssueEvent) -> list[int]:
     assert is_case_closed(event)
 
     issue = event.issue
-    tasks = Task.objects.filter(
-        issue=issue, is_open=True
-    )
+    tasks = Task.objects.filter(issue=issue, is_open=True)
     for task in tasks:
         task.status = TaskStatus.NOT_DONE
         task.save()
