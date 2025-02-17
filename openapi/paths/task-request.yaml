@@ -14,12 +14,12 @@ post:
         schema:
           $ref: ../schemas/TaskRequestCreate.yaml
   responses:
-    "201":
+    "200":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/TaskRequest.yaml
+            $ref: ../schemas/Task.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

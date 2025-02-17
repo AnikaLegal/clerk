@@ -106,6 +106,17 @@ class Task(TimestampedModel):
         if self.pk:
             return reverse("task-detail", args=(self.pk,))
 
+    @property
+    def is_approval_pending(self):
+        return (
+            self.pk
+            and self.is_approval_required
+            and not self.is_approved
+            and self.requests.filter(
+                type=RequestTaskType.APPROVAL, is_open=True
+            ).exists()
+        )
+
     def save(self, *args, **kwargs):
         # Set internal status flag to indicate if a notification is potentially
         # required.

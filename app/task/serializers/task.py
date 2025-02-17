@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
+from task.models.task import RequestTaskType
 from task.models.template import TaskTemplateType
 
 
@@ -79,6 +80,7 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "type",
+            "is_type_approval",
             "name",
             "description",
             "status",
@@ -93,6 +95,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "closed_at",
             "is_urgent",
             "is_approval_required",
+            "is_approval_pending",
             "days_open",
             "url",
         )
@@ -112,6 +115,15 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
+
+    is_type_approval = serializers.SerializerMethodField(read_only=True)
+    is_approval_pending = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_type_approval(self, obj):
+        return obj.type == RequestTaskType.APPROVAL
+
+    def get_is_approval_pending(self, obj):
+        return obj.is_approval_pending
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a

@@ -17,6 +17,7 @@ const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
 
 export const RequestApprovalModal = ({
   task,
+  setTask,
   user,
   open,
   onClose,
@@ -37,9 +38,10 @@ export const RequestApprovalModal = ({
   ) => {
     createTaskRequest({ id: task.id, taskRequestCreate: values })
       .unwrap()
-      .then(() =>
+      .then((task) => {
+        setTask(task)
         enqueueSnackbar('Created approval request', { variant: 'success' })
-      )
+      })
       .catch((e) =>
         enqueueSnackbar(
           getAPIErrorMessage(e, 'Failed to create approval request'),

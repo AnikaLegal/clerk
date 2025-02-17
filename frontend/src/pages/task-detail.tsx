@@ -305,9 +305,12 @@ export const TaskHeader = ({
         {task.is_approved ? (
           <Label color="green">Approved</Label>
         ) : (
-          task.is_approval_required && (
-            <Label color="blue">Requires approval</Label>
-          )
+          task.is_approval_required &&
+          (task.is_approval_pending ? (
+            <Label color="blue">Approval pending</Label>
+          ) : (
+            <Label color="orange">Requires approval</Label>
+          ))
         )}
         {task.is_open && task.is_urgent && <Label color="red">Urgent</Label>}
         {task.is_open && isOverdue && <Label color="red">Overdue</Label>}

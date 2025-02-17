@@ -6,12 +6,13 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import action, api_view
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment
-from task.models.task import Task, TaskStatus, TaskType
+from task.models.task import RequestTaskType, Task, TaskStatus, TaskType
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -255,6 +256,12 @@ class TaskApiViewset(ModelViewSet):
     @action(detail=True, methods=["POST"], serializer_class=TaskCreateRequestSerializer)
     def request(self, request, pk):
         task = self.get_object()
+
+        # Disallow approval requests if there is already one pending.
+        type = request.data.get("type", None)
+        if type == RequestTaskType.APPROVAL and task.is_approval_pending:
+            raise ApprovalRequestPendingException()
+
         data = {
             **request.data,
             "issue_id": task.issue_id,
@@ -264,4 +271,19 @@ class TaskApiViewset(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # NOTE: We respond 200 OK with the requesting task, not 203 CREATED
+        # with the created task, as:
+        #
+        # - the user does not necessarily have access to the created task
+        # - it makes refreshing the client-side easier
+        #
+        # Conceptually you can consider this an "update" to the requesting task
+        # that happens to have the side effect of creating a new task.
+        data = TaskSerializer(instance=task).data
+        return Response(data)
+
+
+class ApprovalRequestPendingException(APIException):
+    status_code = 403
+    default_code = "approval_pending"
+    default_detail = "Approval has already been requested and is pending."

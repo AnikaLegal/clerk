@@ -59,11 +59,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
   }
 
   const cancelTaskHandler = () => {
-    if (isApproved) {
-      setOpenCancel(true)
-    } else {
-      setOpenApprove(true)
-    }
+    setOpenCancel(true)
   }
 
   const options: TaskOption[] = [
@@ -95,6 +91,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'check',
       text: 'Complete the task',
       showWhen: () => user.is_paralegal_or_better && task.is_open,
+      disableWhen: () => task.is_approval_required && task.is_approval_pending,
       action: () => finishTaskHandler(),
     },
     {
@@ -102,6 +99,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'close',
       text: 'Cancel the task',
       showWhen: () => user.is_paralegal_or_better && task.is_open,
+      disableWhen: () => task.is_approval_required && task.is_approval_pending,
       action: () => cancelTaskHandler(),
     },
   ]

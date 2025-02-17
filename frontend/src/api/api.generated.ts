@@ -1027,7 +1027,7 @@ export type UpdateTaskStatusApiArg = {
   taskStatusUpdate: TaskStatusUpdate;
 };
 export type CreateTaskRequestApiResponse =
-  /** status 201 Successful response. */ TaskRequest;
+  /** status 200 Successful response. */ Task;
 export type CreateTaskRequestApiArg = {
   /** Entity ID */
   id: number;
@@ -1379,6 +1379,7 @@ export type Task = TaskBase & {
   assigned_to: User;
   is_open: boolean;
   is_suspended: boolean;
+  is_approval_pending: boolean;
   created_at: string;
   closed_at: string | null;
   days_open: number;
@@ -1444,9 +1445,6 @@ export type TaskRequestBase = {
   name: string;
   description: string;
   assigned_to_id: number;
-};
-export type TaskRequest = TaskRequestBase & {
-  id: number;
 };
 export type TaskRequestCreate = TaskRequestBase & object;
 export type TaskTemplate = {

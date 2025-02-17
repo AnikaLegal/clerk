@@ -1601,12 +1601,12 @@ paths:
             schema:
               $ref: "#/components/schemas/TaskRequestCreate"
       responses:
-        "201":
+        "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TaskRequest"
+                $ref: "#/components/schemas/Task"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -2702,6 +2702,8 @@ components:
               type: boolean
             is_suspended:
               type: boolean
+            is_approval_pending:
+              type: boolean
             created_at:
               type: string
             closed_at:
@@ -2718,6 +2720,7 @@ components:
             - assigned_to
             - is_open
             - is_suspended
+            - is_approval_pending
             - created_at
             - closed_at
             - days_open
@@ -2893,15 +2896,6 @@ components:
         - type: object
           properties: null
           required: null
-    TaskRequest:
-      allOf:
-        - $ref: "#/components/schemas/TaskRequestBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-          required:
-            - id
     TaskTemplate:
       type: object
       properties:
