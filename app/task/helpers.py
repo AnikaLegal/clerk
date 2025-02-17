@@ -30,6 +30,17 @@ def is_lawyer_acting_as_paralegal(issue: Issue) -> bool:
     )
 
 
+def is_case_closed(event: IssueEvent) -> bool:
+    """
+    True if the supplied event represents a case closure.
+    """
+    return (
+        event.event_type == EventType.OPEN
+        and event.prev_is_open is not False
+        and event.next_is_open is False
+    )
+
+
 def is_user_added(event: IssueEvent) -> bool:
     """
     True if the supplied event represents a change to a previously unassigned

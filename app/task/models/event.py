@@ -1,13 +1,14 @@
 import logging
 
 from accounts.models import User
+from core.models import Issue
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
 from django.utils import timezone
 
 from .activity import TaskActivity
-from .task import Task, TaskStatus, RequestTaskType
+from .task import RequestTaskType, Task, TaskStatus
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class TaskEventType(models.TextChoices):
     The type of the event.
     """
 
+    CASE_CLOSED = "CASE_CLOSED"
     REASSIGN = "REASSIGN"
     REQUEST = "REQUEST"
     RESUME = "RESUME"
@@ -42,7 +44,7 @@ class TaskEvent(models.Model):
         blank=True,
         related_name="+",
     )
-    data = models.JSONField()
+    data = models.JSONField(null=True)
     note_html = models.TextField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -58,7 +60,9 @@ class TaskEvent(models.Model):
     def get_desc_html(self):
         html = ""
         try:
-            if self.type == TaskEventType.STATUS_CHANGE:
+            if self.type == TaskEventType.CASE_CLOSED:
+                html = self._get_case_closed_html()
+            elif self.type == TaskEventType.STATUS_CHANGE:
                 html = self._get_status_change_html()
             elif self.type == TaskEventType.SUSPEND:
                 html = self._get_suspend_html()
@@ -73,6 +77,14 @@ class TaskEvent(models.Model):
                 "Could not generate description for TaskEvent<%s>", self.pk
             )
         return html
+
+    def _get_case_closed_html(self):
+        issue: Issue = self.task.issue
+        return (
+            "This task was cancelled because case "
+            + f'<a href="{issue.url}">{issue.fileref}</a>'
+            + " was closed."
+        )
 
     def _get_status_change_html(self):
         prev_status = self.data.get("prev_status")
@@ -151,6 +163,15 @@ class TaskEvent(models.Model):
                 "next_status": next_status,
             },
             note_html=note,
+        )
+
+    @staticmethod
+    def create_case_closed(
+        task: Task,
+    ):
+        return TaskEvent.objects.create(
+            type=TaskEventType.CASE_CLOSED,
+            task=task,
         )
 
     @staticmethod

@@ -9,10 +9,12 @@ from django.db.models import Q
 from django.utils import timezone
 from task.helpers import get_coordinators_user
 from task.models import Task, TaskEvent, TaskGroup, TaskTrigger
+from task.models.task import TaskStatus
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
 from .helpers import (
+    is_case_closed,
     is_lawyer_acting_as_paralegal,
     is_user_added,
     is_user_changed,
@@ -50,6 +52,9 @@ def handle_event_save(event_pk: int):
             resumed_tasks = maybe_resume_tasks(event)
             logger.info("Resumed task(s): %s", resumed_tasks)
             notify_tasks.update(resumed_tasks)
+        elif is_case_closed(event):
+            cancelled_tasks = maybe_cancel_tasks(event)
+            logger.info("Cancelled task(s): %s", cancelled_tasks)
 
         created_tasks = maybe_create_tasks(event)
         logger.info("Created task(s): %s", created_tasks)
@@ -139,6 +144,25 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
         task.save()
 
         TaskEvent.create_resume(task=task, next_user=next_user)
+
+    return [task.pk for task in tasks]
+
+
+def maybe_cancel_tasks(event: IssueEvent) -> list[int]:
+    """
+    Cancel all related tasks.
+    """
+    assert is_case_closed(event)
+
+    issue = event.issue
+    tasks = Task.objects.filter(
+        issue=issue, is_open=True
+    )
+    for task in tasks:
+        task.status = TaskStatus.NOT_DONE
+        task.save()
+
+        TaskEvent.create_case_closed(task=task)
 
     return [task.pk for task in tasks]
 
