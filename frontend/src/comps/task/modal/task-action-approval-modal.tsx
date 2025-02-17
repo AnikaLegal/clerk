@@ -1,11 +1,11 @@
 import api, { TaskRequestCreate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
+import { Formik, FormikHelpers } from 'formik'
+import { RichTextEditorField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
-import { RichTextAreaField } from 'forms/formik'
-import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup'
 
 const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
@@ -69,7 +69,7 @@ export const RequestApprovalModal = ({
         }
 
         return (
-          <Modal size="tiny" open={open} onClose={closeHandler}>
+          <Modal size="small" open={open} onClose={closeHandler}>
             <Modal.Header>Request approval to close this task</Modal.Header>
             <Modal.Content>
               <p>
@@ -81,7 +81,7 @@ export const RequestApprovalModal = ({
                 onSubmit={formik.handleSubmit}
                 error={Object.keys(formik.errors).length > 0}
               >
-                <RichTextAreaField name="description" />
+                <RichTextEditorField name="description" />
               </Form>
             </Modal.Content>
             <Modal.Actions>
