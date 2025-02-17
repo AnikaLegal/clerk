@@ -1,9 +1,10 @@
 import api, { TaskRequestCreate } from 'api'
+import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
 import { Formik, FormikHelpers } from 'formik'
 import { RichTextEditorField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
@@ -23,6 +24,7 @@ export const RequestApprovalModal = ({
   onClose,
 }: ModalProps) => {
   const [createTaskRequest] = api.useCreateTaskRequestMutation()
+  const [confirmationOpen, setConfirmationOpen] = useState(false)
 
   const issue = task.issue
   const initialValues: TaskRequestCreate = {
@@ -63,39 +65,58 @@ export const RequestApprovalModal = ({
       validationSchema={ApprovalRequestSchema}
     >
       {(formik) => {
-        const closeHandler = () => {
-          formik.resetForm()
+        const confirmDiscardHandler = () => {
+          setConfirmationOpen(false)
           onClose()
+          formik.resetForm()
+        }
+        const cancelDiscardHandler = () => {
+          setConfirmationOpen(false)
+        }
+        const closeHandler = () => {
+          if (formik.dirty) {
+            setConfirmationOpen(true)
+          } else {
+            onClose()
+            formik.resetForm()
+          }
         }
 
         return (
-          <Modal size="small" open={open} onClose={closeHandler}>
-            <Modal.Header>Request approval to close this task</Modal.Header>
-            <Modal.Content>
-              <p>
-                This task requires approval to close. Briefly explain what you
-                need approved including links to relevant documents or draft
-                emails:
-              </p>
-              <Form
-                onSubmit={formik.handleSubmit}
-                error={Object.keys(formik.errors).length > 0}
-              >
-                <RichTextEditorField name="description" />
-              </Form>
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                primary
-                type="submit"
-                onClick={() => formik.handleSubmit()}
-                disabled={formik.isSubmitting || !formik.isValid}
-              >
-                Request approval
-              </Button>
-              <Button onClick={closeHandler}>Close</Button>
-            </Modal.Actions>
-          </Modal>
+          <>
+            <DiscardChangesConfirmationModal
+              open={confirmationOpen}
+              onConfirm={confirmDiscardHandler}
+              onCancel={cancelDiscardHandler}
+            />
+            <Modal size="small" open={open} onClose={closeHandler}>
+              <Modal.Header>Request approval to close this task</Modal.Header>
+              <Modal.Content>
+                <p>
+                  This task requires approval to close. Briefly explain what you
+                  need approved including links to relevant documents or draft
+                  emails:
+                </p>
+                <Form
+                  onSubmit={formik.handleSubmit}
+                  error={Object.keys(formik.errors).length > 0}
+                >
+                  <RichTextEditorField name="description" />
+                </Form>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button
+                  primary
+                  type="submit"
+                  onClick={() => formik.handleSubmit()}
+                  disabled={formik.isSubmitting || !formik.isValid}
+                >
+                  Request approval
+                </Button>
+                <Button onClick={closeHandler}>Close</Button>
+              </Modal.Actions>
+            </Modal>
+          </>
         )
       }}
     </Formik>
