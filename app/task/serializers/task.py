@@ -94,6 +94,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "due_at",
             "closed_at",
             "is_urgent",
+            "is_approved",
             "is_approval_required",
             "is_approval_pending",
             "days_open",
