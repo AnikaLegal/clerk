@@ -14,7 +14,7 @@ export const DiscardChangesConfirmationModal = ({
 }: DiscardChangesConfirmationModalProps) => {
   return (
     <Modal size="mini" open={open} onClose={null}>
-      <Modal.Header>Discard changes?</Modal.Header>
+      <Modal.Header>Discard unsaved changes?</Modal.Header>
       <Modal.Content>
         Change that you have made will not be saved.
       </Modal.Content>
