@@ -34,6 +34,7 @@ export const TaskActivityGroup = ({
         if (activity.type == 'comment') {
           return (
             <TaskCommentSegment
+              key={activity.id}
               activity={activity}
               comment={activity.data as TaskComment}
             />
@@ -41,6 +42,7 @@ export const TaskActivityGroup = ({
         } else if (activity.type == 'event') {
           return (
             <TaskEventSegment
+              key={activity.id}
               activity={activity}
               event={activity.data as TaskEvent}
             />
@@ -62,7 +64,7 @@ export const TaskCommentSegment = ({
 }: TaskCommentSegmentProps) => {
   const color: SemanticCOLORS = 'blue'
   return (
-    <Segment key={activity.id}>
+    <Segment>
       <Label attached="top" color={color}>
         <a href={comment.creator.url} style={{ opacity: 'inherit' }}>
           {comment.creator.full_name}
@@ -89,7 +91,7 @@ export const TaskEventSegment = ({
   event,
 }: TaskEventSegmentProps) => {
   return (
-    <Segment key={activity.id}>
+    <Segment>
       <Label attached="top">
         Task Update
         <Label.Detail>
