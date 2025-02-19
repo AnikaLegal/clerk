@@ -1333,9 +1333,19 @@ export type DocumentTemplateCreate = {
   topic: string;
   files: Blob[];
 };
+export type TaskType =
+  | "APPROVAL"
+  | "CHECK"
+  | "CONTACT"
+  | "DRAFT"
+  | "MANAGE"
+  | "OTHER"
+  | "QUESTION"
+  | "REVIEW"
+  | "SEND";
 export type TaskList = {
   id: number;
-  type: string;
+  type: TaskType;
   name: string;
   status: string;
   is_open: boolean;
@@ -1373,7 +1383,7 @@ export type TaskBase = {
 };
 export type Task = TaskBase & {
   id: number;
-  type: string;
+  type: TaskType;
   status: string;
   url: string;
   issue: Issue;
@@ -1384,6 +1394,11 @@ export type Task = TaskBase & {
   created_at: string;
   closed_at: string | null;
   days_open: number;
+  requesting_task: {
+    id: string;
+    name: string;
+    url: string;
+  } | null;
 };
 export type TaskCreate = TaskBase & {
   type: string;

@@ -2564,13 +2564,25 @@ components:
       required:
         - topic
         - files
+    TaskType:
+      type: string
+      enum:
+        - APPROVAL
+        - CHECK
+        - CONTACT
+        - DRAFT
+        - MANAGE
+        - OTHER
+        - QUESTION
+        - REVIEW
+        - SEND
     TaskList:
       type: object
       properties:
         id:
           type: integer
         type:
-          type: string
+          $ref: "#/components/schemas/TaskType"
         name:
           type: string
         status:
@@ -2691,7 +2703,7 @@ components:
             id:
               type: integer
             type:
-              type: string
+              $ref: "#/components/schemas/TaskType"
             status:
               type: string
             url:
@@ -2714,6 +2726,20 @@ components:
               nullable: true
             days_open:
               type: integer
+            requesting_task:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                url:
+                  type: string
+              required:
+                - id
+                - name
+                - url
           required:
             - id
             - url
@@ -2727,6 +2753,7 @@ components:
             - created_at
             - closed_at
             - days_open
+            - requesting_task
     TaskCommentBase:
       type: object
       properties:

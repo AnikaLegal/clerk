@@ -5,7 +5,7 @@ allOf:
       id:
         type: integer
       type:
-        type: string
+        $ref: ./TaskType.yaml
       status:
         type: string
       url:
@@ -28,6 +28,20 @@ allOf:
         nullable: true
       days_open:
         type: integer
+      requesting_task:
+        type: object
+        nullable: true
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          url:
+            type: string
+        required:
+          - id
+          - name
+          - url
     required:
       - id
       - url
@@ -41,3 +55,4 @@ allOf:
       - created_at
       - closed_at
       - days_open
+      - requesting_task

@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
-from task.models.task import RequestTaskType
 from task.models.template import TaskTemplateType
 
 
@@ -80,12 +79,25 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    class RequestingTaskSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Task
+            fields = (
+                "id",
+                "name",
+                "url",
+            )
+
+        url = serializers.SerializerMethodField(read_only=True)
+
+        def get_url(self, obj):
+            return reverse("task-detail", args=(obj.pk,))
+
     class Meta:
         model = Task
         fields = (
             "id",
             "type",
-            "is_type_approval",
             "name",
             "description",
             "status",
@@ -102,6 +114,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "is_approved",
             "is_approval_required",
             "is_approval_pending",
+            "requesting_task",
             "days_open",
             "url",
         )
@@ -122,11 +135,8 @@ class TaskSerializer(serializers.ModelSerializer):
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
 
-    is_type_approval = serializers.SerializerMethodField(read_only=True)
+    requesting_task = RequestingTaskSerializer(read_only=True, allow_null=True)
     is_approval_pending = serializers.SerializerMethodField(read_only=True)
-
-    def get_is_type_approval(self, obj):
-        return obj.type == RequestTaskType.APPROVAL
 
     def get_is_approval_pending(self, obj):
         return obj.is_approval_pending
