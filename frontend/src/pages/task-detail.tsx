@@ -6,9 +6,9 @@ import { CaseSummaryCard } from 'comps/case-summary-card'
 import { CommentInput } from 'comps/comment'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
 import {
+  CreateTaskSchema,
   TaskActionCard,
   TaskActivityGroup,
-  CreateTaskSchema,
   TaskMetaCard,
 } from 'comps/task'
 import { Formik } from 'formik'
@@ -302,21 +302,33 @@ export const TaskHeader = ({
         <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
       </Header>
       <span>
-        {task.is_approved ? (
-          <Label color="green">Approved</Label>
-        ) : (
-          task.is_approval_required &&
-          (task.is_approval_pending ? (
-            <Label color="blue">Approval pending</Label>
-          ) : (
-            <Label color="orange">Requires approval</Label>
-          ))
-        )}
+        <TaskApprovalHeader task={task} />
         {task.is_open && task.is_urgent && <Label color="red">Urgent</Label>}
         {task.is_open && isOverdue && <Label color="red">Overdue</Label>}
       </span>
     </>
   )
+}
+
+export const TaskApprovalHeader = ({ task }: { task: Task }) => {
+  if (task.type == 'APPROVAL') {
+    return (
+      <Label>
+        From task{' '}
+        <a href={task.requesting_task.url}>{task.requesting_task.name}</a>
+      </Label>
+    )
+  }
+  if (task.is_approved) {
+    return <Label color="green">Approved</Label>
+  }
+  if (task.is_approval_required) {
+    if (task.is_approval_pending) {
+      return <Label color="blue">Approval pending</Label>
+    }
+    return <Label color="orange">Requires approval</Label>
+  }
+  return null
 }
 
 export const TaskActivity = ({ task, user }: TaskDetailProps) => {
@@ -338,7 +350,7 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
         taskCommentCreate: values,
       })
         .unwrap()
-        .then((instance) => {
+        .then(() => {
           enqueueSnackbar('Added comment', { variant: 'success' })
           editor.commands.clearContent()
         })
