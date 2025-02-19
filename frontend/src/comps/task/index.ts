@@ -4,7 +4,7 @@ import { TaskActionCard } from './task-action-card'
 import { TaskActivityGroup } from './task-activity-group'
 import { TaskApprovalTableCell } from './task-approval-table-cell'
 import { TaskDueDateTableCell } from './task-due-date-table-cell'
-import { TaskMetaCard } from './task-meta-card'
+import { TaskInformationCard } from './task-information-card'
 export {
   CancelTaskModal,
   CreateTaskSchema,
@@ -14,5 +14,6 @@ export {
   TaskActivityGroup,
   TaskApprovalTableCell,
   TaskDueDateTableCell,
-  TaskMetaCard,
+  TaskInformationCard
 }
+

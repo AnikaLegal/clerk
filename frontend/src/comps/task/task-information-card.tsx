@@ -5,12 +5,15 @@ import { Card, Grid, Header } from 'semantic-ui-react'
 import { ModelChoices } from 'types/global'
 import { choiceToMap } from 'utils'
 
-interface TaskMetaCardProps {
+interface TaskInformationCardProps {
   choices: ModelChoices
   task: Task
 }
 
-export const TaskMetaCard = ({ choices, task }: TaskMetaCardProps) => {
+export const TaskInformationCard = ({
+  choices,
+  task,
+}: TaskInformationCardProps) => {
   const statusMap = useMemo(() => choiceToMap(choices.status), [])
 
   return (

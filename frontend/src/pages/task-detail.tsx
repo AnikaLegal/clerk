@@ -9,7 +9,7 @@ import {
   CreateTaskSchema,
   TaskActionCard,
   TaskActivityGroup,
-  TaskMetaCard,
+  TaskInformationCard,
 } from 'comps/task'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
@@ -119,7 +119,7 @@ const App = () => {
           </Segment>
         </Grid.Column>
         <Grid.Column>
-          <TaskMetaCard choices={choices} task={task} />
+          <TaskInformationCard choices={choices} task={task} />
           <TaskActionCard
             task={task}
             setTask={setTask}
