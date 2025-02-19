@@ -29,19 +29,8 @@ allOf:
       days_open:
         type: integer
       requesting_task:
-        type: object
+        $ref: ./Task.yaml
         nullable: true
-        properties:
-          id:
-            type: string
-          name:
-            type: string
-          url:
-            type: string
-        required:
-          - id
-          - name
-          - url
     required:
       - id
       - url

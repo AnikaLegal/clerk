@@ -79,20 +79,6 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    class RequestingTaskSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Task
-            fields = (
-                "id",
-                "name",
-                "url",
-            )
-
-        url = serializers.SerializerMethodField(read_only=True)
-
-        def get_url(self, obj):
-            return reverse("task-detail", args=(obj.pk,))
-
     class Meta:
         model = Task
         fields = (
@@ -134,12 +120,15 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
-
-    requesting_task = RequestingTaskSerializer(read_only=True, allow_null=True)
     is_approval_pending = serializers.SerializerMethodField(read_only=True)
 
     def get_is_approval_pending(self, obj):
         return obj.is_approval_pending
+
+    def get_fields(self):
+        fields = super().get_fields()
+        fields["requesting_task"] = TaskSerializer(read_only=True, allow_null=True)
+        return fields
 
     def to_internal_value(self, data):
         # Convert empty strings to null for date field. This is just a

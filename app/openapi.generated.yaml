@@ -2727,19 +2727,8 @@ components:
             days_open:
               type: integer
             requesting_task:
-              type: object
+              $ref: "#/components/schemas/Task"
               nullable: true
-              properties:
-                id:
-                  type: string
-                name:
-                  type: string
-                url:
-                  type: string
-              required:
-                - id
-                - name
-                - url
           required:
             - id
             - url

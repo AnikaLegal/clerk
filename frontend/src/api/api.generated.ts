@@ -1394,11 +1394,7 @@ export type Task = TaskBase & {
   created_at: string;
   closed_at: string | null;
   days_open: number;
-  requesting_task: {
-    id: string;
-    name: string;
-    url: string;
-  } | null;
+  requesting_task: Task;
 };
 export type TaskCreate = TaskBase & {
   type: string;
