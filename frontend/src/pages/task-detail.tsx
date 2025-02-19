@@ -11,6 +11,7 @@ import {
   TaskActivityGroup,
   TaskInformationCard,
 } from 'comps/task'
+import { TaskRequestingApprovalCard } from 'comps/task/task-requesting-approval-card'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import moment from 'moment'
@@ -87,7 +88,15 @@ const App = () => {
     <Grid columns="equal" relaxed>
       <Grid.Row>
         <Grid.Column>
-          <CaseSummaryCard issue={task.issue} />
+          <>
+            {task.type == 'APPROVAL' && (
+              <TaskRequestingApprovalCard
+                task={task.requesting_task}
+                choices={choices}
+              />
+            )}
+            <CaseSummaryCard issue={task.issue} />
+          </>
         </Grid.Column>
         <Grid.Column
           width={8}
@@ -311,17 +320,10 @@ export const TaskHeader = ({
 }
 
 export const TaskApprovalHeader = ({ task }: { task: Task }) => {
-  if (task.type == 'APPROVAL') {
-    return (
-      <Label as="a" href={task.requesting_task.url}>
-        For task: {task.requesting_task.name}
-      </Label>
-    )
-  }
-  if (task.is_approved) {
-    return <Label color="green">Approved</Label>
-  }
   if (task.is_approval_required) {
+    if (task.is_approved) {
+      return <Label color="green">Approved</Label>
+    }
     if (task.is_approval_pending) {
       return <Label color="blue">Approval pending</Label>
     }
