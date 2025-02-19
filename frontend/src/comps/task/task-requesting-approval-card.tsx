@@ -24,7 +24,6 @@ export const TaskRequestingApprovalCard = ({
         <Grid>
           <Grid.Row columns={1}>
             <Grid.Column>
-              <Header sub>Name</Header>
               <a href={task.url}>{task.name}</a>
             </Grid.Column>
           </Grid.Row>
