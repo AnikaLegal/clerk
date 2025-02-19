@@ -206,7 +206,12 @@ class TaskEvent(models.Model):
         )
 
     @staticmethod
-    def create_request(task: Task, user: User, request_task: Task):
+    def create_request(
+        task: Task,
+        user: User,
+        request_task: Task,
+        note: str | None = None,
+    ):
         return TaskEvent.objects.create(
             type=TaskEventType.REQUEST,
             task=task,
@@ -214,6 +219,7 @@ class TaskEvent(models.Model):
             data={
                 "request_task_id": request_task.pk,
             },
+            note_html=note,
         )
 
 

@@ -35,5 +35,8 @@ class TaskCreateRequestSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         if request:
             TaskEvent.create_request(
-                task=task.requesting_task, user=request.user, request_task=task
+                task=task.requesting_task,
+                user=request.user,
+                request_task=task,
+                note=task.description,
             )
