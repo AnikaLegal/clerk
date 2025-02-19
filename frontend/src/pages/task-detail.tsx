@@ -11,6 +11,7 @@ import {
   TaskActivityGroup,
   TaskInformationCard,
 } from 'comps/task'
+import { TaskApprovalActionCard } from 'comps/task/task-approval-action-card'
 import { TaskRequestingApprovalCard } from 'comps/task/task-requesting-approval-card'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
@@ -129,13 +130,23 @@ const App = () => {
         </Grid.Column>
         <Grid.Column>
           <TaskInformationCard choices={choices} task={task} />
-          <TaskActionCard
-            task={task}
-            setTask={setTask}
-            update={update}
-            user={user}
-            status={status}
-          />
+          {task.type == 'APPROVAL' ? (
+            <TaskApprovalActionCard
+              task={task}
+              setTask={setTask}
+              update={update}
+              user={user}
+              status={status}
+            />
+          ) : (
+            <TaskActionCard
+              task={task}
+              setTask={setTask}
+              update={update}
+              user={user}
+              status={status}
+            />
+          )}
         </Grid.Column>
       </Grid.Row>
     </Grid>

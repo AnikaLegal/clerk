@@ -12,17 +12,17 @@ export interface ModalProps extends TaskActionProps {
   open: boolean
 }
 
-interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
-  status: TaskStatus
-}
-
-interface TaskOption {
+export interface TaskOption {
   id: string
   icon: SemanticICONS
   text: string
   showWhen: () => boolean
   disableWhen?: () => boolean
   action: () => void
+}
+
+interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
+  status: TaskStatus
 }
 
 export const TaskActionCard = (props: TaskActionProps) => {
