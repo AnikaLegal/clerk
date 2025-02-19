@@ -23,7 +23,7 @@ export const TaskInformationCard = ({
         <Grid>
           <Grid.Row columns={2}>
             <Grid.Column>
-              <Header sub>Assigned To</Header>
+              <Header sub>Assigned to</Header>
               {task.assigned_to ? (
                 <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
               ) : (
@@ -37,23 +37,23 @@ export const TaskInformationCard = ({
           </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column>
-              <Header sub>Date Created</Header>
+              <Header sub>Date created</Header>
               {moment(task.created_at).format('DD/MM/YYYY')}
             </Grid.Column>
             <Grid.Column>
-              <Header sub>Date Due</Header>
+              <Header sub>Date due</Header>
               {task.due_at || '-'}
             </Grid.Column>
           </Grid.Row>
           <Grid.Row columns={2}>
             <Grid.Column>
-              <Header sub>Date Closed</Header>
+              <Header sub>Date closed</Header>
               {task.closed_at
                 ? moment(task.closed_at).format('DD/MM/YYYY')
                 : '-'}
             </Grid.Column>
             <Grid.Column>
-              <Header sub>Days Open</Header>
+              <Header sub>Days open</Header>
               {task.days_open}
             </Grid.Column>
           </Grid.Row>
