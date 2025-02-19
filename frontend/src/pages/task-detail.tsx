@@ -313,9 +313,8 @@ export const TaskHeader = ({
 export const TaskApprovalHeader = ({ task }: { task: Task }) => {
   if (task.type == 'APPROVAL') {
     return (
-      <Label>
-        From task{' '}
-        <a href={task.requesting_task.url}>{task.requesting_task.name}</a>
+      <Label as="a" href={task.requesting_task.url}>
+        For task: {task.requesting_task.name}
       </Label>
     )
   }
