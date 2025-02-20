@@ -336,7 +336,7 @@ export const TaskApprovalHeader = ({ task }: { task: Task }) => {
       return <Label color="green">Approved</Label>
     }
     if (task.is_approval_pending) {
-      return <Label color="blue">Approval pending</Label>
+      return <Label color="yellow">Approval pending</Label>
     }
     return <Label color="orange">Requires approval</Label>
   }

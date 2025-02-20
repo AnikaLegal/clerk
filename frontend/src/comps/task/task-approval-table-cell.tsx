@@ -2,12 +2,14 @@ import { TaskList } from 'api'
 import React from 'react'
 import { SemanticCOLORS, Table } from 'semantic-ui-react'
 
-export const getApprovalTextAndColor = (task: TaskList): [string, SemanticCOLORS] => {
+export const getApprovalTextAndColor = (
+  task: TaskList
+): [string, SemanticCOLORS] => {
   if (task.is_approval_required) {
     if (task.is_approved) {
       return ['Approved', 'green']
     } else if (task.is_approval_pending) {
-      return ['Pending', 'blue']
+      return ['Pending', 'yellow']
     } else {
       return ['Required', 'orange']
     }
