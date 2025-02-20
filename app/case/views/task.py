@@ -22,6 +22,7 @@ from task.serializers import (
     TaskSerializer,
 )
 from task.serializers.actions import (
+    TaskApprovalSerializer,
     TaskCreateRequestSerializer,
     TaskStatusChangeSerializer,
 )
@@ -29,6 +30,7 @@ from task.serializers.actions import (
 from case.utils.react import render_react_page
 from case.views.auth import (
     CoordinatorOrBetterPermission,
+    LawyerOrBetterPermission,
     ParalegalOrBetterObjectPermission,
     paralegal_or_better_required,
 )
@@ -88,6 +90,8 @@ class TaskApiViewset(ModelViewSet):
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [IsAuthenticated]
+        elif self.action == "approval":
+            permission_classes = [LawyerOrBetterPermission]
         elif (
             self.action == "retrieve"
             or self.action == "activity"
@@ -181,7 +185,11 @@ class TaskApiViewset(ModelViewSet):
 
         return queryset
 
-    @action(detail=True, methods=["GET"], serializer_class=TaskActivitySerializer)
+    @action(
+        detail=True,
+        methods=["GET"],
+        serializer_class=TaskActivitySerializer,
+    )
     def activity(self, request, pk):
         """
         Task activity.
@@ -260,7 +268,7 @@ class TaskApiViewset(ModelViewSet):
         # Disallow approval requests if there is already one pending.
         type = request.data.get("type", None)
         if type == RequestTaskType.APPROVAL and task.is_approval_pending:
-            raise ApprovalRequestPendingException()
+            raise ApprovalAlreadyPendingException()
 
         data = {
             **request.data,
@@ -282,8 +290,26 @@ class TaskApiViewset(ModelViewSet):
         data = TaskSerializer(instance=task).data
         return Response(data)
 
+    @action(detail=True, methods=["PATCH"], serializer_class=TaskApprovalSerializer)
+    def approval(self, request, pk):
+        task = self.get_object()
+        if task.type != RequestTaskType.APPROVAL:
+            raise NotApprovalException()
 
-class ApprovalRequestPendingException(APIException):
+        serializer = self.get_serializer(instance=task, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        data = TaskSerializer(instance=task).data
+        return Response(data)
+
+
+class ApprovalAlreadyPendingException(APIException):
     status_code = 403
-    default_code = "approval_pending"
-    default_detail = "Approval has already been requested and is pending."
+    default_code = "approval_already_pending"
+    default_detail = "An approval has already been requested and is pending."
+
+class NotApprovalException(APIException):
+    status_code = 403
+    default_code = "task_not_approval_request"
+    default_detail = "Cannot update a task that is not an approval request."

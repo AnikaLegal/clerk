@@ -1,2 +1,3 @@
-from .status_change import TaskStatusChangeSerializer
+from .approval import TaskApprovalSerializer
 from .create_request import TaskCreateRequestSerializer
+from .status_change import TaskStatusChangeSerializer

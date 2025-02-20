@@ -18,6 +18,7 @@ class TaskEventType(models.TextChoices):
     The type of the event.
     """
 
+    APPROVAL = "APPROVAL"
     CASE_CLOSED = "CASE_CLOSED"
     REASSIGN = "REASSIGN"
     REQUEST = "REQUEST"
@@ -60,7 +61,9 @@ class TaskEvent(models.Model):
     def get_desc_html(self):
         html = ""
         try:
-            if self.type == TaskEventType.CASE_CLOSED:
+            if self.type == TaskEventType.APPROVAL:
+                html = self._get_approval_html()
+            elif self.type == TaskEventType.CASE_CLOSED:
                 html = self._get_case_closed_html()
             elif self.type == TaskEventType.STATUS_CHANGE:
                 html = self._get_status_change_html()
@@ -78,6 +81,17 @@ class TaskEvent(models.Model):
             )
         return html
 
+    def _get_approval_html(self):
+        is_approved = self.data.get("is_approved")
+
+        user_a_tag = _get_user_a_tag(self.user)
+        decision = "approved" if is_approved else "denied"
+        determiner = "the" if self.task.type == RequestTaskType.APPROVAL else "this"
+
+        return (
+            f"{user_a_tag} {decision} the request to complete {determiner} task."
+        )
+
     def _get_case_closed_html(self):
         issue: Issue = self.task.issue
         return (
@@ -94,7 +108,7 @@ class TaskEvent(models.Model):
         next_status = TaskStatus[next_status].label
 
         return (
-            _get_user_anchor_tag(self.user)
+            _get_user_a_tag(self.user)
             + f" changed the status from <strong>{prev_status}</strong>"
             + f" to <strong>{next_status}</strong>."
         )
@@ -105,7 +119,7 @@ class TaskEvent(models.Model):
 
         return (
             "This task was suspended because "
-            + _get_user_anchor_tag(prev_user)
+            + _get_user_a_tag(prev_user)
             + " was removed from the case."
         )
 
@@ -118,9 +132,9 @@ class TaskEvent(models.Model):
 
         return (
             "This task was reassigned from "
-            + _get_user_anchor_tag(prev_user)
+            + _get_user_a_tag(prev_user)
             + " to "
-            + _get_user_anchor_tag(next_user)
+            + _get_user_a_tag(next_user)
             + " because the case user was changed."
         )
 
@@ -130,7 +144,7 @@ class TaskEvent(models.Model):
 
         return (
             "This task was resumed because "
-            + _get_user_anchor_tag(next_user)
+            + _get_user_a_tag(next_user)
             + " was added to the case."
         )
 
@@ -140,7 +154,7 @@ class TaskEvent(models.Model):
 
         if request_task.type == RequestTaskType.APPROVAL:
             return (
-                _get_user_anchor_tag(self.user)
+                _get_user_a_tag(self.user)
                 + " submitted an "
                 + f'<a href="{request_task.url}">approval request</a>'
                 + " for this task."
@@ -222,7 +236,22 @@ class TaskEvent(models.Model):
             note_html=note,
         )
 
+    @staticmethod
+    def create_approval(
+        task: Task,
+        user: User,
+        data: dict,
+        note: str | None = None,
+    ):
+        return TaskEvent.objects.create(
+            type=TaskEventType.APPROVAL,
+            task=task,
+            user=user,
+            data=data,
+            note_html=note,
+        )
 
-def _get_user_anchor_tag(user: User):
+
+def _get_user_a_tag(user: User):
     user_url = reverse("account-detail", args=(user.pk,))
     return f'<a href="{user_url}">{user.first_name}</a>'
