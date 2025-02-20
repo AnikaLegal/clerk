@@ -526,6 +526,16 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.taskRequestCreate,
       }),
     }),
+    updateTaskApproval: build.mutation<
+      UpdateTaskApprovalApiResponse,
+      UpdateTaskApprovalApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/task/${queryArg.id}/approval/`,
+        method: "PATCH",
+        body: queryArg.taskApprovalUpdate,
+      }),
+    }),
     getTaskTriggers: build.query<
       GetTaskTriggersApiResponse,
       GetTaskTriggersApiArg
@@ -1033,6 +1043,13 @@ export type CreateTaskRequestApiArg = {
   id: number;
   taskRequestCreate: TaskRequestCreate;
 };
+export type UpdateTaskApprovalApiResponse =
+  /** status 200 Successful response. */ Task;
+export type UpdateTaskApprovalApiArg = {
+  /** Entity ID */
+  id: number;
+  taskApprovalUpdate: TaskApprovalUpdate;
+};
 export type GetTaskTriggersApiResponse =
   /** status 200 Successful response. */ TaskTrigger[];
 export type GetTaskTriggersApiArg = void;
@@ -1458,6 +1475,13 @@ export type TaskRequestCreate = {
   description: string;
   assigned_to_id: number;
 };
+export type TaskApprovalUpdate = {
+  status: string;
+  requesting_task: {
+    is_approved: boolean;
+    comment?: string;
+  };
+};
 export type TaskTemplate = {
   id?: number;
   type: string;
@@ -1544,6 +1568,7 @@ export const {
   useDeleteTaskAttachmentMutation,
   useUpdateTaskStatusMutation,
   useCreateTaskRequestMutation,
+  useUpdateTaskApprovalMutation,
   useGetTaskTriggersQuery,
   useCreateTaskTriggerMutation,
   useGetTaskTriggerQuery,

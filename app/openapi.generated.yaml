@@ -1611,6 +1611,33 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/task/{id}/approval/:
+    patch:
+      operationId: updateTaskApproval
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskApprovalUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/template-task/:
     get:
       operationId: getTaskTriggers
@@ -2909,6 +2936,23 @@ components:
         - name
         - description
         - assigned_to_id
+    TaskApprovalUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        requesting_task:
+          type: object
+          properties:
+            is_approved:
+              type: boolean
+            comment:
+              type: string
+          required:
+            - is_approved
+      required:
+        - status
+        - requesting_task
     TaskTemplate:
       type: object
       properties:

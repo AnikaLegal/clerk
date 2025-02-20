@@ -83,6 +83,8 @@ paths:
     $ref: paths/task-status-change.yaml
   /clerk/api/task/{id}/request/:
     $ref: paths/task-request.yaml
+  /clerk/api/task/{id}/approval/:
+    $ref: paths/task-approval.yaml
   /clerk/api/template-task/:
     $ref: paths/task-trigger-list.yaml
   /clerk/api/template-task/{id}/:
