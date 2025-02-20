@@ -36,7 +36,7 @@ export const TaskApprovalActionCard = ({ task, ...props }: TaskApprovalActionPro
   return (
     <Card fluid>
       <Card.Content header="Task actions" />
-      <TaskActionCardContent options={options} task={task} {...props} />
+      <TaskActionCardContent options={options} />
     </Card>
   )
 }

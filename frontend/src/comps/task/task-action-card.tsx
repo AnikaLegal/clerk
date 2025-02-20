@@ -117,12 +117,12 @@ export const TaskActionCard = (props: TaskActionProps) => {
         {...props}
       />
       <Card.Content header="Task actions" />
-      <TaskActionCardContent options={options} {...props} />
+      <TaskActionCardContent options={options} />
     </Card>
   )
 }
 
-interface TaskActionCardContentProps extends TaskActionProps {
+interface TaskActionCardContentProps {
   options: TaskOption[]
 }
 export const TaskActionCardContent = (props: TaskActionCardContentProps) => {
