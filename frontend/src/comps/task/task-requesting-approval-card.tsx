@@ -1,8 +1,9 @@
-import { Task } from 'api'
+import { Task, TaskList } from 'api'
 import React, { useMemo } from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
 import { ModelChoices } from 'types/global'
 import { choiceToMap } from 'utils'
+import { getApprovalTextAndColor } from './task-approval-table-cell'
 
 interface TaskRequestingApprovalCardProps {
   choices: ModelChoices
@@ -17,6 +18,8 @@ export const TaskRequestingApprovalCard = ({
   if (!task) {
     return null
   }
+  const [text, _] = getApprovalTextAndColor(task as TaskList)
+
   return (
     <Card fluid>
       <Card.Content header="Requesting task" />
@@ -37,8 +40,8 @@ export const TaskRequestingApprovalCard = ({
               )}
             </Grid.Column>
             <Grid.Column>
-              <Header sub>Status</Header>
-              {statusMap.get(task.status)}
+              <Header sub>Approval?</Header>
+              {text}
             </Grid.Column>
           </Grid.Row>
         </Grid>
