@@ -1,6 +1,7 @@
 import logging
 
 from accounts.models import User
+from core.models import Issue
 from django.conf import settings
 from django.db.models import QuerySet
 from django.template.loader import render_to_string
@@ -21,28 +22,27 @@ def notify_of_assignment(task_pks: list[int]) -> None:
     assert tasks.exists()
     logger.info("Notifying assignment of task(s): %s", task_pks)
 
-    for task in tasks.distinct("assigned_to"):
+    for task in tasks.distinct("assigned_to", "issue"):
         if task.assigned_to:
-            user = task.assigned_to
-            tasks_by_user = tasks.filter(assigned_to=user.pk)
-            notify_user_of_assignment(user, tasks_by_user)
+            tasks_by_user_and_issue = tasks.filter(assigned_to=task.assigned_to, issue=task.issue)
+            notify_user_of_assignment(task.assigned_to, task.issue, tasks_by_user_and_issue)
 
 
-def notify_user_of_assignment(user: User, tasks: QuerySet[Task]) -> None:
+def notify_user_of_assignment(user: User, issue: Issue, tasks: QuerySet[Task]) -> None:
     assert tasks.exists()
     logger.info(
-        "Notifying User<%s> assignment of task(s): %s", user.pk, [t.pk for t in tasks]
+        "Notifying User<%s> assignment of task(s) related to Issue<%s>: %s",
+        user.pk,
+        issue.pk,
+        [t.pk for t in tasks],
     )
-
-    text = get_assignment_notify_text(tasks)
+    text = get_assignment_notify_text(issue, tasks)
     notify_user(user, text)
 
 
-def get_assignment_notify_text(tasks: QuerySet[Task]) -> str:
+def get_assignment_notify_text(issue, tasks: QuerySet[Task]) -> str:
     assert tasks.exists()
-
-    # TODO: template needs work.
-    context = {"tasks": tasks, "base_url": settings.CLERK_BASE_URL}
+    context = {"issue": issue, "tasks": tasks, "base_url": settings.CLERK_BASE_URL}
     return render_to_string("task/tasks_assigned.md", context)
 
 
