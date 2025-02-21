@@ -42,7 +42,7 @@ def get_assignment_notify_text(tasks: QuerySet[Task]) -> str:
     assert tasks.exists()
 
     # TODO: template needs work.
-    context = {"tasks": tasks}
+    context = {"tasks": tasks, "base_url": settings.CLERK_BASE_URL}
     return render_to_string("task/tasks_assigned.md", context)
 
 
