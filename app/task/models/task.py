@@ -1,6 +1,5 @@
 from accounts.models import User
 from core.models import Issue, TimestampedModel
-from django.conf import settings
 from django.db import models
 from django.db.models import functions
 from django.urls import reverse
