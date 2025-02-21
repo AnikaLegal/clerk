@@ -83,7 +83,7 @@ def test_trigger_notify__notify_tasks_match_created_tasks(
 
 @pytest.mark.django_db
 @pytest.mark.enable_signals
-@mock.patch("task.notify.notify_user_of_assignment")
+@mock.patch("task.notify.notify_user_of_task_assignment")
 def test_task_notify__notify_on_task_trigger(
     mock_notify,
     django_capture_on_commit_callbacks,
@@ -110,7 +110,7 @@ def test_task_notify__notify_on_task_trigger(
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
         event.save()
 
-    assert mock_notify.call_count == 2 # Once for each trigger.
+    assert mock_notify.call_count == 2  # Once for each trigger.
     for call in mock_notify.mock_calls:
         notify_user = call.args[0]
         notify_tasks = call.args[2]
@@ -127,7 +127,7 @@ def test_task_notify__notify_on_task_trigger(
 
 @pytest.mark.django_db
 @pytest.mark.enable_signals
-@mock.patch("task.notify.notify_user_of_assignment")
+@mock.patch("task.notify.notify_user_of_task_assignment")
 def test_task_notify__notify_on_assignee_change(
     mock_notify,
     django_capture_on_commit_callbacks,
