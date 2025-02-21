@@ -104,6 +104,8 @@ def test_task_notify__notify_on_task_trigger(
         event=EventType.CREATE, tasks_assignment_role=TasksCaseRole.PARALEGAL
     )
 
+    # TODO: add test for TasksCaseRole.COORDINATOR
+
     with django_capture_on_commit_callbacks(execute=True):
         event = IssueEventFactory(event_type=EventType.CREATE, issue=issue)
         event.save()
@@ -111,7 +113,7 @@ def test_task_notify__notify_on_task_trigger(
     assert mock_notify.call_count == 2 # Once for each trigger.
     for call in mock_notify.mock_calls:
         notify_user = call.args[0]
-        notify_tasks = call.args[1]
+        notify_tasks = call.args[2]
 
         assert notify_user in (lawyer, paralegal)
         if notify_user == lawyer:
@@ -139,4 +141,4 @@ def test_task_notify__notify_on_assignee_change(
 
     mock_notify.assert_called_once()
     assert user == mock_notify.call_args.args[0]
-    assert task.pk == mock_notify.call_args.args[1].first().pk
+    assert task.pk == mock_notify.call_args.args[2].first().pk
