@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "social_django",
     # Async tasks
     "django_q",
+    # Auditing
+    "auditlog",
     # Internal apps
     "accounts.apps.AccountsConfig",
     "web.apps.WebConfig",
@@ -87,6 +89,7 @@ MIDDLEWARE = [
     "web.middleware.RedirectMiddleware",
     "case.middleware.annotate_group_access_middleware",
     "django.middleware.locale.LocaleMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 ROOT_URLCONF = "clerk.urls"

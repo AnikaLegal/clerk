@@ -45,6 +45,7 @@ dependencies = [
     "wagtail-localize",
     "wagtail",
     "whitenoise",
+    "django-auditlog>=3.0.0",
 ]
 
 [tool.uv]
