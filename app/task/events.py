@@ -15,28 +15,15 @@ def handle_create_task_log_entry(log_entry: LogEntry):
     next_type = type_changes[1]
 
     if next_type == RequestTaskType.APPROVAL:
-        description_changes = log_entry.changes.get("description")
-        next_description = description_changes[1]
-
-        requesting_task_changes = log_entry.changes.get("requesting_task")
-        next_requesting_task = requesting_task_changes[1]
-
-        return TaskEvent.objects.create(
-            type=TaskEventType.REQUEST,
-            task_id=next_requesting_task,
-            user=log_entry.actor,
-            data={
-                "request_task_id": log_entry.object_id,
-            },
-            note_html=next_description,
-            created_at=log_entry.timestamp,
-        )
+        _handle_approval_task_creation(log_entry)
 
 
 def handle_update_task_log_entry(log_entry: LogEntry):
     assert log_entry.action == LogEntry.Action.UPDATE
     assert log_entry.content_type == ContentType.objects.get_for_model(Task)
 
+    # We can't rely on the type field being in the collection of changed fields
+    # for an update. Get it from the serialized task data.
     serialized_data_fields = log_entry.serialized_data.get("fields")
     task_type = serialized_data_fields.get("type")
 
@@ -45,6 +32,25 @@ def handle_update_task_log_entry(log_entry: LogEntry):
     else:
         _handle_task_assigned_to_update(log_entry)
         _handle_task_status_update(log_entry)
+
+
+def _handle_approval_task_creation(log_entry: LogEntry):
+    description_changes = log_entry.changes.get("description")
+    next_description = description_changes[1]
+
+    requesting_task_changes = log_entry.changes.get("requesting_task")
+    next_requesting_task = requesting_task_changes[1]
+
+    return TaskEvent.objects.create(
+        type=TaskEventType.REQUEST,
+        task_id=next_requesting_task,
+        user=log_entry.actor,
+        data={
+            "request_task_id": log_entry.object_id,
+        },
+        note_html=next_description,
+        created_at=log_entry.timestamp,
+    )
 
 
 def _handle_approval_task_is_open_update(log_entry: LogEntry):
