@@ -1,7 +1,9 @@
 import logging
 from datetime import timedelta
+import ast
 
 from accounts.models import User
+from auditlog.models import LogEntry
 from core.models import Issue, IssueEvent
 from core.models.issue_event import EventType
 from django.db import transaction
@@ -9,7 +11,8 @@ from django.db.models import Q
 from django.utils import timezone
 from task.helpers import get_coordinators_user
 from task.models import Task, TaskEvent, TaskGroup, TaskTrigger
-from task.models.task import TaskStatus
+from task.models.task import TaskStatus, RequestTaskType
+from task.models.event import TaskEventType
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
@@ -81,6 +84,132 @@ def handle_task_save(task_pk: int):
             task.save()
 
 
+@sentry_task
+def handle_task_log(log_entry_pk: int):
+    log_entry = LogEntry.objects.get(pk=log_entry_pk)
+
+    # NOTE: Changes are stored as strings instead of the literal python type
+    # e.g. None is represented as "None" and True as "True". See
+    # https://github.com/jazzband/django-auditlog/issues/675
+    changes = log_entry.changes_dict
+    action = log_entry.action
+    user = log_entry.actor
+    task_id = log_entry.object_id
+    timestamp = log_entry.timestamp
+
+    additional_data = log_entry.additional_data
+    serialized_data = log_entry.serialized_data.get("fields")
+    task_type = serialized_data.get("type")
+
+    if action == LogEntry.Action.CREATE:
+        if task_type == RequestTaskType.APPROVAL:
+            _, description = changes.get("description")
+            _, requesting_task_id = changes.get("requesting_task")
+
+            return TaskEvent.objects.create(
+                type=TaskEventType.REQUEST,
+                task_id=requesting_task_id,
+                user=user,
+                data={
+                    "request_task_id": task_id,
+                },
+                note_html=description,
+                created_at=timestamp,
+            )
+
+    if action == LogEntry.Action.UPDATE:
+        if task_type == RequestTaskType.APPROVAL:
+            is_open = changes.get("is_open", None)
+            if is_open:
+                # Convert to literal python type, see above.
+                prev_is_open, next_is_open = [ast.literal_eval(x) for x in is_open]
+
+                # TODO:
+                is_approved = additional_data.get("is_approved", None)
+                comment = additional_data.get("comment", None)
+
+                requesting_task_id = serialized_data.get("requesting_task")
+
+                if prev_is_open and not next_is_open:
+                    for id in [task_id, requesting_task_id]:
+                        # Task was closed.
+                        TaskEvent.objects.create(
+                            type=TaskEventType.APPROVAL,
+                            task_id=id,
+                            user=user,
+                            data={
+                                "is_approved": is_approved,
+                            },
+                            note_html=comment,
+                            created_at=timestamp,
+                        )
+                else:
+                    # Task was reopened.
+                    pass
+        else:
+            assigned_to = changes.get("assigned_to", None)
+            if assigned_to:
+                # Convert to literal python type, see above.
+                prev_id, next_id = [ast.literal_eval(x) for x in assigned_to]
+
+                if prev_id and not next_id:
+                    TaskEvent.objects.create(
+                        type=TaskEventType.SUSPEND,
+                        task_id=task_id,
+                        user=user,
+                        data={
+                            "prev_user_id": prev_id,
+                        },
+                        created_at=timestamp,
+                    )
+                elif not prev_id and next_id:
+                    TaskEvent.objects.create(
+                        type=TaskEventType.RESUME,
+                        task_id=task_id,
+                        user=user,
+                        data={
+                            "next_user_id": next_id,
+                        },
+                        created_at=timestamp,
+                    )
+                elif prev_id and next_id and prev_id != next_id:
+                    TaskEvent.objects.create(
+                        type=TaskEventType.REASSIGN,
+                        task_id=task_id,
+                        user=user,
+                        data={
+                            "prev_user_id": prev_id,
+                            "next_user_id": next_id,
+                        },
+                        created_at=timestamp,
+                    )
+
+            status = changes.get("status", None)
+            if status:
+                prev_status, next_status = status
+                is_case_closed = additional_data.get("is_case_closed", False)
+                if is_case_closed:
+                    TaskEvent.objects.create(
+                        type=TaskEventType.CANCELLED,
+                        task_id=task_id,
+                        user=user,
+                        created_at=timestamp,
+                    )
+                else:
+                    comment = additional_data.get("comment", None)
+                    TaskEvent.objects.create(
+                        type=TaskEventType.STATUS_CHANGE,
+                        task_id=task_id,
+                        user=user,
+                        data={
+                            "prev_status": prev_status,
+                            "next_status": next_status,
+                        },
+                        note_html=comment,
+                        created_at=timestamp,
+                    )
+
+
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     """
     Suspend tasks assigned to the user being removed from the case.
@@ -112,8 +241,6 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        TaskEvent.create_suspend(task=task, prev_user=prev_user)
-
     return [task.pk for task in tasks]
 
 
@@ -143,8 +270,6 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        TaskEvent.create_reassign(task=task, prev_user=prev_user, next_user=next_user)
-
     return [task.pk for task in tasks]
 
 
@@ -166,8 +291,6 @@ def maybe_resume_tasks(event: IssueEvent) -> list[int]:
         task.is_system_update = True
         task.save()
 
-        TaskEvent.create_resume(task=task, next_user=next_user)
-
     return [task.pk for task in tasks]
 
 
@@ -180,10 +303,12 @@ def maybe_cancel_tasks(event: IssueEvent) -> list[int]:
     issue = event.issue
     tasks = Task.objects.filter(issue=issue, is_open=True)
     for task in tasks:
+        task.set_log_data("is_case_closed", True)
         task.status = TaskStatus.NOT_DONE
-        task.save()
-
-        TaskEvent.create_case_closed(task=task)
+        try:
+            task.save()
+        finally:
+            task.clear_log_data()
 
     return [task.pk for task in tasks]
 

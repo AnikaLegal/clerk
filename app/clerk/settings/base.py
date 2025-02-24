@@ -353,6 +353,15 @@ MAILCHIMP_API_KEY = os.environ.get("MAILCHIMP_API_KEY")
 GOOGLE_ANALYTICS_ID = ""
 FACEBOOK_PIXEL_ID = ""
 
+# Auditing
+AUDITLOG_INCLUDE_TRACKING_MODELS = (
+    {
+        "model": "task.Task",
+        "exclude_fields": ["created_at", "modified_at"],
+        "serialize_data": True,
+    },
+)
+
 
 # MS Graph Integration
 AZURE_AD_CLIENT_ID = os.environ.get("AZURE_AD_CLIENT_ID")

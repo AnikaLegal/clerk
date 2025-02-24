@@ -5,9 +5,10 @@ from django.db.models import functions
 from django.urls import reverse
 from django.utils import timezone
 
+from .additional_log_data import AdditionalLogDataModel
+from .group import TaskGroup
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
-from .group import TaskGroup
 
 
 class RequestTaskType(models.TextChoices):
@@ -33,7 +34,7 @@ class TaskStatus(models.TextChoices):
     NOT_DONE = "NOT_DONE", "Not done"
 
 
-class Task(TimestampedModel):
+class Task(TimestampedModel, AdditionalLogDataModel):
     type = models.CharField(max_length=32, choices=TaskType)
     name = models.TextField()
     description = models.TextField(blank=True, default="")

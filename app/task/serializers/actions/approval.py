@@ -30,25 +30,21 @@ class TaskApprovalSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         data = validated_data.pop("requesting_task", None)
+
         # NOTE: Remove the comment field as it's not part of the Task model.
         comment = data.pop("comment", None)
 
+        # Update the requesting task.
         requesting_task = instance.requesting_task
         for attr, value in data.items():
             setattr(requesting_task, attr, value)
         requesting_task.save()
 
-        self.create_event(instance, data, comment)
-        self.create_event(requesting_task, data, comment)
-
-        return super().update(instance, validated_data)
-
-    def create_event(self, instance, data, comment):
-        request = self.context.get("request", None)
-        if request:
-            TaskEvent.create_approval(
-                task=instance,
-                user=request.user,
-                data=data,
-                note=comment,
-            )
+        # NOTE: Associate some data with this instance so we can access it later
+        # when we process the log entry for the status change.
+        instance.set_log_data("comment", comment)
+        instance.set_log_data("is_approved", data.get("is_approved"))
+        try:
+            return super().update(instance, validated_data)
+        finally:
+            instance.clear_log_data()

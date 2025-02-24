@@ -19,7 +19,7 @@ class TaskEventType(models.TextChoices):
     """
 
     APPROVAL = "APPROVAL"
-    CASE_CLOSED = "CASE_CLOSED"
+    CANCELLED = "CANCELLED"
     REASSIGN = "REASSIGN"
     REQUEST = "REQUEST"
     RESUME = "RESUME"
@@ -63,8 +63,8 @@ class TaskEvent(models.Model):
         try:
             if self.type == TaskEventType.APPROVAL:
                 html = self._get_approval_html()
-            elif self.type == TaskEventType.CASE_CLOSED:
-                html = self._get_case_closed_html()
+            elif self.type == TaskEventType.CANCELLED:
+                html = self._get_cancelled_html()
             elif self.type == TaskEventType.STATUS_CHANGE:
                 html = self._get_status_change_html()
             elif self.type == TaskEventType.SUSPEND:
@@ -88,11 +88,9 @@ class TaskEvent(models.Model):
         decision = "approved" if is_approved else "denied"
         determiner = "the" if self.task.type == RequestTaskType.APPROVAL else "this"
 
-        return (
-            f"{user_a_tag} {decision} the request to complete {determiner} task."
-        )
+        return f"{user_a_tag} {decision} the request to complete {determiner} task."
 
-    def _get_case_closed_html(self):
+    def _get_cancelled_html(self):
         issue: Issue = self.task.issue
         return (
             "This task was cancelled because case "
@@ -159,97 +157,6 @@ class TaskEvent(models.Model):
                 + f'<a href="{request_task.url}">approval request</a>'
                 + " for this task."
             )
-
-    @staticmethod
-    def create_status_change(
-        task: Task,
-        user: User,
-        prev_status: str,
-        next_status: str,
-        note: str | None = None,
-    ):
-        return TaskEvent.objects.create(
-            type=TaskEventType.STATUS_CHANGE,
-            task=task,
-            user=user,
-            data={
-                "prev_status": prev_status,
-                "next_status": next_status,
-            },
-            note_html=note,
-        )
-
-    @staticmethod
-    def create_case_closed(
-        task: Task,
-    ):
-        return TaskEvent.objects.create(
-            type=TaskEventType.CASE_CLOSED,
-            task=task,
-        )
-
-    @staticmethod
-    def create_suspend(task: Task, prev_user: User):
-        return TaskEvent.objects.create(
-            type=TaskEventType.SUSPEND,
-            task=task,
-            data={
-                "prev_user_id": prev_user.pk,
-            },
-        )
-
-    @staticmethod
-    def create_reassign(task: Task, prev_user: User, next_user: User):
-        return TaskEvent.objects.create(
-            type=TaskEventType.REASSIGN,
-            task=task,
-            data={
-                "prev_user_id": prev_user.pk,
-                "next_user_id": next_user.pk,
-            },
-        )
-
-    @staticmethod
-    def create_resume(task: Task, next_user: User):
-        return TaskEvent.objects.create(
-            type=TaskEventType.RESUME,
-            task=task,
-            data={
-                "next_user_id": next_user.pk,
-            },
-        )
-
-    @staticmethod
-    def create_request(
-        task: Task,
-        user: User,
-        request_task: Task,
-        note: str | None = None,
-    ):
-        return TaskEvent.objects.create(
-            type=TaskEventType.REQUEST,
-            task=task,
-            user=user,
-            data={
-                "request_task_id": request_task.pk,
-            },
-            note_html=note,
-        )
-
-    @staticmethod
-    def create_approval(
-        task: Task,
-        user: User,
-        data: dict,
-        note: str | None = None,
-    ):
-        return TaskEvent.objects.create(
-            type=TaskEventType.APPROVAL,
-            task=task,
-            user=user,
-            data=data,
-            note_html=note,
-        )
 
 
 def _get_user_a_tag(user: User):
