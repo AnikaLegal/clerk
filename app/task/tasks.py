@@ -87,12 +87,28 @@ def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
     """
     assert is_user_removed(event)
 
+    event_type = event.event_type
     issue = event.issue
     prev_user = event.prev_user
 
-    tasks = Task.objects.filter(issue=issue, is_open=True, assigned_to=prev_user)
+    # If the removed user is no longer assigned to the case then we also need to
+    # suspend their tasks that were created manually (i.e. don't have an
+    # assignee_role value)
+    q_filter = Q(assignee_role=event_type)
+    if event.prev_user not in [issue.paralegal, issue.lawyer]:
+        q_filter |= Q(assignee_role__isnull=True)
+
+    tasks = Task.objects.filter(
+        q_filter,
+        issue=issue,
+        is_open=True,
+        assigned_to=prev_user,
+    )
     for task in tasks:
         task.assigned_to = None
+        # Set the assignee role so we know who to assign the task to if it is
+        # resumed.
+        task.assignee_role = event_type
         task.is_system_update = True
         task.save()
 
@@ -107,12 +123,20 @@ def maybe_reassign_tasks(event: IssueEvent) -> list[int]:
     """
     assert is_user_changed(event)
 
+    event_type = event.event_type
     issue = event.issue
     prev_user = event.prev_user
     next_user = event.next_user
 
+    # If the previous user is no longer assigned to the case then we also need
+    # to reassign their tasks that were created manually (i.e. don't have an
+    # assignee_role value)
+    q_filter = Q(assignee_role=event_type)
+    if event.prev_user not in [issue.paralegal, issue.lawyer]:
+        q_filter |= Q(assignee_role__isnull=True)
+
     tasks = Task.objects.filter(
-        issue=issue, is_open=True, assigned_to=prev_user, assignee_role=event.event_type
+        q_filter, issue=issue, is_open=True, assigned_to=prev_user
     )
     for task in tasks:
         task.assigned_to = next_user
@@ -200,7 +224,8 @@ def maybe_create_tasks(event: IssueEvent) -> list[int]:
         # Look for existing tasks related to the same issue, assigned to the
         # same user and created using the same template. This could happen if
         # the trigger was activated twice e.g. the case stage was set back to a
-        # previously used stage that was set to activate a task trigger.
+        # previously used stage that was set to activate a task trigger. If we
+        # find one then don't use that template to create a task.
         templates = []
         for template in trigger.templates.all():
             query = Q(issue=event.issue, template=template, assigned_to=user)
@@ -243,6 +268,5 @@ def get_user_by_role(issue: Issue, role: TasksCaseRole) -> User | None:
     if role == TasksCaseRole.LAWYER:
         return issue.lawyer
     if role == TasksCaseRole.COORDINATOR:
-        user = get_coordinators_user()
-        return user
+        return get_coordinators_user()
     return None
