@@ -1,4 +1,5 @@
 from accounts.models import User
+from auditlog.registry import auditlog
 from core.models import Issue, TimestampedModel
 from django.db import models
 from django.db.models import functions
@@ -156,3 +157,10 @@ class Task(TimestampedModel, AdditionalLogDataModel):
             output_field=models.DurationField(),
         )
         return queryset.annotate(days_open=(functions.ExtractDay(expression)))
+
+
+auditlog.register(
+    Task,
+    exclude_fields=["created_at", "modified_at"],
+    serialize_data=True,
+)
