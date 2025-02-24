@@ -11,30 +11,25 @@ def handle_create_task_log_entry(log_entry: LogEntry):
     assert log_entry.action == LogEntry.Action.CREATE
     assert log_entry.content_type == ContentType.objects.get_for_model(Task)
 
-    actor = log_entry.actor
-    changes = log_entry.changes_dict
-    task_id = log_entry.object_id
-    timestamp = log_entry.timestamp
+    type_changes = log_entry.changes.get("type")
+    next_type = type_changes[1]
 
-    serialized_data_fields = log_entry.serialized_data.get("fields")
-    task_type = serialized_data_fields.get("type")
-
-    if task_type == RequestTaskType.APPROVAL:
-        description_changes = changes.get("description")
+    if next_type == RequestTaskType.APPROVAL:
+        description_changes = log_entry.changes.get("description")
         next_description = description_changes[1]
 
-        requesting_task_changes = changes.get("requesting_task")
+        requesting_task_changes = log_entry.changes.get("requesting_task")
         next_requesting_task = requesting_task_changes[1]
 
         return TaskEvent.objects.create(
             type=TaskEventType.REQUEST,
             task_id=next_requesting_task,
-            user=actor,
+            user=log_entry.actor,
             data={
-                "request_task_id": task_id,
+                "request_task_id": log_entry.object_id,
             },
             note_html=next_description,
-            created_at=timestamp,
+            created_at=log_entry.timestamp,
         )
 
 
