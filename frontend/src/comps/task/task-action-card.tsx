@@ -27,8 +27,8 @@ interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
 
 export const TaskActionCard = (props: TaskActionProps) => {
   const [updateTaskStatus] = useUpdateTaskStatusMutation()
-  const [openCancel, setOpenCancel] = useState(false)
-  const [openApprove, setOpenApprove] = useState(false)
+  const [openCancelTask, setOpenCancelTask] = useState(false)
+  const [openRequestApproval, setOpenRequestApproval] = useState(false)
 
   const task = props.task
   const status = props.status
@@ -54,12 +54,12 @@ export const TaskActionCard = (props: TaskActionProps) => {
     if (isApproved) {
       updateStatusHandler({ status: status.finished })
     } else {
-      setOpenApprove(true)
+      setOpenRequestApproval(true)
     }
   }
 
   const cancelTaskHandler = () => {
-    setOpenCancel(true)
+    setOpenCancelTask(true)
   }
 
   const options: TaskOption[] = [
@@ -107,13 +107,13 @@ export const TaskActionCard = (props: TaskActionProps) => {
   return (
     <Card fluid>
       <CancelTaskModal
-        open={openCancel}
-        onClose={() => setOpenCancel(false)}
+        open={openCancelTask}
+        onClose={() => setOpenCancelTask(false)}
         {...props}
       />
       <RequestApprovalModal
-        open={openApprove}
-        onClose={() => setOpenApprove(false)}
+        open={openRequestApproval}
+        onClose={() => setOpenRequestApproval(false)}
         {...props}
       />
       <Card.Content header="Task actions" />
