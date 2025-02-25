@@ -37,15 +37,17 @@ class TaskApprovalSerializer(serializers.ModelSerializer):
 
         # Update the requesting task.
         requesting_task = instance.requesting_task
-        for attr, value in data.items():
-            setattr(requesting_task, attr, value)
-        requesting_task.save()
-
-        # NOTE: Associate some data with this instance so we can access it later
-        # when we process the log entry for the status change.
-        instance.set_log_data("comment", comment)
-        instance.set_log_data("is_approved", data.get("is_approved"))
         try:
-            return super().update(instance, validated_data)
+            # NOTE: Associate some data with this instance so we can access it
+            # later when we process the log entry for the update.
+            requesting_task.set_log_data("request_task_id", instance.id)
+            requesting_task.set_log_data("comment", comment)
+
+            for attr, value in data.items():
+                setattr(requesting_task, attr, value)
+
+            requesting_task.save()
         finally:
-            instance.clear_log_data()
+            requesting_task.clear_log_data()
+
+        return super().update(instance, validated_data)

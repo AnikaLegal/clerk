@@ -22,16 +22,9 @@ def handle_update_task_log_entry(log_entry: LogEntry):
     assert log_entry.action == LogEntry.Action.UPDATE
     assert log_entry.content_type == ContentType.objects.get_for_model(Task)
 
-    # We can't rely on the type field being in the collection of changed fields
-    # for an update. Get it from the serialized task data.
-    serialized_data_fields = log_entry.serialized_data.get("fields")
-    task_type = serialized_data_fields.get("type")
-
-    if task_type == RequestTaskType.APPROVAL:
-        _handle_approval_task_is_open_update(log_entry)
-    else:
-        _handle_task_assigned_to_update(log_entry)
-        _handle_task_status_update(log_entry)
+    _handle_task_is_approval_pending_update(log_entry)
+    _handle_task_assigned_to_update(log_entry)
+    _handle_task_status_update(log_entry)
 
 
 def _handle_approval_task_creation(log_entry: LogEntry):
@@ -53,37 +46,51 @@ def _handle_approval_task_creation(log_entry: LogEntry):
     )
 
 
-def _handle_approval_task_is_open_update(log_entry: LogEntry):
-    is_open = log_entry.changes.get("is_open", None)
-    if is_open:
+def _handle_task_is_approval_pending_update(log_entry: LogEntry):
+    if not log_entry.changes:
+        return
+
+    is_approval_pending: list | None = log_entry.changes.get(
+        "is_approval_pending", None
+    )
+    if is_approval_pending:
         # NOTE: Changes are stored as strings instead of the literal python type
         # e.g. None is represented as "None" and True as "True". See
         # https://github.com/jazzband/django-auditlog/issues/675
-        prev_is_open, next_is_open = [ast.literal_eval(x) for x in is_open]
-
-        if prev_is_open and not next_is_open:
-            is_approved = log_entry.additional_data.get("is_approved", None)
-            comment = log_entry.additional_data.get("comment", None)
-
+        prev_is_approval_pending, next_is_approval_pending = [
+            ast.literal_eval(x) for x in is_approval_pending
+        ]
+        if prev_is_approval_pending and not next_is_approval_pending:
             serialized_data_fields = log_entry.serialized_data.get("fields")
-            requesting_task_id = serialized_data_fields.get("requesting_task")
+            is_approved = serialized_data_fields.get("is_approved")
 
-            for id in [log_entry.object_id, requesting_task_id]:
-                # Task was closed.
-                TaskEvent.objects.create(
-                    type=TaskEventType.APPROVAL,
-                    task_id=id,
-                    user=log_entry.actor,
-                    data={
-                        "is_approved": is_approved,
-                    },
-                    note_html=comment,
-                    created_at=log_entry.timestamp,
-                )
+            additional_data = log_entry.additional_data
+            comment = additional_data.get("comment", None)
+
+            task = TaskEvent.objects.create(
+                type=TaskEventType.APPROVAL,
+                task_id=log_entry.object_id,
+                user=log_entry.actor,
+                data={
+                    "is_approved": is_approved,
+                },
+                note_html=comment,
+                created_at=log_entry.timestamp,
+            )
+
+            # Duplicate event for the request task.
+            request_task_id = additional_data.get("request_task_id", None)
+            if request_task_id:
+                task.pk = None
+                task.task_id = request_task_id
+                task.save()
 
 
 def _handle_task_assigned_to_update(log_entry: LogEntry):
-    assigned_to = log_entry.changes.get("assigned_to", None)
+    if not log_entry.changes:
+        return
+
+    assigned_to: list | None = log_entry.changes.get("assigned_to", None)
     if assigned_to:
         # Convert to literal python type, see above.
         prev_id, next_id = [ast.literal_eval(x) for x in assigned_to]
