@@ -4,10 +4,7 @@ import React, { useState } from 'react'
 import { Card } from 'semantic-ui-react'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
-import {
-  ApprovalDecision,
-  ApprovalModal,
-} from './modal/task-action-approval-modal'
+import { ApprovalDecision, ApprovalDecisionModal } from './modal'
 import { TaskActionCardContent, TaskOption } from './task-action-card'
 
 export interface ModalProps extends TaskApprovalActionProps {
@@ -24,7 +21,7 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
   const [decision, setDecision] = useState<ApprovalDecision>(
     ApprovalDecision.DECLINED
   )
-  const [openApproval, setOpenApproval] = useState(false)
+  const [openApprovalDecision, setOpenApprovalDecision] = useState(false)
 
   const task = props.task
   const status = props.status
@@ -52,7 +49,7 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
 
   const showApprovalModal = (decision: ApprovalDecision) => {
     setDecision(decision)
-    setOpenApproval(true)
+    setOpenApprovalDecision(true)
   }
 
   const options: TaskOption[] = [
@@ -85,9 +82,9 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
 
   return (
     <Card fluid>
-      <ApprovalModal
-        open={openApproval}
-        onClose={() => setOpenApproval(false)}
+      <ApprovalDecisionModal
+        open={openApprovalDecision}
+        onClose={() => setOpenApprovalDecision(false)}
         decision={decision}
         {...props}
       />

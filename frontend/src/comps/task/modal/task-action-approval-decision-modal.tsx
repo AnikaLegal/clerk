@@ -9,7 +9,7 @@ import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
-const ApprovalSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object({
+const ApprovalDecisionSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object({
   status: Yup.string().required(),
   requesting_task: Yup.object({
     is_approved: Yup.boolean().required(),
@@ -22,18 +22,18 @@ export enum ApprovalDecision {
   DECLINED,
 }
 
-interface ApprovalModalProps extends ModalProps {
+interface ApprovalDecisionModalProps extends ModalProps {
   decision: ApprovalDecision
 }
 
-export const ApprovalModal = ({
+export const ApprovalDecisionModal = ({
   task,
   setTask,
   open,
   onClose,
   status,
   decision,
-}: ApprovalModalProps) => {
+}: ApprovalDecisionModalProps) => {
   const [updateTaskApproval] = useUpdateTaskApprovalMutation()
   const [confirmationOpen, setConfirmationOpen] = useState(false)
 
@@ -68,7 +68,7 @@ export const ApprovalModal = ({
       enableReinitialize
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      validationSchema={ApprovalSchema}
+      validationSchema={ApprovalDecisionSchema}
     >
       {(formik) => {
         const confirmDiscardHandler = () => {
