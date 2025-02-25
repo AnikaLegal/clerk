@@ -85,10 +85,10 @@ class TaskEvent(models.Model):
         is_approved = self.data.get("is_approved")
 
         user_a_tag = _get_user_a_tag(self.user)
-        decision = "approved" if is_approved else "denied"
+        decision = "approved" if is_approved else "declined"
         determiner = "the" if self.task.type == RequestTaskType.APPROVAL else "this"
 
-        return f"{user_a_tag} {decision} the request to complete {determiner} task."
+        return f"{user_a_tag} <strong>{decision}</strong> the request to complete {determiner} task."
 
     def _get_cancelled_html(self):
         issue: Issue = self.task.issue
