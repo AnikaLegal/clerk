@@ -61,7 +61,7 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
       action: () =>
         updateApprovalHandler({
           status: status.stopped,
-          requesting_task: { is_approved: false },
+          requesting_task: { is_approved: false, is_approval_pending: true },
         }),
     },
     {

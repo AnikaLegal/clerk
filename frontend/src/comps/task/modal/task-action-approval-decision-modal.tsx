@@ -9,13 +9,16 @@ import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
-const ApprovalDecisionSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object({
-  status: Yup.string().required(),
-  requesting_task: Yup.object({
-    is_approved: Yup.boolean().required(),
-    comment: Yup.string().optional(),
-  }).required(),
-})
+const ApprovalDecisionSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object(
+  {
+    status: Yup.string().required(),
+    requesting_task: Yup.object({
+      is_approved: Yup.boolean().required(),
+      is_approval_pending: Yup.boolean().required(),
+      comment: Yup.string().optional(),
+    }).required(),
+  }
+)
 
 export enum ApprovalDecision {
   APPROVED,
@@ -39,7 +42,10 @@ export const ApprovalDecisionModal = ({
 
   const initialValues: TaskApprovalUpdate = {
     status: status.finished,
-    requesting_task: { is_approved: decision == ApprovalDecision.APPROVED },
+    requesting_task: {
+      is_approved: decision == ApprovalDecision.APPROVED,
+      is_approval_pending: false,
+    },
   }
 
   const handleSubmit = (values: TaskApprovalUpdate) => {

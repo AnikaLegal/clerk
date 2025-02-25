@@ -1390,7 +1390,7 @@ export type TaskList = {
 };
 export type TaskBase = {
   name: string;
-  description: string;
+  description?: string;
   issue_id: string;
   assigned_to_id: number | null;
   due_at?: string | null;
@@ -1479,6 +1479,7 @@ export type TaskApprovalUpdate = {
   status: string;
   requesting_task: {
     is_approved: boolean;
+    is_approval_pending: boolean;
     comment?: string;
   };
 };

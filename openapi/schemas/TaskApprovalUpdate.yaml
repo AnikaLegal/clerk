@@ -7,10 +7,13 @@ properties:
     properties:
       is_approved:
         type: boolean
+      is_approval_pending:
+        type: boolean
       comment:
         type: string
     required:
       - is_approved
+      - is_approval_pending
 required:
   - status
   - requesting_task
