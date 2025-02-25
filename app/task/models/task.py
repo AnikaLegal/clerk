@@ -45,12 +45,19 @@ class Task(TimestampedModel, AdditionalLogDataModel):
     due_at = models.DateField(blank=True, null=True, default=None)
     closed_at = models.DateTimeField(blank=True, null=True, default=None)
     is_urgent = models.BooleanField(default=False)
+
+    # Fields related to approval requests
     is_approval_required = models.BooleanField(default=False)
+    is_approval_pending = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+
+    requesting_task = models.ForeignKey(
+        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="requests"
+    )
 
     # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
-    is_approved = models.BooleanField(default=False)
 
     # We use these two flags to handle sending notifications when the assignee
     # changes. The flags operate as follows:
@@ -98,25 +105,10 @@ class Task(TimestampedModel, AdditionalLogDataModel):
     )
     group_order = models.IntegerField(default=-1)
 
-    requesting_task = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="requests"
-    )
-
     @property
     def url(self):
         if self.pk:
             return reverse("task-detail", args=(self.pk,))
-
-    @property
-    def is_approval_pending(self):
-        return (
-            self.pk
-            and self.is_approval_required
-            and not self.is_approved
-            and self.requests.filter(
-                type=RequestTaskType.APPROVAL, is_open=True
-            ).exists()
-        )
 
     def save(self, *args, **kwargs):
         # Set internal status flag to indicate if a notification is potentially

@@ -1,6 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
-from task.models import Task, TaskEvent
+from task.models import Task
 
 
 class TaskApprovalRequestingTaskSerializer(serializers.ModelSerializer):
@@ -9,6 +9,7 @@ class TaskApprovalRequestingTaskSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "is_approved",
+            "is_approval_pending",
             "comment",
         )
 

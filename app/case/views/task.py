@@ -279,6 +279,9 @@ class TaskApiViewset(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        task.is_approval_pending = True
+        task.save()
+
         # NOTE: We respond 200 OK with the requesting task, not 203 CREATED
         # with the created task, as:
         #
