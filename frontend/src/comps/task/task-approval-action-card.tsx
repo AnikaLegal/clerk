@@ -1,14 +1,13 @@
-import {
-  TaskApprovalUpdate,
-  TaskStatusUpdate,
-  useUpdateTaskApprovalMutation,
-  useUpdateTaskStatusMutation,
-} from 'api'
+import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
 import { enqueueSnackbar } from 'notistack'
-import React from 'react'
+import React, { useState } from 'react'
 import { Card } from 'semantic-ui-react'
 import { TaskDetailProps, TaskStatus } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
+import {
+  ApprovalDecision,
+  ApprovalModal,
+} from './modal/task-action-approval-modal'
 import { TaskActionCardContent, TaskOption } from './task-action-card'
 
 export interface ModalProps extends TaskApprovalActionProps {
@@ -20,13 +19,16 @@ interface TaskApprovalActionProps extends Omit<TaskDetailProps, 'choices'> {
   status: TaskStatus
 }
 
-export const TaskApprovalActionCard = ({
-  task,
-  setTask,
-  status,
-  user,
-}: TaskApprovalActionProps) => {
+export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
   const [updateTaskApproval] = useUpdateTaskApprovalMutation()
+  const [decision, setDecision] = useState<ApprovalDecision>(
+    ApprovalDecision.DECLINED
+  )
+  const [openApproval, setOpenApproval] = useState(false)
+
+  const task = props.task
+  const status = props.status
+  const user = props.user
 
   const updateApprovalHandler = (values: TaskApprovalUpdate) => {
     updateTaskApproval({
@@ -35,7 +37,7 @@ export const TaskApprovalActionCard = ({
     })
       .unwrap()
       .then((task) => {
-        setTask(task)
+        props.setTask(task)
         enqueueSnackbar('Updated task approval', { variant: 'success' })
       })
       .catch((e) => {
@@ -46,6 +48,11 @@ export const TaskApprovalActionCard = ({
           }
         )
       })
+  }
+
+  const showApprovalModal = (decision: ApprovalDecision) => {
+    setDecision(decision)
+    setOpenApproval(true)
   }
 
   const options: TaskOption[] = [
@@ -65,27 +72,25 @@ export const TaskApprovalActionCard = ({
       icon: 'check',
       text: 'Approve the request',
       showWhen: () => task.is_open,
-      action: () =>
-        updateApprovalHandler({
-          status: status.finished,
-          requesting_task: { is_approved: true },
-        }),
+      action: () => showApprovalModal(ApprovalDecision.APPROVED),
     },
     {
-      id: 'deny',
+      id: 'decline',
       icon: 'close',
-      text: 'Deny the request',
+      text: 'Decline the request',
       showWhen: () => task.is_open,
-      action: () =>
-        updateApprovalHandler({
-          status: status.finished,
-          requesting_task: { is_approved: false },
-        }),
+      action: () => showApprovalModal(ApprovalDecision.DECLINED),
     },
   ]
 
   return (
     <Card fluid>
+      <ApprovalModal
+        open={openApproval}
+        onClose={() => setOpenApproval(false)}
+        decision={decision}
+        {...props}
+      />
       <Card.Content header="Task actions" />
       <TaskActionCardContent options={options} />
     </Card>

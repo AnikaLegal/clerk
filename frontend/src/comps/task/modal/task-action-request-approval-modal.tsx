@@ -1,74 +1,68 @@
-import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
+import api, { TaskRequestCreate } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
-import { Formik } from 'formik'
-import { RichTextAreaField } from 'forms/formik'
+import { Formik, FormikHelpers } from 'formik'
+import { RichTextEditorField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
-const ApprovalSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object({
-  status: Yup.string().required(),
-  requesting_task: Yup.object({
-    is_approved: Yup.boolean().required(),
-    comment: Yup.string().optional(),
-  }).required(),
+const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
+  type: Yup.string().equals(['APPROVAL']).required(),
+  name: Yup.string().required(),
+  description: Yup.string().default(undefined).min(1).required(),
+  assigned_to_id: Yup.number().required(),
 })
 
-export enum ApprovalDecision {
-  APPROVED,
-  DECLINED,
-}
-
-interface ApprovalModalProps extends ModalProps {
-  decision: ApprovalDecision
-}
-
-export const ApprovalModal = ({
+export const RequestApprovalModal = ({
   task,
   setTask,
+  user,
   open,
   onClose,
-  status,
-  decision,
-}: ApprovalModalProps) => {
-  const [updateTaskApproval] = useUpdateTaskApprovalMutation()
+}: ModalProps) => {
+  const [createTaskRequest] = api.useCreateTaskRequestMutation()
   const [confirmationOpen, setConfirmationOpen] = useState(false)
 
-  const initialValues: TaskApprovalUpdate = {
-    status: status.finished,
-    requesting_task: { is_approved: decision == ApprovalDecision.APPROVED },
+  const issue = task.issue
+  const initialValues: TaskRequestCreate = {
+    type: 'APPROVAL',
+    name: `Approval request from ${user.full_name}`,
+    description: '',
+    assigned_to_id: issue.lawyer?.id,
   }
 
-  const handleSubmit = (values: TaskApprovalUpdate) => {
-    updateTaskApproval({
-      id: task.id,
-      taskApprovalUpdate: values,
-    })
+  const handleSubmit = (
+    values: TaskRequestCreate,
+    helpers: FormikHelpers<TaskRequestCreate>
+  ) => {
+    createTaskRequest({ id: task.id, taskRequestCreate: values })
       .unwrap()
       .then((task) => {
         setTask(task)
-        enqueueSnackbar('Updated task approval', { variant: 'success' })
-        onClose()
+        enqueueSnackbar('Created approval request', { variant: 'success' })
       })
-      .catch((e) => {
+      .catch((e) =>
         enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to update task approval'),
+          getAPIErrorMessage(e, 'Failed to create approval request'),
           {
             variant: 'error',
           }
         )
-      })
+      )
+    helpers.resetForm()
+    onClose()
   }
 
   return (
     <Formik
       enableReinitialize
+      isInitialValid={false}
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      validationSchema={ApprovalSchema}
+      validationSchema={ApprovalRequestSchema}
     >
       {(formik) => {
         const confirmDiscardHandler = () => {
@@ -96,34 +90,28 @@ export const ApprovalModal = ({
               onCancel={cancelDiscardHandler}
             />
             <Modal size="small" open={open} onClose={closeHandler}>
-              <Modal.Header>
-                {decision == ApprovalDecision.APPROVED
-                  ? 'Approve the request'
-                  : 'Decline the request'}
-              </Modal.Header>
+              <Modal.Header>Request approval to close this task</Modal.Header>
               <Modal.Content>
                 <p>
-                  You may leave an <strong>optional</strong> comment with your
-                  approval decision:
+                  This task requires approval to close. Briefly explain what you
+                  need approved including links to relevant documents or draft
+                  emails:
                 </p>
                 <Form
                   onSubmit={formik.handleSubmit}
                   error={Object.keys(formik.errors).length > 0}
                 >
-                  <RichTextAreaField name="requesting_task.comment" />
+                  <RichTextEditorField name="description" />
                 </Form>
               </Modal.Content>
               <Modal.Actions>
                 <Button
                   primary
                   type="submit"
-                  negative={decision == ApprovalDecision.DECLINED}
                   onClick={() => formik.handleSubmit()}
                   disabled={formik.isSubmitting || !formik.isValid}
                 >
-                  {decision == ApprovalDecision.APPROVED
-                    ? 'Approve request'
-                    : 'Decline request'}
+                  Request approval
                 </Button>
                 <Button onClick={closeHandler}>Close</Button>
               </Modal.Actions>
