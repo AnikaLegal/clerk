@@ -1,5 +1,4 @@
 from .activity import TaskActivity
-from .additional_log_data import AdditionalLogDataModel
 from .attachment import TaskAttachment
 from .comment import TaskComment
 from .event import TaskEvent

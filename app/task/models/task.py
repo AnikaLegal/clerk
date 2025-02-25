@@ -5,8 +5,8 @@ from django.db import models
 from django.db.models import functions
 from django.urls import reverse
 from django.utils import timezone
+from task.auditlog import LogDataMixin
 
-from .additional_log_data import AdditionalLogDataModel
 from .group import TaskGroup
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
@@ -35,7 +35,7 @@ class TaskStatus(models.TextChoices):
     NOT_DONE = "NOT_DONE", "Not done"
 
 
-class Task(TimestampedModel, AdditionalLogDataModel):
+class Task(TimestampedModel, LogDataMixin):
     type = models.CharField(max_length=32, choices=TaskType)
     name = models.TextField()
     description = models.TextField(blank=True, default="")
