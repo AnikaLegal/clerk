@@ -32,14 +32,11 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { Model, UserInfo } from 'types/global'
-import { TaskDetailProps, TaskStatus } from 'types/task'
+import { TaskDetailProps, TaskDetailChoices, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
-  choices: {
-    status: [string, string][]
-    type: [string, string][]
-  }
+  choices: TaskDetailChoices
   status: TaskStatus
   task_pk: number
   list_url: string
@@ -312,7 +309,7 @@ export const TaskHeader = ({
   user,
   status,
 }: TaskHeaderProps) => {
-  const typeLabels = useMemo(() => choiceToMap(choices.type), [])
+  const typeLabels = useMemo(() => choiceToMap(choices.type), [choices.type])
   const isOverdue = getIsOverdue(task)
 
   return (
@@ -343,7 +340,7 @@ export const TaskApprovalHeader = ({ task }: { task: Task }) => {
   return null
 }
 
-export const TaskActivity = ({ task, user }: TaskDetailProps) => {
+export const TaskActivity = ({ task, user, choices }: TaskDetailProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
   /* TODO: handle errors.
@@ -379,6 +376,7 @@ export const TaskActivity = ({ task, user }: TaskDetailProps) => {
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
       <TaskActivityGroup
         activities={activities}
+        choices={choices}
         loading={activityResult.isLoading}
       />
     </>

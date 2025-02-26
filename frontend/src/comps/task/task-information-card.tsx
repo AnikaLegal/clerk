@@ -2,11 +2,11 @@ import { Task } from 'api'
 import moment from 'moment'
 import React, { useMemo } from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
-import { ModelChoices } from 'types/global'
+import { TaskDetailChoices } from 'types/task'
 import { choiceToMap } from 'utils'
 
 interface TaskInformationCardProps {
-  choices: ModelChoices
+  choices: TaskDetailChoices
   task: Task
 }
 

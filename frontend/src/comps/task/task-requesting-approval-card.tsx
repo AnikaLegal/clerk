@@ -1,12 +1,12 @@
 import { Task, TaskList } from 'api'
 import React, { useMemo } from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
-import { ModelChoices } from 'types/global'
+import { TaskDetailChoices } from 'types/task'
 import { choiceToMap } from 'utils'
 import { getApprovalTextAndColor } from './task-approval-table-cell'
 
 interface TaskRequestingApprovalCardProps {
-  choices: ModelChoices
+  choices: TaskDetailChoices
   task: Task
 }
 
@@ -14,7 +14,6 @@ export const TaskRequestingApprovalCard = ({
   choices,
   task,
 }: TaskRequestingApprovalCardProps) => {
-  const statusMap = useMemo(() => choiceToMap(choices.status), [])
   if (!task) {
     return null
   }

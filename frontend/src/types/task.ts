@@ -1,5 +1,5 @@
 import { Task } from 'api'
-import { ModelChoices, UserInfo, SetModel, UpdateModel } from 'types/global'
+import { SetModel, UpdateModel, UserInfo } from 'types/global'
 
 export interface TaskStatus {
   cancelled: string
@@ -8,12 +8,16 @@ export interface TaskStatus {
   stopped: string
 }
 
+export interface TaskDetailChoices {
+  event_type: [string, string][]
+  status: [string, string][]
+  type: [string, string][]
+}
+
 export interface TaskDetailProps {
-  choices: ModelChoices
+  choices: TaskDetailChoices
   task: Task
   setTask: SetModel<Task>
   update: UpdateModel<Task>
   user: UserInfo
 }
-
-

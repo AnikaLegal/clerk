@@ -1,16 +1,17 @@
-import React from 'react'
 import { TaskActivity, TaskComment, TaskEvent } from 'api'
+import { RichTextDisplay } from 'comps/rich-text'
+import moment from 'moment'
+import React, { useMemo } from 'react'
 import {
-  Segment,
   Comment,
-  Loader,
   Label,
-  Icon,
+  Loader,
+  Segment,
   SemanticCOLORS,
 } from 'semantic-ui-react'
-import moment from 'moment'
 import styled from 'styled-components'
-import { RichTextDisplay } from 'comps/rich-text'
+import { TaskDetailChoices } from 'types/task'
+import { choiceToMap } from 'utils'
 
 const StyledCommentGroup = styled(Comment.Group)`
   && {
@@ -20,11 +21,13 @@ const StyledCommentGroup = styled(Comment.Group)`
 
 export interface TaskActivityGroupProps {
   activities: TaskActivity[]
+  choices: TaskDetailChoices
   loading: boolean
 }
 
 export const TaskActivityGroup = ({
   activities,
+  choices,
   loading,
 }: TaskActivityGroupProps) => {
   return (
@@ -35,7 +38,6 @@ export const TaskActivityGroup = ({
           return (
             <TaskCommentSegment
               key={activity.id}
-              activity={activity}
               comment={activity.data as TaskComment}
             />
           )
@@ -43,8 +45,8 @@ export const TaskActivityGroup = ({
           return (
             <TaskEventSegment
               key={activity.id}
-              activity={activity}
               event={activity.data as TaskEvent}
+              choices={choices}
             />
           )
         }
@@ -54,14 +56,10 @@ export const TaskActivityGroup = ({
 }
 
 export interface TaskCommentSegmentProps {
-  activity: TaskActivity
   comment: TaskComment
 }
 
-export const TaskCommentSegment = ({
-  activity,
-  comment,
-}: TaskCommentSegmentProps) => {
+export const TaskCommentSegment = ({ comment }: TaskCommentSegmentProps) => {
   const color: SemanticCOLORS = 'blue'
   return (
     <Segment>
@@ -82,18 +80,17 @@ export const TaskCommentSegment = ({
 }
 
 export interface TaskEventSegmentProps {
-  activity: TaskActivity
   event: TaskEvent
+  choices: TaskDetailChoices
 }
 
-export const TaskEventSegment = ({
-  activity,
-  event,
-}: TaskEventSegmentProps) => {
+export const TaskEventSegment = ({ event, choices }: TaskEventSegmentProps) => {
+  const eventTypeLabels = useMemo(() => choiceToMap(choices.event_type), [choices.event_type])
+  const typeLabel = eventTypeLabels.get(event.type)
   return (
     <Segment>
       <Label attached="top">
-        Task Update
+        {typeLabel}
         <Label.Detail>
           {moment(event.created_at).format('DD/MM/YY [at] h:mmA')}
         </Label.Detail>

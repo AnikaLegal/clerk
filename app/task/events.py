@@ -35,7 +35,7 @@ def _handle_approval_task_creation(log_entry: LogEntry):
     next_requesting_task = requesting_task_changes[1]
 
     return TaskEvent.objects.create(
-        type=TaskEventType.REQUEST,
+        type=TaskEventType.APPROVAL_REQUEST,
         task_id=next_requesting_task,
         user=log_entry.actor,
         data={
@@ -68,7 +68,7 @@ def _handle_task_is_approval_pending_update(log_entry: LogEntry):
             comment = additional_data.get("comment", None)
 
             task = TaskEvent.objects.create(
-                type=TaskEventType.APPROVAL,
+                type=TaskEventType.APPROVAL_RESPONSE,
                 task_id=log_entry.object_id,
                 user=log_entry.actor,
                 data={
@@ -136,7 +136,7 @@ def _handle_task_status_update(log_entry: LogEntry):
         is_case_closed = log_entry.additional_data.get("is_case_closed", False)
         if is_case_closed:
             TaskEvent.objects.create(
-                type=TaskEventType.CANCELLED,
+                type=TaskEventType.CANCEL,
                 task_id=log_entry.object_id,
                 user=log_entry.actor,
                 created_at=log_entry.timestamp,

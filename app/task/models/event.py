@@ -18,13 +18,13 @@ class TaskEventType(models.TextChoices):
     The type of the event.
     """
 
-    APPROVAL = "APPROVAL"
-    CANCELLED = "CANCELLED"
-    REASSIGN = "REASSIGN"
-    REQUEST = "REQUEST"
-    RESUME = "RESUME"
-    STATUS_CHANGE = "STATUS_CHANGE"
-    SUSPEND = "SUSPEND"
+    APPROVAL_REQUEST = "APPROVAL_REQUEST", "Approval Request"
+    APPROVAL_RESPONSE = "APPROVAL_RESPONSE", "Approval Response"
+    CANCEL = "CANCEL", "Task Cancelled"
+    REASSIGN = "REASSIGN", "Task Reassigned"
+    RESUME = "RESUME", "Task Resumed"
+    STATUS_CHANGE = "STATUS_CHANGE", "Status Change"
+    SUSPEND = "SUSPEND", "Task Suspended"
 
 
 class TaskEvent(models.Model):
@@ -55,15 +55,15 @@ class TaskEvent(models.Model):
         TaskActivity.objects.create(content_object=self)
 
     #
-    # TODO: Perhaps tidy this by moving event creation & generating HTML from
-    # the model to separate functions elsewhere?
+    # TODO: Perhaps tidy this by moving generating HTML from the model to
+    # separate functions elsewhere?
     #
     def get_desc_html(self):
         html = ""
         try:
-            if self.type == TaskEventType.APPROVAL:
+            if self.type == TaskEventType.APPROVAL_RESPONSE:
                 html = self._get_approval_html()
-            elif self.type == TaskEventType.CANCELLED:
+            elif self.type == TaskEventType.CANCEL:
                 html = self._get_cancelled_html()
             elif self.type == TaskEventType.STATUS_CHANGE:
                 html = self._get_status_change_html()
@@ -73,7 +73,7 @@ class TaskEvent(models.Model):
                 html = self._get_reassign_html()
             elif self.type == TaskEventType.RESUME:
                 html = self._get_resume_html()
-            elif self.type == TaskEventType.REQUEST:
+            elif self.type == TaskEventType.APPROVAL_REQUEST:
                 html = self._get_request_html()
         except Exception:
             logger.exception(
@@ -85,10 +85,10 @@ class TaskEvent(models.Model):
         is_approved = self.data.get("is_approved")
 
         user_a_tag = _get_user_a_tag(self.user)
-        decision = "approved" if is_approved else "declined"
         determiner = "the" if self.task.type == RequestTaskType.APPROVAL else "this"
-
-        return f"{user_a_tag} <strong>{decision}</strong> the request to complete {determiner} task."
+        if is_approved:
+            return f"{user_a_tag} <strong>approved</strong> the request to complete {determiner} task."
+        return f"{user_a_tag} suggested that the following changes are necessary to complete {determiner} task."
 
     def _get_cancelled_html(self):
         issue: Issue = self.task.issue

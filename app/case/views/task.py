@@ -13,6 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment
 from task.models.task import RequestTaskType, Task, TaskStatus, TaskType
+from task.models.event import TaskEventType
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -64,6 +65,7 @@ def task_detail_page_view(request, pk):
 
     context = {
         "choices": {
+            "event_type": TaskEventType.choices,
             "status": TaskStatus.choices,
             "type": TaskType,
         },
