@@ -58,7 +58,7 @@ const App = () => {
   const [getTask] = api.useLazyGetTaskQuery()
   const [updateTask] = api.useUpdateTaskMutation()
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [task, setTask] = useState<Task>()
+  const [task, setTask] = useState<Task>({} as Task)
 
   const loadTask = () => {
     setIsLoading(true)
@@ -544,7 +544,9 @@ export const TaskAttachmentGroupItem = ({
 
   const handleDelete = (event) => {
     event.stopPropagation()
-    onDelete(attachment)
+    if (onDelete) {
+      onDelete(attachment)
+    }
   }
 
   return (
