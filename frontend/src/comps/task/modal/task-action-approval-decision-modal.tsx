@@ -1,7 +1,7 @@
 import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
-import { Formik, FormikHelpers } from 'formik'
+import { Formik } from 'formik'
 import { RichTextAreaField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -15,7 +15,11 @@ const ApprovalDecisionSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object(
     requesting_task: Yup.object({
       is_approved: Yup.boolean().required(),
       is_approval_pending: Yup.boolean().required(),
-      comment: Yup.string().optional(),
+      comment: Yup.string().when('is_approved', {
+        is: false,
+        then: (schema) => schema.min(1).required(),
+        otherwise: (schema) => schema.optional(),
+      }),
     }).required(),
   }
 )
@@ -73,6 +77,7 @@ export const ApprovalDecisionModal = ({
   return (
     <Formik
       enableReinitialize
+      isInitialValid={decision == ApprovalDecision.APPROVED}
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={ApprovalDecisionSchema}
@@ -109,15 +114,23 @@ export const ApprovalDecisionModal = ({
                   : 'Decline the request'}
               </Modal.Header>
               <Modal.Content>
-                <p>
-                  You may leave an <strong>optional</strong> comment with your
-                  approval decision:
-                </p>
+                {decision == ApprovalDecision.APPROVED ? (
+                  <p>
+                    You may leave an <strong>optional</strong> comment.
+                  </p>
+                ) : (
+                  <p>
+                    Describe the changes necessary for the task to be approved.
+                  </p>
+                )}
                 <Form
                   onSubmit={formik.handleSubmit}
                   error={Object.keys(formik.errors).length > 0}
                 >
-                  <RichTextAreaField name="requesting_task.comment" />
+                  <RichTextAreaField
+                    name="requesting_task.comment"
+                    required={decision == ApprovalDecision.DECLINED}
+                  />
                 </Form>
               </Modal.Content>
               <Modal.Actions>

@@ -51,3 +51,15 @@ class TaskApprovalSerializer(serializers.ModelSerializer):
             requesting_task.clear_log_data()
 
         return super().update(instance, validated_data)
+
+    def validate_requesting_task(self, requesting_task):
+        is_approval_pending = requesting_task.get("is_approval_pending", None)
+        is_approved = requesting_task.get("is_approved", None)
+        comment = requesting_task.get("comment", None)
+
+        # Require a comment for declined approval requests.
+        if is_approval_pending is False and is_approved is False and not comment:
+            raise serializers.ValidationError(
+                {"comment": "A comment is required for declined approval requests"}
+            )
+        return requesting_task
