@@ -15,11 +15,11 @@ const QuestionSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   name: Yup.string().required(),
   type: Yup.string().required(),
   /* Below not strictly necessary but prevents type error */
-  due_at: Yup.string().notRequired(),
-  is_approval_required: Yup.boolean().notRequired(),
-  is_approved: Yup.boolean().notRequired(),
-  is_urgent: Yup.boolean().notRequired(),
-  status: Yup.string().notRequired(),
+  due_at: Yup.string().optional(),
+  is_approval_required: Yup.boolean().optional(),
+  is_approved: Yup.boolean().optional(),
+  is_urgent: Yup.boolean().optional(),
+  status: Yup.string().optional(),
 })
 
 export const QuestionModal = (props: ModalProps) => {

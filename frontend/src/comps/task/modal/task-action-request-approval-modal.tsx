@@ -10,7 +10,7 @@ import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
 const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
-  type: Yup.string().equals(['APPROVAL']).required(),
+  type: Yup.string().oneOf(["APPROVAL"]).required(),
   name: Yup.string().required(),
   description: Yup.string().default(undefined).min(1).required(),
   assigned_to_id: Yup.number().required(),

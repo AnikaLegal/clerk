@@ -26,27 +26,27 @@ import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
 
+const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
+  id: Yup.number().optional(),
+  name: Yup.string().required(),
+  type: Yup.string().required(),
+  due_in: Yup.number().defined(),
+  is_urgent: Yup.boolean().required(),
+  is_approval_required: Yup.boolean().required(),
+  description: Yup.string().optional(),
+})
+
 const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> = Yup.object({
   name: Yup.string().required(),
   topic: Yup.string().required(),
   event: Yup.string().required(),
   tasks_assignment_role: Yup.string().required(),
-  templates: Yup.array(),
+  templates: Yup.array().of(TaskTemplateSchema).required(),
   event_stage: Yup.string().when('event', {
     is: 'STAGE',
     then: (schema) => schema.required(),
     otherwise: (schema) => schema.notRequired(),
   }),
-})
-
-const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
-  id: Yup.number().notRequired(),
-  name: Yup.string().required(),
-  type: Yup.string().required(),
-  due_in: Yup.number().notRequired(),
-  is_urgent: Yup.boolean(),
-  is_approval_required: Yup.boolean(),
-  description: Yup.string().optional(),
 })
 
 interface TaskTemplateFormProps {

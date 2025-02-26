@@ -203,12 +203,12 @@ const App = () => {
                 url={issue.client.url}
                 tableData={{
                   Name: issue.client.full_name,
-                  ['Preferred name']: issue.client.preferred_name,
+                  ['Preferred name']: issue.client.preferred_name ?? '',
                   Email: issue.client.email,
                   Phone: issue.client.phone_number,
                   Age: issue.client.age,
-                  Gender: issue.client.gender,
-                  Pronouns: issue.client.pronouns,
+                  Gender: issue.client.gender ?? '',
+                  Pronouns: issue.client.pronouns ?? '',
                 }}
               />
               <EntityCard
@@ -217,7 +217,7 @@ const App = () => {
                 tableData={{
                   ['Street address']: tenancy.address,
                   Suburb: `${tenancy.suburb} ${tenancy.postcode}`,
-                  Started: tenancy.started,
+                  Started: tenancy.started ?? '',
                   ['Client on lease?']: tenancy.is_on_lease
                     ? tenancy.is_on_lease.display
                     : '',

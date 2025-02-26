@@ -60,7 +60,11 @@ export const AccountDetailPage = ({ data }: { data: User }) => {
     CONTEXT.user.is_coordinator_or_better ||
     CONTEXT.account_id === CONTEXT.current_user_id
 
-  let tabPanes = []
+  interface pane {
+    menuItem?: any
+    render?: () => React.ReactNode
+  }
+  let tabPanes: pane[] = []
 
   if (showTabs) {
     // Show the lawyer tab for lawyer accounts only.
