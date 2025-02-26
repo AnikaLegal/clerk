@@ -1,7 +1,7 @@
 import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
-import { Formik } from 'formik'
+import { Formik, FormikHelpers } from 'formik'
 import { RichTextAreaField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -48,7 +48,7 @@ export const ApprovalDecisionModal = ({
     },
   }
 
-  const handleSubmit = (values: TaskApprovalUpdate) => {
+  const handleSubmit = (values: TaskApprovalUpdate, { setSubmitting }) => {
     updateTaskApproval({
       id: task.id,
       taskApprovalUpdate: values,
@@ -67,6 +67,7 @@ export const ApprovalDecisionModal = ({
           }
         )
       })
+      .finally(() => setSubmitting(false))
   }
 
   return (
