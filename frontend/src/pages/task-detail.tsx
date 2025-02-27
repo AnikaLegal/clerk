@@ -12,6 +12,7 @@ import {
   TaskInformationCard,
 } from 'comps/task'
 import { TaskApprovalActionCard } from 'comps/task/task-approval-action-card'
+import { getTaskApprovalColor } from 'comps/task/task-approval-table-cell'
 import { TaskRequestingApprovalCard } from 'comps/task/task-requesting-approval-card'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
@@ -32,7 +33,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { Model, UserInfo } from 'types/global'
-import { TaskDetailProps, TaskDetailChoices, TaskStatus } from 'types/task'
+import { TaskDetailChoices, TaskDetailProps, TaskStatus } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
@@ -329,13 +330,16 @@ export const TaskHeader = ({
 
 export const TaskApprovalHeader = ({ task }: { task: Task }) => {
   if (task.is_approval_required) {
-    if (task.is_approved) {
-      return <Label color="green">Approved</Label>
-    }
-    if (task.is_approval_pending) {
-      return <Label color="yellow">Approval pending</Label>
-    }
-    return <Label color="orange">Requires approval</Label>
+    const color = getTaskApprovalColor(task)
+    return (
+      <Label color={color}>
+        {task.is_approved
+          ? 'Approved'
+          : task.is_approval_pending
+            ? 'Approval pending'
+            : 'Requires approval'}
+      </Label>
+    )
   }
   return null
 }

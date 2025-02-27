@@ -1,9 +1,8 @@
 import { Task, TaskList } from 'api'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
 import { TaskDetailChoices } from 'types/task'
-import { choiceToMap } from 'utils'
-import { getApprovalTextAndColor } from './task-approval-table-cell'
+import { getTaskApprovalText } from './task-approval-table-cell'
 
 interface TaskRequestingApprovalCardProps {
   choices: TaskDetailChoices
@@ -17,8 +16,8 @@ export const TaskRequestingApprovalCard = ({
   if (!task) {
     return null
   }
-  const [text, _] = getApprovalTextAndColor(task as TaskList)
 
+  const text = getTaskApprovalText(task)
   return (
     <Card fluid>
       <Card.Content header="Requesting task" />
