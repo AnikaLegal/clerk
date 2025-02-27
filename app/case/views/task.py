@@ -114,8 +114,16 @@ class TaskApiViewset(ModelViewSet):
 
         queryset = Task.objects.all()
         queryset = Task.annotate_with_days_open(queryset)
-        queryset = queryset.select_related("issue", "assigned_to")
-        queryset = queryset.prefetch_related("assigned_to__groups")
+        queryset = queryset.select_related(
+            "assigned_to",
+            "issue__client",
+            "issue__tenancy",
+            "issue__lawyer",
+            "issue__paralegal",
+        )
+        queryset = queryset.prefetch_related(
+            "assigned_to__groups", "issue__lawyer__groups", "issue__paralegal__groups"
+        )
 
         if self.action == "retrieve":
             queryset = queryset.prefetch_related("activities").prefetch_related(
