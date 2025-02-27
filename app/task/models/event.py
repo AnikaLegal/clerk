@@ -74,7 +74,7 @@ class TaskEvent(models.Model):
             elif self.type == TaskEventType.RESUME:
                 html = self._get_resume_html()
             elif self.type == TaskEventType.APPROVAL_REQUEST:
-                html = self._get_request_html()
+                html = self._get_approval_request_html()
         except Exception:
             logger.exception(
                 "Could not generate description for TaskEvent<%s>", self.pk
@@ -146,17 +146,16 @@ class TaskEvent(models.Model):
             + " was added to the case."
         )
 
-    def _get_request_html(self):
+    def _get_approval_request_html(self):
         request_task_id = self.data.get("request_task_id")
         request_task = Task.objects.get(id=request_task_id)
 
-        if request_task.type == RequestTaskType.APPROVAL:
-            return (
-                _get_user_a_tag(self.user)
-                + " submitted an "
-                + f'<a href="{request_task.url}">approval request</a>'
-                + " for this task."
-            )
+        return (
+            _get_user_a_tag(self.user)
+            + " submitted an "
+            + f'<a href="{request_task.url}">approval request</a>'
+            + " for this task."
+        )
 
 
 def _get_user_a_tag(user: User):
