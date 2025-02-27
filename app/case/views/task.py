@@ -1,5 +1,6 @@
 from accounts.models import CaseGroups
 from core.models.issue import CaseTopic
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Prefetch, Q, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -11,9 +12,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
-from task.models import TaskAttachment
-from task.models.task import RequestTaskType, Task, TaskStatus, TaskType
+from task.models import TaskAttachment, TaskComment, TaskEvent
 from task.models.event import TaskEventType
+from task.models.task import RequestTaskType, Task, TaskStatus, TaskType
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -35,9 +36,6 @@ from case.views.auth import (
     ParalegalOrBetterObjectPermission,
     paralegal_or_better_required,
 )
-
-# TODO:
-# - review permissions.
 
 
 @api_view(["GET"])
@@ -197,9 +195,19 @@ class TaskApiViewset(ModelViewSet):
         Task activity.
         """
         task = self.get_object()
-
-        queryset = task.activities.all()
-        queryset = queryset.select_related("content_type")
+        queryset = task.activities.select_related("content_type")
+        prefetch = GenericPrefetch(
+            "content_object",
+            [
+                TaskComment.objects.filter(task=task)
+                .select_related("task", "creator")
+                .prefetch_related("creator__groups"),
+                TaskEvent.objects.filter(task=task)
+                .select_related("task", "user")
+                .prefetch_related("user__groups"),
+            ],
+        )
+        queryset = queryset.prefetch_related(prefetch)
         queryset = queryset.order_by("-created_at")
         data = self.get_serializer(queryset, many=True).data
         return Response(data)
@@ -313,6 +321,7 @@ class ApprovalAlreadyPendingException(APIException):
     status_code = 403
     default_code = "approval_already_pending"
     default_detail = "An approval has already been requested and is pending."
+
 
 class NotApprovalException(APIException):
     status_code = 403
