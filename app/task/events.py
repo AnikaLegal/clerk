@@ -67,7 +67,7 @@ def _handle_task_is_approval_pending_update(log_entry: LogEntry):
             additional_data = log_entry.additional_data
             comment = additional_data.get("comment", None)
 
-            task = TaskEvent.objects.create(
+            event = TaskEvent.objects.create(
                 type=TaskEventType.APPROVAL_RESPONSE,
                 task_id=log_entry.object_id,
                 user=log_entry.actor,
@@ -81,9 +81,9 @@ def _handle_task_is_approval_pending_update(log_entry: LogEntry):
             # Duplicate event for the request task.
             request_task_id = additional_data.get("request_task_id", None)
             if request_task_id:
-                task.pk = None
-                task.task_id = request_task_id
-                task.save()
+                event.pk = None
+                event.task_id = request_task_id
+                event.save()
 
 
 def _handle_task_assigned_to_update(log_entry: LogEntry):
