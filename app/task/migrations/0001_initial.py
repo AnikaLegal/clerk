@@ -190,7 +190,6 @@ class Migration(migrations.Migration):
                             ("REVIEW", "Review document or advice"),
                             ("SEND", "Send document or advice"),
                             ("OTHER", "Other"),
-                            ("QUESTION", "Question"),
                             ("APPROVAL", "Approval request"),
                         ],
                         max_length=32,

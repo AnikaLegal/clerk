@@ -4,7 +4,6 @@ properties:
     type: string
     enum:
       - APPROVAL
-      - QUESTION
   name:
     type: string
   description:

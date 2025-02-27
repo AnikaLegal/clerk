@@ -6,6 +6,5 @@ enum:
   - DRAFT
   - MANAGE
   - OTHER
-  - QUESTION
   - REVIEW
   - SEND

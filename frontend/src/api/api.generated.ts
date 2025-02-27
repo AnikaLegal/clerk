@@ -1357,7 +1357,6 @@ export type TaskType =
   | "DRAFT"
   | "MANAGE"
   | "OTHER"
-  | "QUESTION"
   | "REVIEW"
   | "SEND";
 export type TaskList = {
@@ -1470,7 +1469,7 @@ export type TaskStatusUpdate = {
   comment?: string;
 };
 export type TaskRequestCreate = {
-  type: "APPROVAL" | "QUESTION";
+  type: "APPROVAL";
   name: string;
   description: string;
   assigned_to_id: number;

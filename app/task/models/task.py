@@ -17,7 +17,6 @@ class RequestTaskType(models.TextChoices):
     The possible types of request tasks.
     """
 
-    QUESTION = "QUESTION", "Question"
     APPROVAL = "APPROVAL", "Approval request"
 
 

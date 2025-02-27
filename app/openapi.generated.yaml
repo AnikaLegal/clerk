@@ -2600,7 +2600,6 @@ components:
         - DRAFT
         - MANAGE
         - OTHER
-        - QUESTION
         - REVIEW
         - SEND
     TaskList:
@@ -2923,7 +2922,6 @@ components:
           type: string
           enum:
             - APPROVAL
-            - QUESTION
         name:
           type: string
         description:
