@@ -7,7 +7,12 @@ import {
   Formik,
   FormikHelpers,
 } from 'formik'
-import { DropdownField, InputField, RichTextEditorField } from 'forms/formik'
+import {
+  BooleanField,
+  DropdownField,
+  InputField,
+  RichTextEditorField,
+} from 'forms/formik'
 import React, { useState } from 'react'
 import {
   Button,
@@ -486,12 +491,14 @@ export const TaskTemplateModal = ({
                     name="name"
                     label="Task name"
                     placeholder="Provide more specific task information"
+                    required
                   />
                   <DropdownField
                     name="type"
                     label="Task type"
                     placeholder="Select the task type"
                     options={choiceToOptions(choices.task_type)}
+                    required
                   />
                   <InputField
                     name="due_in"
@@ -499,23 +506,15 @@ export const TaskTemplateModal = ({
                     label="Due in"
                     placeholder="The number of days from when the task is assigned until it is due"
                   />
-                  <DropdownField
+                  <BooleanField
                     name="is_urgent"
                     label="Urgent?"
                     placeholder="Is the task urgent?"
-                    options={[
-                      { key: 'yes', text: 'Yes', value: true },
-                      { key: 'no', text: 'No', value: false },
-                    ]}
                   />
-                  <DropdownField
+                  <BooleanField
                     name="is_approval_required"
                     label="Approval required?"
                     placeholder="Does the task require approval?"
-                    options={[
-                      { key: 'yes', text: 'Yes', value: true },
-                      { key: 'no', text: 'No', value: false },
-                    ]}
                   />
                   <RichTextEditorField
                     name="description"
