@@ -85,7 +85,7 @@ def send_email_alert_slack(email_pk: str):
     msg = (
         "*New Email Notification*\n"
         f"A new email has been received for case <{case_url}|{issue.fileref}>.\n"
-        f"You can view this case's emails here: <{case_email_url}|here>.\n"
+        f"You can view this case's emails <{case_email_url}|here>.\n"
     )
 
     alert_sent = False
@@ -120,7 +120,7 @@ def send_email_failure_alert_slack(email_pk: str):
     msg = (
         "*Email Delivery Failed*\n"
         f"An email failed to send for case <{case_url}|{issue.fileref}>.\n"
-        f"You can view this case's emails here: <{case_email_url}|here>.\n"
+        f"You can view this case's emails <{case_email_url}|here>.\n"
         # #CPR3K4F5K = #caseteam channel
         "Please check you have the correct email address and try again. If it"
         " fails a second time, please post on <#CPR3K4F5K> and ask Leads to help"
