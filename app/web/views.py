@@ -335,7 +335,7 @@ TEAM_MEMBERS = [
         "title": "Principal Lawyer",
         "brags": [
             """Emily is our Principal lawyer, and is responsible for developing
-            and delivering the legal service we provide."""
+            and delivering the legal service we provide.""",
             """Emily brings a wealth of diverse experiences to Anika Legal. She
             has previously worked as a Coroner's Solicitor at the Coroner's
             Court of Victoria and has significant expertise in policy
