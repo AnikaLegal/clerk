@@ -30,7 +30,7 @@ const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
   id: Yup.number().optional(),
   name: Yup.string().required(),
   type: Yup.string().required(),
-  due_in: Yup.number().defined(),
+  due_in: Yup.number().required().nullable(),
   is_urgent: Yup.boolean().required(),
   is_approval_required: Yup.boolean().required(),
   description: Yup.string().optional(),
