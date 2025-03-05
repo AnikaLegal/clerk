@@ -106,23 +106,9 @@ def shuffle(l):
 
 BOARD = [
     {
-        "image": "web/img/photos/board/denis.png",
-        "name": "Denis Nelthorpe AM",
-        "title": "Chair",
-        "brags": [
-            """Denis joined the Board of Anika Legal in June 2021 and is the
-            organisation’s Chair. He brings a wealth of experience from over 40
-            years in the legal assistance sector including as the CEO of
-            WEstjustice and other leadership roles. He is currently also the
-            Chair of Southside Justice and the Deputy Chair of the National
-            Consumer Advisory Committee at the Insurance Council of
-            Australia.""",
-        ],
-    },
-    {
         "image": "web/img/photos/board/kim.png",
         "name": "Kim Shaw",
-        "title": "Board Member",
+        "title": "Chair",
         "brags": [
             """Kim is an experienced Board Director and Committee member who
             brings strong governance, legal, risk and strategic capabilities to
@@ -133,6 +119,20 @@ BOARD = [
             disadvantaged and vulnerable communities in the Asia Pacific
             including through financial literacy in schools and supporting micro
             enterprises particularly for women."""
+        ],
+    },
+    {
+        "image": "web/img/photos/board/denis.png",
+        "name": "Denis Nelthorpe AM",
+        "title": "Board Member",
+        "brags": [
+            """Denis joined the Board of Anika Legal in June 2021 and is the
+            organisation’s Chair. He brings a wealth of experience from over 40
+            years in the legal assistance sector including as the CEO of
+            WEstjustice and other leadership roles. He is currently also the
+            Chair of Southside Justice and the Deputy Chair of the National
+            Consumer Advisory Committee at the Insurance Council of
+            Australia.""",
         ],
     },
     {
@@ -302,18 +302,6 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/zoe.png",
-        "name": "Zoe Chan",
-        "title": "Principal Lawyer",
-        "brags": [
-            """Zoe is our Principal lawyer, and is responsible for developing
-            and delivering the legal service we provide.""",
-            """Zoe was previously a lawyer at Justice Connect, where she gained
-            experience in civil litigation, pro bono projects, and designing
-            user centred service improvements.""",
-        ],
-    },
-    {
         "image": "web/img/photos/team/jacqui.png",
         "name": "Jacqui Siebel",
         "title": "Head of Operations",
@@ -344,10 +332,10 @@ TEAM_MEMBERS = [
     {
         "image": "web/img/photos/team/emily.png",
         "name": "Emily Southwell",
-        "title": "Supervising Lawyer",
+        "title": "Principal Lawyer",
         "brags": [
-            """Emily is a lawyer, supporting our case team to deliver
-            much-needed legal services to Victorian renters.""",
+            """Emily is our Principal lawyer, and is responsible for developing
+            and delivering the legal service we provide.""",
             """Emily brings a wealth of diverse experiences to Anika Legal. She
             has previously worked as a Coroner's Solicitor at the Coroner's
             Court of Victoria and has significant expertise in policy
