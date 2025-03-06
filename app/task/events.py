@@ -147,7 +147,6 @@ def _handle_task_request_approval_create(log_entry: LogEntry):
             note_html=data.get("from_comment"),
             data={
                 "to_task_id": data.get("to_task"),
-                "to_user_id": data.get("to_user"),
             },
             created_at=log_entry.timestamp,
         )

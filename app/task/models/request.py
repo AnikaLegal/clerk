@@ -28,22 +28,12 @@ class TaskRequest(TimestampedModel):
         on_delete=models.CASCADE,
         related_name="requests",
     )
-    from_user = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        related_name="+",
-    )
     from_comment = models.TextField()
 
     to_task = models.OneToOneField(
         "task.Task",
         on_delete=models.CASCADE,
         related_name="request",
-    )
-    to_user = models.ForeignKey(
-        User,
-        on_delete=models.PROTECT,
-        related_name="+",
     )
     to_comment = models.TextField(blank=True, null=True)
 

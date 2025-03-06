@@ -25,11 +25,11 @@ class TaskRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ("task_id", "type")
 
     status = serializers.ChoiceField(choices=TaskRequestStatus.choices)
-    from_task_url = serializers.SerializerMethodField(read_only=True)
-    from_user = TaskListUserSerializer(read_only=True)
 
-    to_task_url = serializers.SerializerMethodField(read_only=True)
+    from_user = TaskListUserSerializer(source="from_task.assigned_to", read_only=True)
+    from_task_url = serializers.SerializerMethodField(read_only=True)
     to_user = TaskListUserSerializer(source="to_task.assigned_to", read_only=True)
+    to_task_url = serializers.SerializerMethodField(read_only=True)
 
     def get_from_task_url(self, obj):
         return obj.from_task.url
@@ -64,7 +64,6 @@ class TaskCreateRequestSerializer(serializers.Serializer):
             "task_id",
             "issue_id",
             "type",
-            "from_user_id",
             "to_user_id",
             "name",
             "comment",
@@ -73,7 +72,6 @@ class TaskCreateRequestSerializer(serializers.Serializer):
     task_id = serializers.IntegerField()
     issue_id = serializers.UUIDField()
     type = serializers.ChoiceField(choices=TaskRequestType.choices)
-    from_user_id = serializers.IntegerField()
     to_user_id = serializers.IntegerField()
     name = serializers.CharField()
     comment = serializers.CharField()
@@ -83,7 +81,6 @@ class TaskCreateRequestSerializer(serializers.Serializer):
         task_id = validated_data["task_id"]
         issue_id = validated_data["issue_id"]
         type = validated_data["type"]
-        from_user_id = validated_data["from_user_id"]
         to_user_id = validated_data["to_user_id"]
         name = validated_data["name"]
         comment = validated_data["comment"]
@@ -98,10 +95,8 @@ class TaskCreateRequestSerializer(serializers.Serializer):
         TaskRequest.objects.create(
             type=type,
             from_task_id=task_id,
-            from_user_id=from_user_id,
-            to_task=to_task,
-            to_user_id=to_user_id,
             from_comment=comment,
+            to_task=to_task,
         )
 
         return validated_data

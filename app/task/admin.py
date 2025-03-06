@@ -198,14 +198,14 @@ class TaskRequestAdmin(admin.ModelAdmin):
     def from_task_link(self, task):
         return task if task else None
 
-    @admin_link("from_user", "From User")
-    def from_user_link(self, user):
-        return user if user else None
+    @admin_link("from_task", "From User")
+    def from_user_link(self, task):
+        return task.assigned_to if task else None
 
     @admin_link("to_task", "To Task")
     def to_task_link(self, task):
         return task if task else None
 
-    @admin_link("to_user", "To User")
-    def to_user_link(self, user):
-        return user if user else None
+    @admin_link("to_task", "To User")
+    def to_user_link(self, task):
+        return task.assigned_to if task else None
