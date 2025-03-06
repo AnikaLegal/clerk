@@ -6,7 +6,11 @@ from django.db.models import Q
 from django.urls import reverse
 from rest_framework import exceptions, serializers
 from task.models import Task
+from task.models.request import TaskRequestStatus, TaskRequestType
 from task.models.template import TaskTemplateType
+
+from .actions import TaskRequestSerializer
+from .user import TaskListUserSerializer
 
 
 class TaskListIssueSerializer(IssueSerializer):
@@ -24,17 +28,6 @@ class TaskListIssueSerializer(IssueSerializer):
         return super(IssueSerializer, self).get_fields(*args, **kwargs)
 
 
-class TaskListUserSerializer(UserSerializer):
-    class Meta:
-        model = UserSerializer.Meta.model
-        read_only_fields = UserSerializer.Meta.read_only_fields
-        fields = (
-            "id",
-            "full_name",
-            "url",
-        )
-
-
 class TaskListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
@@ -47,7 +40,6 @@ class TaskListSerializer(serializers.ModelSerializer):
             "assigned_to",
             "is_open",
             "is_suspended",
-            "created_at",
             "due_at",
             "closed_at",
             "is_urgent",
@@ -56,6 +48,8 @@ class TaskListSerializer(serializers.ModelSerializer):
             "is_approved",
             "days_open",
             "url",
+            "created_at",
+            "modified_at",
         )
         read_only_fields = (
             "is_open",
@@ -64,11 +58,20 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     issue = TaskListIssueSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
     due_at = serializers.DateField(read_only=True)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
+    is_approval_pending = serializers.SerializerMethodField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    modified_at = serializers.DateTimeField(read_only=True)
+
+    def get_is_approval_pending(self, obj):
+        return (
+            obj.requests.filter(type=TaskRequestType.APPROVAL)
+            .exclude(status=TaskRequestStatus.DONE)
+            .exists()
+        )
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
@@ -89,16 +92,17 @@ class TaskSerializer(serializers.ModelSerializer):
             "assigned_to",
             "is_open",
             "is_suspended",
-            "created_at",
             "due_at",
             "closed_at",
             "is_urgent",
             "is_approved",
             "is_approval_required",
             "is_approval_pending",
-            "requesting_task",
             "days_open",
+            "request",
             "url",
+            "created_at",
+            "modified_at",
         )
         read_only_fields = (
             "status",
@@ -116,13 +120,14 @@ class TaskSerializer(serializers.ModelSerializer):
     due_at = serializers.DateField(allow_null=True, required=False)
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
-    requesting_task = serializers.SerializerMethodField(read_only=True)
+    request = TaskRequestSerializer(read_only=True)
+    is_approval_pending = serializers.SerializerMethodField(read_only=True)
 
-    def get_requesting_task(self, obj):
+    def get_is_approval_pending(self, obj):
         return (
-            TaskSerializer(instance=obj.requesting_task).data
-            if obj.requesting_task
-            else None
+            obj.requests.filter(type=TaskRequestType.APPROVAL)
+            .exclude(status=TaskRequestStatus.DONE)
+            .exists()
         )
 
     def to_internal_value(self, data):

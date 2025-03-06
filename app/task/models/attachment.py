@@ -1,9 +1,9 @@
+from core.models import TimestampedModel
 from django.db import models
-from django.utils import timezone
 from utils.uploads import get_s3_key
 
 
-class TaskAttachment(models.Model):
+class TaskAttachment(TimestampedModel):
     UPLOAD_KEY = "task-attachments"
 
     task = models.ForeignKey(
@@ -17,7 +17,6 @@ class TaskAttachment(models.Model):
     )
     file = models.FileField(upload_to=get_s3_key)
     content_type = models.CharField(max_length=128)
-    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name = "attachment"

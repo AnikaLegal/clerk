@@ -1584,7 +1584,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/task/{id}/request/:
+  /clerk/api/task/{id}/request/create/:
     post:
       operationId: createTaskRequest
       parameters:
@@ -1606,27 +1606,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Task"
+                $ref: "#/components/schemas/TaskRequest"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/task/{id}/approval/:
+  /clerk/api/task/{id}/request/{request_id}/:
     patch:
-      operationId: updateTaskApproval
+      operationId: updateTaskRequest
       parameters:
-        - description: Entity ID
+        - name: id
+          description: Task ID
           in: path
-          name: id
           required: true
           schema:
-            type: integer
+            type: number
+        - name: request_id
+          description: Request ID
+          in: path
+          required: true
+          schema:
+            type: number
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskApprovalUpdate"
+              $ref: "#/components/schemas/TaskRequestUpdate"
       responses:
         "200":
           description: Successful response.
@@ -2602,6 +2608,19 @@ components:
         - OTHER
         - REVIEW
         - SEND
+    TaskListUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        url:
+          type: string
+      required:
+        - id
+        - full_name
+        - url
     TaskList:
       type: object
       properties:
@@ -2617,8 +2636,6 @@ components:
           type: boolean
         is_suspended:
           type: boolean
-        created_at:
-          type: string
         due_at:
           type: string
           nullable: true
@@ -2654,18 +2671,11 @@ components:
             - fileref
             - url
         assigned_to:
-          type: object
-          properties:
-            id:
-              type: integer
-            full_name:
-              type: string
-            url:
-              type: string
-          required:
-            - id
-            - full_name
-            - url
+          $ref: "#/components/schemas/TaskListUser"
+        created_at:
+          type: string
+        modified_at:
+          type: string
       required:
         - id
         - type
@@ -2673,7 +2683,6 @@ components:
         - status
         - is_open
         - is_suspended
-        - created_at
         - closed_at
         - is_urgent
         - is_approval_required
@@ -2683,6 +2692,8 @@ components:
         - url
         - issue
         - assigned_to
+        - created_at
+        - modified_at
     TaskBase:
       type: object
       properties:
@@ -2720,6 +2731,41 @@ components:
               type: string
           required:
             - type
+    TaskRequest:
+      type: object
+      properties:
+        id:
+          type: number
+        type:
+          type: string
+        status:
+          type: string
+        is_approved:
+          type: boolean
+        from_task_id:
+          type: number
+        from_user:
+          $ref: "#/components/schemas/TaskListUser"
+        from_comment:
+          type: string
+        to_task_id:
+          type: number
+        to_user:
+          $ref: "#/components/schemas/TaskListUser"
+        to_comment:
+          type: string
+          nullable: true
+      required:
+        - id
+        - type
+        - status
+        - is_approved
+        - from_task_id
+        - from_user
+        - from_comment
+        - to_task_id
+        - to_user
+        - to_comment
     Task:
       allOf:
         - $ref: "#/components/schemas/TaskBase"
@@ -2744,16 +2790,18 @@ components:
               type: boolean
             is_approval_pending:
               type: boolean
-            created_at:
-              type: string
             closed_at:
               type: string
               nullable: true
             days_open:
               type: integer
-            requesting_task:
-              $ref: "#/components/schemas/Task"
+            request:
+              $ref: "#/components/schemas/TaskRequest"
               nullable: true
+            created_at:
+              type: string
+            modified_at:
+              type: string
           required:
             - id
             - url
@@ -2764,10 +2812,11 @@ components:
             - is_open
             - is_suspended
             - is_approval_pending
-            - created_at
             - closed_at
             - days_open
-            - requesting_task
+            - request
+            - created_at
+            - modified_at
     TaskCommentBase:
       type: object
       properties:
@@ -2799,11 +2848,14 @@ components:
                 - url
             created_at:
               type: string
+            modified_at:
+              type: string
           required:
             - id
             - task_id
             - creator
             - created_at
+            - modified_at
     TaskEvent:
       type: object
       properties:
@@ -2811,35 +2863,36 @@ components:
           type: integer
         type:
           type: string
+          enum:
+            - APPROVAL_REQUEST
+            - CANCELLED
+            - REASSIGNED
+            - REQUEST_ACCEPTED
+            - REQUEST_DECLINED
+            - RESUMED
+            - STATUS_CHANGE
+            - SUSPENDED
         task_id:
           type: number
         user:
-          type: object
+          $ref: "#/components/schemas/TaskListUser"
           nullable: true
-          properties:
-            id:
-              type: integer
-            full_name:
-              type: string
-            url:
-              type: string
-          required:
-            - id
-            - full_name
-            - url
-        created_at:
-          type: string
         desc_html:
           type: string
         note_html:
+          type: string
+        created_at:
+          type: string
+        modified_at:
           type: string
       required:
         - id
         - type
         - task_id
-        - created_at
         - desc_html
         - note_html
+        - created_at
+        - modified_at
     TaskActivity:
       type: object
       properties:
@@ -2847,20 +2900,26 @@ components:
           type: integer
         task_id:
           type: number
-        created_at:
-          type: string
         type:
           type: string
+          enum:
+            - comment
+            - event
         data:
           oneOf:
             - $ref: "#/components/schemas/TaskComment"
             - $ref: "#/components/schemas/TaskEvent"
+        created_at:
+          type: string
+        modified_at:
+          type: string
       required:
         - id
         - task_id
-        - created_at
         - type
         - data
+        - created_at
+        - modified_at
     TaskCommentCreate:
       allOf:
         - $ref: "#/components/schemas/TaskCommentBase"
@@ -2922,37 +2981,31 @@ components:
           type: string
           enum:
             - APPROVAL
+        to_user_id:
+          type: number
         name:
           type: string
-        description:
+        comment:
           type: string
-        assigned_to_id:
-          type: number
       required:
         - type
+        - to_user_id
         - name
-        - description
-        - assigned_to_id
-    TaskApprovalUpdate:
+        - comment
+    TaskRequestUpdate:
       type: object
       properties:
         status:
           type: string
-        requesting_task:
-          type: object
-          properties:
-            is_approved:
-              type: boolean
-            is_approval_pending:
-              type: boolean
-            comment:
-              type: string
-          required:
-            - is_approved
-            - is_approval_pending
+          enum:
+            - PENDING
+            - DONE
+        is_approved:
+          type: boolean
+        to_comment:
+          type: string
       required:
         - status
-        - requesting_task
     TaskTemplate:
       type: object
       properties:
@@ -3007,14 +3060,17 @@ components:
           properties:
             id:
               type: integer
+            url:
+              type: string
             created_at:
               type: string
-            url:
+            modified_at:
               type: string
           required:
             - id
-            - created_at
             - url
+            - created_at
+            - modified_at
     TaskTriggerCreate:
       allOf:
         - $ref: "#/components/schemas/TaskTriggerBase"

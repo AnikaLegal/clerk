@@ -1,18 +1,24 @@
 patch:
-  operationId: updateTaskApproval
+  operationId: updateTaskRequest
   parameters:
-    - description: Entity ID
+    - name: id
+      description: Task ID
       in: path
-      name: id
       required: true
       schema:
-        type: integer
+        type: number
+    - name: request_id
+      description: Request ID
+      in: path
+      required: true
+      schema:
+        type: number
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: ../schemas/TaskApprovalUpdate.yaml
+          $ref: ../schemas/TaskRequestUpdate.yaml
   responses:
     "200":
       description: Successful response.

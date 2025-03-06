@@ -17,13 +17,15 @@ class TaskTriggerSerializer(serializers.ModelSerializer):
             "event_stage",
             "tasks_assignment_role",
             "templates",
-            "created_at",
             "url",
+            "created_at",
+            "modified_at",
         )
 
     templates = TaskTemplateSerializer(many=True)
-    created_at = serializers.DateTimeField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    modified_at = serializers.DateTimeField(read_only=True)
 
     def get_url(self, obj):
         return reverse("template-task-detail", args=(obj.pk,))

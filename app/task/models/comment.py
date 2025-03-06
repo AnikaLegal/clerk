@@ -23,7 +23,6 @@ class TaskComment(TimestampedModel):
     @transaction.atomic
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        TaskActivity.objects.create(content_object=self)
 
     class Meta:
         verbose_name = "comment"

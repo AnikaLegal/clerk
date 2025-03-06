@@ -12,8 +12,6 @@ properties:
     type: boolean
   is_suspended:
     type: boolean
-  created_at:
-    type: string
   due_at:
     type: string
     nullable: true
@@ -49,18 +47,11 @@ properties:
       - fileref
       - url
   assigned_to:
-    type: object
-    properties:
-      id:
-        type: integer
-      full_name:
-        type: string
-      url:
-        type: string
-    required:
-      - id
-      - full_name
-      - url
+    $ref: ./TaskListUser.yaml
+  created_at:
+    type: string
+  modified_at:
+    type: string
 required:
   - id
   - type
@@ -68,7 +59,6 @@ required:
   - status
   - is_open
   - is_suspended
-  - created_at
   - closed_at
   - is_urgent
   - is_approval_required
@@ -78,3 +68,5 @@ required:
   - url
   - issue
   - assigned_to
+  - created_at
+  - modified_at

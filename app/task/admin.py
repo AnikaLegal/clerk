@@ -10,6 +10,7 @@ from task.models import (
     TaskTemplate,
     TaskTrigger,
     TaskGroup,
+    TaskRequest,
 )
 from utils.admin import admin_link
 
@@ -169,6 +170,7 @@ class TaskAttachmentAdmin(admin.ModelAdmin):
     def task_link(self, task):
         return task if task else None
 
+
 @admin.register(TaskGroup)
 class TaskGroupAdmin(admin.ModelAdmin):
     model = TaskGroup
@@ -176,3 +178,34 @@ class TaskGroupAdmin(admin.ModelAdmin):
         "id",
         "name",
     )
+
+
+@admin.register(TaskRequest)
+class TaskRequestAdmin(admin.ModelAdmin):
+    model = TaskRequest
+    list_display = (
+        "id",
+        "type",
+        "status",
+        "is_approved",
+        "from_task_link",
+        "from_user_link",
+        "to_task_link",
+        "to_user_link",
+    )
+
+    @admin_link("from_task", "From Task")
+    def from_task_link(self, task):
+        return task if task else None
+
+    @admin_link("from_user", "From User")
+    def from_user_link(self, user):
+        return user if user else None
+
+    @admin_link("to_task", "To Task")
+    def to_task_link(self, task):
+        return task if task else None
+
+    @admin_link("to_user", "To User")
+    def to_user_link(self, user):
+        return user if user else None

@@ -14,7 +14,11 @@ from task.models.task import TaskStatus
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
-from .events import handle_create_task_log_entry, handle_update_task_log_entry
+from .events import (
+    handle_update_task_log_entry,
+    handle_create_task_request_log_entry,
+    handle_update_task_request_log_entry,
+)
 from .helpers import (
     is_case_closed,
     is_lawyer_acting_as_paralegal,
@@ -88,10 +92,19 @@ def handle_task_log(log_entry_pk: int):
     log_entry = LogEntry.objects.get(pk=log_entry_pk)
     action = log_entry.action
 
-    if action == LogEntry.Action.CREATE:
-        handle_create_task_log_entry(log_entry)
-    elif action == LogEntry.Action.UPDATE:
+    if action == LogEntry.Action.UPDATE:
         handle_update_task_log_entry(log_entry)
+
+
+@sentry_task
+def handle_task_request_log(log_entry_pk: int):
+    log_entry = LogEntry.objects.get(pk=log_entry_pk)
+    action = log_entry.action
+
+    if action == LogEntry.Action.CREATE:
+        handle_create_task_request_log_entry(log_entry)
+    elif action == LogEntry.Action.UPDATE:
+        handle_update_task_request_log_entry(log_entry)
 
 
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:

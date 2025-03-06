@@ -4,32 +4,33 @@ properties:
     type: integer
   type:
     type: string
+    enum:
+      - APPROVAL_REQUEST
+      - CANCELLED
+      - REASSIGNED
+      - REQUEST_ACCEPTED
+      - REQUEST_DECLINED
+      - RESUMED
+      - STATUS_CHANGE
+      - SUSPENDED
   task_id:
     type: number
   user:
-    type: object
+    $ref: ./TaskListUser.yaml
     nullable: true
-    properties:
-      id:
-        type: integer
-      full_name:
-        type: string
-      url:
-        type: string
-    required:
-      - id
-      - full_name
-      - url
-  created_at:
-    type: string
   desc_html:
     type: string
   note_html:
+    type: string
+  created_at:
+    type: string
+  modified_at:
     type: string
 required:
   - id
   - type
   - task_id
-  - created_at
   - desc_html
   - note_html
+  - created_at
+  - modified_at

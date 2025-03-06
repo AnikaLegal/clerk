@@ -1,14 +1,13 @@
 import logging
 
 from accounts.models import User
-from core.models import Issue
+from core.models import Issue, TimestampedModel
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
-from django.utils import timezone
 
 from .activity import TaskActivity
-from .task import RequestTaskType, Task, TaskStatus
+from .task import TaskStatus
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +18,16 @@ class TaskEventType(models.TextChoices):
     """
 
     APPROVAL_REQUEST = "APPROVAL_REQUEST", "Approval Request"
-    APPROVAL_RESPONSE = "APPROVAL_RESPONSE", "Approval Response"
-    CANCEL = "CANCEL", "Task Cancelled"
-    REASSIGN = "REASSIGN", "Task Reassigned"
-    RESUME = "RESUME", "Task Resumed"
+    CANCELLED = "CANCELLED", "Task Cancelled"
+    REASSIGNED = "REASSIGNED", "Task Reassigned"
+    REQUEST_ACCEPTED = "REQUEST_ACCEPTED", "Request Accepted"
+    REQUEST_DECLINED = "REQUEST_DECLINED", "Request Declined"
+    RESUMED = "RESUMED", "Task Resumed"
     STATUS_CHANGE = "STATUS_CHANGE", "Status Change"
-    SUSPEND = "SUSPEND", "Task Suspended"
+    SUSPENDED = "SUSPENDED", "Task Suspended"
 
 
-class TaskEvent(models.Model):
+class TaskEvent(TimestampedModel):
     class Meta:
         verbose_name = "event"
 
@@ -47,12 +47,10 @@ class TaskEvent(models.Model):
     )
     data = models.JSONField(null=True)
     note_html = models.TextField(null=True)
-    created_at = models.DateTimeField(default=timezone.now)
 
     @transaction.atomic
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        TaskActivity.objects.create(content_object=self)
 
     #
     # TODO: Perhaps tidy this by moving generating HTML from the model to
@@ -61,34 +59,49 @@ class TaskEvent(models.Model):
     def get_desc_html(self):
         html = ""
         try:
-            if self.type == TaskEventType.APPROVAL_RESPONSE:
-                html = self._get_approval_html()
-            elif self.type == TaskEventType.CANCEL:
+            if self.type == TaskEventType.APPROVAL_REQUEST:
+                html = self._get_approval_request_html()
+            elif self.type == TaskEventType.REQUEST_ACCEPTED:
+                html = self._get_request_accepted_html()
+            elif self.type == TaskEventType.REQUEST_DECLINED:
+                html = self._get_request_declined_html()
+            elif self.type == TaskEventType.CANCELLED:
                 html = self._get_cancelled_html()
             elif self.type == TaskEventType.STATUS_CHANGE:
                 html = self._get_status_change_html()
-            elif self.type == TaskEventType.SUSPEND:
+            elif self.type == TaskEventType.SUSPENDED:
                 html = self._get_suspend_html()
-            elif self.type == TaskEventType.REASSIGN:
+            elif self.type == TaskEventType.REASSIGNED:
                 html = self._get_reassign_html()
-            elif self.type == TaskEventType.RESUME:
+            elif self.type == TaskEventType.RESUMED:
                 html = self._get_resume_html()
-            elif self.type == TaskEventType.APPROVAL_REQUEST:
-                html = self._get_approval_request_html()
         except Exception:
             logger.exception(
                 "Could not generate description for TaskEvent<%s>", self.pk
             )
         return html
 
-    def _get_approval_html(self):
-        is_approved = self.data.get("is_approved")
+    def _get_approval_request_html(self):
+        to_task_id = self.data.get("to_task_id")
+        to_user_id = self.data.get("to_user_id")
 
-        user_a_tag = _get_user_a_tag(self.user)
-        determiner = "the" if self.task.type == RequestTaskType.APPROVAL else "this"
-        if is_approved:
-            return f"{user_a_tag} <strong>approved</strong> the request to complete {determiner} task."
-        return f"{user_a_tag} suggested that the following changes are necessary to complete {determiner} task."
+        to_task_url = reverse("task-detail", args=(to_task_id,))
+        to_user = User.objects.get(id=to_user_id)
+
+        return (
+            _get_user_a_tag(self.user)
+            + " submitted an "
+            + f'<a href="{to_task_url}">approval request</a>'
+            + " to "
+            + _get_user_a_tag(to_user)
+            + "."
+        )
+
+    def _get_request_accepted_html(self):
+        return _get_user_a_tag(self.user) + " accepted the request."
+
+    def _get_request_declined_html(self):
+        return _get_user_a_tag(self.user) + " suggested some changes."
 
     def _get_cancelled_html(self):
         issue: Issue = self.task.issue
@@ -144,17 +157,6 @@ class TaskEvent(models.Model):
             "This task was resumed because "
             + _get_user_a_tag(next_user)
             + " was added to the case."
-        )
-
-    def _get_approval_request_html(self):
-        request_task_id = self.data.get("request_task_id")
-        request_task = Task.objects.get(id=request_task_id)
-
-        return (
-            _get_user_a_tag(self.user)
-            + " submitted an "
-            + f'<a href="{request_task.url}">approval request</a>'
-            + " for this task."
         )
 
 

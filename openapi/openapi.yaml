@@ -81,10 +81,10 @@ paths:
     $ref: paths/task-attachments-detail.yaml
   /clerk/api/task/{id}/status_change/:
     $ref: paths/task-status-change.yaml
-  /clerk/api/task/{id}/request/:
+  /clerk/api/task/{id}/request/create/:
     $ref: paths/task-request.yaml
-  /clerk/api/task/{id}/approval/:
-    $ref: paths/task-approval.yaml
+  /clerk/api/task/{id}/request/{request_id}/:
+    $ref: paths/task-request-update.yaml
   /clerk/api/template-task/:
     $ref: paths/task-trigger-list.yaml
   /clerk/api/template-task/{id}/:

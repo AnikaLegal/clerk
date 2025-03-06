@@ -4,14 +4,14 @@ properties:
     type: string
     enum:
       - APPROVAL
+  to_user_id:
+    type: number
   name:
     type: string
-  description:
+  comment:
     type: string
-  assigned_to_id:
-    type: number
 required:
   - type
+  - to_user_id
   - name
-  - description
-  - assigned_to_id
+  - comment

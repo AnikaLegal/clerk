@@ -1,0 +1,12 @@
+type: object
+properties:
+  id:
+    type: integer
+  full_name:
+    type: string
+  url:
+    type: string
+required:
+  - id
+  - full_name
+  - url

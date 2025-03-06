@@ -19,7 +19,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../schemas/Task.yaml
+            $ref: ../schemas/TaskRequest.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

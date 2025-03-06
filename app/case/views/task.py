@@ -7,14 +7,15 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import action, api_view
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment, TaskComment, TaskEvent
 from task.models.event import TaskEventType
-from task.models.task import RequestTaskType, Task, TaskStatus, TaskType
+from task.models.request import TaskRequestStatus, TaskRequestType
+from task.models.task import Task, TaskStatus, TaskType
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -24,15 +25,14 @@ from task.serializers import (
     TaskSerializer,
 )
 from task.serializers.actions import (
-    TaskApprovalSerializer,
     TaskCreateRequestSerializer,
+    TaskRequestSerializer,
     TaskStatusChangeSerializer,
 )
 
 from case.utils.react import render_react_page
 from case.views.auth import (
     CoordinatorOrBetterPermission,
-    LawyerOrBetterPermission,
     ParalegalOrBetterObjectPermission,
     paralegal_or_better_required,
 )
@@ -90,8 +90,6 @@ class TaskApiViewset(ModelViewSet):
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [IsAuthenticated]
-        elif self.action == "approval":
-            permission_classes = [LawyerOrBetterPermission]
         elif (
             self.action == "retrieve"
             or self.action == "activity"
@@ -99,7 +97,7 @@ class TaskApiViewset(ModelViewSet):
             or self.action == "attachment_delete"
             or self.action == "comments"
             or self.action == "status_change"
-            or self.action == "request"
+            or self.action == "request_create"
         ):
             permission_classes = [
                 CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
@@ -122,7 +120,10 @@ class TaskApiViewset(ModelViewSet):
             "issue__paralegal",
         )
         queryset = queryset.prefetch_related(
-            "assigned_to__groups", "issue__lawyer__groups", "issue__paralegal__groups"
+            "assigned_to__groups",
+            "issue__lawyer__groups",
+            "issue__paralegal__groups",
+            "requests",
         )
 
         if self.action == "retrieve":
@@ -279,59 +280,60 @@ class TaskApiViewset(ModelViewSet):
         data = TaskSerializer(instance=task).data
         return Response(data)
 
-    @action(detail=True, methods=["POST"], serializer_class=TaskCreateRequestSerializer)
-    def request(self, request, pk):
+    @action(
+        detail=True,
+        methods=["POST"],
+        serializer_class=TaskCreateRequestSerializer,
+        url_path="request/create",
+    )
+    def request_create(self, request, pk):
         task = self.get_object()
 
         # Disallow approval requests if there is already one pending.
         type = request.data.get("type", None)
-        if type == RequestTaskType.APPROVAL and task.is_approval_pending:
+        if type == TaskRequestType.APPROVAL and (
+            task.requests.filter(type=TaskRequestType.APPROVAL)
+            .exclude(status=TaskRequestStatus.DONE)
+            .exists()
+        ):
             raise ApprovalAlreadyPendingException()
 
         data = {
             **request.data,
+            "task_id": task.pk,
             "issue_id": task.issue_id,
-            "requesting_task_id": task.pk,
+            "from_user_id": request.user.id,
         }
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        task.is_approval_pending = True
-        task.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        # NOTE: We respond 200 OK with the requesting task, not 203 CREATED
-        # with the created task, as:
-        #
-        # - the user does not necessarily have access to the created task
-        # - it makes refreshing the client-side easier
-        #
-        # Conceptually you can consider this an "update" to the requesting task
-        # that happens to have the side effect of creating a new task.
-        data = TaskSerializer(instance=task).data
-        return Response(data)
-
-    @action(detail=True, methods=["PATCH"], serializer_class=TaskApprovalSerializer)
-    def approval(self, request, pk):
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_path="request/(?P<request_id>[0-9]+)",
+        serializer_class=TaskRequestSerializer,
+    )
+    def request_update(self, request, pk, request_id):
         task = self.get_object()
-        if task.type != RequestTaskType.APPROVAL:
-            raise NotApprovalException()
+        task_request = get_object_or_404(task.requests, pk=request_id)
 
-        serializer = self.get_serializer(instance=task, data=request.data)
+        if (
+            task_request.type == TaskRequestType.APPROVAL
+            and not request.user.is_lawyer_or_better
+        ):
+            raise PermissionDenied()
+
+        serializer = self.get_serializer(instance=task_request, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        data = TaskSerializer(instance=task).data
-        return Response(data)
+        return Response(serializer.data)
 
 
 class ApprovalAlreadyPendingException(APIException):
     status_code = 403
     default_code = "approval_already_pending"
-    default_detail = "An approval has already been requested and is pending."
-
-
-class NotApprovalException(APIException):
-    status_code = 403
-    default_code = "task_not_approval_request"
-    default_detail = "Cannot update a task that is not an approval request."
+    default_detail = "An approval request is already pending."

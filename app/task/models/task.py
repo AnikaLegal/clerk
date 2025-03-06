@@ -8,19 +8,11 @@ from django.utils import timezone
 from task.auditlog import LogDataMixin
 
 from .group import TaskGroup
+from .request import TaskRequestType
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
 
-
-class RequestTaskType(models.TextChoices):
-    """
-    The possible types of request tasks.
-    """
-
-    APPROVAL = "APPROVAL", "Approval request"
-
-
-TaskType = list(TaskTemplateType.choices) + list(RequestTaskType.choices)
+TaskType = list(TaskTemplateType.choices) + list(TaskRequestType.choices)
 
 
 class TaskStatus(models.TextChoices):
@@ -47,12 +39,7 @@ class Task(TimestampedModel, LogDataMixin):
 
     # Fields related to approval requests
     is_approval_required = models.BooleanField(default=False)
-    is_approval_pending = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
-
-    requesting_task = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="requests"
-    )
 
     # Internal status fields used for convenience.
     is_open = models.BooleanField(default=True)

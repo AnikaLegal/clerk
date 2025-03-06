@@ -1,0 +1,34 @@
+type: object
+properties:
+  id:
+    type: number
+  type:
+    type: string
+  status:
+    type: string
+  is_approved:
+    type: boolean
+  from_task_id:
+    type: number
+  from_user:
+    $ref: ./TaskListUser.yaml
+  from_comment:
+    type: string
+  to_task_id:
+    type: number
+  to_user:
+    $ref: ./TaskListUser.yaml
+  to_comment:
+    type: string
+    nullable: true
+required:
+  - id
+  - type
+  - status
+  - is_approved
+  - from_task_id
+  - from_user
+  - from_comment
+  - to_task_id
+  - to_user
+  - to_comment

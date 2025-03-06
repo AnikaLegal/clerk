@@ -21,16 +21,18 @@ allOf:
         type: boolean
       is_approval_pending:
         type: boolean
-      created_at:
-        type: string
       closed_at:
         type: string
         nullable: true
       days_open:
         type: integer
-      requesting_task:
-        $ref: ./Task.yaml
+      request:
+        $ref: ./TaskRequest.yaml
         nullable: true
+      created_at:
+        type: string
+      modified_at:
+        type: string
     required:
       - id
       - url
@@ -41,7 +43,8 @@ allOf:
       - is_open
       - is_suspended
       - is_approval_pending
-      - created_at
       - closed_at
       - days_open
-      - requesting_task
+      - request
+      - created_at
+      - modified_at

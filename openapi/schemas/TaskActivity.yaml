@@ -4,17 +4,23 @@ properties:
     type: integer
   task_id:
     type: number
-  created_at:
-    type: string
   type:
     type: string
+    enum:
+      - comment
+      - event
   data:
     oneOf:
       - $ref: ./TaskComment.yaml
       - $ref: ./TaskEvent.yaml
+  created_at:
+    type: string
+  modified_at:
+    type: string
 required:
   - id
   - task_id
-  - created_at
   - type
   - data
+  - created_at
+  - modified_at

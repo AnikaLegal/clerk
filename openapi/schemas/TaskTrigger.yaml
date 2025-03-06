@@ -4,11 +4,14 @@ allOf:
     properties:
       id:
         type: integer
+      url:
+        type: string
       created_at:
         type: string
-      url:
+      modified_at:
         type: string
     required:
       - id
-      - created_at
       - url
+      - created_at
+      - modified_at

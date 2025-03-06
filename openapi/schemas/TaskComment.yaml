@@ -21,8 +21,11 @@ allOf:
           - url
       created_at:
         type: string
+      modified_at:
+        type: string
     required:
       - id
       - task_id
       - creator
       - created_at
+      - modified_at
