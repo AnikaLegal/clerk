@@ -7,13 +7,13 @@ import { CommentInput } from 'comps/comment'
 import { Editor, RichTextDisplay } from 'comps/rich-text'
 import {
   CreateTaskSchema,
+  getTaskApprovalColor,
   TaskActionCard,
   TaskActivityGroup,
+  TaskApprovalActionCard,
   TaskInformationCard,
+  TaskRequestFromCard,
 } from 'comps/task'
-import { TaskApprovalActionCard } from 'comps/task/task-approval-action-card'
-import { getTaskApprovalColor } from 'comps/task/task-approval-table-cell'
-import { TaskRequestingApprovalCard } from 'comps/task/task-requesting-approval-card'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import moment from 'moment'
@@ -88,11 +88,8 @@ const App = () => {
       <Grid.Row>
         <Grid.Column>
           <>
-            {task.type == 'APPROVAL' && (
-              <TaskRequestingApprovalCard
-                task={task.requesting_task}
-                choices={choices}
-              />
+            {task.request && task.type == 'APPROVAL' && (
+              <TaskRequestFromCard request={task.request} />
             )}
             <CaseSummaryCard issue={task.issue} />
           </>

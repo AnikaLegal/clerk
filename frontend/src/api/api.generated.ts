@@ -521,19 +521,19 @@ const injectedRtkApi = api.injectEndpoints({
       CreateTaskRequestApiArg
     >({
       query: (queryArg) => ({
-        url: `/clerk/api/task/${queryArg.id}/request/`,
+        url: `/clerk/api/task/${queryArg.id}/request/create/`,
         method: "POST",
         body: queryArg.taskRequestCreate,
       }),
     }),
-    updateTaskApproval: build.mutation<
-      UpdateTaskApprovalApiResponse,
-      UpdateTaskApprovalApiArg
+    updateTaskRequest: build.mutation<
+      UpdateTaskRequestApiResponse,
+      UpdateTaskRequestApiArg
     >({
       query: (queryArg) => ({
-        url: `/clerk/api/task/${queryArg.id}/approval/`,
+        url: `/clerk/api/task/${queryArg.id}/request/${queryArg.requestId}/`,
         method: "PATCH",
-        body: queryArg.taskApprovalUpdate,
+        body: queryArg.taskRequestUpdate,
       }),
     }),
     getTaskTriggers: build.query<
@@ -1037,18 +1037,20 @@ export type UpdateTaskStatusApiArg = {
   taskStatusUpdate: TaskStatusUpdate;
 };
 export type CreateTaskRequestApiResponse =
-  /** status 200 Successful response. */ Task;
+  /** status 200 Successful response. */ TaskRequest;
 export type CreateTaskRequestApiArg = {
   /** Entity ID */
   id: number;
   taskRequestCreate: TaskRequestCreate;
 };
-export type UpdateTaskApprovalApiResponse =
+export type UpdateTaskRequestApiResponse =
   /** status 200 Successful response. */ Task;
-export type UpdateTaskApprovalApiArg = {
-  /** Entity ID */
+export type UpdateTaskRequestApiArg = {
+  /** Task ID */
   id: number;
-  taskApprovalUpdate: TaskApprovalUpdate;
+  /** Request ID */
+  requestId: number;
+  taskRequestUpdate: TaskRequestUpdate;
 };
 export type GetTaskTriggersApiResponse =
   /** status 200 Successful response. */ TaskTrigger[];
@@ -1359,6 +1361,11 @@ export type TaskType =
   | "OTHER"
   | "REVIEW"
   | "SEND";
+export type TaskListUser = {
+  id: number;
+  full_name: string;
+  url: string;
+};
 export type TaskList = {
   id: number;
   type: TaskType;
@@ -1366,7 +1373,6 @@ export type TaskList = {
   status: string;
   is_open: boolean;
   is_suspended: boolean;
-  created_at: string;
   due_at?: string | null;
   closed_at: string | null;
   is_urgent: boolean;
@@ -1381,11 +1387,9 @@ export type TaskList = {
     fileref: string;
     url: string;
   };
-  assigned_to: {
-    id: number;
-    full_name: string;
-    url: string;
-  };
+  assigned_to: TaskListUser;
+  created_at: string;
+  modified_at: string;
 };
 export type TaskBase = {
   name: string;
@@ -1397,6 +1401,18 @@ export type TaskBase = {
   is_approval_required?: boolean;
   is_approved?: boolean;
 };
+export type TaskRequest = {
+  id: number;
+  type: string;
+  status: string;
+  is_approved: boolean;
+  from_task_id: number;
+  from_user: TaskListUser;
+  from_comment: string;
+  to_task_id: number;
+  to_user: TaskListUser;
+  to_comment: string | null;
+};
 export type Task = TaskBase & {
   id: number;
   type: TaskType;
@@ -1407,10 +1423,11 @@ export type Task = TaskBase & {
   is_open: boolean;
   is_suspended: boolean;
   is_approval_pending: boolean;
-  created_at: string;
   closed_at: string | null;
   days_open: number;
-  requesting_task: Task;
+  request: TaskRequest;
+  created_at: string;
+  modified_at: string;
 };
 export type TaskCreate = TaskBase & {
   type: string;
@@ -1428,26 +1445,33 @@ export type TaskComment = TaskCommentBase & {
     url: string;
   };
   created_at: string;
+  modified_at: string;
 };
 export type TaskEvent = {
   id: number;
-  type: string;
+  type:
+    | "APPROVAL_REQUEST"
+    | "CANCELLED"
+    | "REASSIGNED"
+    | "REQUEST_ACCEPTED"
+    | "REQUEST_DECLINED"
+    | "RESUMED"
+    | "STATUS_CHANGE"
+    | "SUSPENDED";
   task_id: number;
-  user?: {
-    id: number;
-    full_name: string;
-    url: string;
-  } | null;
-  created_at: string;
+  user?: TaskListUser;
   desc_html: string;
   note_html: string;
+  created_at: string;
+  modified_at: string;
 };
 export type TaskActivity = {
   id: number;
   task_id: number;
-  created_at: string;
-  type: string;
+  type: "comment" | "event";
   data: TaskComment | TaskEvent;
+  created_at: string;
+  modified_at: string;
 };
 export type TaskCommentCreate = TaskCommentBase & {
   creator_id: number;
@@ -1470,17 +1494,14 @@ export type TaskStatusUpdate = {
 };
 export type TaskRequestCreate = {
   type: "APPROVAL";
+  to_user_id: number;
   name: string;
-  description: string;
-  assigned_to_id: number;
+  comment: string;
 };
-export type TaskApprovalUpdate = {
-  status: string;
-  requesting_task: {
-    is_approved: boolean;
-    is_approval_pending: boolean;
-    comment?: string;
-  };
+export type TaskRequestUpdate = {
+  status: "PENDING" | "DONE";
+  is_approved?: boolean;
+  to_comment?: string;
 };
 export type TaskTemplate = {
   id?: number;
@@ -1501,8 +1522,9 @@ export type TaskTriggerBase = {
 };
 export type TaskTrigger = TaskTriggerBase & {
   id: number;
-  created_at: string;
   url: string;
+  created_at: string;
+  modified_at: string;
 };
 export type TaskTriggerCreate = TaskTriggerBase & object;
 export const {
@@ -1568,7 +1590,7 @@ export const {
   useDeleteTaskAttachmentMutation,
   useUpdateTaskStatusMutation,
   useCreateTaskRequestMutation,
-  useUpdateTaskApprovalMutation,
+  useUpdateTaskRequestMutation,
   useGetTaskTriggersQuery,
   useCreateTaskTriggerMutation,
   useGetTaskTriggerQuery,

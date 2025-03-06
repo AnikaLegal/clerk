@@ -1,6 +1,13 @@
 import { generatedApi } from './api.generated'
 
-const ENTITY_TYPES = ['CASE', 'EMAIL', 'TASK_COMMENT'] as const
+const ENTITY_TYPES = [
+  'CASE',
+  'EMAIL',
+  'SERVICE',
+  'TASKS',
+  'TASK_ATTACHMENT',
+  'TASK_ACTIVITY',
+] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
   addTagTypes: ENTITY_TYPES,
@@ -57,6 +64,9 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],
     },
+    getTask: {
+      providesTags: [{ type: 'TASKS' }],
+    },
     getTasks: {
       providesTags: [{ type: 'TASKS' }],
     },
@@ -76,13 +86,13 @@ const enhancedApi = generatedApi.enhanceEndpoints({
       providesTags: [{ type: 'TASK_ACTIVITY' }],
     },
     updateTaskStatus: {
-      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
-    },
-    updateTaskApproval: {
-      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
+      invalidatesTags: [{ type: 'TASKS' }, { type: 'TASK_ACTIVITY' }],
     },
     createTaskRequest: {
-      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
+      invalidatesTags: [{ type: 'TASKS' }, { type: 'TASK_ACTIVITY' }],
+    },
+    updateTaskRequest: {
+      invalidatesTags: [{ type: 'TASKS' }, { type: 'TASK_ACTIVITY' }],
     },
     createTaskComment: {
       invalidatesTags: [{ type: 'TASK_ACTIVITY' }],

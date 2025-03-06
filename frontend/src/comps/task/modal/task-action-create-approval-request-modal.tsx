@@ -10,10 +10,10 @@ import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
 const ApprovalRequestSchema: Yup.ObjectSchema<TaskRequestCreate> = Yup.object({
-  type: Yup.string().oneOf(["APPROVAL"]).required(),
+  type: Yup.string().oneOf(['APPROVAL']).required(),
   name: Yup.string().required(),
-  description: Yup.string().default(undefined).min(1).required(),
-  assigned_to_id: Yup.number().required(),
+  comment: Yup.string().min(1).required(),
+  to_user_id: Yup.number().required(),
 })
 
 export const RequestApprovalModal = ({
@@ -24,14 +24,23 @@ export const RequestApprovalModal = ({
   onClose,
 }: ModalProps) => {
   const [createTaskRequest] = api.useCreateTaskRequestMutation()
+  const [getTask] = api.useLazyGetTaskQuery()
   const [confirmationOpen, setConfirmationOpen] = useState(false)
 
   const issue = task.issue
   const initialValues: TaskRequestCreate = {
     type: 'APPROVAL',
     name: `Approval request from ${user.full_name}`,
-    description: '',
-    assigned_to_id: issue.lawyer?.id,
+    comment: '',
+    to_user_id: issue.lawyer?.id,
+  }
+
+  const updateTask = () => {
+    getTask({ id: task.id })
+      .unwrap()
+      .then((task) => {
+        setTask(task)
+      })
   }
 
   const handleSubmit = (
@@ -40,20 +49,16 @@ export const RequestApprovalModal = ({
   ) => {
     createTaskRequest({ id: task.id, taskRequestCreate: values })
       .unwrap()
-      .then((task) => {
-        setTask(task)
+      .then((request) => {
         enqueueSnackbar('Created approval request', { variant: 'success' })
+        updateTask()
+        onClose()
+        helpers.resetForm()
       })
-      .catch((e) =>
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to create approval request'),
-          {
-            variant: 'error',
-          }
-        )
-      )
-    helpers.resetForm()
-    onClose()
+      .catch((e) => {
+        const mesg = getAPIErrorMessage(e, 'Failed to create approval request')
+        enqueueSnackbar(mesg, { variant: 'error' })
+      })
   }
 
   return (
@@ -101,7 +106,7 @@ export const RequestApprovalModal = ({
                   onSubmit={formik.handleSubmit}
                   error={Object.keys(formik.errors).length > 0}
                 >
-                  <RichTextEditorField name="description" />
+                  <RichTextEditorField name="comment" />
                 </Form>
               </Modal.Content>
               <Modal.Actions>

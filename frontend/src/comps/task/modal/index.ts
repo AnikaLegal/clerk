@@ -1,13 +1,16 @@
 import { CreateTaskModal } from './create-task-modal'
-import { ApprovalDecision, ApprovalDecisionModal } from './task-action-approval-decision-modal'
+import {
+  ApprovalDecision,
+  ApprovalDecisionModal,
+} from './task-action-approval-decision-modal'
 import { CancelTaskModal } from './task-action-cancel-modal'
-import { RequestApprovalModal } from './task-action-request-approval-modal'
+import { RequestApprovalModal } from './task-action-create-approval-request-modal'
+
+export type { ApprovalDecision }
 
 export {
-    ApprovalDecision,
-    ApprovalDecisionModal,
-    CancelTaskModal,
-    CreateTaskModal,
-    RequestApprovalModal
+  ApprovalDecisionModal,
+  CancelTaskModal,
+  CreateTaskModal,
+  RequestApprovalModal,
 }
-

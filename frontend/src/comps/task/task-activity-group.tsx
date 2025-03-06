@@ -34,21 +34,24 @@ export const TaskActivityGroup = ({
     <StyledCommentGroup>
       <Loader inverted inline active={loading} />
       {activities.map((activity) => {
-        if (activity.type == 'comment') {
-          return (
-            <TaskCommentSegment
-              key={activity.id}
-              comment={activity.data as TaskComment}
-            />
-          )
-        } else if (activity.type == 'event') {
-          return (
-            <TaskEventSegment
-              key={activity.id}
-              event={activity.data as TaskEvent}
-              choices={choices}
-            />
-          )
+        switch (activity.type) {
+          case 'comment': {
+            return (
+              <TaskCommentSegment
+                key={activity.id}
+                comment={activity.data as TaskComment}
+              />
+            )
+          }
+          case 'event': {
+            return (
+              <TaskEventSegment
+                key={activity.id}
+                event={activity.data as TaskEvent}
+                choices={choices}
+              />
+            )
+          }
         }
       })}
     </StyledCommentGroup>
@@ -79,23 +82,45 @@ export const TaskCommentSegment = ({ comment }: TaskCommentSegmentProps) => {
   )
 }
 
+const getEventColor = (event: TaskEvent): SemanticCOLORS | undefined => {
+  switch (event.type) {
+    case 'APPROVAL_REQUEST': {
+      return 'orange'
+    }
+    case 'REQUEST_DECLINED': {
+      return 'red'
+    }
+    case 'REQUEST_ACCEPTED': {
+      return 'green'
+    }
+  }
+  return undefined
+}
+
 export interface TaskEventSegmentProps {
   event: TaskEvent
   choices: TaskDetailChoices
 }
 
 export const TaskEventSegment = ({ event, choices }: TaskEventSegmentProps) => {
-  const eventTypeLabels = useMemo(() => choiceToMap(choices.event_type), [choices.event_type])
+  const eventTypeLabels = useMemo(
+    () => choiceToMap(choices.event_type),
+    [choices.event_type]
+  )
   const typeLabel = eventTypeLabels.get(event.type)
+  const color = getEventColor(event)
+
   return (
     <Segment>
-      <Label attached="top">
+      <Label attached="top" color={color}>
         {typeLabel}
         <Label.Detail>
           {moment(event.created_at).format('DD/MM/YY [at] h:mmA')}
         </Label.Detail>
       </Label>
-      <Label attached="top right">Event</Label>
+      <Label attached="top right" color={color}>
+        Event
+      </Label>
       <RichTextDisplay content={event.desc_html} />
       {event.note_html && (
         <RichTextDisplay

@@ -1,4 +1,4 @@
-import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
+import api, { Task, TaskRequestUpdate, useUpdateTaskRequestMutation } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Card } from 'semantic-ui-react'
@@ -16,34 +16,39 @@ interface TaskApprovalActionProps extends Omit<TaskDetailProps, 'choices'> {
   status: TaskStatus
 }
 
-export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
-  const [updateTaskApproval] = useUpdateTaskApprovalMutation()
-  const [decision, setDecision] = useState<ApprovalDecision>(
-    ApprovalDecision.DECLINED
-  )
+export const TaskApprovalActionCard = ({
+  task,
+  user,
+  setTask,
+  ...props
+}: TaskApprovalActionProps) => {
+  const [getTask] = api.useLazyGetTaskQuery()
+  const [updateTaskRequest] = useUpdateTaskRequestMutation()
   const [openApprovalDecision, setOpenApprovalDecision] = useState(false)
+  const [decision, setDecision] = useState<ApprovalDecision>('DECLINED')
 
-  const task = props.task
-  const status = props.status
-  const user = props.user
-
-  const updateApprovalHandler = (values: TaskApprovalUpdate) => {
-    updateTaskApproval({
-      id: task.id,
-      taskApprovalUpdate: values,
-    })
+  const updateTask = () => {
+    getTask({ id: task.id })
       .unwrap()
       .then((task) => {
-        props.setTask(task)
+        setTask(task)
+      })
+  }
+
+  const updateRequest = (values: TaskRequestUpdate) => {
+    return updateTaskRequest({
+      id: task.request.from_task_id,
+      requestId: task.request.id,
+      taskRequestUpdate: values,
+    })
+      .unwrap()
+      .then(() => {
         enqueueSnackbar('Updated task approval', { variant: 'success' })
+        updateTask()
       })
       .catch((e) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to update task approval'),
-          {
-            variant: 'error',
-          }
-        )
+        const mesg = getAPIErrorMessage(e, 'Failed to update task approval')
+        enqueueSnackbar(mesg, { variant: 'error' })
       })
   }
 
@@ -59,9 +64,9 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
       text: 'Reopen the task',
       showWhen: () => user.is_paralegal_or_better && !task.is_open,
       action: () =>
-        updateApprovalHandler({
-          status: status.stopped,
-          requesting_task: { is_approved: false, is_approval_pending: true },
+        updateRequest({
+          status: 'PENDING',
+          is_approved: false,
         }),
     },
     {
@@ -69,23 +74,27 @@ export const TaskApprovalActionCard = (props: TaskApprovalActionProps) => {
       icon: 'check',
       text: 'Approve the request',
       showWhen: () => task.is_open,
-      action: () => showApprovalModal(ApprovalDecision.APPROVED),
+      action: () => showApprovalModal('APPROVED'),
     },
     {
       id: 'decline',
       icon: 'close',
       text: 'Decline the request',
       showWhen: () => task.is_open,
-      action: () => showApprovalModal(ApprovalDecision.DECLINED),
+      action: () => showApprovalModal('DECLINED'),
     },
   ]
 
   return (
     <Card fluid>
       <ApprovalDecisionModal
+        task={task}
+        setTask={setTask}
         open={openApprovalDecision}
         onClose={() => setOpenApprovalDecision(false)}
         decision={decision}
+        updateRequest={updateRequest}
+        user={user}
         {...props}
       />
       <Card.Content header="Task actions" />

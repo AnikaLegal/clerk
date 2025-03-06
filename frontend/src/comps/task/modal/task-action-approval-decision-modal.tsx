@@ -1,75 +1,47 @@
-import { TaskApprovalUpdate, useUpdateTaskApprovalMutation } from 'api'
+import { Task, TaskRequestUpdate } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
 import { Formik } from 'formik'
 import { RichTextAreaField } from 'forms/formik'
-import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
-import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
-const ApprovalDecisionSchema: Yup.ObjectSchema<TaskApprovalUpdate> = Yup.object(
-  {
-    status: Yup.string().required(),
-    requesting_task: Yup.object({
-      is_approved: Yup.boolean().required(),
-      is_approval_pending: Yup.boolean().required(),
-      comment: Yup.string().when('is_approved', {
-        is: false,
-        then: (schema) => schema.min(1).required(),
-        otherwise: (schema) => schema.optional(),
-      }),
-    }).required(),
-  }
-)
+const ApprovalDecisionSchema: Yup.ObjectSchema<TaskRequestUpdate> = Yup.object({
+  status: Yup.string().oneOf(['PENDING', 'DONE']).required(),
+  is_approved: Yup.boolean().required(),
+  to_comment: Yup.string().when('is_approved', {
+    is: false,
+    then: (schema) => schema.min(1).required(),
+    otherwise: (schema) => schema.optional(),
+  }),
+})
 
-export enum ApprovalDecision {
-  APPROVED,
-  DECLINED,
-}
+export type ApprovalDecision = 'APPROVED' | 'DECLINED'
 
 interface ApprovalDecisionModalProps extends ModalProps {
   decision: ApprovalDecision
+  updateRequest: (values: TaskRequestUpdate) => Promise<Task | void>
 }
 
 export const ApprovalDecisionModal = ({
-  task,
-  setTask,
   open,
   onClose,
-  status,
   decision,
+  updateRequest,
 }: ApprovalDecisionModalProps) => {
-  const [updateTaskApproval] = useUpdateTaskApprovalMutation()
   const [confirmationOpen, setConfirmationOpen] = useState(false)
 
-  const initialValues: TaskApprovalUpdate = {
-    status: status.finished,
-    requesting_task: {
-      is_approved: decision == ApprovalDecision.APPROVED,
-      is_approval_pending: false,
-    },
+  const initialValues: TaskRequestUpdate = {
+    status: 'DONE',
+    is_approved: decision == 'APPROVED',
+    to_comment: '',
   }
 
-  const handleSubmit = (values: TaskApprovalUpdate, { setSubmitting }) => {
-    updateTaskApproval({
-      id: task.id,
-      taskApprovalUpdate: values,
-    })
-      .unwrap()
-      .then((task) => {
-        setTask(task)
-        enqueueSnackbar('Updated task approval', { variant: 'success' })
+  const handleSubmit = (values: TaskRequestUpdate, { setSubmitting }) => {
+    updateRequest(values)
+      .then(() => {
         onClose()
-      })
-      .catch((e) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to update task approval'),
-          {
-            variant: 'error',
-          }
-        )
       })
       .finally(() => setSubmitting(false))
   }
@@ -77,7 +49,7 @@ export const ApprovalDecisionModal = ({
   return (
     <Formik
       enableReinitialize
-      isInitialValid={decision == ApprovalDecision.APPROVED}
+      isInitialValid={decision == 'APPROVED'}
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={ApprovalDecisionSchema}
@@ -109,12 +81,12 @@ export const ApprovalDecisionModal = ({
             />
             <Modal size="small" open={open} onClose={closeHandler}>
               <Modal.Header>
-                {decision == ApprovalDecision.APPROVED
+                {decision == 'APPROVED'
                   ? 'Approve the request'
                   : 'Decline the request'}
               </Modal.Header>
               <Modal.Content>
-                {decision == ApprovalDecision.APPROVED ? (
+                {decision == 'APPROVED' ? (
                   <p>
                     You may leave an <strong>optional</strong> comment.
                   </p>
@@ -128,8 +100,8 @@ export const ApprovalDecisionModal = ({
                   error={Object.keys(formik.errors).length > 0}
                 >
                   <RichTextAreaField
-                    name="requesting_task.comment"
-                    required={decision == ApprovalDecision.DECLINED}
+                    name="to_comment"
+                    required={decision == 'DECLINED'}
                   />
                 </Form>
               </Modal.Content>
@@ -137,11 +109,11 @@ export const ApprovalDecisionModal = ({
                 <Button
                   primary
                   type="submit"
-                  negative={decision == ApprovalDecision.DECLINED}
+                  negative={decision == 'DECLINED'}
                   onClick={() => formik.handleSubmit()}
                   disabled={formik.isSubmitting || !formik.isValid}
                 >
-                  {decision == ApprovalDecision.APPROVED
+                  {decision == 'APPROVED'
                     ? 'Approve request'
                     : 'Decline request'}
                 </Button>
