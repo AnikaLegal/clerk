@@ -1,7 +1,7 @@
 import { Task, TaskRequestUpdate } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { ModalProps } from 'comps/task/task-action-card'
-import { Formik } from 'formik'
+import { Formik, FormikHelpers } from 'formik'
 import { RichTextAreaField } from 'forms/formik'
 import React, { useState } from 'react'
 import { Button, Form, Modal } from 'semantic-ui-react'
@@ -38,10 +38,14 @@ export const ApprovalDecisionModal = ({
     to_comment: '',
   }
 
-  const handleSubmit = (values: TaskRequestUpdate, { setSubmitting }) => {
+  const handleSubmit = (
+    values: TaskRequestUpdate,
+    { setSubmitting, resetForm }: FormikHelpers<TaskRequestUpdate>
+  ) => {
     updateRequest(values)
       .then(() => {
         onClose()
+        resetForm()
       })
       .finally(() => setSubmitting(false))
   }
