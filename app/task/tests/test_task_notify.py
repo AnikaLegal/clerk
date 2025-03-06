@@ -16,7 +16,7 @@ EVENT_TYPES = [c[0] for c in EventType.choices]
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 @pytest.mark.parametrize("event_type", EVENT_TYPES)
-@mock.patch("task.tasks.notify_of_assignment")
+@mock.patch("task.tasks.notify_of_task_assignment")
 def test_trigger_notify__single_notification(
     mock_notify,
     event_type,
@@ -39,7 +39,7 @@ def test_trigger_notify__single_notification(
 
     # A single call to the notify method?
     mock_notify.assert_called_once()
-    # notify_of_assignment takes a list of task ids to notify about. This should
+    # notify_of_task_assignment takes a list of task ids to notify about. This should
     # match the number of templates used to create tasks.
     assert (
         mock_notify.call_args
@@ -49,7 +49,7 @@ def test_trigger_notify__single_notification(
 
 @pytest.mark.django_db
 @pytest.mark.enable_signals
-@mock.patch("task.tasks.notify_of_assignment")
+@mock.patch("task.tasks.notify_of_task_assignment")
 def test_trigger_notify__notify_tasks_match_created_tasks(
     mock_notify,
     django_capture_on_commit_callbacks,
