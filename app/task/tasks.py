@@ -9,14 +9,15 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from task.helpers import get_coordinators_user
-from task.models import Task, TaskGroup, TaskTrigger
+from task.models import Task, TaskGroup, TaskRequest, TaskTrigger
+from task.models.request import TaskRequestStatus
 from task.models.task import TaskStatus
 from task.models.trigger import TasksCaseRole, TriggerTopic
 from utils.sentry import sentry_task
 
 from .events import (
-    handle_update_task_log_entry,
     handle_create_task_request_log_entry,
+    handle_update_task_log_entry,
     handle_update_task_request_log_entry,
 )
 from .helpers import (
@@ -26,7 +27,7 @@ from .helpers import (
     is_user_changed,
     is_user_removed,
 )
-from .notify import notify_of_task_assignment
+from .notify import notify_of_task_assignment, notify_of_task_request_completion
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +95,15 @@ def handle_task_log(log_entry_pk: int):
 
     if action == LogEntry.Action.UPDATE:
         handle_update_task_log_entry(log_entry)
+
+
+@sentry_task
+def handle_task_request_save(task_request_pk: int, created: bool):
+    # Notify requester on task request completion.
+    if not created:
+        request = TaskRequest.objects.get(pk=task_request_pk)
+        if request and request.status == TaskRequestStatus.DONE:
+            notify_of_task_request_completion(request.pk)
 
 
 @sentry_task

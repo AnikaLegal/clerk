@@ -11,16 +11,17 @@ from slack.services import (
     send_slack_message,
 )
 from task.helpers import get_coordinators_user
-from task.models import Task
+from task.models import Task, TaskRequest
 
 logger = logging.getLogger(__name__)
 
 
 def notify_of_task_assignment(task_pks: list[int]) -> None:
     assert task_pks
+    logger.info("Notifying assignment of task(s): %s", task_pks)
+
     tasks = Task.objects.filter(pk__in=task_pks)
     assert tasks.exists()
-    logger.info("Notifying assignment of task(s): %s", task_pks)
 
     for task in tasks.distinct("assigned_to", "issue"):
         if task.assigned_to:
@@ -30,6 +31,15 @@ def notify_of_task_assignment(task_pks: list[int]) -> None:
             notify_user_of_task_assignment(
                 task.assigned_to, task.issue, tasks_by_user_and_issue
             )
+
+
+def notify_of_task_request_completion(request_pk: int) -> None:
+    logger.info("Notifying completion of TaskRequest<%s>", request_pk)
+
+    request = TaskRequest.objects.get(pk=request_pk)
+    task = request.from_task
+    if task.assigned_to:
+        notify_user_of_task_update(task.assigned_to, task)
 
 
 def notify_user_of_task_assignment(
@@ -42,14 +52,33 @@ def notify_user_of_task_assignment(
         issue.pk,
         [t.pk for t in tasks],
     )
-    text = get_assignment_notify_text(issue, tasks)
+    text = get_task_assignment_notify_text(issue, tasks)
     notify_user(user, text)
 
 
-def get_assignment_notify_text(issue, tasks: QuerySet[Task]) -> str:
+def notify_user_of_task_update(user: User, task: Task) -> None:
+    logger.info(
+        "Notifying User<%s> of update to Task<%s>",
+        user.pk,
+        task.pk,
+    )
+    text = get_task_update_notify_text(task)
+    notify_user(user, text)
+
+
+def get_task_assignment_notify_text(issue, tasks: QuerySet[Task]) -> str:
     assert tasks.exists()
+
     context = {"issue": issue, "tasks": tasks, "base_url": settings.CLERK_BASE_URL}
     return render_to_string("task/tasks_assigned.md", context)
+
+
+def get_task_update_notify_text(task: Task) -> str:
+    context = {
+        "task": task,
+        "base_url": settings.CLERK_BASE_URL,
+    }
+    return render_to_string("task/task_update.md", context)
 
 
 def notify_user(user: User, text: str) -> None:

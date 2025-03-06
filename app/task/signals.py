@@ -18,6 +18,7 @@ from .tasks import (
     handle_event_save,
     handle_task_log,
     handle_task_request_log,
+    handle_task_request_save,
     handle_task_save,
 )
 
@@ -36,6 +37,26 @@ def post_save_task(instance, **kwargs):
     transaction.on_commit(lambda: async_task(handle_task_save, task.pk))
 
 
+@receiver(post_save, sender=TaskRequest)
+def post_save_task_request(instance, created, **kwargs):
+    request: TaskRequest = instance
+    transaction.on_commit(
+        lambda: async_task(handle_task_request_save, request.pk, created)
+    )
+
+
+@receiver(post_save, sender=TaskComment)
+def post_save_task_comment(instance, created, **kwargs):
+    if created:
+        TaskActivity.objects.create(content_object=instance)
+
+
+@receiver(post_save, sender=TaskEvent)
+def post_save_task_event(instance, created, **kwargs):
+    if created:
+        TaskActivity.objects.create(content_object=instance)
+
+
 @receiver(post_log, sender=Task)
 def post_log_task(log_entry, error, **kwargs):
     if error:
@@ -50,15 +71,3 @@ def post_log_task_request(log_entry, error, **kwargs):
         logger.exception(error)
     else:
         transaction.on_commit(lambda: async_task(handle_task_request_log, log_entry.pk))
-
-
-@receiver(post_save, sender=TaskComment)
-def post_save_task_comment(instance, created, **kwargs):
-    if created:
-        TaskActivity.objects.create(content_object=instance)
-
-
-@receiver(post_save, sender=TaskEvent)
-def post_save_task_event(instance, created, **kwargs):
-    if created:
-        TaskActivity.objects.create(content_object=instance)
