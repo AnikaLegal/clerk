@@ -15,12 +15,13 @@ class TaskRequestSerializer(serializers.ModelSerializer):
             "from_task_id",
             "from_task_url",
             "from_user",
+            "from_comment",
             "to_task_id",
             "to_task_url",
             "to_user",
+            "to_comment",
             "status",
             "is_approved",
-            "to_comment",
         )
         read_only_fields = ("task_id", "type")
 
@@ -28,6 +29,7 @@ class TaskRequestSerializer(serializers.ModelSerializer):
 
     from_user = TaskListUserSerializer(source="from_task.assigned_to", read_only=True)
     from_task_url = serializers.SerializerMethodField(read_only=True)
+    from_comment = serializers.CharField(read_only=True)
     to_user = TaskListUserSerializer(source="to_task.assigned_to", read_only=True)
     to_task_url = serializers.SerializerMethodField(read_only=True)
 
