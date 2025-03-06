@@ -16,7 +16,7 @@ from task.models import Task
 logger = logging.getLogger(__name__)
 
 
-def notify_of_assignment(task_pks: list[int]) -> None:
+def notify_of_task_assignment(task_pks: list[int]) -> None:
     assert task_pks
     tasks = Task.objects.filter(pk__in=task_pks)
     assert tasks.exists()

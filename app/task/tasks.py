@@ -26,7 +26,7 @@ from .helpers import (
     is_user_changed,
     is_user_removed,
 )
-from .notify import notify_of_assignment
+from .notify import notify_of_task_assignment
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def handle_event_save(event_pk: int):
 
     if notify_tasks:
         try:
-            notify_of_assignment(list(notify_tasks))
+            notify_of_task_assignment(list(notify_tasks))
         finally:
             Task.objects.filter(pk__in=notify_tasks).update(
                 is_notify_pending=False, is_system_update=False
@@ -79,7 +79,7 @@ def handle_task_save(task_pk: int):
     task = Task.objects.get(pk=task_pk)
     try:
         if task and task.is_notify_pending and not task.is_system_update:
-            notify_of_assignment([task.pk])
+            notify_of_task_assignment([task.pk])
     finally:
         if task and (task.is_notify_pending or task.is_system_update):
             task.is_notify_pending = False
