@@ -235,12 +235,13 @@ export const TaskBody = ({
   }
 
   const initialValues = {
+    issue_id: task.issue_id,
+    type: task.type,
     name: task.name,
     description: task.description,
     assigned_to_id: task.assigned_to_id,
-    type: task.type,
-    issue_id: task.issue_id,
     is_urgent: task.is_urgent,
+    due_at: task.due_at,
     is_approval_required: task.is_approval_required,
   }
 
