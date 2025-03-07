@@ -4,6 +4,7 @@ from case.serializers import IssueSerializer, UserSerializer
 from core.models import Issue
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.timezone import now
 from rest_framework import exceptions, serializers
 from task.models import Task
 from task.models.request import TaskRequestStatus, TaskRequestType
@@ -143,6 +144,12 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get("request", None)
         if request and not request.user.is_lawyer_or_better:
             raise exceptions.PermissionDenied()
+        return value
+
+    def validate_due_at(self, value):
+        # Due date must be in the future.
+        if value <= now().date():
+            raise exceptions.ValidationError("Due date must be after today's date.")
         return value
 
     def validate(self, attrs):
