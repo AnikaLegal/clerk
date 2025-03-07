@@ -6,9 +6,8 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import exceptions, serializers
-from task.models import Task
 from task.models.request import TaskRequestStatus, TaskRequestType
-from task.models.template import TaskTemplateType
+from task.models.task import Task, TaskType
 
 from .actions import TaskRequestSerializer
 from .user import TaskListUserSerializer
@@ -113,7 +112,7 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
     issue_id = serializers.UUIDField()
-    type = serializers.ChoiceField(choices=TaskTemplateType.choices)
+    type = serializers.ChoiceField(choices=TaskType)
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
