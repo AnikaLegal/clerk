@@ -1361,6 +1361,7 @@ export type TaskType =
   | "OTHER"
   | "REVIEW"
   | "SEND";
+export type TaskStatus = "NOT_STARTED" | "IN_PROGRESS" | "DONE" | "NOT_DONE";
 export type TaskListUser = {
   id: number;
   full_name: string;
@@ -1370,7 +1371,7 @@ export type TaskList = {
   id: number;
   type: TaskType;
   name: string;
-  status: string;
+  status: TaskStatus;
   is_open: boolean;
   is_suspended: boolean;
   due_at?: string | null;
@@ -1416,7 +1417,7 @@ export type TaskRequest = {
 export type Task = TaskBase & {
   id: number;
   type: TaskType;
-  status: string;
+  status: TaskStatus;
   url: string;
   issue: Issue;
   assigned_to: User;
@@ -1430,8 +1431,8 @@ export type Task = TaskBase & {
   modified_at: string;
 };
 export type TaskCreate = TaskBase & {
-  type: string;
-  status?: string;
+  type: TaskType | "";
+  status?: TaskStatus;
 };
 export type TaskCommentBase = {
   text: string;
@@ -1489,7 +1490,7 @@ export type TaskAttachmentCreate = TaskAttachmentBase & {
   file: Blob;
 };
 export type TaskStatusUpdate = {
-  status: string;
+  status: TaskStatus;
   comment?: string;
 };
 export type TaskRequestCreate = {

@@ -7,7 +7,7 @@ properties:
   name:
     type: string
   status:
-    type: string
+    $ref: ./TaskStatus.yaml
   is_open:
     type: boolean
   is_suspended:

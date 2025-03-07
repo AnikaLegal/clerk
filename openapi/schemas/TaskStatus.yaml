@@ -1,0 +1,6 @@
+type: string
+enum:
+  - NOT_STARTED
+  - IN_PROGRESS
+  - DONE
+  - NOT_DONE

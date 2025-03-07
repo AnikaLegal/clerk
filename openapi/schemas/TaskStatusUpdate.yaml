@@ -1,7 +1,7 @@
 type: object
 properties:
   status:
-    type: string
+    $ref: ./TaskStatus.yaml
   comment:
     type: string
 required:

@@ -2,7 +2,7 @@ import api, { Task, TaskRequestUpdate, useUpdateTaskRequestMutation } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Card } from 'semantic-ui-react'
-import { TaskDetailProps, TaskStatus } from 'types/task'
+import { TaskDetailProps } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
 import { ApprovalDecision, ApprovalDecisionModal } from './modal'
 import { TaskActionCardContent, TaskOption } from './task-action-card'
@@ -12,9 +12,7 @@ export interface ModalProps extends TaskApprovalActionProps {
   open: boolean
 }
 
-interface TaskApprovalActionProps extends Omit<TaskDetailProps, 'choices'> {
-  status: TaskStatus
-}
+interface TaskApprovalActionProps extends Omit<TaskDetailProps, 'choices'> {}
 
 export const TaskApprovalActionCard = ({
   task,

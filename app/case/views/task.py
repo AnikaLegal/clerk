@@ -67,12 +67,6 @@ def task_detail_page_view(request, pk):
             "status": TaskStatus.choices,
             "type": TaskType,
         },
-        "status": {
-            "stopped": TaskStatus.NOT_STARTED,
-            "started": TaskStatus.IN_PROGRESS,
-            "finished": TaskStatus.DONE,
-            "cancelled": TaskStatus.NOT_DONE,
-        },
         "task_pk": pk,
         "list_url": reverse("task-list"),
     }

@@ -1,4 +1,4 @@
-import api, { TaskStatusUpdate } from 'api'
+import api, { TaskStatus, TaskStatusUpdate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
 import { Formik, FormikHelpers } from 'formik'
 import { RichTextAreaField } from 'forms/formik'
@@ -12,12 +12,12 @@ export const CancelTaskModal = (props: ModalProps) => {
   const [updateTaskStatus] = api.useUpdateTaskStatusMutation()
 
   const schema: Yup.ObjectSchema<TaskStatusUpdate> = Yup.object({
-    status: Yup.string().required(),
+    status: Yup.string().oneOf(["NOT_DONE"]).required(),
     comment: Yup.string().min(1).required(),
   })
 
-  const initialValues = {
-    status: props.status.cancelled,
+  const initialValues: TaskStatusUpdate = {
+    status: 'NOT_DONE',
   }
 
   const handleSubmit = (

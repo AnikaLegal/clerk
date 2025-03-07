@@ -3,8 +3,12 @@ allOf:
   - type: object
     properties:
       type:
-        type: string
+        oneOf:
+          - $ref: ./TaskType.yaml
+          - type: string
+            enum:
+              - ""
       status:
-        type: string
+        $ref: ./TaskStatus.yaml
     required:
       - type

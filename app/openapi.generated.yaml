@@ -2608,6 +2608,13 @@ components:
         - OTHER
         - REVIEW
         - SEND
+    TaskStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - IN_PROGRESS
+        - DONE
+        - NOT_DONE
     TaskListUser:
       type: object
       properties:
@@ -2631,7 +2638,7 @@ components:
         name:
           type: string
         status:
-          type: string
+          $ref: "#/components/schemas/TaskStatus"
         is_open:
           type: boolean
         is_suspended:
@@ -2726,9 +2733,13 @@ components:
         - type: object
           properties:
             type:
-              type: string
+              oneOf:
+                - $ref: "#/components/schemas/TaskType"
+                - type: string
+                  enum:
+                    - ""
             status:
-              type: string
+              $ref: "#/components/schemas/TaskStatus"
           required:
             - type
     TaskRequest:
@@ -2776,7 +2787,7 @@ components:
             type:
               $ref: "#/components/schemas/TaskType"
             status:
-              type: string
+              $ref: "#/components/schemas/TaskStatus"
             url:
               type: string
             issue:
@@ -2969,7 +2980,7 @@ components:
       type: object
       properties:
         status:
-          type: string
+          $ref: "#/components/schemas/TaskStatus"
         comment:
           type: string
       required:

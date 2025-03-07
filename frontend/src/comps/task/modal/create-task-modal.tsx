@@ -1,6 +1,6 @@
 import api, { Issue, TaskCreate } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
-import { Formik } from 'formik'
+import { Formik, FormikHelpers } from 'formik'
 import { TaskForm } from 'forms'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -58,7 +58,7 @@ export const CreateTaskModal = ({
 
   const handleSubmit = (
     values: TaskCreate,
-    { setSubmitting, setErrors, resetForm }
+    { setSubmitting, setErrors, resetForm }: FormikHelpers<TaskCreate>
   ) => {
     if (!user.is_lawyer_or_better) {
       values = {
@@ -83,7 +83,7 @@ export const CreateTaskModal = ({
           setErrors(requestErrors)
         }
       })
-      .finally(setSubmitting(false))
+      .finally(() => setSubmitting(false))
   }
 
   return (

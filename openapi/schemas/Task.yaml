@@ -7,7 +7,7 @@ allOf:
       type:
         $ref: ./TaskType.yaml
       status:
-        type: string
+        $ref: ./TaskStatus.yaml
       url:
         type: string
       issue:

@@ -4,7 +4,7 @@ import { CancelTaskModal, RequestApprovalModal } from 'comps/task'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
-import { TaskDetailProps, TaskStatus } from 'types/task'
+import { TaskDetailProps } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
 
 export interface ModalProps extends TaskActionProps {
@@ -21,9 +21,7 @@ export interface TaskOption {
   action: () => void
 }
 
-interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {
-  status: TaskStatus
-}
+interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {}
 
 export const TaskActionCard = (props: TaskActionProps) => {
   const [updateTaskStatus] = useUpdateTaskStatusMutation()
@@ -31,7 +29,6 @@ export const TaskActionCard = (props: TaskActionProps) => {
   const [openRequestApproval, setOpenRequestApproval] = useState(false)
 
   const task = props.task
-  const status = props.status
   const user = props.user
   const isApproved =
     user.is_lawyer_or_better || !task.is_approval_required || task.is_approved
@@ -52,7 +49,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
 
   const finishTaskHandler = () => {
     if (isApproved) {
-      updateStatusHandler({ status: status.finished })
+      updateStatusHandler({ status: 'DONE' })
     } else {
       setOpenRequestApproval(true)
     }
@@ -68,23 +65,23 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'undo',
       text: 'Reopen the task',
       showWhen: () => user.is_paralegal_or_better && !task.is_open,
-      action: () => updateStatusHandler({ status: status.stopped }),
+      action: () => updateStatusHandler({ status: 'NOT_STARTED' }),
     },
     {
       id: 'start',
       icon: 'play',
       text: 'Start the task',
       showWhen: () =>
-        user.is_paralegal_or_better && task.status === status.stopped,
-      action: () => updateStatusHandler({ status: status.started }),
+        user.is_paralegal_or_better && task.status == 'NOT_STARTED',
+      action: () => updateStatusHandler({ status: 'IN_PROGRESS' }),
     },
     {
       id: 'stop',
       icon: 'stop',
       text: 'Stop the task',
       showWhen: () =>
-        user.is_paralegal_or_better && task.status === status.started,
-      action: () => updateStatusHandler({ status: status.stopped }),
+        user.is_paralegal_or_better && task.status == 'IN_PROGRESS',
+      action: () => updateStatusHandler({ status: 'NOT_STARTED' }),
     },
     {
       id: 'complete',

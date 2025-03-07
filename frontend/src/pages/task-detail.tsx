@@ -33,24 +33,20 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { Model, UserInfo } from 'types/global'
-import { TaskDetailChoices, TaskDetailProps, TaskStatus } from 'types/task'
+import { TaskDetailChoices, TaskDetailProps } from 'types/task'
 import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   choices: TaskDetailChoices
-  status: TaskStatus
   task_pk: number
   list_url: string
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-export interface TaskBodyProps extends TaskDetailProps {
-  status: TaskStatus
-}
-export interface TaskHeaderProps extends TaskDetailProps {
-  status: TaskStatus
-}
+export interface TaskBodyProps extends TaskDetailProps {}
+
+export interface TaskHeaderProps extends TaskDetailProps {}
 
 const App = () => {
   const [getTask] = api.useLazyGetTaskQuery()
@@ -76,7 +72,6 @@ const App = () => {
   }
   const choices = CONTEXT.choices
   const user = CONTEXT.user
-  const status = CONTEXT.status
   const update = (values: Model) =>
     updateTask({
       id: task.id,
@@ -108,7 +103,6 @@ const App = () => {
               update={update}
               choices={choices}
               user={user}
-              status={status}
             />
           </Segment>
           <Segment basic style={{ marginTop: '0' }}>
@@ -131,7 +125,6 @@ const App = () => {
               setTask={setTask}
               update={update}
               user={user}
-              status={status}
             />
           ) : (
             <TaskActionCard
@@ -139,7 +132,6 @@ const App = () => {
               setTask={setTask}
               update={update}
               user={user}
-              status={status}
             />
           )}
         </Grid.Column>
@@ -154,7 +146,6 @@ export const TaskBody = ({
   update,
   choices,
   user,
-  status,
 }: TaskBodyProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
@@ -170,7 +161,6 @@ export const TaskBody = ({
               update={update}
               choices={choices}
               user={user}
-              status={status}
             />
           </Grid.Column>
           {user.is_coordinator_or_better && (
@@ -302,11 +292,7 @@ const getIsOverdue = (task: Task): boolean => {
 
 export const TaskHeader = ({
   task,
-  setTask,
-  update,
   choices,
-  user,
-  status,
 }: TaskHeaderProps) => {
   const typeLabels = useMemo(() => choiceToMap(choices.type), [choices.type])
   const isOverdue = getIsOverdue(task)
