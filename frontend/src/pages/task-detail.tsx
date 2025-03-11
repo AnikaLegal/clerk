@@ -217,7 +217,7 @@ export const TaskBody = ({
       .finally(setSubmitting(false))
   }
 
-  const initialValues = {
+  const initialValues: TaskCreate = {
     issue_id: task.issue_id,
     type: task.type,
     name: task.name,
