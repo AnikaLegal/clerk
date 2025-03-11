@@ -43,7 +43,6 @@ from case.views.auth import (
 def task_list_page_view(request):
     context = {
         "choices": {
-            "case_topic": CaseTopic.CHOICES,
             "is_open": [
                 ("true", "Open"),
                 ("false", "Closed"),

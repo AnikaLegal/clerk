@@ -16,19 +16,18 @@ import {
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
 import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
+import { CASE_TYPES } from 'consts'
 
 interface DjangoContext {
   choices: {
     type: string[][]
     status: string[][]
     is_open: string[][]
-    case_topic: string[][]
   }
   user: UserInfo
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const TOPIC_LABELS = choiceToMap(CONTEXT.choices.case_topic)
 const TYPE_LABELS = choiceToMap(CONTEXT.choices.type)
 const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
@@ -140,7 +139,11 @@ const App = () => {
                   clearable
                   value={filter.issueTopic || ''}
                   placeholder="Case topic"
-                  options={choiceToOptions(CONTEXT.choices.case_topic)}
+                  options={Object.entries(CASE_TYPES).map(([key, value]) => ({
+                    key: key,
+                    value: key,
+                    text: value,
+                  }))}
                   onChange={(e, { value }) => updateFilter('issueTopic', value)}
                 />
               </Form.Field>
@@ -209,7 +212,7 @@ const App = () => {
                 <Table.Cell>
                   <a href={task.issue.url}>{task.issue.fileref}</a>
                 </Table.Cell>
-                <Table.Cell>{TOPIC_LABELS.get(task.issue.topic)}</Table.Cell>
+                <Table.Cell>{CASE_TYPES[task.issue.topic]}</Table.Cell>
                 <Table.Cell>
                   <a href={task.url}>{task.name}</a>
                 </Table.Cell>
