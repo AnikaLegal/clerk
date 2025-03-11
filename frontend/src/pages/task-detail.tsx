@@ -34,18 +34,15 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { Model, UserInfo } from 'types/global'
-import { TaskDetailChoices, TaskDetailProps } from 'types/task'
+import { TaskDetailProps } from 'types/task'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
-  choices: TaskDetailChoices
   task_pk: number
   list_url: string
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-
-export interface TaskBodyProps extends TaskDetailProps {}
 
 const App = () => {
   const [getTask] = api.useLazyGetTaskQuery()
@@ -69,7 +66,6 @@ const App = () => {
   if (isLoading) {
     return null
   }
-  const choices = CONTEXT.choices
   const user = CONTEXT.user
   const update = (values: Model) =>
     updateTask({
@@ -100,7 +96,6 @@ const App = () => {
               task={task}
               setTask={setTask}
               update={update}
-              choices={choices}
               user={user}
             />
           </Segment>
@@ -109,15 +104,12 @@ const App = () => {
             <Header as="h4">Activity</Header>
             <TaskActivity
               task={task}
-              setTask={setTask}
-              update={update}
-              choices={choices}
               user={user}
             />
           </Segment>
         </Grid.Column>
         <Grid.Column>
-          <TaskInformationCard choices={choices} task={task} />
+          <TaskInformationCard task={task} />
           {task.type == 'APPROVAL' ? (
             <TaskApprovalActionCard
               task={task}
@@ -139,13 +131,7 @@ const App = () => {
   )
 }
 
-export const TaskBody = ({
-  task,
-  setTask,
-  update,
-  choices,
-  user,
-}: TaskBodyProps) => {
+export const TaskBody = ({ task, setTask, update, user }: TaskDetailProps) => {
   const [isEditMode, setEditMode] = useState(false)
   const toggleEditMode = () => setEditMode(!isEditMode)
 
@@ -321,7 +307,12 @@ export const TaskApprovalHeader = ({ task }: { task: Task }) => {
   return null
 }
 
-export const TaskActivity = ({ task, user, choices }: TaskDetailProps) => {
+export interface TaskActivityProps {
+  task: Task
+  user: UserInfo
+}
+
+export const TaskActivity = ({ task, user }: TaskActivityProps) => {
   const [createTaskComment] = api.useCreateTaskCommentMutation()
 
   /* TODO: handle errors.

@@ -1,21 +1,15 @@
 import { Task } from 'api'
 import moment from 'moment'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
-import { TaskDetailChoices } from 'types/task'
-import { choiceToMap } from 'utils'
 
 interface TaskInformationCardProps {
-  choices: TaskDetailChoices
   task: Task
 }
 
 export const TaskInformationCard = ({
-  choices,
   task,
 }: TaskInformationCardProps) => {
-  const statusMap = useMemo(() => choiceToMap(choices.status), [])
-
   return (
     <Card fluid>
       <Card.Content header="Task information" />
@@ -32,7 +26,7 @@ export const TaskInformationCard = ({
             </Grid.Column>
             <Grid.Column>
               <Header sub>Status</Header>
-              {statusMap.get(task.status)}
+              {task.status_display}
             </Grid.Column>
           </Grid.Row>
           <Grid.Row columns={2}>

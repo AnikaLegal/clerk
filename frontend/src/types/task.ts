@@ -1,4 +1,4 @@
-import { Task, TaskType } from 'api'
+import { Task, TaskStatus, TaskType } from 'api'
 import { SetModel, UpdateModel, UserInfo } from 'types/global'
 
 export interface TaskTypesRequest {
@@ -13,12 +13,11 @@ export type TaskTypes = {
   [key in TaskType]: string
 }
 
-export interface TaskDetailChoices {
-  status: [string, string][]
+export type TaskStatuses = {
+  [key in TaskStatus]: string
 }
 
 export interface TaskDetailProps {
-  choices: TaskDetailChoices
   task: Task
   setTask: SetModel<Task>
   update: UpdateModel<Task>

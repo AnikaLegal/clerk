@@ -1,4 +1,4 @@
-import api, { Task, TaskRequestUpdate, useUpdateTaskRequestMutation } from 'api'
+import api, { TaskRequestUpdate, useUpdateTaskRequestMutation } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Card } from 'semantic-ui-react'
@@ -12,13 +12,13 @@ export interface ModalProps extends TaskApprovalActionProps {
   open: boolean
 }
 
-interface TaskApprovalActionProps extends Omit<TaskDetailProps, 'choices'> {}
+interface TaskApprovalActionProps extends TaskDetailProps {}
 
 export const TaskApprovalActionCard = ({
   task,
   user,
   setTask,
-  ...props
+  update,
 }: TaskApprovalActionProps) => {
   const [getTask] = api.useLazyGetTaskQuery()
   const [updateTaskRequest] = useUpdateTaskRequestMutation()
@@ -93,7 +93,7 @@ export const TaskApprovalActionCard = ({
         decision={decision}
         updateRequest={updateRequest}
         user={user}
-        {...props}
+        update={update}
       />
       <Card.Content header="Task actions" />
       <TaskActionCardContent options={options} />

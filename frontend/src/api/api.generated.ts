@@ -1373,6 +1373,7 @@ export type TaskList = {
   type_display: string;
   name: string;
   status: TaskStatus;
+  status_display: string;
   is_open: boolean;
   is_suspended: boolean;
   due_at?: string | null;
@@ -1420,6 +1421,7 @@ export type Task = TaskBase & {
   type: TaskType;
   type_display: string;
   status: TaskStatus;
+  status_display: string;
   url: string;
   issue: Issue;
   assigned_to: User;

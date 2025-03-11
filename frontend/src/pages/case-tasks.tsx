@@ -15,20 +15,14 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { choiceToMap, mount } from 'utils'
-
-export interface CaseTasksChoices {
-  status: string[][]
-}
+import { mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: CaseTasksChoices
   urls: CaseTabUrls
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
 const App = () => {
   const caseId = CONTEXT.case_pk
@@ -128,7 +122,7 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
                 <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
               )}
             </Table.Cell>
-            <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+            <Table.Cell>{task.status_display}</Table.Cell>
             <TaskApprovalTableCell task={task} />
             <Table.Cell textAlign="center">
               {task.is_open ? (

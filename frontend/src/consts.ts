@@ -1,9 +1,9 @@
-import { TaskStatus } from 'api'
 
 import {
+  TaskStatuses,
+  TaskTypes,
   TaskTypesRequest,
   TaskTypesWithoutRequestTypes,
-  TaskTypes,
 } from 'types/task'
 
 export const URLS = {
@@ -63,4 +63,11 @@ export const TASK_TYPES_WITHOUT_REQUEST_TYPES: TaskTypesWithoutRequestTypes = {
 export const TASK_TYPES: TaskTypes = {
   ...TASK_TYPES_REQUEST,
   ...TASK_TYPES_WITHOUT_REQUEST_TYPES,
+} as const
+
+export const TASK_STATUSES: TaskStatuses = {
+  NOT_STARTED: 'Not started',
+  IN_PROGRESS: 'In progress',
+  DONE: 'Done',
+  NOT_DONE: 'Not done',
 } as const

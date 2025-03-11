@@ -15,20 +15,16 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { choiceToMap, choiceToOptions, mount, useDebounce } from 'utils'
-import { CASE_TYPES, TASK_TYPES } from 'consts'
+import { choiceToOptions, mount, useDebounce } from 'utils'
+import { CASE_TYPES, TASK_STATUSES, TASK_TYPES } from 'consts'
 
 interface DjangoContext {
   choices: {
-    type: string[][]
-    status: string[][]
     is_open: string[][]
   }
   user: UserInfo
 }
-
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -170,7 +166,13 @@ const App = () => {
                   clearable
                   value={filter.status || ''}
                   placeholder="Task status"
-                  options={choiceToOptions(CONTEXT.choices.status)}
+                  options={Object.entries(TASK_STATUSES).map(
+                    ([key, value]) => ({
+                      key: key,
+                      value: key,
+                      text: value,
+                    })
+                  )}
                   onChange={(e, { value }) => updateFilter('status', value)}
                 />
               </Form.Field>
@@ -225,7 +227,7 @@ const App = () => {
                     </a>
                   )}
                 </Table.Cell>
-                <Table.Cell>{STATUS_LABELS.get(task.status)}</Table.Cell>
+                <Table.Cell>{task.status_display}</Table.Cell>
                 <TaskApprovalTableCell task={task} />
                 <Table.Cell textAlign="center">
                   {task.is_open ? (

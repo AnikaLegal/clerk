@@ -151,9 +151,6 @@ def case_detail_task_list_page_view(request, pk):
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
-        "choices": {
-            "status": TaskStatus.choices,
-        },
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
 

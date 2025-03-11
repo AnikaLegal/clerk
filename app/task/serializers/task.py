@@ -38,6 +38,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "type_display",
             "name",
             "status",
+            "status_display",
             "issue",
             "assigned_to",
             "is_open",
@@ -59,6 +60,7 @@ class TaskListSerializer(serializers.ModelSerializer):
         )
 
     type_display = serializers.CharField(source="get_type_display", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
     issue = TaskListIssueSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
     due_at = serializers.DateField(read_only=True)
@@ -90,6 +92,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "status",
+            "status_display",
             "issue_id",
             "issue",
             "assigned_to_id",
@@ -120,6 +123,7 @@ class TaskSerializer(serializers.ModelSerializer):
         choices=list(TaskTemplateType.choices) + list(TaskRequestType.choices)
     )
     type_display = serializers.CharField(source="get_type_display", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)

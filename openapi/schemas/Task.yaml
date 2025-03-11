@@ -10,6 +10,8 @@ allOf:
         type: string
       status:
         $ref: ./TaskStatus.yaml
+      status_display:
+        type: string
       url:
         type: string
       issue:
@@ -41,6 +43,7 @@ allOf:
       - type
       - type_display
       - status
+      - status_display
       - issue
       - assigned_to
       - is_open

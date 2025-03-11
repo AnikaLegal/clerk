@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment, TaskComment, TaskEvent
 from task.models.request import TaskRequestStatus, TaskRequestType
-from task.models.task import Task, TaskStatus
+from task.models.task import Task
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -45,7 +45,6 @@ def task_list_page_view(request):
                 ("true", "Open"),
                 ("false", "Closed"),
             ],
-            "status": TaskStatus.choices,
         },
     }
     return render_react_page(request, "Tasks", "task-list", context)
@@ -58,9 +57,6 @@ def task_detail_page_view(request, pk):
         raise Http404()
 
     context = {
-        "choices": {
-            "status": TaskStatus.choices,
-        },
         "task_pk": pk,
         "list_url": reverse("task-list"),
     }

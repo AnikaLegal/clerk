@@ -1,4 +1,4 @@
-import api, { TaskStatus, TaskStatusUpdate } from 'api'
+import api, { TaskStatusUpdate } from 'api'
 import { ModalProps } from 'comps/task/task-action-card'
 import { Formik, FormikHelpers } from 'formik'
 import { RichTextAreaField } from 'forms/formik'

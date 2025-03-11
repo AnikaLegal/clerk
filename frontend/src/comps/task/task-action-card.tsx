@@ -7,6 +7,8 @@ import { Card, Icon, List, SemanticICONS } from 'semantic-ui-react'
 import { TaskDetailProps } from 'types/task'
 import { getAPIErrorMessage } from 'utils'
 
+interface TaskActionProps extends TaskDetailProps {}
+
 export interface ModalProps extends TaskActionProps {
   onClose: () => void
   open: boolean
@@ -20,8 +22,6 @@ export interface TaskOption {
   disableWhen?: () => boolean
   action: () => void
 }
-
-interface TaskActionProps extends Omit<TaskDetailProps, 'choices'> {}
 
 export const TaskActionCard = (props: TaskActionProps) => {
   const [updateTaskStatus] = useUpdateTaskStatusMutation()
