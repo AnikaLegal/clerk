@@ -99,7 +99,7 @@ def _handle_task_status_update(log_entry: LogEntry):
                     "prev_status": prev_status,
                     "next_status": next_status,
                 },
-                note_html=comment,
+                note_html=comment if comment else "",
                 created_at=log_entry.timestamp,
             )
 
@@ -114,6 +114,7 @@ def _handle_task_request_approval_status_update(log_entry: LogEntry):
 
     if type == TaskRequestType.APPROVAL and status == TaskRequestStatus.DONE:
         is_approved = data.get("is_approved")
+        comment = data.get("to_comment")
 
         event = TaskEvent.objects.create(
             type=TaskEventType.REQUEST_ACCEPTED
@@ -121,7 +122,7 @@ def _handle_task_request_approval_status_update(log_entry: LogEntry):
             else TaskEventType.REQUEST_DECLINED,
             task_id=data.get("to_task"),
             user=log_entry.actor,
-            note_html=data.get("to_comment"),
+            note_html=comment if comment else "",
             created_at=log_entry.timestamp,
         )
 
@@ -140,11 +141,13 @@ def _handle_task_request_approval_create(log_entry: LogEntry):
     status = data.get("status")
 
     if type == TaskRequestType.APPROVAL and status == TaskRequestStatus.PENDING:
+        comment = data.get("from_comment")
+
         TaskEvent.objects.create(
             type=TaskEventType.APPROVAL_REQUEST,
             task_id=data.get("from_task"),
             user=log_entry.actor,
-            note_html=data.get("from_comment"),
+            note_html=comment if comment else "",
             data={
                 "to_task_id": data.get("to_task"),
             },
