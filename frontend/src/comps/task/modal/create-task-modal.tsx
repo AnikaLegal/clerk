@@ -18,7 +18,7 @@ export const CreateTaskSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   name: Yup.string().required(),
   type: Yup.string<TaskType>().required(),
   description: Yup.string().optional(),
-  due_at: Yup.string().optional(),
+  due_at: Yup.string().nullable(),
   is_approval_required: Yup.boolean().optional(),
   is_approved: Yup.boolean().optional(),
   is_urgent: Yup.boolean().optional(),
