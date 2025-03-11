@@ -2,6 +2,7 @@ import api, { GetTasksApiArg, TaskList } from 'api'
 import { TaskDueDateTableCell } from 'comps/task'
 import { TaskApprovalTableCell } from 'comps/task/task-approval-table-cell'
 import { FadeTransition } from 'comps/transitions'
+import { CASE_TYPES, TASK_IS_OPEN, TASK_STATUSES, TASK_TYPES } from 'consts'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
@@ -15,13 +16,9 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { choiceToOptions, mount, useDebounce } from 'utils'
-import { CASE_TYPES, TASK_STATUSES, TASK_TYPES } from 'consts'
+import { mount, useDebounce } from 'utils'
 
 interface DjangoContext {
-  choices: {
-    is_open: string[][]
-  }
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -104,7 +101,11 @@ const App = () => {
                   clearable
                   value={filter.isOpen || ''}
                   placeholder="Is task open?"
-                  options={choiceToOptions(CONTEXT.choices.is_open)}
+                  options={Object.entries(TASK_IS_OPEN).map(([key, value]) => ({
+                    key: key,
+                    value: key,
+                    text: value,
+                  }))}
                   onChange={(e, { value }) => updateFilter('isOpen', value)}
                 />
               </Form.Field>

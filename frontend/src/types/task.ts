@@ -17,6 +17,10 @@ export type TaskStatuses = {
   [key in TaskStatus]: string
 }
 
+export type TaskIsOpen = {
+  [key in "true" | "false"]: string
+}
+
 export interface TaskDetailProps {
   task: Task
   setTask: SetModel<Task>

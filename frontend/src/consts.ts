@@ -1,5 +1,5 @@
-
 import {
+  TaskIsOpen,
   TaskStatuses,
   TaskTypes,
   TaskTypesRequest,
@@ -70,4 +70,9 @@ export const TASK_STATUSES: TaskStatuses = {
   IN_PROGRESS: 'In progress',
   DONE: 'Done',
   NOT_DONE: 'Not done',
+} as const
+
+export const TASK_IS_OPEN: TaskIsOpen = {
+  true: 'Open',
+  false: 'Closed',
 } as const

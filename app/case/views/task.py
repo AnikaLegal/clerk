@@ -39,15 +39,7 @@ from case.views.auth import (
 @api_view(["GET"])
 @paralegal_or_better_required
 def task_list_page_view(request):
-    context = {
-        "choices": {
-            "is_open": [
-                ("true", "Open"),
-                ("false", "Closed"),
-            ],
-        },
-    }
-    return render_react_page(request, "Tasks", "task-list", context)
+    return render_react_page(request, "Tasks", "task-list", {})
 
 
 @api_view(["GET"])
