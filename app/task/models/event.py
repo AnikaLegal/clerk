@@ -46,7 +46,7 @@ class TaskEvent(TimestampedModel):
         related_name="+",
     )
     data = models.JSONField(null=True)
-    note_html = models.TextField(null=True)
+    note_html = models.TextField(blank=True, default="")
 
     @transaction.atomic
     def save(self, *args, **kwargs):
