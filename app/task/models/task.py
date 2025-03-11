@@ -25,11 +25,13 @@ class TaskStatus(models.TextChoices):
 
 
 class Task(TimestampedModel, LogDataMixin):
-    type = models.CharField(max_length=32, choices=TaskType)
+    type = models.TextField(
+        choices=list(TaskTemplateType.choices) + list(TaskRequestType.choices),
+    )
     name = models.TextField()
     description = models.TextField(blank=True, default="")
-    status = models.CharField(
-        max_length=32, choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
+    status = models.TextField(
+        choices=TaskStatus.choices, default=TaskStatus.NOT_STARTED
     )
     due_at = models.DateField(blank=True, null=True, default=None)
     closed_at = models.DateTimeField(blank=True, null=True, default=None)
