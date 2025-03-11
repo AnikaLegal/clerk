@@ -1,5 +1,4 @@
 from accounts.models import CaseGroups
-from core.models.issue import CaseTopic
 from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Prefetch, Q, QuerySet
 from django.http import Http404
@@ -13,9 +12,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment, TaskComment, TaskEvent
-from task.models.event import TaskEventType
 from task.models.request import TaskRequestStatus, TaskRequestType
-from task.models.task import Task, TaskStatus, TaskType
+from task.models.task import Task, TaskStatus
 from task.serializers import (
     TaskActivitySerializer,
     TaskAttachmentSerializer,
@@ -48,7 +46,6 @@ def task_list_page_view(request):
                 ("false", "Closed"),
             ],
             "status": TaskStatus.choices,
-            "type": TaskType,
         },
     }
     return render_react_page(request, "Tasks", "task-list", context)
@@ -63,7 +60,6 @@ def task_detail_page_view(request, pk):
     context = {
         "choices": {
             "status": TaskStatus.choices,
-            "type": TaskType,
         },
         "task_pk": pk,
         "list_url": reverse("task-list"),

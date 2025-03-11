@@ -6,6 +6,8 @@ allOf:
         type: integer
       type:
         $ref: ./TaskType.yaml
+      type_display:
+        type: string
       status:
         $ref: ./TaskStatus.yaml
       url:
@@ -37,6 +39,7 @@ allOf:
       - id
       - url
       - type
+      - type_display
       - status
       - issue
       - assigned_to

@@ -1,3 +1,11 @@
+import { TaskStatus } from 'api'
+
+import {
+  TaskTypesRequest,
+  TaskTypesWithoutRequestTypes,
+  TaskTypes,
+} from 'types/task'
+
 export const URLS = {
   PERSON: {
     CREATE: '/clerk/parties/create/',
@@ -23,7 +31,7 @@ export const OUTCOMES = {
   UNKNOWN: 'Unknown',
   SUCCESSFUL: 'Successful',
   UNSUCCESSFUL: 'Unsuccessful',
-} as const 
+} as const
 
 export const CASE_TYPES = {
   REPAIRS: 'Repairs',
@@ -36,4 +44,23 @@ export const GROUPS = {
   ADMIN: 'Admin',
   COORDINATOR: 'Coordinator',
   LAWYER: 'Lawyer',
+} as const
+
+export const TASK_TYPES_REQUEST: TaskTypesRequest = {
+  APPROVAL: 'Approval request',
+} as const
+
+export const TASK_TYPES_WITHOUT_REQUEST_TYPES: TaskTypesWithoutRequestTypes = {
+  CHECK: 'Check for conflict/eligibility',
+  CONTACT: 'Contact client or other party',
+  DRAFT: 'Draft document or advice',
+  MANAGE: 'Manage the case file',
+  REVIEW: 'Review document or advice',
+  SEND: 'Send document or advice',
+  OTHER: 'Other',
+} as const
+
+export const TASK_TYPES: TaskTypes = {
+  ...TASK_TYPES_REQUEST,
+  ...TASK_TYPES_WITHOUT_REQUEST_TYPES,
 } as const

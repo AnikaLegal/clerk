@@ -2635,6 +2635,8 @@ components:
           type: integer
         type:
           $ref: "#/components/schemas/TaskType"
+        type_display:
+          type: string
         name:
           type: string
         status:
@@ -2686,6 +2688,7 @@ components:
       required:
         - id
         - type
+        - type_display
         - name
         - status
         - is_open
@@ -2782,6 +2785,8 @@ components:
               type: integer
             type:
               $ref: "#/components/schemas/TaskType"
+            type_display:
+              type: string
             status:
               $ref: "#/components/schemas/TaskStatus"
             url:
@@ -2813,6 +2818,7 @@ components:
             - id
             - url
             - type
+            - type_display
             - status
             - issue
             - assigned_to

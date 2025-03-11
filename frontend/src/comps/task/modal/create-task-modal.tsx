@@ -1,5 +1,6 @@
 import api, { Issue, TaskCreate, TaskStatus, TaskType } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
+import { TASK_TYPES_WITHOUT_REQUEST_TYPES } from 'consts'
 import { Formik, FormikHelpers } from 'formik'
 import { TaskForm } from 'forms'
 import { enqueueSnackbar } from 'notistack'
@@ -29,9 +30,6 @@ interface CreateTaskModalProps {
   onClose: () => void
   open: boolean
   user: UserInfo
-  choices: {
-    type: string[][]
-  }
 }
 
 export const CreateTaskModal = ({
@@ -39,7 +37,6 @@ export const CreateTaskModal = ({
   onClose,
   open,
   user,
-  choices,
 }: CreateTaskModalProps) => {
   const [createTask] = api.useCreateTaskMutation()
   const [confirmationOpen, setConfirmationOpen] = useState(false)
@@ -121,7 +118,11 @@ export const CreateTaskModal = ({
             <Modal open={open} onClose={closeHandler}>
               <Modal.Header>Add a task</Modal.Header>
               <Modal.Content>
-                <TaskForm formik={formik} choices={choices} user={user} />
+                <TaskForm
+                  formik={formik}
+                  user={user}
+                  typeChoices={TASK_TYPES_WITHOUT_REQUEST_TYPES}
+                />
               </Modal.Content>
               <Modal.Actions>
                 <Button

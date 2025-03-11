@@ -19,7 +19,6 @@ import { choiceToMap, mount } from 'utils'
 
 export interface CaseTasksChoices {
   status: string[][]
-  type: string[][]
 }
 
 interface DjangoContext {
@@ -29,7 +28,6 @@ interface DjangoContext {
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const TYPE_LABELS = choiceToMap(CONTEXT.choices.type)
 const STATUS_LABELS = choiceToMap(CONTEXT.choices.status)
 
 const App = () => {
@@ -44,11 +42,7 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.TASKS} urls={urls} />
       <Segment basic>
-        <CaseTasks
-          issue={issue}
-          user={CONTEXT.user}
-          choices={CONTEXT.choices}
-        />
+        <CaseTasks issue={issue} user={CONTEXT.user} />
       </Segment>
     </Container>
   )
@@ -57,10 +51,9 @@ const App = () => {
 export interface CaseTasksProps {
   issue: Issue
   user: UserInfo
-  choices: CaseTasksChoices
 }
 
-export const CaseTasks = ({ issue, choices, user }: CaseTasksProps) => {
+export const CaseTasks = ({ issue, user }: CaseTasksProps) => {
   const [open, setOpen] = useState(false)
 
   return (
@@ -69,7 +62,6 @@ export const CaseTasks = ({ issue, choices, user }: CaseTasksProps) => {
         issue={issue}
         open={open}
         onClose={() => setOpen(false)}
-        choices={{ type: choices.type }}
         user={user}
       />
       <Grid>
@@ -130,7 +122,7 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
             <Table.Cell>
               <a href={task.url}>{task.name}</a>
             </Table.Cell>
-            <Table.Cell>{TYPE_LABELS.get(task.type)}</Table.Cell>
+            <Table.Cell>{task.type_display}</Table.Cell>
             <Table.Cell>
               {task.assigned_to && (
                 <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>

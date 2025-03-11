@@ -12,8 +12,6 @@ from .request import TaskRequestType
 from .template import TaskTemplate, TaskTemplateType
 from .trigger import TasksCaseRole
 
-TaskType = list(TaskTemplateType.choices) + list(TaskRequestType.choices)
-
 
 class TaskStatus(models.TextChoices):
     """

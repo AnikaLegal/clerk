@@ -1370,6 +1370,7 @@ export type TaskListUser = {
 export type TaskList = {
   id: number;
   type: TaskType;
+  type_display: string;
   name: string;
   status: TaskStatus;
   is_open: boolean;
@@ -1417,6 +1418,7 @@ export type TaskRequest = {
 export type Task = TaskBase & {
   id: number;
   type: TaskType;
+  type_display: string;
   status: TaskStatus;
   url: string;
   issue: Issue;

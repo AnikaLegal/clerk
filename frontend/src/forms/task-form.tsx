@@ -3,7 +3,7 @@ import { FormikProps } from 'formik'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
-import { choiceToOptions } from 'utils'
+import { TaskTypes, TaskTypesWithoutRequestTypes } from 'types/task'
 import {
   BooleanField,
   DateInputField,
@@ -16,12 +16,10 @@ import {
 interface TaskFormProps {
   formik: FormikProps<TaskCreate>
   user: UserInfo
-  choices: {
-    type: string[][]
-  }
+  typeChoices: TaskTypes | TaskTypesWithoutRequestTypes
 }
 
-export const TaskForm = ({ formik, user, choices }: TaskFormProps) => {
+export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
   return (
     <Form
       onSubmit={formik.handleSubmit}
@@ -32,7 +30,11 @@ export const TaskForm = ({ formik, user, choices }: TaskFormProps) => {
         required
         name="type"
         label="Type"
-        options={choiceToOptions(choices.type)}
+        options={Object.entries(typeChoices).map(([key, value]) => ({
+          key: key,
+          value: key,
+          text: value,
+        }))}
       />
       <UserDropdownField
         required

@@ -14,11 +14,12 @@ import {
   TaskInformationCard,
   TaskRequestFromCard,
 } from 'comps/task'
+import { TASK_TYPES } from 'consts'
 import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import moment from 'moment'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -34,7 +35,7 @@ import {
 } from 'semantic-ui-react'
 import { Model, UserInfo } from 'types/global'
 import { TaskDetailChoices, TaskDetailProps } from 'types/task'
-import { choiceToMap, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   choices: TaskDetailChoices
@@ -45,8 +46,6 @@ interface DjangoContext {
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 export interface TaskBodyProps extends TaskDetailProps {}
-
-export interface TaskHeaderProps extends TaskDetailProps {}
 
 const App = () => {
   const [getTask] = api.useLazyGetTaskQuery()
@@ -155,13 +154,7 @@ export const TaskBody = ({
       <Grid>
         <Grid.Row>
           <Grid.Column style={{ flexGrow: '1' }}>
-            <TaskHeader
-              task={task}
-              setTask={setTask}
-              update={update}
-              choices={choices}
-              user={user}
-            />
+            <TaskHeader task={task} />
           </Grid.Column>
           {user.is_coordinator_or_better && (
             <Grid.Column style={{ width: 'auto' }}>
@@ -250,8 +243,8 @@ export const TaskBody = ({
               <Grid.Column>
                 <TaskForm
                   formik={formik}
-                  choices={{ type: choices.type }}
                   user={user}
+                  typeChoices={TASK_TYPES}
                 />
               </Grid.Column>
             </Grid.Row>
@@ -290,15 +283,18 @@ const getIsOverdue = (task: Task): boolean => {
   return false
 }
 
-export const TaskHeader = ({ task, choices }: TaskHeaderProps) => {
-  const typeLabels = useMemo(() => choiceToMap(choices.type), [choices.type])
+export interface TaskHeaderProps {
+  task: Task
+}
+
+export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const isOverdue = getIsOverdue(task)
 
   return (
     <>
       <Header as="h1">
         {task.name}
-        <Header.Subheader>{typeLabels.get(task.type)}</Header.Subheader>
+        <Header.Subheader>{task.type_display}</Header.Subheader>
       </Header>
       <span>
         <TaskApprovalHeader task={task} />

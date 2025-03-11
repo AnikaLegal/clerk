@@ -4,6 +4,8 @@ properties:
     type: integer
   type:
     $ref: ./TaskType.yaml
+  type_display:
+    type: string
   name:
     type: string
   status:
@@ -55,6 +57,7 @@ properties:
 required:
   - id
   - type
+  - type_display
   - name
   - status
   - is_open

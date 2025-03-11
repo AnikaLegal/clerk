@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import exceptions, serializers
 from task.models.request import TaskRequestStatus, TaskRequestType
-from task.models.task import Task, TaskType
+from task.models.task import Task
+from task.models.template import TaskTemplateType
 
 from .actions import TaskRequestSerializer
 from .user import TaskListUserSerializer
@@ -34,6 +35,7 @@ class TaskListSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "type",
+            "type_display",
             "name",
             "status",
             "issue",
@@ -56,6 +58,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             "is_suspended",
         )
 
+    type_display = serializers.CharField(source="get_type_display", read_only=True)
     issue = TaskListIssueSerializer(read_only=True)
     assigned_to = TaskListUserSerializer(read_only=True)
     due_at = serializers.DateField(read_only=True)
@@ -83,6 +86,7 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "type",
+            "type_display",
             "name",
             "description",
             "status",
@@ -112,7 +116,10 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
     issue_id = serializers.UUIDField()
-    type = serializers.ChoiceField(choices=TaskType)
+    type = serializers.ChoiceField(
+        choices=list(TaskTemplateType.choices) + list(TaskRequestType.choices)
+    )
+    type_display = serializers.CharField(source="get_type_display", read_only=True)
     issue = IssueSerializer(read_only=True)
     assigned_to_id = serializers.IntegerField()
     assigned_to = UserSerializer(read_only=True)
