@@ -7,7 +7,7 @@ export interface TaskDueDateTableCellProps {
   task: TaskList
 }
 
-const getDueDateColor = (task: TaskList): SemanticCOLORS => {
+const getDueDateColor = (task: TaskList): SemanticCOLORS | undefined => {
   if (task.is_urgent) {
     return 'red'
   }
@@ -27,7 +27,7 @@ const getDueDateColor = (task: TaskList): SemanticCOLORS => {
       }
     }
   }
-  return null
+  return undefined
 }
 
 export const TaskDueDateTableCell = ({ task }: TaskDueDateTableCellProps) => {
