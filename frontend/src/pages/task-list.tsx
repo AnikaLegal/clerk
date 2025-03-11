@@ -228,7 +228,7 @@ const App = () => {
                     </a>
                   )}
                 </Table.Cell>
-                <Table.Cell>{task.status_display}</Table.Cell>
+                <Table.Cell>{TASK_STATUSES[task.status]}</Table.Cell>
                 <TaskApprovalTableCell task={task} />
                 <Table.Cell textAlign="center">
                   {task.is_open ? (

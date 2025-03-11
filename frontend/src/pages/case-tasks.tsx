@@ -2,6 +2,7 @@ import api, { Issue } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { TaskApprovalTableCell, TaskDueDateTableCell } from 'comps/task'
 import { CreateTaskModal } from 'comps/task/modal'
+import { TASK_STATUSES, TASK_TYPES } from 'consts'
 import moment from 'moment'
 import React, { useState } from 'react'
 import {
@@ -116,13 +117,13 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
             <Table.Cell>
               <a href={task.url}>{task.name}</a>
             </Table.Cell>
-            <Table.Cell>{task.type_display}</Table.Cell>
+            <Table.Cell>{TASK_TYPES[task.type]}</Table.Cell>
             <Table.Cell>
               {task.assigned_to && (
                 <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
               )}
             </Table.Cell>
-            <Table.Cell>{task.status_display}</Table.Cell>
+            <Table.Cell>{TASK_STATUSES[task.status]}</Table.Cell>
             <TaskApprovalTableCell task={task} />
             <Table.Cell textAlign="center">
               {task.is_open ? (

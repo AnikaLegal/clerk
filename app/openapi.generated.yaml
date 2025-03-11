@@ -2635,14 +2635,10 @@ components:
           type: integer
         type:
           $ref: "#/components/schemas/TaskType"
-        type_display:
-          type: string
         name:
           type: string
         status:
           $ref: "#/components/schemas/TaskStatus"
-        status_display:
-          type: string
         is_open:
           type: boolean
         is_suspended:
@@ -2690,10 +2686,8 @@ components:
       required:
         - id
         - type
-        - type_display
         - name
         - status
-        - status_display
         - is_open
         - is_suspended
         - closed_at
@@ -2788,12 +2782,8 @@ components:
               type: integer
             type:
               $ref: "#/components/schemas/TaskType"
-            type_display:
-              type: string
             status:
               $ref: "#/components/schemas/TaskStatus"
-            status_display:
-              type: string
             url:
               type: string
             issue:
@@ -2823,9 +2813,7 @@ components:
             - id
             - url
             - type
-            - type_display
             - status
-            - status_display
             - issue
             - assigned_to
             - is_open

@@ -1,4 +1,5 @@
 import { Task } from 'api'
+import { TASK_STATUSES } from 'consts'
 import moment from 'moment'
 import React from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
@@ -26,7 +27,7 @@ export const TaskInformationCard = ({
             </Grid.Column>
             <Grid.Column>
               <Header sub>Status</Header>
-              {task.status_display}
+              {TASK_STATUSES[task.status]}
             </Grid.Column>
           </Grid.Row>
           <Grid.Row columns={2}>

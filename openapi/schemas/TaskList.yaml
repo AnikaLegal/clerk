@@ -4,14 +4,10 @@ properties:
     type: integer
   type:
     $ref: ./TaskType.yaml
-  type_display:
-    type: string
   name:
     type: string
   status:
     $ref: ./TaskStatus.yaml
-  status_display:
-    type: string
   is_open:
     type: boolean
   is_suspended:
@@ -59,10 +55,8 @@ properties:
 required:
   - id
   - type
-  - type_display
   - name
   - status
-  - status_display
   - is_open
   - is_suspended
   - closed_at

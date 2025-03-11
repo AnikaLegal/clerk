@@ -102,10 +102,7 @@ const App = () => {
           <Segment basic style={{ marginTop: '0' }}>
             <Divider />
             <Header as="h4">Activity</Header>
-            <TaskActivity
-              task={task}
-              user={user}
-            />
+            <TaskActivity task={task} user={user} />
           </Segment>
         </Grid.Column>
         <Grid.Column>
@@ -280,7 +277,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
     <>
       <Header as="h1">
         {task.name}
-        <Header.Subheader>{task.type_display}</Header.Subheader>
+        <Header.Subheader>{TASK_TYPES[task.type]}</Header.Subheader>
       </Header>
       <span>
         <TaskApprovalHeader task={task} />
