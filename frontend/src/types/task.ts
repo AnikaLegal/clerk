@@ -2,7 +2,6 @@ import { Task } from 'api'
 import { SetModel, UpdateModel, UserInfo } from 'types/global'
 
 export interface TaskDetailChoices {
-  event_type: [string, string][]
   status: [string, string][]
   type: [string, string][]
 }
