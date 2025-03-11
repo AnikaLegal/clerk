@@ -1,4 +1,3 @@
-from accounts.models import User
 from auditlog.registry import auditlog
 from core.models import TimestampedModel
 from django.db import models, transaction
