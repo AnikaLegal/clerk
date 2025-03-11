@@ -1431,7 +1431,7 @@ export type Task = TaskBase & {
   modified_at: string;
 };
 export type TaskCreate = TaskBase & {
-  type: TaskType | "";
+  type: TaskType;
   status?: TaskStatus;
 };
 export type TaskCommentBase = {

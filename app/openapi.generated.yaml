@@ -2733,11 +2733,7 @@ components:
         - type: object
           properties:
             type:
-              oneOf:
-                - $ref: "#/components/schemas/TaskType"
-                - type: string
-                  enum:
-                    - ""
+              $ref: "#/components/schemas/TaskType"
             status:
               $ref: "#/components/schemas/TaskStatus"
           required:

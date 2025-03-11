@@ -1,4 +1,4 @@
-import api, { Issue, TaskCreate } from 'api'
+import api, { Issue, TaskCreate, TaskStatus, TaskType } from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import { Formik, FormikHelpers } from 'formik'
 import { TaskForm } from 'forms'
@@ -15,14 +15,13 @@ export const CreateTaskSchema: Yup.ObjectSchema<TaskCreate> = Yup.object({
   assigned_to_id: Yup.number().required(),
   issue_id: Yup.string().required(),
   name: Yup.string().required(),
-  type: Yup.string().required(),
-  /* Below not strictly necessary but prevents type error */
+  type: Yup.string<TaskType>().required(),
   description: Yup.string().optional(),
   due_at: Yup.string().optional(),
   is_approval_required: Yup.boolean().optional(),
   is_approved: Yup.boolean().optional(),
   is_urgent: Yup.boolean().optional(),
-  status: Yup.string().optional(),
+  status: Yup.string<TaskStatus>().optional(),
 })
 
 interface CreateTaskModalProps {
@@ -48,6 +47,7 @@ export const CreateTaskModal = ({
   const initialValues: TaskCreate = {
     issue_id: issue.id,
     name: '',
+    // @ts-expect-error
     type: '',
     due_at: '',
     assigned_to_id: null,
