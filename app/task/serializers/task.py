@@ -147,7 +147,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate_due_at(self, value):
         # Due date must be in the future.
-        if value <= now().date():
+        if value and value <= now().date():
             raise exceptions.ValidationError("Due date must be after today's date.")
         return value
 
