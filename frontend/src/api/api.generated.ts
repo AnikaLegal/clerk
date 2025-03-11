@@ -1459,6 +1459,7 @@ export type TaskEvent = {
     | "RESUMED"
     | "STATUS_CHANGE"
     | "SUSPENDED";
+  type_display: string;
   task_id: number;
   user?: TaskListUser;
   desc_html: string;

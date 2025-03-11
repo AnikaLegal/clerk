@@ -63,7 +63,6 @@ def task_detail_page_view(request, pk):
 
     context = {
         "choices": {
-            "event_type": TaskEventType.choices,
             "status": TaskStatus.choices,
             "type": TaskType,
         },

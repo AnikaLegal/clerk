@@ -13,6 +13,8 @@ properties:
       - RESUMED
       - STATUS_CHANGE
       - SUSPENDED
+  type_display:
+    type: string
   task_id:
     type: number
   user:
@@ -29,6 +31,7 @@ properties:
 required:
   - id
   - type
+  - type_display
   - task_id
   - desc_html
   - note_html

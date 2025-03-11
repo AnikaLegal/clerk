@@ -290,10 +290,7 @@ const getIsOverdue = (task: Task): boolean => {
   return false
 }
 
-export const TaskHeader = ({
-  task,
-  choices,
-}: TaskHeaderProps) => {
+export const TaskHeader = ({ task, choices }: TaskHeaderProps) => {
   const typeLabels = useMemo(() => choiceToMap(choices.type), [choices.type])
   const isOverdue = getIsOverdue(task)
 
@@ -364,7 +361,6 @@ export const TaskActivity = ({ task, user, choices }: TaskDetailProps) => {
       <CommentInput onSubmit={handleSubmit} placeholder="Leave a comment…" />
       <TaskActivityGroup
         activities={activities}
-        choices={choices}
         loading={activityResult.isLoading}
       />
     </>

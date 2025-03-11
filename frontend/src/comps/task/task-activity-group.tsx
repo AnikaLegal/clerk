@@ -1,7 +1,7 @@
 import { TaskActivity, TaskComment, TaskEvent } from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
 import moment from 'moment'
-import React, { useMemo } from 'react'
+import React from 'react'
 import {
   Comment,
   Label,
@@ -10,8 +10,6 @@ import {
   SemanticCOLORS,
 } from 'semantic-ui-react'
 import styled from 'styled-components'
-import { TaskDetailChoices } from 'types/task'
-import { choiceToMap } from 'utils'
 
 const StyledCommentGroup = styled(Comment.Group)`
   && {
@@ -21,13 +19,11 @@ const StyledCommentGroup = styled(Comment.Group)`
 
 export interface TaskActivityGroupProps {
   activities: TaskActivity[]
-  choices: TaskDetailChoices
   loading: boolean
 }
 
 export const TaskActivityGroup = ({
   activities,
-  choices,
   loading,
 }: TaskActivityGroupProps) => {
   return (
@@ -48,7 +44,6 @@ export const TaskActivityGroup = ({
               <TaskEventSegment
                 key={activity.id}
                 event={activity.data as TaskEvent}
-                choices={choices}
               />
             )
           }
@@ -99,21 +94,14 @@ const getEventColor = (event: TaskEvent): SemanticCOLORS | undefined => {
 
 export interface TaskEventSegmentProps {
   event: TaskEvent
-  choices: TaskDetailChoices
 }
 
-export const TaskEventSegment = ({ event, choices }: TaskEventSegmentProps) => {
-  const eventTypeLabels = useMemo(
-    () => choiceToMap(choices.event_type),
-    [choices.event_type]
-  )
-  const typeLabel = eventTypeLabels.get(event.type)
+export const TaskEventSegment = ({ event }: TaskEventSegmentProps) => {
   const color = getEventColor(event)
-
   return (
     <Segment>
       <Label attached="top" color={color}>
-        {typeLabel}
+        {event.type_display}
         <Label.Detail>
           {moment(event.created_at).format('DD/MM/YY [at] h:mmA')}
         </Label.Detail>

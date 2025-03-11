@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from task.models import TaskEvent
+from task.models.event import TaskEvent, TaskEventType
 
 from .task import TaskListUserSerializer
 
@@ -10,17 +10,20 @@ class TaskEventSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "type",
+            "type_display",
             "task_id",
             "user",
-            "created_at",
             "desc_html",
             "note_html",
+            "created_at",
+            "modified_at",
         )
+        read_only_fields = fields
 
+    type = serializers.ChoiceField(choices=TaskEventType.choices)
+    type_display = serializers.CharField(source="get_type_display")
     task_id = serializers.IntegerField()
-    user = TaskListUserSerializer(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True)
-    desc_html = serializers.SerializerMethodField(read_only=True)
-
-    def get_desc_html(self, obj):
-        return obj.get_desc_html()
+    user = TaskListUserSerializer()
+    desc_html = serializers.CharField(source="get_desc_html")
+    created_at = serializers.DateTimeField()
+    modified_at = serializers.DateTimeField()
