@@ -13,7 +13,7 @@ export const DiscardChangesConfirmationModal = ({
   onCancel,
 }: DiscardChangesConfirmationModalProps) => {
   return (
-    <Modal size="mini" open={open} onClose={null}>
+    <Modal size="mini" open={open}>
       <Modal.Header>Discard unsaved changes?</Modal.Header>
       <Modal.Content>
         Change that you have made will not be saved.
