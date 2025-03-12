@@ -16,3 +16,11 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.IntegerField(required=False)
+
+    def to_internal_value(self, data):
+        # Convert empty strings to null for some fields. This is just a
+        # convenience so we don't have to do it on the frontend.
+        for field in ("due_in",):
+            if field in data and data[field] == "":
+                data[field] = None
+        return super().to_internal_value(data)
