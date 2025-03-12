@@ -1,4 +1,10 @@
-import { Task, TaskStatus, TaskType } from 'api'
+import {
+  Task,
+  TaskStatus,
+  TaskTriggerRole,
+  TaskTriggerTopic,
+  TaskType,
+} from 'api'
 import { SetModel, UpdateModel, UserInfo } from 'types/global'
 
 export interface TaskTypesRequest {
@@ -18,7 +24,15 @@ export type TaskStatuses = {
 }
 
 export type TaskIsOpen = {
-  [key in "true" | "false"]: string
+  [key in 'true' | 'false']: string
+}
+
+export type TaskTriggerTopics = {
+  [key in TaskTriggerTopic]: string
+}
+
+export type TaskTriggerRoles = {
+  [key in TaskTriggerRole]: string
 }
 
 export interface TaskDetailProps {

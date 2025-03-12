@@ -1,6 +1,22 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
-import { TaskTemplate, TaskTriggerCreate } from 'api'
+import {
+  IssueEventType,
+  IssueStage,
+  IssueTopic,
+  TaskTemplate,
+  TaskTriggerCreate,
+  TaskTriggerRole,
+  TaskType,
+} from 'api'
 import { DiscardChangesConfirmationModal } from 'comps/modal'
+import {
+  CASE_EVENT_TYPES,
+  STAGES,
+  TASK_TRIGGER_ROLES,
+  TASK_TRIGGER_TOPICS,
+  TASK_TYPES,
+  TASK_TYPES_WITHOUT_REQUEST_TYPES,
+} from 'consts'
 import {
   FieldArray,
   FieldArrayRenderProps,
@@ -26,7 +42,6 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { choiceToMap, choiceToOptions } from 'utils'
 import * as Yup from 'yup'
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
@@ -34,8 +49,8 @@ Yup.setLocale({ mixed: { required: 'This field is required.' } })
 const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
   id: Yup.number().optional(),
   name: Yup.string().required(),
-  type: Yup.string().required(),
-  due_in: Yup.number().required().nullable(),
+  type: Yup.string<TaskType>().required(),
+  due_in: Yup.number().required().nullable().default(null),
   is_urgent: Yup.boolean().required(),
   is_approval_required: Yup.boolean().required(),
   description: Yup.string().optional(),
@@ -43,11 +58,11 @@ const TaskTemplateSchema: Yup.ObjectSchema<TaskTemplate> = Yup.object({
 
 const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> = Yup.object({
   name: Yup.string().required(),
-  topic: Yup.string().required(),
-  event: Yup.string().required(),
-  tasks_assignment_role: Yup.string().required(),
+  topic: Yup.string<IssueTopic>().required(),
+  event: Yup.string<IssueEventType>().required(),
+  tasks_assignment_role: Yup.string<TaskTriggerRole>().required(),
   templates: Yup.array().of(TaskTemplateSchema).required(),
-  event_stage: Yup.string().when('event', {
+  event_stage: Yup.string<IssueStage>().when('event', {
     is: 'STAGE',
     then: (schema) => schema.required(),
     otherwise: (schema) => schema.notRequired(),
@@ -57,13 +72,6 @@ const TaskTriggerSchema: Yup.ObjectSchema<TaskTriggerCreate> = Yup.object({
 interface TaskTemplateFormProps {
   create?: boolean
   onDelete?: (e: any) => void
-  choices: {
-    topic: string[][]
-    event: string[][]
-    event_stage: string[][]
-    tasks_assignment_role: string[][]
-    task_type: string[][]
-  }
   initialValues: TaskTriggerCreate
   onSubmit: (
     values: TaskTriggerCreate,
@@ -74,7 +82,6 @@ interface TaskTemplateFormProps {
 export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   create,
   onDelete,
-  choices,
   initialValues,
   onSubmit,
 }) => {
@@ -108,7 +115,13 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             name="topic"
             label="Case type"
             placeholder="Select a case type"
-            options={choiceToOptions(choices.topic)}
+            options={Object.entries(TASK_TRIGGER_TOPICS).map(
+              ([key, value]) => ({
+                key: key,
+                value: key,
+                text: value,
+              })
+            )}
             disabled={isSubmitting}
           />
           <DropdownField
@@ -116,7 +129,11 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             name="event"
             label="Trigger event"
             placeholder="Select which event will trigger task creation"
-            options={choiceToOptions(choices.event)}
+            options={Object.entries(CASE_EVENT_TYPES).map(([key, value]) => ({
+              key: key,
+              value: key,
+              text: value,
+            }))}
             onChange={(e, { value }) => {
               const isStage = value === 'STAGE'
               setShowEventStage(isStage)
@@ -133,7 +150,11 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
               name="event_stage"
               label="Trigger stage"
               placeholder="Select which event stage will trigger task creation"
-              options={choiceToOptions(choices.event_stage)}
+              options={Object.entries(STAGES).map(([key, value]) => ({
+                key: key,
+                value: key,
+                text: value,
+              }))}
               disabled={isSubmitting}
             />
           )}
@@ -142,7 +163,13 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             name="tasks_assignment_role"
             label="Assignment role"
             placeholder="Select the role of the user to which the task(s) should be assigned"
-            options={choiceToOptions(choices.tasks_assignment_role)}
+            options={Object.entries(TASK_TRIGGER_ROLES).map(
+              ([key, value]) => ({
+                key: key,
+                value: key,
+                text: value,
+              })
+            )}
             disabled={isSubmitting}
           />
 
@@ -161,7 +188,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                           size="mini"
                           type="button"
                           arrayHelpers={arrayHelpers}
-                          choices={choices}
                         >
                           Add task
                         </AddTaskTemplateButton>
@@ -171,7 +197,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                   <TaskTemplateTable
                     arrayHelpers={arrayHelpers}
                     templates={values.templates}
-                    choices={choices}
                   />
                 </>
               )
@@ -206,16 +231,12 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
 interface TaskTemplateTableProps {
   arrayHelpers: FieldArrayRenderProps
   templates: TaskTemplate[]
-  choices: any
 }
 
 export const TaskTemplateTable = ({
   arrayHelpers,
   templates,
-  choices,
 }: TaskTemplateTableProps) => {
-  const typeLabels = choiceToMap(choices.task_type)
-
   if (templates.length == 0) {
     return (
       <Segment textAlign="center" secondary>
@@ -239,7 +260,7 @@ export const TaskTemplateTable = ({
         {templates.map((template, index) => (
           <Table.Row key={template.id}>
             <Table.Cell>{template.name}</Table.Cell>
-            <Table.Cell>{typeLabels.get(template.type)}</Table.Cell>
+            <Table.Cell>{TASK_TYPES[template.type]}</Table.Cell>
             <Table.Cell>{template.due_in}</Table.Cell>
             <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
             <Table.Cell>
@@ -250,7 +271,6 @@ export const TaskTemplateTable = ({
                 templates={templates}
                 index={index}
                 arrayHelpers={arrayHelpers}
-                choices={choices}
               />
             </Table.Cell>
           </Table.Row>
@@ -264,14 +284,12 @@ export interface TaskTemplateActionIconProps {
   templates: TaskTemplate[]
   index: number
   arrayHelpers: FieldArrayRenderProps
-  choices: any
 }
 
 export const TaskTemplateActionIcons = ({
   templates,
   index,
   arrayHelpers,
-  choices,
 }: TaskTemplateActionIconProps) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
 
@@ -311,7 +329,6 @@ export const TaskTemplateActionIcons = ({
         name="pencil"
         templates={templates}
         index={index}
-        choices={choices}
         arrayHelpers={arrayHelpers}
       />
       <Icon
@@ -342,14 +359,12 @@ export const TaskTemplateActionIcons = ({
 export interface EditTaskTemplateIconProps {
   templates: TaskTemplate[]
   index: number
-  choices: any
   arrayHelpers: FieldArrayRenderProps
 }
 
 export const EditTaskTemplateIcon = ({
   templates,
   index,
-  choices,
   arrayHelpers,
   ...props
 }: EditTaskTemplateIconProps & IconProps) => {
@@ -368,7 +383,6 @@ export const EditTaskTemplateIcon = ({
     <>
       <TaskTemplateModal
         initialValues={templates[index]}
-        choices={choices}
         open={open}
         setOpen={setOpen}
         handleSubmit={handleSubmit}
@@ -380,13 +394,11 @@ export const EditTaskTemplateIcon = ({
 }
 
 export interface AddTaskTemplateButtonProps {
-  choices: any
   arrayHelpers: FieldArrayRenderProps
   children: string | number
 }
 
 export const AddTaskTemplateButton = ({
-  choices,
   arrayHelpers,
   children,
   ...props
@@ -406,6 +418,7 @@ export const AddTaskTemplateButton = ({
     <>
       <TaskTemplateModal
         initialValues={{
+          // @ts-expect-error
           type: '',
           name: '',
           due_in: null,
@@ -413,7 +426,6 @@ export const AddTaskTemplateButton = ({
           is_approval_required: false,
           description: '',
         }}
-        choices={choices}
         open={open}
         setOpen={setOpen}
         handleSubmit={handleSubmit}
@@ -435,7 +447,6 @@ export interface TaskTemplateModalProps {
     helpers: FormikHelpers<TaskTemplate>
   ) => void
   label: string | number
-  choices: any
 }
 
 export const TaskTemplateModal = ({
@@ -444,7 +455,6 @@ export const TaskTemplateModal = ({
   initialValues,
   handleSubmit,
   label,
-  choices,
 }: TaskTemplateModalProps) => {
   const [confirmationOpen, setConfirmationOpen] = useState(false)
 
@@ -497,7 +507,13 @@ export const TaskTemplateModal = ({
                     name="type"
                     label="Task type"
                     placeholder="Select the task type"
-                    options={choiceToOptions(choices.task_type)}
+                    options={Object.entries(
+                      TASK_TYPES_WITHOUT_REQUEST_TYPES
+                    ).map(([key, value]) => ({
+                      key: key,
+                      value: key,
+                      text: value,
+                    }))}
                     required
                   />
                   <InputField

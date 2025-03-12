@@ -2,7 +2,7 @@ import api, { GetTasksApiArg, TaskList } from 'api'
 import { TaskDueDateTableCell } from 'comps/task'
 import { TaskApprovalTableCell } from 'comps/task/task-approval-table-cell'
 import { FadeTransition } from 'comps/transitions'
-import { CASE_TYPES, TASK_IS_OPEN, TASK_STATUSES, TASK_TYPES } from 'consts'
+import { CASE_TOPICS, TASK_IS_OPEN, TASK_STATUSES, TASK_TYPES } from 'consts'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
@@ -135,7 +135,7 @@ const App = () => {
                   clearable
                   value={filter.issueTopic || ''}
                   placeholder="Case topic"
-                  options={Object.entries(CASE_TYPES).map(([key, value]) => ({
+                  options={Object.entries(CASE_TOPICS).map(([key, value]) => ({
                     key: key,
                     value: key,
                     text: value,
@@ -216,7 +216,7 @@ const App = () => {
                 <Table.Cell>
                   <a href={task.issue.url}>{task.issue.fileref}</a>
                 </Table.Cell>
-                <Table.Cell>{CASE_TYPES[task.issue.topic]}</Table.Cell>
+                <Table.Cell>{CASE_TOPICS[task.issue.topic]}</Table.Cell>
                 <Table.Cell>
                   <a href={task.url}>{task.name}</a>
                 </Table.Cell>

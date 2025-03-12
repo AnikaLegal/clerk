@@ -3,7 +3,7 @@ properties:
   id:
     type: integer
   type:
-    type: string
+    $ref: ./TaskType.yaml
   name:
     type: string
   description:

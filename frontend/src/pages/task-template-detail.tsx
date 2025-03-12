@@ -8,13 +8,6 @@ import { Container, Header } from 'semantic-ui-react'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
-  choices: {
-    topic: string[][]
-    event: string[][]
-    event_stage: string[][]
-    tasks_assignment_role: string[][]
-    task_type: string[][]
-  }
   list_url: string
   task_trigger_pk: number
 }
@@ -30,6 +23,8 @@ const App = () => {
   if (taskTriggerResult.isLoading) {
     return null
   }
+  // TODO: Error handling.
+  const taskTrigger = taskTriggerResult.data || {} as TaskTriggerCreate
 
   const handleSubmit = (
     values: TaskTriggerCreate,
@@ -95,8 +90,7 @@ const App = () => {
         </Header.Subheader>
       </Header>
       <TaskTemplateForm
-        initialValues={taskTriggerResult.data}
-        choices={CONTEXT.choices}
+        initialValues={taskTrigger}
         onSubmit={handleSubmit}
         onDelete={handleDelete}
       />

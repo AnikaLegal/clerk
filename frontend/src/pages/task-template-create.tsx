@@ -1,22 +1,10 @@
 import { TaskTriggerCreate, useCreateTaskTriggerMutation } from 'api'
-import { Formik, FormikHelpers } from 'formik'
+import { FormikHelpers } from 'formik'
 import { TaskTemplateForm } from 'forms/task-template'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { Container, Header } from 'semantic-ui-react'
 import { getAPIFormErrors, mount } from 'utils'
-
-interface DjangoContext {
-  choices: {
-    topic: string[][]
-    event: string[][]
-    event_stage: string[][]
-    tasks_assignment_role: string[][]
-    task_type: string[][]
-  }
-}
-
-const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [createTaskTrigger] = useCreateTaskTriggerMutation()
@@ -42,11 +30,15 @@ const App = () => {
       })
   }
 
-  const initialValues = {
+  const initialValues: TaskTriggerCreate = {
     name: '',
+    // @ts-expect-error
     topic: '',
+    // @ts-expect-error
     event: '',
+    // @ts-expect-error
     event_stage: '',
+    // @ts-expect-error
     tasks_assignment_role: '',
     templates: [],
   }
@@ -57,7 +49,6 @@ const App = () => {
       <TaskTemplateForm
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        choices={CONTEXT.choices}
         create
       />
     </Container>

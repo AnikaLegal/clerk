@@ -3,13 +3,13 @@ properties:
   name:
     type: string
   topic:
-    type: string
+    $ref: ./TaskTriggerTopic.yaml
   event:
-    type: string
+    $ref: ./IssueEventType.yaml
   tasks_assignment_role:
-    type: string
+    $ref: ./TaskTriggerRole.yaml
   event_stage:
-    type: string
+    $ref: ./IssueStage.yaml
   templates:
     type: array
     items:

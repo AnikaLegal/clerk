@@ -1,0 +1,7 @@
+type: string
+enum:
+  - CREATE
+  - LAWYER
+  - PARALEGAL
+  - STAGE
+  - OPEN

@@ -1,6 +1,9 @@
+import { CaseEventTypes, CaseStages, CaseTopics } from 'types/case'
 import {
   TaskIsOpen,
   TaskStatuses,
+  TaskTriggerRoles,
+  TaskTriggerTopics,
   TaskTypes,
   TaskTypesRequest,
   TaskTypesWithoutRequestTypes,
@@ -12,7 +15,7 @@ export const URLS = {
   },
 } as const
 
-export const STAGES = {
+export const STAGES: CaseStages = {
   UNSTARTED: 'Not started',
   CLIENT_AGREEMENT: 'Client agreement',
   ADVICE: 'Drafting advice',
@@ -33,10 +36,18 @@ export const OUTCOMES = {
   UNSUCCESSFUL: 'Unsuccessful',
 } as const
 
-export const CASE_TYPES = {
+export const CASE_TOPICS: CaseTopics = {
   REPAIRS: 'Repairs',
   BONDS: 'Bonds',
   EVICTION: 'Eviction',
+} as const
+
+export const CASE_EVENT_TYPES: CaseEventTypes = {
+  CREATE: 'Created',
+  LAWYER: 'Lawyer assigned',
+  PARALEGAL: 'Paralegal assigned',
+  STAGE: 'Stage change',
+  OPEN: 'Open change',
 } as const
 
 export const GROUPS = {
@@ -44,6 +55,17 @@ export const GROUPS = {
   ADMIN: 'Admin',
   COORDINATOR: 'Coordinator',
   LAWYER: 'Lawyer',
+} as const
+
+export const TASK_TRIGGER_TOPICS: TaskTriggerTopics = {
+  ANY: 'Any',
+  ...CASE_TOPICS,
+} as const
+
+export const TASK_TRIGGER_ROLES: TaskTriggerRoles = {
+  PARALEGAL: 'Paralegal',
+  LAWYER: 'Lawyer',
+  COORDINATOR: 'Coordinators',
 } as const
 
 export const TASK_TYPES_REQUEST: TaskTypesRequest = {

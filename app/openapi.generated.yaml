@@ -3016,13 +3016,50 @@ components:
           type: string
       required:
         - status
+    IssueTopic:
+      type: string
+      enum:
+        - REPAIRS
+        - BONDS
+        - EVICTION
+    TaskTriggerTopic:
+      oneOf:
+        - type: string
+          enum:
+            - ANY
+        - $ref: "#/components/schemas/IssueTopic"
+    IssueEventType:
+      type: string
+      enum:
+        - CREATE
+        - LAWYER
+        - PARALEGAL
+        - STAGE
+        - OPEN
+    TaskTriggerRole:
+      type: string
+      enum:
+        - PARALEGAL
+        - LAWYER
+        - COORDINATOR
+    IssueStage:
+      type: string
+      enum:
+        - UNSTARTED
+        - CLIENT_AGREEMENT
+        - ADVICE
+        - FORMAL_LETTER
+        - NEGOTIATIONS
+        - VCAT_CAV
+        - POST_CASE_INTERVIEW
+        - CLOSED
     TaskTemplate:
       type: object
       properties:
         id:
           type: integer
         type:
-          type: string
+          $ref: "#/components/schemas/TaskType"
         name:
           type: string
         description:
@@ -3046,13 +3083,13 @@ components:
         name:
           type: string
         topic:
-          type: string
+          $ref: "#/components/schemas/TaskTriggerTopic"
         event:
-          type: string
+          $ref: "#/components/schemas/IssueEventType"
         tasks_assignment_role:
-          type: string
+          $ref: "#/components/schemas/TaskTriggerRole"
         event_stage:
-          type: string
+          $ref: "#/components/schemas/IssueStage"
         templates:
           type: array
           items:

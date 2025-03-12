@@ -1505,9 +1505,27 @@ export type TaskRequestUpdate = {
   is_approved?: boolean;
   to_comment?: string;
 };
+export type IssueTopic = "REPAIRS" | "BONDS" | "EVICTION";
+export type TaskTriggerTopic = "ANY" | IssueTopic;
+export type IssueEventType =
+  | "CREATE"
+  | "LAWYER"
+  | "PARALEGAL"
+  | "STAGE"
+  | "OPEN";
+export type TaskTriggerRole = "PARALEGAL" | "LAWYER" | "COORDINATOR";
+export type IssueStage =
+  | "UNSTARTED"
+  | "CLIENT_AGREEMENT"
+  | "ADVICE"
+  | "FORMAL_LETTER"
+  | "NEGOTIATIONS"
+  | "VCAT_CAV"
+  | "POST_CASE_INTERVIEW"
+  | "CLOSED";
 export type TaskTemplate = {
   id?: number;
-  type: string;
+  type: TaskType;
   name: string;
   description?: string;
   due_in: number | null;
@@ -1516,10 +1534,10 @@ export type TaskTemplate = {
 };
 export type TaskTriggerBase = {
   name: string;
-  topic: string;
-  event: string;
-  tasks_assignment_role: string;
-  event_stage?: string;
+  topic: TaskTriggerTopic;
+  event: IssueEventType;
+  tasks_assignment_role: TaskTriggerRole;
+  event_stage?: IssueStage;
   templates: TaskTemplate[];
 };
 export type TaskTrigger = TaskTriggerBase & {

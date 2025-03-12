@@ -1,0 +1,5 @@
+oneOf:
+  - type: string
+    enum:
+      - ANY
+  - $ref: ./IssueTopic.yaml
