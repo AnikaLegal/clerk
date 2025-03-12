@@ -43,7 +43,7 @@ export const RichTextArea = (props: RichTextAreaProps) => {
     const parseOptions: ParseOptions = {
       preserveWhitespace: 'full',
     }
-    editor?.commands.setContent(props.initialContent, false, parseOptions)
+    editor?.commands.setContent(props.initialContent ?? '', false, parseOptions)
   }, [editor])
 
   useEffect(() => {

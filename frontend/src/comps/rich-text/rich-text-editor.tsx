@@ -49,7 +49,7 @@ export const RichTextEditor = ({
     const parseOptions: ParseOptions = {
       preserveWhitespace: 'full',
     }
-    editor?.commands.setContent(initialContent, false, parseOptions)
+    editor?.commands.setContent(initialContent ?? '', false, parseOptions)
   }, [editor])
 
   useEffect(() => {

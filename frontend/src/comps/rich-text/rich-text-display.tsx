@@ -28,7 +28,7 @@ export const RichTextDisplay = ({
   })
 
   useEffect(() => {
-    editor?.commands.setContent(content)
+      editor?.commands.setContent(content ?? '')
   }, [editor, content])
 
   return (
