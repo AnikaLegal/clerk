@@ -1,4 +1,4 @@
-import { TaskCreate, useGetCaseQuery, useGetUsersQuery } from 'api'
+import { TaskCreate, useGetCaseQuery, useGetUsersQuery, User } from 'api'
 import { FormikProps } from 'formik'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
@@ -8,7 +8,6 @@ import {
   BooleanField,
   DateInputField,
   DropdownField,
-  DropdownFieldProps,
   InputField,
   RichTextEditorField,
 } from './formik'
@@ -20,6 +19,8 @@ interface TaskFormProps {
 }
 
 export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
+  const { users, isLoading } = getAssignedToUsers(formik.values)
+
   return (
     <Form
       onSubmit={formik.handleSubmit}
@@ -36,12 +37,17 @@ export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
           text: value,
         }))}
       />
-      <UserDropdownField
+      <DropdownField
         required
         search
         name="assigned_to_id"
         label="Assigned To"
-        values={formik.values}
+        options={users.map((u) => ({
+          key: u.id,
+          value: u.id,
+          text: u.email,
+        }))}
+        loading={isLoading}
       />
       <DateInputField name="due_at" label="Due date" dateFormat="DD/MM/YYYY" />
       <BooleanField name="is_urgent" label="Urgent?" />
@@ -53,41 +59,40 @@ export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
   )
 }
 
-interface UserDropdownFieldProps extends DropdownFieldProps {
+const getAssignedToUsers = (
   values: TaskCreate
-}
-
-const UserDropdownField = ({ values, ...props }: UserDropdownFieldProps) => {
+): { users: User[]; isLoading: boolean } => {
   const issueResult = useGetCaseQuery({ id: values.issue_id })
   const userResult = useGetUsersQuery({ isActive: true, sort: 'email' })
 
   if (issueResult.isLoading || userResult.isLoading) {
-    return <DropdownField loading {...props} />
+    return { users: [], isLoading: true }
   }
-  const issue = issueResult.data.issue
+  const issue = issueResult.data?.issue
   const users = userResult.data
+  if (!issue || !users) {
+    return { users: [], isLoading: false }
+  }
 
   /* Only include:
-   * - The current assignee.
+   *
+   * - The current assignee, if any.
    * - The case paralegal.
    * - All coordinators plus.
+   * - Special so-called system accounts.
+   *
    * You can't assign to another paralegal user as they cannot access the case
    * or task. You need to reassign the case to that paralegal and the associated
    * tasks will be reassigned automatically.
    */
-  const userOptions = users
-    .filter(
+  return {
+    users: users.filter(
       (u) =>
         u.id == values.assigned_to_id ||
         u.id == issue.paralegal?.id ||
         u.is_coordinator_or_better ||
         u.is_system_account
-    )
-    .map((u) => ({
-      key: u.id,
-      value: u.id,
-      text: u.email,
-    }))
-
-  return <DropdownField options={userOptions} {...props} />
+    ),
+    isLoading: false,
+  }
 }
