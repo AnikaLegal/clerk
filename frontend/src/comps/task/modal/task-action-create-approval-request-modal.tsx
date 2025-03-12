@@ -5,7 +5,7 @@ import { Formik, FormikHelpers } from 'formik'
 import { RichTextEditorField } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { Button, Form, Modal } from 'semantic-ui-react'
+import { Button, Form, Icon, Message, Modal } from 'semantic-ui-react'
 import { getAPIErrorMessage } from 'utils'
 import * as Yup from 'yup'
 
@@ -32,6 +32,9 @@ export const RequestApprovalModal = ({
     type: 'APPROVAL',
     name: `Approval request from ${user.full_name}`,
     comment: '',
+    // @ts-expect-error
+    // If the lawyer is not set we include a message and the user cannot submit
+    // the request.
     to_user_id: issue.lawyer?.id,
   }
 
@@ -45,15 +48,15 @@ export const RequestApprovalModal = ({
 
   const handleSubmit = (
     values: TaskRequestCreate,
-    helpers: FormikHelpers<TaskRequestCreate>
+    { resetForm }: FormikHelpers<TaskRequestCreate>
   ) => {
     createTaskRequest({ id: task.id, taskRequestCreate: values })
       .unwrap()
-      .then((request) => {
+      .then(() => {
         enqueueSnackbar('Created approval request', { variant: 'success' })
         updateTask()
         onClose()
-        helpers.resetForm()
+        resetForm()
       })
       .catch((e) => {
         const mesg = getAPIErrorMessage(e, 'Failed to create approval request')
@@ -97,6 +100,12 @@ export const RequestApprovalModal = ({
             <Modal size="small" open={open} onClose={closeHandler}>
               <Modal.Header>Request approval to close this task</Modal.Header>
               <Modal.Content>
+                {!issue.lawyer && (
+                  <Message negative>
+                    <Icon name="warning" />
+                    Cannot request approval as no case supervisor is assigned.
+                  </Message>
+                )}
                 <p>
                   This task requires approval to close. Briefly explain what you
                   need approved including links to relevant documents or draft

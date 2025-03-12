@@ -265,14 +265,20 @@ class TaskApiViewset(ModelViewSet):
     def request_create(self, request, pk):
         task = self.get_object()
 
-        # Disallow approval requests if there is already one pending.
         type = request.data.get("type", None)
-        if type == TaskRequestType.APPROVAL and (
-            task.requests.filter(type=TaskRequestType.APPROVAL)
-            .exclude(status=TaskRequestStatus.DONE)
-            .exists()
-        ):
-            raise ApprovalAlreadyPendingException()
+        if type == TaskRequestType.APPROVAL:
+            # Disallow approval requests if there is no supervisor to approve
+            # it.
+            if not task.issue.lawyer:
+                raise NoSupervisorToApproveException()
+
+            # Disallow approval requests if there is already one pending.
+            if (
+                task.requests.filter(type=TaskRequestType.APPROVAL)
+                .exclude(status=TaskRequestStatus.DONE)
+                .exists()
+            ):
+                raise ApprovalAlreadyPendingException()
 
         data = {
             **request.data,
@@ -312,3 +318,8 @@ class ApprovalAlreadyPendingException(APIException):
     status_code = 403
     default_code = "approval_already_pending"
     default_detail = "An approval request is already pending."
+
+class NoSupervisorToApproveException(APIException):
+    status_code = 403
+    default_code = "no_supervisor_to_approve"
+    default_detail = "No case supervisor assigned to approve the request."
