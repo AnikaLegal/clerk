@@ -11,7 +11,7 @@ import {
 import { DiscardChangesConfirmationModal } from 'comps/modal'
 import {
   CASE_EVENT_TYPES,
-  STAGES,
+  CASE_STAGES,
   TASK_TRIGGER_ROLES,
   TASK_TRIGGER_TOPICS,
   TASK_TYPES,
@@ -150,7 +150,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
               name="event_stage"
               label="Trigger stage"
               placeholder="Select which event stage will trigger task creation"
-              options={Object.entries(STAGES).map(([key, value]) => ({
+              options={Object.entries(CASE_STAGES).map(([key, value]) => ({
                 key: key,
                 value: key,
                 text: value,

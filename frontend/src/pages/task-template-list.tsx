@@ -5,7 +5,7 @@ import { useGetTaskTriggersQuery } from 'api'
 import { FadeTransition } from 'comps/transitions'
 import {
   CASE_EVENT_TYPES,
-  STAGES,
+  CASE_STAGES,
   TASK_TRIGGER_ROLES,
   TASK_TRIGGER_TOPICS,
 } from 'consts'
@@ -54,7 +54,7 @@ const App = () => {
                 <Table.Cell>{TASK_TRIGGER_TOPICS[trigger.topic]}</Table.Cell>
                 <Table.Cell>{CASE_EVENT_TYPES[trigger.event]}</Table.Cell>
                 <Table.Cell>
-                  {trigger.event_stage ? STAGES[trigger.event_stage] : '-'}
+                  {trigger.event_stage ? CASE_STAGES[trigger.event_stage] : '-'}
                 </Table.Cell>
                 <Table.Cell>
                   {TASK_TRIGGER_ROLES[trigger.tasks_assignment_role]}

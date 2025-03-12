@@ -2,10 +2,10 @@ import React from 'react'
 import { FormikProps } from 'formik'
 import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
 
-import { STAGES } from 'consts'
+import { CASE_STAGES } from 'consts'
 import { SlackyMarkdownEditor } from 'comps/markdown-editor'
 
-const STAGE_OPTIONS = Object.entries(STAGES)
+const STAGE_OPTIONS = Object.entries(CASE_STAGES)
   .filter(([k, v]) => k !== 'UNSTARTED')
   .map(([k, v]) => ({
     key: k,

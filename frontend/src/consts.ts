@@ -15,7 +15,7 @@ export const URLS = {
   },
 } as const
 
-export const STAGES: CaseStages = {
+export const CASE_STAGES: CaseStages = {
   UNSTARTED: 'Not started',
   CLIENT_AGREEMENT: 'Client agreement',
   ADVICE: 'Drafting advice',

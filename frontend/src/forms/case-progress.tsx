@@ -14,9 +14,9 @@ import { useSnackbar } from 'notistack'
 import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useUpdateCaseMutation } from 'api'
-import { STAGES } from 'consts'
+import { CASE_STAGES } from 'consts'
 
-const STAGE_OPTIONS = Object.entries(STAGES)
+const STAGE_OPTIONS = Object.entries(CASE_STAGES)
   .filter(([k, v]) => k !== 'CLOSED')
   .map(([k, v]) => ({
     key: k,
