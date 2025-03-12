@@ -87,16 +87,20 @@ export const TaskActionCard = (props: TaskActionProps) => {
       id: 'complete',
       icon: 'check',
       text: 'Complete the task',
-      showWhen: () => user.is_paralegal_or_better && task.status == "IN_PROGRESS",
-      disableWhen: () => task.is_approval_required && task.is_approval_pending,
+      showWhen: () =>
+        user.is_paralegal_or_better && task.status == 'IN_PROGRESS',
+      disableWhen: () =>
+        task.is_approval_required === true && task.is_approval_pending,
       action: () => finishTaskHandler(),
     },
     {
       id: 'cancel',
       icon: 'close',
       text: 'Cancel the task',
-      showWhen: () => user.is_paralegal_or_better && task.status == "IN_PROGRESS",
-      disableWhen: () => task.is_approval_required && task.is_approval_pending,
+      showWhen: () =>
+        user.is_paralegal_or_better && task.status == 'IN_PROGRESS',
+      disableWhen: () =>
+        task.is_approval_required === true && task.is_approval_pending,
       action: () => cancelTaskHandler(),
     },
   ]
