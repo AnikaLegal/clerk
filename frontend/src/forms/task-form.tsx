@@ -1,5 +1,6 @@
 import { TaskCreate, useGetCaseQuery, useGetUsersQuery, User } from 'api'
 import { FormikProps } from 'formik'
+import moment from 'moment'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
@@ -49,7 +50,12 @@ export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
         }))}
         loading={isLoading}
       />
-      <DateInputField name="due_at" label="Due date" dateFormat="DD/MM/YYYY" />
+      <DateInputField
+        name="due_at"
+        label="Due date"
+        dateFormat="DD/MM/YYYY"
+        minDate={moment().add(1, 'day')}
+      />
       <BooleanField name="is_urgent" label="Urgent?" />
       {user.is_lawyer_or_better && (
         <BooleanField name="is_approval_required" label="Approval required?" />
