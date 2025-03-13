@@ -101,6 +101,13 @@ header .nav-items a:visited {
   margin: 0;
 }
 
+/* An internal element of the rich text editor has padding, which we don't want,
+ * that we cannot manipulate with component styling. This is a convenient way to
+ * address that. */
+.rich-text-display .tiptap.ProseMirror {
+  padding: 0;
+}
+
 main {
   width: calc(100vw - 2 * var(--container-padding));
   margin: 0 auto;
