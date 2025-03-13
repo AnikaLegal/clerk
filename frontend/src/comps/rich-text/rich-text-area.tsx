@@ -1,6 +1,8 @@
 import { useFocusWithin } from '@mantine/hooks'
 import { RichTextEditor } from '@mantine/tiptap'
+import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
+import Underline from '@tiptap/extension-underline'
 import { ParseOptions } from '@tiptap/pm/model'
 import { BubbleMenu, EditorEvents, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -10,21 +12,17 @@ import { CustomLink } from './extensions/rich-text-editor-link-fix'
 import '@mantine/core/styles.css'
 import '@mantine/tiptap/styles.css'
 
-interface RichTextAreaProps {
-  initialContent?: string
+export interface RichTextAreaProps {
+  autoFocus?: boolean
+  children?: React.ReactNode
   disabled?: boolean
-  placeholder?: string
-  onUpdate?: (update: EditorEvents['update']) => void
+  initialContent?: string
   onBlur?: (blur: EditorEvents['blur']) => void
+  onUpdate?: (update: EditorEvents['update']) => void
+  placeholder?: string
 }
 
-export const RichTextArea = ({
-  initialContent,
-  disabled,
-  placeholder,
-  onUpdate,
-  onBlur,
-}: RichTextAreaProps) => {
+export const RichTextArea = (props: RichTextAreaProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -35,7 +33,9 @@ export const RichTextArea = ({
         },
         openOnClick: false,
       }),
-      Placeholder.configure({ placeholder: placeholder }),
+      Highlight,
+      Placeholder.configure({ placeholder: props.placeholder }),
+      Underline,
     ],
   })
 
@@ -43,45 +43,56 @@ export const RichTextArea = ({
     const parseOptions: ParseOptions = {
       preserveWhitespace: 'full',
     }
-    editor?.commands.setContent(initialContent, false, parseOptions)
+    editor?.commands.setContent(props.initialContent ?? '', false, parseOptions)
   }, [editor])
 
   useEffect(() => {
-    editor?.setEditable(!disabled, false)
-  }, [editor, disabled])
+    editor?.setEditable(!props.disabled, false)
+  }, [editor, props.disabled])
 
   useEffect(() => {
-    onUpdate ? editor?.on('update', onUpdate) : editor?.off('update')
-  }, [editor, onUpdate])
+    props.onUpdate
+      ? editor?.on('update', props.onUpdate)
+      : editor?.off('update')
+  }, [editor, props.onUpdate])
 
   useEffect(() => {
-    onBlur ? editor?.on('blur', onBlur) : editor?.off('blur')
-  }, [editor, onBlur])
+    props.onBlur ? editor?.on('blur', props.onBlur) : editor?.off('blur')
+  }, [editor, props.onBlur])
+
+  useEffect(() => {
+    if (props.autoFocus) {
+      editor?.commands.focus()
+    }
+  }, [editor, props.autoFocus])
 
   /* Emulate semantic-ui-react focus styling to match other components for
    * the time being */
   const { ref, focused } = useFocusWithin()
   const focusedStyle: CSSProperties = {
-    outline: '1px solid #85b7d9',
-    borderRadius: 'var(--mantine-radius-default)',
+    borderColor: '#85b7d9',
   }
 
   return (
     <RichTextEditor
       ref={ref}
       editor={editor}
-      styles={{ content: focused ? focusedStyle : {} }}
+      styles={{ root: focused ? focusedStyle : {} }}
     >
       {editor && (
         <BubbleMenu editor={editor}>
           <RichTextEditor.ControlsGroup>
             <RichTextEditor.Bold />
             <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+            <RichTextEditor.Highlight />
             <RichTextEditor.Link />
+            <RichTextEditor.Unlink />
           </RichTextEditor.ControlsGroup>
         </BubbleMenu>
       )}
       <RichTextEditor.Content />
+      {props.children && props.children}
     </RichTextEditor>
   )
 }

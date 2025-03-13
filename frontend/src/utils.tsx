@@ -1,9 +1,10 @@
 import { createTheme, MantineProvider } from '@mantine/core'
+import { ModalsProvider } from '@mantine/modals'
 import { Error as ErrorType } from 'api'
 import { store } from 'api/store'
 import { ErrorBoundary } from 'comps/error-boundary'
 import { SnackbarProvider } from 'notistack'
-import React, { RefObject, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { Converter, setFlavor } from 'showdown'
@@ -71,11 +72,13 @@ export const mount = (App: React.ComponentType) => {
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
         <MantineProvider theme={theme}>
-          <ErrorBoundary>
-            <FadeInOnLoad>
-              <App />
-            </FadeInOnLoad>
-          </ErrorBoundary>
+          <ModalsProvider>
+            <ErrorBoundary>
+              <FadeInOnLoad>
+                <App />
+              </FadeInOnLoad>
+            </ErrorBoundary>
+          </ModalsProvider>
         </MantineProvider>
       </SnackbarProvider>
     </Provider>
@@ -85,6 +88,11 @@ export const mount = (App: React.ComponentType) => {
     const root = createRoot(domNode)
     root.render(reactNode)
   }
+  /*
+  else {
+    // TODO: hydration?
+  }
+  */
 }
 
 const FadeInOnLoad = styled.div`
@@ -190,7 +198,7 @@ const parseError = (error: any) => {
 }
 
 export const choiceToMap = (choices: string[][]): Map<string, string> => {
-  return choices.reduce(function (map, entry) {
+  return choices.reduce((map, entry) => {
     map.set(entry[0], entry[1])
     return map
   }, new Map())

@@ -1,27 +1,20 @@
-import { Link, RichTextEditor } from '@mantine/tiptap'
+import { Link, RichTextEditor, RichTextEditorProps } from '@mantine/tiptap'
 import { useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect } from 'react'
-import { createGlobalStyle } from 'styled-components'
 
 import '@mantine/core/styles.css'
 import '@mantine/tiptap/styles.css'
 
-interface RichTextDisplayProps {
+interface RichTextDisplayProps
+  extends Omit<RichTextEditorProps, 'editor' | 'children'> {
   content?: string
 }
 
-/* An internal element of the text editor has padding, which we don't want, that
- * we cannot manipulate with component styling. This is a convenient way to
- * address that.
- */
-const GlobalStyles = createGlobalStyle`
-  .rich-text-display .tiptap.ProseMirror {
-    padding: 0;
-  }
-`
-
-export const RichTextDisplay = ({ content }: RichTextDisplayProps) => {
+export const RichTextDisplay = ({
+  content,
+  ...props
+}: RichTextDisplayProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -35,7 +28,7 @@ export const RichTextDisplay = ({ content }: RichTextDisplayProps) => {
   })
 
   useEffect(() => {
-    editor?.commands.setContent(content)
+      editor?.commands.setContent(content ?? '')
   }, [editor, content])
 
   return (
@@ -43,8 +36,8 @@ export const RichTextDisplay = ({ content }: RichTextDisplayProps) => {
       className="rich-text-display"
       editor={editor}
       styles={{ root: { border: 'none' } }}
+      {...props}
     >
-      <GlobalStyles />
       <RichTextEditor.Content />
     </RichTextEditor>
   )

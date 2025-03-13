@@ -6,7 +6,6 @@ import { Formik, FormikHelpers } from 'formik'
 import {
   FormikDiscreteServiceFields,
   FormikOngoingServiceFields,
-  FormikServiceErrorMessages,
   ServiceCategory,
 } from 'forms/case-service'
 import { enqueueSnackbar } from 'notistack'
@@ -235,7 +234,11 @@ export const OngoingServices = ({
   )
 }
 
-export const OngoingServicesTable = ({ issue, canChange, fields }: ServiceTableProps) => {
+export const OngoingServicesTable = ({
+  issue,
+  canChange,
+  fields,
+}: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
     category: ServiceCategory.Ongoing,
@@ -509,7 +512,6 @@ export const ServiceModal = ({
                 error={Object.keys(errors).length > 0}
               >
                 {fields}
-                <FormikServiceErrorMessages />
               </Form>
             </Modal.Content>
             <Modal.Actions>
