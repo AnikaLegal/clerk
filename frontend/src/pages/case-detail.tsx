@@ -535,7 +535,9 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     id: 'service',
     icon: 'balance scale',
     text: 'Add a service',
-    when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
+    when: (perms, issue) =>
+      (perms.is_paralegal_or_better && issue.is_open) ||
+      perms.is_coordinator_or_better,
   },
   {
     id: 'close',

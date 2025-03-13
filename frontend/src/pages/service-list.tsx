@@ -25,7 +25,7 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { CaseFormServiceChoices } from 'types'
+import { CaseFormServiceChoices, UserPermission } from 'types'
 import {
   choiceToMap,
   filterEmpty,
@@ -38,6 +38,7 @@ interface DjangoContext {
   case_pk: string
   choices: CaseFormServiceChoices
   urls: CaseTabUrls
+  user: UserPermission
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_DISCRETE)
@@ -46,19 +47,31 @@ const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ONGOING)
 const App = () => {
   const caseId = CONTEXT.case_pk
   const urls = CONTEXT.urls
+  const user = CONTEXT.user
 
   const caseResult = api.useGetCaseQuery({ id: caseId })
-  if (caseResult.isFetching) return null
+  if (caseResult.isFetching || !caseResult.data) {
+    return null
+  }
+  const issue = caseResult.data.issue
+  const canChange = issue.is_open || user.is_coordinator_or_better
 
-  const issue = caseResult.data!.issue
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
       <Segment basic>
-        <DiscreteServices issue={issue} choices={CONTEXT.choices} />
+        <DiscreteServices
+          issue={issue}
+          canChange={canChange}
+          choices={CONTEXT.choices}
+        />
       </Segment>
       <Segment basic>
-        <OngoingServices issue={issue} choices={CONTEXT.choices} />
+        <OngoingServices
+          issue={issue}
+          canChange={canChange}
+          choices={CONTEXT.choices}
+        />
       </Segment>
     </Container>
   )
@@ -66,15 +79,21 @@ const App = () => {
 
 interface ServiceProps {
   issue: Issue
+  canChange: boolean
   choices: CaseFormServiceChoices
 }
 
 interface ServiceTableProps {
   issue: Issue
+  canChange: boolean
   fields: React.ReactNode
 }
 
-export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
+export const DiscreteServices = ({
+  issue,
+  canChange,
+  choices,
+}: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Discrete,
     count: 1,
@@ -91,7 +110,7 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Discrete services</Header>
           </Grid.Column>
-          {issue.is_open && (
+          {canChange && (
             <Grid.Column style={{ width: 'auto' }}>
               <AddServiceButton
                 floated="right"
@@ -106,12 +125,20 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           )}
         </Grid.Row>
       </Grid>
-      <DiscreteServicesTable issue={issue} fields={fields} />
+      <DiscreteServicesTable
+        issue={issue}
+        canChange={canChange}
+        fields={fields}
+      />
     </>
   )
 }
 
-export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
+export const DiscreteServicesTable = ({
+  issue,
+  canChange,
+  fields,
+}: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
     category: ServiceCategory.Discrete,
@@ -119,13 +146,14 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
   if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (result.data.length == 0) {
+  if (!result.data || result.data.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No discrete services exist for this case.</p>
       </Segment>
     )
   }
+
   return (
     <Table celled>
       <Table.Header>
@@ -134,7 +162,7 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>Count</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
+          {canChange && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -144,9 +172,9 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>
-              <RichTextDisplay content={service.notes} />
+              <RichTextDisplay content={service.notes || ''} />
             </Table.Cell>
-            {issue.is_open && (
+            {canChange && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
                   issue={issue}
@@ -162,7 +190,11 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
   )
 }
 
-export const OngoingServices = ({ issue, choices }: ServiceProps) => {
+export const OngoingServices = ({
+  issue,
+  canChange,
+  choices,
+}: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Ongoing,
     started_at: '',
@@ -179,7 +211,7 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Ongoing services</Header>
           </Grid.Column>
-          {issue.is_open && (
+          {canChange && (
             <Grid.Column style={{ width: 'auto' }}>
               <AddServiceButton
                 floated="right"
@@ -194,12 +226,16 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           )}
         </Grid.Row>
       </Grid>
-      <OngoingServicesTable issue={issue} fields={fields} />
+      <OngoingServicesTable
+        issue={issue}
+        canChange={canChange}
+        fields={fields}
+      />
     </>
   )
 }
 
-export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
+export const OngoingServicesTable = ({ issue, canChange, fields }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
     category: ServiceCategory.Ongoing,
@@ -207,7 +243,7 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
   if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (result.data.length == 0) {
+  if (!result.data || result.data.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No ongoing services exist for this case.</p>
@@ -222,7 +258,7 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Start date</Table.HeaderCell>
           <Table.HeaderCell>Finish date</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
+          {canChange && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -232,9 +268,9 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>
-              <RichTextDisplay content={service.notes} />
+              <RichTextDisplay content={service.notes || ''} />
             </Table.Cell>
-            {issue.is_open && (
+            {canChange && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
                   issue={issue}

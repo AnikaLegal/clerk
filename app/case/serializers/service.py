@@ -1,11 +1,11 @@
+from core.models import Issue
 from core.models.service import (
     DiscreteServiceType,
     OngoingServiceType,
     Service,
     ServiceCategory,
 )
-from core.models import Issue
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -63,11 +63,15 @@ class ServiceSerializer(serializers.ModelSerializer):
                 {"finished_at": "Finish date must be after the start date"}
             )
 
+        # Cannot create or edit a service for a case that is closed unless you
+        # have coordinator+ permissions.
         issue_id = attrs.get("issue_id")
         if issue_id and Issue.objects.filter(id=issue_id, is_open=False).exists():
-            raise serializers.ValidationError(
-                "Cannot add a service to a case that is closed"
-            )
+            request = self.context.get("request", None)
+            if not request or not request.user.is_coordinator_or_better:
+                raise exceptions.PermissionDenied(
+                    "Cannot create or edit a service for a case that is closed."
+                )
 
         return attrs
 
