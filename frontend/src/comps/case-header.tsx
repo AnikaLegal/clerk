@@ -127,7 +127,6 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           <i className="folder open outline icon"></i>
           Documents
         </a>
-        {/*
         <a
           href={urls.services}
           className={`item ${activeTab === CASE_TABS.SERVICES ? 'active' : ''}`}
@@ -135,7 +134,6 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           <i className="balance scale icon"></i>
           Services
         </a>
-        */}
       </div>
     </>
   )
