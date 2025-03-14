@@ -3,9 +3,9 @@ from core.events.service import (
     on_service_delete,
     on_service_update,
 )
-from core.models import Issue, IssueNote
+from core.models import Issue, IssueNote, ServiceEvent
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
-from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -247,9 +247,18 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         else:
             note_types = IssueNote.PARALEGAL_NOTE_TYPES
 
+        prefetch = GenericPrefetch(
+            "content_object",
+            [
+                ServiceEvent.objects.filter(service__issue=issue)
+                .select_related("user")
+                .prefetch_related("user__groups"),
+            ],
+        )
+
         notes = (
             IssueNote.objects.filter(issue=issue.pk)
-            .prefetch_related("creator__groups")
+            .prefetch_related(prefetch, "creator__groups")
             .filter(note_type__in=note_types)
             .order_by("-created_at")
             .all()
