@@ -209,12 +209,14 @@ paths:
         - name: category
           in: query
           schema:
-            type: string
+            $ref: "#/components/schemas/ServiceCategory"
           required: false
         - name: type
           in: query
           schema:
-            type: string
+            oneOf:
+              - $ref: "#/components/schemas/ServiceTypeDiscrete"
+              - $ref: "#/components/schemas/ServiceTypeOngoing"
           required: false
       responses:
         "200":
@@ -1759,9 +1761,6 @@ components:
     ServiceBase:
       type: object
       properties:
-        issue_id:
-          type: string
-          format: uuid
         category:
           $ref: "#/components/schemas/ServiceCategory"
         type:
@@ -1780,7 +1779,6 @@ components:
           type: string
           nullable: true
       required:
-        - issue_id
         - category
         - type
         - started_at
@@ -1794,8 +1792,12 @@ components:
           properties:
             id:
               type: integer
+            issue_id:
+              type: string
+              format: uuid
           required:
             - id
+            - issue_id
     ServiceCreate:
       allOf:
         - $ref: "#/components/schemas/ServiceBase"

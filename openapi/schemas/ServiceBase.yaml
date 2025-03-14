@@ -1,8 +1,5 @@
 type: object
 properties:
-  issue_id:
-    type: string
-    format: uuid
   category:
     $ref: ./ServiceCategory.yaml
   type:
@@ -21,7 +18,6 @@ properties:
     type: string
     nullable: true
 required:
-  - issue_id
   - category
   - type
   - started_at

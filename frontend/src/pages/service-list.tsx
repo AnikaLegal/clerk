@@ -7,7 +7,6 @@ import { Formik, FormikHelpers } from 'formik'
 import {
   FormikDiscreteServiceFields,
   FormikOngoingServiceFields,
-  ServiceCategory,
 } from 'forms/case-service'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -26,12 +25,7 @@ import {
   Table,
 } from 'semantic-ui-react'
 import { UserPermission } from 'types'
-import {
-  filterEmpty,
-  getAPIErrorMessage,
-  getAPIFormErrors,
-  mount
-} from 'utils'
+import { filterEmpty, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
@@ -77,11 +71,13 @@ interface ServiceTableProps {
 }
 
 export const DiscreteServices = ({ issue, canChange }: ServiceProps) => {
-  const initialValues = {
-    category: ServiceCategory.Discrete,
+  const initialValues: ServiceCreate = {
+    category: 'DISCRETE',
+    // @ts-expect-error
+    type: '',
     count: 1,
     started_at: '',
-  } as ServiceCreate
+  }
   const fields: React.ReactNode = <FormikDiscreteServiceFields />
 
   return (
@@ -122,7 +118,7 @@ export const DiscreteServicesTable = ({
 }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: ServiceCategory.Discrete,
+    category: 'DISCRETE',
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />
@@ -172,11 +168,13 @@ export const DiscreteServicesTable = ({
 }
 
 export const OngoingServices = ({ issue, canChange }: ServiceProps) => {
-  const initialValues = {
-    category: ServiceCategory.Ongoing,
+  const initialValues: ServiceCreate = {
+    category: 'ONGOING',
+    // @ts-expect-error
+    type: '',
     started_at: '',
     finished_at: '',
-  } as ServiceCreate
+  }
   const fields: React.ReactNode = <FormikOngoingServiceFields />
 
   return (
@@ -217,7 +215,7 @@ export const OngoingServicesTable = ({
 }: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: ServiceCategory.Ongoing,
+    category: 'ONGOING',
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />

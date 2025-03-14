@@ -468,8 +468,8 @@ export type GetCaseServicesApiResponse =
 export type GetCaseServicesApiArg = {
   /** Entity ID */
   id: string;
-  category?: string;
-  type?: string;
+  category?: ServiceCategory;
+  type?: ServiceTypeDiscrete | ServiceTypeOngoing;
 };
 export type CreateCaseServiceApiResponse =
   /** status 201 Successful response. */ Service;
@@ -938,7 +938,6 @@ export type ServiceTypeOngoing =
   | "REPRESENTATION_COURT_TRIBUNAL"
   | "REPRESENTATION_OTHER";
 export type ServiceBase = {
-  issue_id: string;
   category: ServiceCategory;
   type: ServiceTypeDiscrete | ServiceTypeOngoing;
   started_at: string;
@@ -948,6 +947,7 @@ export type ServiceBase = {
 };
 export type Service = ServiceBase & {
   id: number;
+  issue_id: string;
 };
 export type ServiceCreate = ServiceBase & object;
 export type EmailCreate = {

@@ -1,4 +1,5 @@
 import api, {
+  ServiceCategory,
   ServiceCreate,
   useAppDispatch,
   useCreateCaseServiceMutation,
@@ -20,11 +21,6 @@ import {
   InputField,
   RichTextAreaField,
 } from './formik'
-
-export enum ServiceCategory {
-  Discrete = 'DISCRETE',
-  Ongoing = 'ONGOING',
-}
 
 export const ServiceForm = ({ issue, onCancel }: CaseDetailFormProps) => {
   const [createService] = useCreateCaseServiceMutation()
@@ -94,7 +90,7 @@ export const ServiceForm = ({ issue, onCancel }: CaseDetailFormProps) => {
 }
 
 export const FormikServiceFields = () => {
-  const [category, setCategory] = useState<string>()
+  const [category, setCategory] = useState<ServiceCategory>()
   const { setFieldValue, isSubmitting } = useFormikContext<ServiceCreate>()
 
   const onCategoryChange = (e, data) => {
@@ -121,7 +117,7 @@ export const FormikServiceFields = () => {
       />
       {category && (
         <>
-          {category == ServiceCategory.Discrete ? (
+          {category == 'DISCRETE' ? (
             <FormikDiscreteServiceFields />
           ) : (
             <FormikOngoingServiceFields />
