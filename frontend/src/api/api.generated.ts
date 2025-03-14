@@ -926,10 +926,21 @@ export type SharepointDocument = {
   size: number;
   is_file: boolean;
 };
+export type ServiceCategory = "DISCRETE" | "ONGOING";
+export type ServiceTypeDiscrete =
+  | "LEGAL_ADVICE"
+  | "LEGAL_TASK"
+  | "GENERAL_INFORMATION"
+  | "GENERAL_REFERRAL_SIMPLE"
+  | "GENERAL_REFERRAL_FACILITATED";
+export type ServiceTypeOngoing =
+  | "LEGAL_SUPPORT"
+  | "REPRESENTATION_COURT_TRIBUNAL"
+  | "REPRESENTATION_OTHER";
 export type ServiceBase = {
   issue_id: string;
-  category: string;
-  type: string;
+  category: ServiceCategory;
+  type: ServiceTypeDiscrete | ServiceTypeOngoing;
   started_at: string;
   finished_at: string | null;
   count: number | null;

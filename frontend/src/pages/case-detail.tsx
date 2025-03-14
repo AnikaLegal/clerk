@@ -40,19 +40,17 @@ import {
   ReviewForm,
   ServiceForm,
 } from 'forms'
-import { CaseDetailFormProps, CaseFormChoices, UserPermission } from 'types'
+import { CaseDetailFormProps, UserPermission } from 'types'
 import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: CaseFormChoices
   urls: CaseTabUrls
   user: UserPermission
 }
 
 const {
   case_pk,
-  choices,
   urls,
   user: permissions,
 } = (window as any).REACT_CONTEXT as DjangoContext
@@ -190,7 +188,6 @@ const App = () => {
         <div className="column">
           {activeFormId && (
             <ActiveForm
-              choices={choices}
               issue={issue}
               onCancel={() => setActiveFormId(null)}
             />

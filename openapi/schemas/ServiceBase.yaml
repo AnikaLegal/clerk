@@ -4,9 +4,11 @@ properties:
     type: string
     format: uuid
   category:
-    type: string
+    $ref: ./ServiceCategory.yaml
   type:
-    type: string
+    oneOf:
+    - $ref: ./ServiceTypeDiscrete.yaml
+    - $ref: ./ServiceTypeOngoing.yaml
   started_at:
     type: string
   finished_at:
