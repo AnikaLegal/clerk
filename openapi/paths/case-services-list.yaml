@@ -11,12 +11,14 @@ get:
     - name: category
       in: query
       schema:
-        type: string
+        $ref: ../schemas/ServiceCategory.yaml
       required: false
     - name: type
       in: query
       schema:
-        type: string
+        oneOf:
+          - $ref: ../schemas/ServiceTypeDiscrete.yaml
+          - $ref: ../schemas/ServiceTypeOngoing.yaml
       required: false
   responses:
     "200":

@@ -16,7 +16,6 @@ import {
 import { CaseDetailFormProps } from 'types/case'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
-import { ServiceCategory } from './case-service'
 
 const OUTCOME_OPTIONS = Object.entries(OUTCOMES).map(([k, v]) => ({
   key: k,
@@ -39,7 +38,7 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
 
   const servicesResult = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: ServiceCategory.Ongoing,
+    category: "ONGOING",
   })
   const isLoadingServices = servicesResult.isLoading
 

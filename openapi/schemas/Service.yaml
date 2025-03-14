@@ -4,5 +4,9 @@ allOf:
     properties:
       id:
         type: integer
+      issue_id:
+        type: string
+        format: uuid
     required:
       - id
+      - issue_id
