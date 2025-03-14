@@ -1,4 +1,6 @@
 import { Link, RichTextEditor, RichTextEditorProps } from '@mantine/tiptap'
+import Highlight from '@tiptap/extension-highlight'
+import Underline from '@tiptap/extension-underline'
 import { useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useEffect } from 'react'
@@ -23,12 +25,14 @@ export const RichTextDisplay = ({
           target: null,
         },
       }),
+      Highlight,
+      Underline,
     ],
     editable: false,
   })
 
   useEffect(() => {
-      editor?.commands.setContent(content ?? '')
+    editor?.commands.setContent(content ?? '')
   }, [editor, content])
 
   return (

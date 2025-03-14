@@ -2,6 +2,7 @@ import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import api, { Issue, Service, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { RichTextDisplay } from 'comps/rich-text'
+import { DISCRETE_SERVICE_TYPES, ONGOING_SERVICE_TYPES } from 'consts'
 import { Formik, FormikHelpers } from 'formik'
 import {
   FormikDiscreteServiceFields,
@@ -24,25 +25,15 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { CaseFormServiceChoices } from 'types/case'
 import { UserInfo } from 'types/global'
-import {
-  choiceToMap,
-  filterEmpty,
-  getAPIErrorMessage,
-  getAPIFormErrors,
-  mount,
-} from 'utils'
+import { filterEmpty, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: CaseFormServiceChoices
   urls: CaseTabUrls
   user: UserInfo
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_DISCRETE)
-const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ONGOING)
 
 const App = () => {
   const caseId = CONTEXT.case_pk
@@ -60,18 +51,10 @@ const App = () => {
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
       <Segment basic>
-        <DiscreteServices
-          issue={issue}
-          canChange={canChange}
-          choices={CONTEXT.choices}
-        />
+        <DiscreteServices issue={issue} canChange={canChange} />
       </Segment>
       <Segment basic>
-        <OngoingServices
-          issue={issue}
-          canChange={canChange}
-          choices={CONTEXT.choices}
-        />
+        <OngoingServices issue={issue} canChange={canChange} />
       </Segment>
     </Container>
   )
@@ -80,7 +63,6 @@ const App = () => {
 interface ServiceProps {
   issue: Issue
   canChange: boolean
-  choices: CaseFormServiceChoices
 }
 
 interface ServiceTableProps {
@@ -89,19 +71,13 @@ interface ServiceTableProps {
   fields: React.ReactNode
 }
 
-export const DiscreteServices = ({
-  issue,
-  canChange,
-  choices,
-}: ServiceProps) => {
+export const DiscreteServices = ({ issue, canChange }: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Discrete,
     count: 1,
     started_at: '',
   } as ServiceCreate
-  const fields: React.ReactNode = (
-    <FormikDiscreteServiceFields choices={choices} />
-  )
+  const fields: React.ReactNode = <FormikDiscreteServiceFields />
 
   return (
     <>
@@ -168,7 +144,7 @@ export const DiscreteServicesTable = ({
       <Table.Body>
         {result.data.map((service) => (
           <Table.Row key={service.id}>
-            <Table.Cell>{DISCRETE_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{DISCRETE_SERVICE_TYPES[service.type]}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>
@@ -190,19 +166,13 @@ export const DiscreteServicesTable = ({
   )
 }
 
-export const OngoingServices = ({
-  issue,
-  canChange,
-  choices,
-}: ServiceProps) => {
+export const OngoingServices = ({ issue, canChange }: ServiceProps) => {
   const initialValues = {
     category: ServiceCategory.Ongoing,
     started_at: '',
     finished_at: '',
   } as ServiceCreate
-  const fields: React.ReactNode = (
-    <FormikOngoingServiceFields choices={choices} />
-  )
+  const fields: React.ReactNode = <FormikOngoingServiceFields />
 
   return (
     <>
@@ -268,7 +238,7 @@ export const OngoingServicesTable = ({
       <Table.Body>
         {result.data.map((service) => (
           <Table.Row key={service.id}>
-            <Table.Cell>{ONGOING_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{ONGOING_SERVICE_TYPES[service.type]}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>

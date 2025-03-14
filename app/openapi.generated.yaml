@@ -2253,6 +2253,25 @@ components:
         - id
         - size
         - is_file
+    ServiceCategory:
+      type: string
+      enum:
+        - DISCRETE
+        - ONGOING
+    ServiceTypeDiscrete:
+      type: string
+      enum:
+        - LEGAL_ADVICE
+        - LEGAL_TASK
+        - GENERAL_INFORMATION
+        - GENERAL_REFERRAL_SIMPLE
+        - GENERAL_REFERRAL_FACILITATED
+    ServiceTypeOngoing:
+      type: string
+      enum:
+        - LEGAL_SUPPORT
+        - REPRESENTATION_COURT_TRIBUNAL
+        - REPRESENTATION_OTHER
     ServiceBase:
       type: object
       properties:
@@ -2260,9 +2279,11 @@ components:
           type: string
           format: uuid
         category:
-          type: string
+          $ref: "#/components/schemas/ServiceCategory"
         type:
-          type: string
+          oneOf:
+            - $ref: "#/components/schemas/ServiceTypeDiscrete"
+            - $ref: "#/components/schemas/ServiceTypeOngoing"
         started_at:
           type: string
         finished_at:

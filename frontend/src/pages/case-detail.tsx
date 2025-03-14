@@ -40,27 +40,25 @@ import {
   ReviewForm,
   ServiceForm,
 } from 'forms'
-import { CaseDetailFormProps, CaseFormChoices } from 'types/case'
+import { CaseDetailFormProps } from 'types/case'
 import { UserInfo } from 'types/global'
 import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: CaseFormChoices
   urls: CaseTabUrls
   user: UserInfo
 }
 
 const {
   case_pk,
-  choices,
   urls,
   user: permissions,
 } = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const { enqueueSnackbar } = useSnackbar()
-  const [activeFormId, setActiveFormId] = useState(null)
+  const [activeFormId, setActiveFormId] = useState<string | null>(null)
   const [showSystemNotes, setShowSystemNotes] = useState(true)
   const [_updateTenancy, updateTenancyResult] = useUpdateTenancyMutation()
   const [_updateCase, updateCaseResult] = useUpdateCaseMutation()
@@ -191,7 +189,6 @@ const App = () => {
         <div className="column">
           {activeFormId && (
             <ActiveForm
-              choices={choices}
               issue={issue}
               onCancel={() => setActiveFormId(null)}
             />

@@ -99,13 +99,6 @@ def case_detail_page_view(request, pk):
     issue = get_object_or_404(Issue, pk=pk)
     context = {
         "case_pk": pk,
-        "choices": {
-            "service": {
-                "category": ServiceCategory.choices,
-                "type_DISCRETE": DiscreteServiceType.choices,
-                "type_ONGOING": OngoingServiceType.choices,
-            },
-        },
         "urls": get_detail_urls(issue),
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
@@ -132,11 +125,6 @@ def case_detail_services_page_view(request, pk):
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
-        "choices": {
-            "category": ServiceCategory.choices,
-            "type_DISCRETE": DiscreteServiceType.choices,
-            "type_ONGOING": OngoingServiceType.choices,
-        },
     }
     return render_react_page(request, f"Case {issue.fileref}", "service-list", context)
 

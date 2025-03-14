@@ -3,12 +3,17 @@ import api, {
   useAppDispatch,
   useCreateCaseServiceMutation,
 } from 'api'
+import {
+  DISCRETE_SERVICE_TYPES,
+  ONGOING_SERVICE_TYPES,
+  SERVICE_CATEGORIES,
+} from 'consts'
 import { Formik, FormikHelpers, useFormikContext } from 'formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { Button, Form, Header, Segment } from 'semantic-ui-react'
-import { CaseDetailFormProps, CaseFormServiceChoices } from 'types/case'
-import { choiceToOptions, filterEmpty, getAPIFormErrors } from 'utils'
+import { CaseDetailFormProps } from 'types/case'
+import { filterEmpty, getAPIFormErrors } from 'utils'
 import {
   DateInputField,
   DropdownField,
@@ -21,11 +26,7 @@ export enum ServiceCategory {
   Ongoing = 'ONGOING',
 }
 
-export const ServiceForm = ({
-  issue,
-  onCancel,
-  choices,
-}: CaseDetailFormProps) => {
+export const ServiceForm = ({ issue, onCancel }: CaseDetailFormProps) => {
   const [createService] = useCreateCaseServiceMutation()
   const dispatch = useAppDispatch()
 
@@ -70,7 +71,7 @@ export const ServiceForm = ({
               onSubmit={handleSubmit}
               error={Object.keys(errors).length > 0}
             >
-              <FormikServiceFields choices={choices.service} />
+              <FormikServiceFields />
               <div style={{ marginTop: '1rem' }}>
                 <Button
                   loading={isSubmitting}
@@ -92,11 +93,7 @@ export const ServiceForm = ({
   )
 }
 
-export const FormikServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
+export const FormikServiceFields = () => {
   const [category, setCategory] = useState<string>()
   const { setFieldValue, isSubmitting } = useFormikContext<ServiceCreate>()
 
@@ -115,15 +112,19 @@ export const FormikServiceFields = ({
         label="Category"
         placeholder="Select the service category"
         loading={isSubmitting}
-        options={choiceToOptions(choices.category)}
+        options={Object.entries(SERVICE_CATEGORIES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
         onChange={onCategoryChange}
       />
       {category && (
         <>
           {category == ServiceCategory.Discrete ? (
-            <FormikDiscreteServiceFields choices={choices} />
+            <FormikDiscreteServiceFields />
           ) : (
-            <FormikOngoingServiceFields choices={choices} />
+            <FormikOngoingServiceFields />
           )}
         </>
       )}
@@ -131,11 +132,7 @@ export const FormikServiceFields = ({
   )
 }
 
-export const FormikDiscreteServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
+export const FormikDiscreteServiceFields = () => {
   const { values } = useFormikContext<ServiceCreate>()
 
   return (
@@ -145,9 +142,11 @@ export const FormikDiscreteServiceFields = ({
         name="type"
         label="Type"
         placeholder="Select the service type"
-        options={choiceToOptions(
-          choices['type_' + values.category.toUpperCase()]
-        )}
+        options={Object.entries(DISCRETE_SERVICE_TYPES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
       />
       <DateInputField
         required
@@ -162,11 +161,7 @@ export const FormikDiscreteServiceFields = ({
   )
 }
 
-export const FormikOngoingServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
+export const FormikOngoingServiceFields = () => {
   const { values } = useFormikContext<ServiceCreate>()
 
   return (
@@ -176,9 +171,11 @@ export const FormikOngoingServiceFields = ({
         name="type"
         label="Type"
         placeholder="Select the service type"
-        options={choiceToOptions(
-          choices['type_' + values.category.toUpperCase()]
-        )}
+        options={Object.entries(ONGOING_SERVICE_TYPES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
       />
       <DateInputField
         required
