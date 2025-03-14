@@ -1,35 +1,28 @@
 import api, {
+  ServiceCategory,
   ServiceCreate,
   useAppDispatch,
   useCreateCaseServiceMutation,
 } from 'api'
-import DateInput from 'comps/date-input'
-import { RichTextArea } from 'comps/rich-text'
-import { Field, Formik, FormikHelpers, useFormikContext } from 'formik'
+import {
+  DISCRETE_SERVICE_TYPES,
+  ONGOING_SERVICE_TYPES,
+  SERVICE_CATEGORIES,
+} from 'consts'
+import { Formik, FormikHelpers, useFormikContext } from 'formik'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
+import { Button, Form, Header, Segment } from 'semantic-ui-react'
+import { CaseDetailFormProps } from 'types'
+import { filterEmpty, getAPIFormErrors } from 'utils'
 import {
-  Button,
-  Dropdown,
-  Form,
-  Header,
-  Input,
-  Message,
-  Segment,
-} from 'semantic-ui-react'
-import { CaseDetailFormProps, CaseFormServiceChoices } from 'types'
-import { choiceToOptions, filterEmpty, getAPIFormErrors } from 'utils'
+  DateInputField,
+  DropdownField,
+  InputField,
+  RichTextAreaField,
+} from './formik'
 
-export enum ServiceCategory {
-  Discrete = 'DISCRETE',
-  Ongoing = 'ONGOING',
-}
-
-export const ServiceForm = ({
-  issue,
-  onCancel,
-  choices,
-}: CaseDetailFormProps) => {
+export const ServiceForm = ({ issue, onCancel }: CaseDetailFormProps) => {
   const [createService] = useCreateCaseServiceMutation()
   const dispatch = useAppDispatch()
 
@@ -74,9 +67,8 @@ export const ServiceForm = ({
               onSubmit={handleSubmit}
               error={Object.keys(errors).length > 0}
             >
-              <FormikServiceFields choices={choices.service} />
+              <FormikServiceFields />
               <div style={{ marginTop: '1rem' }}>
-                <FormikServiceErrorMessages />
                 <Button
                   loading={isSubmitting}
                   disabled={isSubmitting || !values.category}
@@ -97,52 +89,38 @@ export const ServiceForm = ({
   )
 }
 
-export const FormikServiceErrorMessages = () => {
-  const { errors } = useFormikContext<ServiceCreate>()
-  return (
-    <>
-      {Object.entries(errors).map(([k, v]) => (
-        <Message error key={k}>
-          {k != 'non_field_errors' && <div className="header">{k}</div>}
-          <p>{v}</p>
-        </Message>
-      ))}
-    </>
-  )
-}
-
-export const FormikServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
-  const [category, setCategory] = useState<string>()
+export const FormikServiceFields = () => {
+  const [category, setCategory] = useState<ServiceCategory>()
   const { setFieldValue, isSubmitting } = useFormikContext<ServiceCreate>()
 
+  const onCategoryChange = (e, data) => {
+    setCategory(data.value)
+    setFieldValue('category', data.value)
+    setFieldValue('type', '')
+    setFieldValue('count', 1)
+  }
+
   return (
     <>
-      <Field
-        as={Dropdown}
-        fluid
-        selection
+      <DropdownField
+        required
         name="category"
+        label="Category"
+        placeholder="Select the service category"
         loading={isSubmitting}
-        placeholder="Service category"
-        options={choiceToOptions(choices.category)}
-        onChange={(e, data) => {
-          setCategory(data.value)
-          setFieldValue('category', data.value)
-          setFieldValue('type', '')
-          setFieldValue('count', 1)
-        }}
-        style={{ marginBottom: '1rem' }}
+        options={Object.entries(SERVICE_CATEGORIES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
+        onChange={onCategoryChange}
       />
       {category && (
         <>
-          {category == ServiceCategory.Discrete ? (
-            <FormikDiscreteServiceFields choices={choices} />
+          {category == 'DISCRETE' ? (
+            <FormikDiscreteServiceFields />
           ) : (
-            <FormikOngoingServiceFields choices={choices} />
+            <FormikOngoingServiceFields />
           )}
         </>
       )}
@@ -150,108 +128,65 @@ export const FormikServiceFields = ({
   )
 }
 
-export const FormikDiscreteServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
-  const { setFieldValue, isSubmitting, values } =
-    useFormikContext<ServiceCreate>()
-  const handleChange = (e, { name, value }) => setFieldValue(name, value, false)
+export const FormikDiscreteServiceFields = () => {
+  const { values } = useFormikContext<ServiceCreate>()
 
   return (
     <>
-      <Dropdown
-        fluid
-        selection
+      <DropdownField
+        required
         name="type"
-        loading={isSubmitting}
-        placeholder="Service type"
-        options={choiceToOptions(
-          choices['type_' + values.category.toUpperCase()]
-        )}
-        onChange={handleChange}
-        value={values.type}
+        label="Type"
+        placeholder="Select the service type"
+        options={Object.entries(DISCRETE_SERVICE_TYPES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
       />
-      <DateInput
+      <DateInputField
+        required
         name="started_at"
+        label="Date"
         dateFormat="DD/MM/YYYY"
         autoComplete="off"
-        placeholder="Date"
-        onChange={handleChange}
-        value={values.started_at}
-        style={{ marginTop: '1rem' }}
       />
-      <Input
-        fluid
-        name="count"
-        type="number"
-        min="1"
-        placeholder="Count"
-        onChange={handleChange}
-        value={values.count}
-        style={{ marginBottom: '1rem' }}
-      />
-      <RichTextArea
-        disabled={isSubmitting}
-        placeholder="Notes"
-        onUpdate={({ editor }) =>
-          setFieldValue('notes', editor.isEmpty ? '' : editor.getHTML())
-        }
-        initialContent={values.notes}
-      />
+      <InputField required name="count" label="Count" type="number" min="1" />
+      <RichTextAreaField name="notes" label="Notes" />
     </>
   )
 }
 
-export const FormikOngoingServiceFields = ({
-  choices,
-}: {
-  choices: CaseFormServiceChoices
-}) => {
-  const { setFieldValue, isSubmitting, values } =
-    useFormikContext<ServiceCreate>()
-  const handleChange = (e, { name, value }) => setFieldValue(name, value, false)
+export const FormikOngoingServiceFields = () => {
+  const { values } = useFormikContext<ServiceCreate>()
 
   return (
     <>
-      <Dropdown
-        fluid
-        selection
+      <DropdownField
+        required
         name="type"
-        loading={isSubmitting}
-        placeholder="Service type"
-        options={choiceToOptions(
-          choices['type_' + values.category.toUpperCase()]
-        )}
-        onChange={handleChange}
-        value={values.type}
+        label="Type"
+        placeholder="Select the service type"
+        options={Object.entries(ONGOING_SERVICE_TYPES).map(([key, value]) => ({
+          key: key,
+          text: value,
+          value: key,
+        }))}
       />
-      <DateInput
+      <DateInputField
+        required
         name="started_at"
+        label="Start date"
         dateFormat="DD/MM/YYYY"
         autoComplete="off"
-        placeholder="Start date"
-        onChange={handleChange}
-        value={values.started_at}
-        style={{ marginTop: '1rem' }}
       />
-      <DateInput
+      <DateInputField
         name="finished_at"
+        label="Finish date"
         dateFormat="DD/MM/YYYY"
         autoComplete="off"
-        placeholder="Finish date"
-        onChange={handleChange}
-        value={values.finished_at}
       />
-      <RichTextArea
-        disabled={isSubmitting}
-        placeholder="Notes"
-        onUpdate={({ editor }) =>
-          setFieldValue('notes', editor.isEmpty ? '' : editor.getHTML())
-        }
-        initialContent={values.notes}
-      />
+      <RichTextAreaField name="notes" label="Notes" />
     </>
   )
 }

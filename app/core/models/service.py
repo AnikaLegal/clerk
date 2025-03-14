@@ -43,7 +43,7 @@ class Service(TimestampedModel):
     category = models.CharField(max_length=32, choices=ServiceCategory)
     type = models.CharField(
         max_length=64,
-        choices=DiscreteServiceType.choices + OngoingServiceType.choices,
+        choices=list(DiscreteServiceType.choices) + list(OngoingServiceType.choices),
     )
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
     started_at = models.DateField()

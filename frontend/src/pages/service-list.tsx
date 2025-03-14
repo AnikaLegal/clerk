@@ -2,12 +2,11 @@ import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import api, { Issue, Service, ServiceCreate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { RichTextDisplay } from 'comps/rich-text'
+import { DISCRETE_SERVICE_TYPES, ONGOING_SERVICE_TYPES } from 'consts'
 import { Formik, FormikHelpers } from 'formik'
 import {
   FormikDiscreteServiceFields,
   FormikOngoingServiceFields,
-  FormikServiceErrorMessages,
-  ServiceCategory,
 } from 'forms/case-service'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -25,40 +24,36 @@ import {
   Segment,
   Table,
 } from 'semantic-ui-react'
-import { CaseFormServiceChoices } from 'types'
-import {
-  choiceToMap,
-  filterEmpty,
-  getAPIErrorMessage,
-  getAPIFormErrors,
-  mount,
-} from 'utils'
+import { UserPermission } from 'types'
+import { filterEmpty, getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
-  choices: CaseFormServiceChoices
   urls: CaseTabUrls
+  user: UserPermission
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const DISCRETE_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_DISCRETE)
-const ONGOING_TYPE_LABELS = choiceToMap(CONTEXT.choices.type_ONGOING)
 
 const App = () => {
   const caseId = CONTEXT.case_pk
   const urls = CONTEXT.urls
+  const user = CONTEXT.user
 
   const caseResult = api.useGetCaseQuery({ id: caseId })
-  if (caseResult.isFetching) return null
+  if (caseResult.isFetching || !caseResult.data) {
+    return null
+  }
+  const issue = caseResult.data.issue
+  const canChange = issue.is_open || user.is_coordinator_or_better
 
-  const issue = caseResult.data!.issue
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.SERVICES} urls={urls} />
       <Segment basic>
-        <DiscreteServices issue={issue} choices={CONTEXT.choices} />
+        <DiscreteServices issue={issue} canChange={canChange} />
       </Segment>
       <Segment basic>
-        <OngoingServices issue={issue} choices={CONTEXT.choices} />
+        <OngoingServices issue={issue} canChange={canChange} />
       </Segment>
     </Container>
   )
@@ -66,23 +61,24 @@ const App = () => {
 
 interface ServiceProps {
   issue: Issue
-  choices: CaseFormServiceChoices
+  canChange: boolean
 }
 
 interface ServiceTableProps {
   issue: Issue
+  canChange: boolean
   fields: React.ReactNode
 }
 
-export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
-  const initialValues = {
-    category: ServiceCategory.Discrete,
+export const DiscreteServices = ({ issue, canChange }: ServiceProps) => {
+  const initialValues: ServiceCreate = {
+    category: 'DISCRETE',
+    // @ts-expect-error
+    type: '',
     count: 1,
     started_at: '',
-  } as ServiceCreate
-  const fields: React.ReactNode = (
-    <FormikDiscreteServiceFields choices={choices} />
-  )
+  }
+  const fields: React.ReactNode = <FormikDiscreteServiceFields />
 
   return (
     <>
@@ -91,7 +87,7 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Discrete services</Header>
           </Grid.Column>
-          {issue.is_open && (
+          {canChange && (
             <Grid.Column style={{ width: 'auto' }}>
               <AddServiceButton
                 floated="right"
@@ -106,26 +102,35 @@ export const DiscreteServices = ({ issue, choices }: ServiceProps) => {
           )}
         </Grid.Row>
       </Grid>
-      <DiscreteServicesTable issue={issue} fields={fields} />
+      <DiscreteServicesTable
+        issue={issue}
+        canChange={canChange}
+        fields={fields}
+      />
     </>
   )
 }
 
-export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
+export const DiscreteServicesTable = ({
+  issue,
+  canChange,
+  fields,
+}: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: ServiceCategory.Discrete,
+    category: 'DISCRETE',
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (result.data.length == 0) {
+  if (!result.data || result.data.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No discrete services exist for this case.</p>
       </Segment>
     )
   }
+
   return (
     <Table celled>
       <Table.Header>
@@ -134,19 +139,19 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Date</Table.HeaderCell>
           <Table.HeaderCell>Count</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
+          {canChange && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {result.data.map((service) => (
           <Table.Row key={service.id}>
-            <Table.Cell>{DISCRETE_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{DISCRETE_SERVICE_TYPES[service.type]}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.count}</Table.Cell>
             <Table.Cell>
-              <RichTextDisplay content={service.notes} />
+              <RichTextDisplay content={service.notes || ''} />
             </Table.Cell>
-            {issue.is_open && (
+            {canChange && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
                   issue={issue}
@@ -162,15 +167,15 @@ export const DiscreteServicesTable = ({ issue, fields }: ServiceTableProps) => {
   )
 }
 
-export const OngoingServices = ({ issue, choices }: ServiceProps) => {
-  const initialValues = {
-    category: ServiceCategory.Ongoing,
+export const OngoingServices = ({ issue, canChange }: ServiceProps) => {
+  const initialValues: ServiceCreate = {
+    category: 'ONGOING',
+    // @ts-expect-error
+    type: '',
     started_at: '',
     finished_at: '',
-  } as ServiceCreate
-  const fields: React.ReactNode = (
-    <FormikOngoingServiceFields choices={choices} />
-  )
+  }
+  const fields: React.ReactNode = <FormikOngoingServiceFields />
 
   return (
     <>
@@ -179,7 +184,7 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           <Grid.Column style={{ flexGrow: '1' }}>
             <Header as="h2">Ongoing services</Header>
           </Grid.Column>
-          {issue.is_open && (
+          {canChange && (
             <Grid.Column style={{ width: 'auto' }}>
               <AddServiceButton
                 floated="right"
@@ -194,20 +199,28 @@ export const OngoingServices = ({ issue, choices }: ServiceProps) => {
           )}
         </Grid.Row>
       </Grid>
-      <OngoingServicesTable issue={issue} fields={fields} />
+      <OngoingServicesTable
+        issue={issue}
+        canChange={canChange}
+        fields={fields}
+      />
     </>
   )
 }
 
-export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
+export const OngoingServicesTable = ({
+  issue,
+  canChange,
+  fields,
+}: ServiceTableProps) => {
   const result = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: ServiceCategory.Ongoing,
+    category: 'ONGOING',
   })
   if (result.isLoading) {
     return <Loader active inline="centered" />
   }
-  if (result.data.length == 0) {
+  if (!result.data || result.data.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No ongoing services exist for this case.</p>
@@ -222,19 +235,19 @@ export const OngoingServicesTable = ({ issue, fields }: ServiceTableProps) => {
           <Table.HeaderCell>Start date</Table.HeaderCell>
           <Table.HeaderCell>Finish date</Table.HeaderCell>
           <Table.HeaderCell>Notes</Table.HeaderCell>
-          {issue.is_open && <Table.HeaderCell></Table.HeaderCell>}
+          {canChange && <Table.HeaderCell></Table.HeaderCell>}
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {result.data.map((service) => (
           <Table.Row key={service.id}>
-            <Table.Cell>{ONGOING_TYPE_LABELS.get(service.type)}</Table.Cell>
+            <Table.Cell>{ONGOING_SERVICE_TYPES[service.type]}</Table.Cell>
             <Table.Cell>{service.started_at}</Table.Cell>
             <Table.Cell>{service.finished_at}</Table.Cell>
             <Table.Cell>
-              <RichTextDisplay content={service.notes} />
+              <RichTextDisplay content={service.notes || ''} />
             </Table.Cell>
-            {issue.is_open && (
+            {canChange && (
               <Table.Cell collapsing textAlign="center">
                 <ServiceActionIcons
                   issue={issue}
@@ -473,7 +486,6 @@ export const ServiceModal = ({
                 error={Object.keys(errors).length > 0}
               >
                 {fields}
-                <FormikServiceErrorMessages />
               </Form>
             </Modal.Content>
             <Modal.Actions>
