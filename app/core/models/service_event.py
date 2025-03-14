@@ -15,6 +15,8 @@ class _ServiceSerializer(serializers.ModelSerializer):
         model = Service
         fields = "__all__"
 
+    issue = serializers.PrimaryKeyRelatedField(read_only=True)
+
 
 class EventType(models.TextChoices):
     CREATE = "CREATE", "Service created"
@@ -38,7 +40,8 @@ class ServiceEvent(TimestampedModel):
     service_at_event = models.JSONField(encoder=DjangoJSONEncoder)
 
     def save(self, *args, **kwargs):
-        self.service_at_event = _ServiceSerializer(self.service).data
+        serializer = _ServiceSerializer(self.service)
+        self.service_at_event = serializer.data
         return super().save(*args, **kwargs)
 
     def get_text(self) -> str:
