@@ -57,7 +57,7 @@ const {
 
 const App = () => {
   const { enqueueSnackbar } = useSnackbar()
-  const [activeFormId, setActiveFormId] = useState(null)
+  const [activeFormId, setActiveFormId] = useState<string | null>(null)
   const [showSystemNotes, setShowSystemNotes] = useState(true)
   const [_updateTenancy, updateTenancyResult] = useUpdateTenancyMutation()
   const [_updateCase, updateCaseResult] = useUpdateCaseMutation()
