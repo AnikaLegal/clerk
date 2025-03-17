@@ -31,7 +31,7 @@ class Tenancy(TimestampedModel):
     postcode = models.CharField(max_length=6, null=True, blank=True)
     started = models.DateTimeField(null=True, blank=True)
     is_on_lease = models.CharField(
-        max_length=32, choices=LeaseType.choices, blank=True, null=True
+        max_length=32, choices=LeaseType.choices, blank=True, default=""
     )
     rental_circumstances = models.CharField(
         max_length=32, choices=RentalType.choices, blank=True, default=""
