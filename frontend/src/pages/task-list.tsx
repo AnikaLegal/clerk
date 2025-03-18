@@ -188,7 +188,7 @@ const App = () => {
               <Table.HeaderCell colSpan={2} textAlign="center">
                 Case
               </Table.HeaderCell>
-              <Table.HeaderCell colSpan={7} textAlign="center">
+              <Table.HeaderCell colSpan={8} textAlign="center">
                 Task
               </Table.HeaderCell>
             </Table.Row>
