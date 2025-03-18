@@ -1,5 +1,5 @@
 import api, { GetTasksApiArg, TaskList } from 'api'
-import { TaskDueDateTableCell } from 'comps/task'
+import { TaskAssignedToNode, TaskDueDateTableCell } from 'comps/task'
 import { TaskApprovalTableCell } from 'comps/task/task-approval-table-cell'
 import { FadeTransition } from 'comps/transitions'
 import { CASE_TOPICS, TASK_IS_OPEN, TASK_STATUSES, TASK_TYPES } from 'consts'
@@ -222,11 +222,7 @@ const App = () => {
                 </Table.Cell>
                 <Table.Cell>{TASK_TYPES[task.type]}</Table.Cell>
                 <Table.Cell>
-                  {task.assigned_to && (
-                    <a href={task.assigned_to.url}>
-                      {task.assigned_to.full_name}
-                    </a>
-                  )}
+                  <TaskAssignedToNode task={task} />
                 </Table.Cell>
                 <Table.Cell>{TASK_STATUSES[task.status]}</Table.Cell>
                 <TaskApprovalTableCell task={task} />

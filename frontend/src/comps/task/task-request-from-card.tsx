@@ -10,6 +10,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 import { getTaskApprovalText } from './task-approval-table-cell'
+import { TaskAssignedToNode } from './task-assigned-to-node'
 
 interface TaskRequestFromProps {
   request: TaskRequest
@@ -67,11 +68,7 @@ const RequestingTask = ({ isLoading, isError, task }: RequestingTaskProps) => {
       <Grid.Row columns={2}>
         <Grid.Column>
           <Header sub>Assigned to</Header>
-          {task.assigned_to ? (
-            <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
-          ) : (
-            '-'
-          )}
+          <TaskAssignedToNode task={task} />
         </Grid.Column>
         <Grid.Column>
           <Header sub>Approval?</Header>

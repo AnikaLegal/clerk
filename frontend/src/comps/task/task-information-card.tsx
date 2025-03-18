@@ -3,14 +3,13 @@ import { TASK_STATUSES } from 'consts'
 import moment from 'moment'
 import React from 'react'
 import { Card, Grid, Header } from 'semantic-ui-react'
+import { TaskAssignedToNode } from './task-assigned-to-node'
 
 interface TaskInformationCardProps {
   task: Task
 }
 
-export const TaskInformationCard = ({
-  task,
-}: TaskInformationCardProps) => {
+export const TaskInformationCard = ({ task }: TaskInformationCardProps) => {
   return (
     <Card fluid>
       <Card.Content header="Task information" />
@@ -19,11 +18,7 @@ export const TaskInformationCard = ({
           <Grid.Row columns={2}>
             <Grid.Column>
               <Header sub>Assigned to</Header>
-              {task.assigned_to ? (
-                <a href={task.assigned_to.url}>{task.assigned_to.full_name}</a>
-              ) : (
-                '-'
-              )}
+              <TaskAssignedToNode task={task} />
             </Grid.Column>
             <Grid.Column>
               <Header sub>Status</Header>

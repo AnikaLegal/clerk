@@ -7,6 +7,7 @@ import {
   getTaskApprovalColor,
   TaskApprovalTableCell,
 } from './task-approval-table-cell'
+import { TaskAssignedToNode } from './task-assigned-to-node'
 import { TaskDueDateTableCell } from './task-due-date-table-cell'
 import { TaskInformationCard } from './task-information-card'
 import { TaskRequestFromCard } from './task-request-from-card'
@@ -19,6 +20,7 @@ export {
   TaskActivityGroup,
   TaskApprovalActionCard,
   TaskApprovalTableCell,
+  TaskAssignedToNode,
   TaskDueDateTableCell,
   TaskInformationCard,
   TaskRequestFromCard,
