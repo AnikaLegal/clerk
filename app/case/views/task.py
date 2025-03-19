@@ -120,6 +120,9 @@ class TaskApiViewset(ModelViewSet):
             # should only be able to see the tasks related to cases of which
             # they are the assigned paralegal.
             queryset = queryset.filter(issue__paralegal=user)
+        elif user.is_lawyer:
+            # Lawyers can see all tasks for their assigned cases.
+            queryset = queryset.filter(issue__lawyer=user)
         elif not user.is_coordinator_or_better:
             # No permissions if you're not a paralegal or coordinator+.
             queryset = queryset.none()

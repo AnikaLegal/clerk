@@ -141,6 +141,7 @@ class CoordinatorOrBetterCanWritePermission(permissions.IsAuthenticated):
         return self.has_permission(request, view)
 
 
+# TODO: remove?
 class LawyerOrBetterPermission(permissions.IsAuthenticated):
     """
     Lawyer or better required.

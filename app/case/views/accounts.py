@@ -94,9 +94,9 @@ class AccountApiViewset(
             queryset = self.sort_queryset(queryset)
             queryset = self.search_queryset(queryset)
 
-            if user.is_paralegal:
-                # Paralegals can only view their own & so-called system
-                # accounts.
+            if user.is_paralegal or user.is_lawyer:
+                # Paralegals & lawyers can only view their own & so-called
+                # system accounts.
                 query = Q(id=user.id)
                 query |= Q(is_system_account=True)
                 queryset = queryset.filter(query)

@@ -503,7 +503,7 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     id: 'performance',
     icon: 'clipboard outline',
     text: 'Add a paralegal performance review note',
-    when: (perms, issue) => perms.is_coordinator_or_better && !!issue.paralegal,
+    when: (perms, issue) => perms.is_lawyer_or_better && !!issue.paralegal,
   },
   {
     id: 'conflict',

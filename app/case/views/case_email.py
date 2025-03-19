@@ -140,6 +140,9 @@ class EmailApiViewset(GenericViewSet):
         if user.is_paralegal:
             # Paralegals can only see assigned cases
             queryset = queryset.filter(paralegal=user)
+        elif user.is_lawyer:
+            # Lawyers can only see assigned cases
+            queryset = queryset.filter(lawyer=user)
         elif not user.is_coordinator_or_better:
             # If you're not a paralegal or coordinator you can't see nuthin.
             queryset = queryset.none()

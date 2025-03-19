@@ -124,7 +124,10 @@ class EmploymentType(models.TextChoices):
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
     # Legacy below - Do not use.
-    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19 (DO NOT USE)"
+    INCOME_REDUCED_COVID = (
+        "INCOME_REDUCED_COVID",
+        "Income reduced due to COVID-19 (DO NOT USE)",
+    )
     UNEMPLOYED = "UNEMPLOYED", "Currently unemployed (DO NOT USE)"
 
 
@@ -248,4 +251,4 @@ class Issue(TimestampedModel):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return self.paralegal == user
+        return self.paralegal == user or self.lawyer == user

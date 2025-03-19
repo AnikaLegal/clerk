@@ -1,8 +1,7 @@
-from django.db import models
-
 from accounts.models import User
+from django.db import models
+from django.db.models import Q
 
-from .client import Client
 from .person import Person
 from .timestamped import TimestampedModel
 
@@ -47,4 +46,5 @@ class Tenancy(TimestampedModel):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return self.issue_set.filter(paralegal=user).exists()
+        filter = Q(paralegal=user) | Q(lawyer=user)
+        return self.issue_set.filter(filter).exists()

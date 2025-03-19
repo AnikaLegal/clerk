@@ -96,6 +96,7 @@ const getAssignedToUsers = (
       (u) =>
         u.id == values.assigned_to_id ||
         u.id == issue.paralegal?.id ||
+        u.id == issue.lawyer?.id ||
         u.is_coordinator_or_better ||
         u.is_system_account
     ),
