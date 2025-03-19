@@ -8,6 +8,7 @@ import React, { useEffect, useState } from 'react'
 import {
   Container,
   Dropdown,
+  DropdownItemProps,
   Form,
   Header,
   Icon,
@@ -48,24 +49,47 @@ const App = () => {
   }
   useEffect(() => search(), [filter])
 
-  const updateFilter = (name: keyof GetTasksApiArg, value) => {
-    var updated = {}
-    if (value === null || value === '') {
-      const { [name]: _, ...remaining } = filter
-      updated = remaining
-    } else {
-      updated = { ...filter, [name]: value }
+  interface IUpdateFilter {
+    name: keyof GetTasksApiArg
+    value: any
+  }
+  const updateFilter = (filters: IUpdateFilter | IUpdateFilter[]) => {
+    var updated = filter
+    filters = Array.isArray(filters) ? filters : [filters]
+    for (const { name, value } of filters) {
+      if (value == null || value === '') {
+        const { [name]: _, ...remaining } = updated
+        updated = remaining
+      } else {
+        updated = { ...updated, [name]: value }
+      }
     }
     setFilter(updated)
   }
 
   const updateQuery = () => {
-    updateFilter('q', debouncedQuery)
+    updateFilter({ name: 'q', value: debouncedQuery })
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
   const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
   const users = userResults.data ?? []
+  const userOptions: DropdownItemProps[] = users.map((u) => ({
+    key: u.id,
+    value: u.id,
+    text: u.email,
+  }))
+  userOptions.push({
+    key: 'SUSPENDED',
+    value: 'SUSPENDED',
+    text: 'SUSPENDED',
+  })
+
+  const assignedToValue = filter.assignedTo
+    ? filter.assignedTo
+    : filter.isSuspended
+      ? 'SUSPENDED'
+      : ''
 
   return (
     <Container>
@@ -106,7 +130,9 @@ const App = () => {
                     value: key,
                     text: value,
                   }))}
-                  onChange={(e, { value }) => updateFilter('isOpen', value)}
+                  onChange={(e, { value }) =>
+                    updateFilter({ name: 'isOpen', value: value })
+                  }
                 />
               </Form.Field>
               <Form.Field>
@@ -115,14 +141,22 @@ const App = () => {
                   fluid
                   search
                   selection
-                  value={filter.assignedTo || ''}
+                  value={assignedToValue}
                   placeholder="Assignee"
-                  options={users.map((u) => ({
-                    key: u.id,
-                    value: u.id,
-                    text: u.email,
-                  }))}
-                  onChange={(e, { value }) => updateFilter('assignedTo', value)}
+                  options={userOptions}
+                  onChange={(e, { value }) => {
+                    if (value === 'SUSPENDED') {
+                      updateFilter([
+                        { name: 'isSuspended', value: true },
+                        { name: 'assignedTo', value: '' },
+                      ])
+                    } else {
+                      updateFilter([
+                        { name: 'isSuspended', value: '' },
+                        { name: 'assignedTo', value: value },
+                      ])
+                    }
+                  }}
                   loading={userResults.isLoading}
                 />
               </Form.Field>
@@ -140,7 +174,9 @@ const App = () => {
                     value: key,
                     text: value,
                   }))}
-                  onChange={(e, { value }) => updateFilter('issueTopic', value)}
+                  onChange={(e, { value }) =>
+                    updateFilter({ name: 'issueTopic', value: value })
+                  }
                 />
               </Form.Field>
               <Form.Field>
@@ -157,7 +193,9 @@ const App = () => {
                       text: value,
                     }))
                     .sort((a, b) => a.text.localeCompare(b.text))}
-                  onChange={(e, { value }) => updateFilter('type', value)}
+                  onChange={(e, { value }) =>
+                    updateFilter({ name: 'type', value: value })
+                  }
                 />
               </Form.Field>
               <Form.Field>
@@ -174,7 +212,9 @@ const App = () => {
                       text: value,
                     })
                   )}
-                  onChange={(e, { value }) => updateFilter('status', value)}
+                  onChange={(e, { value }) =>
+                    updateFilter({ name: 'status', value: value })
+                  }
                 />
               </Form.Field>
             </Form.Group>
