@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0074_alter_serviceevent_event_type"),
+        ("core", "0075_alter_tenancy_is_on_lease"),
     ]
 
     operations = [
