@@ -98,7 +98,7 @@ const getAssignedToUsers = (
         u.id == issue.paralegal?.id ||
         u.id == issue.lawyer?.id ||
         u.is_coordinator_or_better ||
-        u.is_system_account
+        u.email == "coordinators@anikalegal.com"
     ),
     isLoading: false,
   }

@@ -19,7 +19,6 @@ class UserAdmin(BaseUserAdmin):
                 "fields": (
                     "university",
                     "ms_account_created_at",
-                    "is_system_account",
                 )
             },
         ),

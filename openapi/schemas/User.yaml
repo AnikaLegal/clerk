@@ -43,8 +43,6 @@ allOf:
       ms_account_created_at:
         type: string
         nullable: true
-      is_system_account:
-        type: boolean
     required:
       - id
       - case_capacity
@@ -65,4 +63,3 @@ allOf:
       - is_paralegal
       - is_ms_account_set_up
       - ms_account_created_at
-      - is_system_account

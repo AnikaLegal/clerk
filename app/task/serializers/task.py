@@ -9,6 +9,7 @@ from rest_framework import exceptions, serializers
 from task.models.request import TaskRequestStatus, TaskRequestType
 from task.models.task import Task
 from task.models.template import TaskTemplateType
+from task.helpers import get_coordinators_user
 
 from .actions import TaskRequestSerializer
 from .user import TaskListUserSerializer
@@ -165,19 +166,21 @@ class TaskSerializer(serializers.ModelSerializer):
         # - Users with coordinator or greater permissions.
         # - Users assigned as the paralegal on the related case.
         # - Users assigned as the lawyer on the related case.
-        # - Users designated as "system" accounts.
+        # - The coordinators user.
         #
         assigned_to_id = attrs.get("assigned_to_id", None)
         issue_id = attrs.get("issue_id", None)
 
         if assigned_to_id and issue_id:
+            coordinators_user = get_coordinators_user()
+
             filter = Q(id=assigned_to_id) & Q(
                 Q(groups__name__in=COORDINATOR_GROUPS)
                 | Q(is_superuser=True)
-                | Q(is_system_account=True)
+                | Q(id=coordinators_user.pk)
             )
             filter |= Q(issue__id=issue_id, issue__paralegal=assigned_to_id) | Q(
-                lawyer_issue__id=issue_id, lawyer_issue__paralegal=assigned_to_id
+                lawyer_issue__id=issue_id, lawyer_issue__lawyer=assigned_to_id
             )
 
             if not User.objects.filter(filter).exists():

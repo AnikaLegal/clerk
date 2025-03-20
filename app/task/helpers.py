@@ -14,7 +14,6 @@ def get_coordinators_user() -> User:
             "username": "coordinators@anikalegal.com",
             "first_name": "Paralegal",
             "last_name": "Coordinators",
-            "is_system_account": True,
         },
     )
     return user
