@@ -16,7 +16,6 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from task.models.task import TaskStatus
 
 from case.serializers import (
     IssueNoteSerializer,
