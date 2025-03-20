@@ -244,6 +244,7 @@ class TaskApiViewset(ModelViewSet):
     )
     def attachment_delete(self, request, pk, attachment_id):
         task = self.get_object()
+
         attachment = get_object_or_404(task.attachments, pk=attachment_id)
         attachment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -302,8 +303,8 @@ class TaskApiViewset(ModelViewSet):
     )
     def request_update(self, request, pk, request_id):
         task = self.get_object()
-        task_request = get_object_or_404(task.requests, pk=request_id)
 
+        task_request = get_object_or_404(task.requests, pk=request_id)
         if (
             task_request.type == TaskRequestType.APPROVAL
             and not request.user.is_lawyer_or_better
