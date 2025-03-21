@@ -80,6 +80,15 @@ class Task(TimestampedModel, LogDataMixin):
         null=True,
     )
 
+    # The user that created the task, if any.
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
     # If the task was created by the system then this refers to the template
     # used to create the task.
     template = models.ForeignKey(

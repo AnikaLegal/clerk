@@ -129,6 +129,15 @@ class TaskSerializer(serializers.ModelSerializer):
     request = TaskRequestSerializer(read_only=True)
     is_approval_pending = serializers.SerializerMethodField(read_only=True)
 
+    def create(self, validated_data):
+        # Save the user that created the task but don't expose it. We don't use
+        # this presently but I want to have future potential to do so.
+        request = self.context.get("request", None)
+        if request and request.user:
+            validated_data["created_by_id"] = request.user.pk
+
+        return super().create(validated_data)
+
     def get_is_approval_pending(self, obj):
         return (
             obj.requests.filter(type=TaskRequestType.APPROVAL)
