@@ -426,6 +426,8 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/task/`,
         params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
           q: queryArg.q,
           type: queryArg["type"],
           name: queryArg.name,
@@ -583,14 +585,8 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as generatedApi };
-export type GetCasesApiResponse = /** status 200 Successful response. */ {
-  current: number;
-  next: number | null;
-  prev: number | null;
-  page_count: number;
-  item_count: number;
-  results: Issue[];
-};
+export type GetCasesApiResponse =
+  /** status 200 Successful response. */ CaseListResponse;
 export type GetCasesApiArg = {
   page?: number;
   search?: string;
@@ -961,8 +957,10 @@ export type DeleteDocumentTemplateApiArg = {
   id: number;
 };
 export type GetTasksApiResponse =
-  /** status 200 Successful response. */ TaskList[];
+  /** status 200 Successful response. */ TaskListResponse;
 export type GetTasksApiArg = {
+  page?: number;
+  pageSize?: number;
   q?: string;
   type?: string;
   name?: string;
@@ -1078,6 +1076,13 @@ export type DeleteTaskTriggerApiResponse = unknown;
 export type DeleteTaskTriggerApiArg = {
   /** Entity ID */
   id: number;
+};
+export type PaginationBase = {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
 };
 export type IssueBase = {
   topic: string;
@@ -1201,6 +1206,9 @@ export type Issue = IssueBase & {
   is_conflict_check: boolean | null;
   is_eligibility_check: boolean | null;
   next_review: string | null;
+};
+export type CaseListResponse = PaginationBase & {
+  results: Issue[];
 };
 export type IssueNoteBase = {
   note_type: string;
@@ -1401,6 +1409,9 @@ export type TaskList = {
   assigned_to: TaskListUser;
   created_at: string;
   modified_at: string;
+};
+export type TaskListResponse = PaginationBase & {
+  results: TaskList[];
 };
 export type TaskBase = {
   name: string;

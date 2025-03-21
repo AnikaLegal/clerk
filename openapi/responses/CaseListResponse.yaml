@@ -1,0 +1,9 @@
+
+allOf:
+  - $ref: ./PaginationBase.yaml
+  - properties:
+      results:
+        items:
+          $ref: ../schemas/Issue.yaml
+    required:
+      - results

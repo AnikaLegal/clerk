@@ -1,6 +1,16 @@
 get:
   operationId: getTasks
   parameters:
+    - name: page
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
     - name: q
       in: query
       schema:
@@ -52,9 +62,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../schemas/TaskList.yaml
+            $ref: ../responses/TaskListResponse.yaml
 post:
   operationId: createTask
   requestBody:

@@ -20,7 +20,8 @@ def test_task_list_view__with_no_access(user_client: APIClient, user: User):
 
     response = user_client.get(url)
     assert response.status_code == 200
-    assert response.json() == []
+    data = response.json()
+    assert data["results"] == []
     schema_tester.validate_response(response=response)
 
 
@@ -41,7 +42,8 @@ def test_task_list_view__as_paralegal_with_no_access_to_task(
 
     response = user_client.get(url)
     assert response.status_code == 200
-    assert response.json() == []
+    data = response.json()
+    assert data["results"] == []
     schema_tester.validate_response(response=response)
 
 
@@ -63,7 +65,8 @@ def test_task_list_view__as_paralegal_with_no_access_to_issue(
 
     response = user_client.get(url)
     assert response.status_code == 200
-    assert response.json() == []
+    data = response.json()
+    assert data["results"] == []
     schema_tester.validate_response(response=response)
 
 
@@ -85,7 +88,8 @@ def test_task_list_view__as_paralegal_with_access_to_issue_but_no_access_to_task
 
     response = user_client.get(url)
     assert response.status_code == 200
-    assert response.json() == []
+    data = response.json()
+    assert data["results"] == []
     schema_tester.validate_response(response=response)
 
 
@@ -112,7 +116,8 @@ def test_task_list_view__as_paralegal_with_access(
 
     response = user_client.get(url)
     assert response.status_code == 200
-    results = response.json()
+    data = response.json()
+    results = data["results"]
     assert len(results) == 1
     assert results[0]["id"] == task.pk
     schema_tester.validate_response(response=response)
@@ -138,8 +143,8 @@ def test_task_list_view__as_coordinator(
 
     response = user_client.get(url)
     assert response.status_code == 200
-    results = response.json()
-    assert len(results) == 4
+    data = response.json()
+    assert len(data["results"]) == 4
     schema_tester.validate_response(response=response)
 
 
@@ -153,13 +158,14 @@ def test_task_list_view__search(superuser_client: APIClient):
     # No search results
     response = superuser_client.get(url, {"q": "xxxxxxxxxxxx"})
     assert response.status_code == 200
-    results = response.json()
-    assert len(results) == 0
+    data = response.json()
+    assert len(data["results"]) == 0
 
     # One search result
     response = superuser_client.get(url, {"q": "task_1"})
     assert response.status_code == 200
-    results = response.json()
+    data = response.json()
+    results = data["results"]
     assert len(results) == 1
     assert results[0]["id"] == task_1.pk
     schema_tester.validate_response(response=response)

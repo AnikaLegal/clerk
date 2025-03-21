@@ -54,31 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  current:
-                    type: number
-                  next:
-                    type: number
-                    nullable: true
-                  prev:
-                    type: number
-                    nullable: true
-                  page_count:
-                    type: number
-                  item_count:
-                    type: number
-                  results:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Issue"
-                required:
-                  - current
-                  - next
-                  - prev
-                  - page_count
-                  - item_count
-                  - results
+                $ref: "#/components/schemas/CaseListResponse"
   /clerk/api/case/{id}/:
     get:
       operationId: getCase
@@ -1310,6 +1286,16 @@ paths:
     get:
       operationId: getTasks
       parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
         - name: q
           in: query
           schema:
@@ -1361,9 +1347,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/TaskList"
+                $ref: "#/components/schemas/TaskListResponse"
     post:
       operationId: createTask
       requestBody:
@@ -1739,6 +1723,27 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    PaginationBase:
+      type: object
+      properties:
+        current:
+          type: number
+        next:
+          type: number
+          nullable: true
+        prev:
+          type: number
+          nullable: true
+        page_count:
+          type: number
+        item_count:
+          type: number
+      required:
+        - current
+        - next
+        - prev
+        - page_count
+        - item_count
     IssueBase:
       type: object
       properties:
@@ -2130,6 +2135,15 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
+    CaseListResponse:
+      allOf:
+        - $ref: "#/components/schemas/PaginationBase"
+        - properties:
+            results:
+              items:
+                $ref: "#/components/schemas/Issue"
+          required:
+            - results
     IssueNoteBase:
       type: object
       properties:
@@ -2721,6 +2735,15 @@ components:
         - assigned_to
         - created_at
         - modified_at
+    TaskListResponse:
+      allOf:
+        - $ref: "#/components/schemas/PaginationBase"
+        - properties:
+            results:
+              items:
+                $ref: "#/components/schemas/TaskList"
+          required:
+            - results
     TaskBase:
       type: object
       properties:

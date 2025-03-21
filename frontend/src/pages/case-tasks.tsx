@@ -1,4 +1,4 @@
-import api, { Issue } from 'api'
+import api, { Issue, TaskList } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import {
   TaskApprovalTableCell,
@@ -18,6 +18,7 @@ import {
   Loader,
   Segment,
   Table,
+  Pagination,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
 import { mount } from 'utils'
@@ -87,13 +88,18 @@ export interface CaseTasksTableProps {
 }
 
 export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
+  const [page, setPage] = useState<number | undefined>(undefined)
+
   const result = api.useGetTasksQuery({
+    page: page,
+    pageSize: 100,
     issue: issue.id,
   })
-  if (result.isLoading) {
+  if (result.isFetching) {
     return <Loader active inline="centered" />
   }
-  if (!result.data || result.data.length == 0) {
+
+  if (!result.data || result.data.results.length == 0) {
     return (
       <Segment textAlign="center" secondary>
         <p>No tasks exist for this case.</p>
@@ -102,46 +108,72 @@ export const CaseTasksTable = ({ issue }: CaseTasksTableProps) => {
   }
 
   return (
-    <Table celled structured>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Type</Table.HeaderCell>
-          <Table.HeaderCell>Assigned To</Table.HeaderCell>
-          <Table.HeaderCell>Status</Table.HeaderCell>
-          <Table.HeaderCell>Approval?</Table.HeaderCell>
-          <Table.HeaderCell>Open?</Table.HeaderCell>
-          <Table.HeaderCell>Created</Table.HeaderCell>
-          <Table.HeaderCell>Due date</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {result.data.map((task) => (
+    <>
+      <Table celled structured>
+        <Table.Header>
           <Table.Row>
-            <Table.Cell>
-              <a href={task.url}>{task.name}</a>
-            </Table.Cell>
-            <Table.Cell>{TASK_TYPES[task.type]}</Table.Cell>
-            <Table.Cell>
-              <TaskAssignedToNode task={task} />
-            </Table.Cell>
-            <Table.Cell>{TASK_STATUSES[task.status]}</Table.Cell>
-            <TaskApprovalTableCell task={task} />
-            <Table.Cell textAlign="center">
-              {task.is_open ? (
-                <Icon name="check" color="green" />
-              ) : (
-                <Icon name="close" color="yellow" />
-              )}
-            </Table.Cell>
-            <Table.Cell>
-              {moment(task.created_at).format('DD/MM/YYYY')}
-            </Table.Cell>
-            <TaskDueDateTableCell task={task} />
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Type</Table.HeaderCell>
+            <Table.HeaderCell>Assigned To</Table.HeaderCell>
+            <Table.HeaderCell>Status</Table.HeaderCell>
+            <Table.HeaderCell>Approval?</Table.HeaderCell>
+            <Table.HeaderCell>Open?</Table.HeaderCell>
+            <Table.HeaderCell>Created</Table.HeaderCell>
+            <Table.HeaderCell>Due date</Table.HeaderCell>
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Header>
+        <Table.Body>
+          {result.data.results.map((task) => (
+            <Table.Row>
+              <Table.Cell>
+                <a href={task.url}>{task.name}</a>
+              </Table.Cell>
+              <Table.Cell>{TASK_TYPES[task.type]}</Table.Cell>
+              <Table.Cell>
+                <TaskAssignedToNode task={task} />
+              </Table.Cell>
+              <Table.Cell>{TASK_STATUSES[task.status]}</Table.Cell>
+              <TaskApprovalTableCell task={task} />
+              <Table.Cell textAlign="center">
+                {task.is_open ? (
+                  <Icon name="check" color="green" />
+                ) : (
+                  <Icon name="close" color="yellow" />
+                )}
+              </Table.Cell>
+              <Table.Cell>
+                {moment(task.created_at).format('DD/MM/YYYY')}
+              </Table.Cell>
+              <TaskDueDateTableCell task={task} />
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+      {result.data.item_count > result.data.results.length && (
+        <Pagination
+          activePage={result.data.current}
+          onPageChange={(e, { activePage }) => {
+            setPage(activePage ? +activePage : undefined)
+          }}
+          totalPages={result.data.page_count}
+          style={{ marginTop: '1em' }}
+          ellipsisItem={{
+            content: <Icon name="ellipsis horizontal" />,
+            icon: true,
+          }}
+          firstItem={{
+            content: <Icon name="angle double left" />,
+            icon: true,
+          }}
+          lastItem={{
+            content: <Icon name="angle double right" />,
+            icon: true,
+          }}
+          prevItem={{ content: <Icon name="angle left" />, icon: true }}
+          nextItem={{ content: <Icon name="angle right" />, icon: true }}
+        />
+      )}
+    </>
   )
 }
 

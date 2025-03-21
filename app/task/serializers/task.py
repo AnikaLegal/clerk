@@ -6,10 +6,10 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import exceptions, serializers
+from task.helpers import get_coordinators_user
 from task.models.request import TaskRequestStatus, TaskRequestType
 from task.models.task import Task
 from task.models.template import TaskTemplateType
-from task.helpers import get_coordinators_user
 
 from .actions import TaskRequestSerializer
 from .user import TaskListUserSerializer

@@ -1,4 +1,4 @@
-import api, { GetTasksApiArg, TaskList } from 'api'
+import api, { GetTasksApiArg, TaskListResponse } from 'api'
 import { TaskAssignedToNode, TaskDueDateTableCell } from 'comps/task'
 import { TaskApprovalTableCell } from 'comps/task/task-approval-table-cell'
 import { FadeTransition } from 'comps/transitions'
@@ -14,6 +14,7 @@ import {
   Icon,
   Input,
   Label,
+  Pagination,
   Table,
 } from 'semantic-ui-react'
 import { UserInfo } from 'types/global'
@@ -26,33 +27,36 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [tasks, setTasks] = useState<TaskList[]>([])
   const [query, setQuery] = useState<string>()
+  const [page, setPage] = useState<number | undefined>(undefined)
   const [filter, setFilter] = useState<GetTasksApiArg>({
     isOpen: 'true',
     assignedTo: CONTEXT.user.id,
   })
+  const [taskListResponse, setTaskListResponse] = useState<TaskListResponse>()
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(true)
   const [getTasks] = api.useLazyGetTasksQuery()
+  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
 
   const debouncedQuery = useDebounce(query, 300)
 
   const search = () => {
     setIsLoading(true)
-    getTasks(filter)
+    getTasks({ ...filter, page: page })
       .unwrap()
-      .then((tasks) => {
-        setTasks(tasks)
+      .then((response) => {
+        setTaskListResponse(response)
         setIsLoading(false)
       })
       .catch(() => setIsLoading(false))
   }
-  useEffect(() => search(), [filter])
+  useEffect(() => search(), [filter, page])
 
   interface IUpdateFilter {
     name: keyof GetTasksApiArg
     value: any
   }
+
   const updateFilter = (filters: IUpdateFilter | IUpdateFilter[]) => {
     var updated = filter
     filters = Array.isArray(filters) ? filters : [filters]
@@ -64,6 +68,10 @@ const App = () => {
         updated = { ...updated, [name]: value }
       }
     }
+    /* Reset the page when we update the filter. Pagination fails on the server
+     * if the specified page is greater than the actual number of pages in the
+     * result. */
+    setPage(undefined)
     setFilter(updated)
   }
 
@@ -72,8 +80,13 @@ const App = () => {
   }
   useEffect(() => updateQuery(), [debouncedQuery])
 
-  const userResults = api.useGetUsersQuery({ isActive: true, sort: 'email' })
+  const tasks = taskListResponse?.results ?? []
+  const itemCount = taskListResponse?.item_count ?? 0
+  const currentPage = taskListResponse?.current ?? 0
+  const totalPages = taskListResponse?.page_count ?? 0
+
   const users = userResults.data ?? []
+
   const userOptions: DropdownItemProps[] = users.map((u) => ({
     key: u.id,
     value: u.id,
@@ -95,7 +108,9 @@ const App = () => {
     <Container>
       <Header as="h1">
         Tasks
-        <Header.Subheader>Showing {tasks.length} tasks</Header.Subheader>
+        <Header.Subheader>
+          Showing {tasks.length} of {itemCount} tasks
+        </Header.Subheader>
       </Header>
       <Form>
         <Form.Field>
@@ -281,6 +296,30 @@ const App = () => {
             ))}
           </Table.Body>
         </Table>
+        {itemCount > tasks.length && (
+          <Pagination
+            activePage={currentPage}
+            onPageChange={(e, { activePage }) => {
+              setPage(activePage ? +activePage : undefined)
+            }}
+            totalPages={totalPages}
+            style={{ marginTop: '1em' }}
+            ellipsisItem={{
+              content: <Icon name="ellipsis horizontal" />,
+              icon: true,
+            }}
+            firstItem={{
+              content: <Icon name="angle double left" />,
+              icon: true,
+            }}
+            lastItem={{
+              content: <Icon name="angle double right" />,
+              icon: true,
+            }}
+            prevItem={{ content: <Icon name="angle left" />, icon: true }}
+            nextItem={{ content: <Icon name="angle right" />, icon: true }}
+          />
+        )}
       </FadeTransition>
     </Container>
   )

@@ -1,0 +1,20 @@
+type: object
+properties:
+  current:
+    type: number
+  next:
+    type: number
+    nullable: true
+  prev:
+    type: number
+    nullable: true
+  page_count:
+    type: number
+  item_count:
+    type: number
+required:
+  - current
+  - next
+  - prev
+  - page_count
+  - item_count

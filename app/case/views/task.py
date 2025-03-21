@@ -28,7 +28,7 @@ from task.serializers.actions import (
     TaskStatusChangeSerializer,
 )
 
-from case.utils.react import render_react_page
+from case.utils import ClerkPaginator, render_react_page
 from case.views.auth import (
     CoordinatorOrBetterPermission,
     ParalegalOrBetterObjectPermission,
@@ -55,8 +55,15 @@ def task_detail_page_view(request, pk):
     return render_react_page(request, "Task", "task-detail", context)
 
 
+class TaskPaginator(ClerkPaginator):
+    page_size = 20
+    max_page_size = 100
+    page_size_query_param = "page_size"
+
+
 class TaskApiViewset(ModelViewSet):
     serializer_class = TaskSerializer
+    pagination_class = TaskPaginator
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -322,6 +329,7 @@ class ApprovalAlreadyPendingException(APIException):
     status_code = 403
     default_code = "approval_already_pending"
     default_detail = "An approval request is already pending."
+
 
 class NoSupervisorToApproveException(APIException):
     status_code = 403
