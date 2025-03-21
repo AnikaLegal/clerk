@@ -23,6 +23,7 @@ import React, { useEffect, useState } from 'react'
 import {
   Button,
   ButtonProps,
+  Container,
   Divider,
   Form,
   Grid,
@@ -30,6 +31,7 @@ import {
   Icon,
   Label,
   List,
+  Message,
   Popup,
   Segment,
 } from 'semantic-ui-react'
@@ -48,14 +50,18 @@ const App = () => {
   const [getTask] = api.useLazyGetTaskQuery()
   const [updateTask] = api.useUpdateTaskMutation()
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [task, setTask] = useState<Task>({} as Task)
+  const [task, setTask] = useState<Task>()
+  const [error, setError] = useState()
 
   const loadTask = () => {
     setIsLoading(true)
     getTask({ id: CONTEXT.task_pk })
       .unwrap()
-      .then((instance) => {
-        setTask(instance)
+      .then((payload) => {
+        setTask(payload)
+      })
+      .catch((error) => {
+        setError(error.data.detail)
       })
       .finally(() => {
         setIsLoading(false)
@@ -63,9 +69,24 @@ const App = () => {
   }
   useEffect(() => loadTask(), [])
 
-  if (isLoading) {
+  if (error) {
+    return (
+      <Container>
+        <Message negative icon>
+          <Icon name="exclamation" size="mini" />
+          <Message.Content>
+            <Message.Header>Oops! There was an error</Message.Header>
+            {error}
+          </Message.Content>
+        </Message>
+      </Container>
+    )
+  }
+
+  if (isLoading || !task) {
     return null
   }
+
   const user = CONTEXT.user
   const update = (values: Model) =>
     updateTask({
