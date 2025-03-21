@@ -50,7 +50,7 @@ const RequestingTask = ({ isLoading, isError, task }: RequestingTaskProps) => {
       <Message negative icon>
         <Icon name="exclamation" size="mini" />
         <Message.Content>
-          <Message.Header>Oops! There's an error</Message.Header>
+          <Message.Header>Oops! There was an error</Message.Header>
           Failed to load requesting task.
         </Message.Content>
       </Message>
