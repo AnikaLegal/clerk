@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from task.helpers import get_coordinators_user
 from task.models import TaskAttachment, TaskComment, TaskEvent
-from task.models.request import TaskRequestStatus, TaskRequestType
+from task.models.request import TaskRequest, TaskRequestStatus, TaskRequestType
 from task.models.task import Task
 from task.serializers import (
     TaskActivitySerializer,
@@ -106,17 +106,26 @@ class TaskApiViewset(ModelViewSet):
             "assigned_to__groups",
             "issue__lawyer__groups",
             "issue__paralegal__groups",
-            "requests",
         )
 
         if self.action == "retrieve":
-            queryset = queryset.prefetch_related("activities").prefetch_related(
+            queryset = queryset.prefetch_related("activities")
+            queryset = queryset.prefetch_related(
                 Prefetch(
                     "attachments",
                     queryset=TaskAttachment.objects.filter(comment_id__isnull=True),
                 )
             )
         elif self.action == "list":
+            queryset = queryset.prefetch_related(
+                Prefetch(
+                    "requests",
+                    queryset=TaskRequest.objects.filter(
+                        type=TaskRequestType.APPROVAL
+                    ).exclude(status=TaskRequestStatus.DONE),
+                    to_attr="pending_approval_requests"
+                )
+            )
             queryset = self.sort_queryset(queryset)
             queryset = self.search_queryset(queryset)
 
@@ -190,6 +199,7 @@ class TaskApiViewset(ModelViewSet):
         Task activity.
         """
         task = self.get_object()
+
         queryset = task.activities.select_related("content_type")
         prefetch = GenericPrefetch(
             "content_object",
@@ -204,6 +214,7 @@ class TaskApiViewset(ModelViewSet):
         )
         queryset = queryset.prefetch_related(prefetch)
         queryset = queryset.order_by("-created_at")
+
         data = self.get_serializer(queryset, many=True).data
         return Response(data)
 
@@ -213,6 +224,7 @@ class TaskApiViewset(ModelViewSet):
         Task comments.
         """
         task = self.get_object()
+
         data = {
             **request.data,
             "task_id": task.pk,

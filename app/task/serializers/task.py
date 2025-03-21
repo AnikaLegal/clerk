@@ -69,11 +69,13 @@ class TaskListSerializer(serializers.ModelSerializer):
     modified_at = serializers.DateTimeField(read_only=True)
 
     def get_is_approval_pending(self, obj):
-        return (
-            obj.requests.filter(type=TaskRequestType.APPROVAL)
-            .exclude(status=TaskRequestStatus.DONE)
-            .exists()
-        )
+        # This attribute is prefetched, see the TaskApiViewset. Can't figure out
+        # how to prefetch the values when using a related field from the obj
+        # instance. Otherwise I would do something like:
+        #
+        #  return obj.requests.(...).exists()
+        #
+        return len(obj.pending_approval_requests) > 0
 
     def get_url(self, obj):
         return reverse("task-detail", args=(obj.pk,))
