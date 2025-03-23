@@ -65,7 +65,7 @@ export const TaskActionCard = (props: TaskActionProps) => {
       icon: 'undo',
       text: 'Reopen the task',
       showWhen: () => user.is_paralegal_or_better && !task.is_open,
-      action: () => updateStatusHandler({ status: 'NOT_STARTED' }),
+      action: () => updateStatusHandler({ status: 'IN_PROGRESS' }),
     },
     {
       id: 'start',
