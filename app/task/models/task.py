@@ -130,6 +130,7 @@ class Task(TimestampedModel, LogDataMixin):
                 self.closed_at = timezone.now()
 
         super().save(*args, **kwargs)
+        self.clear_log_data()
 
     @staticmethod
     def annotate_with_days_open(

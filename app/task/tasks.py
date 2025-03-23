@@ -210,12 +210,9 @@ def maybe_cancel_tasks(event: IssueEvent) -> list[int]:
     issue = event.issue
     tasks = Task.objects.filter(issue=issue, is_open=True)
     for task in tasks:
-        task.set_log_data("is_case_closed", True)
         task.status = TaskStatus.NOT_DONE
-        try:
-            task.save()
-        finally:
-            task.clear_log_data()
+        task.is_system_update = True
+        task.save()
 
     return [task.pk for task in tasks]
 

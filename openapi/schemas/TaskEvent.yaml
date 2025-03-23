@@ -7,7 +7,8 @@ properties:
     enum:
       - APPROVAL_REQUEST
       - CANCELLED
-      - REASSIGNED
+      - REASSIGNED_CASE
+      - REASSIGNED_TASK
       - REQUEST_ACCEPTED
       - REQUEST_DECLINED
       - RESUMED

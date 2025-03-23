@@ -73,6 +73,9 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     createTask: {
       invalidatesTags: [{ type: 'TASKS' }],
     },
+    updateTask: {
+      invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
+    },
     getTaskAttachments: {
       providesTags: [{ type: 'TASK_ATTACHMENT' }],
     },

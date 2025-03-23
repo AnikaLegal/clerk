@@ -61,8 +61,13 @@ def _handle_task_assigned_to_update(log_entry: LogEntry):
                 created_at=log_entry.timestamp,
             )
         elif prev_id and next_id and prev_id != next_id:
+            data = log_entry.serialized_data.get("fields")
+            is_system_update = data.get("is_system_update")
+
             TaskEvent.objects.create(
-                type=TaskEventType.REASSIGNED,
+                type=TaskEventType.REASSIGNED_CASE
+                if is_system_update
+                else TaskEventType.REASSIGNED_TASK,
                 task_id=log_entry.object_id,
                 user=log_entry.actor,
                 data={
@@ -81,8 +86,10 @@ def _handle_task_status_update(log_entry: LogEntry):
     if status:
         prev_status, next_status = status
 
-        is_case_closed = log_entry.additional_data.get("is_case_closed", False)
-        if is_case_closed:
+        data = log_entry.serialized_data.get("fields")
+        is_system_update = data.get("is_system_update")
+
+        if is_system_update:
             TaskEvent.objects.create(
                 type=TaskEventType.CANCELLED,
                 task_id=log_entry.object_id,
@@ -91,6 +98,9 @@ def _handle_task_status_update(log_entry: LogEntry):
             )
         else:
             comment = log_entry.additional_data.get("comment", None)
+            if not comment:
+                comment = ""
+
             TaskEvent.objects.create(
                 type=TaskEventType.STATUS_CHANGE,
                 task_id=log_entry.object_id,
@@ -99,7 +109,7 @@ def _handle_task_status_update(log_entry: LogEntry):
                     "prev_status": prev_status,
                     "next_status": next_status,
                 },
-                note_html=comment if comment else "",
+                note_html=comment,
                 created_at=log_entry.timestamp,
             )
 

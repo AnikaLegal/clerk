@@ -19,16 +19,13 @@ class TaskStatusChangeSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        # NOTE: Also remove the comment field as it's not part of the Task model.
+        # Also remove the comment field as it's not part of the Task model.
         comment = validated_data.pop("comment", None)
 
-        # NOTE: Associate some data with this instance so we can access it later
-        # when we process the log entry for the status change.
+        # Associate some data with this instance so we can access it later when
+        # we process the log entry for the status change.
         instance.set_log_data("comment", comment)
-        try:
-            return super().update(instance, validated_data)
-        finally:
-            instance.clear_log_data()
+        return super().update(instance, validated_data)
 
     def validate(self, attrs):
         # Require explanatory comment if the task is not done.

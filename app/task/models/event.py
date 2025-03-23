@@ -19,7 +19,8 @@ class TaskEventType(models.TextChoices):
 
     APPROVAL_REQUEST = "APPROVAL_REQUEST", "Approval Request"
     CANCELLED = "CANCELLED", "Task Cancelled"
-    REASSIGNED = "REASSIGNED", "Task Reassigned"
+    REASSIGNED_CASE = "REASSIGNED_CASE", "Case Reassigned"
+    REASSIGNED_TASK = "REASSIGNED_TASK", "Task Reassigned"
     REQUEST_ACCEPTED = "REQUEST_ACCEPTED", "Request Accepted"
     REQUEST_DECLINED = "REQUEST_DECLINED", "Request Declined"
     RESUMED = "RESUMED", "Task Resumed"
@@ -71,8 +72,10 @@ class TaskEvent(TimestampedModel):
                 html = self._get_status_change_html()
             elif self.type == TaskEventType.SUSPENDED:
                 html = self._get_suspend_html()
-            elif self.type == TaskEventType.REASSIGNED:
-                html = self._get_reassign_html()
+            elif self.type == TaskEventType.REASSIGNED_CASE:
+                html = self._get_reassign_case_html()
+            elif self.type == TaskEventType.REASSIGNED_TASK:
+                html = self._get_reassign_task_html()
             elif self.type == TaskEventType.RESUMED:
                 html = self._get_resume_html()
         except Exception:
@@ -99,7 +102,7 @@ class TaskEvent(TimestampedModel):
     def _get_cancelled_html(self):
         issue: Issue = self.task.issue
         return (
-            "This task was cancelled because case "
+            "The task was cancelled because case "
             + f'<a href="{issue.url}">{issue.fileref}</a>'
             + " was closed."
         )
@@ -122,12 +125,12 @@ class TaskEvent(TimestampedModel):
         prev_user = User.objects.get(id=prev_user_id)
 
         return (
-            "This task was suspended because "
+            "The task was suspended because "
             + _get_user_a_tag(prev_user)
             + " was removed from the case."
         )
 
-    def _get_reassign_html(self):
+    def _get_reassign_task_html(self):
         prev_user_id = self.data.get("prev_user_id")
         prev_user = User.objects.get(id=prev_user_id)
 
@@ -135,7 +138,23 @@ class TaskEvent(TimestampedModel):
         next_user = User.objects.get(id=next_user_id)
 
         return (
-            "This task was reassigned from "
+            _get_user_a_tag(self.user)
+            + " reassigned the task from "
+            + _get_user_a_tag(prev_user)
+            + " to "
+            + _get_user_a_tag(next_user)
+            + "."
+        )
+
+    def _get_reassign_case_html(self):
+        prev_user_id = self.data.get("prev_user_id")
+        prev_user = User.objects.get(id=prev_user_id)
+
+        next_user_id = self.data.get("next_user_id")
+        next_user = User.objects.get(id=next_user_id)
+
+        return (
+            "The task was reassigned from "
             + _get_user_a_tag(prev_user)
             + " to "
             + _get_user_a_tag(next_user)
@@ -147,7 +166,7 @@ class TaskEvent(TimestampedModel):
         next_user = User.objects.get(id=next_user_id)
 
         return (
-            "This task was resumed because "
+            "The task was resumed because "
             + _get_user_a_tag(next_user)
             + " was added to the case."
         )
