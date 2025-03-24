@@ -5,7 +5,7 @@ from core.models import IssueEvent
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_q.tasks import async_task
+from django_q.tasks import async_task, result
 from task.models import (
     Task,
     TaskActivity,
@@ -62,7 +62,13 @@ def post_log_task(log_entry, error, **kwargs):
     if error:
         logger.exception(error)
     else:
-        transaction.on_commit(lambda: async_task(handle_task_log, log_entry.pk))
+        # Wait on the result for a little bit so we can update the frontend UI
+        # immediately. We could, of course, just run the task synchronously, i.e.
+        # without using async_task, but then if the task fails it is difficult to
+        # rerun the same task again.
+        transaction.on_commit(
+            lambda: result(async_task(handle_task_log, log_entry.pk), wait=2000)
+        )
 
 
 @receiver(post_log, sender=TaskRequest)
@@ -70,4 +76,6 @@ def post_log_task_request(log_entry, error, **kwargs):
     if error:
         logger.exception(error)
     else:
-        transaction.on_commit(lambda: async_task(handle_task_request_log, log_entry.pk))
+        transaction.on_commit(
+            lambda: result(async_task(handle_task_request_log, log_entry.pk), wait=2000)
+        )

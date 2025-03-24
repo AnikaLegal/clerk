@@ -74,6 +74,8 @@ def handle_event_save(event_pk: int):
                 is_notify_pending=False, is_system_update=False
             )
 
+    return True
+
 
 @sentry_task
 def handle_task_save(task_pk: int):
@@ -87,14 +89,7 @@ def handle_task_save(task_pk: int):
             task.is_system_update = False
             task.save()
 
-
-@sentry_task
-def handle_task_log(log_entry_pk: int):
-    log_entry = LogEntry.objects.get(pk=log_entry_pk)
-    action = log_entry.action
-
-    if action == LogEntry.Action.UPDATE:
-        handle_update_task_log_entry(log_entry)
+    return True
 
 
 @sentry_task
@@ -104,6 +99,19 @@ def handle_task_request_save(task_request_pk: int, created: bool):
         request = TaskRequest.objects.get(pk=task_request_pk)
         if request and request.status == TaskRequestStatus.DONE:
             notify_of_task_request_completion(request.pk)
+
+    return True
+
+
+@sentry_task
+def handle_task_log(log_entry_pk: int):
+    log_entry = LogEntry.objects.get(pk=log_entry_pk)
+    action = log_entry.action
+
+    if action == LogEntry.Action.UPDATE:
+        handle_update_task_log_entry(log_entry)
+
+    return True
 
 
 @sentry_task
@@ -115,6 +123,8 @@ def handle_task_request_log(log_entry_pk: int):
         handle_create_task_request_log_entry(log_entry)
     elif action == LogEntry.Action.UPDATE:
         handle_update_task_request_log_entry(log_entry)
+
+    return True
 
 
 def maybe_suspend_tasks(event: IssueEvent) -> list[int]:
