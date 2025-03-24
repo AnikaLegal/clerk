@@ -163,13 +163,11 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             name="tasks_assignment_role"
             label="Assignment role"
             placeholder="Select the role of the user to which the task(s) should be assigned"
-            options={Object.entries(TASK_TRIGGER_ROLES).map(
-              ([key, value]) => ({
-                key: key,
-                value: key,
-                text: value,
-              })
-            )}
+            options={Object.entries(TASK_TRIGGER_ROLES).map(([key, value]) => ({
+              key: key,
+              value: key,
+              text: value,
+            }))}
             disabled={isSubmitting}
           />
 
@@ -261,7 +259,7 @@ export const TaskTemplateTable = ({
           <Table.Row key={template.id}>
             <Table.Cell>{template.name}</Table.Cell>
             <Table.Cell>{TASK_TYPES[template.type]}</Table.Cell>
-            <Table.Cell>{template.due_in}</Table.Cell>
+            <Table.Cell>{template.due_in || '-'}</Table.Cell>
             <Table.Cell>{template.is_urgent ? 'Yes' : 'No'}</Table.Cell>
             <Table.Cell>
               {template.is_approval_required ? 'Yes' : 'No'}
