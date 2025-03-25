@@ -42,19 +42,6 @@ def task_list_page_view(request):
     return render_react_page(request, "Tasks", "task-list", {})
 
 
-@api_view(["GET"])
-@paralegal_or_better_required
-def task_detail_page_view(request, pk):
-    if not Task.objects.filter(pk=pk).exists():
-        raise Http404()
-
-    context = {
-        "task_pk": pk,
-        "list_url": reverse("task-list"),
-    }
-    return render_react_page(request, "Task", "task-detail", context)
-
-
 class TaskPaginator(ClerkPaginator):
     page_size = 20
     max_page_size = 100
@@ -123,7 +110,7 @@ class TaskApiViewset(ModelViewSet):
                     queryset=TaskRequest.objects.filter(
                         type=TaskRequestType.APPROVAL
                     ).exclude(status=TaskRequestStatus.DONE),
-                    to_attr="pending_approval_requests"
+                    to_attr="pending_approval_requests",
                 )
             )
             queryset = self.sort_queryset(queryset)

@@ -86,7 +86,13 @@ class TaskEvent(TimestampedModel):
 
     def _get_approval_request_html(self):
         to_task_id = self.data.get("to_task_id")
-        to_task_url = reverse("task-detail", args=(to_task_id,))
+        to_task_url = reverse(
+            "case-task-detail",
+            args=(
+                self.task.issue.pk,
+                to_task_id,
+            ),
+        )
         return (
             _get_user_a_tag(self.user)
             + " submitted an "

@@ -103,7 +103,7 @@ class Task(TimestampedModel, LogDataMixin):
     @property
     def url(self):
         if self.pk:
-            return reverse("task-detail", args=(self.pk,))
+            return reverse("case-task-detail", args=(self.issue.pk, self.pk,))
 
     def save(self, *args, **kwargs):
         # Set internal status flag to indicate if a notification is potentially

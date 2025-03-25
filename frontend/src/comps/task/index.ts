@@ -10,7 +10,6 @@ import {
 import { TaskAssignedToNode } from './task-assigned-to-node'
 import { TaskDueDateTableCell } from './task-due-date-table-cell'
 import { TaskInformationCard } from './task-information-card'
-import { TaskRequestFromCard } from './task-request-from-card'
 export {
   CancelTaskModal,
   CreateTaskSchema,
@@ -23,5 +22,4 @@ export {
   TaskAssignedToNode,
   TaskDueDateTableCell,
   TaskInformationCard,
-  TaskRequestFromCard,
 }

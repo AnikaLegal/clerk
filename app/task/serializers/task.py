@@ -78,7 +78,7 @@ class TaskListSerializer(serializers.ModelSerializer):
         return len(obj.pending_approval_requests) > 0
 
     def get_url(self, obj):
-        return reverse("task-detail", args=(obj.pk,))
+        return reverse("case-task-detail", args=(obj.issue_id, obj.pk,))
 
 
 class TaskSerializer(serializers.ModelSerializer):

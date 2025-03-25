@@ -16,6 +16,7 @@ from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from task.models import Task
 
 from case.serializers import (
     IssueNoteSerializer,
@@ -137,6 +138,21 @@ def case_detail_task_list_page_view(request, pk):
     issue = get_object_or_404(Issue, pk=pk)
     context = {
         "case_pk": pk,
+        "urls": get_detail_urls(issue),
+    }
+    return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
+def case_detail_task_detail_page_view(request, pk, task_pk):
+    """
+    The tasks related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "task_pk": task_pk,
         "urls": get_detail_urls(issue),
     }
     return render_react_page(request, f"Case {issue.fileref}", "case-tasks", context)

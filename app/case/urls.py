@@ -86,6 +86,11 @@ urlpatterns = [
         case.case_detail_task_list_page_view,
         name="case-task-list",
     ),
+    re_path(
+        f"^cases/{UUID_PK}/tasks/(?P<task_pk>[0-9]+)$",
+        case.case_detail_task_detail_page_view,
+        name="case-task-detail",
+    ),
     # Email
     re_path(
         f"^cases/email/{UUID_PK}/$",
@@ -114,7 +119,6 @@ urlpatterns = [
     ),
     # Tasks
     path("tasks/", task.task_list_page_view, name="task-list"),
-    re_path(f"^tasks/{INT_PK}/$", task.task_detail_page_view, name="task-detail"),
     path(
         "templates/task/",
         task_templates.template_task_list_page_view,
