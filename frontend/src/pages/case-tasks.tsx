@@ -29,7 +29,7 @@ import { Formik } from 'formik'
 import { TaskForm } from 'forms'
 import { default as moment } from 'moment'
 import { enqueueSnackbar } from 'notistack'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -533,6 +533,7 @@ interface TaskAttachmentButtonProps {
 
 export const TaskAttachmentButton = ({ task }: TaskAttachmentButtonProps) => {
   const [createTaskAttachment] = api.useCreateTaskAttachmentMutation()
+  const resetRef = useRef<() => void>(null);
 
   const handleChange = (files: File[]) => {
     if (files.length > 0) {
@@ -547,23 +548,25 @@ export const TaskAttachmentButton = ({ task }: TaskAttachmentButtonProps) => {
           taskAttachmentCreate: values as any,
         })
           .unwrap()
-          .then((instance) => {
+          .then((payload) => {
             enqueueSnackbar('Added attachment', { variant: 'success' })
           })
-          .catch((err) => {
+          .catch((error) => {
             enqueueSnackbar(
-              getAPIErrorMessage(err, 'Failed to add attachment'),
+              getAPIErrorMessage(error, 'Failed to add attachment'),
               {
                 variant: 'error',
               }
             )
+          }).finally(() => {
+            resetRef.current?.()
           })
       }
     }
   }
 
   return (
-    <FileButton onChange={handleChange} multiple>
+    <FileButton resetRef={resetRef} onChange={handleChange} multiple>
       {(props) => (
         <Popup
           mouseEnterDelay={1000}
