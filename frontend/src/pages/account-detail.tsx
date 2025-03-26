@@ -14,6 +14,7 @@ import { AccountPermissions } from 'comps/account-permissions'
 import { FormField, getFormSchema, getModelChoices } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
 import { ErrorBoundary } from 'comps/error-boundary'
+import { ErrorMessage } from 'comps/error-message'
 import { FIELD_TYPES } from 'comps/field-component'
 import { FieldTable, TableForm } from 'comps/table-form'
 import { TimelineNote } from 'comps/timeline-item'
@@ -23,9 +24,12 @@ import {
   Container,
   Header,
   Icon,
+  Loader,
   Pagination,
   PaginationProps,
   Tab,
+  Grid,
+  Segment,
 } from 'semantic-ui-react'
 import { mount } from 'utils'
 import * as Yup from 'yup'
@@ -39,11 +43,25 @@ interface DjangoContext {
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const accountResult = useGetUserQuery({ id: CONTEXT.account_id })
-  if (accountResult.isLoading) {
+  const result = useGetUserQuery({ id: CONTEXT.account_id })
+  if (result.isLoading) {
+    return (
+      <Loader active inline="centered" />
+    )
+  }
+  if (result.isError) {
+    return (
+      <Grid centered>
+        <Segment basic>
+          <ErrorMessage error={result.error} />
+        </Segment>
+      </Grid>
+    )
+  }
+  if (!result.data) {
     return null
   }
-  return <AccountDetailPage data={accountResult.data} />
+  return <AccountDetailPage data={result.data} />
 }
 
 export const AccountDetailPage = ({ data }: { data: User }) => {
@@ -195,7 +213,7 @@ export const PaginatedCaseList = ({
   fields,
   onPageChange,
 }: {
-  data: GetCasesApiResponse
+  data: GetCasesApiResponse | undefined
   fields: string[]
   onPageChange: (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -242,7 +260,7 @@ export const PaginatedNotes = ({
   data,
   onPageChange,
 }: {
-  data: GetNotesApiResponse
+  data: GetNotesApiResponse | undefined
   onPageChange: (
     event: React.MouseEvent<HTMLAnchorElement>,
     data: PaginationProps

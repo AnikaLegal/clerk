@@ -229,7 +229,13 @@ export const CaseTaskDetail = ({ taskId, user, urls }: CaseTaskDetailProps) => {
     return <Loader active inline="centered" />
   }
   if (result.isError) {
-    return <ErrorMessage error={result.error} />
+    return (
+      <Grid centered>
+        <Segment basic>
+          <ErrorMessage error={result.error} />
+        </Segment>
+      </Grid>
+    )
   }
   if (!result.data) {
     return null
