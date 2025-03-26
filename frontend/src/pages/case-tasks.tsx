@@ -587,10 +587,8 @@ export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
   const [showAttachments, setShowAttachments] = useState(true)
   const [deleteTaskAttachment] = api.useDeleteTaskAttachmentMutation()
 
-  const attachmentResult = api.useGetTaskAttachmentsQuery({ id: task.id })
-  const attachments = attachmentResult.data || []
-
-  if (attachments.length === 0) {
+  const result = api.useGetTaskAttachmentsQuery({ id: task.id })
+  if (!result.data || result.data.length == 0) {
     return null
   }
 
@@ -600,12 +598,12 @@ export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
       attachmentId: attachment.id,
     })
       .unwrap()
-      .then((instance) => {
+      .then((payload) => {
         enqueueSnackbar('Removed attachment', { variant: 'success' })
       })
-      .catch((err) => {
+      .catch((error) => {
         enqueueSnackbar(
-          getAPIErrorMessage(err, 'Failed to remove attachment'),
+          getAPIErrorMessage(error, 'Failed to remove attachment'),
           {
             variant: 'error',
           }
@@ -625,7 +623,7 @@ export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
       </Grid.Row>
       {showAttachments && (
         <TaskAttachmentGroup
-          attachments={attachments}
+          attachments={result.data}
           onDelete={handleDelete}
         />
       )}
