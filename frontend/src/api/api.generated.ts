@@ -1439,6 +1439,7 @@ export type Task = TaskBase & {
   id: number;
   type: TaskType;
   status: TaskStatus;
+  description_display: string;
   url: string;
   issue: Issue;
   assigned_to: User;
@@ -1474,7 +1475,8 @@ export type TaskEvent = {
   type:
     | "APPROVAL_REQUEST"
     | "CANCELLED"
-    | "REASSIGNED"
+    | "REASSIGNED_CASE"
+    | "REASSIGNED_TASK"
     | "REQUEST_ACCEPTED"
     | "REQUEST_DECLINED"
     | "RESUMED"

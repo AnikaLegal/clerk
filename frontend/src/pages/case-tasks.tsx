@@ -331,7 +331,7 @@ export const TaskBody = ({ task, setTask, update, user }: TaskDetailProps) => {
           <Grid.Column>
             <Form>
               <Form.Field>
-                <RichTextDisplay content={task.description} />
+                <RichTextDisplay content={task.description_display} />
               </Form.Field>
             </Form>
           </Grid.Column>

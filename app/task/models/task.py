@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import functions
 from django.urls import reverse
 from django.utils import timezone
+
 from task.auditlog import LogDataMixin
 
 from .group import TaskGroup

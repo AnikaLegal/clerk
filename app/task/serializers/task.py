@@ -1,8 +1,11 @@
+from html import unescape
+
 from accounts.models import User
 from case.middleware import COORDINATOR_GROUPS
 from case.serializers import IssueSerializer, UserSerializer
 from core.models import Issue
 from django.db.models import Q
+from django.template import Context, Template
 from django.urls import reverse
 from django.utils.timezone import now
 from rest_framework import exceptions, serializers
@@ -78,7 +81,13 @@ class TaskListSerializer(serializers.ModelSerializer):
         return len(obj.pending_approval_requests) > 0
 
     def get_url(self, obj):
-        return reverse("case-task-detail", args=(obj.issue_id, obj.pk,))
+        return reverse(
+            "case-task-detail",
+            args=(
+                obj.issue_id,
+                obj.pk,
+            ),
+        )
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -89,6 +98,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "type",
             "name",
             "description",
+            "description_display",
             "status",
             "issue_id",
             "issue",
@@ -127,6 +137,7 @@ class TaskSerializer(serializers.ModelSerializer):
     closed_at = serializers.DateTimeField(read_only=True)
     days_open = serializers.IntegerField(read_only=True)
     request = TaskRequestSerializer(read_only=True)
+    description_display = serializers.SerializerMethodField(read_only=True)
     is_approval_pending = serializers.SerializerMethodField(read_only=True)
 
     def create(self, validated_data):
@@ -137,6 +148,11 @@ class TaskSerializer(serializers.ModelSerializer):
             validated_data["created_by_id"] = request.user.pk
 
         return super().create(validated_data)
+
+    def get_description_display(self, obj):
+        template = Template(unescape(obj.description))
+        context = Context({"case": obj.issue, "assigned_to": obj.assigned_to})
+        return template.render(context)
 
     def get_is_approval_pending(self, obj):
         return (
