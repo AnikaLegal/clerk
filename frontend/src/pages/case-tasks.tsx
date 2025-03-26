@@ -74,13 +74,15 @@ const App = () => {
   return (
     <Container>
       <CaseHeader issue={issue} activeTab={CASE_TABS.TASKS} urls={urls} />
-      <Segment basic style={{ marginTop: '0' }}>
-        {!taskId ? (
+      {!taskId ? (
+        <Segment basic>
           <CaseTaskList issue={issue} user={user} />
-        ) : (
+        </Segment>
+      ) : (
+        <Segment basic style={{ marginTop: '0' }}>
           <CaseTaskDetail taskId={taskId} urls={urls} user={user} />
-        )}
-      </Segment>
+        </Segment>
+      )}
     </Container>
   )
 }
