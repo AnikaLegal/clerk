@@ -601,34 +601,43 @@ export const TaskAttachmentButton = ({
 
   const handleChange = (files: File[]) => {
     if (files.length > 0) {
+      setIsUploading(true)
+
+      const promises: Promise<TaskAttachment>[] = []
       for (const file of files) {
-        setIsUploading(true)
         // TODO: would be nice if this could be typed.
         const values = new FormData()
         values.set('file', file)
         values.set('comment_id', '')
 
-        createTaskAttachment({
+        const promise = createTaskAttachment({
           id: task.id,
           taskAttachmentCreate: values as any,
-        })
-          .unwrap()
-          .then((payload) => {
-            enqueueSnackbar('Added attachment', { variant: 'success' })
-          })
-          .catch((error) => {
-            enqueueSnackbar(
-              getAPIErrorMessage(error, 'Failed to add attachment'),
-              {
-                variant: 'error',
-              }
-            )
-          })
-          .finally(() => {
-            resetRef.current?.()
-            setIsUploading(false)
-          })
+        }).unwrap()
+        promises.push(promise)
       }
+
+      Promise.allSettled(promises)
+        .then((results) => {
+          for (const result of results) {
+            if (result.status == 'fulfilled') {
+              enqueueSnackbar('Added attachment', {
+                variant: 'success',
+              })
+            } else {
+              enqueueSnackbar(
+                getAPIErrorMessage(result.reason, 'Failed to add attachment'),
+                {
+                  variant: 'error',
+                }
+              )
+            }
+          }
+        })
+        .finally(() => {
+          resetRef.current?.()
+          setIsUploading(false)
+        })
     }
   }
 
