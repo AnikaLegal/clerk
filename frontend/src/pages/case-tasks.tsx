@@ -344,15 +344,6 @@ export const TaskBody = ({ task, setTask, update, user }: TaskDetailProps) => {
             </Form>
           </Grid.Column>
         </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <List floated="right" horizontal>
-              <List.Item>
-                <TaskAttachmentButton task={task} />
-              </List.Item>
-            </List>
-          </Grid.Column>
-        </Grid.Row>
         <TaskAttachments task={task} />
       </Grid>
     )
@@ -535,58 +526,6 @@ export const TaskActivity = ({ task, user }: TaskActivityProps) => {
   )
 }
 
-interface TaskAttachmentButtonProps {
-  task: Task
-}
-
-export const TaskAttachmentButton = ({ task }: TaskAttachmentButtonProps) => {
-  const [createTaskAttachment] = api.useCreateTaskAttachmentMutation()
-  const resetRef = useRef<() => void>(null);
-
-  const handleChange = (files: File[]) => {
-    if (files.length > 0) {
-      for (const file of files) {
-        // TODO: would be nice if this could be typed.
-        const values = new FormData()
-        values.set('file', file)
-        values.set('comment_id', '')
-
-        createTaskAttachment({
-          id: task.id,
-          taskAttachmentCreate: values as any,
-        })
-          .unwrap()
-          .then((payload) => {
-            enqueueSnackbar('Added attachment', { variant: 'success' })
-          })
-          .catch((error) => {
-            enqueueSnackbar(
-              getAPIErrorMessage(error, 'Failed to add attachment'),
-              {
-                variant: 'error',
-              }
-            )
-          }).finally(() => {
-            resetRef.current?.()
-          })
-      }
-    }
-  }
-
-  return (
-    <FileButton resetRef={resetRef} onChange={handleChange} multiple>
-      {(props) => (
-        <Popup
-          mouseEnterDelay={1000}
-          trigger={<Icon link name="attach" onClick={props.onClick} />}
-        >
-          Attach files
-        </Popup>
-      )}
-    </FileButton>
-  )
-}
-
 interface TaskAttachmentsProps {
   task: Task
 }
@@ -596,9 +535,7 @@ export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
   const [deleteTaskAttachment] = api.useDeleteTaskAttachmentMutation()
 
   const result = api.useGetTaskAttachmentsQuery({ id: task.id })
-  if (!result.data || result.data.length == 0) {
-    return null
-  }
+  const data = result.data || []
 
   const handleDelete = (attachment: TaskAttachment) => {
     deleteTaskAttachment({
@@ -621,21 +558,101 @@ export const TaskAttachments = ({ task }: TaskAttachmentsProps) => {
 
   return (
     <>
-      <Grid.Row style={{ paddingTop: '0' }}>
+      <Grid.Row>
         <Grid.Column>
-          <TaskAttachmentToggleButton
-            open={showAttachments}
-            onClick={() => setShowAttachments(!showAttachments)}
-          />
+          <List floated="right" horizontal>
+            <List.Item>
+              <TaskAttachmentButton task={task} isLoading={result.isLoading} />
+            </List.Item>
+          </List>
         </Grid.Column>
       </Grid.Row>
-      {showAttachments && (
-        <TaskAttachmentGroup
-          attachments={result.data}
-          onDelete={handleDelete}
-        />
+      {data.length > 0 && (
+        <>
+          <Grid.Row style={{ paddingTop: '0' }}>
+            <Grid.Column>
+              <TaskAttachmentToggleButton
+                open={showAttachments}
+                onClick={() => setShowAttachments(!showAttachments)}
+              />
+            </Grid.Column>
+          </Grid.Row>
+          {showAttachments && (
+            <TaskAttachmentGroup attachments={data} onDelete={handleDelete} />
+          )}
+        </>
       )}
     </>
+  )
+}
+
+interface TaskAttachmentButtonProps {
+  task: Task
+  isLoading: boolean
+}
+
+export const TaskAttachmentButton = ({
+  task,
+  isLoading,
+}: TaskAttachmentButtonProps) => {
+  const [createTaskAttachment] = api.useCreateTaskAttachmentMutation()
+  const [isUploading, setIsUploading] = useState(false)
+  const resetRef = useRef<() => void>(null)
+
+  const handleChange = (files: File[]) => {
+    if (files.length > 0) {
+      for (const file of files) {
+        setIsUploading(true)
+        // TODO: would be nice if this could be typed.
+        const values = new FormData()
+        values.set('file', file)
+        values.set('comment_id', '')
+
+        createTaskAttachment({
+          id: task.id,
+          taskAttachmentCreate: values as any,
+        })
+          .unwrap()
+          .then((payload) => {
+            enqueueSnackbar('Added attachment', { variant: 'success' })
+          })
+          .catch((error) => {
+            enqueueSnackbar(
+              getAPIErrorMessage(error, 'Failed to add attachment'),
+              {
+                variant: 'error',
+              }
+            )
+          })
+          .finally(() => {
+            resetRef.current?.()
+            setIsUploading(false)
+          })
+      }
+    }
+  }
+
+  return (
+    <FileButton
+      resetRef={resetRef}
+      onChange={handleChange}
+      multiple
+      disabled={isLoading || isUploading}
+    >
+      {(props) => {
+        if (isLoading || isUploading) {
+          return <Loader active inline size="mini" />
+        }
+        return (
+          <Popup
+            mouseEnterDelay={1000}
+            trigger={<Icon link name="attach" onClick={props.onClick} />}
+          >
+            Attach files
+          </Popup>
+        )
+      }}
+    </FileButton>
   )
 }
 
