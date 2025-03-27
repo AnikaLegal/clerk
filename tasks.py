@@ -76,6 +76,12 @@ def ngrok(c, url):
 
 
 @task
+def docs(c, fileref):
+    """Create case documents from templates for local development & testing"""
+    run(c, f"./manage.py set_up_case_docs {fileref}")
+
+
+@task
 def own(c, user=None):
     """Assert file ownership of project"""
     if not user:
