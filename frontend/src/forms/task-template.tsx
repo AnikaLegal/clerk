@@ -267,7 +267,7 @@ export const TaskTemplateTable = ({
       </Table.Header>
       <Table.Body>
         {templates.map((template, index) => (
-          <Table.Row key={template.id}>
+          <Table.Row key={template.id || template.type + '_' + template.name}>
             <Table.Cell>{template.name}</Table.Cell>
             <Table.Cell>{TASK_TYPES[template.type]}</Table.Cell>
             <Table.Cell>{template.due_in || '-'}</Table.Cell>
