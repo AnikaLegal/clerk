@@ -240,7 +240,6 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
               <Button
                 color="red"
                 disabled={formik.isSubmitting}
-                loading={formik.isSubmitting}
                 onClick={onDelete}
               >
                 Delete
