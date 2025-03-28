@@ -100,28 +100,23 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
       onSubmit={onSubmit}
       validationSchema={TaskTriggerSchema}
     >
-      {({
-        dirty,
-        errors,
-        handleSubmit,
-        isSubmitting,
-        setFieldTouched,
-        setFieldValue,
-        values,
-      }) => {
-        if (dirty) {
+      {(formik) => {
+        if (formik.dirty) {
           window.addEventListener('beforeunload', beforeUnloadHandler)
         } else {
           window.removeEventListener('beforeunload', beforeUnloadHandler)
         }
         return (
-          <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+          <Form
+            onSubmit={formik.handleSubmit}
+            error={Object.keys(formik.errors).length > 0}
+          >
             <InputField
               required
               name="name"
               label="Name"
               placeholder="Describe the task template"
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
             />
             <DropdownField
               required
@@ -135,7 +130,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                   text: value,
                 })
               )}
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
             />
             <DropdownField
               required
@@ -151,11 +146,11 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                 const isStage = value === 'STAGE'
                 setShowEventStage(isStage)
                 if (!isStage) {
-                  setFieldValue('event_stage', null)
+                  formik.setFieldValue('event_stage', null)
                 }
-                setFieldTouched('event_stage', false)
+                formik.setFieldTouched('event_stage', false)
               }}
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
             />
             {showEventStage && (
               <DropdownField
@@ -168,7 +163,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                   value: key,
                   text: value,
                 }))}
-                disabled={isSubmitting}
+                disabled={formik.isSubmitting}
               />
             )}
             <DropdownField
@@ -183,7 +178,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                   text: value,
                 })
               )}
-              disabled={isSubmitting}
+              disabled={formik.isSubmitting}
             />
 
             <FieldArray name="templates">
@@ -209,7 +204,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
                     </Grid>
                     <TaskTemplateTable
                       arrayHelpers={arrayHelpers}
-                      templates={values.templates}
+                      templates={formik.values.templates}
                     />
                   </>
                 )
@@ -219,8 +214,8 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             <Button
               primary
               type="submit"
-              disabled={isSubmitting}
-              loading={isSubmitting}
+              disabled={formik.isSubmitting}
+              loading={formik.isSubmitting}
               style={{ marginTop: '1rem' }}
             >
               {create ? 'Create task template' : 'Update task template'}
@@ -228,8 +223,8 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             {!create && onDelete && (
               <Button
                 color="red"
-                disabled={isSubmitting}
-                loading={isSubmitting}
+                disabled={formik.isSubmitting}
+                loading={formik.isSubmitting}
                 onClick={onDelete}
               >
                 Delete
