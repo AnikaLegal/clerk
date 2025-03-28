@@ -29,7 +29,7 @@ import {
   InputField,
   RichTextEditorField,
 } from 'forms/formik'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   ButtonProps,
@@ -79,6 +79,23 @@ interface TaskTemplateFormProps {
   ) => void | Promise<any>
 }
 
+const beforeUnloadHandler = (event) => {
+  event.preventDefault()
+  event.returnValue = true
+}
+
+const HandleUnload = ({ dirty }: { dirty: boolean }) => {
+  useEffect(() => {
+    if (dirty) {
+      window.addEventListener('beforeunload', beforeUnloadHandler)
+    } else {
+      window.removeEventListener('beforeunload', beforeUnloadHandler)
+    }
+  }, [dirty])
+
+  return null
+}
+
 export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   create,
   onDelete,
@@ -89,24 +106,23 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
     initialValues.event === 'STAGE'
   )
 
-  const beforeUnloadHandler = (event) => {
-    event.preventDefault()
-    event.returnValue = true
+  const handleSubmit = (
+    values: TaskTriggerCreate,
+    helpers: FormikHelpers<TaskTriggerCreate>
+  ) => {
+    onSubmit(values, helpers)
+    helpers.resetForm({ values: values })
   }
 
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       validationSchema={TaskTriggerSchema}
     >
-      {(formik) => {
-        if (formik.dirty) {
-          window.addEventListener('beforeunload', beforeUnloadHandler)
-        } else {
-          window.removeEventListener('beforeunload', beforeUnloadHandler)
-        }
-        return (
+      {(formik) => (
+        <>
+          <HandleUnload dirty={formik.dirty} />
           <Form
             onSubmit={formik.handleSubmit}
             error={Object.keys(formik.errors).length > 0}
@@ -231,8 +247,8 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
               </Button>
             )}
           </Form>
-        )
-      }}
+        </>
+      )}
     </Formik>
   )
 }
