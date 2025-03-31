@@ -17,7 +17,7 @@
   "pk": 2,
   "fields": {
     "created_at": "2025-03-24T05:25:42.733Z",
-    "modified_at": "2025-03-31T04:25:41.868Z",
+    "modified_at": "2025-03-31T06:02:34.461Z",
     "name": "Initial steps on repairs case assignment",
     "topic": "REPAIRS",
     "event": "PARALEGAL",
@@ -62,7 +62,7 @@
   "pk": 3,
   "fields": {
     "created_at": "2025-03-26T00:46:14.669Z",
-    "modified_at": "2025-03-31T04:25:41.843Z",
+    "modified_at": "2025-03-31T06:02:34.438Z",
     "type": "MANAGE",
     "name": "01a - Receive your client file - Confirm receipt of assignment",
     "description": "<p>Hello {{assigned_to.get_full_name}}, you have been assigned the {{case.get_topic_display}} case {{case.fileref}}.</p><p>The materials needed to advise the client are located in this file. Please use this, along with information from the client call, to populate the file note. <strong>Please do not distribute any of these materials.</strong></p><h4>Your case</h4><ul><li><p>Case reference: {{case.fileref}}</p></li><li><p>Client: {{case.client.get_full_name}}</p></li><li><p>Case start date: {{case.created_at|date:\"SHORT_DATE_FORMAT\"}}</p></li><li><p>Supervising lawyer: {{case.lawyer.get_full_name}} at {{case.lawyer.email}}</p></li></ul><h4>Compliance</h4><ul><li><p>Other than the client's email address, all email correspondence must be sent to Anika email addresses <strong>only</strong>. Any email otherwise sent to an external email address is a breach of client confidentiality. <strong>Do not send case emails to any other email domain under any circumstance</strong>.</p></li><li><p>If someone at Anika asks you to CC them at their personal email, please don’t! This is a breach of confidentiality.</p></li><li><p>All information relating to the case is confidential and can only be shared with Anika inducted staff.</p></li><li><p>For legal questions about the case contact your supervising lawyer.</p></li><li><p>For questions about the general process contact your supervising coordinator for the particular day on the <a rel=\"noopener noreferrer nofollow\" href=\"https://anika-legal.slack.com/archives/CPR3K4F5K\">case team slack channel.</a></p></li></ul><h4>First steps</h4><ul><li><p>Add a file note \"Confirmed receipt of assignment\" immediately.</p></li><li><p>Read any file notes the Paralegal Leads have left for you during preliminary triage - particularly regarding outstanding information for eligibility checks, conflict checks, or client engagement notes.</p></li></ul><p>You are expected to start giving case updates on this matter within 2 business days. Any questions you have please get in touch with the Paralegal Lead of the day.</p><p>Be sure to keep track of all feedback!</p><p>Good luck,</p><p>Anika Case Team Leadership</p>",
@@ -78,10 +78,10 @@
   "pk": 17,
   "fields": {
     "created_at": "2025-03-31T01:29:43.495Z",
-    "modified_at": "2025-03-31T04:25:41.855Z",
+    "modified_at": "2025-03-31T06:02:34.448Z",
     "type": "CONTACT",
     "name": "01b - Preparing to engage the client - Call your client",
-    "description": "<p>Call your client following the script in Precedent 01 and fill out the relevant fields. </p><p></p><h4>Contact details</h4><ul><li><p>Client name: {{case.client.get_full_name}}</p></li><li><p>Preferred name: {{case.client.preferred_name}}</p></li><li><p>Phone number: {{case.client.phone_number}}</p></li><li><p>Call times: TODO</p></li><li><p>Email: {{case.client.email}}</p></li></ul><p></p><p>If the client doesn't answer your first call and email, make sure you try calling the client at least three times across different days and times! Make a file note on the timeline every time you attempt a call, and the outcome of that call.</p><p>If client still fails to respond:</p><p>- Send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email to the client at {{case.client.email}} to arrange another time to call.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again and put them on notice of case closure.</p><p>- If they fail to respond, [use the standard procedure for case closure].</p><p></p>",
+    "description": "<p>Call your client following the script in Precedent 01 and fill out the relevant fields. </p><p></p><h4>Contact details</h4><ul><li><p>Client name: {{case.client.get_full_name}}</p></li><li><p>Preferred name: {{case.client.preferred_name}}</p></li><li><p>Phone number: {{case.client.phone_number}}</p></li><li><p>Call times: {{case.client.get_call_times_display|join:\" | \"}}</p></li><li><p>Email: {{case.client.email}}</p></li></ul><p></p><p>If the client doesn't answer your first call and email, make sure you try calling the client at least three times across different days and times! Make a file note on the timeline every time you attempt a call, and the outcome of that call.</p><p>If client still fails to respond:</p><p>- Send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email to the client at {{case.client.email}} to arrange another time to call.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again and put them on notice of case closure.</p><p>- If they fail to respond, [use the standard procedure for case closure].</p><p></p>",
     "due_in": null,
     "is_urgent": false,
     "is_approval_required": false,
@@ -94,7 +94,7 @@
   "pk": 19,
   "fields": {
     "created_at": "2025-03-31T01:31:11.541Z",
-    "modified_at": "2025-03-31T04:25:41.848Z",
+    "modified_at": "2025-03-31T06:02:34.442Z",
     "type": "MANAGE",
     "name": "01b - Preparing to engage the client - Pre-fill file note & prepare questions",
     "description": "<p>To prepare for your client call, complete Precedent 01 based on the info in the matter thus far. Prepare a list of questions that you would like to ask your client to clarify those fields.</p>",
@@ -110,7 +110,7 @@
   "pk": 45,
   "fields": {
     "created_at": "2025-03-31T03:01:59.244Z",
-    "modified_at": "2025-03-31T04:25:41.853Z",
+    "modified_at": "2025-03-31T06:02:34.446Z",
     "type": "CONTACT",
     "name": "01b - Preparing to engage the client - Introduce yourself",
     "description": "<p>Email your client using &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;Repairs Template 1&lt;/a&gt;.</p><h4>Contact details</h4><ul><li><p>Client name: {{case.client.get_full_name}}</p></li><li><p>Email: {{case.client.email}}</p></li></ul>",
@@ -126,7 +126,7 @@
   "pk": 46,
   "fields": {
     "created_at": "2025-03-31T03:01:59.249Z",
-    "modified_at": "2025-03-31T04:25:41.858Z",
+    "modified_at": "2025-03-31T06:02:34.451Z",
     "type": "SEND",
     "name": "01b - Preparing to engage the client - Send the client agreement",
     "description": "<p>Fill out and email the &lt;a href=\"{% url 'case-docs' case.id %}\"&gt;Client Agreement&lt;/a&gt; form to your client using &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;Repairs template 2&lt;/a&gt;.</p><p></p>",
@@ -142,7 +142,7 @@
   "pk": 47,
   "fields": {
     "created_at": "2025-03-31T03:01:59.253Z",
-    "modified_at": "2025-03-31T04:25:41.860Z",
+    "modified_at": "2025-03-31T06:02:34.454Z",
     "type": "MANAGE",
     "name": "01b - Preparing to engage the client - Proceed",
     "description": "<p>Update the case stage to \"Client agreement\". New tasks will be assigned to you automatically.</p>",
