@@ -19,7 +19,7 @@ class TaskTemplateType(models.TextChoices):
 
 class TaskTemplate(TimestampedModel):
     type = models.CharField(max_length=32, choices=TaskTemplateType.choices)
-    name = models.CharField(max_length=64)
+    name = models.TextField()
     description = models.TextField(blank=True, default="")
     # Number of days from when the task is assigned until it is due.
     due_in = models.IntegerField(blank=True, null=True, default=None)
