@@ -230,7 +230,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
             <Button
               primary
               type="submit"
-              disabled={formik.isSubmitting}
+              disabled={!formik.dirty || formik.isSubmitting}
               loading={formik.isSubmitting}
               style={{ marginTop: '1rem' }}
             >
