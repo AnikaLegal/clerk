@@ -182,13 +182,14 @@ EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
 
 # Internationalization
-LANGUAGE_CODE = "en"
+LANGUAGE_CODE = "en-AU"
 TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
 USE_TZ = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
     ("en", "English"),
+    ("en-AU", "English"),
     ("ar", "Arabic"),
     ("hi", "Hindi"),
     ("id", "Indonesian"),
