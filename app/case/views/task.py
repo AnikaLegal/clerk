@@ -133,7 +133,7 @@ class TaskApiViewset(ModelViewSet):
         return queryset
 
     def sort_queryset(self, queryset: QuerySet[Task]) -> QuerySet[Task]:
-        return queryset.order_by("-is_urgent", "due_at", "-days_open")
+        return queryset.order_by("-is_urgent", "due_at", "-days_open", "group_order")
 
     def search_queryset(self, queryset: QuerySet[Task]) -> QuerySet[Task]:
         """
