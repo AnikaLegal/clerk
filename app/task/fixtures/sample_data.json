@@ -1,1 +1,156 @@
-[{"model": "task.tasktrigger", "pk": 1, "fields": {"created_at": "2025-03-24T04:49:56.879Z", "modified_at": "2025-03-28T02:29:16.624Z", "name": "Initial checks on repairs case creation", "topic": "REPAIRS", "event": "CREATE", "event_stage": null, "tasks_assignment_role": "COORDINATOR"}}, {"model": "task.tasktrigger", "pk": 2, "fields": {"created_at": "2025-03-24T05:25:42.733Z", "modified_at": "2025-03-28T05:38:57.386Z", "name": "Initial steps on repairs case assignment", "topic": "REPAIRS", "event": "PARALEGAL", "event_stage": null, "tasks_assignment_role": "PARALEGAL"}}, {"model": "task.tasktemplate", "pk": 1, "fields": {"created_at": "2025-03-24T04:49:56.885Z", "modified_at": "2025-03-28T02:29:16.610Z", "type": "CHECK", "name": "Preliminary eligibility check", "description": "<p>Hi Coordinators, </p><p>Please assess whether the help-seeker satisfies our eligibility criteria by following (1) the Internal Assessment Method in our <a rel=\"noopener noreferrer nofollow\" href=\"https://drive.google.com/file/d/1ocW-k9GYLfLtn6Kd89CAU6CbyuhUEbeb/view?usp=sharing\">Eligibility Criteria document</a>, and (2) with reference to the appropriate scope of the respective service.</p><ul><li><p>If eligible on both counts, log eligibility check as “Cleared” and the provide considerations for your conclusion.<br></p></li><li><p>If ineligible, log eligibility check as “Not cleared” and provide reasons for your conclusion. Notify the help-seeker that they are ineligible:</p><ol><li><p>Send General Template 2.</p></li><li><p>Send referrals using the LHO Referral Process.</p></li></ol></li><li><p>If insufficient details are available from intake submission, leave a file note on the timeline for the yet-to-be-assigned paralegal/intern:</p></li></ul><blockquote><p>Insufficient details provided to complete eligibility check. Please obtain further details about #### during your initial client call. If the client’s response is ####, they are eligible and you may proceed. If the client’s response is ####, they are ineligible and you should end the call and liaise with a Paralegal Lead for the next steps.</p></blockquote><p>Please <strong>reassign this task to yourself </strong>so that other coordinators do not also begin work on it.</p>", "due_in": null, "is_urgent": false, "is_approval_required": false, "trigger": 1, "_order": 0}}, {"model": "task.tasktemplate", "pk": 2, "fields": {"created_at": "2025-03-24T04:49:56.899Z", "modified_at": "2025-03-28T02:29:16.617Z", "type": "CHECK", "name": "Preliminary conflict check", "description": "<p>Hi Coordinators, </p><p>Please conduct a conflict check. </p><ul><li><p>If the conflict check cleared, log the conflict check as “Cleared”.<br></p></li><li><p>If the conflict check is suspected conflicted, escalate the conflict identified to the Principal Lawyer via Clerk email stating the matter is conflicted, the reason for which it is conflicted, and whether the conflict may be cleared:<br></p><ul><li><p>If the Principal Lawyer clears the conflict, log the conflict check as “Cleared”.</p></li><li><p>If the Principal Lawyer confirms that the matter is conflicted, log the conflict check as “Not cleared” and notify the help-seeker that they are ineligible:</p><ol><li><p>Send General Template 2.</p></li><li><p>Send referrals using the LHO Referral Process.</p></li></ol></li></ul></li><li><p>If insufficient details are available from intake submission, leave a file note on the timeline for the yet-to-be-assigned paralegal/intern:</p></li></ul><blockquote><p>Insufficient details were provided to enable a conflict check. Please obtain party details during your initial client call and trigger a conflict check with the Paralegal Leads, <strong>before</strong> sending a client agreement.</p><p>If the client does not know the landlord's full name, ask them to check their rental agreement.</p><p>If the client is still not sure where to find the landlord's name on the rental agreement, ask them to send through the agreement to us after the initial call (send the client a follow-up email so that they can reply to it with the agreement attached.)</p></blockquote><p>Please <strong>reassign this task to yourself </strong>so that other coordinators do not also begin work on it.</p>", "due_in": null, "is_urgent": false, "is_approval_required": false, "trigger": 1, "_order": 1}}, {"model": "task.tasktemplate", "pk": 3, "fields": {"created_at": "2025-03-26T00:46:14.669Z", "modified_at": "2025-03-28T05:38:57.381Z", "type": "MANAGE", "name": "01a - Receive your client file - Confirm receipt of assignment", "description": "<p>Hello {{assigned_to.get_full_name}}, you have been assigned the {{case.get_topic_display}} case {{case.fileref}}.</p><p>The materials needed to advise the client are located in this file. Please use this, along with information from the client call, to populate the file note. <strong>Please do not distribute any of these materials.</strong></p><h4>Your case</h4><ul><li><p>Case reference: {{case.fileref}}</p></li><li><p>Client: {{case.client.get_full_name}}</p></li><li><p>Case start date: {{case.created_at}}</p></li><li><p>Supervising lawyer: {{case.lawyer.get_full_name}} at {{case.lawyer.email}}</p></li></ul><h4>Compliance</h4><ul><li><p>Other than the client's email address, all email correspondence must be sent to Anika email addresses <strong>only</strong>. Any email otherwise sent to an external email address is a breach of client confidentiality. <strong>Do not send case emails to any other email domain under any circumstance</strong>.</p></li><li><p>If someone at Anika asks you to CC them at their personal email, please don’t! This is a breach of confidentiality.</p></li><li><p>All information relating to the case is confidential and can only be shared with Anika inducted staff.</p></li><li><p>For legal questions about the case contact your supervising lawyer.</p></li><li><p>For questions about the general process contact your supervising coordinator for the particular day on the <a rel=\"noopener noreferrer nofollow\" href=\"https://anika-legal.slack.com/archives/CPR3K4F5K\">case team slack channel.</a></p></li></ul><h4>First steps</h4><ul><li><p>Add a file note \"Confirmed receipt of assignment\" immediately.</p></li><li><p>Read any file notes the Paralegal Leads have left for you during preliminary triage - particularly regarding outstanding information for eligibility checks, conflict checks, or client engagement notes.</p></li></ul><p>You are expected to start giving case updates on this matter within 2 business days. Any questions you have please get in touch with the Paralegal Lead of the day.</p><p>Be sure to keep track of all feedback!</p><p>Good luck,</p><p>Anika Case Team Leadership</p>", "due_in": null, "is_urgent": false, "is_approval_required": false, "trigger": 2, "_order": 0}}, {"model": "task.tasktemplate", "pk": 10, "fields": {"created_at": "2025-03-28T05:38:57.373Z", "modified_at": "2025-03-28T05:38:57.374Z", "type": "MANAGE", "name": "01b - Preparing to engage the client - Pre-fill file note & prepare questions", "description": "<p>To prepare for your client call, complete Precedent 01 based on the info in the matter thus far. Prepare a list of questions that you would like to ask your client to clarify those fields.</p>", "due_in": null, "is_urgent": false, "is_approval_required": false, "trigger": 2, "_order": 1}}, {"model": "task.tasktemplate", "pk": 11, "fields": {"created_at": "2025-03-28T05:38:57.377Z", "modified_at": "2025-03-28T05:38:57.377Z", "type": "CONTACT", "name": "01b - Preparing to engage the client - Introduce yourself", "description": "<p>Send &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;Repairs Template 1&lt;/a&gt; to the client at {{case.client.email}}.</p>", "due_in": null, "is_urgent": false, "is_approval_required": false, "trigger": 2, "_order": 2}}]
+[
+{
+  "model": "task.tasktrigger",
+  "pk": 1,
+  "fields": {
+    "created_at": "2025-03-24T04:49:56.879Z",
+    "modified_at": "2025-03-28T02:29:16.624Z",
+    "name": "Initial checks on repairs case creation",
+    "topic": "REPAIRS",
+    "event": "CREATE",
+    "event_stage": null,
+    "tasks_assignment_role": "COORDINATOR"
+  }
+},
+{
+  "model": "task.tasktrigger",
+  "pk": 2,
+  "fields": {
+    "created_at": "2025-03-24T05:25:42.733Z",
+    "modified_at": "2025-03-31T01:45:11.716Z",
+    "name": "Initial steps on repairs case assignment",
+    "topic": "REPAIRS",
+    "event": "PARALEGAL",
+    "event_stage": null,
+    "tasks_assignment_role": "PARALEGAL"
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 1,
+  "fields": {
+    "created_at": "2025-03-24T04:49:56.885Z",
+    "modified_at": "2025-03-28T02:29:16.610Z",
+    "type": "CHECK",
+    "name": "Preliminary eligibility check",
+    "description": "<p>Hi Coordinators, </p><p>Please assess whether the help-seeker satisfies our eligibility criteria by following (1) the Internal Assessment Method in our <a rel=\"noopener noreferrer nofollow\" href=\"https://drive.google.com/file/d/1ocW-k9GYLfLtn6Kd89CAU6CbyuhUEbeb/view?usp=sharing\">Eligibility Criteria document</a>, and (2) with reference to the appropriate scope of the respective service.</p><ul><li><p>If eligible on both counts, log eligibility check as “Cleared” and the provide considerations for your conclusion.<br></p></li><li><p>If ineligible, log eligibility check as “Not cleared” and provide reasons for your conclusion. Notify the help-seeker that they are ineligible:</p><ol><li><p>Send General Template 2.</p></li><li><p>Send referrals using the LHO Referral Process.</p></li></ol></li><li><p>If insufficient details are available from intake submission, leave a file note on the timeline for the yet-to-be-assigned paralegal/intern:</p></li></ul><blockquote><p>Insufficient details provided to complete eligibility check. Please obtain further details about #### during your initial client call. If the client’s response is ####, they are eligible and you may proceed. If the client’s response is ####, they are ineligible and you should end the call and liaise with a Paralegal Lead for the next steps.</p></blockquote><p>Please <strong>reassign this task to yourself </strong>so that other coordinators do not also begin work on it.</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 1,
+    "_order": 0
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 2,
+  "fields": {
+    "created_at": "2025-03-24T04:49:56.899Z",
+    "modified_at": "2025-03-28T02:29:16.617Z",
+    "type": "CHECK",
+    "name": "Preliminary conflict check",
+    "description": "<p>Hi Coordinators, </p><p>Please conduct a conflict check. </p><ul><li><p>If the conflict check cleared, log the conflict check as “Cleared”.<br></p></li><li><p>If the conflict check is suspected conflicted, escalate the conflict identified to the Principal Lawyer via Clerk email stating the matter is conflicted, the reason for which it is conflicted, and whether the conflict may be cleared:<br></p><ul><li><p>If the Principal Lawyer clears the conflict, log the conflict check as “Cleared”.</p></li><li><p>If the Principal Lawyer confirms that the matter is conflicted, log the conflict check as “Not cleared” and notify the help-seeker that they are ineligible:</p><ol><li><p>Send General Template 2.</p></li><li><p>Send referrals using the LHO Referral Process.</p></li></ol></li></ul></li><li><p>If insufficient details are available from intake submission, leave a file note on the timeline for the yet-to-be-assigned paralegal/intern:</p></li></ul><blockquote><p>Insufficient details were provided to enable a conflict check. Please obtain party details during your initial client call and trigger a conflict check with the Paralegal Leads, <strong>before</strong> sending a client agreement.</p><p>If the client does not know the landlord's full name, ask them to check their rental agreement.</p><p>If the client is still not sure where to find the landlord's name on the rental agreement, ask them to send through the agreement to us after the initial call (send the client a follow-up email so that they can reply to it with the agreement attached.)</p></blockquote><p>Please <strong>reassign this task to yourself </strong>so that other coordinators do not also begin work on it.</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 1,
+    "_order": 1
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 3,
+  "fields": {
+    "created_at": "2025-03-26T00:46:14.669Z",
+    "modified_at": "2025-03-31T01:45:11.702Z",
+    "type": "MANAGE",
+    "name": "01a - Receive your client file - Confirm receipt of assignment",
+    "description": "<p>Hello {{assigned_to.get_full_name}}, you have been assigned the {{case.get_topic_display}} case {{case.fileref}}.</p><p>The materials needed to advise the client are located in this file. Please use this, along with information from the client call, to populate the file note. <strong>Please do not distribute any of these materials.</strong></p><h4>Your case</h4><ul><li><p>Case reference: {{case.fileref}}</p></li><li><p>Client: {{case.client.get_full_name}}</p></li><li><p>Case start date: {{case.created_at}}</p></li><li><p>Supervising lawyer: {{case.lawyer.get_full_name}} at {{case.lawyer.email}}</p></li></ul><h4>Compliance</h4><ul><li><p>Other than the client's email address, all email correspondence must be sent to Anika email addresses <strong>only</strong>. Any email otherwise sent to an external email address is a breach of client confidentiality. <strong>Do not send case emails to any other email domain under any circumstance</strong>.</p></li><li><p>If someone at Anika asks you to CC them at their personal email, please don’t! This is a breach of confidentiality.</p></li><li><p>All information relating to the case is confidential and can only be shared with Anika inducted staff.</p></li><li><p>For legal questions about the case contact your supervising lawyer.</p></li><li><p>For questions about the general process contact your supervising coordinator for the particular day on the <a rel=\"noopener noreferrer nofollow\" href=\"https://anika-legal.slack.com/archives/CPR3K4F5K\">case team slack channel.</a></p></li></ul><h4>First steps</h4><ul><li><p>Add a file note \"Confirmed receipt of assignment\" immediately.</p></li><li><p>Read any file notes the Paralegal Leads have left for you during preliminary triage - particularly regarding outstanding information for eligibility checks, conflict checks, or client engagement notes.</p></li></ul><p>You are expected to start giving case updates on this matter within 2 business days. Any questions you have please get in touch with the Paralegal Lead of the day.</p><p>Be sure to keep track of all feedback!</p><p>Good luck,</p><p>Anika Case Team Leadership</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 0
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 17,
+  "fields": {
+    "created_at": "2025-03-31T01:29:43.495Z",
+    "modified_at": "2025-03-31T01:45:11.707Z",
+    "type": "CONTACT",
+    "name": "01b - Preparing to engage the client - Call your client",
+    "description": "<p>Call your client following the script in Precedent 01 and fill out the relevant fields. </p><p>Contact details</p><p>- Client name: {{case.client.get_full_name}}</p><p>- Preferred name: {{case.client.preferred_name}}</p><p>- Phone number: {{case.client.phone_number}}</p><p>- Call times: {% for time in case.client.get_call_times_display %} {{ time }} | {% endfor %} - TODO</p><p>- Email: {{case.client.email}}</p><p>If the client doesn't answer your first call and email, make sure you try calling the client at least three times across different days and times! Make a file note on the timeline every time you attempt a call, and the outcome of that call.</p><p>If client still fails to respond:</p><p>- Send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email to the client at {{case.client.email}} to arrange another time to call.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again.</p><p>- If they fail to respond, send the &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;General Template 3&lt;/a&gt; email again and put them on notice of case closure.</p><p>- If they fail to respond, [use the standard procedure for case closure].</p><p></p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 3
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 19,
+  "fields": {
+    "created_at": "2025-03-31T01:31:11.541Z",
+    "modified_at": "2025-03-31T01:45:11.705Z",
+    "type": "MANAGE",
+    "name": "01b - Preparing to engage the client - Pre-fill file note & prepare questions",
+    "description": "<p>To prepare for your client call, complete Precedent 01 based on the info in the matter thus far. Prepare a list of questions that you would like to ask your client to clarify those fields.</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 1
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 33,
+  "fields": {
+    "created_at": "2025-03-31T01:45:11.689Z",
+    "modified_at": "2025-03-31T01:45:11.689Z",
+    "type": "CONTACT",
+    "name": "01b - Preparing to engage the client - Introduce yourself",
+    "description": "<p>Send &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;Repairs Template 1&lt;/a&gt; to the client at {{case.client.email}}.</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 2
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 34,
+  "fields": {
+    "created_at": "2025-03-31T01:45:11.693Z",
+    "modified_at": "2025-03-31T01:45:11.694Z",
+    "type": "SEND",
+    "name": "01b - Preparing to engage the client - Send the client agreement",
+    "description": "<p>Fill out and email the &lt;a href=\"{% url 'case-docs' case.id %}\"&gt;Client Agreement&lt;/a&gt; form to your client using &lt;a href=\"{% url 'case-email-draft' case.id %}\"&gt;Repairs template 2&lt;/a&gt;.</p><p></p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 4
+  }
+},
+{
+  "model": "task.tasktemplate",
+  "pk": 35,
+  "fields": {
+    "created_at": "2025-03-31T01:45:11.698Z",
+    "modified_at": "2025-03-31T01:45:11.698Z",
+    "type": "MANAGE",
+    "name": "01b - Preparing to engage the client - Proceed",
+    "description": "<p>Update the case stage to \"Client agreement\". New tasks will be assigned to you automatically.</p>",
+    "due_in": null,
+    "is_urgent": false,
+    "is_approval_required": false,
+    "trigger": 2,
+    "_order": 5
+  }
+}
+]
