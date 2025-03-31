@@ -74,7 +74,10 @@ class AboriginalOrTorresStraitIslander(models.TextChoices):
         "YES_ABORIGINAL_AND_TSI",
         "Yes, Aboriginal and Torres Strait Islander",
     )
-    YES_CONFIRM = "YES_CONFIRM", "Yes (Confirm if Aboriginal and/or Torres Strait Islander)"
+    YES_CONFIRM = (
+        "YES_CONFIRM",
+        "Yes (Confirm if Aboriginal and/or Torres Strait Islander)",
+    )
     PREFER_NOT_TO_ANSWER = "PREFER_NOT_TO_ANSWER", "Prefer not to answer"
     NOT_STATED = "NOT_STATED", "Not Stated"
 
@@ -166,6 +169,12 @@ class Client(TimestampedModel):
     def get_age(self) -> int:
         if self.date_of_birth:
             return int((timezone.now() - self.date_of_birth).days / 365.25)
+
+    def get_call_times_display(self):
+        return [CallTime[value].label for value in self.call_times]
+
+    def get_eligibility_circumstances_display(self):
+        return [EligibilityCircumstanceType[value].label for value in self.eligibility_circumstances]
 
     def __str__(self) -> str:
         name = self.get_full_name()
