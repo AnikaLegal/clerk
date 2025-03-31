@@ -54,6 +54,7 @@ export const TaskForm = ({ formik, user, typeChoices }: TaskFormProps) => {
         name="due_at"
         label="Due date"
         dateFormat="DD/MM/YYYY"
+        initialDate={moment().add(1, 'day')}
         minDate={moment().add(1, 'day')}
       />
       <BooleanField name="is_urgent" label="Urgent?" />
