@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  web:
+    command: bash /app/scripts/web/prod.sh
+    image: anikalaw/clerk:dev
+    ports:
+      - 8001:8001
+    volumes:
+      - /var/run/postgresql:/app/postgres.sock
+      - /var/log/clerk/test/web:/var/log
+    env_file:
+      - ../env/staging.env
+
+  worker:
+    command: bash /app/scripts/worker/prod.sh
+    image: anikalaw/clerk:dev
+    volumes:
+      - /var/run/postgresql:/app/postgres.sock
+      - /var/log/clerk/test/worker:/var/log
+    env_file:
+      - ../env/staging.env

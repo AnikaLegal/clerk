@@ -169,9 +169,8 @@
                 </p>
             </div>
         </div>
-        {% get_cookie "dismiss_footer_banner_energy_report" as dismiss_footer_banner %}
-        {% slugurl 'report-too-hot-too-cold-too-costly' as report_url %}
-        {% if false and request.path != report_url and not dismiss_footer_banner %}
+        {% get_cookie "dismiss_footer_banner_easter_2025_appeal" as dismiss_footer_banner %}
+        {% if not dismiss_footer_banner %}
         <div id="footer-banner">
             <div class="footer-banner-contents">
                 <div class="footer-banner-image">
@@ -179,16 +178,12 @@
                 </div>
                 <div class="footer-banner-text">
                     <div class="footer-banner-header">
-                        Report: Too Hot, Too Cold, Too Costly
-                    </div>
-                    <div class="footer-banner-subheading">
-                        We've delved deep into the data surrounding energy
-                        inefficiency and its impact on Victorian renters. Read
-                        the full report today.
+                        Legal support today. A fairer system tomorrow.
+                        Donate to Anika Legal's Easter Appeal.
                     </div>
                 </div>
                 <div class="footer-banner-action">
-                    <a href="{{ report_url }}"><button>Read the report here</button></a>
+                    <a href="https://anika-appeal.raiselysite.com/"><button>Donate</button></a>
                 </div>
             </div>
             <div class="footer-banner-close">
@@ -208,7 +203,7 @@
     </script>
     <script>
         function dismissFooterBanner() {
-            document.cookie = "dismiss_footer_banner_energy_report=true; max-age=604800; Path=/";
+            document.cookie = "dismiss_footer_banner_easter_2025_appeal=true; max-age=604800; Path=/";
             document.getElementById("footer-banner").style.display = "none";
         }
     </script>
