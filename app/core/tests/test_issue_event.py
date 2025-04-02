@@ -58,11 +58,9 @@ def test_issue_event_created_on_issue_lawyer():
     assert event.next_user == None
 
 
-# TODO: We have to mock these functions to prevent errors that occur when
-# changing the paralegal. We should fix this so that the mocks are not required.
-@mock.patch("core.signals.issue.add_user_to_case", autospec=True)
-@mock.patch("core.signals.issue.remove_user_from_case", autospec=True)
-@mock.patch("core.signals.issue.send_case_assignment_slack", autospec=True)
+@mock.patch("core.signals.issue_event.add_user_to_case", autospec=True)
+@mock.patch("core.signals.issue_event.remove_user_from_case", autospec=True)
+@mock.patch("core.signals.issue_event.send_case_assignment_slack", autospec=True)
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 def test_issue_event_created_on_issue_paralegal(mock_add, mock_remove, mock_send):
@@ -98,7 +96,7 @@ def test_issue_event_created_on_issue_paralegal(mock_add, mock_remove, mock_send
     assert events.count() == 3
     event = events.last()
     assert event.prev_user == user_2
-    assert event.next_user == None
+    assert event.next_user is None
 
 
 @pytest.mark.django_db

@@ -88,8 +88,8 @@ def test_admin_to_coordinator(
 
 @pytest.mark.enable_signals
 @pytest.mark.django_db
-@patch("core.signals.issue.remove_user_from_case")
-@patch("core.signals.issue.add_user_to_case")
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
 def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
     user = UserFactory()
     issue = IssueFactory(is_case_sent=True, paralegal=None)
@@ -102,8 +102,8 @@ def test_add_paralegal_to_case(add_user_to_case, remove_user_from_case):
 
 @pytest.mark.enable_signals
 @pytest.mark.django_db
-@patch("core.signals.issue.remove_user_from_case")
-@patch("core.signals.issue.add_user_to_case")
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
 def test_remove_paralegal_from_case(add_user_to_case, remove_user_from_case):
     user = UserFactory()
     issue = IssueFactory(is_case_sent=True, paralegal=user, lawyer=UserFactory())
@@ -118,8 +118,8 @@ def test_remove_paralegal_from_case(add_user_to_case, remove_user_from_case):
 @patch("accounts.signals.remove_user_from_case")
 @patch("accounts.signals.set_up_coordinator")
 @patch("accounts.signals.tear_down_coordinator")
-@patch("core.signals.issue.remove_user_from_case")
-@patch("core.signals.issue.add_user_to_case")
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
 def test_remove_paralegal_from_group(
     core_add_user_to_case,
     core_remove_user_from_case,

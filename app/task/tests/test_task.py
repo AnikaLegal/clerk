@@ -1,5 +1,6 @@
 from random import randint
 
+from unittest.mock import patch
 import pytest
 from core.factories import IssueEventFactory, IssueFactory, UserFactory
 from core.models.issue_event import EventType
@@ -9,9 +10,13 @@ from task.models.task import TaskStatus
 from task.models.trigger import TasksCaseRole
 
 
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 def test_task__tasks_suspended(
+    patch_remove_user_from_case,
+    patch_add_user_to_case,
     django_capture_on_commit_callbacks,
 ):
     """
@@ -93,9 +98,15 @@ def test_task__tasks_suspended(
     ).count() == len(tasks_4)
 
 
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
+@patch("core.signals.issue_event.send_case_assignment_slack")
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 def test_task__tasks_resumed(
+    patch_remove_user_from_case,
+    patch_add_user_to_case,
+    patch_send_case_assignment_slack,
     django_capture_on_commit_callbacks,
 ):
     """
@@ -200,9 +211,15 @@ def test_task__tasks_resumed(
     ).count() == len(tasks_4)
 
 
+@patch("core.signals.issue_event.remove_user_from_case")
+@patch("core.signals.issue_event.add_user_to_case")
+@patch("core.signals.issue_event.send_case_assignment_slack")
 @pytest.mark.django_db
 @pytest.mark.enable_signals
 def test_task__tasks_reassigned(
+    patch_remove_user_from_case,
+    patch_add_user_to_case,
+    patch_send_case_assignment_slack,
     django_capture_on_commit_callbacks,
 ):
     """

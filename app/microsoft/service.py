@@ -166,6 +166,10 @@ def add_user_to_case(user, issue):
     """
     Give User write permissions for a specific case (folder).
     """
+    logger.info(
+        f"Add User<{user.id}> to the Sharepoint folder matching Issue<{issue.id}>",
+    )
+
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
     api.folder.create_permissions(case_path, "write", [user.email])
@@ -175,6 +179,10 @@ def remove_user_from_case(user, issue):
     """
     Delete the permissions that a User has for a specific case (folder).
     """
+    logger.info(
+        f"Remove User<{user.id}> from the Sharepoint folder matching Issue<{issue.id}>",
+    )
+
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
 

@@ -5,10 +5,9 @@ from django.dispatch import receiver
 from django_q.tasks import async_task
 
 from core.models import Issue, IssueEvent
-from core.services.slack import send_issue_slack, send_case_assignment_slack
+from core.services.slack import send_issue_slack
 from emails.service.welcome import send_welcome_email
 from microsoft.tasks import set_up_new_case_task
-from microsoft.service import add_user_to_case, remove_user_from_case
 
 logger = logging.getLogger(__name__)
 
@@ -28,34 +27,6 @@ def pre_save_issue(sender, instance, **kwargs):
         prev_issue = None
 
     IssueEvent.maybe_generate_event(issue, prev_issue)
-
-    if prev_issue == None:
-        return
-
-    # TODO: move elsewhere? issue event post save handler? If the save
-    # subsequently fails we have already sent out notifications etc.
-    #
-    # If the paralegal for the current Issue object is different from that in
-    # the database.  We need to update the matching folder on Sharepoint by
-    # removing the old paralegal and adding the new one.
-    if issue.paralegal != prev_issue.paralegal:
-        if prev_issue.paralegal:
-            logger.info(
-                "Removing User<%s> from the Sharepoint folder matching Issue<%s>",
-                prev_issue.paralegal.id,
-                prev_issue.id,
-            )
-            remove_user_from_case(prev_issue.paralegal, prev_issue)
-
-        if issue.paralegal:
-            logger.info(
-                "Adding User<%s> to the Sharepoint folder matching Issue<%s>",
-                issue.paralegal.id,
-                issue.id,
-            )
-            add_user_to_case(issue.paralegal, issue)
-            # Send Slack message to paralegal
-            send_case_assignment_slack(issue)
 
 
 @receiver(post_save, sender=Issue)
