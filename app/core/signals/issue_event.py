@@ -33,5 +33,6 @@ def post_save_issue_event(sender, instance, **kwargs):
             add_user_to_case(event.next_user, event.issue)
 
             # Notify paralegal of case assignment.
+            # TODO: remove if tasks replaces this functionality.
             if event.event_type == EventType.PARALEGAL:
                 send_case_assignment_slack(event.issue)
