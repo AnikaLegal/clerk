@@ -23,13 +23,17 @@ services:
       - ../app:/app
       - /app/.venv/ # Exclude
       - build:/build
-      - ipython_data_local:/root/.ipython/profile_default
+      - config_local:/root/.config
     links:
       - worker
       - webpack
       - clerk_db
     env_file:
       - ../env/dev.env
+    environment:
+      - SHELLOPTS=vi
+      - HISTFILE=/root/.config/bash_history
+      - IPYTHON_DIR=/root/.config/ipython
 
   # Django-q worker.
   worker:
@@ -67,6 +71,6 @@ services:
       - ../env/test.env
 
 volumes:
-  clerk-postgres-data:
   build:
-  ipython_data_local:
+  clerk-postgres-data:
+  config_local:
