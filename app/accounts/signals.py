@@ -1,20 +1,19 @@
 # User / Group / Permission signals go here
 # set_up_coordinator / tear_down_coordinator
+from case.middleware import COORDINATOR_GROUPS, LAWYER_GROUPS
+from core.models import Issue
 from django.contrib.auth.models import Group
 from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
-
-from core.models import Issue
-from case.middleware import COORDINATOR_GROUPS
-from accounts.models import User, CaseGroups
 from microsoft.service import (
+    add_office_licence,
+    remove_office_licence,
     remove_user_from_case,
     set_up_coordinator,
     tear_down_coordinator,
-    remove_office_licence,
-    add_office_licence,
 )
 
+from accounts.models import CaseGroups, User
 
 POST_ADD = "post_add"
 POST_REMOVE = "post_remove"
@@ -66,6 +65,14 @@ def post_save_group(sender, instance, action, **kwargs):
             # If the user is not coordinator and is not a super user,
             # then try tear down their Microsoft account permissions.
             tear_down_coordinator(user)
+
+        is_lawyer_or_better = user.groups.filter(name__in=LAWYER_GROUPS).exists()
+        if (not user.is_active) or (not is_lawyer_or_better):
+            # If the user is not a lawyer or better then tear down their
+            # Microsoft account permissions for every case they are assigned to.
+            issues = Issue.objects.filter(lawyer=user)
+            for issue in issues:
+                remove_user_from_case(user, issue)
 
         is_paralegal_or_better = user.groups.filter(name__in=CaseGroups.GROUPS).exists()
         if (not user.is_active) or (not is_paralegal_or_better):

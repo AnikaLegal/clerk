@@ -17,12 +17,16 @@ def test_issue_event_created_on_issue_create():
 
     events = IssueEvent.objects.filter(issue=issue)
     assert events.count() == 1
-    assert events.last().event_type == EventType.CREATE
+    event = events.last()
+    assert event
+    assert event.event_type == EventType.CREATE
 
 
+@mock.patch("core.signals.issue_event.add_user_to_case", autospec=True)
+@mock.patch("core.signals.issue_event.remove_user_from_case", autospec=True)
 @pytest.mark.django_db
 @pytest.mark.enable_signals
-def test_issue_event_created_on_issue_lawyer():
+def test_issue_event_created_on_issue_lawyer(mock_add, mock_remove):
     """
     Ensure an issue event is created when a lawyer is assigned, changed and
     removed from an issue.
@@ -36,6 +40,7 @@ def test_issue_event_created_on_issue_lawyer():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 1
     event = events.last()
+    assert event
     assert event.prev_user is None
     assert event.next_user == user_1
 
@@ -45,6 +50,7 @@ def test_issue_event_created_on_issue_lawyer():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 2
     event = events.last()
+    assert event
     assert event.prev_user == user_1
     assert event.next_user == user_2
 
@@ -54,8 +60,9 @@ def test_issue_event_created_on_issue_lawyer():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 3
     event = events.last()
+    assert event
     assert event.prev_user == user_2
-    assert event.next_user == None
+    assert event.next_user is None
 
 
 @mock.patch("core.signals.issue_event.add_user_to_case", autospec=True)
@@ -77,6 +84,7 @@ def test_issue_event_created_on_issue_paralegal(mock_add, mock_remove, mock_send
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 1
     event = events.last()
+    assert event
     assert event.prev_user is None
     assert event.next_user == user_1
 
@@ -86,6 +94,7 @@ def test_issue_event_created_on_issue_paralegal(mock_add, mock_remove, mock_send
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 2
     event = events.last()
+    assert event
     assert event.prev_user == user_1
     assert event.next_user == user_2
 
@@ -95,6 +104,7 @@ def test_issue_event_created_on_issue_paralegal(mock_add, mock_remove, mock_send
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 3
     event = events.last()
+    assert event
     assert event.prev_user == user_2
     assert event.next_user is None
 
@@ -118,6 +128,7 @@ def test_issue_event_created_on_issue_stage():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 1
     event = events.last()
+    assert event
     assert event.next_stage == issue.stage
 
     issue.stage = CaseStage.ADVICE
@@ -126,6 +137,7 @@ def test_issue_event_created_on_issue_stage():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 2
     event = events.last()
+    assert event
     assert event.prev_stage == CaseStage.CLIENT_AGREEMENT
     assert event.next_stage == CaseStage.ADVICE
 
@@ -135,6 +147,7 @@ def test_issue_event_created_on_issue_stage():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 3
     event = events.last()
+    assert event
     assert event.prev_stage == CaseStage.ADVICE
     assert event.next_stage == CaseStage.FORMAL_LETTER
 
@@ -159,8 +172,9 @@ def test_issue_event_created_on_issue_open():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 1
     event = events.last()
-    assert event.prev_is_open == True
-    assert event.next_is_open == False
+    assert event
+    assert event.prev_is_open
+    assert not event.next_is_open
     assert event.prev_stage == CaseStage.UNSTARTED
     assert event.next_stage == CaseStage.CLOSED
 
@@ -171,7 +185,8 @@ def test_issue_event_created_on_issue_open():
     events = IssueEvent.objects.filter(issue=issue, event_type=event_type)
     assert events.count() == 2
     event = events.last()
-    assert event.prev_is_open == False
-    assert event.next_is_open == True
+    assert event
+    assert not event.prev_is_open
+    assert event.next_is_open
     assert event.prev_stage == CaseStage.CLOSED
     assert event.next_stage == CaseStage.UNSTARTED

@@ -24,12 +24,14 @@ def post_save_issue_event(sender, instance, **kwargs):
         )
 
     # Adjust Sharepoint access permissions.
-    if event.event_type == EventType.PARALEGAL:
+    if event.event_type == EventType.PARALEGAL or event.event_type == EventType.LAWYER:
         if event.prev_user:
             # Remove Sharepoint access permissions.
             remove_user_from_case(event.prev_user, event.issue)
         if event.next_user:
             # Add Sharepoint access permissions.
             add_user_to_case(event.next_user, event.issue)
-            # Notify user of case assignment.
-            send_case_assignment_slack(event.issue)
+
+            # Notify paralegal of case assignment.
+            if event.event_type == EventType.PARALEGAL:
+                send_case_assignment_slack(event.issue)
