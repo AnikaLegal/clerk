@@ -45,13 +45,13 @@ def events_email_view(request):
 
         if not sendgrid_id:
             logger.info(
-                f"Could not get sendgrid_id for event {event_type} at {timestamp}"
+                f"Could not get sendgrid_id for event '{event_type}' at {timestamp}"
             )
             continue
 
         if event_type not in EMAIL_EVENTS:
             logger.info(
-                f"Skipping email event {event_type} for email with sendgrid id {sendgrid_id}"
+                f"Skipping email event '{event_type}' for email with sendgrid id {sendgrid_id}"
             )
             continue
 
@@ -61,12 +61,12 @@ def events_email_view(request):
                 email = Email.objects.select_for_update().get(sendgrid_id=sendgrid_id)
             except Email.DoesNotExist:
                 logger.info(
-                    f"Could not find email for event {event_type} with sendgrid id {sendgrid_id}"
+                    f"Could not find email for event '{event_type}' with sendgrid id {sendgrid_id}"
                 )
                 continue
 
             logger.info(
-                f"Updating Email<{email.pk}> for event {event_type} with sendgrid id {sendgrid_id}"
+                f"Updating Email<{email.pk}> for event '{event_type}' with sendgrid id {sendgrid_id}"
             )
             state = None
             if event_type == "delivered":
@@ -76,7 +76,7 @@ def events_email_view(request):
 
             # Skip if the email state is already the same.
             if state and email.state != state:
-                logger.info(f"Setting Email<{email.pk}> state to {state}")
+                logger.info(f"Setting Email<{email.pk}> state to '{state}'")
                 email.state = state
                 email.save()
 
