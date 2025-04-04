@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from accounts.models import User
 from core.models import Issue, TimestampedModel, CaseTopic
-from utils.uploads import get_s3_key
+from utils.uploads import get_s3_key, FILE_FIELD_MAX_LENGTH_S3
 
 
 class EmailState:
@@ -94,7 +94,7 @@ class EmailAttachment(models.Model):
     UPLOAD_KEY = "email-attachments"
 
     email = models.ForeignKey(Email, on_delete=models.PROTECT, null=True, blank=True)
-    file = models.FileField(upload_to=get_s3_key)
+    file = models.FileField(upload_to=get_s3_key, max_length=FILE_FIELD_MAX_LENGTH_S3)
     content_type = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=timezone.now)
     actionstep_id = models.IntegerField(blank=True, null=True)

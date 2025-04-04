@@ -1,6 +1,13 @@
 import hashlib
 from django.utils.text import slugify
 
+"""
+63: max s3 bucket name size.
+1: file path separator between bucket name & object key.
+1024: max s3 object key length.
+"""
+FILE_FIELD_MAX_LENGTH_S3 = 63 + 1 + 1024
+
 
 def get_s3_key(model, filename: str):
     """
