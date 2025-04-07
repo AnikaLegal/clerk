@@ -1,4 +1,5 @@
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
+import { modals } from '@mantine/modals'
 import {
   IssueEventType,
   IssueStage,
@@ -105,6 +106,22 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
   const [showEventStage, setShowEventStage] = useState<boolean>(
     initialValues.event === 'STAGE'
   )
+
+  const handleDelete = (event) => {
+    event.preventDefault()
+    if (onDelete) {
+      modals.openConfirmModal({
+        title: 'Are you sure you want to delete this task template?',
+        centered: true,
+        labels: { confirm: 'Delete task template', cancel: 'Cancel' },
+        confirmProps: { color: 'red' },
+        onConfirm: () => {
+          window.removeEventListener('beforeunload', beforeUnloadHandler)
+          onDelete(event)
+        },
+      })
+    }
+  }
 
   const handleSubmit = (
     values: TaskTriggerCreate,
@@ -240,7 +257,7 @@ export const TaskTemplateForm: React.FC<TaskTemplateFormProps> = ({
               <Button
                 color="red"
                 disabled={formik.isSubmitting}
-                onClick={onDelete}
+                onClick={handleDelete}
               >
                 Delete
               </Button>

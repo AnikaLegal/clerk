@@ -24,7 +24,7 @@ const App = () => {
     return null
   }
   // TODO: Error handling.
-  const taskTrigger = taskTriggerResult.data || {} as TaskTriggerCreate
+  const taskTrigger = taskTriggerResult.data || ({} as TaskTriggerCreate)
 
   const handleSubmit = (
     values: TaskTriggerCreate,
@@ -55,30 +55,19 @@ const App = () => {
 
   const handleDelete = (event) => {
     event.preventDefault()
-    modals.openConfirmModal({
-      title: 'Are you sure you want to delete this task template?',
-      centered: true,
-      labels: { confirm: 'Delete task template', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      onConfirm: () => {
-        deleteTaskTrigger({ id: CONTEXT.task_trigger_pk })
-          .unwrap()
-          .then(() => {
-            window.location.href = CONTEXT.list_url
-          })
-          .catch((e) => {
-            enqueueSnackbar(
-              getAPIErrorMessage(
-                e,
-                'Failed to delete this notification template'
-              ),
-              {
-                variant: 'error',
-              }
-            )
-          })
-      },
-    })
+    deleteTaskTrigger({ id: CONTEXT.task_trigger_pk })
+      .unwrap()
+      .then(() => {
+        window.location.href = CONTEXT.list_url
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to delete this notification template'),
+          {
+            variant: 'error',
+          }
+        )
+      })
   }
 
   return (
