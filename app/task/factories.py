@@ -59,7 +59,7 @@ class TaskFactory(TimestampedModelFactory):
     assignee_role = TasksCaseRole.PARALEGAL
     issue = factory.SubFactory(
         IssueFactory,
-        paralegal=factory.SelfAttribute("..assigned_to"),
+        paralegal=factory.SubFactory(UserFactory),
         lawyer=factory.SubFactory(UserFactory),
         is_alert_sent=True,
         is_welcome_email_sent=True,
