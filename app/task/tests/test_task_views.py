@@ -9,16 +9,17 @@ from task.factories import TaskFactory
 
 
 @pytest.mark.django_db
-def test_task_list_view__with_no_access(user_client: APIClient, user: User):
+@pytest.mark.parametrize(
+    "user_fixture", ["unprivileged_user", "paralegal_user", "lawyer_user"]
+)
+def test_task_list_view__unassigned_user(user_fixture, user_client: APIClient, request):
     """
-    Logged in, but otherwise unauthorized, users can fetch tasks but no results
+    Users can fetch tasks but no results because they're not assigned.
     """
-    annotate_group_access(user)
-    url = reverse("task-api-list")
-
+    user = request.getfixturevalue(user_fixture)
     TaskFactory()  # There's a task but the user can't see it
 
-    response = user_client.get(url)
+    response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
     data = response.json()
     assert data["results"] == []
@@ -26,44 +27,20 @@ def test_task_list_view__with_no_access(user_client: APIClient, user: User):
 
 
 @pytest.mark.django_db
-def test_task_list_view__as_paralegal_with_no_access_to_task(
+@pytest.mark.parametrize("user_fixture", ["paralegal_user", "lawyer_user"])
+def test_task_list_view__user_assigned_to_task_but_not_issue(
+    user_fixture,
     user_client: APIClient,
-    user: User,
-    paralegal_group,
+    request,
 ):
     """
-    Paralegal users can fetch tasks but no results because they're not assigned.
+    Users can fetch tasks but no results because they're not assigned to the
+    issue to which the task is related.
     """
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("task-api-list")
-
-    TaskFactory()
-
-    response = user_client.get(url)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["results"] == []
-    schema_tester.validate_response(response=response)
-
-
-@pytest.mark.django_db
-def test_task_list_view__as_paralegal_with_no_access_to_issue(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-):
-    """
-    Paralegal users can fetch tasks but no results because they're not assigned
-    to the issue to which the task is related.
-    """
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("task-api-list")
-
+    user = request.getfixturevalue(user_fixture)
     TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
 
-    response = user_client.get(url)
+    response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
     data = response.json()
     assert data["results"] == []
@@ -71,22 +48,17 @@ def test_task_list_view__as_paralegal_with_no_access_to_issue(
 
 
 @pytest.mark.django_db
-def test_task_list_view__as_paralegal_with_access_to_issue_but_no_access_to_task(
+def test_task_list_view__as_paralegal_assigned_to_issue_but_not_task(
+    paralegal_user,
     user_client: APIClient,
-    user: User,
-    paralegal_group,
 ):
     """
     Paralegal users can fetch tasks but no results because even though they are
     assigned to the issue they're not assigned to the task.
     """
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("task-api-list")
+    TaskFactory(issue__paralegal=paralegal_user)
 
-    TaskFactory(issue__paralegal=user)
-
-    response = user_client.get(url)
+    response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
     data = response.json()
     assert data["results"] == []
@@ -94,27 +66,22 @@ def test_task_list_view__as_paralegal_with_access_to_issue_but_no_access_to_task
 
 
 @pytest.mark.django_db
-def test_task_list_view__as_paralegal_with_access(
+def test_task_list_view__as_assigned_paralegal(
+    paralegal_user,
     user_client: APIClient,
-    user: User,
-    paralegal_group,
 ):
     """
     Paralegal users can fetch tasks and see results when they're the assigned to
     the task and assigned to the issue.
     """
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("task-api-list")
-
-    task = TaskFactory(assigned_to=user, issue__paralegal=user)
+    task = TaskFactory(assigned_to=paralegal_user, issue__paralegal=paralegal_user)
 
     # Other tasks but no access.
-    TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
-    TaskFactory(issue__paralegal=user)
+    TaskFactory(assigned_to=paralegal_user, issue__paralegal=UserFactory())
+    TaskFactory(issue__paralegal=paralegal_user)
     TaskFactory()
 
-    response = user_client.get(url)
+    response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
     data = response.json()
     results = data["results"]
@@ -124,24 +91,46 @@ def test_task_list_view__as_paralegal_with_access(
 
 
 @pytest.mark.django_db
-def test_task_list_view__as_coordinator(
+def test_task_list_view__as_assigned_lawyer(
+    lawyer_user,
     user_client: APIClient,
-    user: User,
-    coordinator_group,
+):
+    """
+    Lawyer users can see all of the tasks related to their assigned issues.
+    """
+    task_1 = TaskFactory(
+        assigned_to=lawyer_user,
+        issue__lawyer=lawyer_user,
+    )
+    task_2 = TaskFactory(issue__lawyer=lawyer_user)
+    # Other tasks but no access.
+    TaskFactory(assigned_to=lawyer_user, issue__lawyer=UserFactory())
+    TaskFactory(issue__paralegal=lawyer_user)
+    TaskFactory()
+
+    response = user_client.get(reverse("task-api-list"))
+    assert response.status_code == 200
+    data = response.json()
+    results = data["results"]
+    assert len(results) == 2
+    assert {results[0]["id"], results[1]["id"]} == {task_1.pk, task_2.pk}
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_task_list_view__as_coordinator(
+    coordinator_user,
+    user_client: APIClient,
 ):
     """
     Coordinator users can see all tasks.
     """
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
-    url = reverse("task-api-list")
-
-    TaskFactory(assigned_to=user, issue__paralegal=user)
-    TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
-    TaskFactory(issue__paralegal=user)
+    TaskFactory(assigned_to=coordinator_user, issue__paralegal=coordinator_user)
+    TaskFactory(assigned_to=coordinator_user, issue__paralegal=UserFactory())
+    TaskFactory(issue__paralegal=coordinator_user)
     TaskFactory()
 
-    response = user_client.get(url)
+    response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
     data = response.json()
     assert len(data["results"]) == 4
