@@ -9,10 +9,13 @@ class TextChoiceField(serializers.CharField):
 
     def to_representation(self, value):
         display = self.text_choice_cls[value].label if value else ""
+        choices = self.text_choice_cls.choices
+        if self.allow_blank:
+            choices.insert(0, ("", "-"))
         return {
             "display": display,
             "value": value,
-            "choices": self.text_choice_cls.choices,
+            "choices": choices,
         }
 
 
