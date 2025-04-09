@@ -1,7 +1,6 @@
-import React from 'react'
-import { Header } from 'semantic-ui-react'
-
 import { Issue } from 'api'
+import React from 'react'
+import { Header, Icon, Label, Menu, Segment } from 'semantic-ui-react'
 import { MarkdownAsHtmlDisplay } from 'utils'
 
 export const CASE_TABS = {
@@ -38,7 +37,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       <Header as="h1">
         {issue.topic_display} case for {issue.client.full_name} ({issue.fileref}
         )
-        <div className="sub header">
+        <Header.Subheader>
           Created {issue.created_at}
           <br />
           {issue.paralegal ? (
@@ -59,82 +58,83 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             'not supervised '
           )}
           {actionstepUrl && <a href={actionstepUrl}>view in Actionstep</a>}
-        </div>
+        </Header.Subheader>
       </Header>
       <span id="case-status" hx-swap-oob="true">
         {issue.is_open ? (
-          <div className="ui blue label">Case open</div>
+          <Label color="blue">Case open</Label>
         ) : (
-          <div className="ui green label">Case closed</div>
+          <Label color="green">Case closed</Label>
         )}
+
         {issue.provided_legal_services ? (
-          <div className="ui green label">Legal services provided</div>
+          <Label color="green">Legal services provided</Label>
         ) : (
-          <div className="ui blue label">Legal services not provided</div>
+          <Label color="blue">Legal services not provided</Label>
         )}
 
-        <div className="ui grey label">
+        <Label color="grey">
           Stage
-          {issue.stage ? (
-            <div className="detail">{issue.stage_display}</div>
-          ) : (
-            <div className="detail">-</div>
-          )}
-        </div>
+          <Label.Detail>{issue.stage ? issue.stage_display : '-'}</Label.Detail>
+        </Label>
 
-        <div className="ui grey label">
+        <Label color="grey">
           Outcome
-          {issue.outcome ? (
-            <div className="detail">{issue.outcome_display}</div>
-          ) : (
-            <div className="detail">-</div>
-          )}
-        </div>
+          <Label.Detail>
+            {issue.outcome ? issue.outcome_display : '-'}
+          </Label.Detail>
+        </Label>
+
         {!issue.is_open && issue.outcome_notes && (
-          <div className="ui segment padded">
-            <div className="ui top attached label green">Outcome notes</div>
+          <Segment padded>
+            <Label attached="top" color="green">
+              Outcome notes
+            </Label>
             <p style={{ marginBottom: 0 }}>{issue.outcome_notes}</p>
-          </div>
+          </Segment>
         )}
+
         {issue.client.notes && (
-          <div className="ui segment padded">
-            <div className="ui top attached label">Client notes</div>
+          <Segment padded>
+            <Label attached="top">Client notes</Label>
             <MarkdownAsHtmlDisplay markdown={issue.client.notes} />
-          </div>
+          </Segment>
         )}
       </span>
-      <div className="ui top attached tabular menu">
-        <a
+      <Menu attached="top" tabular>
+        <Menu.Item
+          as="a"
           href={urls.detail}
-          className={`item ${activeTab === CASE_TABS.DETAIL ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.DETAIL}
         >
-          <i className="clipboard outline icon"></i>
+          <Icon name="clipboard outline" />
           Details
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.email}
-          className={`item ${activeTab === CASE_TABS.EMAIL ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.EMAIL}
         >
-          <i className="envelope outline icon"></i>
+          <Icon name="envelope outline" />
           Email
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.docs}
-          className={`item ${
-            activeTab === CASE_TABS.DOCUMENTS ? 'active' : ''
-          }`}
+          active={activeTab === CASE_TABS.DOCUMENTS}
         >
-          <i className="folder open outline icon"></i>
+          <Icon name="folder open outline" />
           Documents
-        </a>
-        <a
+        </Menu.Item>
+        <Menu.Item
+          as="a"
           href={urls.services}
-          className={`item ${activeTab === CASE_TABS.SERVICES ? 'active' : ''}`}
+          active={activeTab === CASE_TABS.SERVICES}
         >
-          <i className="balance scale icon"></i>
+          <Icon name="balance scale" />
           Services
-        </a>
-      </div>
+        </Menu.Item>
+      </Menu>
     </>
   )
 }
