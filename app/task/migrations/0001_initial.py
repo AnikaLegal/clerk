@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("core", "0076_alter_issueevent_event_type"),
+        ("core", "0077_alter_issueevent_event_type"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
