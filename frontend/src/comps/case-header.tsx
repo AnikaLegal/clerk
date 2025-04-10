@@ -1,4 +1,4 @@
-import { Issue } from 'api'
+import { Client, Issue } from 'api'
 import React from 'react'
 import { Header, Icon, Label, Menu, Segment } from 'semantic-ui-react'
 import { MarkdownAsHtmlDisplay } from 'utils'
@@ -85,6 +85,10 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
           </Label.Detail>
         </Label>
 
+        {/* NOTE: Should always be between the labels & segments i.e. don't put
+        a segment above or a label below. */}
+        <MaybeContactRestrictionNotes client={issue.client} />
+
         {!issue.is_open && issue.outcome_notes && (
           <Segment padded>
             <Label attached="top" color="green">
@@ -137,4 +141,30 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       </Menu>
     </>
   )
+}
+
+interface MaybeContactRestrictionNotesProps {
+  client: Client
+}
+
+const MaybeContactRestrictionNotes = ({
+  client,
+}: MaybeContactRestrictionNotesProps) => {
+  const status = client.contact_restriction
+  const notes = client.contact_notes
+
+  if (notes) {
+    return (
+      <Segment padded>
+        <Label color="orange" attached="top">
+          {status.value ? status.display : 'Contact notes'}
+        </Label>
+        <p>{notes}</p>
+      </Segment>
+    )
+  }
+  if (status.value) {
+    return <Label color="orange">{status.display}</Label>
+  }
+  return null
 }
