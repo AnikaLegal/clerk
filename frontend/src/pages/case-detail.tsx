@@ -188,10 +188,7 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm
-              issue={issue}
-              onCancel={() => setActiveFormId(null)}
-            />
+            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
           )}
           {!activeFormId && (
             <React.Fragment>
@@ -204,8 +201,10 @@ const App = () => {
                   Email: issue.client.email,
                   Phone: issue.client.phone_number,
                   Age: issue.client.age,
-                  Gender: issue.client.gender ?? '',
-                  Pronouns: issue.client.pronouns ?? '',
+                  Gender: issue.client.gender,
+                  Pronouns: issue.client.pronouns,
+                  ['Contact restriction?']:
+                    issue.client.contact_restriction.display,
                 }}
               />
               <EntityCard

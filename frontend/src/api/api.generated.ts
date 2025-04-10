@@ -1141,6 +1141,8 @@ export type ClientBase = {
   number_of_dependents: number | null;
   notes: string;
   date_of_birth: string | null;
+  contact_restriction: TextChoiceField;
+  contact_notes?: string;
 };
 export type TextChoiceListField = {
   display: string;

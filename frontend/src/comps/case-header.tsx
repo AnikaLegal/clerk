@@ -1,7 +1,6 @@
+import { Client, Issue } from 'api'
 import React from 'react'
 import { Header, Icon, Label, Menu, Segment } from 'semantic-ui-react'
-
-import { Issue } from 'api'
 import { MarkdownAsHtmlDisplay } from 'utils'
 
 export const CASE_TABS = {
@@ -69,6 +68,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         ) : (
           <Label color="green">Case closed</Label>
         )}
+
         {issue.provided_legal_services ? (
           <Label color="green">Legal services provided</Label>
         ) : (
@@ -77,21 +77,19 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
 
         <Label color="grey">
           Stage
-          {issue.stage ? (
-            <Label.Detail>{issue.stage_display}</Label.Detail>
-          ) : (
-            <Label.Detail>-</Label.Detail>
-          )}
+          <Label.Detail>{issue.stage ? issue.stage_display : '-'}</Label.Detail>
         </Label>
 
         <Label color="grey">
           Outcome
-          {issue.outcome ? (
-            <Label.Detail>{issue.outcome_display}</Label.Detail>
-          ) : (
-            <Label.Detail>-</Label.Detail>
-          )}
+          <Label.Detail>
+            {issue.outcome ? issue.outcome_display : '-'}
+          </Label.Detail>
         </Label>
+
+        {/* NOTE: Should always be between the labels & segments i.e. don't put
+        a segment above or a label below. */}
+        <MaybeContactRestrictionNotes client={issue.client} />
 
         {!issue.is_open && issue.outcome_notes && (
           <Segment padded>
@@ -101,6 +99,7 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
             <p style={{ marginBottom: 0 }}>{issue.outcome_notes}</p>
           </Segment>
         )}
+
         {issue.client.notes && (
           <Segment padded>
             <Label attached="top">Client notes</Label>
@@ -152,4 +151,30 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       </Menu>
     </>
   )
+}
+
+interface MaybeContactRestrictionNotesProps {
+  client: Client
+}
+
+const MaybeContactRestrictionNotes = ({
+  client,
+}: MaybeContactRestrictionNotesProps) => {
+  const status = client.contact_restriction
+  const notes = client.contact_notes
+
+  if (notes) {
+    return (
+      <Segment padded>
+        <Label color="orange" attached="top">
+          {status.value ? status.display : 'Contact notes'}
+        </Label>
+        <p>{notes}</p>
+      </Segment>
+    )
+  }
+  if (status.value) {
+    return <Label color="orange">{status.display}</Label>
+  }
+  return null
 }

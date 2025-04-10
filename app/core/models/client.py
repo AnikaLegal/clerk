@@ -94,6 +94,18 @@ class RequiresInterpreter(models.TextChoices):
     UNKNOWN = "UNKNOWN", "Unknown"
 
 
+class ContactRestriction(models.TextChoices):
+    DO_NOT_CONTACT = "DO_NOT_CONTACT", "Do not contact"
+    DO_NOT_CONTACT_MARKETING = (
+        "DO_NOT_CONTACT_MARKETING",
+        "Do not contact for marketing",
+    )
+    DO_NOT_CONTACT_ACTION_RESEARCH = (
+        "DO_NOT_CONTACT_ACTION_RESEARCH",
+        "Do not contact for action research",
+    )
+
+
 class Client(TimestampedModel):
     """
     A person that we are helping.
@@ -149,6 +161,11 @@ class Client(TimestampedModel):
         choices=RequiresInterpreter.choices,
         default=RequiresInterpreter.UNKNOWN,
     )
+
+    contact_restriction = models.TextField(
+        choices=ContactRestriction.choices, blank=True, default=""
+    )
+    contact_notes = models.TextField(blank=True, default="")
 
     # Deprecated fields: do not use.
     legal_access_difficulties = ArrayField(

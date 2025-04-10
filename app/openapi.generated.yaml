@@ -1908,6 +1908,10 @@ components:
         date_of_birth:
           type: string
           nullable: true
+        contact_restriction:
+          $ref: "#/components/schemas/TextChoiceField"
+        contact_notes:
+          type: string
       required:
         - first_name
         - last_name
@@ -1925,6 +1929,7 @@ components:
         - number_of_dependents
         - notes
         - date_of_birth
+        - contact_restriction
     TextChoiceListField:
       type: object
       properties:

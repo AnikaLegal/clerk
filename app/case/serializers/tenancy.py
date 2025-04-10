@@ -29,7 +29,7 @@ class TenancySerializer(serializers.ModelSerializer):
     landlord_id = serializers.IntegerField(write_only=True, allow_null=True)
     agent_id = serializers.IntegerField(write_only=True, allow_null=True)
     url = serializers.SerializerMethodField()
-    is_on_lease = TextChoiceField(LeaseType, allow_blank=True)
+    is_on_lease = TextChoiceField(LeaseType)
     rental_circumstances = TextChoiceField(RentalType)
     started = serializers.DateTimeField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
 
