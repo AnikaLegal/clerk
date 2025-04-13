@@ -74,7 +74,10 @@ class AboriginalOrTorresStraitIslander(models.TextChoices):
         "YES_ABORIGINAL_AND_TSI",
         "Yes, Aboriginal and Torres Strait Islander",
     )
-    YES_CONFIRM = "YES_CONFIRM", "Yes (Confirm if Aboriginal and/or Torres Strait Islander)"
+    YES_CONFIRM = (
+        "YES_CONFIRM",
+        "Yes (Confirm if Aboriginal and/or Torres Strait Islander)",
+    )
     PREFER_NOT_TO_ANSWER = "PREFER_NOT_TO_ANSWER", "Prefer not to answer"
     NOT_STATED = "NOT_STATED", "Not Stated"
 
@@ -89,6 +92,18 @@ class RequiresInterpreter(models.TextChoices):
     YES_WRITTEN_SPOKEN = "YES_WRITTEN_SPOKEN", "Yes (written and spoken)"
     YES_CONFIRM = "YES_CONFIRM", "Yes (Confirm if written and/or spoken)"
     UNKNOWN = "UNKNOWN", "Unknown"
+
+
+class ContactRestriction(models.TextChoices):
+    DO_NOT_CONTACT = "DO_NOT_CONTACT", "Do not contact"
+    DO_NOT_CONTACT_MARKETING = (
+        "DO_NOT_CONTACT_MARKETING",
+        "Do not contact for marketing",
+    )
+    DO_NOT_CONTACT_ACTION_RESEARCH = (
+        "DO_NOT_CONTACT_ACTION_RESEARCH",
+        "Do not contact for action research",
+    )
 
 
 class Client(TimestampedModel):
@@ -146,6 +161,11 @@ class Client(TimestampedModel):
         choices=RequiresInterpreter.choices,
         default=RequiresInterpreter.UNKNOWN,
     )
+
+    contact_restriction = models.TextField(
+        choices=ContactRestriction.choices, blank=True, default=""
+    )
+    contact_notes = models.TextField(blank=True, default="")
 
     # Deprecated fields: do not use.
     legal_access_difficulties = ArrayField(

@@ -10,7 +10,7 @@ class Command(BaseCommand):
     ./manage.py sync_ms_account_created
     """
 
-    help = "Sync Microsft account creation date"
+    help = "Sync Microsoft account creation date"
 
     def handle(self, *args, **kwargs):
         api = MSGraphAPI()
