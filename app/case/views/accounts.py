@@ -1,35 +1,34 @@
 import logging
 from typing import Optional
 
-from django.http import Http404
+from accounts.models import CaseGroups, User
 from django.contrib.auth.models import Group
-from django.db.models import QuerySet, Q
-from rest_framework.decorators import api_view, action
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, ListModelMixin
+from django.db.models import Q, QuerySet
+from django.http import Http404
 from django.urls import reverse
 from django_q.tasks import async_task
-from django.core.exceptions import PermissionDenied
+from microsoft.service import get_user_permissions
+from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from rest_framework.decorators import action, api_view
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-from accounts.models import User, CaseGroups
-from case.utils.react import render_react_page
-from accounts.models import User
-from case.views.auth import (
-    paralegal_or_better_required,
-    coordinator_or_better_required,
-    CoordinatorOrBetterPermission,
-)
 from case.serializers import (
     AccountSearchSerializer,
     AccountSortSerializer,
-    UserSerializer,
-    UserCreateSerializer,
-    IssueSerializer,
     IssueNoteSerializer,
+    IssueSerializer,
+    UserCreateSerializer,
+    UserSerializer,
 )
-from microsoft.service import get_user_permissions
-from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from case.utils.react import render_react_page
+from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    AdminOrBetterPermission,
+    coordinator_or_better_required,
+    paralegal_or_better_required,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -98,9 +97,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def sort_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
-        serializer = AccountSortSerializer(
-            data=self.request.query_params, partial=True
-        )
+        serializer = AccountSortSerializer(data=self.request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         sort = serializer.validated_data.get("sort", ["-date_joined"])
         return queryset.order_by(*sort)
@@ -130,9 +127,12 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Invite a paralegal to join the platform"""
+        """
+        Invite a paralegal to join.
+        """
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         email = serializer.validated_data["email"]
         user = User.objects.filter(email=email).last()
         if not user:
@@ -148,12 +148,9 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         url_name="perms",
     )
     def get_account_detail_permissions(self, request, pk):
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
+        user = self.get_object()
         perms_data = _load_ms_permissions(user)
+
         return Response(perms_data)
 
     @action(
@@ -163,12 +160,9 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         url_name="perms-resync",
     )
     def account_detail_perms_resync_view(self, request, pk):
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
+        user = self.get_object()
         refresh_ms_permissions(user)
+
         perms_data = _load_ms_permissions(user)
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
@@ -179,18 +173,12 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         methods=["POST"],
         url_path="perms-promote",
         url_name="perms-promote",
+        permission_classes=[AdminOrBetterPermission]
     )
     def account_detail_perms_promote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
+        user = self.get_object()
 
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        if is_paralegal:
+        if user.role.is_paralegal:
             group = Group.objects.get(name=CaseGroups.COORDINATOR)
             user.groups.add(group)
         else:
@@ -208,33 +196,22 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         methods=["POST"],
         url_path="perms-demote",
         url_name="perms-demote",
+        permission_classes=[AdminOrBetterPermission]
     )
     def account_detail_perms_demote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
+        user = self.get_object()
 
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        is_coordinator = user.groups.filter(name=CaseGroups.COORDINATOR).exists()
-        group_name = None
-        if is_coordinator:
-            group_name = CaseGroups.COORDINATOR
-        elif is_paralegal:
-            group_name = CaseGroups.PARALEGAL
-
-        if group_name:
-            group = Group.objects.get(name=group_name)
+        if user.role.is_coordinator:
+            group = Group.objects.get(name=CaseGroups.COORDINATOR)
+            user.groups.remove(group)
+        elif user.role.is_paralegal:
+            group = Group.objects.get(name=CaseGroups.PARALEGAL)
             user.groups.remove(group)
 
         perms_data = _load_ms_permissions(user)
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
         )
-
 
 def _load_ms_permissions(user) -> Optional[dict]:
     try:

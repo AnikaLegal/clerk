@@ -5,7 +5,6 @@ from django.db.models.signals import m2m_changed, pre_save
 from django.dispatch import receiver
 
 from core.models import Issue
-from case.middleware import COORDINATOR_GROUPS
 from accounts.models import User, CaseGroups
 from microsoft.service import (
     remove_user_from_case,
@@ -15,7 +14,7 @@ from microsoft.service import (
     add_office_licence,
 )
 
-
+COORDINATOR_GROUPS = [CaseGroups.ADMIN, CaseGroups.COORDINATOR]
 POST_ADD = "post_add"
 POST_REMOVE = "post_remove"
 
@@ -33,7 +32,7 @@ def pre_save_user(sender, instance, **kwargs):
 
     if prev_user.is_active and not user.is_active:
         remove_office_licence(user)
-    elif (not prev_user.is_active) and user.is_active:
+    elif not prev_user.is_active and user.is_active:
         add_office_licence(user)
 
 
@@ -44,6 +43,8 @@ def post_save_group(sender, instance, action, **kwargs):
         return
 
     user = instance
+    user.clear_role()
+
     if action == POST_ADD:
         if not user.is_active:
             return

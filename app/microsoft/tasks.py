@@ -1,25 +1,25 @@
 import logging
 
-from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth.models import Group
-
-from utils.sentry import sentry_task
+from accounts.models import CaseGroups, User
 from core.models import Issue
-from accounts.models import User, CaseGroups
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.utils import timezone
 from emails.service.send import send_email
+from utils.sentry import sentry_task
+
 from .service import (
-    set_up_new_case,
-    set_up_new_user,
     add_user_to_case,
     set_up_coordinator,
+    set_up_new_case,
+    set_up_new_user,
 )
-
 
 logger = logging.getLogger(__name__)
 
 
-def refresh_ms_permissions(user):
+# TODO: Sharepoint permissions not torn down when user marked as inactive.
+def refresh_ms_permissions(user: User):
     """
     Ensure all users who should have MS accounts get those accounts with correct permissions.
     """
@@ -49,6 +49,7 @@ def refresh_ms_permissions(user):
         ).exists()
     )
     is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
+
     if is_coordinator_or_better:
         set_up_coordinator(user)
     elif is_paralegal:
