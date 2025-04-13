@@ -25,10 +25,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         return value
 
-    def validate(self, data):
-        if data["email"] != data["username"]:
+    def validate(self, attrs):
+        if attrs["email"] != attrs["username"]:
             raise ValidationError("Username must be the same as email.")
-        return data
+        return attrs
 
 
 class UserSerializer(serializers.ModelSerializer):
