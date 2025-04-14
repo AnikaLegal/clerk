@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 TEMPLATE_PATHS = {
     CaseTopic.BONDS: "templates/bonds",
     CaseTopic.REPAIRS: "templates/repairs",
-    CaseTopic.EVICTION: "templates/evictions",
+    CaseTopic.EVICTION_ARREARS: "templates/evictions-arrears",
     CaseTopic.HEALTH_CHECK: "templates/health-check",
 }
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
