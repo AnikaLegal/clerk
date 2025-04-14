@@ -30,6 +30,10 @@ class MicrosoftUserPermissions:
     paralegal_perm_missing_issues: list[Issue]
 
 
+def get_document_template_path(topic: str):
+    return TEMPLATE_PATHS[topic]
+
+
 def get_user_permissions(user):
     api = MSGraphAPI()
     ms_account = api.user.get(user.email)
@@ -105,11 +109,14 @@ def set_up_new_case(issue: Issue):
     api = MSGraphAPI()
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-    template_path = TEMPLATE_PATHS[issue.topic]
+
+
     # Copy templates to the case folder if not already done.
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
+
+        template_path = get_document_template_path(issue.topic)
         api.folder.copy(template_path, case_folder_name, parent_folder_id)
         case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     else:
@@ -244,7 +251,7 @@ def tear_down_coordinator(user):
 
 def list_templates(topic):
     api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
+    path = get_document_template_path(topic)
     children = api.folder.get_children(path)
     return [
         {
@@ -264,7 +271,7 @@ def list_templates(topic):
 
 def upload_template(topic, file):
     api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
+    path = get_document_template_path(topic)
     parent = api.folder.get(path)
     api.folder.upload_file(file, parent["id"])
 
