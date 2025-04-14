@@ -18,6 +18,7 @@ class CaseTopic:
     REPAIRS = "REPAIRS"
     RENT_REDUCTION = "RENT_REDUCTION"
     EVICTION_ARREARS = "EVICTION_ARREARS"
+    EVICTION_RETALIATORY = "EVICTION_RETALIATORY"
     BONDS = "BONDS"
     OTHER = "OTHER"
     HEALTH_CHECK = "HEALTH_CHECK"
@@ -26,12 +27,14 @@ class CaseTopic:
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
         (EVICTION_ARREARS, "Eviction (Arrears)"),
+        (EVICTION_RETALIATORY, "Eviction (Retaliatory)"),
         (HEALTH_CHECK, "Housing Health Check"),
     ]
     CHOICES = (
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
         (EVICTION_ARREARS, "Eviction (Arrears)"),
+        (EVICTION_RETALIATORY, "Eviction (Retaliatory)"),
         (HEALTH_CHECK, "Housing Health Check"),
         (RENT_REDUCTION, "Rent reduction"),
         (OTHER, "Other"),
