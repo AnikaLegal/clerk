@@ -30,7 +30,7 @@ def send_slack_message(message_slug: str, message_text: str):
     else:
         text = message_text
 
-    logging.info("Sending %s", slack_msg)
+    logger.info("Sending %s", slack_msg)
     url = slack_msg.channel.webhook_url
     if not settings.SLACK_MESSAGE_DISABLED:
         resp = requests.post(
@@ -64,6 +64,6 @@ def get_slack_user_by_email(email: str):
     if not settings.SLACK_MESSAGE_DISABLED:
         resp.raise_for_status()
         user_data = resp.json()
-        logging.info(user_data)
+        logger.info(user_data)
         if user_data["ok"]:
             return user_data["user"]

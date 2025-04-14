@@ -1,37 +1,45 @@
-from rest_framework.decorators import api_view, action
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin, CreateModelMixin
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.db.models import Q, Max, QuerySet
+from core.events.service import (
+    on_service_create,
+    on_service_delete,
+    on_service_update,
+)
+from core.models import Issue, IssueNote, ServiceEvent
+from core.models.issue import CaseOutcome, CaseStage, CaseTopic
+from django.contrib.contenttypes.prefetch import GenericPrefetch
+from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from microsoft.service import get_case_folder_info
+from rest_framework import status
+from rest_framework.decorators import action, api_view
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-
-from core.models import Issue, IssueNote
-from core.models.issue import CaseStage, CaseOutcome, CaseTopic
-from case.utils import render_react_page, ClerkPaginator
 from case.serializers import (
-    IssueSerializer,
-    IssueSearchSerializer,
     IssueNoteSerializer,
+    IssueSearchSerializer,
+    IssueSerializer,
+    ServiceSearchSerializer,
+    ServiceSerializer,
     TenancySerializer,
 )
+from case.utils import ClerkPaginator, render_react_page
 from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    ParalegalOrBetterObjectPermission,
+    coordinator_or_better_required,
     login_required,
     paralegal_or_better_required,
-    coordinator_or_better_required,
-    ParalegalOrBetterObjectPermission,
-    CoordinatorOrBetterPermission,
 )
-from microsoft.service import get_case_folder_info
-
 
 COORDINATORS_EMAIL = "coordinators@anikalegal.com"
 
 topic_options = [
     {"key": key, "value": key, "text": label} for key, label in CaseTopic.ACTIVE_CHOICES
 ]
+
 
 @api_view(["GET"])
 @login_required
@@ -53,6 +61,7 @@ def case_list_page_view(request):
     }
     return render_react_page(request, "Cases", "case-list", context)
 
+
 @api_view(["GET"])
 @coordinator_or_better_required
 def case_create_page_view(request):
@@ -70,7 +79,7 @@ def case_inbox_page_view(request):
     is_open = Q(is_open=True)
     is_inbox = is_unassigned & is_open
     issues = (
-        Issue.objects.select_related("client")
+        Issue.objects.select_related("client", "tenancy__agent", "tenancy__landlord")
         .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
         .filter(is_inbox)
         .order_by("created_at")
@@ -85,7 +94,7 @@ def case_inbox_page_view(request):
 def case_review_page_view(request):
     """Page where coordinators can see existing cases for them to review"""
     issues = (
-        Issue.objects.select_related("client")
+        Issue.objects.select_related("client", "tenancy__agent", "tenancy__landlord")
         .prefetch_related("issuenote_set", "paralegal__groups", "lawyer__groups")
         .filter(is_open=True)
         .annotate(next_review=Max("issuenote__event"))
@@ -103,7 +112,10 @@ def case_detail_page_view(request, pk):
     The details of a given case.
     """
     issue = get_object_or_404(Issue, pk=pk)
-    context = {"case_pk": pk, "urls": get_detail_urls(issue)}
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+    }
     return render_react_page(request, f"Case {issue.fileref}", "case-detail", context)
 
 
@@ -118,11 +130,26 @@ def case_detail_documents_page_view(request, pk):
     return render_react_page(request, f"Case {issue.fileref}", "document-list", context)
 
 
+@api_view(["GET"])
+@paralegal_or_better_required
+def case_detail_services_page_view(request, pk):
+    """
+    The services related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+    }
+    return render_react_page(request, f"Case {issue.fileref}", "service-list", context)
+
+
 def get_detail_urls(issue: Issue):
     return {
         "detail": reverse("case-detail", args=(issue.pk,)),
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
+        "services": reverse("case-services", args=(issue.pk,)),
     }
 
 
@@ -131,7 +158,9 @@ class CasePaginator(ClerkPaginator):
     max_page_size = 14
 
 
-class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin, CreateModelMixin):
+class CaseApiViewset(
+    GenericViewSet, ListModelMixin, UpdateModelMixin, CreateModelMixin
+):
     serializer_class = IssueSerializer
     pagination_class = CasePaginator
 
@@ -153,7 +182,9 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin, CreateMod
     def get_queryset(self):
         user = self.request.user
         queryset = (
-            Issue.objects.select_related("client", "tenancy")
+            Issue.objects.select_related(
+                "client", "tenancy__agent", "tenancy__landlord"
+            )
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
         )
@@ -221,9 +252,18 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin, CreateMod
         else:
             note_types = IssueNote.PARALEGAL_NOTE_TYPES
 
+        prefetch = GenericPrefetch(
+            "content_object",
+            [
+                ServiceEvent.objects.filter(service__issue=issue)
+                .select_related("user")
+                .prefetch_related("user__groups"),
+            ],
+        )
+
         notes = (
             IssueNote.objects.filter(issue=issue.pk)
-            .prefetch_related("creator__groups")
+            .prefetch_related(prefetch, "creator__groups")
             .filter(note_type__in=note_types)
             .order_by("-created_at")
             .all()
@@ -276,3 +316,71 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin, CreateMod
         documents, sharepoint_url = get_case_folder_info(issue)
         data = {"sharepoint_url": sharepoint_url, "documents": documents}
         return Response(data)
+
+    @action(
+        detail=True,
+        methods=["GET", "POST"],
+        url_path="services",
+        url_name="service-list",
+        serializer_class=ServiceSerializer,
+    )
+    def service_list(self, request, pk):
+        """
+        List or create case services.
+        """
+        issue = self.get_object()
+
+        if request.method == "GET":
+            queryset = issue.service_set.exclude(is_deleted=True)
+            queryset = queryset.order_by("-started_at", "-modified_at")
+            serializer = ServiceSearchSerializer(
+                data=self.request.query_params, partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            terms = serializer.validated_data
+            for key, value in terms.items():
+                if value is not None:
+                    queryset = queryset.filter(**{key: value})
+
+            data = self.get_serializer(queryset, many=True).data
+            return Response(data)
+        else:
+            data = {**request.data, "issue_id": issue.pk}
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            service = serializer.save()
+            on_service_create(service=service, user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=["GET", "PATCH", "DELETE"],
+        url_path="services/(?P<service_pk>[^/.]+)",
+        url_name="service-detail",
+        serializer_class=ServiceSerializer,
+    )
+    def service_detail(self, request, pk, service_pk):
+        """
+        Get, update or delete a particular case service.
+        """
+        issue = self.get_object()
+        service = get_object_or_404(
+            issue.service_set.exclude(is_deleted=True), pk=service_pk
+        )
+
+        if request.method == "DELETE":
+            # NOTE: we use soft deletes. This eases the handling of service
+            # related file notes.
+            service.is_deleted = True
+            service.save()
+            on_service_delete(service=service, user=request.user)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        elif request.method == "PATCH":
+            serializer = self.get_serializer(service, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            service = serializer.save()
+            on_service_update(service=service, user=request.user)
+            return Response(serializer.data)
+        else:
+            serializer = self.get_serializer(service)
+            return Response(serializer.data)

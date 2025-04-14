@@ -1,3 +1,9 @@
+import {
+  DiscreteServiceTypes,
+  OngoingServiceTypes,
+  ServiceCategories,
+} from 'types'
+
 export const URLS = {
   PERSON: {
     CREATE: '/clerk/parties/create/',
@@ -23,7 +29,7 @@ export const OUTCOMES = {
   UNKNOWN: 'Unknown',
   SUCCESSFUL: 'Successful',
   UNSUCCESSFUL: 'Unsuccessful',
-} as const 
+} as const
 
 export const CASE_TYPES = {
   REPAIRS: 'Repairs',
@@ -36,4 +42,23 @@ export const GROUPS = {
   ADMIN: 'Admin',
   COORDINATOR: 'Coordinator',
   LAWYER: 'Lawyer',
+} as const
+
+export const SERVICE_CATEGORIES: ServiceCategories = {
+  DISCRETE: 'Discrete service',
+  ONGOING: 'Ongoing service',
+} as const
+
+export const DISCRETE_SERVICE_TYPES: DiscreteServiceTypes = {
+  LEGAL_ADVICE: 'Legal advice',
+  LEGAL_TASK: 'Legal task',
+  GENERAL_INFORMATION: 'Information',
+  GENERAL_REFERRAL_SIMPLE: 'Referral (Simple)',
+  GENERAL_REFERRAL_FACILITATED: 'Referral (Facilitated)',
+} as const
+
+export const ONGOING_SERVICE_TYPES: OngoingServiceTypes = {
+  LEGAL_SUPPORT: 'Legal support',
+  REPRESENTATION_COURT_TRIBUNAL: 'Court or tribunal representation',
+  REPRESENTATION_OTHER: 'Other representation',
 } as const

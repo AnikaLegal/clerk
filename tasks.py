@@ -2,24 +2,33 @@ from invoke import task
 
 APP_NAME = "clerk"
 HOST = "13.55.250.149"
-COMPOSE = "docker-compose -p clerk -f docker/docker-compose.local.yml"
+COMPOSE = "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 
 @task
 def schema(c):
-    """Regenerate Open API schema and JavaScript API client"""
+    """Regenerate OpenAPI schema and JavaScript API client"""
     c.run("cd frontend && npm run schema")
 
 
 @task
-def build(c, webpack=False):
+def build(c, base=False, webpack=False, no_cache=False):
     """Build Docker environment locally"""
-    if webpack:
-        c.run(
-            f"docker build -f docker/Dockerfile.webpack -t {APP_NAME}-webpack:local ."
-        )
-    else:
-        c.run(f"docker build -f docker/Dockerfile -t {APP_NAME}:local .")
+
+    file = "Dockerfile"
+    tag = f"{APP_NAME}:local"
+    if base:
+        file = "Dockerfile.base"
+        tag = "anikalaw/clerkbase:latest"
+    elif webpack:
+        file = "Dockerfile.webpack"
+        tag = f"{APP_NAME}-webpack:local"
+
+    args = ""
+    if no_cache:
+        args += "--no-cache"
+
+    c.run(f"docker build {args} --file docker/{file} --tag {tag} .")
 
 
 @task
@@ -30,7 +39,7 @@ def dev(c):
 
 @task
 def down(c):
-    """Stop docker-compose"""
+    """Stop Docker Compose"""
     c.run(f"{COMPOSE} down", pty=True)
 
 
@@ -42,26 +51,34 @@ def debug(c):
 
 @task
 def restart(c, service_name):
-    """Restart Docker-Compose service"""
+    """Restart Docker Compose service"""
     c.run(f"{COMPOSE} restart {service_name}", pty=True)
 
 
 @task
 def logs(c, service_name):
-    """View logs for Docker-Compose service"""
+    """View logs for Docker Compose service"""
     c.run(f"{COMPOSE} logs --tail 200 -f {service_name}", pty=True)
 
 
 @task
 def ssh(c):
     """SSH into prod"""
-    print(f"ssh root@{HOST}")
+    cmd = f"ssh root@{HOST}"
+    print(cmd)
+    c.run(cmd, pty=True)
 
 
 @task
 def ngrok(c, url):
-    """Add ngrok URL to sendgrid to receive emails on dev address"""
+    """Add ngrok URL to SendGrid to receive emails on dev address"""
     run(c, f"./manage.py setup_dev_inbound_emails {url}")
+
+
+@task
+def docs(c, fileref):
+    """Create case documents from templates for local development & testing"""
+    run(c, f"./manage.py set_up_case_docs {fileref}")
 
 
 @task
@@ -125,8 +142,15 @@ def psql(c):
     run(c, "psql")
 
 
-@task
-def test(c, recreate=False, interactive=False, quiet=False, debug=False):
+@task(incrementable=["verbose"])
+def test(
+    c,
+    recreate=False,
+    interactive=False,
+    quiet=False,
+    verbose=0,
+    debug=False,
+):
     """Run pytest"""
     if interactive:
         cmd = "bash"
@@ -139,8 +163,8 @@ def test(c, recreate=False, interactive=False, quiet=False, debug=False):
 
         if quiet:
             cmd += " --quiet --no-summary --exitfirst"
-        else:
-            cmd += " -vv"
+        elif verbose:
+            cmd += " -" + ("v" * verbose)
 
     debug_args = ""
     if debug:
@@ -156,14 +180,20 @@ def test(c, recreate=False, interactive=False, quiet=False, debug=False):
 
 
 @task
+def obfuscate(c):
+    """Obfuscate personally identifiable info"""
+    run(c, "./manage.py obfuscate_data")
+
+
+@task
 def reset(c):
     """Reset local database"""
     run(c, "/app/scripts/tasks/dev-reset.sh")
 
 
-@task
+@task()
 def restore(c):
-    """Restore local database from production backups"""
+    """Restore local database from staging backups"""
     run(c, "/app/scripts/tasks/dev-restore.sh")
 
 
@@ -173,32 +203,10 @@ def migrate(c):
     run(c, 'bash -c "./manage.py makemigrations && ./manage.py migrate"')
 
 
-S3_PROD = "anika-clerk"
-S3_TEST = "anika-clerk-test"
-SYNC_DIRS = [
-    "images",
-    "original_images",
-    "file-uploads",
-    "action-documents",
-    "email-attachments",
-]
-
-
 @task
-def sync_s3(c):
-    """
-    Sync S3 assets from prod to test
-    FIXME: Improve upon public read status.
-    """
-    for sync_dir in SYNC_DIRS:
-        cmd = f"aws s3 sync --acl public-read s3://{S3_PROD}/{sync_dir} s3://{S3_TEST}/{sync_dir}"
-        c.run(f"{COMPOSE} run --rm web {cmd}", pty=True)
-
-
-@task
-def obfuscate(c):
-    """Obfuscate personally identifiable info from prod"""
-    run(c, "./manage.py obfuscate_data")
+def superuser(c, email):
+    """Create superuser for local development & testing"""
+    run(c, f"./manage.py createsuperuser --no-input --username {email} --email {email}")
 
 
 def run(c, cmd: str, service="web"):

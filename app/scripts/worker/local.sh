@@ -6,4 +6,4 @@ watchmedo \
     --recursive \
     --pattern '*.py' \
     -- \
-    ./manage.py qcluster
+    python -Xfrozen_modules=off manage.py qcluster

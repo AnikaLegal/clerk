@@ -85,6 +85,25 @@ header .nav-items a:visited {
   color: var(--dark-1);
 }
 
+.login .messages {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items:center;
+}
+
+.login .messages .message {
+  margin: 0;
+}
+
+/* An internal element of the rich text editor has padding, which we don't want,
+ * that we cannot manipulate with component styling. */
+.rich-text-display .tiptap.ProseMirror {
+  padding: 0;
+}
+
 main {
   max-width: 1240px;
   width: calc(100vw - 2 * var(--container-padding));

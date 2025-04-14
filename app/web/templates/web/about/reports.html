@@ -1,5 +1,6 @@
 {% extends "web/_base.html" %}
 {% load static %}
+{% load wagtailcore_tags %}
 {% block title %}Reports{% endblock %}
 {% block social_meta %}
 {% include 'web/snippets/_social_meta.html' with title="Reports" description="Anika Legal is an independent legal practice, tax-deductible charity & social enterprise. Our Annual, Financial and Impact Reports outline the work we do." %}
@@ -14,11 +15,14 @@
             <div class="content">
                 <h1>Reports</h1>
                 <p style="max-width: 530px">
-                    Anika Legal is an independent legal practice, tax-deductible charity & social enterprise.
-                    Our Annual, Financial and Impact Reports outline the work we do.
+                    Anika Legal is an independent legal practice, tax-deductible
+                    charity & social enterprise.  Our Annual, Financial and
+                    Impact Reports outline the work we do.
                 </p>
-                <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2022-2023.pdf' %}">
-                    <button>Latest annual report</button>
+                <a href="{% slugurl 'report-too-hot-too-cold-too-costly' %}">
+                    <button>
+                        Read our Too Hot, Too Cold, Too Costly report
+                    </button>
                 </a>
             </div>
             <img class="round not-responsive top-left top-right bottom-left"
@@ -36,6 +40,54 @@
         <div class="link-list two">
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>Annual Report<br class="mobile-break"> 2023-2024</h2>
+                <p>
+                    Read about the work we've done over the last year.
+                </p>
+                <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2023-2024.pdf' %}">
+                    <button>View</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>
+                    Too Hot, Too Cold, Too Costly
+                </h2>
+                <p>
+                    We've delved deep into the data surrounding energy
+                    inefficiency and its impact on Victorian renters.
+                </p>
+                <a href="{% slugurl 'report-too-hot-too-cold-too-costly' %}">
+                    <button>View</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>
+                    FY24 Special Purpose Financial Report
+                </h2>
+                <p>
+                    See an overview of our finances.
+                </p>
+                <a href="{% static 'web/docs/Anika-Legal-FY24-Special-Purpose-Financial-Report.pdf' %}">
+                    <button>View</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
+                <h2>
+                    Broken Bonds
+                </h2>
+                <p>
+                    Our Broken Bonds report explores the experiences of renters
+                    facing unfair bond claims.
+                </p>
+                <a href="{% slugurl 'broken-bonds' %}">
+                    <button>View</button>
+                </a>
+            </div>
+            <div class="card">
+                <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>
                     Impact Report
                 </h2>
@@ -47,7 +99,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>
@@ -60,7 +111,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>
@@ -87,7 +137,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>
@@ -100,7 +149,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Annual Report<br class="mobile-break"> 2022-2023</h2>
@@ -118,7 +166,6 @@
                     </a>
                 </div>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Strategic Plan<br class="mobile-break"> 2023-2025</h2>
@@ -129,7 +176,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Repairing rental homes (2022)</h2>
@@ -140,7 +186,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Annual Report<br class="mobile-break"> 2021-2022</h2>
@@ -151,7 +196,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Financial Report<br class="mobile-break"> 2021-2022</h2>
@@ -162,7 +206,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Annual Report<br class="mobile-break"> 2020-2021</h2>
@@ -173,7 +216,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Financial Report<br class="mobile-break"> 2020-2021</h2>
@@ -184,7 +226,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Annual Report<br class="mobile-break"> 2019-2020</h2>
@@ -195,7 +236,6 @@
                     <button>View</button>
                 </a>
             </div>
-
             <div class="card">
                 <img class="icon" src="{% static 'web/img/icons/document.svg' %}">
                 <h2>Financial Report<br class="mobile-break"> 2018-2019</h2>
@@ -208,16 +248,6 @@
             </div>
         </div>
 
-    </div>
-</div>
-
-<div class="segment gold round-large top-right ">
-    <div class="container wide">
-        <h2>
-            Impact Resources
-        </h2>
-        <div class="divider"></div>
-        {% include 'web/snippets/_theory_of_change.html' with id="toc-links" %}
     </div>
 </div>
 

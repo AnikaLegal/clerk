@@ -1,6 +1,7 @@
 """
 Django settings for clerk project.
 """
+
 import os
 
 IS_PROD = False
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
     # Wagtail
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
-    "wagtail.contrib.modeladmin",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     "wagtail.images",
     "wagtail.search",
     "wagtail.admin",
-    "wagtail.core",
+    "wagtail",
     "wagtail_localize",
     "wagtail_localize.locales",
     "modelcluster",
@@ -110,12 +110,16 @@ TEMPLATES = [
     }
 ]
 
+SILENCED_SYSTEM_CHECKS = [
+    "wagtailadmin.W004",  # The AWS_S3_FILE_OVERWRITE setting is set to True
+]
+
 
 # Database
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("PGDATABASE"),
         "USER": os.environ.get("PGUSER"),
         "PASSWORD": os.environ.get("PGPASSWORD"),
@@ -152,12 +156,10 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.get_username",
     # Associates the current social details with another user account with a similar email address.
     "social_core.pipeline.social_auth.associate_by_email",
-    "social_core.pipeline.user.create_user",
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
-    # Ensure new users can access the Wagtail CMS
-    "accounts.social_auth.set_new_user_as_cms_editor",
+    "accounts.social_auth.confirm_user_setup",
 )
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -179,7 +181,6 @@ EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_API_KEY")
 LANGUAGE_CODE = "en"
 TIME_ZONE = "Australia/Melbourne"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 WAGTAIL_I18N_ENABLED = True
 WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
@@ -196,18 +197,23 @@ WAGTAIL_CONTENT_LANGUAGES = LANGUAGES = [
     ("zh-hant", "Chinese (Traditional)"),
 ]
 
-
 # Enable iPython for shell_plus
 SHELL_PLUS = "ipython"
 
-
-# Static files
+# Media storage & static files
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
-STATICFILES_STORAGE = "whitenoise.storage.ManifestStaticFilesStorage"
 STATICFILES_DIRS = [
     ("webpack_bundles", "/build/bundles/"),
 ]
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.ManifestStaticFilesStorage",
+    },
+}
 
 # Webpack loader
 WEBPACK_LOADER = {
@@ -219,13 +225,10 @@ WEBPACK_LOADER = {
     }
 }
 
-
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 
-# Media storage
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = "public-read"
@@ -234,13 +237,12 @@ AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each oth
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-# Disable CSRF
-# FIXME: Remove this once users can log in and fetch a token - or if you figure out a smarter way to do this.
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.BasicAuthentication",
-        "clerk.auth.CsrfExemptSessionAuthentication",
-    )
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DATE_FORMAT": "%d/%m/%Y",
+    "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
 }
 
 ONE_HUNDRED_YEARS = 100 * 365 * 24 * 60 * 60  # seconds
@@ -259,16 +261,41 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "root": {"level": "INFO", "handlers": ["console", "file"]},
+    "formatters": {
+        "default": {
+            "format": "{asctime} - {levelname} - {name} - {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
-        "console": {"level": "INFO", "class": "logging.StreamHandler"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
             "filename": "/var/log/django.log",
+            "formatter": "default",
         },
     },
     "loggers": {
-        "django": {"handlers": ["console", "file"], "level": "INFO", "propagate": True},
+        "django": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "django.server": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "django-q": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
         "django.db.backends": {
             "level": "ERROR",
             "handlers": ["console", "file"],
@@ -288,7 +315,7 @@ class SlackMessage:
 
 SLACK_MESSAGE = SlackMessage
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
-SLACK_EMAIL_ALERT_OVERRIDE = "mattdsegal@gmail.com"  # Set to None in prod only
+SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.com"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
 INTAKE_NOEMAIL_EMAIL = None
@@ -312,7 +339,7 @@ EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_DOMAIN = "em7221.test-mail.anikalegal.com"
-
+EMAIL_BUCKET_NAME = None  # Overwrite me
 
 # Marketing emails via MailChimp
 MAILCHIMP_API_KEY = os.environ.get("MAILCHIMP_API_KEY")

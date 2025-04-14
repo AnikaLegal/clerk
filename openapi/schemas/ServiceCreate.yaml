@@ -1,0 +1,3 @@
+allOf:
+  - $ref: ./ServiceBase.yaml
+  - type: object

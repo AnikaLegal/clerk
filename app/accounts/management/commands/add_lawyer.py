@@ -26,7 +26,7 @@ class Command(BaseCommand):
         coordinator_group = Group.objects.get(name=CaseGroups.COORDINATOR)
 
         for email in options["email_addresses"]:
-            self.stdout.write("Setting up {}".format(email))
+            self.stdout.write(f"Setting up {email}")
 
             first_name, last_name = email.split("@")[0].split(".")
             first_name, last_name = first_name.title(), last_name.title()
@@ -51,4 +51,4 @@ class Command(BaseCommand):
             user.groups.add(lawyer_group)
             user.groups.remove(paralegal_group)
 
-            self.stdout.write("Finished setting up {}".format(email))
+            self.stdout.write(f"Finished setting up {email}")

@@ -100,29 +100,29 @@ const ParalegalTable: React.FC<ParalegalTableProps> = ({ accounts }) => (
     <Table.Header>
       <Table.Row>
         <Table.HeaderCell>Name</Table.HeaderCell>
-        <Table.HeaderCell textAlign="center">Latest Case</Table.HeaderCell>
+        <Table.HeaderCell textAlign="center">Latest case</Table.HeaderCell>
         <Table.HeaderCell textAlign="center">Capacity (%)</Table.HeaderCell>
         <Table.HeaderCell textAlign="center">
           Total
           <br />
-          Open
+          open
         </Table.HeaderCell>
         <Table.HeaderCell textAlign="center">
           Repairs
           <br />
-          Open
+          open
         </Table.HeaderCell>
         <Table.HeaderCell textAlign="center">
           Bonds
           <br />
-          Open
+          open
         </Table.HeaderCell>
         <Table.HeaderCell textAlign="center">
           Eviction
           <br />
-          Open
+          open
         </Table.HeaderCell>
-        <Table.HeaderCell textAlign="center">Total Cases</Table.HeaderCell>
+        <Table.HeaderCell textAlign="center">Total cases</Table.HeaderCell>
       </Table.Row>
     </Table.Header>
     <Table.Body>

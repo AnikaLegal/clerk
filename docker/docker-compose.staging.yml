@@ -10,7 +10,7 @@ services:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/test/web:/var/log
     env_file:
-      - staging.env
+      - ../env/staging.env
 
   worker:
     command: bash /app/scripts/worker/prod.sh
@@ -19,4 +19,4 @@ services:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/test/worker:/var/log
     env_file:
-      - staging.env
+      - ../env/staging.env

@@ -7,6 +7,7 @@ from core.models.client import (
     EligibilityCircumstanceType,
     AboriginalOrTorresStraitIslander,
     RequiresInterpreter,
+    ContactRestriction,
 )
 from .fields import TextChoiceField, TextChoiceListField
 
@@ -36,6 +37,8 @@ class ClientSerializer(serializers.ModelSerializer):
             "is_aboriginal_or_torres_strait_islander",
             "number_of_dependents",
             "eligibility_circumstances",
+            "contact_restriction",
+            "contact_notes",
             "age",
             "full_name",
             "notes",
@@ -54,11 +57,11 @@ class ClientSerializer(serializers.ModelSerializer):
     is_aboriginal_or_torres_strait_islander = TextChoiceField(
         AboriginalOrTorresStraitIslander, required=False
     )
-    requires_interpreter = TextChoiceField(RequiresInterpreter, required=False)
-
     full_name = serializers.SerializerMethodField()
     age = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+    requires_interpreter = TextChoiceField(RequiresInterpreter)
+    contact_restriction = TextChoiceField(ContactRestriction, allow_blank=True)
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))

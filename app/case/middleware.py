@@ -1,6 +1,7 @@
 """
 https://docs.djangoproject.com/en/3.2/topics/http/middleware/
 """
+
 from accounts.models import CaseGroups
 
 ADMIN_GROUPS = [CaseGroups.ADMIN]
@@ -49,6 +50,10 @@ def annotate_group_access_middleware(get_response):
         if user and user.is_authenticated:
             annotate_group_access(user)
         else:
+            # NOTE: the DRF clones the request object and overwrites the user
+            # for unauthenticated (AKA anonymous) users as part of its request
+            # processing. So the following is useless in that context.
+            # TODO: remove I can figure out if it is unused elsewhere.
             user.is_admin = False
             user.is_coordinator = False
             user.is_paralegal = False

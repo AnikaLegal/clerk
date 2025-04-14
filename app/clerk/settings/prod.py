@@ -62,11 +62,12 @@ TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "em9037.mail.anikalegal.com"
+EMAIL_BUCKET_NAME = "anika-emails"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
 # Google Analytics
-GOOGLE_ANALYTICS_ID = "UA-133303109-1"
+GOOGLE_ANALYTICS_ID = "G-93HHFX2LBQ"
 FACEBOOK_PIXEL_ID = "580273702543728"
 
 # MS Graph Integration
@@ -77,3 +78,4 @@ MS_REMOVE_OFFICE_LICENCES = True
 
 SLACK_EMAIL_ALERT_OVERRIDE = None
 CLERK_BASE_URL = "https://www.anikalegal.com"
+WAGTAILADMIN_BASE_URL = CLERK_BASE_URL

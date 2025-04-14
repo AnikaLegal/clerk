@@ -279,7 +279,7 @@ const App = () => {
             menuItem: 'Attach from SharePoint',
             render: () => (
               <Tab.Pane>
-                <SharepoinAttachForm />
+                <SharepointAttachForm />
               </Tab.Pane>
             ),
           },
@@ -408,7 +408,7 @@ const FileUploadAttachForm = () => {
   )
 }
 
-const SharepoinAttachForm = () => {
+const SharepointAttachForm = () => {
   const { enqueueSnackbar } = useSnackbar()
   const docsResult = useGetCaseDocumentsQuery({ id: case_pk })
   const sharePointDocs = (docsResult.data?.documents ?? []).filter(

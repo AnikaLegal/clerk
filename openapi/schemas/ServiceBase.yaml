@@ -1,0 +1,26 @@
+type: object
+properties:
+  category:
+    $ref: ./ServiceCategory.yaml
+  type:
+    oneOf:
+    - $ref: ./ServiceTypeDiscrete.yaml
+    - $ref: ./ServiceTypeOngoing.yaml
+  started_at:
+    type: string
+  finished_at:
+    type: string
+    nullable: true
+  count:
+    type: number
+    nullable: true
+  notes:
+    type: string
+    nullable: true
+required:
+  - category
+  - type
+  - started_at
+  - finished_at
+  - count
+  - notes

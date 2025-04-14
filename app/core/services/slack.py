@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from utils.sentry import sentry_task
+from accounts.models import User
 from core.models import Issue, Submission
 from core.models.issue import CaseOutcome
 from slack.services import (
@@ -28,13 +29,13 @@ def send_submission_failure_slack(sub_pk: str):
     send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, msg)
 
 
-def send_case_assignment_slack(issue: str):
+def send_case_assignment_slack(issue: Issue):
     """
     Notify assigned paralegal of new case assignment.
     """
     assert issue.paralegal, f"Assigned paralegal not found for Issue<{issue.pk}>"
     assert issue.lawyer, f"Assigned lawyer not found for Issue<{issue.pk}>"
-    logging.info(
+    logger.info(
         "Notifying User<%s> of assignment to Issue<%s>", issue.paralegal.pk, issue.pk
     )
     slack_user = get_slack_user_by_email(issue.paralegal.email)
@@ -61,7 +62,7 @@ def send_issue_slack(issue_pk: str):
     """
     issue = Issue.objects.select_related("client").get(pk=issue_pk)
     text = get_text(issue)
-    logging.info("Notifying Slack of Issue<%s>", issue_pk)
+    logger.info("Notifying Slack of Issue<%s>", issue_pk)
     send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, text)
     # Mark request as sent
     Issue.objects.filter(pk=issue.pk).update(is_alert_sent=True)
@@ -72,41 +73,81 @@ def send_email_alert_slack(email_pk: str):
     """
     Notify alerts channel of new unhandled email.
     """
-    logging.info("Sending alert for Email<%s>", email_pk)
+    logger.info("Sending alert for Email<%s>", email_pk)
     email = Email.objects.get(pk=email_pk)
     issue = email.issue
     assert issue, f"Email<{email_pk}> does not have an associated Issue"
-    paralegal = issue.paralegal
-    alert_sent = False
+
     case_email_url = settings.CLERK_BASE_URL + reverse(
         "case-email-list", args=(str(issue.pk),)
     )
     case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
     msg = (
         "*New Email Notification*\n"
-        f"A new email has been received for case <{case_url}|{issue.fileref}> .\n"
-        f"You can view this case's emails here: <{case_email_url}|here>.\n"
+        f"A new email has been received for case <{case_url}|{issue.fileref}>.\n"
+        f"You can view this case's emails <{case_email_url}|here>.\n"
     )
-    if paralegal and issue.is_open:
-        # Send alert directly to paralegal for open issues.
-        alert_email = settings.SLACK_EMAIL_ALERT_OVERRIDE or paralegal.email
-        logging.info("Looking up %s in Slack", alert_email)
-        slack_user = get_slack_user_by_email(alert_email)
-        if slack_user:
-            logging.info("Notifying %s of Email<%s> via Slack", alert_email, email_pk)
-            send_slack_direct_message(msg, slack_user["id"])
-            alert_sent = True
 
+    alert_sent = False
+    if issue.paralegal and issue.is_open:
+        alert_sent = send_slack_message_to_user(issue.paralegal, msg)
     if not alert_sent:
         # In all other cases send to alerts channel.
-        logging.info(
+        logger.info(
             "Could not find someone to DM in Slack, sending generic alert for Email<%s>",
             email_pk,
         )
         send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, msg)
 
     Email.objects.filter(pk=email_pk).update(is_alert_sent=True)
-    logging.info("Alert sent sucessfully for Email<%s>", email_pk)
+    logger.info("Alert sent successfully for Email<%s>", email_pk)
+
+
+@sentry_task
+def send_email_failure_alert_slack(email_pk: str):
+    """
+    Notify of failed email delivery.
+    """
+    logger.info("Sending failure alert for Email<%s>", email_pk)
+    email = Email.objects.get(pk=email_pk)
+    issue = email.issue
+    assert issue, f"Email<{email_pk}> does not have an associated Issue"
+
+    case_email_url = settings.CLERK_BASE_URL + reverse(
+        "case-email-list", args=(str(issue.pk),)
+    )
+    case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
+    msg = (
+        "*Email Delivery Failed*\n"
+        f"An email failed to send for case <{case_url}|{issue.fileref}>.\n"
+        f"You can view this case's emails <{case_email_url}|here>.\n"
+        # #CPR3K4F5K = #caseteam channel
+        "Please check you have the correct email address and try again. If it"
+        " fails a second time, please post on <#CPR3K4F5K> and ask Leads to help"
+        " you send the email from the coordinator's inbox."
+    )
+
+    alert_sent = False
+    if issue.paralegal and issue.is_open:
+        alert_sent = send_slack_message_to_user(issue.paralegal, msg)
+    if not alert_sent:
+        # In all other cases send to alerts channel.
+        logger.info(f"Sending generic alert for Email<{email_pk}>")
+        send_slack_message(settings.SLACK_MESSAGE.CLIENT_INTAKE, msg)
+
+    Email.objects.filter(pk=email_pk).update(is_alert_sent=True)
+    logger.info(f"Alert sent successfully for Email<{email_pk}>")
+
+
+def send_slack_message_to_user(user: User, message: str) -> bool:
+    email = settings.SLACK_EMAIL_ALERT_OVERRIDE or user.email
+    logger.info(f"Looking up {email} in Slack")
+    slack_user = get_slack_user_by_email(email)
+    if slack_user:
+        logger.info(f"Notifying {email} via Slack")
+        send_slack_direct_message(message, slack_user["id"])
+        return True
+    return False
 
 
 def get_text(issue: Issue):
@@ -120,7 +161,7 @@ def get_text(issue: Issue):
         if referrer:
             ref_str += f" / {referrer}"
     else:
-        ref_str = f"*Referral type*: no info available."
+        ref_str = "*Referral type*: no info available."
 
     topic = issue.topic.lower()
     text = (

@@ -131,6 +131,16 @@ const CONTACT_FIELDS = [
     type: FIELD_TYPES.MULTI_CHOICE,
     name: 'call_times',
   },
+  {
+    label: 'Contact restriction?',
+    name: 'contact_restriction',
+    type: FIELD_TYPES.SINGLE_CHOICE,
+  },
+  {
+    label: 'Contact notes',
+    name: 'contact_notes',
+    type: FIELD_TYPES.TEXT,
+  },
 ]
 const OTHER_FIELDS = [
   {
@@ -153,7 +163,7 @@ const OTHER_FIELDS = [
   {
     label: 'Number of dependents',
     name: 'number_of_dependents',
-    schema: Yup.number().integer().min(0).nullable(true),
+    schema: Yup.number().integer().min(0).nullable(),
     type: FIELD_TYPES.NUMBER,
   },
   {

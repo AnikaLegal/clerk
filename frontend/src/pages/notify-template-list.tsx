@@ -86,7 +86,7 @@ const App = () => {
               <Table.HeaderCell>Event</Table.HeaderCell>
               <Table.HeaderCell>Channel</Table.HeaderCell>
               <Table.HeaderCell>Target</Table.HeaderCell>
-              <Table.HeaderCell>Created At</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>

@@ -32,7 +32,8 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
-INTAKE_NOEMAIL_EMAIL = "matt@anikalegal.com"
+EMAIL_BUCKET_NAME = "anika-emails-test"
+INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
@@ -45,5 +46,14 @@ CASES_FOLDER_ID = "014GE5DG2XPLXZF3NLYNGK4IDSYOAG5ICE"
 
 
 CLERK_BASE_URL = "http://localhost:8000"
+WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
 
 WEBPACK_LOADER["DEFAULT"]["CACHE"] = False
+
+MIDDLEWARE += [
+    "querycount.middleware.QueryCountMiddleware",
+]
+
+QUERYCOUNT = {
+    "DISPLAY_DUPLICATES": None,
+}

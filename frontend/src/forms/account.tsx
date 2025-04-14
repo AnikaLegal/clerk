@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
+import { Button, Input, Form } from 'semantic-ui-react'
 import { FormikProps } from 'formik'
 
 interface AccountFormProps {
@@ -12,7 +12,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
 }) => (
   <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
     <div className={`field ${errors.first_name && 'error'}`}>
-      <label>Full Name</label>
+      <label>First Name</label>
       <Input
         placeholder="Jane"
         value={values.first_name}
@@ -22,7 +22,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
       />
     </div>
     <div className={`field ${errors.last_name && 'error'}`}>
-      <label>Full Name</label>
+      <label>Last Name</label>
       <Input
         placeholder="Doe"
         value={values.last_name}

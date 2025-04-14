@@ -144,7 +144,7 @@ class Issue(TimestampedModel):
     outcome = models.CharField(
         max_length=32, null=True, blank=True, choices=CaseOutcome.CHOICES
     )
-    outcome_notes = models.CharField(max_length=256, blank=True, default="")
+    outcome_notes = models.TextField(blank=True, default="")
     # Whether we provided legal advice.
     provided_legal_services = models.BooleanField(default=False)
     # File reference number for internal comms

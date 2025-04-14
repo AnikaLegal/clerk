@@ -1,21 +1,21 @@
 import io
+from datetime import timezone
 from uuid import uuid4
 
 import factory
-from faker import Faker
+from accounts.models import User
+from core.models import Client, FileUpload, Issue, IssueNote, Person, Tenancy, Service
+from core.models.issue import CaseStage, CaseTopic
+from core.models.service import ServiceCategory, DiscreteServiceType, OngoingServiceType
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
-from django.utils import timezone
-
-from accounts.models import User
-from emails.models import Email, EmailTemplate, EmailAttachment
-from core.models import Client, FileUpload, Issue, Person, Tenancy, IssueNote
-from core.models.issue import CaseStage
+from emails.models import Email, EmailAttachment, EmailTemplate
+from faker import Faker
 from notify.models import (
-    Notification,
     NOTIFY_TOPIC_CHOICES,
-    NotifyEvent,
+    Notification,
     NotifyChannel,
+    NotifyEvent,
     NotifyTarget,
 )
 
@@ -44,10 +44,10 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class TimestampedModelFactory(factory.django.DjangoModelFactory):
     modified_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-1m", end_date="now"
+        "date_time_between", tzinfo=timezone.utc, start_date="-1M", end_date="now"
     )
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="-1M"
     )
 
 
@@ -97,7 +97,9 @@ class IssueFactory(TimestampedModelFactory):
         model = Issue
 
     id = factory.LazyAttribute(lambda x: uuid4())
-    topic = "REPAIRS"
+    topic = factory.Faker(
+        "random_element", elements=[CaseTopic.BONDS, CaseTopic.REPAIRS]
+    )
     answers = {}
     client = factory.SubFactory(ClientFactory)
     tenancy = factory.SubFactory(TenancyFactory)
@@ -149,7 +151,7 @@ class EmailFactory(factory.django.DjangoModelFactory):
     text = factory.Faker("sentence")
     received_data = {}
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="now"
     )
 
 
@@ -172,7 +174,7 @@ class EmailAttachmentFactory(factory.django.DjangoModelFactory):
     email = factory.SubFactory(EmailFactory)
     content_type = "image/png"
     created_at = factory.Faker(
-        "date_time_between", tzinfo=timezone.utc, start_date="-2m", end_date="-1m"
+        "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="now"
     )
 
 
@@ -204,3 +206,39 @@ class NotificationFactory(factory.django.DjangoModelFactory):
     )
     raw_text = factory.Faker("sentence")
     message_text = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
+class ServiceFactory(TimestampedModelFactory):
+    class Meta:
+        model = Service
+
+    category = factory.Faker("random_element", elements=ServiceCategory)
+    type = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.DISCRETE),
+        yes_declaration=factory.Faker("random_element", elements=DiscreteServiceType),
+        no_declaration=factory.Faker("random_element", elements=OngoingServiceType),
+    )
+    issue = factory.SubFactory(IssueFactory)
+    started_at = factory.Faker("date_between", start_date="-2M", end_date="-1w")
+    notes = factory.Faker("paragraph")
+
+    # Yikes!
+    # If service is discrete the finished_at always None.
+    # If service is ongoing then 50/50 chance of None or date from started_at to now.
+    finished_at = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.ONGOING),
+        yes_declaration=factory.Maybe(
+            factory.LazyFunction(lambda: fake.boolean(chance_of_getting_true=50)),
+            yes_declaration=factory.Faker(
+                "past_date", start_date=factory.SelfAttribute("..started_at")
+            ),
+            no_declaration=None,
+        ),
+        no_declaration=None,
+    )
+    count = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.category == ServiceCategory.DISCRETE),
+        yes_declaration=factory.Faker("pyint", min_value=1, max_value=3),
+        no_declaration=1,
+    )

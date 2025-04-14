@@ -2,6 +2,7 @@
 Smoke tests for pages that render HTML or React apps.
 ie. not JSON API endpoints
 """
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -26,6 +27,7 @@ PAGE_TEST_CASE = [
     PageTestCase(name="case-detail", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="case-docs", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="case-create", factory=None, is_detail=False),
+    PageTestCase(name="case-services", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
         name="person-create", factory=factories.PersonFactory, is_detail=False

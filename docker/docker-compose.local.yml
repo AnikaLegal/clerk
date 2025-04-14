@@ -21,13 +21,19 @@ services:
       - 8123:8123 # Debug
     volumes:
       - ../app:/app
+      - /app/.venv/ # Exclude
       - build:/build
+      - config_local:/root/.config
     links:
       - worker
       - webpack
       - clerk_db
     env_file:
       - ../env/dev.env
+    environment:
+      - SHELLOPTS=vi
+      - HISTFILE=/root/.config/bash_history
+      - IPYTHON_DIR=/root/.config/ipython
 
   # Django-q worker.
   worker:
@@ -35,6 +41,7 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
+      - /app/.venv/ # Exclude
     links:
       - clerk_db
     env_file:
@@ -57,11 +64,13 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
+      - /app/.venv/ # Exclude
     links:
       - clerk_db
     env_file:
       - ../env/test.env
 
 volumes:
-  clerk-postgres-data:
   build:
+  clerk-postgres-data:
+  config_local:

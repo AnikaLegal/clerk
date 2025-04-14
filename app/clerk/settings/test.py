@@ -7,11 +7,15 @@ EMAIL_PREFIX = "TEST"
 SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["*"]
 DATABASES["default"]["name"] = "test"
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "test_media")
 
-# Use default, otherwise Whitenoise gets angry and fails to load static files.
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        # Use default, otherwise Whitenoise gets angry and fails to load static files.
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
 
 # Django-q cluster should run synchronously
 Q_CLUSTER = {

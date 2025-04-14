@@ -21,19 +21,12 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
   const [updateCase] = useUpdateCaseMutation()
   const { enqueueSnackbar } = useSnackbar()
   const [isSuccess, setSuccess] = useState(false)
-  const paralegalResults = useGetUsersQuery({ group: 'Paralegal' })
-  const lawyerResults = useGetUsersQuery({ group: 'Lawyer' })
+  const paralegalResults = useGetUsersQuery({ group: 'Paralegal', isActive: true, sort: "email" })
+  const lawyerResults = useGetUsersQuery({ group: 'Lawyer', isActive: true, sort: "email" })
   const isLoading = paralegalResults.isFetching || lawyerResults.isFetching
 
-  const lawyers = [
-    ...(lawyerResults.data ?? [])
-  ].filter(x => x.is_active)
-    .sort((a, b) => (a.email > b.email) ? 1 : -1)
-
-  const paralegals = [
-    ...(paralegalResults.data ?? [])
-  ].filter(x => x.is_active)
-    .sort((a, b) => (a.email > b.email) ? 1 : -1)
+  const lawyers = lawyerResults.data ?? []
+  const paralegals = paralegalResults.data ?? []
 
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
@@ -47,7 +40,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
       .then(() => {
         setSubmitting(false)
         setSuccess(true)
-        enqueueSnackbar('Assignment succeess', { variant: 'success' })
+        enqueueSnackbar('Assignment success', { variant: 'success' })
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Assignment failed'), {

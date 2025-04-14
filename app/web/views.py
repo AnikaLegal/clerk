@@ -106,23 +106,9 @@ def shuffle(l):
 
 BOARD = [
     {
-        "image": "web/img/photos/board/denis.png",
-        "name": "Denis Nelthorpe AM",
-        "title": "Chair",
-        "brags": [
-            """Denis joined the Board of Anika Legal in June 2021 and is the
-            organisation’s Chair. He brings a wealth of experience from over 40
-            years in the legal assistance sector including as the CEO of
-            WEstjustice and other leadership roles. He is currently also the
-            Chair of Southside Justice and the Deputy Chair of the National
-            Consumer Advisory Committee at the Insurance Council of
-            Australia.""",
-        ],
-    },
-    {
         "image": "web/img/photos/board/kim.png",
         "name": "Kim Shaw",
-        "title": "Board Member",
+        "title": "Chair",
         "brags": [
             """Kim is an experienced Board Director and Committee member who
             brings strong governance, legal, risk and strategic capabilities to
@@ -133,6 +119,20 @@ BOARD = [
             disadvantaged and vulnerable communities in the Asia Pacific
             including through financial literacy in schools and supporting micro
             enterprises particularly for women."""
+        ],
+    },
+    {
+        "image": "web/img/photos/board/denis.png",
+        "name": "Denis Nelthorpe AM",
+        "title": "Board Member",
+        "brags": [
+            """Denis joined the Board of Anika Legal in June 2021 and is the
+            organisation’s Chair. He brings a wealth of experience from over 40
+            years in the legal assistance sector including as the CEO of
+            WEstjustice and other leadership roles. He is currently also the
+            Chair of Southside Justice and the Deputy Chair of the National
+            Consumer Advisory Committee at the Insurance Council of
+            Australia.""",
         ],
     },
     {
@@ -203,37 +203,17 @@ BOARD = [
 
 ADVISORS = [
     {
-        "image": "web/img/photos/advisors/brendan-lacota.png",
-        "name": "Brendan Lacota",
-        "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
+        "image": "web/img/photos/advisors/madeleine-dupuche.png",
+        "name": "Madeleine Dupuche",
+        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
         "brags": [
-            """Brendan is a leader in designing innovative ways to provide
-            community services. With over a decade's experience in both the
-            community and private sectors, Brendan advises on the intersection
-            of service design, evaluation, project governance, stakeholder
-            engagement, and technology.""",
-            """Brendan currently leads ANZ's flagship social impact programs
-            throughout Australia, Pacific, and New Zealand as well as providing
-            independent consulting services for not-for-profit and for-purpose
-            entities.""",
-        ],
-    },
-    {
-        "image": "web/img/photos/advisors/alan-peckham.png",
-        "name": "Alan Peckham",
-        "title": """Consultant, Former Chief Administrative Officer at Herbert
-        Smith Freehills""",
-        "brags": [
-            """Alan has spent over 25 years working in the legal sector as a
-            practitioner and in a range of executive roles, most recently as
-            Chief Administrative Officer at Herbert Smith Freehills. Alan has
-            been sharing his operations experience and expertise with our
-            team.""",
-            """Alan is also a senior advisor to TILT Legal, a legal tech
-            consultancy that helps legal teams reinvent themselves by using
-            cutting edge technology / AI, and sits on the Advisory Board of
-            Pickering Pearce, a strategy consulting firm that provides
-            innovative and independent advice to law firms around the world.""",
+            """Madeleine is an experienced strategy and education leader whose
+            purpose and career have centred on supporting the creation of a
+            legal profession that accurately reflects the community it serves.""",
+            """Madeleine practised as a solicitor in Melbourne and London before
+            teaching across the continuum of legal education for over 20 years,
+            including at law school, in practical legal training and in
+            continuing professional development.""",
         ],
     },
     {
@@ -254,15 +234,57 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/matt.png",
-        "name": "Matthew Segal",
-        "title": "Technical Advisor and full-stack software developer",
+        "image": "web/img/photos/advisors/helga-svendsen.png",
+        "name": "Helga Svendsen FAICD",
+        "title": """Host of Take on Board podcast, Leadership & Executive Coach &
+        Non Executive Director""",
         "brags": [
-            """Matt previously led our Technology portfolio, which improved our
-            technical infrastructure. He now provides strategic advice and
-            shares his extensive expertise with our team.""",
-            """Matt is a full-stack software developer with experience in
-            eCommerce, disease modelling, fintech and online media.""",
+            """Helga specialises in strategy and planning, governance and
+            stakeholder engagement. Building on her extensive leadership roles
+            in government, not-for-profit and membership organisations, Helga is
+            a dynamic facilitator, coach, trainer and speaker.""",
+            """Helga has held a number of chair and board roles, including the
+            Royal Women's Hospital and Social Housing Australia. Initially
+            trained and practising as a lawyer, her previous roles include Chief
+            Executive Officer of Hotham Mission Asylum Seeker Project, Assistant
+            Secretary of the Australian Services Union and Facilitator at
+            Sustainability Victoria. She has also founded two group coaching
+            programs for women - Board KickStarter and Board Accelerator to
+            encourage women into, and on, Boards.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/brendan-lacota.png",
+        "name": "Brendan Lacota",
+        "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
+        "brags": [
+            """Brendan is a leader in designing innovative ways to provide
+            community services. With over a decade's experience in both the
+            community and private sectors, Brendan advises on the intersection
+            of service design, evaluation, project governance, stakeholder
+            engagement, and technology.""",
+            """Brendan currently leads ANZ's flagship social impact programs
+            throughout Australia, Pacific, and New Zealand as well as providing
+            independent consulting services for not-for-profit and for-purpose
+            entities.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/advisors/alan-peckham.png",
+        "name": "Alan Peckham",
+        "title": """Head of Legal at Australian Institute of Company Directors
+        and former Chief Administrative Officer at Herbert Smith Freehills""",
+        "brags": [
+            """Alan has spent over 25 years working in the legal sector as a
+            practitioner and in a range of executive roles, most recently as
+            Chief Administrative Officer at Herbert Smith Freehills. Alan has
+            been sharing his operations experience and expertise with our
+            team.""",
+            """Alan is also a senior advisor to TILT Legal, a legal tech
+            consultancy that helps legal teams reinvent themselves by using
+            cutting edge technology / AI, and sits on the Advisory Board of
+            Pickering Pearce, a strategy consulting firm that provides
+            innovative and independent advice to law firms around the world.""",
         ],
     },
 ]
@@ -277,18 +299,6 @@ TEAM_MEMBERS = [
             """Noel drives the direction of our organisation and ensures that
             each portfolio is successfully managed.""",
             """Noel is the full-time CEO and co-founder of Anika Legal.""",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/zoe.png",
-        "name": "Zoe Chan",
-        "title": "Principal Lawyer",
-        "brags": [
-            """Zoe is our Principal lawyer, and is responsible for developing
-            and delivering the legal service we provide.""",
-            """Zoe was previously a lawyer at Justice Connect, where she gained
-            experience in civil litigation, pro bono projects, and designing
-            user centred service improvements.""",
         ],
     },
     {
@@ -320,16 +330,17 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/kawshi.png",
-        "name": "Kawshalya Manisegaran",
-        "title": "Lawyer and Clinical Programs Lead",
+        "image": "web/img/photos/team/emily.png",
+        "name": "Emily Southwell",
+        "title": "Principal Lawyer",
         "brags": [
-            """Kawshalya is a lawyer, supporting our paralegals to deliver much
-            needed legal services to Victorian renters.""",
-            """Kawshalya has considerable experience as a lawyer, specialising
-            in transport infrastructure projects. She previously worked at PwC
-            in their Infrastructure team, and at MinterEllison in their
-            Projects, Infrastructure and Construction team.""",
+            """Emily is our Principal lawyer, and is responsible for developing
+            and delivering the legal service we provide.""",
+            """Emily brings a wealth of diverse experiences to Anika Legal. She
+            has previously worked as a Coroner's Solicitor at the Coroner's
+            Court of Victoria and has significant expertise in policy
+            development, particularly in the areas of justice and Aboriginal
+            affairs.""",
         ],
     },
     {
@@ -344,17 +355,6 @@ TEAM_MEMBERS = [
             """Luca is a software developer with extensive experience working
             with large national institutions in the cultural and heritage
             sector.""",
-        ],
-    },
-    {
-        "image": "web/img/photos/team/lucy.png",
-        "name": "Lucy Majstorovic",
-        "title": "Partnerships & Fundraising Lead",
-        "brags": [
-            """Lucy supports our Partnership and Fundraising team, working with
-            our trusted partners to maximise Anika’s impact.""",
-            """Lucy previously worked in consumer goods, where she gained
-            experience in relationship management, marketing and analytics""",
         ],
     },
 ]

@@ -1,17 +1,11 @@
 from django.db import models
-from wagtail.core import blocks
-from wagtail.core.models import Page
-from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import (
-    FieldPanel,
-    StreamFieldPanel,
-    PrivacyModalPanel,
-)
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail import blocks
+from wagtail.models import Page
+from wagtail.fields import StreamField
+from wagtail.admin.panels import FieldPanel
 from wagtail.images.blocks import ImageChooserBlock
 
 from web.blocks import AttributedQuoteBlock
-from .mixins import RICH_TEXT_FEATURES
 
 
 class VolunteerListPage(Page):
@@ -40,11 +34,12 @@ class VolunteerPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
             ("quote", blocks.BlockQuoteBlock()),
             ("attributed_quote", AttributedQuoteBlock()),
-        ]
+        ],
+        use_json_field=True
     )
     position = models.CharField(max_length=255, help_text="The name of their role")
     main_image = models.ForeignKey(
@@ -56,11 +51,10 @@ class VolunteerPage(Page):
     )
 
     promote_panels = [FieldPanel("slug")]
-    settings_panels = [PrivacyModalPanel()]
     content_panels = Page.content_panels + [
         FieldPanel("position"),
-        ImageChooserPanel("main_image"),
-        StreamFieldPanel("body"),
+        FieldPanel("main_image"),
+        FieldPanel("body"),
     ]
 
     def save(self, *args, **kwargs):

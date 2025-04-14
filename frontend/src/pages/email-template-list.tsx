@@ -83,7 +83,7 @@ const App = () => {
               <Table.HeaderCell>Name</Table.HeaderCell>
               <Table.HeaderCell>Topic</Table.HeaderCell>
               <Table.HeaderCell>Subject</Table.HeaderCell>
-              <Table.HeaderCell>Created At</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>

@@ -1,7 +1,71 @@
+[project]
+name = "clerk"
+version = "0.1.0"
+description = ""
+requires-python = "==3.12.5"
+authors = [
+    { name = "Matt Segal", email = "matt.segal@anikalegal.com" },
+    { name = "Luca Vari", email = "luca.vari@anikalegal.com" },
+]
+dependencies = [
+    "awscli",
+    "beautifulsoup4",
+    "black",
+    "boto3",
+    "django-cleanup",
+    "django-cors-headers",
+    "django-override-storage",
+    "django-q2",
+    "django-storages",
+    "django-webpack-loader",
+    "django",
+    "djangorestframework",
+    "drf-openapi-tester",
+    "faker",
+    "flake8",
+    "freezegun",
+    "gunicorn",
+    "html-sanitizer",
+    "isort",
+    "mailchimp3",
+    "msal",
+    "openapi-spec-validator",
+    "pillow",
+    "psycopg2-binary",
+    "pygments",
+    "pytest-django",
+    "pytest-factoryboy",
+    "requests",
+    "responses",
+    "sendgrid",
+    "sentry-sdk",
+    "social-auth-app-django",
+    "twilio",
+    "tzdata",
+    "wagtail-localize",
+    "wagtail",
+    "whitenoise",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "debugpy",
+    "django-browser-reload",
+    "django-debug-toolbar",
+    "django-extensions",
+    "django-querycount",
+    "ipython",
+    "setuptools",
+    "watchdog[watchmedo]",
+]
+# Our dependency on drf-openapi-tester limits django to version >=3 & <=4 but we
+# can safely use a later django version. We should find a replacement for
+# drf-openapi-tester anyway as it has been archived and is no longer being
+# updated which is likely why its dependencies haven't been updated.
+override-dependencies = ["django>=5"]
+
 [tool.pytest.ini_options]
 filterwarnings = [
-    "ignore::UserWarning",
-    "ignore::django.utils.deprecation.RemovedInDjango50Warning",
-    "ignore::wagtail.utils.deprecation.RemovedInWagtail217Warning",
+    "ignore::django.utils.deprecation.RemovedInDjango60Warning",
 ]
-addopts = "--reuse-db --ds=clerk.settings.test"
+addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"

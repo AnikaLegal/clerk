@@ -4,7 +4,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django_q.tasks import async_task
 
-from core.models import Issue
+from core.models.issue import Issue, CaseStage
 from notify.models import Notification, NotifyEvent, NotifyTarget, NotifyChannel
 from slack.services import (
     send_slack_direct_message,
@@ -55,11 +55,18 @@ def on_issue_stage_change(issue_pk, old_stage: str, new_stage: str):
             email = issue.lawyer and issue.lawyer.email
 
         if not email:
-            logger.error(
-                "No matching email found for Notification[%s] and Issue[%s]",
-                notification.pk,
-                issue_pk,
-            )
+            if old_stage == CaseStage.UNSTARTED and new_stage == CaseStage.CLOSED:
+                logger.info(
+                    "No notification target for Notification[%s] as Issue[%s] closed unassigned and unstarted",
+                    notification.pk,
+                    issue_pk,
+                )
+            else:
+                logger.error(
+                    "No notification target found for Notification[%s] and Issue[%s]",
+                    notification.pk,
+                    issue_pk,
+                )
             continue
 
         logger.info(

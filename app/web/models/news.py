@@ -1,17 +1,10 @@
 from django.db import models
-from wagtail.core import blocks
-from wagtail.core.models import Page
-from wagtail.core.fields import StreamField
-from wagtail.admin.edit_handlers import (
-    FieldPanel,
-    StreamFieldPanel,
-    PrivacyModalPanel,
-)
-from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail import blocks
+from wagtail.models import Page
+from wagtail.fields import StreamField
+from wagtail.admin.panels import FieldPanel
 
 from wagtail.images.blocks import ImageChooserBlock
-
-from .mixins import RICH_TEXT_FEATURES
 
 
 class NewsListPage(Page):
@@ -41,17 +34,17 @@ class NewsPage(Page):
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
-            ("paragraph", blocks.RichTextBlock(features=RICH_TEXT_FEATURES)),
+            ("paragraph", blocks.RichTextBlock()),
             ("image", ImageChooserBlock()),
             ("quote", blocks.BlockQuoteBlock()),
-        ]
+        ],
+        use_json_field=True,
     )
     promote_panels = [FieldPanel("slug")]
-    settings_panels = [PrivacyModalPanel()]
     content_panels = Page.content_panels + [
         FieldPanel("owner", heading="Author"),
         FieldPanel("search_description", heading="Social description"),
-        StreamFieldPanel("body"),
+        FieldPanel("body"),
     ]
 
 
@@ -70,7 +63,7 @@ class ExternalNews(models.Model):
         FieldPanel("title"),
         FieldPanel("published_date"),
         FieldPanel("url"),
-        ImageChooserPanel("brand_image"),
+        FieldPanel("brand_image"),
     ]
 
     class Meta:

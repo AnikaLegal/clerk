@@ -47,7 +47,7 @@ export const OutcomeForm: React.FC<CaseDetailFormProps> = ({
       .then(() => {
         setSubmitting(false)
         setSuccess(true)
-        enqueueSnackbar('Case update succeess', { variant: 'success' })
+        enqueueSnackbar('Case update success', { variant: 'success' })
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Case update failed'), {

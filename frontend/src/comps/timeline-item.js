@@ -115,7 +115,7 @@ const NOTE_TYPES = {
       color="teal"
       bottomLabel={
         <span>
-          About&nbsp;
+          About{" "}
           <a href={note.reviewee.url}>{note.reviewee.full_name}</a>
         </span>
       }

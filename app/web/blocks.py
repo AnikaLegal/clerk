@@ -1,4 +1,4 @@
-from wagtail.core.blocks import StructBlock, CharBlock
+from wagtail.blocks import StructBlock, CharBlock
 
 
 class AttributedQuoteBlock(StructBlock):
