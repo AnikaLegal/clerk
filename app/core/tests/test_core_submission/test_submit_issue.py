@@ -103,7 +103,7 @@ EVICTIONS_ANSWERS = {
 }
 EVICTIONS_ISSUE = {
     "client": "Matthew",
-    "topic": "EVICTION",
+    "topic": "EVICTION_ARREARS",
     "stage": None,
     "outcome": None,
     "outcome_notes": "",

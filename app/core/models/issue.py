@@ -17,7 +17,7 @@ from .timestamped import TimestampedModel
 class CaseTopic:
     REPAIRS = "REPAIRS"
     RENT_REDUCTION = "RENT_REDUCTION"
-    EVICTION = "EVICTION"
+    EVICTION_ARREARS = "EVICTION_ARREARS"
     BONDS = "BONDS"
     OTHER = "OTHER"
     HEALTH_CHECK = "HEALTH_CHECK"
@@ -25,13 +25,13 @@ class CaseTopic:
     ACTIVE_CHOICES = [
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
-        (EVICTION, "Eviction"),
+        (EVICTION_ARREARS, "Eviction (Arrears)"),
         (HEALTH_CHECK, "Housing Health Check"),
     ]
     CHOICES = (
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
-        (EVICTION, "Eviction"),
+        (EVICTION_ARREARS, "Eviction (Arrears)"),
         (HEALTH_CHECK, "Housing Health Check"),
         (RENT_REDUCTION, "Rent reduction"),
         (OTHER, "Other"),

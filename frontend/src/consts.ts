@@ -34,7 +34,7 @@ export const OUTCOMES = {
 export const CASE_TYPES = {
   REPAIRS: 'Repairs',
   BONDS: 'Bonds',
-  EVICTION: 'Eviction',
+  EVICTION_ARREARS: 'Eviction (Arrears)',
 } as const
 
 export const GROUPS = {
