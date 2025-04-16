@@ -60,8 +60,19 @@ def _calculate_user_capacity(user_qs, issue_rel):
                 Q(
                     **{
                         f"{issue_rel}__is_open": True,
-                        f"{issue_rel}__topic": CaseTopic.EVICTION_ARREARS,
                     }
+                )
+                & Q(
+                    Q(
+                        **{
+                            f"{issue_rel}__topic": CaseTopic.EVICTION_ARREARS,
+                        }
+                    )
+                    | Q(
+                        **{
+                            f"{issue_rel}__topic": CaseTopic.EVICTION_RETALIATORY,
+                        }
+                    )
                 ),
                 distinct=True,
             ),
