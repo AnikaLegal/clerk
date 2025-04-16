@@ -1,24 +1,18 @@
 import logging
+import os
 from dataclasses import dataclass
 
+from accounts.models import User
+from core.models import CaseTopic, FileUpload, Issue
 from django.conf import settings
 from django.utils import timezone
-
-from accounts.models import User
-from core.models import CaseTopic, Issue, FileUpload
+from django.utils.text import slugify
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
 
 
-# Paths for template folders.
-TEMPLATE_PATHS = {
-    CaseTopic.BONDS: "templates/bonds",
-    CaseTopic.REPAIRS: "templates/repairs",
-    CaseTopic.EVICTION_ARREARS: "templates/evictions-arrears",
-    CaseTopic.HEALTH_CHECK: "templates/health-check",
-}
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
@@ -31,7 +25,8 @@ class MicrosoftUserPermissions:
 
 
 def get_document_template_path(topic: str):
-    return TEMPLATE_PATHS[topic]
+    assert [x for x in CaseTopic.CHOICES if topic == x[0]]
+    return os.path.join("templates", slugify(topic))
 
 
 def get_user_permissions(user):
@@ -109,7 +104,6 @@ def set_up_new_case(issue: Issue):
     api = MSGraphAPI()
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-
 
     # Copy templates to the case folder if not already done.
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
