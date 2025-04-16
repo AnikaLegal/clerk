@@ -264,10 +264,15 @@ def list_templates(topic):
 
 
 def upload_template(topic, file):
-    api = MSGraphAPI()
     path = get_document_template_path(topic)
-    parent = api.folder.get(path)
-    api.folder.upload_file(file, parent["id"])
+
+    api = MSGraphAPI()
+    info = api.folder.get(path)
+    if not info:
+        api.folder.create_path(path)
+        info = api.folder.get(path)
+
+    api.folder.upload_file(file, info["id"])
 
 
 def delete_template(file_id):
