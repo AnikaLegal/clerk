@@ -319,9 +319,11 @@ class EmailApiViewset(GenericViewSet):
 def get_email_threads(issue: Issue) -> List[EmailThread]:
     email_qs = (
         issue.email_set.filter(state__in=DISPLAY_EMAIL_STATES)
-        .prefetch_related("emailattachment_set")
+        .select_related("sender")
+        .prefetch_related("sender__groups", "emailattachment_set")
         .order_by("created_at")
     )
+
     threads = []
     for email in email_qs:
         process_email_for_display(email)
