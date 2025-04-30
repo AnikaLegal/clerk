@@ -14,10 +14,10 @@ class EmailThread:
 
     @staticmethod
     def slugify_subject(subject):
-        sub = subject or ""
-        sub_cleaned = re.sub(r"re\s*:\s*", "", sub, flags=re.IGNORECASE)
-        sub_cleaned = sub_cleaned or "No Subject"
-        return slugify(sub_cleaned)
+        slug = subject or ""
+        slug = re.sub(r"re\s*:\s*", "", slug, flags=re.IGNORECASE)
+        slug = slugify(slug)
+        return slug or slugify("No Subject")
 
     def is_email_in_thread(self, email: Email) -> bool:
         return self.slug == self.slugify_subject(email.subject)
