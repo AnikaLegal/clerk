@@ -11,5 +11,3 @@ echo -e "\nCreating new superuser 'admin' with password: $DJANGO_SUPERUSER_PASSW
     --username admin \
     --email admin@example.com \
     --noinput
-
-./manage.py create_test_user_accounts
