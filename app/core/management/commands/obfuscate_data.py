@@ -38,14 +38,13 @@ class Command(BaseCommand):
         tenancies = Tenancy.objects.all()
         comments = TaskComment.objects.all()
 
-        # Obfuscate any user that isn't a lawyer, admin or superuser. We want to
-        # keep the accounts unchanged for users in those groups so they can be
-        # used for testing.
+        # Obfuscate any user that isn't an admin or superuser. We want to keep
+        # the accounts unchanged for users in those groups so they can be used
+        # for testing. Also keep the coordinators account.
         users = User.objects.exclude(
-            Q(groups__name__in=[CaseGroups.LAWYER, CaseGroups.ADMIN])
-            | Q(email="dummy.test@anikalegal.com")
-            | Q(email="coordinators@anikalegal.com")
+            Q(groups__name__in=[CaseGroups.ADMIN])
             | Q(is_superuser=True)
+            | Q(email="coordinators@anikalegal.com")
         ).distinct()
 
         for t in tenancies.iterator():
