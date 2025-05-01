@@ -1,15 +1,15 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+
+set -o errexit
+
 echo -e "\nRunning migrations"
 ./manage.py migrate
 
-echo -e "\nCreating new superuser 'admin'"
+export DJANGO_SUPERUSER_PASSWORD=12345
+echo -e "\nCreating new superuser 'admin' with password: $DJANGO_SUPERUSER_PASSWORD"
 ./manage.py createsuperuser \
     --username admin \
     --email admin@example.com \
     --noinput
 
-
-echo -e "\nSetting superuser 'admin' password to 12345"
-SHELL_COMMAND="u=User.objects.get(username='admin');u.set_password('12345');u.save();"
-./manage.py shell_plus --quiet-load -c "$SHELL_COMMAND"
+./manage.py create_test_user_accounts
