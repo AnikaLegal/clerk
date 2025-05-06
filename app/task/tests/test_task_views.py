@@ -18,6 +18,7 @@ def test_task_list_view__unassigned_user(user_fixture, user_client: APIClient, r
     """
     user = request.getfixturevalue(user_fixture)
     TaskFactory()  # There's a task but the user can't see it
+    assert Task.objects.count() == 1
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -39,6 +40,7 @@ def test_task_list_view__user_assigned_to_task_but_not_issue(
     """
     user = request.getfixturevalue(user_fixture)
     TaskFactory(assigned_to=user, issue__paralegal=UserFactory())
+    assert Task.objects.count() == 1
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -57,6 +59,7 @@ def test_task_list_view__as_paralegal_assigned_to_issue_but_not_task(
     assigned to the issue they're not assigned to the task.
     """
     TaskFactory(issue__paralegal=paralegal_user)
+    assert Task.objects.count() == 1
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -75,11 +78,11 @@ def test_task_list_view__as_assigned_paralegal(
     the task and assigned to the issue.
     """
     task = TaskFactory(assigned_to=paralegal_user, issue__paralegal=paralegal_user)
-
     # Other tasks but no access.
     TaskFactory(assigned_to=paralegal_user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=paralegal_user)
     TaskFactory()
+    assert Task.objects.count() == 4
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -107,6 +110,7 @@ def test_task_list_view__as_assigned_lawyer(
     TaskFactory(assigned_to=lawyer_user, issue__lawyer=UserFactory())
     TaskFactory(issue__paralegal=lawyer_user)
     TaskFactory()
+    assert Task.objects.count() == 5
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -129,6 +133,7 @@ def test_task_list_view__as_coordinator(
     TaskFactory(assigned_to=coordinator_user, issue__paralegal=UserFactory())
     TaskFactory(issue__paralegal=coordinator_user)
     TaskFactory()
+    assert Task.objects.count() == 4
 
     response = user_client.get(reverse("task-api-list"))
     assert response.status_code == 200
@@ -138,10 +143,11 @@ def test_task_list_view__as_coordinator(
 
 
 @pytest.mark.django_db
-def test_task_list_view__search(superuser_client: APIClient):
+def test_task_list_view__search_by_q(superuser_client: APIClient):
     task_1 = TaskFactory(name="task_1")
     task_2 = TaskFactory(name="task_2")
-    task_3 = TaskFactory(name="task_3")
+    assert Task.objects.count() == 2
+
     url = reverse("task-api-list")
 
     # No search results
