@@ -3,7 +3,8 @@
 {% load notice %}
 {% load wagtailcore_tags %}
 {% load wagtail_clerk %}
-{% load cookie %}
+{% load banner %}
+
 <html lang="en">
 
 <head>
@@ -98,6 +99,7 @@
         </script>
     </header>
     {% block content %}{% endblock %}
+    {% banner %}
     <footer>
         <div class=inner>
             <div class=column>
@@ -169,30 +171,6 @@
                 </p>
             </div>
         </div>
-        {% get_cookie "dismiss_footer_banner_easter_2025_appeal" as dismiss_footer_banner %}
-        {% if false and not dismiss_footer_banner %}
-        <div id="footer-banner">
-            <div class="footer-banner-contents">
-                <div class="footer-banner-image">
-                    <img src="{% static 'web/img/footer-banner.png' %}">
-                </div>
-                <div class="footer-banner-text">
-                    <div class="footer-banner-header">
-                        Legal support today. A fairer system tomorrow.
-                        Donate to Anika Legal's Easter Appeal.
-                    </div>
-                </div>
-                <div class="footer-banner-action">
-                    <a href="https://anika-appeal.raiselysite.com/"><button>Donate</button></a>
-                </div>
-            </div>
-            <div class="footer-banner-close">
-                <button onclick="dismissFooterBanner()">
-                    <img class="icon" src="{% static 'web/img/close.svg' %}">
-                </button>
-            </div>
-        </div>
-        {% endif %}
     </footer>
     {% analytics %}
     <script type="text/javascript" src="{% static 'web/scripts/htmx.min.js' %}"></script>
@@ -200,12 +178,6 @@
         document.body.addEventListener('htmx:configRequest', (event) => {
             event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         })
-    </script>
-    <script>
-        function dismissFooterBanner() {
-            document.cookie = "dismiss_footer_banner_easter_2025_appeal=true; max-age=604800; Path=/";
-            document.getElementById("footer-banner").style.display = "none";
-        }
     </script>
     {% block scripts %}{% endblock %}
 </body>

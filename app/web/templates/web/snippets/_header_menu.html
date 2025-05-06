@@ -1,33 +1,33 @@
 {% load wagtail_clerk %}
 <div class="dropdown">
-    <span class="title">Get help</span>
-    <div class="options">
-        <a href="https://intake.anikalegal.com/">Start your case</a>
-        <a href="{% url 'repairs' %}">I need something repaired</a>
-        <a href="{% url 'bonds' %}">I want to recover my bond</a>
-    </div>
+  <span class="title">Get help</span>
+  <div class="options">
+    <a href="https://intake.anikalegal.com/">Start your case</a>
+    <a href="{% url 'repairs' %}">I need something repaired</a>
+    <a href="{% url 'bonds' %}">I want to recover my bond</a>
+  </div>
 </div>
 <a class="dropdown" href="{% url 'refer' %}">Refer someone</a>
 <div class="dropdown">
-    <span class="title">About</span>
-    <div class="options">
-        <a href="{% url 'about' %}">Anika</a>
-        <a href="{% url 'impact' %}">Impact</a>
-        <a href="{% url 'team' %}">Team</a>
-        <a href="{% clerk_slugurl 'news' %}">News</a>
-        <a href="{% url 'reports' %}">Reports</a>
-    </div>
+  <span class="title">About</span>
+  <div class="options">
+    <a href="{% url 'about' %}">Anika</a>
+    <a href="{% url 'impact' %}">Impact</a>
+    <a href="{% url 'team' %}">Team</a>
+    <a href="{% clerk_slugurl 'news' %}">News</a>
+    <a href="{% url 'reports' %}">Reports</a>
+  </div>
 </div>
 <div class="dropdown">
-    <span class="title">Get involved</span>
-    <div class="options">
-        <a href="{% url 'law-student-partners' %}">Law students</a>
-        <a href="{% url 'philanthropy-partners' %}">Philanthropic partners</a>
-        <a href="{% url 'corporate-partners' %}">Corporate partners</a>
-        <a href="{% url 'university-partners' %}">Universities</a>
-        <a href="{% url 'community-partners' %}">Community organisations</a>
-        <a href="{% clerk_slugurl 'jobs' %}">Join the team</a>
-        <a href="{% url 'subscribe' %}">Join our mailing list</a>
-    </div>
+  <span class="title">Get involved</span>
+  <div class="options">
+    <a href="{% url 'law-student-partners' %}">Law students</a>
+    <a href="{% url 'philanthropy-partners' %}">Philanthropic partners</a>
+    <a href="{% url 'corporate-partners' %}">Corporate partners</a>
+    <a href="{% url 'university-partners' %}">Universities</a>
+    <a href="{% url 'community-partners' %}">Community organisations</a>
+    <a href="{% clerk_slugurl 'jobs' %}">Join the team</a>
+    <a href="{% url 'subscribe' %}">Join our mailing list</a>
+  </div>
 </div>
-<a href="https://anika-legal.raisely.com/"><button id="donate">Donate</button></a>
+<a href="{{ settings.web.LinkSettings.donate_url }}"><button id="donate">Donate</button></a>

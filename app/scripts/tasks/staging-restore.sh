@@ -53,7 +53,7 @@ Schedule.objects.all().delete();\
 OrmQ.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "$SHELL_CMD"
 
-echo -e "\nObfuscating all personally identifiable information"
 ./manage.py obfuscate_data
+./manage.py create_test_user_accounts
 
 echo -e "\nDatabase restore finished"

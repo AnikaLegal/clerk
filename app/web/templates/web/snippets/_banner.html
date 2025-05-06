@@ -1,0 +1,125 @@
+{% if banner %}
+  {% load wagtailimages_tags %}
+  {% load static %}
+
+  <div id="banner">
+    <div class="content">
+      <div class="image">
+        <!-- prettier-ignore -->
+        {% image banner.image width-800 height='200' %}
+      </div>
+      <div class="text">
+        <div class="title">{{ banner.title }}</div>
+        <div class="subtitle">{{ banner.subtitle|linebreaks }}</div>
+      </div>
+      <div class="cta">
+        <a href="{{ banner.call_to_action_url }}"><button>{{ banner.call_to_action_text }}</button></a>
+      </div>
+    </div>
+    <div class="dismiss">
+      <button onclick="dismissBanner()"><img class="icon" src="{% static 'web/img/close.svg' %}" /></button>
+    </div>
+  </div>
+  <style>
+    #banner {
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      background-color: var(--blue-dark);
+      display: flex;
+      flex-flow: row nowrap;
+      max-height: 25vh;
+      min-height: 200px;
+      z-index: 99;
+    }
+    #banner .content {
+      flex: 99;
+      display: flex;
+      flex-flow: row nowrap;
+    }
+    #banner .image {
+      flex: 1 1 36%;
+      align-self: stretch;
+      clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
+    }
+    #banner .image img {
+      max-width: 100%;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+    }
+    #banner .text {
+      flex: 1 0 46%;
+      color: white;
+      padding: 1rem;
+      padding-left: 2rem;
+      line-height: 1;
+    }
+    #banner .cta {
+      flex: 1 0 18%;
+      color: white;
+      text-align: center;
+      margin: auto;
+      width: 50%;
+    }
+    #banner .title {
+      font-size: xx-large;
+    }
+    #banner .subtitle {
+      padding-top: 1rem;
+      line-height: 1;
+    }
+    #banner .subtitle > p {
+      color: white;
+      line-height: 1;
+    }
+    #banner .cta > a > button {
+      display: revert;
+      padding: 0.5rem 1rem;
+      box-shadow: none;
+      background-color: beige;
+      color: var(--dark-0);
+      font-size: medium;
+      min-width: 40%;
+    }
+    #banner .dismiss {
+      flex: 1;
+      padding: 0.5rem;
+      align-self: flex-start;
+    }
+    #banner .dismiss > button {
+      width: 1.8rem;
+      height: 1.8rem;
+      padding: 0.5rem;
+      box-shadow: none;
+      font-size: medium;
+      color: var(--dark-0);
+      background-color: beige;
+    }
+    @media (max-width: 1200px) {
+      #banner .image {
+        display: none;
+      }
+    }
+    @media (max-width: 768px) {
+      #banner .content {
+        flex-flow: column nowrap;
+      }
+      #banner .subtitle {
+        display: none;
+      }
+      #banner .cta {
+        padding-bottom: 1rem;
+      }
+      #banner .dismiss {
+        align-self: center;
+      }
+    }
+  </style>
+  <script>
+    function dismissBanner() {
+      document.cookie = '{{dismiss_banner_cookie}}'
+      document.getElementById('banner').style.display = 'none'
+    }
+  </script>
+{% endif %}

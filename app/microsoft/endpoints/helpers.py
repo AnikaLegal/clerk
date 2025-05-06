@@ -1,8 +1,8 @@
-import msal
 import logging
-import string
 import secrets
+import string
 
+import msal
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +32,14 @@ def get_token(client):
     )
 
     if not result:
-        logger.info("No suitable token exists in cache. Get new one from Azure AD")
+        logger.debug("No suitable token exists in cache. Get new one from Azure AD")
         result = client.acquire_token_for_client(
             scopes=["https://graph.microsoft.com/.default"]
         )
 
     # If we can't get access token, see what went wrong, otherwise return it.
     if "access_token" not in result:
-        logger.exception(f'{result["error_description"]} - {result["correlation_id"]}')
+        logger.exception(f"{result['error_description']} - {result['correlation_id']}")
     else:
         return result["access_token"]
 
