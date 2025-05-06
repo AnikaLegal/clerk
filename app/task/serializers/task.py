@@ -246,6 +246,7 @@ class TaskSearchSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
+    issue = serializers.UUIDField(required=False)
     issue__topic = serializers.CharField(required=False)
     # Special case searches.
     q = serializers.CharField(required=False)  # General query.
