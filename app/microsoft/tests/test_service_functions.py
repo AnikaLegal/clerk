@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from microsoft.service import (
-    TEMPLATE_PATHS,
+    get_document_template_path,
     set_up_new_user,
     set_up_new_case,
     add_user_to_case,
@@ -86,7 +86,7 @@ def test_set_up_new_case(mock_api):
     set_up_new_case(issue)
 
     mock_api.folder.copy.assert_called_once_with(
-        TEMPLATE_PATHS[issue.topic], str(issue.id), settings.CASES_FOLDER_ID
+        get_document_template_path(issue.topic), str(issue.id), settings.CASES_FOLDER_ID
     )
 
 

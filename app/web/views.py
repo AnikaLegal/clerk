@@ -38,7 +38,7 @@ def impact_view(request):
         created_at__gte=start_time, provided_legal_services=True
     )
     repairs_count = issues_serviced.filter(topic=CaseTopic.REPAIRS).count()
-    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION).count()
+    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION_ARREARS).count()
     bonds_count = issues_serviced.filter(topic=CaseTopic.BONDS).count()
     context = {
         "repairs_advice_count": repairs_count,
