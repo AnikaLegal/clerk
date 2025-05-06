@@ -1,11 +1,13 @@
+import uuid
+
 import pytest
-from accounts.models import User
-from case.middleware import annotate_group_access
 from conftest import schema_tester
 from core.factories import UserFactory
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 from task.factories import TaskFactory
+from task.helpers import get_coordinators_user
+from task.models import Task
 
 
 @pytest.mark.django_db
@@ -163,4 +165,81 @@ def test_task_list_view__search_by_q(superuser_client: APIClient):
     results = data["results"]
     assert len(results) == 1
     assert results[0]["id"] == task_1.pk
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_task_list_view__filter_by_issue(superuser_client: APIClient):
+    task_1 = TaskFactory()
+    task_2 = TaskFactory()
+    assert Task.objects.count() == 2
+
+    url = reverse("task-api-list")
+
+    # No search results
+    response = superuser_client.get(url, {"issue": str(uuid.uuid4())})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["results"]) == 0
+
+    # One search result
+    response = superuser_client.get(url, {"issue": str(task_1.issue.pk)})
+    assert response.status_code == 200
+    data = response.json()
+    results = data["results"]
+    assert len(results) == 1
+    assert results[0]["id"] == task_1.pk
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_task_list_view__filter_by_assigned_to(superuser_client: APIClient):
+    task_1 = TaskFactory()
+    task_2 = TaskFactory()
+    assert Task.objects.count() == 2
+
+    url = reverse("task-api-list")
+
+    # No search results
+    user = UserFactory()
+    response = superuser_client.get(url, {"assigned_to": user.pk})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["results"]) == 0
+
+    # One search result
+    response = superuser_client.get(url, {"assigned_to": task_1.assigned_to.pk})
+    assert response.status_code == 200
+    data = response.json()
+    results = data["results"]
+    assert len(results) == 1
+    assert results[0]["id"] == task_1.pk
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_task_list_view__filter_by_assigned_to_coordinator_user(
+    user_client, coordinator_user
+):
+    """
+    Tasks assigned to the special "coordinators@anikalegal.com" user are also
+    listed when filtering tasks assigned to a specific coordinator user.
+    """
+    task_1 = TaskFactory(assigned_to=coordinator_user)
+    task_2 = TaskFactory(assigned_to=get_coordinators_user())
+    task_3 = TaskFactory()
+    assert Task.objects.count() == 3
+
+    # Two search result
+    response = user_client.get(
+        reverse("task-api-list"), {"assigned_to": coordinator_user.pk}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    results = data["results"]
+    assert len(results) == 2
+    assert set(x["id"] for x in results) == {task_1.pk, task_2.pk}
+
     schema_tester.validate_response(response=response)
