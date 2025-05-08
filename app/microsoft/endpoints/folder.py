@@ -73,6 +73,20 @@ class FolderEndpoint(BaseEndpoint):
             },
         )
 
+    def create_path(self, path):
+        """
+        Create a folder path under the root folder.
+        """
+        parent_id = "root"
+        partial_path = ""
+        for part in path.split(os.path.sep):
+            partial_path = os.path.join(partial_path, part)
+            info = self.get(partial_path)
+            if not info:
+                self.create_folder(part, parent_id)
+                info = self.get(partial_path)
+            parent_id = info["id"]
+
     def upload_file(self, file, parent_id, name=None):
         """
         Uploads file to parent

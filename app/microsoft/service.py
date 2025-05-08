@@ -1,24 +1,18 @@
 import logging
+import os
 from dataclasses import dataclass
 
+from accounts.models import User
+from core.models import CaseTopic, FileUpload, Issue
 from django.conf import settings
 from django.utils import timezone
-
-from accounts.models import User
-from core.models import CaseTopic, Issue, FileUpload
+from django.utils.text import slugify
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
 
 
-# Paths for template folders.
-TEMPLATE_PATHS = {
-    CaseTopic.BONDS: "templates/bonds",
-    CaseTopic.REPAIRS: "templates/repairs",
-    CaseTopic.EVICTION: "templates/evictions",
-    CaseTopic.HEALTH_CHECK: "templates/health-check",
-}
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
@@ -28,6 +22,11 @@ class MicrosoftUserPermissions:
     has_coordinator_perms: bool
     paralegal_perm_issues: list[Issue]
     paralegal_perm_missing_issues: list[Issue]
+
+
+def get_document_template_path(topic: str):
+    assert [x for x in CaseTopic.CHOICES if topic == x[0]]
+    return os.path.join("templates", slugify(topic))
 
 
 def get_user_permissions(user):
@@ -105,11 +104,13 @@ def set_up_new_case(issue: Issue):
     api = MSGraphAPI()
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-    template_path = TEMPLATE_PATHS[issue.topic]
+
     # Copy templates to the case folder if not already done.
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
+
+        template_path = get_document_template_path(issue.topic)
         api.folder.copy(template_path, case_folder_name, parent_folder_id)
         case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     else:
@@ -244,7 +245,7 @@ def tear_down_coordinator(user):
 
 def list_templates(topic):
     api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
+    path = get_document_template_path(topic)
     children = api.folder.get_children(path)
     return [
         {
@@ -263,10 +264,15 @@ def list_templates(topic):
 
 
 def upload_template(topic, file):
+    path = get_document_template_path(topic)
+
     api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
-    parent = api.folder.get(path)
-    api.folder.upload_file(file, parent["id"])
+    info = api.folder.get(path)
+    if not info:
+        api.folder.create_path(path)
+        info = api.folder.get(path)
+
+    api.folder.upload_file(file, info["id"])
 
 
 def delete_template(file_id):
