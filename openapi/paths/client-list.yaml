@@ -6,7 +6,7 @@ get:
       schema:
         type: integer
       required: false
-    - name: search
+    - name: q
       in: query
       schema:
         type: string

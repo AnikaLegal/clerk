@@ -13,6 +13,7 @@ const injectedRtkApi = api.injectEndpoints({
           is_open: queryArg.isOpen,
           paralegal: queryArg.paralegal,
           lawyer: queryArg.lawyer,
+          client: queryArg.client,
         },
       }),
     }),
@@ -223,7 +224,7 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/clerk/api/client/`,
         params: {
           page: queryArg.page,
-          search: queryArg.search,
+          q: queryArg.q,
         },
       }),
     }),
@@ -232,14 +233,6 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/clerk/api/client/`,
         method: "POST",
         body: queryArg.clientCreate,
-      }),
-    }),
-    searchClient: build.query<SearchClientApiResponse, SearchClientApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/client/search/`,
-        params: {
-          query: queryArg.query,
-        },
       }),
     }),
     getClient: build.query<GetClientApiResponse, GetClientApiArg>({
@@ -462,6 +455,7 @@ export type GetCasesApiArg = {
   isOpen?: string;
   paralegal?: string;
   lawyer?: string;
+  client?: string;
 };
 export type CreateCaseApiResponse =
   /** status 201 Successful response. */ Issue;
@@ -673,17 +667,12 @@ export type GetClientsApiResponse = /** status 200 Successful response. */ {
 };
 export type GetClientsApiArg = {
   page?: number;
-  search?: string;
+  q?: string;
 };
 export type CreateClientApiResponse =
   /** status 201 Successful response. */ Client;
 export type CreateClientApiArg = {
   clientCreate: ClientCreate;
-};
-export type SearchClientApiResponse =
-  /** status 200 Successful response. */ Client[];
-export type SearchClientApiArg = {
-  query: string;
 };
 export type GetClientApiResponse =
   /** status 200 Successful response. */ Client;
@@ -883,14 +872,14 @@ export type ClientBase = {
   pronouns: string | null;
   centrelink_support: boolean;
   eligibility_notes: string;
-  requires_interpreter: TextChoiceField;
+  requires_interpreter?: TextChoiceField;
   primary_language_non_english: boolean;
   primary_language: string;
   is_aboriginal_or_torres_strait_islander: TextChoiceField;
   number_of_dependents: number | null;
   notes: string;
   date_of_birth: string | null;
-  contact_restriction: TextChoiceField;
+  contact_restriction?: TextChoiceField;
   contact_notes?: string;
 };
 export type TextChoiceListField = {
@@ -1161,7 +1150,6 @@ export const {
   useUpdateTenancyMutation,
   useGetClientsQuery,
   useCreateClientMutation,
-  useSearchClientQuery,
   useGetClientQuery,
   useUpdateClientMutation,
   useGetUsersQuery,

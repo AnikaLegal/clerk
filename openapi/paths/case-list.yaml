@@ -41,6 +41,11 @@ get:
       schema:
         type: string
       required: false
+    - name: client
+      in: query
+      schema:
+        type: string
+      required: false
   responses:
     "200":
       description: Successful response.

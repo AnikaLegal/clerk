@@ -48,6 +48,11 @@ paths:
           schema:
             type: string
           required: false
+        - name: client
+          in: query
+          schema:
+            type: string
+          required: false
       responses:
         "200":
           description: Successful response.
@@ -775,7 +780,7 @@ paths:
           schema:
             type: integer
           required: false
-        - name: search
+        - name: q
           in: query
           schema:
             type: string
@@ -830,24 +835,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/client/search/:
-    get:
-      operationId: searchClient
-      parameters:
-        - name: query
-          in: query
-          schema:
-            type: string
-          required: true
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Client"
   /clerk/api/client/{id}/:
     get:
       operationId: getClient
@@ -1522,14 +1509,12 @@ components:
         - pronouns
         - centrelink_support
         - eligibility_notes
-        - requires_interpreter
         - primary_language_non_english
         - primary_language
         - is_aboriginal_or_torres_strait_islander
         - number_of_dependents
         - notes
         - date_of_birth
-        - contact_restriction
     TextChoiceListField:
       type: object
       properties:
