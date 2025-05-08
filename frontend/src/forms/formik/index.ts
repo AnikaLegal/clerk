@@ -10,10 +10,17 @@ import type { RichTextAreaFieldProps } from './rich-text-area-field'
 import { RichTextAreaField } from './rich-text-area-field'
 import type { RichTextEditorFieldProps } from './rich-text-editor-field'
 import { RichTextEditorField } from './rich-text-editor-field'
+import type { SelectSearchFieldProps } from './select-search-field'
+import { SelectSearchField } from './select-search-field'
+
+import type { ClientSelectSearchFieldProps } from './select-search-field-client'
+import { ClientSelectSearchField } from './select-search-field-client'
 
 export {
   BooleanField,
   BooleanFieldProps,
+  ClientSelectSearchField,
+  ClientSelectSearchFieldProps,
   DateInputField,
   DateInputFieldProps,
   DropdownField,
@@ -23,6 +30,7 @@ export {
   RichTextAreaField,
   RichTextAreaFieldProps,
   RichTextEditorField,
-  RichTextEditorFieldProps
+  RichTextEditorFieldProps,
+  SelectSearchField,
+  SelectSearchFieldProps,
 }
-

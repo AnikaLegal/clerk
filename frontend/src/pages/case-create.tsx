@@ -1,11 +1,10 @@
-import React from 'react'
-import { Formik } from 'formik'
-import { Container, Header } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
-
-import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { useCreateCaseMutation } from 'api'
-import { CaseForm } from 'forms/case'
+import { Formik } from 'formik'
+import { ClientSelectSearchField, DropdownField } from 'forms/formik'
+import { useSnackbar } from 'notistack'
+import React from 'react'
+import { Button, Container, Form, Header } from 'semantic-ui-react'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 interface DjangoContext {
   topic_options: { key: string; value: string; text: string }[]
@@ -19,22 +18,24 @@ const App = () => {
     <Container>
       <Header as="h1">Create a new case</Header>
       <Formik
-        initialValues={{}}
-        validate={(values) => { }}
+        initialValues={{
+          topic: '',
+          client_id: '',
+        }}
         onSubmit={(values, { setSubmitting, setErrors }) => {
           createCase({ issueCreate: values })
             .unwrap()
             .then((caseResponse) => {
               window.location.href = caseResponse.url
             })
-            .catch((err) => {
+            .catch((e) => {
               enqueueSnackbar(
-                getAPIErrorMessage(err, 'Failed to create a new case'),
+                getAPIErrorMessage(e, 'Failed to create a new case'),
                 {
                   variant: 'error',
                 }
               )
-              const requestErrors = getAPIFormErrors(err)
+              const requestErrors = getAPIFormErrors(e)
               if (requestErrors) {
                 setErrors(requestErrors)
               }
@@ -42,11 +43,26 @@ const App = () => {
             })
         }}
       >
-        {(formik) => <CaseForm
-          formik={formik}
-          topicOptions={CONTEXT.topic_options}
-          create
-          editable />}
+        {({ handleSubmit, errors, isSubmitting }) => (
+          <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+            <Header as="h3">Case</Header>
+            <DropdownField
+              name="topic"
+              label="Topic"
+              placeholder="Select case topic"
+              options={CONTEXT.topic_options}
+            />
+            <ClientSelectSearchField name="client_id" label="Client" />
+            <Button
+              primary
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
+              Create case
+            </Button>
+          </Form>
+        )}
       </Formik>
     </Container>
   )
