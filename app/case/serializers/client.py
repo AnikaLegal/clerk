@@ -13,7 +13,7 @@ from .fields import TextChoiceField, TextChoiceListField
 
 
 class ClientSearchSerializer(serializers.Serializer):
-    search = serializers.CharField(max_length=256, required=True)
+    q = serializers.CharField(max_length=256, required=True)
 
 
 class ClientSerializer(serializers.ModelSerializer):

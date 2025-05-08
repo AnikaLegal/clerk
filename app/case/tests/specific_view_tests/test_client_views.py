@@ -117,11 +117,11 @@ def test_client_list_view__search(superuser_client: APIClient):
     url = reverse("client-api-list")
 
     # Empty search parameter.
-    response = superuser_client.get(url, {"search": ""})
+    response = superuser_client.get(url, {"q": ""})
     assert response.status_code == 400
 
     # No search results.
-    response = superuser_client.get(url, {"search": "MISS"})
+    response = superuser_client.get(url, {"q": "MISS"})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 0
@@ -129,7 +129,7 @@ def test_client_list_view__search(superuser_client: APIClient):
     assert len(results) == 0
 
     # One search result.
-    response = superuser_client.get(url, {"search": "John"})
+    response = superuser_client.get(url, {"q": "John"})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 1
@@ -139,7 +139,7 @@ def test_client_list_view__search(superuser_client: APIClient):
     schema_tester.validate_response(response=response)
 
     # Two search results.
-    response = superuser_client.get(url, {"search": "Smith"})
+    response = superuser_client.get(url, {"q": "Smith"})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 2
@@ -236,7 +236,7 @@ def test_client_update_view(superuser_client: APIClient):
 
 
 @pytest.mark.django_db
-def test_case_create_view_permissions(
+def test_client_create_view_permissions(
     user_client: APIClient,
     user: User,
     paralegal_group,

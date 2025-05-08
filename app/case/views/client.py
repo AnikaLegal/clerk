@@ -98,7 +98,7 @@ class ClientApiViewset(
             data=self.request.query_params, partial=True
         )
         serializer.is_valid(raise_exception=True)
-        search = serializer.validated_data.get("search", None)
+        search = serializer.validated_data.get("q", None)
         if search:
             q_filter = (
                 Q(full_name__icontains=search)
