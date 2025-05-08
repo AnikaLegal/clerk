@@ -60,8 +60,10 @@ class ClientSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     age = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
-    requires_interpreter = TextChoiceField(RequiresInterpreter)
-    contact_restriction = TextChoiceField(ContactRestriction, allow_blank=True)
+    requires_interpreter = TextChoiceField(RequiresInterpreter, required=False)
+    contact_restriction = TextChoiceField(
+        ContactRestriction, required=False, allow_blank=True
+    )
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))
