@@ -1,0 +1,40 @@
+allOf:
+  - $ref: ./IssueBase.yaml
+  - type: object
+    properties:
+      paralegal_id:
+        $ref: ./User.yaml
+        nullable: true
+      lawyer_id:
+        $ref: ./User.yaml
+        nullable: true
+      client_id:
+        $ref: ./Client.yaml
+      tenancy_id:
+        $ref: ./Tenancy.yaml
+      support_worker_id:
+        $ref: ./Person.yaml
+        nullable: true
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
+      weekly_rent:
+        type: integer
+        nullable: true
+    required:
+      - paralegal_id
+      - lawyer_id
+      - client_id
+      - tenancy_id
+      - support_worker_id
+      - employment_status
+      - weekly_income
+      - referrer
+      - referrer_type
+      - weekly_rent

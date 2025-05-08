@@ -43,7 +43,7 @@ def test_generic_list_view_requires_permissions(
 
     # Apply group annotations (usually done in middleware)
     annotate_group_access(user)
-    is_authorized = test_case.test_read_permission(user)
+    is_authorized = test_case.test_read_permissions(user)
 
     # Try view a list of items as the user (client logged in as user)
     list_view_name = f"{test_case.base_view_name}-list"
@@ -115,7 +115,7 @@ def test_generic_detail_view_requires_permissions(
 
     # Apply group annotations (usually done in middleware)
     annotate_group_access(user)
-    is_authorized = test_case.test_read_permission(user)
+    is_authorized = test_case.test_read_permissions(user)
 
     # Try view an item as the user (client logged in as user)
     detail_view_name = f"{test_case.base_view_name}-detail"

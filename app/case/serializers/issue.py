@@ -39,7 +39,9 @@ class IssueSerializer(serializers.ModelSerializer):
             "lawyer",
             "lawyer_id",
             "client",
+            "client_id",
             "tenancy",
+            "tenancy_id",
             "employment_status",
             "weekly_income",
             "weekly_rent",
@@ -59,28 +61,44 @@ class IssueSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.CharField(read_only=True)
+
     lawyer = UserSerializer(read_only=True)
-    paralegal = UserSerializer(read_only=True)
-    client = ClientSerializer(read_only=True)
-    tenancy = TenancySerializer(read_only=True)
-    support_worker = PersonSerializer(read_only=True)
-    support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
-    paralegal_id = serializers.PrimaryKeyRelatedField(
-        write_only=True,
-        queryset=User.objects.filter(groups__name="Paralegal"),
-        allow_null=True,
-    )
     lawyer_id = serializers.PrimaryKeyRelatedField(
         write_only=True,
         queryset=User.objects.filter(groups__name="Lawyer"),
         allow_null=True,
+        required=False,
     )
-    topic_display = serializers.CharField(source="get_topic_display")
-    outcome_display = serializers.CharField(source="get_outcome_display")
-    stage_display = serializers.CharField(source="get_stage_display")
+
+    paralegal = UserSerializer(read_only=True)
+    paralegal_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Paralegal"),
+        allow_null=True,
+        required=False,
+    )
+
+    client = ClientSerializer(read_only=True)
+    client_id = serializers.UUIDField(write_only=True)
+
+    tenancy = TenancySerializer(read_only=True)
+    tenancy_id = serializers.IntegerField(write_only=True)
+
+    support_worker = PersonSerializer(read_only=True)
+    support_worker_id = serializers.IntegerField(
+        write_only=True, allow_null=True, required=False
+    )
+
+    topic_display = serializers.CharField(source="get_topic_display", read_only=True)
+    outcome_display = serializers.CharField(
+        source="get_outcome_display", read_only=True
+    )
+    stage_display = serializers.CharField(source="get_stage_display", read_only=True)
     created_at = LocalDateField()
-    employment_status = TextChoiceListField(EmploymentType)
-    referrer_type = TextChoiceField(ReferrerType)
+    employment_status = TextChoiceListField(EmploymentType, required=False)
+    referrer_type = TextChoiceField(ReferrerType, required=False)
+    answers = serializers.JSONField(read_only=True)
+
     url = serializers.SerializerMethodField()
     # Case review fields.
     is_conflict_check = serializers.SerializerMethodField()

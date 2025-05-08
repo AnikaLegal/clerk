@@ -16,6 +16,13 @@ const injectedRtkApi = api.injectEndpoints({
         },
       }),
     }),
+    createCase: build.mutation<CreateCaseApiResponse, CreateCaseApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/case/`,
+        method: "POST",
+        body: queryArg.issueCreate,
+      }),
+    }),
     getCase: build.query<GetCaseApiResponse, GetCaseApiArg>({
       query: (queryArg) => ({ url: `/clerk/api/case/${queryArg.id}/` }),
     }),
@@ -210,6 +217,33 @@ const injectedRtkApi = api.injectEndpoints({
         method: "PATCH",
         body: queryArg.tenancyCreate,
       }),
+    }),
+    getClients: build.query<GetClientsApiResponse, GetClientsApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/`,
+        params: {
+          page: queryArg.page,
+          search: queryArg.search,
+        },
+      }),
+    }),
+    createClient: build.mutation<CreateClientApiResponse, CreateClientApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/`,
+        method: "POST",
+        body: queryArg.clientCreate,
+      }),
+    }),
+    searchClient: build.query<SearchClientApiResponse, SearchClientApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/client/search/`,
+        params: {
+          query: queryArg.query,
+        },
+      }),
+    }),
+    getClient: build.query<GetClientApiResponse, GetClientApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/client/${queryArg.id}/` }),
     }),
     updateClient: build.mutation<UpdateClientApiResponse, UpdateClientApiArg>({
       query: (queryArg) => ({
@@ -429,6 +463,11 @@ export type GetCasesApiArg = {
   paralegal?: string;
   lawyer?: string;
 };
+export type CreateCaseApiResponse =
+  /** status 201 Successful response. */ Issue;
+export type CreateCaseApiArg = {
+  issueCreate: IssueCreate;
+};
 export type GetCaseApiResponse = /** status 200 Successful response. */ {
   issue: Issue;
   tenancy: Tenancy;
@@ -623,6 +662,34 @@ export type UpdateTenancyApiArg = {
   id: number;
   /** Successful response. */
   tenancyCreate: TenancyCreate;
+};
+export type GetClientsApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: Client[];
+};
+export type GetClientsApiArg = {
+  page?: number;
+  search?: string;
+};
+export type CreateClientApiResponse =
+  /** status 201 Successful response. */ Client;
+export type CreateClientApiArg = {
+  clientCreate: ClientCreate;
+};
+export type SearchClientApiResponse =
+  /** status 200 Successful response. */ Client[];
+export type SearchClientApiArg = {
+  query: string;
+};
+export type GetClientApiResponse =
+  /** status 200 Successful response. */ Client;
+export type GetClientApiArg = {
+  /** Entity ID */
+  id: string;
 };
 export type UpdateClientApiResponse =
   /** status 200 Successful response. */ Client;
@@ -834,7 +901,7 @@ export type TextChoiceListField = {
 export type Client = ClientBase & {
   id: string;
   url: string;
-  age: number;
+  age: number | null;
   full_name: string;
   call_times: TextChoiceListField;
   eligibility_circumstances: TextChoiceListField;
@@ -886,10 +953,26 @@ export type Issue = IssueBase & {
   url: string;
   answers: {
     [key: string]: string;
-  };
+  } | null;
   is_conflict_check: boolean | null;
   is_eligibility_check: boolean | null;
   next_review: string | null;
+};
+export type Error = {
+  detail?: string | object | (string | object | any)[];
+  nonFieldErrors?: string[];
+};
+export type IssueCreate = IssueBase & {
+  paralegal_id: User;
+  lawyer_id: User;
+  client_id: Client;
+  tenancy_id: Tenancy;
+  support_worker_id: Person;
+  employment_status: TextChoiceListField;
+  weekly_income: number | null;
+  referrer: string;
+  referrer_type: TextChoiceField;
+  weekly_rent: number | null;
 };
 export type IssueNoteBase = {
   note_type: string;
@@ -902,10 +985,6 @@ export type IssueNote = IssueNoteBase & {
   text_display: string;
   created_at: string;
   reviewee: User | null;
-};
-export type Error = {
-  detail?: string | object | (string | object | any)[];
-  nonFieldErrors?: string[];
 };
 export type IssueUpdate = IssueBase & {
   paralegal_id: User;
@@ -1053,6 +1132,7 @@ export type DocumentTemplateCreate = {
 };
 export const {
   useGetCasesQuery,
+  useCreateCaseMutation,
   useGetCaseQuery,
   useUpdateCaseMutation,
   useCreateCaseNoteMutation,
@@ -1079,6 +1159,10 @@ export const {
   useDeletePersonMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
+  useGetClientsQuery,
+  useCreateClientMutation,
+  useSearchClientQuery,
+  useGetClientQuery,
   useUpdateClientMutation,
   useGetUsersQuery,
   useCreateUserMutation,

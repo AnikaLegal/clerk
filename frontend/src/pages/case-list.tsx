@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+  Button,
   Container,
   Header,
   Input,
@@ -14,8 +15,10 @@ import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
 import { useGetUsersQuery, useGetCasesQuery } from 'api'
+import { UserPermission } from 'types'
 
 interface DjangoContext {
+  user: UserPermission
   choices: {
     stage: string[][]
     topic: string[][]
@@ -92,6 +95,13 @@ const App = () => {
         <Header.Subheader>
           Showing {issues.length} of {totalIssues} cases
         </Header.Subheader>
+        {CONTEXT.user.is_coordinator_or_better && (
+          <Header.Subheader style={{ marginTop: '1rem' }}>
+            <a href={CONTEXT.create_url}>
+              <Button primary>Create a new case</Button>
+            </a>
+          </Header.Subheader>
+        )}
       </Header>
       <Form>
         <Form.Field>

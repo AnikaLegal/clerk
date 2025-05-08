@@ -55,6 +55,7 @@ allOf:
         type: object
         additionalProperties:
           type: string
+        nullable: true
       # Case review fields
       is_conflict_check:
         type: boolean

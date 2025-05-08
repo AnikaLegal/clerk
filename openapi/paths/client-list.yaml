@@ -1,5 +1,5 @@
 get:
-  operationId: getCases
+  operationId: getClients
   parameters:
     - name: page
       in: query
@@ -7,36 +7,6 @@ get:
         type: integer
       required: false
     - name: search
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: topic
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: stage
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: outcome
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: is_open
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: paralegal
-      in: query
-      schema:
-        type: string
-      required: false
-    - name: lawyer
       in: query
       schema:
         type: string
@@ -64,7 +34,7 @@ get:
               results:
                 type: array
                 items:
-                  $ref: ../schemas/Issue.yaml
+                  $ref: ../schemas/Client.yaml
             required:
               - current
               - next
@@ -73,20 +43,20 @@ get:
               - item_count
               - results
 post:
-  operationId: createCase
+  operationId: createClient
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: ../schemas/IssueCreate.yaml
+          $ref: ../schemas/ClientCreate.yaml
   responses:
     "201":
       description: Successful response.
       content:
         application/json:
           schema:
-            $ref: ../schemas/Issue.yaml
+            $ref: ../schemas/Client.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":
