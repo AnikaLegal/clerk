@@ -187,8 +187,10 @@ class IssueSearchSerializer(serializers.ModelSerializer):
             "is_open",
             "lawyer",
             "paralegal",
+            "client",
             "search",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
+    client = serializers.UUIDField(required=False)
     search = serializers.CharField(required=False)
