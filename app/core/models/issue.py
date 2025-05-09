@@ -38,6 +38,16 @@ class CaseTopic:
     )
 
 
+class EvictionSubtopic(models.TextChoices):
+    ARREARS = "ARREARS", "Arrears"
+    RETALIATORY = "RETALIATORY", "Retaliatory"
+
+
+class CaseSubtopic(models.TextChoices):
+    ARREARS = EvictionSubtopic.ARREARS
+    RETALIATORY = EvictionSubtopic.RETALIATORY
+
+
 class CaseStage:
     UNSTARTED = "UNSTARTED"
     CLIENT_AGREEMENT = "CLIENT_AGREEMENT"
@@ -124,7 +134,10 @@ class EmploymentType(models.TextChoices):
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
     # Legacy below - Do not use.
-    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19 (DO NOT USE)"
+    INCOME_REDUCED_COVID = (
+        "INCOME_REDUCED_COVID",
+        "Income reduced due to COVID-19 (DO NOT USE)",
+    )
     UNEMPLOYED = "UNEMPLOYED", "Currently unemployed (DO NOT USE)"
 
 
@@ -134,8 +147,11 @@ class Issue(TimestampedModel):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
+    subtopic = models.CharField(max_length=32, choices=CaseSubtopic.choices, default="")
+
     # Where the case is at now.
     stage = models.CharField(
         max_length=32, choices=CaseStage.CHOICES, default=CaseStage.UNSTARTED
