@@ -1,6 +1,12 @@
 from accounts.models import User
 from core.models import Issue, IssueNote, Service
-from core.models.issue import CaseStage, EmploymentType, ReferrerType
+from core.models.issue import (
+    CaseStage,
+    EmploymentType,
+    ReferrerType,
+    CaseTopic,
+    EvictionSubtopic,
+)
 from core.models.service import ServiceCategory
 from django.db.models import Q
 from django.urls import reverse
@@ -26,8 +32,10 @@ class IssueSerializer(serializers.ModelSerializer):
             "id",
             "topic",
             "topic_display",
-            "stage_display",
+            "subtopic",
+            "subtopic_display",
             "stage",
+            "stage_display",
             "outcome",
             "outcome_display",
             "outcome_notes",
@@ -76,6 +84,7 @@ class IssueSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     topic_display = serializers.CharField(source="get_topic_display")
+    subtopic_display = serializers.CharField(source="get_subtopic_display")
     outcome_display = serializers.CharField(source="get_outcome_display")
     stage_display = serializers.CharField(source="get_stage_display")
     created_at = LocalDateField()
@@ -97,6 +106,18 @@ class IssueSerializer(serializers.ModelSerializer):
         return fields
 
     def validate(self, attrs):
+        # Subtopic must belong to a set of choices depending on the topic value.
+        topic = attrs.get("topic")
+        if topic:
+            subtopic = attrs.get("subtopic")
+            if topic == CaseTopic.EVICTION and subtopic not in EvictionSubtopic:
+                error_message = (
+                    f"When topic is {topic}, subtopic must be one of: "
+                    + ", ".join(EvictionSubtopic)
+                )
+                raise serializers.ValidationError({"type": error_message})
+
+        # Check for unfinished ongoing services.
         if attrs.get("stage") == CaseStage.CLOSED and self.instance:
             query = Q(
                 issue_id=self.instance.id,

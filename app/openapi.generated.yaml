@@ -1237,6 +1237,8 @@ components:
       properties:
         topic:
           type: string
+        subtopic:
+          type: string
         stage:
           type: string
         outcome:
@@ -1250,6 +1252,7 @@ components:
           type: boolean
       required:
         - topic
+        - subtopic
         - stage
         - outcome
         - outcome_notes
@@ -1541,6 +1544,8 @@ components:
               format: uuid
             topic_display:
               type: string
+            subtopic_display:
+              type: string
             stage_display:
               type: string
             outcome_display:
@@ -1601,6 +1606,7 @@ components:
           required:
             - id
             - topic_display
+            - subtopic_display
             - stage_display
             - outcome_display
             - fileref

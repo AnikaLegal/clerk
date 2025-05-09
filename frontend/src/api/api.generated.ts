@@ -770,6 +770,7 @@ export type DeleteDocumentTemplateApiArg = {
 };
 export type IssueBase = {
   topic: string;
+  subtopic: string;
   stage: string;
   outcome: string | null;
   outcome_notes: string;
@@ -867,6 +868,7 @@ export type Tenancy = TenancyBase & {
 export type Issue = IssueBase & {
   id: string;
   topic_display: string;
+  subtopic_display: string;
   stage_display: string;
   outcome_display: string | null;
   fileref: string;
