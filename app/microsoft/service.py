@@ -243,38 +243,38 @@ def tear_down_coordinator(user):
         api.group.remove_user(user_id)
 
 
-def list_templates(topic):
+def list_path(path):
     api = MSGraphAPI()
-    path = get_document_template_path(topic)
-    children = api.folder.get_children(path)
-    return [
-        {
-            "id": doc["id"],
-            "name": doc["name"],
-            "url": doc["webUrl"],
-            "created_at": timezone.datetime.fromisoformat(
-                doc["createdDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-            "modified_at": timezone.datetime.fromisoformat(
-                doc["lastModifiedDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-        }
-        for doc in children
-    ]
+    return api.folder.get_children(path)
 
 
-def upload_template(topic, file):
-    path = get_document_template_path(topic)
-
+def upload_file(path, file):
     api = MSGraphAPI()
     info = api.folder.get(path)
     if not info:
         api.folder.create_path(path)
         info = api.folder.get(path)
-
     api.folder.upload_file(file, info["id"])
 
 
-def delete_template(file_id):
+def delete_file(file_id: str, allowed_path: str | None = None):
+    """
+    Deletes a file only if it is in the allowed path.
+    If allowed_path is None, it will delete the file regardless of its path.
+
+    Raises:
+      PermissionError - if the file is not in the allowed path.
+    """
     api = MSGraphAPI()
+
+    if allowed_path:
+        # Get file metadata to verify its path
+        file_info = api.folder.get_info_by_id(file_id)
+        file_path = file_info.get("parentReference", {}).get("path", "")
+
+        # Check if the file path starts with the allowed path
+        if not file_path.startswith(allowed_path):
+            raise PermissionError("File deletion is restricted to the allowed path.")
+
+    # Proceed with deletion if the path is valid
     api.folder.delete_file(file_id)

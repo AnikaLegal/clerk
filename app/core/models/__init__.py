@@ -1,5 +1,5 @@
 from .client import Client
-from .issue import CaseTopic, Issue
+from .issue import CaseTopic, CaseSubtopic, Issue
 from .issue_event import IssueEvent
 from .issue_note import IssueNote
 from .person import Person

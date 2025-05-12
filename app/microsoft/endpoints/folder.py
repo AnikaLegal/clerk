@@ -32,6 +32,10 @@ class FolderEndpoint(BaseEndpoint):
 
         return super().get(url)
 
+    def get_info_by_id(self, item_id):
+        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{item_id}"
+        return super().get(url)
+
     def get_children(self, path):
         """
         Get child items (folders, files) inside current folder
