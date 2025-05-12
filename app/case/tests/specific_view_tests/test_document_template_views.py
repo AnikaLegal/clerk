@@ -1,43 +1,39 @@
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import pytest
+from conftest import schema_tester
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-from django.core.files.uploadedfile import InMemoryUploadedFile
-
-from conftest import schema_tester
 
 
 @pytest.mark.django_db
-@patch("case.views.document_templates.list_templates")
-def test_document_template_list_api_view(
-    mock_list_templates, superuser_client: APIClient
-):
-    mock_list_templates.return_value = [
+@patch("case.views.document_templates.list_path")
+def test_document_template_list_api_view(mock_list_path, superuser_client: APIClient):
+    mock_list_path.return_value = [
         {
             "id": "1",
             "name": "foo",
-            "url": "3",
-            "created_at": "4",
-            "modified_at": "5",
+            "webUrl": "3",
+            "createdDateTime": "2025-05-12T02:42:24+00:00",
+            "lastModifiedDateTime": "2025-05-12T02:42:24+00:00",
         },
         {
             "id": "1",
             "name": "bar",
-            "url": "3",
-            "created_at": "4",
-            "modified_at": "5",
+            "webUrl": "3",
+            "createdDateTime": "2025-05-12T02:42:24+00:00",
+            "lastModifiedDateTime": "2025-05-12T02:42:24+00:00",
         },
     ]
 
-    list_view_name = "template-doc-api-list"
-    url = reverse(list_view_name)
-    params = {"name": "foo", "topic": "baz"}
+    url = reverse("template-doc-api-list")
+    params = {"name": "foo", "topic": "REPAIRS"}
     response = superuser_client.get(url, data=params)
 
     # Check results
-    mock_list_templates.assert_called_once_with("baz")
+    mock_list_path.assert_called_once_with("templates/repairs")
     schema_tester.validate_response(response=response)
     assert response.status_code == 200, response.json()
     assert response.json() == [
@@ -45,17 +41,17 @@ def test_document_template_list_api_view(
             "id": "1",
             "name": "foo",
             "url": "3",
-            "created_at": "4",
-            "modified_at": "5",
-            "topic": "baz",
+            "created_at": "12/05/2025",
+            "modified_at": "12/05/2025",
+            "topic": "REPAIRS",
         }
     ]
 
 
 @pytest.mark.django_db
-@patch("case.views.document_templates.upload_template")
+@patch("case.serializers.documents.upload_file")
 def test_document_template_create_api_view(
-    mock_upload_template, superuser_client: APIClient
+    mock_upload_file, superuser_client: APIClient
 ):
     file_a = InMemoryUploadedFile(
         BytesIO(b"file a content"),
@@ -73,29 +69,34 @@ def test_document_template_create_api_view(
         charset=None,
         name="file_b.txt",
     )
-    list_view_name = "template-doc-api-list"
-    url = reverse(list_view_name)
+
+    url = reverse("template-doc-api-list")
     data = {"topic": "REPAIRS", "files": [file_a, file_b]}
     response = superuser_client.post(url, data=data)
+
     assert response.status_code == 201, response.json()
-    assert mock_upload_template._mock_call_count == 2
-    call_1, call_2 = mock_upload_template._mock_call_args_list
-    assert call_1[0][0] == "REPAIRS"
-    assert call_2[0][0] == "REPAIRS"
+    assert mock_upload_file._mock_call_count == 2
+
+    call_1, call_2 = mock_upload_file._mock_call_args_list
+    assert call_1[0][0] == "templates/repairs"
     assert call_1[0][1].name == "file_a.txt"
+    assert call_2[0][0] == "templates/repairs"
     assert call_2[0][1].name == "file_b.txt"
+
     schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-@patch("case.views.document_templates.delete_template")
+@patch("case.views.document_templates.delete_file")
 def test_document_template_destroy_api_view(
-    mock_delete_template, superuser_client: APIClient
+    mock_delete_file, superuser_client: APIClient
 ):
     file_id = "some-file-id"
-    detail_view_name = "template-doc-api-detail"
-    url = reverse(detail_view_name, args=(file_id,))
+    url = reverse(
+        "template-doc-api-detail",
+        args=(file_id,),
+    )
     response = superuser_client.delete(url)
     assert response.status_code == 204, response.json()
-    mock_delete_template.assert_called_once_with(file_id=file_id)
+    mock_delete_file.assert_called_once_with(file_id=file_id, allowed_path=ANY)
     schema_tester.validate_response(response=response)
