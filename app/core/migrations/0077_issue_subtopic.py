@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
             model_name="issue",
             name="subtopic",
             field=models.CharField(
+                blank=True,
                 choices=[("ARREARS", "Arrears"), ("RETALIATORY", "Retaliatory")],
                 default="",
                 max_length=32,

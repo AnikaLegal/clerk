@@ -150,7 +150,9 @@ class Issue(TimestampedModel):
 
     # What kind of case it is.
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
-    subtopic = models.CharField(max_length=32, choices=CaseSubtopic.choices, default="")
+    subtopic = models.CharField(
+        max_length=32, choices=CaseSubtopic.choices, default="", blank=True
+    )
 
     # Where the case is at now.
     stage = models.CharField(

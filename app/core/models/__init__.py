@@ -1,5 +1,6 @@
 from .client import Client
-from .issue import CaseTopic, CaseSubtopic, Issue
+from .document_template import DocumentTemplate
+from .issue import CaseSubtopic, CaseTopic, Issue
 from .issue_event import IssueEvent
 from .issue_note import IssueNote
 from .person import Person

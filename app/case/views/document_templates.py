@@ -1,16 +1,13 @@
-import os
-
+from core.models.document_template import DocumentTemplate
 from core.models.issue import CaseTopic
+from django.db.models import CharField, Value
+from django.db.models.functions import Reverse, Right, StrIndex
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
-from django.utils.text import slugify
-from microsoft.service import delete_file, list_path
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from case.serializers import (
-    DocumentTemplateFileSerializer,
     DocumentTemplateFilterSerializer,
     DocumentTemplateSerializer,
 )
@@ -53,37 +50,29 @@ class DocumentTemplateApiViewset(ViewSet):
     def list(self, request):
         serializer = DocumentTemplateFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        query_params = serializer.validated_data
 
-        topic = query_params.get("topic", CaseTopic.REPAIRS)
-        subtopic = query_params.get("subtopic", "")
-        name = query_params.get("name")
+        # Annotate the queryset to extract the file name from the file path so
+        # we can filter by name only.
+        queryset = DocumentTemplate.objects.all()
+        queryset = queryset.order_by("name")
 
-        path = os.path.join("templates", slugify(topic), slugify(subtopic)).rstrip("/")
-        serializer = DocumentTemplateSerializer(list_path(path), many=True)
+        for key, value in serializer.validated_data.items():
+            if value is not None:
+                if key == "name":
+                    queryset = queryset.filter(name__icontains=value)
+                else:
+                    queryset = queryset.filter(**{key: value})
 
-        templates = []
-        for item in serializer.data:
-            if name and name.lower() not in item["name"].lower():
-                continue
-
-            item["topic"] = topic
-            if subtopic:
-                item["subtopic"] = subtopic
-            templates.append(item)
-
-        templates = sorted(templates, key=lambda x: x["name"])
-        return Response(data=templates)
+        data = DocumentTemplateSerializer(queryset, many=True).data
+        return Response(data=data)
 
     def create(self, request):
-        serializer = DocumentTemplateFileSerializer(data=request.data)
+        serializer = DocumentTemplateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=201)
 
     def destroy(self, request, pk):
-        try:
-            delete_file(file_id=pk, allowed_path="/drive/root:/templates")
-        except PermissionError:
-            raise PermissionDenied
+        template = DocumentTemplate.objects.get(pk=pk)
+        template.delete()
         return Response(status=204)

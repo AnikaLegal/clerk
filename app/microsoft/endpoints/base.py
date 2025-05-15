@@ -1,7 +1,7 @@
 import logging
-import requests
 
-from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS
+import requests
+from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS, get_token
 
 logger = logging.getLogger(__name__)
 
@@ -9,9 +9,17 @@ logger = logging.getLogger(__name__)
 class BaseEndpoint:
     """Base class for MS Graph endpoints."""
 
-    def __init__(self, access_token):
-        HTTP_HEADERS["Authorization"] = "Bearer " + access_token
-        self.headers = HTTP_HEADERS
+    def __init__(self, client):
+        self.client = client
+
+    @property
+    def token(self) -> str | None:
+        return get_token(self.client)
+
+    @property
+    def headers(self):
+        HTTP_HEADERS["Authorization"] = "Bearer " + self.token
+        return HTTP_HEADERS
 
     def get(self, path):
         resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)

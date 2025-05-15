@@ -10,13 +10,12 @@ from microsoft.endpoints.folder import FolderEndpoint
 def _rename_document_template_folder(apps, schema_editor):
     try:
         api = MSGraphAPI()
-    except TypeError:
-        pass  # Doesn't work in test so just ignore.
-    else:
         path = "templates/health-check"
         if api.folder.get(path):
             url = os.path.join(FolderEndpoint.MIDDLE_URL, path)
             super(FolderEndpoint, api.folder).patch(url, {"name": "health_check"})
+    except TypeError:
+        pass  # Doesn't work in test so just ignore.
 
 
 class Migration(migrations.Migration):

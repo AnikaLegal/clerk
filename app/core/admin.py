@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.messages import constants as messages
 from django_q.tasks import async_task
 from utils.admin import admin_link, dict_to_json_html
+from urllib.parse import unquote
 
 from .models import (
     Client,
@@ -15,6 +16,7 @@ from .models import (
     Person,
     Submission,
     Tenancy,
+    DocumentTemplate,
 )
 
 
@@ -93,7 +95,7 @@ class IssueAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "fileref",
-        "topic_pretty",
+        "topic",
         "client_link",
         "is_alert_sent",
         "is_case_sent",
@@ -105,11 +107,6 @@ class IssueAdmin(admin.ModelAdmin):
     list_filter = ("topic", "is_alert_sent", "is_case_sent", "referrer_type")
 
     list_select_related = ("client",)
-
-    def topic_pretty(self, sub):
-        return sub.topic.replace("_", " ").title()
-
-    topic_pretty.short_description = "topic"
 
     @admin_link("client", "Client")
     def client_link(self, client):
@@ -182,3 +179,14 @@ class ServiceEventAdmin(admin.ModelAdmin):
     @admin_link("user", "User")
     def user_link(self, user):
         return user.get_full_name()
+
+
+@admin.register(DocumentTemplate)
+class DocumentTemplateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "topic",
+        "subtopic",
+        "file",
+    )
+    list_filter = ("topic", "subtopic")

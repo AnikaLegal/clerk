@@ -1,42 +1,68 @@
 import os
 
+from core.models.document_template import DocumentTemplate
 from core.models import CaseSubtopic, CaseTopic
-from django.utils import timezone
-from django.utils.text import slugify
+from core.models.issue import EvictionSubtopic
 from rest_framework import serializers
-from microsoft.service import upload_file
-
-
-class ISO8601StringDateField(serializers.DateField):
-    def to_representation(self, value):
-        value = timezone.localtime(timezone.datetime.fromisoformat(value)).date()
-        return super().to_representation(value)
 
 
 class DocumentTemplateFilterSerializer(serializers.Serializer):
-    topic = serializers.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES, required=True)
+    topic = serializers.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES, required=False)
     subtopic = serializers.ChoiceField(choices=CaseSubtopic.choices, required=False)
     name = serializers.CharField(required=False)
 
 
-class DocumentTemplateSerializer(serializers.Serializer):
-    id = serializers.CharField(required=True)
-    name = serializers.CharField(required=True)
-    url = serializers.CharField(source="webUrl", required=True)
-    created_at = ISO8601StringDateField(source="createdDateTime")
-    modified_at = ISO8601StringDateField(source="lastModifiedDateTime")
+class DocumentTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentTemplate
+        fields = [
+            "id",
+            "topic",
+            "subtopic",
+            "name",
+            "url",
+            "created_at",
+            "modified_at",
+            "files",
+        ]
 
+    # read only fields
+    id = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    url = serializers.CharField(source="file.url", read_only=True)
+    created_at = serializers.DateTimeField(read_only=True, format="%d/%m/%Y")
+    modified_at = serializers.DateTimeField(read_only=True, format="%d/%m/%Y")
 
-class DocumentTemplateFileSerializer(serializers.Serializer):
+    # read/write fields
     topic = serializers.ChoiceField(choices=CaseTopic.ACTIVE_CHOICES, required=True)
     subtopic = serializers.ChoiceField(choices=CaseSubtopic.choices, required=False)
-    files = serializers.ListField(child=serializers.FileField(), allow_empty=False)
+
+    # write only fields
+    files = serializers.ListField(
+        child=serializers.FileField(), allow_empty=False, write_only=True
+    )
+
+    def validate(self, attrs):
+        topic = attrs.get("topic")
+        subtopic = attrs.get("subtopic", "")
+
+        if topic == CaseTopic.EVICTION and subtopic not in EvictionSubtopic:
+            error_message = f"When topic is {topic}, subtopic must be one of: "
+            raise serializers.ValidationError(
+                {"subtopic": error_message + ", ".join(EvictionSubtopic)}
+            )
+
+        return attrs
 
     def create(self, validated_data):
+        files = validated_data.pop("files")
         topic = validated_data.get("topic")
         subtopic = validated_data.get("subtopic", "")
-        path = os.path.join("templates", slugify(topic), slugify(subtopic)).rstrip("/")
 
-        for file in validated_data["files"]:
-            upload_file(path, file)
-        return True
+        for file in files:
+            DocumentTemplate.objects.create(
+                topic=topic,
+                subtopic=subtopic,
+                file=file,
+            )
+        return validated_data
