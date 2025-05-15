@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0077_issue_subtopic"),
     ]
@@ -63,7 +62,6 @@ class Migration(migrations.Migration):
                         upload_to=core.models.document_template.DocumentTemplate._get_upload_to,
                     ),
                 ),
-                ("name", models.CharField(max_length=256)),
             ],
             options={
                 "abstract": False,

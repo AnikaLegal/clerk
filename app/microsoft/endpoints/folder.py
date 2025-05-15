@@ -31,11 +31,12 @@ class FolderEndpoint(BaseEndpoint):
         url = os.path.join(self.MIDDLE_URL, path)
         if select:
             url += r"?$select=" + ",".join(select)
-
         return super().get(url)
 
-    def get_info_by_id(self, item_id):
+    def get_info_by_id(self, item_id, select: list | None = None):
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{item_id}"
+        if select:
+            url += r"?$select=" + ",".join(select)
         return super().get(url)
 
     def get_children(self, path):
