@@ -30,7 +30,7 @@ class MSGraphStorage(Storage):
         )
 
     def _save(self, name, content):
-        dir, file_name = os.path.split(name)
+        dir, _ = os.path.split(name)
         info = self._get_file_info(dir)
         if not info:
             path = self._get_full_path(dir)
@@ -38,7 +38,7 @@ class MSGraphStorage(Storage):
             info = self._get_file_info(dir)
         if not info:
             raise FileNotFoundError(f"Folder {dir} not found")
-        self.api.folder.upload_file(content, info["id"], file_name)
+        self.api.folder.upload_file(content, info["id"])
         return name
 
     def delete(self, name):
