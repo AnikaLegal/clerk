@@ -24,3 +24,14 @@ class MSGraphAPI:
         self.group = GroupEndpoint(client)
         self.user = UserEndpoint(client)
         self.folder = FolderEndpoint(client)
+
+    def is_available(self):
+        """
+        Check if the MS Graph API is available.
+        This will check if a token is available and if an endpoint is reachable.
+        """
+        try:
+            self.group.get()
+            return True
+        except Exception:
+            return False

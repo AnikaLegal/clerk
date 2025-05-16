@@ -8,17 +8,14 @@ from microsoft.endpoints import MSGraphAPI
 
 def _set_initial_data(apps, schema_editor):
     DocumentTemplate = apps.get_model("core", "DocumentTemplate")
-    try:
-        api = MSGraphAPI()
+    api = MSGraphAPI()
+    if api.is_available():
         for topic in ["REPAIRS", "BONDS", "EVICTION", "HEALTH_CHECK"]:
             files = api.folder.get_children(f"templates/{topic}")
             for file in files:
                 name = file["name"]
                 path = os.path.join(slugify(topic), name)
                 DocumentTemplate.objects.create(topic=topic, file=path, name=name)
-    except TypeError:
-        # Handle the case where MSGraphAPI is not available
-        pass
 
 
 class Migration(migrations.Migration):
