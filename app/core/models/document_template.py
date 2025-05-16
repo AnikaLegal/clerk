@@ -25,3 +25,9 @@ class DocumentTemplate(TimestampedModel):
     file = models.FileField(
         storage=_get_storage_class, upload_to=_get_upload_to, max_length=256
     )
+    name = models.CharField(max_length=256, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name = os.path.basename(self.file.name)
+        super().save(*args, **kwargs)

@@ -6,6 +6,12 @@ from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS, get_token
 logger = logging.getLogger(__name__)
 
 
+class MSGraphTokenError(Exception):
+    """Exception raised when no token is available for MS Graph API."""
+
+    pass
+
+
 class BaseEndpoint:
     """Base class for MS Graph endpoints."""
 
@@ -18,7 +24,10 @@ class BaseEndpoint:
 
     @property
     def headers(self):
-        HTTP_HEADERS["Authorization"] = "Bearer " + self.token
+        token = self.token
+        if not token:
+            raise MSGraphTokenError("No token available for MS Graph API")
+        HTTP_HEADERS["Authorization"] = "Bearer " + token
         return HTTP_HEADERS
 
     def get(self, path):

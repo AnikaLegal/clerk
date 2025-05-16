@@ -23,20 +23,16 @@ class FolderEndpoint(BaseEndpoint):
 
     MIDDLE_URL = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/root:/"
 
-    def get(self, path, select: list | None = None):
+    def get(self, path):
         """
         Get the Folder inside the Group Drive (filesystem).
         Returns driveItem object or None.
         """
         url = os.path.join(self.MIDDLE_URL, path)
-        if select:
-            url += r"?$select=" + ",".join(select)
         return super().get(url)
 
-    def get_info_by_id(self, item_id, select: list | None = None):
+    def get_info_by_id(self, item_id):
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{item_id}"
-        if select:
-            url += r"?$select=" + ",".join(select)
         return super().get(url)
 
     def get_children(self, path):

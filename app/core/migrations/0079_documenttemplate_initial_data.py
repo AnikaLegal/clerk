@@ -13,8 +13,9 @@ def _set_initial_data(apps, schema_editor):
         for topic in ["REPAIRS", "BONDS", "EVICTION", "HEALTH_CHECK"]:
             files = api.folder.get_children(f"templates/{topic}")
             for file in files:
-                id = f"{slugify(topic)}:{file['id']}"
-                DocumentTemplate.objects.create(topic=topic, file=id)
+                name = file["name"]
+                path = os.path.join(slugify(topic), name)
+                DocumentTemplate.objects.create(topic=topic, file=path, name=name)
     except TypeError:
         # Handle the case where MSGraphAPI is not available
         pass
