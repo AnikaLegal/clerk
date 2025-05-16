@@ -1,5 +1,7 @@
 import os
+
 from django.core.files.storage import Storage
+from django.core.files.uploadedfile import SimpleUploadedFile
 from microsoft.endpoints import MSGraphAPI
 
 
@@ -14,6 +16,18 @@ class MSGraphStorage(Storage):
     def _get_file_info(self, name):
         path = self._get_full_path(name)
         return self.api.folder.get(path)
+
+    def _open(self, name, mode="rb"):
+        info = self._get_file_info(name)
+        if not info:
+            raise FileNotFoundError(f"File {name} not found")
+        file_name, content_type, bytes = self.api.folder.download_file(info["id"])
+
+        return SimpleUploadedFile(
+            name=os.path.basename(file_name),
+            content=bytes,
+            content_type=content_type,
+        )
 
     def _save(self, name, content):
         dir, file_name = os.path.split(name)
@@ -37,6 +51,12 @@ class MSGraphStorage(Storage):
 
     def get_valid_name(self, name: str) -> str:
         return name
+
+    def size(self, name):
+        info = self._get_file_info(name)
+        if not info:
+            raise FileNotFoundError(f"File {name} not found")
+        return info["size"]
 
     def url(self, name):
         info = self._get_file_info(name)
