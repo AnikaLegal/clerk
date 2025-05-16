@@ -6,33 +6,26 @@ from microsoft.endpoints import MSGraphAPI
 class MSGraphStorage(Storage):
     def __init__(self, base_path: str):
         self.api = MSGraphAPI()
-        self.base_path = "/" + base_path.lstrip("/")
+        self.base_path = base_path
 
     def _get_full_path(self, path):
         return os.path.join(self.base_path, path)
-
-    def _check_path(self, info: dict, path: str):
-        parent_path = info.get("parentReference", {}).get("path")
-        if parent_path:
-            parent_path = parent_path.split(":")[-1]
-            if path == parent_path:
-                return
-        raise PermissionError("Access denied")
 
     def _get_file_info(self, name):
         path = self._get_full_path(name)
         return self.api.folder.get(path)
 
     def _save(self, name, content):
-        head, tail = os.path.split(name)
-        info = self._get_file_info(head)
+        dir, file_name = os.path.split(name)
+        info = self._get_file_info(dir)
         if not info:
-            path = self._get_full_path(head)
+            path = self._get_full_path(dir)
             self.api.folder.create_path(path)
-            info = self._get_file_info(head)
-
-        info = self.api.folder.upload_file(content, info["id"], tail)
-        return f"{head}:{info['id']}"
+            info = self._get_file_info(dir)
+        if not info:
+            raise FileNotFoundError(f"Folder {dir} not found")
+        self.api.folder.upload_file(content, info["id"], file_name)
+        return name
 
     def delete(self, name):
         info = self._get_file_info(name)
