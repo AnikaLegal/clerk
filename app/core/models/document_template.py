@@ -1,22 +1,26 @@
 import os
+from urllib.parse import quote
+
 from core.models.issue import CaseSubtopic, CaseTopic
 from core.models.timestamped import TimestampedModel
 from django.db import models
-from microsoft.storage import MSGraphStorage
 from django.utils.text import slugify
 from django_cleanup import cleanup
+from microsoft.storage import MSGraphStorage
+
+STORAGE_BASE_PATH = "templates"
 
 
 @cleanup.select
 class DocumentTemplate(TimestampedModel):
     def _get_storage_class():
-        return MSGraphStorage(base_path="templates")
+        return MSGraphStorage(base_path=STORAGE_BASE_PATH)
 
     def _get_upload_to(instance, filename):
         topic = slugify(instance.topic)
         subtopic = slugify(instance.subtopic)
         path = os.path.join(topic, subtopic).rstrip("/")
-        return os.path.join(path, filename)
+        return os.path.join(path, quote(filename))
 
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     subtopic = models.CharField(
@@ -31,3 +35,7 @@ class DocumentTemplate(TimestampedModel):
         if not self.name:
             self.name = os.path.basename(self.file.name)
         super().save(*args, **kwargs)
+
+    @property
+    def file_path(self):
+        return os.path.join(STORAGE_BASE_PATH, self.file.name)
