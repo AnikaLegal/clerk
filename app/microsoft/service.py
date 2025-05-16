@@ -1,12 +1,11 @@
 import logging
-import os
 from dataclasses import dataclass
 
 from accounts.models import User
-from core.models import CaseTopic, FileUpload, Issue
+from core.models import FileUpload, Issue
+from core.models.document_template import DocumentTemplate
 from django.conf import settings
 from django.utils import timezone
-from django.utils.text import slugify
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
@@ -22,11 +21,6 @@ class MicrosoftUserPermissions:
     has_coordinator_perms: bool
     paralegal_perm_issues: list[Issue]
     paralegal_perm_missing_issues: list[Issue]
-
-
-def get_document_template_path(topic: str):
-    assert [x for x in CaseTopic.CHOICES if topic == x[0]]
-    return os.path.join("templates", slugify(topic))
 
 
 def get_user_permissions(user):
@@ -109,10 +103,17 @@ def set_up_new_case(issue: Issue):
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
-
-        template_path = get_document_template_path(issue.topic)
-        api.folder.copy(template_path, case_folder_name, parent_folder_id)
-        case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
+        case_folder = api.folder.create_folder(case_folder_name, parent_folder_id)
+        if case_folder:
+            templates = DocumentTemplate.objects.filter(
+                topic=issue.topic, subtopic=issue.subtopic
+            ).all()
+            for template in templates:
+                api.folder.copy(
+                    template.file_path,
+                    template.name,
+                    case_folder["id"],
+                )
     else:
         logger.info("Case folder already exists for Issue<%s>", issue.pk)
 
