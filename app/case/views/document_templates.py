@@ -1,7 +1,5 @@
 from core.models.document_template import DocumentTemplate
 from core.models.issue import CaseTopic
-from django.db.models import CharField, Value
-from django.db.models.functions import Reverse, Right, StrIndex
 from django.urls import reverse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
