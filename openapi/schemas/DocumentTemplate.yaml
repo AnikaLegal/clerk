@@ -6,6 +6,8 @@ properties:
     type: string
   topic:
     type: string
+  subtopic:
+    type: string
   url:
     type: string
   created_at:
@@ -16,6 +18,7 @@ required:
   - id
   - name
   - topic
+  - subtopic
   - url
   - created_at
   - modified_at

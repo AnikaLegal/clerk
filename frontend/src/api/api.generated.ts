@@ -1045,12 +1045,14 @@ export type DocumentTemplate = {
   id: string;
   name: string;
   topic: string;
+  subtopic: string;
   url: string;
   created_at: string;
   modified_at: string;
 };
 export type DocumentTemplateCreate = {
   topic: string;
+  subtopic?: string;
   files: Blob[];
 };
 export const {

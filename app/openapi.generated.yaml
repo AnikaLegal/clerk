@@ -2089,6 +2089,8 @@ components:
           type: string
         topic:
           type: string
+        subtopic:
+          type: string
         url:
           type: string
         created_at:
@@ -2099,6 +2101,7 @@ components:
         - id
         - name
         - topic
+        - subtopic
         - url
         - created_at
         - modified_at
@@ -2106,6 +2109,8 @@ components:
       type: object
       properties:
         topic:
+          type: string
+        subtopic:
           type: string
         files:
           type: array

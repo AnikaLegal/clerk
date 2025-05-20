@@ -2,6 +2,8 @@ type: object
 properties:
   topic:
     type: string
+  subtopic:
+    type: string
   files:
     type: array
     items:
