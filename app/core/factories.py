@@ -1,16 +1,28 @@
 import io
+import os
 from datetime import timezone
+from unittest.mock import patch
 from uuid import uuid4
 
 import factory
 from accounts.models import User
-from core.models import Client, FileUpload, Issue, IssueNote, Person, Tenancy, Service
-from core.models.issue import CaseStage, CaseTopic
-from core.models.service import ServiceCategory, DiscreteServiceType, OngoingServiceType
+from core.models import (
+    Client,
+    DocumentTemplate,
+    FileUpload,
+    Issue,
+    IssueNote,
+    Person,
+    Service,
+    Tenancy,
+)
+from core.models.issue import CaseStage, CaseTopic, EvictionSubtopic
+from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from emails.models import Email, EmailAttachment, EmailTemplate
 from faker import Faker
+from microsoft.storage import MSGraphStorage
 from notify.models import (
     NOTIFY_TOPIC_CHOICES,
     Notification,
@@ -98,8 +110,13 @@ class IssueFactory(TimestampedModelFactory):
 
     id = factory.LazyAttribute(lambda x: uuid4())
     topic = factory.Faker(
-        "random_element", elements=[CaseTopic.BONDS, CaseTopic.REPAIRS]
+        "random_element", elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
     )
+    subtopic = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.topic == CaseTopic.EVICTION),
+        yes_declaration=factory.Faker("random_element", elements=EvictionSubtopic),
+    )
+
     answers = {}
     client = factory.SubFactory(ClientFactory)
     tenancy = factory.SubFactory(TenancyFactory)
@@ -242,3 +259,32 @@ class ServiceFactory(TimestampedModelFactory):
         yes_declaration=factory.Faker("pyint", min_value=1, max_value=3),
         no_declaration=1,
     )
+
+
+@factory.django.mute_signals(post_save)
+class DocumentTemplateFactory(TimestampedModelFactory):
+    class Meta:
+        model = DocumentTemplate
+
+    topic = factory.Faker(
+        "random_element", elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
+    )
+    subtopic = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.topic == CaseTopic.EVICTION),
+        yes_declaration=factory.Faker("random_element", elements=EvictionSubtopic),
+    )
+    file = factory.django.FileField()
+    name = factory.LazyAttribute(lambda obj: os.path.basename(obj.file.name))
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        template = model_class(*args, **kwargs)
+        # Prevent the Django file storage API from using the MS Graph API as it
+        # does not work in tests. This is a convenience as we could do this in
+        # the tests themselves but that would be tedious.
+        with patch.object(MSGraphStorage, "exists", return_value=False):
+            name = DocumentTemplate._get_upload_to(template, template.file.name)
+            with patch.object(MSGraphStorage, "_save", return_value=name):
+                template.save()
+
+        return template
