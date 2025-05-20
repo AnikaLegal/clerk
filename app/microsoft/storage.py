@@ -4,18 +4,48 @@ from django.core.files.storage import Storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from microsoft.endpoints import MSGraphAPI
 
+from django.core.cache import cache
+
+
+class SimpleCache:
+    def __init__(self, cache_prefix, timeout=None):
+        self.cache_prefix = cache_prefix
+        self.timeout = timeout
+
+    def _get_key(self, key):
+        return f"{self.cache_prefix}:{key}"
+
+    def get(self, key):
+        key = self._get_key(key)
+        return cache.get(key)
+
+    def set(self, key, value, timeout=None):
+        key = self._get_key(key)
+        cache.set(key, value, timeout=self.timeout if timeout is None else timeout)
+
+    def delete(self, key):
+        key = self._get_key(key)
+        cache.delete(key)
+
 
 class MSGraphStorage(Storage):
     def __init__(self, base_path: str):
         self.api = MSGraphAPI()
         self.base_path = base_path
+        self.cache = SimpleCache(cache_prefix="ms_graph_file_info", timeout=300)
 
-    def _get_full_path(self, path):
-        return os.path.join(self.base_path, path)
+    def _get_full_path(self, name):
+        return os.path.join(self.base_path, name)
 
-    def _get_file_info(self, name):
+    def _get_file_info(self, name) -> dict | None:
         path = self._get_full_path(name)
-        return self.api.folder.get(path)
+        info = self.cache.get(path)
+        if info:
+            return info
+        info = self.api.folder.get(path)
+        if info:
+            self.cache.set(path, info)
+        return info
 
     def _open(self, name, mode="rb"):
         info = self._get_file_info(name)
@@ -45,6 +75,8 @@ class MSGraphStorage(Storage):
         info = self._get_file_info(name)
         if info:
             self.api.folder.delete_file(info["id"])
+            path = self._get_full_path(name)
+            self.cache.delete(path)
 
     def exists(self, name):
         return self._get_file_info(name) is not None
