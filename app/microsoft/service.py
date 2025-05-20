@@ -2,8 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from accounts.models import User
-from core.models import FileUpload, Issue
-from core.models.document_template import DocumentTemplate
+from core.models import DocumentTemplate, FileUpload, Issue
 from django.conf import settings
 from django.utils import timezone
 from emails.models import Email, EmailAttachment
@@ -110,7 +109,7 @@ def set_up_new_case(issue: Issue):
             ).all()
             for template in templates:
                 api.folder.copy(
-                    template.file_path,
+                    template.api_file_path,
                     template.name,
                     case_folder["id"],
                 )

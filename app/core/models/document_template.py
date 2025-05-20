@@ -8,6 +8,7 @@ from django.utils.text import slugify
 from django_cleanup import cleanup
 from microsoft.storage import MSGraphStorage
 
+
 STORAGE_BASE_PATH = "templates"
 
 
@@ -32,10 +33,9 @@ class DocumentTemplate(TimestampedModel):
     name = models.CharField(max_length=256, blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.name:
-            self.name = os.path.basename(self.file.name)
+        self.name = os.path.basename(self.file.name)
         super().save(*args, **kwargs)
 
     @property
-    def file_path(self):
+    def api_file_path(self):
         return os.path.join(STORAGE_BASE_PATH, self.file.name)
