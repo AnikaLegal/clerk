@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote
 
 from django.core.files.storage import Storage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -29,19 +30,52 @@ class SimpleCache:
 
 
 class MSGraphStorage(Storage):
-    def __init__(self, base_path: str):
+    def __init__(
+        self, base_path: str, cache_timeout=60, enable_directory_caching=False
+    ):
         self.api = MSGraphAPI()
         self.base_path = base_path
-        self.cache = SimpleCache(cache_prefix="ms_graph_file_info", timeout=300)
+        self.cache = SimpleCache(
+            cache_prefix="ms_graph_file_info", timeout=cache_timeout
+        )
+        self.enable_directory_caching = enable_directory_caching
 
     def _get_full_path(self, name):
         return os.path.join(self.base_path, name)
 
+    def _cache_target_and_siblings(self, name):
+        path = self._get_full_path(name)
+        dir, _ = os.path.split(path)
+        if not dir:
+            return
+        info = self.api.folder.get(dir)
+        if not info:
+            return
+        siblings = self.api.folder.get_children(dir)
+        if not siblings:
+            return
+        for sibling in siblings:
+            name = quote(sibling["name"])
+            path = os.path.join(dir, name)
+            self.cache.set(path, sibling)
+
     def _get_file_info(self, name) -> dict | None:
+        # Check if the info is in the cache
         path = self._get_full_path(name)
         info = self.cache.get(path)
         if info:
             return info
+
+        if self.enable_directory_caching:
+            # This is a performance optimisation to avoid hitting the API for
+            # every file access. We attempt to get & cache the file info for
+            # each file in the same directory as the target file with one API
+            # call.
+            self._cache_target_and_siblings(name)
+            info = self.cache.get(path)
+            if info:
+                return info
+
         info = self.api.folder.get(path)
         if info:
             self.cache.set(path, info)

@@ -15,7 +15,9 @@ STORAGE_BASE_PATH = "templates"
 @cleanup.select
 class DocumentTemplate(TimestampedModel):
     def _get_storage_class():
-        return MSGraphStorage(base_path=STORAGE_BASE_PATH)
+        return MSGraphStorage(
+            base_path=STORAGE_BASE_PATH, enable_directory_caching=True
+        )
 
     def _get_upload_to(instance, filename):
         topic = slugify(instance.topic)
