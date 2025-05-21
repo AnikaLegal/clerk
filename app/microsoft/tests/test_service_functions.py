@@ -1,49 +1,26 @@
-from unittest import mock
-import pytest
+from unittest.mock import patch
 
+import pytest
+from core.factories import DocumentTemplateFactory, IssueFactory, UserFactory
 from microsoft.service import (
-    get_document_template_path,
-    set_up_new_user,
-    set_up_new_case,
     add_user_to_case,
-    remove_user_from_case,
     get_case_folder_info,
+    remove_user_from_case,
     set_up_coordinator,
+    set_up_new_case,
+    set_up_new_user,
     tear_down_coordinator,
 )
-from microsoft.endpoints import MSGraphAPI
-from core.factories import UserFactory, IssueFactory
-
-from django.conf import settings
-
-
-@pytest.fixture
-def mock_client():
-    """Stub helper methods called when MSGraphAPI object is created."""
-    with mock.patch("microsoft.endpoints.create_client") as mock_create_client:
-        mock_client = mock.Mock()
-        mock_client.acquire_token_silent.return_value = {"access_token": "1812"}
-        mock_create_client.return_value = mock_client
-        yield mock_client
+from microsoft.storage import MSGraphStorage
 
 
 @pytest.fixture
 def mock_api():
-    """Mock MSGraphAPI object instantiated by each service function."""
-    with mock.patch("microsoft.service.MSGraphAPI") as mock_MSGraphAPI:
-        mock_api = mock.Mock()
-        mock_MSGraphAPI.return_value = mock_api
-        yield mock_api
-
-
-def test_MSGraphAPI(mock_client):
-    """MSGraphAPI constructor obtains access token and uses it to instantiate Endpoint objects."""
-    api = MSGraphAPI()
-
-    mock_client.acquire_token_silent.assert_called_once()
-    assert api.group.headers["Authorization"] == "Bearer 1812"
-    assert api.user.headers["Authorization"] == "Bearer 1812"
-    assert api.folder.headers["Authorization"] == "Bearer 1812"
+    # Mock the MSGraphAPI instance
+    with patch("microsoft.service.MSGraphAPI") as mock_msgraph_api:
+        mock_instance = mock_msgraph_api.return_value
+        mock_instance.is_available.return_value = True
+        yield mock_instance
 
 
 @pytest.mark.django_db
@@ -82,11 +59,17 @@ def test_set_up_new_user_B(mock_api):
 def test_set_up_new_case(mock_api):
     """Check service function creates new case folder and places it inside parent folder."""
     issue = IssueFactory()
-    mock_api.folder.get_child_if_exists.side_effect = [None, {"id": "abcefg"}]
+
+    with patch.object(MSGraphStorage, "_get_file_info", return_value={}):
+        template = DocumentTemplateFactory(topic=issue.topic)
+
+    mock_api.folder.get_child_if_exists.return_value = None
+    mock_api.folder.create_folder.return_value = {"id": "folder_id"}
+
     set_up_new_case(issue)
 
     mock_api.folder.copy.assert_called_once_with(
-        get_document_template_path(issue.topic), str(issue.id), settings.CASES_FOLDER_ID
+        template.api_file_path, template.name, "folder_id"
     )
 
 
