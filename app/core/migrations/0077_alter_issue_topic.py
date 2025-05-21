@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                     ("REPAIRS", "Repairs"),
                     ("BONDS", "Bonds"),
                     ("EVICTION_ARREARS", "Eviction (Arrears)"),
+                    ("EVICTION_RETALIATORY", "Eviction (Retaliatory)"),
                     ("HEALTH_CHECK", "Housing Health Check"),
                     ("RENT_REDUCTION", "Rent reduction"),
                     ("OTHER", "Other"),
