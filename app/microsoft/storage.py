@@ -73,6 +73,9 @@ class MSGraphStorage(Storage):
             return
 
         for sibling in siblings:
+            if sibling.get("folder"):
+                logger.debug(f"Skipping folder: {sibling['name']}")
+                continue
             name = quote(sibling["name"])
             path = os.path.join(dir, name)
             logger.debug(f"Caching sibling: {path}")
