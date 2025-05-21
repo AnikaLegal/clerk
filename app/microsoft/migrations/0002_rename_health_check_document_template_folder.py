@@ -8,11 +8,8 @@ from microsoft.endpoints.folder import FolderEndpoint
 
 
 def _rename_document_template_folder(apps, schema_editor):
-    try:
-        api = MSGraphAPI()
-    except TypeError:
-        pass  # Doesn't work in test so just ignore.
-    else:
+    api = MSGraphAPI()
+    if api.is_available():
         path = "templates/health-check"
         if api.folder.get(path):
             url = os.path.join(FolderEndpoint.MIDDLE_URL, path)
