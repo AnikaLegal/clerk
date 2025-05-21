@@ -3,10 +3,9 @@ import os
 from dataclasses import dataclass
 
 from accounts.models import User
-from core.models import CaseTopic, FileUpload, Issue
+from core.models import DocumentTemplate, FileUpload, Issue
 from django.conf import settings
 from django.utils import timezone
-from django.utils.text import slugify
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
@@ -109,10 +108,15 @@ def set_up_new_case(issue: Issue):
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
-
-        template_path = get_document_template_path(issue.topic)
-        api.folder.copy(template_path, case_folder_name, parent_folder_id)
-        case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
+        case_folder = api.folder.create_folder(case_folder_name, parent_folder_id)
+        if case_folder:
+            templates = DocumentTemplate.objects.filter(topic=issue.topic).all()
+            for template in templates:
+                api.folder.copy(
+                    template.api_file_path,
+                    template.name,
+                    case_folder["id"],
+                )
     else:
         logger.info("Case folder already exists for Issue<%s>", issue.pk)
 
@@ -241,40 +245,3 @@ def tear_down_coordinator(user):
         result = api.user.get(user.email)
         user_id = result["id"]
         api.group.remove_user(user_id)
-
-
-def list_templates(topic):
-    api = MSGraphAPI()
-    path = get_document_template_path(topic)
-    children = api.folder.get_children(path)
-    return [
-        {
-            "id": doc["id"],
-            "name": doc["name"],
-            "url": doc["webUrl"],
-            "created_at": timezone.datetime.fromisoformat(
-                doc["createdDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-            "modified_at": timezone.datetime.fromisoformat(
-                doc["lastModifiedDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-        }
-        for doc in children
-    ]
-
-
-def upload_template(topic, file):
-    path = get_document_template_path(topic)
-
-    api = MSGraphAPI()
-    info = api.folder.get(path)
-    if not info:
-        api.folder.create_path(path)
-        info = api.folder.get(path)
-
-    api.folder.upload_file(file, info["id"])
-
-
-def delete_template(file_id):
-    api = MSGraphAPI()
-    api.folder.delete_file(file_id)

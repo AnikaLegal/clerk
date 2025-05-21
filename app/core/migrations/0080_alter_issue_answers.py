@@ -5,9 +5,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("core", "0078_alter_issue_topic"),
+        ("core", "0079_documenttemplate_initial_data"),
     ]
 
     operations = [

@@ -23,7 +23,7 @@ def create_client(client_id, authority_url, client_secret):
     return client
 
 
-def get_token(client):
+def get_token(client) -> str | None:
     """Get access token after authenticating our app."""
     # Begin by looking in token cache, first arg is for scopes,
     # because token is for app rather than user, second arg is None.

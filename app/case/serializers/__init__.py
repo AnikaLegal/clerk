@@ -1,6 +1,9 @@
 from .account import AccountSearchSerializer, AccountSortSerializer
 from .client import ClientSearchSerializer, ClientSerializer
-from .documents import DocumentTemplateSerializer
+from .documents import (
+    DocumentTemplateFilterSerializer,
+    DocumentTemplateSerializer,
+)
 from .email import (
     EmailAttachmentSerializer,
     EmailSerializer,
