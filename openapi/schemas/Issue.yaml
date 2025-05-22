@@ -1,135 +1,92 @@
-type: object
-required:
-  - id
-  - topic
-  - topic_display
-  - stage
-  - stage_display
-  - outcome
-  - outcome_display
-  - outcome_notes
-  - provided_legal_services
-  - fileref
-  - answers
-  - paralegal
-  - paralegal_id
-  - lawyer
-  - lawyer_id
-  - client
-  - client_id
-  - tenancy
-  - tenancy_id
-  - support_worker
-  - support_worker_id
-  - is_open
-  - is_sharepoint_set_up
-  - actionstep_id
-  - created_at
-  - employment_status
-  - weekly_income
-  - weekly_rent
-  - referrer_type
-  - referrer
-  - url
-  - is_conflict_check
-  - is_eligibility_check
-  - next_review
-properties:
-  id:
-    type: string
-    format: uuid
-    readOnly: true
-  topic:
-    type: string
-  topic_display:
-    type: string
-    readOnly: true
-  stage:
-    type: string
-  stage_display:
-    type: string
-    readOnly: true
-  outcome:
-    type: string
-  outcome_display:
-    type: string
-    readOnly: true
-  outcome_notes:
-    type: string
-  provided_legal_services:
-    type: boolean
-  fileref:
-    type: string
-  answers:
-    type: object
-    additionalProperties: true
-    readOnly: true
-    nullable: true
-  paralegal:
-    $ref: ./User.yaml
-    readOnly: true
-  paralegal_id:
-    type: integer
-    nullable: true
-  lawyer:
-    $ref: ./User.yaml
-    readOnly: true
-  lawyer_id:
-    type: integer
-    nullable: true
-  client:
-    $ref: ./Client.yaml
-    readOnly: true
-  client_id:
-    type: string
-    format: uuid
-  tenancy:
-    $ref: ./Tenancy.yaml
-    readOnly: true
-  tenancy_id:
-    type: integer
-  support_worker:
-    $ref: ./Person.yaml
-    readOnly: true
-  support_worker_id:
-    type: integer
-    nullable: true
-  is_open:
-    type: boolean
-  is_sharepoint_set_up:
-    type: boolean
-  actionstep_id:
-    type: integer
-    nullable: true
-  created_at:
-    type: string
-    format: date
-  employment_status:
-    type: array
-    items:
-      type: string
-  weekly_income:
-    type: integer
-    nullable: true
-  weekly_rent:
-    type: integer
-    nullable: true
-  referrer_type:
-    type: string
-  referrer:
-    type: string
-  url:
-    type: string
-    format: uri
-    readOnly: true
-  is_conflict_check:
-    type: boolean
-    readOnly: true
-  is_eligibility_check:
-    type: boolean
-    readOnly: true
-  next_review:
-    type: string
-    format: date
-    nullable: true
-    readOnly: true
+allOf:
+  - $ref: ./IssueBase.yaml
+  - type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      topic_display:
+        type: string
+      stage_display:
+        type: string
+      outcome_display:
+        type: string
+        nullable: true
+      fileref:
+        type: string
+      is_sharepoint_set_up:
+        type: boolean
+      paralegal:
+        nullable: true
+        allOf:
+          - $ref: ./User.yaml
+      lawyer:
+        nullable: true
+        allOf:
+          - $ref: ./User.yaml
+      client:
+        $ref: ./Client.yaml
+      employment_status:
+        $ref: ./TextChoiceListField.yaml
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        $ref: ./TextChoiceField.yaml
+      tenancy:
+        $ref: ./Tenancy.yaml
+      weekly_rent:
+        type: integer
+        nullable: true
+      support_worker:
+        nullable: true
+        allOf:
+          - $ref: ./Person.yaml
+      actionstep_id:
+        type: integer
+        nullable: true
+      created_at:
+        type: string
+      url:
+        type: string
+      answers:
+        type: object
+        additionalProperties:
+          type: string
+        nullable: true
+      # Case review fields
+      is_conflict_check:
+        type: boolean
+        nullable: true
+      is_eligibility_check:
+        type: boolean
+        nullable: true
+      next_review:
+        type: string
+        nullable: true
+    required:
+      - id
+      - topic_display
+      - stage_display
+      - outcome_display
+      - fileref
+      - paralegal
+      - lawyer
+      - client
+      - employment_status
+      - weekly_income
+      - referrer
+      - referrer_type
+      - tenancy
+      - weekly_rent
+      - support_worker
+      - is_sharepoint_set_up
+      - actionstep_id
+      - created_at
+      - url
+      - answers
+      - is_conflict_check
+      - is_eligibility_check
+      - next_review

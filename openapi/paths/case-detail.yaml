@@ -44,7 +44,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/Issue.yaml
+          $ref: ../schemas/IssueUpdate.yaml
   responses:
     "200":
       description: Successful response.

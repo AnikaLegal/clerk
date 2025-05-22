@@ -41,7 +41,7 @@ export const OutcomeForm: React.FC<CaseDetailFormProps> = ({
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
       id: issue.id,
-      issue: values as any,
+      issueUpdate: values as any,
     })
       .unwrap()
       .then(() => {

@@ -91,7 +91,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Issue"
+              $ref: "#/components/schemas/IssueCreate"
       responses:
         "201":
           description: Successful response.
@@ -150,7 +150,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Issue"
+              $ref: "#/components/schemas/IssueUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1337,6 +1337,29 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    IssueBase:
+      type: object
+      properties:
+        topic:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        is_open:
+          type: boolean
+      required:
+        - topic
+        - stage
+        - outcome
+        - outcome_notes
+        - provided_legal_services
+        - is_open
     UserCreate:
       type: object
       properties:
@@ -1613,141 +1636,138 @@ components:
             - landlord
             - agent
     Issue:
-      type: object
-      required:
-        - id
-        - topic
-        - topic_display
-        - stage
-        - stage_display
-        - outcome
-        - outcome_display
-        - outcome_notes
-        - provided_legal_services
-        - fileref
-        - answers
-        - paralegal
-        - paralegal_id
-        - lawyer
-        - lawyer_id
-        - client
-        - client_id
-        - tenancy
-        - tenancy_id
-        - support_worker
-        - support_worker_id
-        - is_open
-        - is_sharepoint_set_up
-        - actionstep_id
-        - created_at
-        - employment_status
-        - weekly_income
-        - weekly_rent
-        - referrer_type
-        - referrer
-        - url
-        - is_conflict_check
-        - is_eligibility_check
-        - next_review
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        topic:
-          type: string
-        topic_display:
-          type: string
-          readOnly: true
-        stage:
-          type: string
-        stage_display:
-          type: string
-          readOnly: true
-        outcome:
-          type: string
-        outcome_display:
-          type: string
-          readOnly: true
-        outcome_notes:
-          type: string
-        provided_legal_services:
-          type: boolean
-        fileref:
-          type: string
-        answers:
-          type: object
-          additionalProperties: true
-          readOnly: true
-          nullable: true
-        paralegal:
-          $ref: "#/components/schemas/User"
-          readOnly: true
-        paralegal_id:
-          type: integer
-          nullable: true
-        lawyer:
-          $ref: "#/components/schemas/User"
-          readOnly: true
-        lawyer_id:
-          type: integer
-          nullable: true
-        client:
-          $ref: "#/components/schemas/Client"
-          readOnly: true
-        client_id:
-          type: string
-          format: uuid
-        tenancy:
-          $ref: "#/components/schemas/Tenancy"
-          readOnly: true
-        tenancy_id:
-          type: integer
-        support_worker:
-          $ref: "#/components/schemas/Person"
-          readOnly: true
-        support_worker_id:
-          type: integer
-          nullable: true
-        is_open:
-          type: boolean
-        is_sharepoint_set_up:
-          type: boolean
-        actionstep_id:
-          type: integer
-          nullable: true
-        created_at:
-          type: string
-          format: date
-        employment_status:
-          type: array
-          items:
-            type: string
-        weekly_income:
-          type: integer
-          nullable: true
-        weekly_rent:
-          type: integer
-          nullable: true
-        referrer_type:
-          type: string
-        referrer:
-          type: string
-        url:
-          type: string
-          format: uri
-          readOnly: true
-        is_conflict_check:
-          type: boolean
-          readOnly: true
-        is_eligibility_check:
-          type: boolean
-          readOnly: true
-        next_review:
-          type: string
-          format: date
-          nullable: true
-          readOnly: true
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            topic_display:
+              type: string
+            stage_display:
+              type: string
+            outcome_display:
+              type: string
+              nullable: true
+            fileref:
+              type: string
+            is_sharepoint_set_up:
+              type: boolean
+            paralegal:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
+            lawyer:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/User"
+            client:
+              $ref: "#/components/schemas/Client"
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            tenancy:
+              $ref: "#/components/schemas/Tenancy"
+            weekly_rent:
+              type: integer
+              nullable: true
+            support_worker:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/Person"
+            actionstep_id:
+              type: integer
+              nullable: true
+            created_at:
+              type: string
+            url:
+              type: string
+            answers:
+              type: object
+              additionalProperties:
+                type: string
+              nullable: true
+            is_conflict_check:
+              type: boolean
+              nullable: true
+            is_eligibility_check:
+              type: boolean
+              nullable: true
+            next_review:
+              type: string
+              nullable: true
+          required:
+            - id
+            - topic_display
+            - stage_display
+            - outcome_display
+            - fileref
+            - paralegal
+            - lawyer
+            - client
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+            - tenancy
+            - weekly_rent
+            - support_worker
+            - is_sharepoint_set_up
+            - actionstep_id
+            - created_at
+            - url
+            - answers
+            - is_conflict_check
+            - is_eligibility_check
+            - next_review
+    IssueCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            paralegal_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            client_id:
+              $ref: "#/components/schemas/Client"
+            tenancy_id:
+              $ref: "#/components/schemas/Tenancy"
+            support_worker_id:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+            weekly_rent:
+              type: integer
+              nullable: true
+          required:
+            - paralegal_id
+            - lawyer_id
+            - client_id
+            - tenancy_id
+            - support_worker_id
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
+            - weekly_rent
     Error:
       description: The schema for an error response
       type: object
@@ -1803,6 +1823,41 @@ components:
             - text_display
             - created_at
             - reviewee
+    IssueUpdate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            paralegal_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            lawyer_id:
+              $ref: "#/components/schemas/User"
+              nullable: true
+            support_worker_id:
+              $ref: "#/components/schemas/Person"
+              nullable: true
+            weekly_rent:
+              type: integer
+              nullable: true
+            employment_status:
+              $ref: "#/components/schemas/TextChoiceListField"
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              $ref: "#/components/schemas/TextChoiceField"
+          required:
+            - paralegal_id
+            - lawyer_id
+            - support_worker_id
+            - weekly_rent
+            - employment_status
+            - weekly_income
+            - referrer
+            - referrer_type
     IssueNoteCreate:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"
@@ -2064,17 +2119,14 @@ components:
       properties:
         has_coordinator_perms:
           type: boolean
-          readOnly: true
         paralegal_perm_issues:
           type: array
           items:
             $ref: "#/components/schemas/Issue"
-          readOnly: true
         paralegal_perm_missing_issues:
           type: array
           items:
             $ref: "#/components/schemas/Issue"
-          readOnly: true
       required:
         - has_coordinator_perms
         - paralegal_perm_issues

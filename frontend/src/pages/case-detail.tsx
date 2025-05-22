@@ -17,7 +17,7 @@ import * as Yup from 'yup'
 
 import {
   Issue,
-  IssueRead,
+  IssueUpdate,
   TenancyCreate,
   useGetCaseQuery,
   useGetPeopleQuery,
@@ -71,12 +71,10 @@ const App = () => {
 
   if (isInitialLoad) return null
 
-  const issueRead = caseResult.data!.issue
+  const issue = caseResult.data!.issue
   const tenancy = caseResult.data!.tenancy
   const notes = caseResult.data?.notes ?? []
-  const details = issueRead.answers
-    ? getSubmittedDetails(issueRead.answers)
-    : null
+  const details = issue.answers ? getSubmittedDetails(issue.answers) : null
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
@@ -95,8 +93,8 @@ const App = () => {
       })
   }
 
-  const updateCase = (issue: Issue) => {
-    _updateCase({ id: issueRead.id, issue })
+  const updateCase = (issueUpdate: IssueUpdate) => {
+    _updateCase({ id: issue.id, issueUpdate })
       .unwrap()
       .then(() => {
         enqueueSnackbar('Updated case', { variant: 'success' })
@@ -136,31 +134,30 @@ const App = () => {
 
   return (
     <Container>
-      <CaseHeader issue={issueRead} activeTab={CASE_TABS.DETAIL} urls={urls} />
+      <CaseHeader issue={issue} activeTab={CASE_TABS.DETAIL} urls={urls} />
       <div className="ui two column grid" style={{ marginTop: '1rem' }}>
         <div className="column">
           <Segment>
             <List divided verticalAlign="middle" selection>
-              {CASE_FORM_OPTIONS.filter((o) =>
-                o.when(permissions, issueRead)
-              ).map(({ id, icon, text }) => (
-                <List.Item
-                  active={id === activeFormId}
-                  key={text}
-                  onClick={() =>
-                    id === activeFormId
-                      ? setActiveFormId(null)
-                      : setActiveFormId(id)
-                  }
-                >
-                  <List.Content>
-                    <div className="header">
-                      <i className={`${icon} icon`}></i>
-                      {text}
-                    </div>
-                  </List.Content>
-                </List.Item>
-              ))}
+              {CASE_FORM_OPTIONS.filter((o) => o.when(permissions, issue)).map(
+                ({ id, icon, text }) => (
+                  <List.Item
+                    active={id === activeFormId}
+                    key={text}
+                    onClick={() =>
+                      id === activeFormId
+                        ? setActiveFormId(null)
+                        : setActiveFormId(id)
+                    }>
+                    <List.Content>
+                      <div className="header">
+                        <i className={`${icon} icon`}></i>
+                        {text}
+                      </div>
+                    </List.Content>
+                  </List.Item>
+                )
+              )}
             </List>
           </Segment>
 
@@ -189,26 +186,23 @@ const App = () => {
         </div>
         <div className="column">
           {activeFormId && (
-            <ActiveForm
-              issue={issueRead}
-              onCancel={() => setActiveFormId(null)}
-            />
+            <ActiveForm issue={issue} onCancel={() => setActiveFormId(null)} />
           )}
           {!activeFormId && (
             <React.Fragment>
               <EntityCard
                 title="Client"
-                url={issueRead.client.url}
+                url={issue.client.url}
                 tableData={{
-                  Name: issueRead.client.full_name,
-                  ['Preferred name']: issueRead.client.preferred_name,
-                  Email: issueRead.client.email,
-                  Phone: issueRead.client.phone_number,
-                  Age: issueRead.client.age,
-                  Gender: issueRead.client.gender,
-                  Pronouns: issueRead.client.pronouns,
+                  Name: issue.client.full_name,
+                  ['Preferred name']: issue.client.preferred_name,
+                  Email: issue.client.email,
+                  Phone: issue.client.phone_number,
+                  Age: issue.client.age,
+                  Gender: issue.client.gender,
+                  Pronouns: issue.client.pronouns,
                   ['Contact restriction?']:
-                    issueRead.client.contact_restriction.display,
+                    issue.client.contact_restriction.display,
                 }}
               />
               <EntityCard
@@ -263,16 +257,16 @@ const App = () => {
                   isLoading={isTenancyLoading}
                 />
               )}
-              {issueRead.support_worker ? (
+              {issue.support_worker ? (
                 <EntityCard
                   title="Support Worker"
                   onRemove={onRemoveSupportWorker}
-                  url={issueRead.support_worker.url}
+                  url={issue.support_worker.url}
                   tableData={{
-                    Name: issueRead.support_worker.full_name,
-                    Address: issueRead.support_worker.address,
-                    Email: issueRead.support_worker.email,
-                    Phone: issueRead.support_worker.phone_number,
+                    Name: issue.support_worker.full_name,
+                    Address: issue.support_worker.address,
+                    Email: issue.support_worker.email,
+                    Phone: issue.support_worker.phone_number,
                   }}
                 />
               ) : (
@@ -284,14 +278,14 @@ const App = () => {
                 />
               )}
               <CurrentCircumstancesCard
-                initialIssue={issueRead}
+                initialIssue={issue}
                 updateCase={_updateCase}
               />
               <OtherInformationCard
-                initialIssue={issueRead}
+                initialIssue={issue}
                 updateCase={_updateCase}
               />
-              {details && (
+              { details && (
                 <EntityCard title="Other submitted data" tableData={details} />
               )}
             </React.Fragment>
@@ -390,7 +384,7 @@ const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Weekly rent',
-      schema: Yup.number().integer().min(0).nullable(),
+      schema: Yup.number().integer().min(0).nullable(true),
       type: FIELD_TYPES.NUMBER,
       name: 'weekly_rent',
     },
@@ -403,7 +397,7 @@ const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
     {
       label: 'Weekly income',
       name: 'weekly_income',
-      schema: Yup.number().integer().min(0).nullable(),
+      schema: Yup.number().integer().min(0).nullable(true),
       type: FIELD_TYPES.NUMBER,
     },
   ]
@@ -444,11 +438,11 @@ const OtherInformationCard = ({ initialIssue, updateCase }) => {
 }
 
 const TableFormCard = ({ header, fields, initialIssue, updateCase }) => {
-  const [issue, setIssue] = useState<IssueRead>(initialIssue)
+  const [issue, setIssue] = useState<Issue>(initialIssue)
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateCase({
       id: issue.id,
-      issue: values as Issue,
+      issueUpdate: values as IssueUpdate,
     }).unwrap()
 
   const schema = getFormSchema(fields)
@@ -488,7 +482,7 @@ interface CaseFormOption {
   id: string
   icon: string
   text: string
-  when: (perms: UserPermission, issue: IssueRead) => boolean
+  when: (perms: UserPermission, issue: Issue) => boolean
 }
 
 const CASE_FORM_OPTIONS: CaseFormOption[] = [
@@ -562,9 +556,7 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
   },
 ]
 
-const getSubmittedDetails = (
-  answers: Record<string, string>
-): { [key: string]: string } =>
+const getSubmittedDetails = (answers: Record<string, string>): { [key: string]: string } =>
   Object.entries(answers).reduce((obj, [k, v]) => {
     if (!v) return obj
     // Chop off first part of title

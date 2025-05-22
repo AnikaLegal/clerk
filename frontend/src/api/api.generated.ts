@@ -21,7 +21,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/case/`,
         method: "POST",
-        body: queryArg.issue,
+        body: queryArg.issueCreate,
       }),
     }),
     getCase: build.query<GetCaseApiResponse, GetCaseApiArg>({
@@ -31,7 +31,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/case/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.issue,
+        body: queryArg.issueUpdate,
       }),
     }),
     createCaseNote: build.mutation<
@@ -444,7 +444,7 @@ export type GetCasesApiResponse = /** status 200 Successful response. */ {
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: IssueRead[];
+  results: Issue[];
 };
 export type GetCasesApiArg = {
   page?: number;
@@ -458,12 +458,12 @@ export type GetCasesApiArg = {
   client?: string;
 };
 export type CreateCaseApiResponse =
-  /** status 201 Successful response. */ IssueRead;
+  /** status 201 Successful response. */ Issue;
 export type CreateCaseApiArg = {
-  issue: Issue;
+  issueCreate: IssueCreate;
 };
 export type GetCaseApiResponse = /** status 200 Successful response. */ {
-  issue: IssueRead;
+  issue: Issue;
   tenancy: Tenancy;
   notes: IssueNote[];
 };
@@ -472,12 +472,12 @@ export type GetCaseApiArg = {
   id: string;
 };
 export type UpdateCaseApiResponse =
-  /** status 200 Successful response. */ IssueRead;
+  /** status 200 Successful response. */ Issue;
 export type UpdateCaseApiArg = {
   /** Entity ID */
   id: string;
   /** Successful response. */
-  issue: Issue;
+  issueUpdate: IssueUpdate;
 };
 export type CreateCaseNoteApiResponse =
   /** status 201 Successful response. */ IssueNote;
@@ -717,7 +717,7 @@ export type UpdateUserApiArg = {
   userCreate: UserCreate;
 };
 export type GetUserAccountPermissionsApiResponse =
-  /** status 200 Successful response. */ MicrosoftUserPermissionsRead;
+  /** status 200 Successful response. */ MicrosoftUserPermissions;
 export type GetUserAccountPermissionsApiArg = {
   /** Entity ID */
   id: number;
@@ -725,7 +725,7 @@ export type GetUserAccountPermissionsApiArg = {
 export type ResyncUserAccountPermissionsApiResponse =
   /** status 201 Successful response. */ {
     account: User;
-    permissions: MicrosoftUserPermissionsRead;
+    permissions: MicrosoftUserPermissions;
   };
 export type ResyncUserAccountPermissionsApiArg = {
   /** Entity ID */
@@ -734,7 +734,7 @@ export type ResyncUserAccountPermissionsApiArg = {
 export type PromoteUserAccountPermissionsApiResponse =
   /** status 201 Successful response. */ {
     account: User;
-    permissions: MicrosoftUserPermissionsRead;
+    permissions: MicrosoftUserPermissions;
   };
 export type PromoteUserAccountPermissionsApiArg = {
   /** Entity ID */
@@ -743,7 +743,7 @@ export type PromoteUserAccountPermissionsApiArg = {
 export type DemoteUserAccountPermissionsApiResponse =
   /** status 201 Successful response. */ {
     account: User;
-    permissions: MicrosoftUserPermissionsRead;
+    permissions: MicrosoftUserPermissions;
   };
 export type DemoteUserAccountPermissionsApiArg = {
   /** Entity ID */
@@ -823,6 +823,14 @@ export type DeleteDocumentTemplateApiResponse = unknown;
 export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number;
+};
+export type IssueBase = {
+  topic: string;
+  stage: string;
+  outcome: string | null;
+  outcome_notes: string;
+  provided_legal_services: boolean;
+  is_open: boolean;
 };
 export type UserCreate = {
   first_name: string;
@@ -912,74 +920,48 @@ export type Tenancy = TenancyBase & {
   landlord: Person;
   agent: Person;
 };
-export type Issue = {
-  topic: string;
-  stage: string;
-  outcome: string;
-  outcome_notes: string;
-  provided_legal_services: boolean;
-  fileref: string;
-  paralegal: User;
-  paralegal_id: number | null;
-  lawyer: User;
-  lawyer_id: number | null;
-  client: Client;
-  client_id: string;
-  tenancy: Tenancy;
-  tenancy_id: number;
-  support_worker: Person;
-  support_worker_id: number | null;
-  is_open: boolean;
-  is_sharepoint_set_up: boolean;
-  actionstep_id: number | null;
-  created_at: string;
-  employment_status: string[];
-  weekly_income: number | null;
-  weekly_rent: number | null;
-  referrer_type: string;
-  referrer: string;
-};
-export type IssueRead = {
+export type Issue = IssueBase & {
   id: string;
-  topic: string;
   topic_display: string;
-  stage: string;
   stage_display: string;
-  outcome: string;
-  outcome_display: string;
-  outcome_notes: string;
-  provided_legal_services: boolean;
+  outcome_display: string | null;
   fileref: string;
-  answers: {
-    [key: string]: any;
-  } | null;
-  paralegal: User;
-  paralegal_id: number | null;
-  lawyer: User;
-  lawyer_id: number | null;
-  client: Client;
-  client_id: string;
-  tenancy: Tenancy;
-  tenancy_id: number;
-  support_worker: Person;
-  support_worker_id: number | null;
-  is_open: boolean;
   is_sharepoint_set_up: boolean;
+  paralegal: User | null;
+  lawyer: User | null;
+  client: Client;
+  employment_status: TextChoiceListField;
+  weekly_income: number | null;
+  referrer: string;
+  referrer_type: TextChoiceField;
+  tenancy: Tenancy;
+  weekly_rent: number | null;
+  support_worker: Person | null;
   actionstep_id: number | null;
   created_at: string;
-  employment_status: string[];
-  weekly_income: number | null;
-  weekly_rent: number | null;
-  referrer_type: string;
-  referrer: string;
   url: string;
-  is_conflict_check: boolean;
-  is_eligibility_check: boolean;
+  answers: {
+    [key: string]: string;
+  } | null;
+  is_conflict_check: boolean | null;
+  is_eligibility_check: boolean | null;
   next_review: string | null;
 };
 export type Error = {
   detail?: string | object | (string | object | any)[];
   nonFieldErrors?: string[];
+};
+export type IssueCreate = IssueBase & {
+  paralegal_id: User;
+  lawyer_id: User;
+  client_id: Client;
+  tenancy_id: Tenancy;
+  support_worker_id: Person;
+  employment_status: TextChoiceListField;
+  weekly_income: number | null;
+  referrer: string;
+  referrer_type: TextChoiceField;
+  weekly_rent: number | null;
 };
 export type IssueNoteBase = {
   note_type: string;
@@ -992,6 +974,16 @@ export type IssueNote = IssueNoteBase & {
   text_display: string;
   created_at: string;
   reviewee: User | null;
+};
+export type IssueUpdate = IssueBase & {
+  paralegal_id: User;
+  lawyer_id: User;
+  support_worker_id: Person;
+  weekly_rent: number | null;
+  employment_status: TextChoiceListField;
+  weekly_income: number | null;
+  referrer: string;
+  referrer_type: TextChoiceField;
 };
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number;
@@ -1079,11 +1071,10 @@ export type ClientCreate = ClientBase & {
   employment_status: string[];
   eligibility_circumstances: string[];
 };
-export type MicrosoftUserPermissions = {};
-export type MicrosoftUserPermissionsRead = {
+export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean;
-  paralegal_perm_issues: IssueRead[];
-  paralegal_perm_missing_issues: IssueRead[];
+  paralegal_perm_issues: Issue[];
+  paralegal_perm_missing_issues: Issue[];
 };
 export type EmailTemplateCreate = {
   name: string;

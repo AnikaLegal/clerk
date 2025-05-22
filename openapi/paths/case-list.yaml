@@ -84,7 +84,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: ../schemas/Issue.yaml
+          $ref: ../schemas/IssueCreate.yaml
   responses:
     "201":
       description: Successful response.
