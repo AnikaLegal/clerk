@@ -1,5 +1,5 @@
 import {
-  Issue,
+  IssueRead,
   ServiceCategory,
   ServiceTypeDiscrete,
   ServiceTypeOngoing,
@@ -27,6 +27,6 @@ export type OngoingServiceTypes = {
 }
 
 export interface CaseDetailFormProps {
-  issue: Issue
+  issue: IssueRead
   onCancel: () => void
 }

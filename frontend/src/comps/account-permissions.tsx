@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Table, Label, Button } from 'semantic-ui-react'
-import styled from 'styled-components'
-import { useSnackbar } from 'notistack'
-
-import { GroupLabels } from 'comps/group-label'
 import api, {
-  User,
-  MicrosoftUserPermissions,
-  useResyncUserAccountPermissionsMutation,
-  usePromoteUserAccountPermissionsMutation,
+  MicrosoftUserPermissionsRead,
   useDemoteUserAccountPermissionsMutation,
+  usePromoteUserAccountPermissionsMutation,
+  User,
+  useResyncUserAccountPermissionsMutation,
 } from 'api'
+import { GroupLabels } from 'comps/group-label'
+import { useSnackbar } from 'notistack'
+import React, { useEffect, useState } from 'react'
+import { Button, Label, Table } from 'semantic-ui-react'
+import styled from 'styled-components'
 import { getAPIErrorMessage } from 'utils'
 
 interface DjangoContext {
@@ -31,7 +30,7 @@ export const AccountPermissions: React.FC<AccountPermissionsProps> = ({
   const [isLoading, setIsLoading] = useState(true)
   const [isButtonLoading, setIsButtonLoading] = useState(false)
   const [getPermissions] = api.useLazyGetUserAccountPermissionsQuery()
-  const [perms, setPerms] = useState<MicrosoftUserPermissions | null>(null)
+  const [perms, setPerms] = useState<MicrosoftUserPermissionsRead | null>(null)
   useEffect(() => {
     getPermissions({ id: account.id })
       .unwrap()

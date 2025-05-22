@@ -21,8 +21,16 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
   const [updateCase] = useUpdateCaseMutation()
   const { enqueueSnackbar } = useSnackbar()
   const [isSuccess, setSuccess] = useState(false)
-  const paralegalResults = useGetUsersQuery({ group: 'Paralegal', isActive: true, sort: "email" })
-  const lawyerResults = useGetUsersQuery({ group: 'Lawyer', isActive: true, sort: "email" })
+  const paralegalResults = useGetUsersQuery({
+    group: 'Paralegal',
+    isActive: true,
+    sort: 'email',
+  })
+  const lawyerResults = useGetUsersQuery({
+    group: 'Lawyer',
+    isActive: true,
+    sort: 'email',
+  })
   const isLoading = paralegalResults.isFetching || lawyerResults.isFetching
 
   const lawyers = lawyerResults.data ?? []
@@ -31,7 +39,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
       id: issue.id,
-      issueUpdate: {
+      issue: {
         paralegal_id: values.paralegal,
         lawyer_id: values.lawyer,
       } as any,

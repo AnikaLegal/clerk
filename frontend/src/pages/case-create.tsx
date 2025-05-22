@@ -23,7 +23,7 @@ const App = () => {
           client_id: '',
         }}
         onSubmit={(values, { setSubmitting, setErrors }) => {
-          createCase({ issueCreate: values })
+          createCase({ issue: values })
             .unwrap()
             .then((caseResponse) => {
               window.location.href = caseResponse.url

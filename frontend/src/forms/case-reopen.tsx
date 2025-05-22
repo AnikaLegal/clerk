@@ -39,7 +39,7 @@ export const ReopenForm: React.FC<CaseDetailFormProps> = ({
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
       id: issue.id,
-      issueUpdate: values as any,
+      issue: values as any,
     })
       .unwrap()
       .then(() => {
