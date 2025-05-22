@@ -1342,24 +1342,8 @@ components:
       properties:
         topic:
           type: string
-        stage:
-          type: string
-        outcome:
-          type: string
-          nullable: true
-        outcome_notes:
-          type: string
-        provided_legal_services:
-          type: boolean
-        is_open:
-          type: boolean
       required:
         - topic
-        - stage
-        - outcome
-        - outcome_notes
-        - provided_legal_services
-        - is_open
     UserCreate:
       type: object
       properties:
@@ -1645,13 +1629,24 @@ components:
               format: uuid
             topic_display:
               type: string
+            stage:
+              type: string
             stage_display:
               type: string
+            outcome:
+              type: string
+              nullable: true
             outcome_display:
               type: string
               nullable: true
+            outcome_notes:
+              type: string
             fileref:
               type: string
+            provided_legal_services:
+              type: boolean
+            is_open:
+              type: boolean
             is_sharepoint_set_up:
               type: boolean
             paralegal:
@@ -1706,10 +1701,15 @@ components:
           required:
             - id
             - topic_display
+            - stage
             - stage_display
+            - outcome
             - outcome_display
+            - outcome_notes
             - fileref
             - paralegal
+            - provided_legal_services
+            - is_open
             - lawyer
             - client
             - employment_status
@@ -1732,18 +1732,28 @@ components:
         - $ref: "#/components/schemas/IssueBase"
         - type: object
           properties:
+            stage:
+              type: string
+            outcome:
+              type: string
+              nullable: true
+            outcome_notes:
+              type: string
+            provided_legal_services:
+              type: boolean
             paralegal_id:
-              $ref: "#/components/schemas/User"
+              type: number
               nullable: true
             lawyer_id:
-              $ref: "#/components/schemas/User"
+              type: number
               nullable: true
             client_id:
-              $ref: "#/components/schemas/Client"
+              type: string
+              format: uuid
             tenancy_id:
-              $ref: "#/components/schemas/Tenancy"
+              type: number
             support_worker_id:
-              $ref: "#/components/schemas/Person"
+              type: number
               nullable: true
             employment_status:
               $ref: "#/components/schemas/TextChoiceListField"
@@ -1758,16 +1768,8 @@ components:
               type: integer
               nullable: true
           required:
-            - paralegal_id
-            - lawyer_id
             - client_id
             - tenancy_id
-            - support_worker_id
-            - employment_status
-            - weekly_income
-            - referrer
-            - referrer_type
-            - weekly_rent
     Error:
       description: The schema for an error response
       type: object
@@ -1824,40 +1826,40 @@ components:
             - created_at
             - reviewee
     IssueUpdate:
-      allOf:
-        - $ref: "#/components/schemas/IssueBase"
-        - type: object
-          properties:
-            paralegal_id:
-              $ref: "#/components/schemas/User"
-              nullable: true
-            lawyer_id:
-              $ref: "#/components/schemas/User"
-              nullable: true
-            support_worker_id:
-              $ref: "#/components/schemas/Person"
-              nullable: true
-            weekly_rent:
-              type: integer
-              nullable: true
-            employment_status:
-              $ref: "#/components/schemas/TextChoiceListField"
-            weekly_income:
-              type: number
-              nullable: true
-            referrer:
-              type: string
-            referrer_type:
-              $ref: "#/components/schemas/TextChoiceField"
-          required:
-            - paralegal_id
-            - lawyer_id
-            - support_worker_id
-            - weekly_rent
-            - employment_status
-            - weekly_income
-            - referrer
-            - referrer_type
+      type: object
+      properties:
+        topic:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        paralegal_id:
+          type: number
+          nullable: true
+        lawyer_id:
+          type: number
+          nullable: true
+        support_worker_id:
+          type: number
+          nullable: true
+        weekly_rent:
+          type: integer
+          nullable: true
+        employment_status:
+          $ref: "#/components/schemas/TextChoiceListField"
+        weekly_income:
+          type: number
+          nullable: true
+        referrer:
+          type: string
+        referrer_type:
+          $ref: "#/components/schemas/TextChoiceField"
     IssueNoteCreate:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"

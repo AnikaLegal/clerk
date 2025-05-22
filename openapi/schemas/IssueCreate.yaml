@@ -2,18 +2,28 @@ allOf:
   - $ref: ./IssueBase.yaml
   - type: object
     properties:
+      stage:
+        type: string
+      outcome:
+        type: string
+        nullable: true
+      outcome_notes:
+        type: string
+      provided_legal_services:
+        type: boolean
       paralegal_id:
-        $ref: ./User.yaml
+        type: number
         nullable: true
       lawyer_id:
-        $ref: ./User.yaml
+        type: number
         nullable: true
       client_id:
-        $ref: ./Client.yaml
+        type: string
+        format: uuid
       tenancy_id:
-        $ref: ./Tenancy.yaml
+        type: number
       support_worker_id:
-        $ref: ./Person.yaml
+        type: number
         nullable: true
       employment_status:
         $ref: ./TextChoiceListField.yaml
@@ -28,13 +38,5 @@ allOf:
         type: integer
         nullable: true
     required:
-      - paralegal_id
-      - lawyer_id
       - client_id
       - tenancy_id
-      - support_worker_id
-      - employment_status
-      - weekly_income
-      - referrer
-      - referrer_type
-      - weekly_rent

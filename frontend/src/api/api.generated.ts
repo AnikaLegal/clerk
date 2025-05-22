@@ -826,11 +826,6 @@ export type DeleteDocumentTemplateApiArg = {
 };
 export type IssueBase = {
   topic: string;
-  stage: string;
-  outcome: string | null;
-  outcome_notes: string;
-  provided_legal_services: boolean;
-  is_open: boolean;
 };
 export type UserCreate = {
   first_name: string;
@@ -923,9 +918,14 @@ export type Tenancy = TenancyBase & {
 export type Issue = IssueBase & {
   id: string;
   topic_display: string;
+  stage: string;
   stage_display: string;
+  outcome: string | null;
   outcome_display: string | null;
+  outcome_notes: string;
   fileref: string;
+  provided_legal_services: boolean;
+  is_open: boolean;
   is_sharepoint_set_up: boolean;
   paralegal: User | null;
   lawyer: User | null;
@@ -952,16 +952,20 @@ export type Error = {
   nonFieldErrors?: string[];
 };
 export type IssueCreate = IssueBase & {
-  paralegal_id: User;
-  lawyer_id: User;
-  client_id: Client;
-  tenancy_id: Tenancy;
-  support_worker_id: Person;
-  employment_status: TextChoiceListField;
-  weekly_income: number | null;
-  referrer: string;
-  referrer_type: TextChoiceField;
-  weekly_rent: number | null;
+  stage?: string;
+  outcome?: string | null;
+  outcome_notes?: string;
+  provided_legal_services?: boolean;
+  paralegal_id?: number | null;
+  lawyer_id?: number | null;
+  client_id: string;
+  tenancy_id: number;
+  support_worker_id?: number | null;
+  employment_status?: TextChoiceListField;
+  weekly_income?: number | null;
+  referrer?: string;
+  referrer_type?: TextChoiceField;
+  weekly_rent?: number | null;
 };
 export type IssueNoteBase = {
   note_type: string;
@@ -975,15 +979,20 @@ export type IssueNote = IssueNoteBase & {
   created_at: string;
   reviewee: User | null;
 };
-export type IssueUpdate = IssueBase & {
-  paralegal_id: User;
-  lawyer_id: User;
-  support_worker_id: Person;
-  weekly_rent: number | null;
-  employment_status: TextChoiceListField;
-  weekly_income: number | null;
-  referrer: string;
-  referrer_type: TextChoiceField;
+export type IssueUpdate = {
+  topic?: string;
+  stage?: string;
+  outcome?: string | null;
+  outcome_notes?: string;
+  provided_legal_services?: boolean;
+  paralegal_id?: number | null;
+  lawyer_id?: number | null;
+  support_worker_id?: number | null;
+  weekly_rent?: number | null;
+  employment_status?: TextChoiceListField;
+  weekly_income?: number | null;
+  referrer?: string;
+  referrer_type?: TextChoiceField;
 };
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number;
