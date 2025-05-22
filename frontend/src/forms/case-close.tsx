@@ -38,7 +38,7 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
 
   const servicesResult = api.useGetCaseServicesQuery({
     id: issue.id,
-    category: "ONGOING",
+    category: 'ONGOING',
   })
   const isLoadingServices = servicesResult.isLoading
 
@@ -50,7 +50,7 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
       id: issue.id,
-      issueUpdate: values as any,
+      issueUpdate: values,
     })
       .unwrap()
       .then(() => {
