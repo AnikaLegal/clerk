@@ -1756,14 +1756,14 @@ components:
               type: number
               nullable: true
             employment_status:
-              $ref: "#/components/schemas/TextChoiceListField"
+              type: string
             weekly_income:
               type: number
               nullable: true
             referrer:
               type: string
             referrer_type:
-              $ref: "#/components/schemas/TextChoiceField"
+              type: string
             weekly_rent:
               type: integer
               nullable: true
@@ -1852,14 +1852,14 @@ components:
           type: integer
           nullable: true
         employment_status:
-          $ref: "#/components/schemas/TextChoiceListField"
+          type: string
         weekly_income:
           type: number
           nullable: true
         referrer:
           type: string
         referrer_type:
-          $ref: "#/components/schemas/TextChoiceField"
+          type: string
     IssueNoteCreate:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"

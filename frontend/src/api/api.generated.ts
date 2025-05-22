@@ -961,10 +961,10 @@ export type IssueCreate = IssueBase & {
   client_id: string;
   tenancy_id: number;
   support_worker_id?: number | null;
-  employment_status?: TextChoiceListField;
+  employment_status?: string;
   weekly_income?: number | null;
   referrer?: string;
-  referrer_type?: TextChoiceField;
+  referrer_type?: string;
   weekly_rent?: number | null;
 };
 export type IssueNoteBase = {
@@ -989,10 +989,10 @@ export type IssueUpdate = {
   lawyer_id?: number | null;
   support_worker_id?: number | null;
   weekly_rent?: number | null;
-  employment_status?: TextChoiceListField;
+  employment_status?: string;
   weekly_income?: number | null;
   referrer?: string;
-  referrer_type?: TextChoiceField;
+  referrer_type?: string;
 };
 export type IssueNoteCreate = IssueNoteBase & {
   creator_id: number;

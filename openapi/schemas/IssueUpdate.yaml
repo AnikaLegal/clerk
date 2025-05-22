@@ -24,11 +24,11 @@ properties:
     type: integer
     nullable: true
   employment_status:
-    $ref: ./TextChoiceListField.yaml
+    type: string
   weekly_income:
     type: number
     nullable: true
   referrer:
     type: string
   referrer_type:
-    $ref: ./TextChoiceField.yaml
+    type: string
