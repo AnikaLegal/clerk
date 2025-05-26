@@ -6,6 +6,11 @@ get:
       schema:
         type: integer
       required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
     - name: q
       in: query
       schema:
