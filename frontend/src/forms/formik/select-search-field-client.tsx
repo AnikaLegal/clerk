@@ -27,13 +27,14 @@ export const ClientSelectSearchField = ({
   const search = () => {
     if (query.length < minQueryLength) {
       setIsLoading(false)
+      setResults({})
       return
     }
     setIsLoading(true)
     getClients({ q: query, page: page })
       .unwrap()
       .then((response) => {
-        const nextResult: ClientRecord = Object.fromEntries(
+        const clientRecords: ClientRecord = Object.fromEntries(
           response.results.map((client) => [
             client.id,
             {
@@ -43,7 +44,7 @@ export const ClientSelectSearchField = ({
             },
           ])
         )
-        setResults({ ...results, ...nextResult })
+        setResults((prev) => ({ ...prev, ...clientRecords }))
 
         if (response.next) {
           setPage(response.next)
