@@ -1,22 +1,20 @@
+import { ComboboxData, Group, Loader, Text } from '@mantine/core'
 import api, {
-  Issue,
   IssueCreate,
   Tenancy,
   useCreateCaseMutation,
-  useGetCasesQuery,
+  useGetClientsQuery,
 } from 'api'
 import { Formik, FormikProps } from 'formik'
-import { ClientSelectSearchField, DropdownField } from 'forms/formik'
+import { DropdownField, SelectField, SelectFieldProps } from 'forms/formik'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState } from 'react'
-import { h } from 'react-router/dist/development/fog-of-war-Ckdfl79L'
+import React, { useState } from 'react'
 import {
   Button,
   Container,
   DropdownItemProps,
   Form,
   Header,
-  Message,
 } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
@@ -53,6 +51,8 @@ export const CreateCaseSchema: Yup.ObjectSchema<IssueCreate> = Yup.object({
 
 const App = () => {
   const [createCase] = useCreateCaseMutation()
+  const [clients, setClients] = useState({})
+
   return (
     <Container>
       <Header as="h1">Create a new case</Header>
@@ -86,11 +86,6 @@ const App = () => {
         validationSchema={CreateCaseSchema}
       >
         {(formik) => {
-          const handleChange = (value: string) => {
-            formik.setFieldValue('tenancy_id', null)
-            formik.setFieldError('tenancy_id', undefined)
-          }
-
           return (
             <Form
               onSubmit={formik.handleSubmit}
@@ -103,16 +98,16 @@ const App = () => {
                 placeholder="Select case topic"
                 options={CONTEXT.topic_options}
               />
-              <ClientSelectSearchField
+              <ClientSelectField
                 name="client_id"
                 label="Client"
-                onChange={handleChange}
+                placeholder="Select client"
               />
               <TenancyDropdownField
                 clientId={formik.values.client_id}
                 name="tenancy_id"
                 label="Tenancy"
-                placeholder="Select client tenancy"
+                placeholder="Select tenancy"
                 formik={formik}
               />
               <Button
@@ -131,6 +126,76 @@ const App = () => {
   )
 }
 mount(App)
+
+interface ClientInfo {
+  full_name: string
+  email: string
+}
+
+export function ClientSelectField(props: SelectFieldProps) {
+  const [page, setPage] = useState(1)
+  const [isFinished, setIsFinished] = useState(false)
+  const [clients, setClients] = useState<Record<string, ClientInfo>>({})
+  const results = useGetClientsQuery({ page: page, pageSize: 200 })
+
+  if (results.isError) {
+    enqueueSnackbar(
+      getAPIErrorMessage(results.error, 'Failed to load clients'),
+      { variant: 'error' }
+    )
+    setIsFinished(true)
+  } else if (!isFinished && !results.isLoading) {
+    const newClients = results.data?.results.reduce(
+      (acc, client) => ({
+        ...acc,
+        [client.id]: {
+          full_name: client.full_name,
+          email: client.email,
+        },
+      }),
+      {}
+    )
+    setClients((prevClients) => {
+      return { ...prevClients, ...newClients }
+    })
+
+    if (results.data?.next) {
+      setPage(results.data.next)
+    } else {
+      setIsFinished(true)
+    }
+  }
+
+  const renderOption = ({ option }) => {
+    const client = clients[option.value]
+    return (
+      <Group gap="sm">
+        <div>
+          <Text size="md">{client.full_name}</Text>
+          <Text size="sm" opacity={0.5}>
+            {client.email}
+          </Text>
+        </div>
+      </Group>
+    )
+  }
+
+  const data: ComboboxData = Object.entries(clients).map(([id, client]) => ({
+    value: id,
+    label: `${client.full_name} (${client.email})`,
+  }))
+
+  return (
+    <SelectField
+      {...props}
+      data={data}
+      renderOption={renderOption}
+      limit={25}
+      nothingFoundMessage="No clients found"
+      rightSection={!isFinished && <Loader size="sm" />}
+    />
+  )
+}
 
 interface TenancyDropdownFieldProps {
   clientId: string
@@ -168,10 +233,10 @@ export function TenancyDropdownField({
   }
 
   const search = () => {
+    setOptions([])
     if (!clientId) {
       setIsLoading(false)
       setNotFound(false)
-      setOptions([])
       return
     }
     setIsLoading(true)

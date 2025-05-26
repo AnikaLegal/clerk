@@ -224,6 +224,7 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/clerk/api/client/`,
         params: {
           page: queryArg.page,
+          page_size: queryArg.pageSize,
           q: queryArg.q,
         },
       }),
@@ -667,6 +668,7 @@ export type GetClientsApiResponse = /** status 200 Successful response. */ {
 };
 export type GetClientsApiArg = {
   page?: number;
+  pageSize?: number;
   q?: string;
 };
 export type CreateClientApiResponse =
