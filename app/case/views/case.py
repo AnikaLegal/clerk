@@ -66,7 +66,9 @@ def case_list_page_view(request):
 @coordinator_or_better_required
 def case_create_page_view(request):
     context = {
-        "topic_options": topic_options,
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        }
     }
     return render_react_page(request, "Create case", "case-create", context)
 
