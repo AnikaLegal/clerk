@@ -108,6 +108,9 @@ def process_issue(answers, client, tenancy):
         # Tanancy data
         tenancy=tenancy,
         weekly_rent=answers["WEEKLY_RENT"],
+        # Internal flags
+        is_alert_sent=False,
+        is_welcome_email_sent=False,
     )
     FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
     return issue

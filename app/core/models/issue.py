@@ -127,7 +127,10 @@ class EmploymentType(models.TextChoices):
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
     # Legacy below - Do not use.
-    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19 (DO NOT USE)"
+    INCOME_REDUCED_COVID = (
+        "INCOME_REDUCED_COVID",
+        "Income reduced due to COVID-19 (DO NOT USE)",
+    )
     UNEMPLOYED = "UNEMPLOYED", "Currently unemployed (DO NOT USE)"
 
 
@@ -177,12 +180,16 @@ class Issue(TimestampedModel):
     )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
+
     # Tracks whether a Slack alert has been successfully sent.
-    is_alert_sent = models.BooleanField(default=False)
-    # Tracks whether the case data has been successfully sent to Actionstep.
-    is_case_sent = models.BooleanField(default=False)
+    is_alert_sent = models.BooleanField(default=True)
     # Tracks we have sent the welcome email.
-    is_welcome_email_sent = models.BooleanField(default=False)
+    is_welcome_email_sent = models.BooleanField(default=True)
+
+    # Tracks whether the case data has been successfully sent to Actionstep.
+    # NOTE: This is no longer used.
+    is_case_sent = models.BooleanField(default=False)
+
     # Tracks whether a matching folder has been set up in Sharepoint.
     is_sharepoint_set_up = models.BooleanField(default=False)
 
