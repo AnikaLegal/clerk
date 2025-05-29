@@ -14,7 +14,6 @@ export interface SelectFieldProps extends SelectProps {
 
 export const SelectField = ({
   name,
-  label,
   required,
   onChange,
   rightSection,
@@ -27,25 +26,19 @@ export const SelectField = ({
       onChange(value, option)
     }
   }
+
+  if (!rightSection && (!field.value || !props.clearable)) {
+    rightSection = <IconCaretDownFilled size={12} />
+  }
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
-      {label && <label>{label}</label>}
       <Select
         {...props}
-        searchable
-        clearable
         size="md"
-        styles={{
-          input: {
-            paddingLeft: 'unset',
-            paddingInlineStart: 'var(--input-padding-inline-start)',
-          },
-        }}
         onChange={handleChange}
-        rightSection={
-          rightSection ||
-          (!field.value && <IconCaretDownFilled size={12} color="black" />)
-        }
+        rightSection={rightSection}
+        withCheckIcon={false}
+        value={field.value}
       />
       <ErrorMessage name={name} />
     </Form.Field>
