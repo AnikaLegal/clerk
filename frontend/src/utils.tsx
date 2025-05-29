@@ -236,3 +236,9 @@ export const filterObject = <T extends {}, V = Entry<T>>(
   obj: T,
   fn: (entry: Entry<T>, i: number, arr: Entry<T>[]) => boolean
 ): V => Object.fromEntries((Object.entries(obj) as Entry<T>[]).filter(fn)) as V
+
+type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K
+}[keyof T]
+
+export type RequiredProps<T> = Pick<T, RequiredKeys<T>>

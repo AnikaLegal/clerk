@@ -11,10 +11,16 @@ import {
 } from '@mantine/core'
 import { createFormContext } from '@mantine/form'
 import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
+import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { Container, Header } from 'semantic-ui-react'
-import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import {
+  getAPIErrorMessage,
+  getAPIFormErrors,
+  mount,
+  RequiredProps,
+} from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
@@ -24,21 +30,18 @@ interface DjangoContext {
     topic: string[][]
   }
 }
+
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-Yup.setLocale({ mixed: { required: 'This field is required.' } })
+export const CreateCaseSchema: Yup.ObjectSchema<RequiredProps<IssueCreate>> =
+  Yup.object({
+    topic: Yup.string().required(),
+    client_id: Yup.string().required(),
+    tenancy_id: Yup.number().required(),
+  })
 
-export const CreateCaseSchema: Yup.ObjectSchema<IssueCreate> = Yup.object({
-  topic: Yup.string().required(),
-  client_id: Yup.string().required(),
-  tenancy_id: Yup.number().required(),
-})
+type FormValues = Yup.InferType<typeof CreateCaseSchema>
 
-interface FormValues {
-  topic: string
-  client_id: string
-  tenancy_id: number
-}
 const [FormProvider, useFormContext, useForm] = createFormContext<FormValues>()
 
 const App = () => {
@@ -50,6 +53,7 @@ const App = () => {
       client_id: '',
       tenancy_id: null!,
     },
+    validate: yupResolver(CreateCaseSchema),
   })
 
   const handleSubmit = (values: typeof form.values) => {
@@ -109,7 +113,7 @@ const App = () => {
           <Button
             type="submit"
             mt="md"
-            disabled={form.submitting || !form.isValid}
+            disabled={form.submitting || !form.isValid()}
             loading={form.submitting}
           >
             Create case
