@@ -102,7 +102,7 @@ class CaseOutcome:
 
 class ReferrerType(models.TextChoices):
     LEGAL_CENTRE = "LEGAL_CENTRE", "Legal centre"
-    COMMUNITY_ORGANISATION = "COMMUNITY_ORGANISATION", "Community Organisation"
+    COMMUNITY_ORGANISATION = "COMMUNITY_ORGANISATION", "Community organisation"
     SEARCH = "SEARCH", "Search"
     SOCIAL_MEDIA = "SOCIAL_MEDIA", "Social media"
     WORD_OF_MOUTH = "WORD_OF_MOUTH", "Word of mouth"
