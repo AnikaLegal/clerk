@@ -1,21 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import { enqueueSnackbar } from 'notistack'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Container,
-  Header,
-  Table,
-  Input,
   Dropdown,
+  Header,
+  Input,
+  Table,
 } from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
 
-import { mount, debounce, getAPIErrorMessage } from 'utils'
+import api, { DocumentTemplate, useDeleteDocumentTemplateMutation } from 'api'
 import { FadeTransition } from 'comps/transitions'
-import api, { useDeleteDocumentTemplateMutation, DocumentTemplate } from 'api'
+import {
+  choiceToMap,
+  choiceToOptions,
+  debounce,
+  getAPIErrorMessage,
+  mount,
+} from 'utils'
 
 interface DjangoContext {
-  topic_options: { key: string; value: string; text: string }[]
-  topic: string
+  choices: {
+    topic: [string, string][]
+  }
   create_url: string
 }
 
@@ -24,14 +31,14 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const debouncer = debounce(300)
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [templates, setTemplates] = useState<DocumentTemplate[]>([])
   const [name, setName] = useState('')
-  const [topic, setTopic] = useState(CONTEXT.topic)
+  const [topic, setTopic] = useState('')
   const [searchTemplates] = api.useLazyGetDocumentTemplatesQuery()
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
-  const { enqueueSnackbar } = useSnackbar()
+  const topicLabels = choiceToMap(CONTEXT.choices.topic)
 
   const onDelete = (id) => () => {
     const template = templates.filter((t) => t.id === id).pop()
@@ -90,8 +97,9 @@ const App = () => {
         <Dropdown
           fluid
           selection
+          clearable
           placeholder="Select a case type"
-          options={CONTEXT.topic_options}
+          options={choiceToOptions(CONTEXT.choices.topic)}
           onChange={(e, { value }) => setTopic(value as string)}
           value={topic}
         />
@@ -118,7 +126,7 @@ const App = () => {
                 <Table.Cell>
                   <a href={t.url}>{t.name}</a>
                 </Table.Cell>
-                <Table.Cell>{t.topic}</Table.Cell>
+                <Table.Cell>{topicLabels.get(t.topic)}</Table.Cell>
                 <Table.Cell>{t.created_at}</Table.Cell>
                 <Table.Cell>{t.modified_at}</Table.Cell>
                 <Table.Cell>
