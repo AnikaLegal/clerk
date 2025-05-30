@@ -1,5 +1,12 @@
+import { Box, LoadingOverlay } from '@mantine/core'
+import { useDebouncedCallback } from '@mantine/hooks'
+import {
+  GetDocumentTemplatesApiArg,
+  useDeleteDocumentTemplateMutation,
+  useGetDocumentTemplatesQuery,
+} from 'api'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   Container,
@@ -8,15 +15,7 @@ import {
   Input,
   Table,
 } from 'semantic-ui-react'
-import { LoadingOverlay, Box } from '@mantine/core'
-import api, { DocumentTemplate, useDeleteDocumentTemplateMutation } from 'api'
-import {
-  choiceToMap,
-  choiceToOptions,
-  debounce,
-  getAPIErrorMessage,
-  mount,
-} from 'utils'
+import { choiceToMap, choiceToOptions, getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
 
@@ -28,30 +27,26 @@ interface DjangoContext {
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-
-const debouncer = debounce(300)
+const TopicLabels = choiceToMap(CONTEXT.choices.topic)
+const CreateUrl = CONTEXT.create_url
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [templates, setTemplates] = useState<DocumentTemplate[]>([])
-  const [name, setName] = useState('')
-  const [topic, setTopic] = useState('')
-  const [searchTemplates] = api.useLazyGetDocumentTemplatesQuery()
+  const [args, setArgs] = useState<GetDocumentTemplatesApiArg>({})
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
-  const topicLabels = choiceToMap(CONTEXT.choices.topic)
+  const result = useGetDocumentTemplatesQuery(args)
+  const data = result.data || []
 
-  const onDelete = (id) => () => {
-    const template = templates.filter((t) => t.id === id).pop()
-    if (template && window.confirm(`Delete file ${template.name}?`)) {
+  const onDelete = (id: number, name: string) => () => {
+    if (window.confirm(`Delete file ${name}?`)) {
       deleteDocumentTemplate({ id })
         .unwrap()
         .then(() => {
-          setTemplates(templates.filter((t) => t.id !== id))
+          enqueueSnackbar('Document template deleted', { variant: 'success' })
         })
-        .catch((err) => {
+        .catch((e) => {
           enqueueSnackbar(
-            getAPIErrorMessage(err, 'Failed to delete this document template'),
+            getAPIErrorMessage(e, 'Failed to delete document template'),
             {
               variant: 'error',
             }
@@ -59,27 +54,19 @@ const App = () => {
         })
     }
   }
-  const search = debouncer(() => {
-    setIsLoading(true)
-    searchTemplates({ name, topic })
-      .unwrap()
-      .then((templates) => {
-        setTemplates(templates)
+  const onSearchChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, { value }) => {
+      setArgs((prev) => {
+        return { ...prev, name: value }
       })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
-          variant: 'error',
-        })
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  })
-  useEffect(() => search(), [name, topic])
+    },
+    300
+  )
+
   return (
     <Container>
       <Header as="h1">Document Templates</Header>
-      <a href={CONTEXT.create_url}>
+      <a href={CreateUrl}>
         <Button primary>Upload document template</Button>
       </a>
       <div
@@ -92,9 +79,8 @@ const App = () => {
       >
         <Input
           icon="search"
-          placeholder="Search by template name or subject..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder="Search by template name..."
+          onChange={onSearchChange}
         />
         <Dropdown
           fluid
@@ -102,13 +88,16 @@ const App = () => {
           clearable
           placeholder="Select a case type"
           options={choiceToOptions(CONTEXT.choices.topic)}
-          onChange={(e, { value }) => setTopic(value as string)}
-          value={topic}
+          onChange={(e, { value }) => {
+            setArgs((prev) => {
+              return { ...prev, topic: value as string }
+            })
+          }}
         />
       </div>
       <Box pos="relative">
         <LoadingOverlay
-          visible={isLoading}
+          visible={result.isLoading}
           overlayProps={{ radius: 'sm', blur: 2 }}
         />
         <Table celled>
@@ -122,22 +111,22 @@ const App = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {!isLoading &&
-              (templates.length < 1 ? (
+            {!result.isLoading &&
+              (data.length < 1 ? (
                 <Table.Row>
                   <td>No templates found</td>
                 </Table.Row>
               ) : (
-                templates.map((t) => (
+                data.map((t) => (
                   <Table.Row key={t.url}>
                     <Table.Cell>
                       <a href={t.url}>{t.name}</a>
                     </Table.Cell>
-                    <Table.Cell>{topicLabels.get(t.topic)}</Table.Cell>
+                    <Table.Cell>{TopicLabels.get(t.topic)}</Table.Cell>
                     <Table.Cell>{t.created_at}</Table.Cell>
                     <Table.Cell>{t.modified_at}</Table.Cell>
                     <Table.Cell>
-                      <Button negative basic onClick={onDelete(t.id)}>
+                      <Button negative basic onClick={onDelete(t.id, t.name)}>
                         Delete
                       </Button>
                     </Table.Cell>
