@@ -8,9 +8,8 @@ import {
   Input,
   Table,
 } from 'semantic-ui-react'
-
+import { LoadingOverlay, Box } from '@mantine/core'
 import api, { DocumentTemplate, useDeleteDocumentTemplateMutation } from 'api'
-import { FadeTransition } from 'comps/transitions'
 import {
   choiceToMap,
   choiceToOptions,
@@ -18,6 +17,8 @@ import {
   getAPIErrorMessage,
   mount,
 } from 'utils'
+
+import '@mantine/core/styles.css'
 
 interface DjangoContext {
   choices: {
@@ -64,12 +65,13 @@ const App = () => {
       .unwrap()
       .then((templates) => {
         setTemplates(templates)
-        setIsLoading(false)
       })
       .catch((err) => {
         enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
           variant: 'error',
         })
+      })
+      .finally(() => {
         setIsLoading(false)
       })
   })
@@ -104,7 +106,11 @@ const App = () => {
           value={topic}
         />
       </div>
-      <FadeTransition in={!isLoading}>
+      <Box pos="relative">
+        <LoadingOverlay
+          visible={isLoading}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+        />
         <Table celled>
           <Table.Header>
             <Table.Row>
@@ -116,29 +122,31 @@ const App = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {templates.length < 1 && (
-              <Table.Row>
-                <td>No templates found</td>
-              </Table.Row>
-            )}
-            {templates.map((t) => (
-              <Table.Row key={t.url}>
-                <Table.Cell>
-                  <a href={t.url}>{t.name}</a>
-                </Table.Cell>
-                <Table.Cell>{topicLabels.get(t.topic)}</Table.Cell>
-                <Table.Cell>{t.created_at}</Table.Cell>
-                <Table.Cell>{t.modified_at}</Table.Cell>
-                <Table.Cell>
-                  <Button negative basic onClick={onDelete(t.id)}>
-                    Delete
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
+            {!isLoading &&
+              (templates.length < 1 ? (
+                <Table.Row>
+                  <td>No templates found</td>
+                </Table.Row>
+              ) : (
+                templates.map((t) => (
+                  <Table.Row key={t.url}>
+                    <Table.Cell>
+                      <a href={t.url}>{t.name}</a>
+                    </Table.Cell>
+                    <Table.Cell>{topicLabels.get(t.topic)}</Table.Cell>
+                    <Table.Cell>{t.created_at}</Table.Cell>
+                    <Table.Cell>{t.modified_at}</Table.Cell>
+                    <Table.Cell>
+                      <Button negative basic onClick={onDelete(t.id)}>
+                        Delete
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                ))
+              ))}
           </Table.Body>
         </Table>
-      </FadeTransition>
+      </Box>
     </Container>
   )
 }
