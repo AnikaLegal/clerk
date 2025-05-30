@@ -6,7 +6,7 @@ import {
   useGetDocumentTemplatesQuery,
 } from 'api'
 import { enqueueSnackbar } from 'notistack'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Container,
@@ -35,7 +35,6 @@ const App = () => {
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
   const result = useGetDocumentTemplatesQuery(args)
-  const data = result.data || []
 
   const onDelete = (id: number, name: string) => () => {
     if (window.confirm(`Delete file ${name}?`)) {
@@ -100,10 +99,6 @@ const App = () => {
         />
       </div>
       <Box pos="relative">
-        <LoadingOverlay
-          visible={result.isLoading}
-          overlayProps={{ radius: 'sm', blur: 2 }}
-        />
         <Table celled>
           <Table.Header>
             <Table.Row>
@@ -115,32 +110,87 @@ const App = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {!result.isLoading &&
-              (data.length < 1 ? (
-                <Table.Row>
-                  <td>No templates found</td>
-                </Table.Row>
-              ) : (
-                data.map((t) => (
-                  <Table.Row key={t.url}>
-                    <Table.Cell>
-                      <a href={t.url}>{t.name}</a>
-                    </Table.Cell>
-                    <Table.Cell>{TopicLabels.get(t.topic)}</Table.Cell>
-                    <Table.Cell>{t.created_at}</Table.Cell>
-                    <Table.Cell>{t.modified_at}</Table.Cell>
-                    <Table.Cell>
-                      <Button negative basic onClick={onDelete(t.id, t.name)}>
-                        Delete
-                      </Button>
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-              ))}
+            <DocumentTemplateTableBody result={result} onDelete={onDelete} />
           </Table.Body>
         </Table>
       </Box>
     </Container>
+  )
+}
+
+const ErrorState = ({ error }: { error: any }) => {
+  useEffect(() => {
+    const message = getAPIErrorMessage(
+      error,
+      'Could not load document templates'
+    )
+    enqueueSnackbar(message, { variant: 'error' })
+  }, [error])
+
+  return (
+    <Table.Row>
+      <td colSpan={5}>Could not load document templates.</td>
+    </Table.Row>
+  )
+}
+
+const LoadingState = () => (
+  <Table.Row>
+    <td colSpan={5}>
+      <LoadingOverlay visible overlayProps={{ radius: 'sm', blur: 30 }} />
+    </td>
+  </Table.Row>
+)
+
+const EmptyState = () => (
+  <Table.Row>
+    <td colSpan={5}>No templates found.</td>
+  </Table.Row>
+)
+
+interface DocumentTemplateTableBodyProps {
+  result: ReturnType<typeof useGetDocumentTemplatesQuery>
+  onDelete: (id: number, name: string) => () => void
+}
+
+const DocumentTemplateTableBody = ({
+  result,
+  onDelete,
+}: DocumentTemplateTableBodyProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} />
+  }
+  if (result.isLoading) {
+    return <LoadingState />
+  }
+
+  const data = result.data || []
+  if (data.length < 1) {
+    return <EmptyState />
+  }
+
+  return (
+    <>
+      {data.map((template) => (
+        <Table.Row key={template.url}>
+          <Table.Cell>
+            <a href={template.url}>{template.name}</a>
+          </Table.Cell>
+          <Table.Cell>{TopicLabels.get(template.topic)}</Table.Cell>
+          <Table.Cell>{template.created_at}</Table.Cell>
+          <Table.Cell>{template.modified_at}</Table.Cell>
+          <Table.Cell>
+            <Button
+              negative
+              basic
+              onClick={onDelete(template.id, template.name)}
+            >
+              Delete
+            </Button>
+          </Table.Cell>
+        </Table.Row>
+      ))}
+    </>
   )
 }
 
