@@ -54,11 +54,19 @@ const App = () => {
         })
     }
   }
+
+  const setArgByName = (
+    name: keyof GetDocumentTemplatesApiArg,
+    value: string
+  ) => {
+    setArgs((prev) => {
+      return { ...prev, [name]: value }
+    })
+  }
+
   const onSearchChange = useDebouncedCallback(
     (event: React.ChangeEvent<HTMLInputElement>, { value }) => {
-      setArgs((prev) => {
-        return { ...prev, name: value }
-      })
+      setArgByName('name', value)
     },
     300
   )
@@ -88,11 +96,7 @@ const App = () => {
           clearable
           placeholder="Select a case type"
           options={choiceToOptions(CONTEXT.choices.topic)}
-          onChange={(e, { value }) => {
-            setArgs((prev) => {
-              return { ...prev, topic: value as string }
-            })
-          }}
+          onChange={(e, { value }) => setArgByName('topic', value as string)}
         />
       </div>
       <Box pos="relative">
