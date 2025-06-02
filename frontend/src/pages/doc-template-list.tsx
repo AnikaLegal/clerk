@@ -18,7 +18,6 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
-
 import {
   DocumentTemplate,
   GetDocumentTemplatesApiArg,
