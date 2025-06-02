@@ -1,21 +1,33 @@
-import { Box, LoadingOverlay } from '@mantine/core'
-import { useDebouncedCallback } from '@mantine/hooks'
 import {
+  ActionIcon,
+  Button,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Select,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
+import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
+import {
+  IconExclamationCircle,
+  IconSearch,
+  IconTrash,
+} from '@tabler/icons-react'
+
+import {
+  DocumentTemplate,
   GetDocumentTemplatesApiArg,
   useDeleteDocumentTemplateMutation,
   useGetDocumentTemplatesQuery,
 } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
-import {
-  Button,
-  Container,
-  Dropdown,
-  Header,
-  Input,
-  Table,
-} from 'semantic-ui-react'
-import { choiceToMap, choiceToOptions, getAPIErrorMessage, mount } from 'utils'
+import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
 
@@ -32,27 +44,8 @@ const CreateUrl = CONTEXT.create_url
 
 const App = () => {
   const [args, setArgs] = useState<GetDocumentTemplatesApiArg>({})
-  const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
   const result = useGetDocumentTemplatesQuery(args)
-
-  const onDelete = (id: number, name: string) => () => {
-    if (window.confirm(`Delete file ${name}?`)) {
-      deleteDocumentTemplate({ id })
-        .unwrap()
-        .then(() => {
-          enqueueSnackbar('Document template deleted', { variant: 'success' })
-        })
-        .catch((e) => {
-          enqueueSnackbar(
-            getAPIErrorMessage(e, 'Failed to delete document template'),
-            {
-              variant: 'error',
-            }
-          )
-        })
-    }
-  }
 
   const setArgByName = (
     name: keyof GetDocumentTemplatesApiArg,
@@ -63,57 +56,63 @@ const App = () => {
     })
   }
 
-  const onSearchChange = useDebouncedCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, { value }) => {
-      setArgByName('name', value)
+  const onChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setArgByName('name', event.target.value.trim())
     },
     300
   )
 
   return (
-    <Container>
-      <Header as="h1">Document Templates</Header>
-      <a href={CreateUrl}>
-        <Button primary>Upload document template</Button>
-      </a>
-      <div
-        style={{
-          margin: '1rem 0',
-          display: 'grid',
-          gap: '1rem',
-          gridTemplateColumns: '1fr 1fr',
-        }}
+    <Container size="xl">
+      <Title order={1}>Document Templates</Title>
+      <Button component="a" href={CreateUrl} size="md" mt="sm">
+        Upload document template
+      </Button>
+      <Grid mt="md">
+        <Grid.Col span={6}>
+          <TextInput
+            placeholder="Search by template name..."
+            rightSection={<IconSearch size={16} stroke={4} />}
+            size="md"
+            onChange={onChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Select
+            clearable
+            searchable
+            size="md"
+            placeholder="Select a case type"
+            data={Array.from(TopicLabels, ([key, value]) => ({
+              value: key,
+              label: value,
+            }))}
+            onChange={(value) => setArgByName('topic', (value as string) || '')}
+            withCheckIcon={false}
+          />
+        </Grid.Col>
+      </Grid>
+      <Table
+        withColumnBorders
+        withTableBorder
+        verticalSpacing="md"
+        fz="md"
+        mt="md"
       >
-        <Input
-          icon="search"
-          placeholder="Search by template name..."
-          onChange={onSearchChange}
-        />
-        <Dropdown
-          fluid
-          selection
-          clearable
-          placeholder="Select a case type"
-          options={choiceToOptions(CONTEXT.choices.topic)}
-          onChange={(e, { value }) => setArgByName('topic', value as string)}
-        />
-      </div>
-      <Box pos="relative">
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-              <Table.HeaderCell>Modified</Table.HeaderCell>
-              <Table.HeaderCell>Actions</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            <DocumentTemplateTableBody result={result} onDelete={onDelete} />
-          </Table.Body>
-        </Table>
-      </Box>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Topic</Table.Th>
+            <Table.Th>Created</Table.Th>
+            <Table.Th>Modified</Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          <DocumentTemplateTableBody result={result} />
+        </Table.Tbody>
+      </Table>
     </Container>
   )
 }
@@ -128,34 +127,41 @@ const ErrorState = ({ error }: { error: any }) => {
   }, [error])
 
   return (
-    <Table.Row>
-      <td colSpan={5}>Could not load document templates.</td>
-    </Table.Row>
+    <Table.Tr>
+      <td colSpan={5}>
+        <Group justify="center" gap="xs" m="sm" c="red">
+          <IconExclamationCircle />
+          <Text>Could not load document templates</Text>
+        </Group>
+      </td>
+    </Table.Tr>
   )
 }
 
 const LoadingState = () => (
-  <Table.Row>
+  <Table.Tr>
     <td colSpan={5}>
-      <LoadingOverlay visible overlayProps={{ radius: 'sm', blur: 30 }} />
+      <Center m="sm">
+        <Loader />
+      </Center>
     </td>
-  </Table.Row>
+  </Table.Tr>
 )
 
 const EmptyState = () => (
-  <Table.Row>
-    <td colSpan={5}>No templates found.</td>
-  </Table.Row>
+  <Table.Tr>
+    <td colSpan={5}>
+      <Center m="sm">No templates found</Center>
+    </td>
+  </Table.Tr>
 )
 
 interface DocumentTemplateTableBodyProps {
   result: ReturnType<typeof useGetDocumentTemplatesQuery>
-  onDelete: (id: number, name: string) => () => void
 }
 
 const DocumentTemplateTableBody = ({
   result,
-  onDelete,
 }: DocumentTemplateTableBodyProps) => {
   if (result.isError) {
     return <ErrorState error={result.error} />
@@ -172,25 +178,76 @@ const DocumentTemplateTableBody = ({
   return (
     <>
       {data.map((template) => (
-        <Table.Row key={template.url}>
-          <Table.Cell>
+        <Table.Tr key={template.url}>
+          <Table.Td>
             <a href={template.url}>{template.name}</a>
-          </Table.Cell>
-          <Table.Cell>{TopicLabels.get(template.topic)}</Table.Cell>
-          <Table.Cell>{template.created_at}</Table.Cell>
-          <Table.Cell>{template.modified_at}</Table.Cell>
-          <Table.Cell>
-            <Button
-              negative
-              basic
-              onClick={onDelete(template.id, template.name)}
-            >
-              Delete
-            </Button>
-          </Table.Cell>
-        </Table.Row>
+          </Table.Td>
+          <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
+          <Table.Td>{template.created_at}</Table.Td>
+          <Table.Td>{template.modified_at}</Table.Td>
+          <Table.Td>
+            <DocumentTemplateActionIcons template={template} />
+          </Table.Td>
+        </Table.Tr>
       ))}
     </>
+  )
+}
+
+interface DocumentTemplateActionIconsProps {
+  template: DocumentTemplate
+}
+
+const DocumentTemplateActionIcons = ({
+  template,
+}: DocumentTemplateActionIconsProps) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
+
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    setShowConfirmDelete(false)
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
+
+  const handleDelete = () => {
+    deleteDocumentTemplate({ id: template.id })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Document template deleted', { variant: 'success' })
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to delete document template'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+  }
+
+  if (showConfirmDelete) {
+    return (
+      <div ref={ref}>
+        <Center>
+          <Button
+            variant="filled"
+            color="red"
+            size="compact-sm"
+            onClick={handleDelete}
+          >
+            Confirm delete
+          </Button>
+        </Center>
+      </div>
+    )
+  }
+
+  return (
+    <Center>
+      <ActionIcon variant="transparent" color="gray">
+        <IconTrash stroke={1.5} onClick={() => setShowConfirmDelete(true)} />
+      </ActionIcon>
+    </Center>
   )
 }
 

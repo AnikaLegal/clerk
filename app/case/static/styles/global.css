@@ -91,7 +91,7 @@ header .nav-items a:visited {
   flex-direction: column;
   flex-wrap: wrap;
   gap: 0.5rem;
-  align-items:center;
+  align-items: center;
 }
 
 .login .messages .message {
@@ -115,4 +115,8 @@ main {
 .ui.dropdown > .dropdown.icon.clear:before {
   content: "\f00d";
   font-family: Icons;
+}
+
+.mantine-Table-thead {
+  background-color: #f9fafb;
 }
