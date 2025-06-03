@@ -14,7 +14,6 @@ import React from 'react'
 import { getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
-import '@mantine/dropzone/styles.css'
 
 interface DjangoContext {
   choices: {
