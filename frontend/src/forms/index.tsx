@@ -10,14 +10,12 @@ import { ProgressForm } from './case-progress'
 import { ReopenForm } from './case-reopen'
 import { ReviewForm } from './case-review-note'
 import { ServiceForm } from './case-service'
-import { DocumentTemplateForm } from './doc-template'
 import { TenancyForm } from './tenancy'
 export {
   AccountForm,
   AssignForm,
   CloseForm,
   ConflictForm,
-  DocumentTemplateForm,
   EligibilityForm,
   FilenoteForm,
   OutcomeForm,
@@ -26,5 +24,5 @@ export {
   ReopenForm,
   ReviewForm,
   ServiceForm,
-  TenancyForm
+  TenancyForm,
 }
