@@ -10,7 +10,7 @@ def _migrate_legacy_eviction_value(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0076_client_contact_notes_client_contact_restriction"),
+        ("core", "0077_alter_issue_referrer_type"),
     ]
 
     operations = [

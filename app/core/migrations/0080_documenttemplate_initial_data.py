@@ -22,7 +22,7 @@ def _set_initial_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0078_documenttemplate"),
+        ("core", "0079_documenttemplate"),
         ("microsoft", "0001_rename_evictions_document_template_folder"),
         ("microsoft", "0002_rename_health_check_document_template_folder"),
     ]

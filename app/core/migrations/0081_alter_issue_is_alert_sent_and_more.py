@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("core", "0079_documenttemplate_initial_data"),
+        ("core", "0080_documenttemplate_initial_data"),
     ]
 
     operations = [
