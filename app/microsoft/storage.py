@@ -1,13 +1,12 @@
 import logging
 import os
-from urllib.parse import quote
 from datetime import datetime
-from django.utils import timezone
-
+from urllib.parse import quote
 
 from django.core.cache import cache
 from django.core.files.storage import Storage
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
