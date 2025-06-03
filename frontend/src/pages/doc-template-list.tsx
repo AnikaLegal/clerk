@@ -169,7 +169,7 @@ const DocumentTemplateTableBody = ({
     return <LoadingState />
   }
 
-  const data = result.data || []
+  const data: DocumentTemplate[] = result.data || []
   if (data.length < 1) {
     return <EmptyState />
   }
