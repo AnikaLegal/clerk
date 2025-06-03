@@ -1,18 +1,17 @@
-from django.http import Http404
+from core.models.issue import CaseTopic
 from django.db.models import Q
+from django.http import Http404
 from django.urls import reverse
+from emails.models import EmailTemplate
 from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 
-from case.utils.react import render_react_page
 from case.serializers import EmailTemplateSerializer
-from emails.models import EmailTemplate
-from core.models.issue import CaseTopic
-
+from case.utils.react import render_react_page
 from case.views.auth import (
+    CoordinatorOrBetterCanWritePermission,
     coordinator_or_better_required,
     paralegal_or_better_required,
-    CoordinatorOrBetterCanWritePermission,
 )
 
 topic_options = [
@@ -20,15 +19,16 @@ topic_options = [
 ] + [
     {"key": key, "value": key, "text": label} for key, label in CaseTopic.ACTIVE_CHOICES
 ]
+TOPIC_CHOICES = CaseTopic.ACTIVE_CHOICES + [("GENERAL", "General")]
 
 
 @api_view(["GET"])
 @coordinator_or_better_required
 def template_email_list_page_view(request):
-    templates = EmailTemplate.objects.order_by("-created_at").all()
     context = {
-        "topic_options": topic_options,
-        "templates": EmailTemplateSerializer(templates, many=True).data,
+        "choices": {
+            "topic": TOPIC_CHOICES,
+        },
         "create_url": reverse("template-email-create"),
     }
     return render_react_page(request, "Email Templates", "email-template-list", context)
@@ -72,7 +72,8 @@ class EmailTemplateApiViewset(ModelViewSet):
 
     def get_queryset(self):
         """Filter by query params"""
-        queryset = EmailTemplate.objects.order_by("-created_at").all()
+
+        queryset = EmailTemplate.objects.order_by("topic", "name").all()
         name = self.request.query_params.get("name")
         topic = self.request.query_params.get("topic")
 
