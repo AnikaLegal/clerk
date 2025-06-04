@@ -32,7 +32,8 @@ interface DjangoContext {
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const TopicLabels = choiceToMap(CONTEXT.choices.topic)
+const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
+const TopicLabels = choiceToMap(Topics)
 const CreateUrl = CONTEXT.create_url
 
 const App = () => {
@@ -74,9 +75,9 @@ const App = () => {
             searchable
             size="md"
             placeholder="Select a case type"
-            data={Array.from(TopicLabels, ([key, value]) => ({
-              value: key,
-              label: value,
+            data={Topics.map(([value, label]) => ({
+              value,
+              label,
             }))}
             onChange={(value) => setArgByName('topic', (value as string) || '')}
             withCheckIcon={false}

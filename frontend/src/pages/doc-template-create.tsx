@@ -23,7 +23,7 @@ interface DjangoContext {
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const Topics = CONTEXT.choices.topic
+const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
 const ListUrl = CONTEXT.list_url
 
 interface FormValues {
@@ -84,9 +84,9 @@ const App = () => {
           searchable
           size="md"
           placeholder="Select a case type"
-          data={Topics.map((x) => ({
-            value: x[0],
-            label: x[1],
+          data={Topics.map(([value, label]) => ({
+            value,
+            label,
           }))}
           withCheckIcon={false}
           onChange={(value) =>
