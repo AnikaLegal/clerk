@@ -1,90 +1,163 @@
-import React from 'react'
-import { Button, Input, Dropdown, Form } from 'semantic-ui-react'
+import {
+  Button,
+  Grid,
+  Group,
+  Paper,
+  Select,
+  Textarea,
+  TextInput,
+  Text,
+} from '@mantine/core'
+import { useForm } from '@mantine/form'
+import { modals } from '@mantine/modals'
+import { EmailTemplateCreate } from 'api'
+import MarkdownInfoIconWithPopover from 'comps/markdown-info-icon'
+import { RichTextDisplay } from 'comps/rich-text'
+import React, { ChangeEvent, MouseEvent } from 'react'
+import { markdownToHtml } from 'utils'
 
-import { MarkdownEditor } from 'comps/markdown-editor'
+interface EmailTemplateFormProps {
+  topicChoices: [string, string][]
+  onSubmit: (values: EmailTemplateCreate) => void
+  initialData?: EmailTemplateCreate
+  onDelete?: () => void
+}
 
-// Formik form component
 export const EmailTemplateForm = ({
-  create,
-  editable,
-  topicOptions,
-  handleDelete,
-  formik: {
-    values,
-    errors,
-    handleChange,
-    handleSubmit,
-    isSubmitting,
-    setFieldValue,
-  },
-}) => (
-  <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
-    <div className={`field ${errors.topic && 'error'}`}>
-      <label>Case Type</label>
-      <Dropdown
-        fluid
-        selection
-        placeholder="Select a case type"
-        options={topicOptions}
-        onChange={(e, { value }) => setFieldValue('topic', value)}
-        value={values.topic}
-        disabled={!editable}
+  topicChoices,
+  onSubmit,
+  initialData,
+  onDelete,
+}: EmailTemplateFormProps) => {
+  const [html, setHtml] = React.useState<string>(
+    markdownToHtml(initialData?.text || '')
+  )
+
+  const isUpdate = !!initialData
+
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: initialData,
+  })
+
+  const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setHtml(markdownToHtml(event.target.value))
+
+    const props = form.getInputProps('text')
+    if (props.onChange) {
+      props.onChange(event)
+    }
+  }
+
+  const handleDelete = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    if (onDelete) {
+      modals.openConfirmModal({
+        title: <Text fw={700}>Delete Email Template</Text>,
+        children: <Text>Are you sure you want to delete this template?</Text>,
+        centered: true,
+        labels: { confirm: 'Delete email template', cancel: 'Cancel' },
+        confirmProps: { color: 'red' },
+        onConfirm: () => onDelete(),
+      })
+    }
+  }
+
+  return (
+    <form onSubmit={form.onSubmit(onSubmit)}>
+      <Select
+        {...form.getInputProps('topic')}
+        key={form.key('topic')}
+        label={
+          <Text fw={700} mb="0.25rem">
+            Topic
+          </Text>
+        }
+        placeholder="Select case topic"
+        size="md"
+        mt="md"
+        data={topicChoices.map(([value, label]) => ({
+          value,
+          label,
+        }))}
+        withCheckIcon={false}
       />
-    </div>
-    <div className={`field ${errors.name && 'error'}`}>
-      <label>Name</label>
-      <Input
-        placeholder="Template name"
-        value={values.name}
-        name="name"
-        onChange={handleChange}
-        disabled={!editable}
+      <TextInput
+        {...form.getInputProps('name')}
+        key={form.key('name')}
+        label={
+          <Text fw={700} mb="0.25rem">
+            Name
+          </Text>
+        }
+        size="md"
+        mt="md"
       />
-    </div>
-    <div className={`field ${errors.subject && 'error'}`}>
-      <label>Subject</label>
-      <Input
-        placeholder="Template subject"
-        value={values.subject}
-        name="subject"
-        onChange={handleChange}
-        disabled={!editable}
+      <TextInput
+        {...form.getInputProps('subject')}
+        key={form.key('subject')}
+        label={
+          <Text fw={700} mb="0.25rem">
+            Subject
+          </Text>
+        }
+        size="md"
+        mt="md"
       />
-    </div>
-    <MarkdownEditor
-      text={values.text}
-      html={values.html}
-      onChangeText={(text) => setFieldValue('text', text)}
-      onChangeHtml={(html) => setFieldValue('html', html)}
-      disabled={!editable}
-      placeholder="Dear Ms Example..."
-    />
-    {Object.entries(errors).map(([k, v]) => (
-      <div key={k} className="ui error message">
-        <div className="header">{k}</div>
-        <p>{v}</p>
-      </div>
-    ))}
-    {editable ? (
-      <Button
-        primary
-        type="submit"
-        disabled={isSubmitting}
-        loading={isSubmitting}
-      >
-        {create ? 'Create email template' : 'Update email template'}
-      </Button>
-    ) : null}
-    {!create && editable ? (
-      <Button
-        primary
-        color="red"
-        disabled={isSubmitting}
-        loading={isSubmitting}
-        onClick={handleDelete}
-      >
-        Delete
-      </Button>
-    ) : null}
-  </Form>
-)
+      <Grid mt="md">
+        <Grid.Col span={6} pb={0}>
+          <Group justify="space-between">
+            <Text fw={700}>Body</Text>
+            <MarkdownInfoIconWithPopover width={300} shadow="md" />
+          </Group>
+        </Grid.Col>
+        <Grid.Col span={6} pb={0}>
+          <Text fw={700}>Preview</Text>
+        </Grid.Col>
+        <Grid.Col span={6} pt="0.25rem">
+          <Textarea
+            {...form.getInputProps('text')}
+            key={form.key('text')}
+            size="md"
+            minRows={5}
+            autosize
+            onChange={handleTextChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6} pt="0.25rem">
+          <Paper
+            withBorder
+            p="xs"
+            mih="100%"
+            style={{ borderColor: 'var(--mantine-color-default-border)' }}
+          >
+            <RichTextDisplay content={html} />
+          </Paper>
+        </Grid.Col>
+      </Grid>
+      <Group gap="sm">
+        <Button
+          type="submit"
+          mt="md"
+          disabled={form.submitting || !form.isValid()}
+          loading={form.submitting}
+        >
+          {isUpdate ? 'Update email template' : 'Create email template'}
+        </Button>
+        {onDelete && (
+          <Button
+            mt="md"
+            disabled={form.submitting}
+            loading={form.submitting}
+            onClick={handleDelete}
+            color="red"
+          >
+            Delete
+          </Button>
+        )}
+      </Group>
+    </form>
+  )
+}
+
+export default EmailTemplateForm
