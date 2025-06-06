@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0079_documenttemplate_initial_data"),
+        ("core", "0082_add_db_collation_natural"),
     ]
 
     operations = [
