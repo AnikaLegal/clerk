@@ -74,7 +74,7 @@ const App = () => {
             clearable
             searchable
             size="md"
-            placeholder="Select a case type"
+            placeholder="Select a case topic"
             data={Topics.map(([value, label]) => ({
               value,
               label,

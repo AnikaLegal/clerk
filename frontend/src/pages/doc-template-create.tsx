@@ -77,13 +77,12 @@ const App = () => {
           key={form.key('topic')}
           label={
             <Text fw={700} mb="0.25rem">
-              Topic
+              Case topic
             </Text>
           }
           clearable
           searchable
           size="md"
-          placeholder="Select a case type"
           data={Topics.map(([value, label]) => ({
             value,
             label,

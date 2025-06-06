@@ -82,7 +82,7 @@ const App = () => {
             clearable
             searchable
             size="md"
-            placeholder="Select a case type"
+            placeholder="Select a case topic"
             data={Array.from(TopicLabels, ([key, value]) => ({
               value: key,
               label: value,

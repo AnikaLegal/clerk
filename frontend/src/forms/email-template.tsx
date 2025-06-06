@@ -70,10 +70,9 @@ export const EmailTemplateForm = ({
         key={form.key('topic')}
         label={
           <Text fw={700} mb="0.25rem">
-            Topic
+            Case topic
           </Text>
         }
-        placeholder="Select case topic"
         size="md"
         mt="md"
         data={topicChoices.map(([value, label]) => ({
@@ -87,7 +86,7 @@ export const EmailTemplateForm = ({
         key={form.key('name')}
         label={
           <Text fw={700} mb="0.25rem">
-            Name
+            Template name
           </Text>
         }
         size="md"
@@ -98,7 +97,7 @@ export const EmailTemplateForm = ({
         key={form.key('subject')}
         label={
           <Text fw={700} mb="0.25rem">
-            Subject
+            Email subject
           </Text>
         }
         size="md"
@@ -107,7 +106,7 @@ export const EmailTemplateForm = ({
       <Grid mt="md">
         <Grid.Col span={6} pb={0}>
           <Group justify="space-between">
-            <Text fw={700}>Body</Text>
+            <Text fw={700}>Email body</Text>
             <MarkdownInfoIconWithPopover width={300} shadow="md" />
           </Group>
         </Grid.Col>
@@ -122,6 +121,8 @@ export const EmailTemplateForm = ({
             minRows={5}
             autosize
             onChange={handleTextChange}
+            placeholder="Dear Ms Example..."
+            autoComplete="off"
           />
         </Grid.Col>
         <Grid.Col span={6} pt="0.25rem">
