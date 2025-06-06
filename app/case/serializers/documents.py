@@ -23,7 +23,6 @@ class DocumentTemplateSerializer(serializers.ModelSerializer):
         ]
 
     # read only fields
-    id = serializers.CharField(read_only=True)
     name = serializers.CharField(read_only=True)
     url = serializers.CharField(source="file.url", read_only=True)
     created_at = serializers.SerializerMethodField()
