@@ -67,7 +67,7 @@ def test_slack_not_dispatched_when_already_sent(mock_async):
     Ensure Slack message not sent twice.
     """
     mock_async.assert_not_called()
-    issue = IssueFactory(is_case_sent=True)
+    issue = IssueFactory(is_alert_sent=False, is_case_sent=True)
     issue.save()
     # Ensure only email task was dispatched
     mock_async.assert_has_calls([mock.call(send_issue_slack, str(issue.pk))])

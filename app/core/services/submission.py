@@ -108,6 +108,9 @@ def process_issue(answers, client, tenancy):
         # Tanancy data
         tenancy=tenancy,
         weekly_rent=answers["WEEKLY_RENT"],
+        # Internal flags
+        is_alert_sent=False,
+        is_welcome_email_sent=False,
     )
     FileUpload.objects.filter(pk__in=issue_upload_ids).update(issue=issue.pk)
     return issue
@@ -122,6 +125,7 @@ UPLOAD_ANSWERS = {
         "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT",
     ],
     "EVICTION": ["EVICTIONS_DOCUMENTS_UPLOAD"],
+    "EVICTION_RETALIATORY": ["EVICTIONS_DOCUMENTS_UPLOAD"],
     "BONDS": [
         "BONDS_RTBA_APPLICATION_UPLOAD",
         "BONDS_DAMAGE_QUOTE_UPLOAD",

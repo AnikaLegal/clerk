@@ -15,17 +15,14 @@ from case.views.auth import (
     coordinator_or_better_required,
 )
 
-topic_options = [
-    {"key": key, "value": key, "text": label} for key, label in CaseTopic.ACTIVE_CHOICES
-]
-
 
 @api_view(["GET"])
 @coordinator_or_better_required
 def template_doc_list_page_view(request):
     context = {
-        "topic_options": topic_options,
-        "topic": CaseTopic.REPAIRS,
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        },
         "create_url": reverse("template-doc-create"),
     }
     return render_react_page(
@@ -36,7 +33,12 @@ def template_doc_list_page_view(request):
 @api_view(["GET"])
 @coordinator_or_better_required
 def template_doc_create_page_view(request):
-    context = {"topic_options": topic_options, "list_url": reverse("template-doc-list")}
+    context = {
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        },
+        "list_url": reverse("template-doc-list"),
+    }
     return render_react_page(
         request, "Document Templates", "doc-template-create", context
     )
@@ -52,7 +54,7 @@ class DocumentTemplateApiViewset(ViewSet):
         # Annotate the queryset to extract the file name from the file path so
         # we can filter by name only.
         queryset = DocumentTemplate.objects.all()
-        queryset = queryset.order_by("name")
+        queryset = queryset.order_by("topic", "name")
 
         for key, value in serializer.validated_data.items():
             if value is not None:

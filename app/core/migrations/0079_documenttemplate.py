@@ -7,7 +7,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0077_alter_issue_topic"),
+        ("core", "0078_alter_issue_topic"),
     ]
 
     operations = [

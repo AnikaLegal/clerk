@@ -1119,7 +1119,7 @@ export type NotificationTemplateCreate = NotificationTemplateBase & {
   target: string;
 };
 export type DocumentTemplate = {
-  id: string;
+  id: number;
   name: string;
   topic: string;
   url: string;

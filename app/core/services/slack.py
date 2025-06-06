@@ -151,24 +151,24 @@ def send_slack_message_to_user(user: User, message: str) -> bool:
 
 
 def get_text(issue: Issue):
-    pk = issue.pk
-    case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
-    referrer_type = issue.referrer_type.title().replace("_", " ")
-    referrer = issue.referrer
-
-    if referrer_type:
-        ref_str = f"*Referral type*: {referrer_type}"
-        if referrer:
-            ref_str += f" / {referrer}"
-    else:
-        ref_str = "*Referral type*: no info available."
-
-    topic = issue.topic.lower()
-    text = (
-        f"A client has just submitted a *{topic}* case via the intake form.\n"
-        f"You can view their case in Clerk here: <{case_url}|{pk}>.\n"
+    topic_display_lower = issue.get_topic_display().lower()
+    indefinite_article = (
+        "an" if topic_display_lower[0] in ("a", "e", "i", "o", "u") else "a"
     )
-    text += ref_str
+    case_url = settings.CLERK_BASE_URL + reverse("case-detail", args=(str(issue.pk),))
+
+    referrer_info = issue.get_referrer_type_display()
+    if referrer_info:
+        if issue.referrer:
+            referrer_info += f" / {issue.referrer}"
+    else:
+        referrer_info = "no info available"
+
+    text = (
+        f"A client has just submitted {indefinite_article} *{topic_display_lower}* case via the intake form.\n"
+        f"You can view their case in Clerk here: <{case_url}|{issue.fileref}>.\n"
+        f"*Referral type*: {referrer_info}.\n"
+    )
     return text
 
 

@@ -4,21 +4,22 @@ import pytest
 
 from core.factories import IssueFactory
 from core.models import Issue
-from core.services import slack
 from core.services.slack import send_issue_slack
 
 
 @pytest.mark.django_db
-def test_slack_issue_message(monkeypatch):
+@mock.patch("core.services.slack.send_slack_message", autospec=True)
+def test_slack_issue_message(mock_send_slack_message: mock.Mock):
     """
     Ensure we call Slack without anything exploding
     """
-    mock_send_msg = mock.Mock()
-    monkeypatch.setattr(slack, "send_slack_message", mock_send_msg)
-    issue = IssueFactory()
+
+    issue = IssueFactory(is_alert_sent=False)
+
     assert not issue.is_alert_sent
-    mock_send_msg.assert_not_called()
+    mock_send_slack_message.assert_not_called()
+
     send_issue_slack(issue.pk)
-    assert mock_send_msg.call_count == 1
-    issue = Issue.objects.get(pk=issue.id)
-    assert issue.is_alert_sent
+
+    assert mock_send_slack_message.call_count == 1
+    assert Issue.objects.get(pk=issue.id).is_alert_sent

@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, patch
 
+
 import pytest
 from conftest import schema_tester
 from core.factories import DocumentTemplateFactory
@@ -31,7 +32,13 @@ def test_document_template_list_api_view(superuser_client: APIClient):
         ),
     )
 
-    with patch.object(MSGraphStorage, "url", return_value="https://example.com/file"):
+    url = "http://example.com/file"
+    now = timezone.now()
+    with (
+        patch.object(MSGraphStorage, "url", return_value=url),
+        patch.object(MSGraphStorage, "get_created_time", return_value=now),
+        patch.object(MSGraphStorage, "get_modified_time", return_value=now),
+    ):
         response = superuser_client.get(
             reverse("template-doc-api-list"), data={"topic": "REPAIRS"}
         )
@@ -40,16 +47,11 @@ def test_document_template_list_api_view(superuser_client: APIClient):
 
     json = response.json()
     assert len(json) == 1
-    assert json[0]["id"] == str(template.id)
+    assert json[0]["id"] == template.id
     assert json[0]["name"] == template.name
-    assert json[0]["url"] == "https://example.com/file"
-
-    created_at = timezone.localtime(template.created_at)
-    assert json[0]["created_at"] == created_at.strftime("%d/%m/%Y")
-
-    modified_at = timezone.localtime(template.modified_at)
-    assert json[0]["modified_at"] == modified_at.strftime("%d/%m/%Y")
-
+    assert json[0]["url"] == url
+    assert json[0]["created_at"] == now.strftime("%d/%m/%Y")
+    assert json[0]["modified_at"] == now.strftime("%d/%m/%Y")
     assert json[0]["topic"] == template.topic
 
     schema_tester.validate_response(response=response)

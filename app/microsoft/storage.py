@@ -1,10 +1,12 @@
 import logging
 import os
+from datetime import datetime
 from urllib.parse import quote
 
 from django.core.cache import cache
 from django.core.files.storage import Storage
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
@@ -156,6 +158,22 @@ class MSGraphStorage(Storage):
         logger.debug(f"Checking existence of file: {name}")
         return self._get_file_info(name) is not None
 
+    def get_created_time(self, name: str) -> datetime:
+        logger.debug(f"Getting created time for file: {name}")
+        info = self._get_file_info(name)
+        if not info:
+            logger.error(f"File not found: {name}")
+            raise FileNotFoundError(f"File {name} not found")
+        return timezone.datetime.fromisoformat(info["createdDateTime"])
+
+    def get_modified_time(self, name: str) -> datetime:
+        logger.debug(f"Getting modified time for file: {name}")
+        info = self._get_file_info(name)
+        if not info:
+            logger.error(f"File not found: {name}")
+            raise FileNotFoundError(f"File {name} not found")
+        return timezone.datetime.fromisoformat(info["lastModifiedDateTime"])
+
     def get_valid_name(self, name: str) -> str:
         logger.debug(f"Validating name: {name}")
         return name
@@ -172,6 +190,6 @@ class MSGraphStorage(Storage):
         logger.debug(f"Getting URL for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.debug(f"No URL found for file: {name}")
+            logger.error(f"File not found: {name}")
             return ""
         return info["webUrl"]
