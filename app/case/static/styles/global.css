@@ -19,6 +19,7 @@
   --white: #fff;
   /* Sizes */
   --container-padding: 100px;
+  --container-width: calc(100vw - 2 * var(--container-padding));
 }
 
 /* Responsive variables (phone) */
@@ -49,7 +50,7 @@ body > header .inner {
   display: flex;
   justify-content: space-between;
   max-width: 1240px;
-  width: calc(100vw - 2 * var(--container-padding));
+  width: var(--container-width);
   margin: 0 auto;
   padding: 1.5rem 0;
   align-items: center;
@@ -81,7 +82,6 @@ body > header .nav-items a:hover {
   text-decoration: underline;
 }
 body > header .nav-items a:visited {
-  color: var(--dark-1);
 }
 
 .login .messages {
@@ -105,7 +105,7 @@ body > header .nav-items a:visited {
 
 main {
   max-width: 1240px;
-  width: calc(100vw - 2 * var(--container-padding));
+  width: var(--container-width);
   margin: 0 auto;
   padding-bottom: 6rem;
 }
