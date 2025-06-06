@@ -2,6 +2,7 @@ import {
   Button,
   ComboboxData,
   ComboboxItem,
+  Container,
   Group,
   Loader,
   Select,
@@ -14,7 +15,6 @@ import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
-import { Container, Header } from 'semantic-ui-react'
 import {
   getAPIErrorMessage,
   getAPIFormErrors,
@@ -75,13 +75,12 @@ const App = () => {
   }
 
   return (
-    <Container>
+    <Container size="xl">
       <Title order={1} mb="md">
         Create a new case
       </Title>
       <FormProvider form={form}>
         <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Header as="h3">Case</Header>
           <Select
             {...form.getInputProps('topic')}
             key={form.key('topic')}
