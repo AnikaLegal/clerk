@@ -85,7 +85,9 @@ const App = () => {
           <Select
             {...form.getInputProps('topic')}
             key={form.key('topic')}
-            label="Topic"
+            label=<Text fw={700} mb="0.25rem">
+              Topic
+            </Text>
             placeholder="Select case topic"
             size="md"
             mt="md"
@@ -97,7 +99,9 @@ const App = () => {
           <ClientSelectField
             {...form.getInputProps('client_id')}
             key={form.key('client_id')}
-            label="Client"
+            label=<Text fw={700} mb="0.25rem">
+              Client
+            </Text>
             placeholder="Select client"
             size="md"
             mt="md"
@@ -105,7 +109,9 @@ const App = () => {
           <TenancyDropdownField
             {...form.getInputProps('tenancy_id')}
             key={form.key('tenancy_id')}
-            label="Tenancy"
+            label=<Text fw={700} mb="0.25rem">
+              Tenancy
+            </Text>
             placeholder="Select tenancy"
             size="md"
             mt="md"
