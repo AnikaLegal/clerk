@@ -9,16 +9,15 @@ from rest_framework.viewsets import ModelViewSet
 from case.serializers import EmailTemplateSerializer
 from case.utils.react import render_react_page
 from case.views.auth import (
-    CoordinatorOrBetterCanWritePermission,
-    coordinator_or_better_required,
-    paralegal_or_better_required,
+    admin_or_better_required,
+    AdminOrBetterPermission,
 )
 
 TOPIC_CHOICES = CaseTopic.ACTIVE_CHOICES + [("GENERAL", "General")]
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_email_list_page_view(request):
     context = {
         "choices": {
@@ -30,7 +29,7 @@ def template_email_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_email_create_page_view(request):
     context = {
         "choices": {
@@ -43,7 +42,7 @@ def template_email_create_page_view(request):
 
 
 @api_view(["GET"])
-@paralegal_or_better_required
+@admin_or_better_required
 def template_email_detail_page_view(request, pk):
     template = get_object_or_404(EmailTemplate, pk=pk)
     context = {
@@ -60,7 +59,7 @@ def template_email_detail_page_view(request, pk):
 
 class EmailTemplateApiViewset(ModelViewSet):
     serializer_class = EmailTemplateSerializer
-    permission_classes = [CoordinatorOrBetterCanWritePermission]
+    permission_classes = [AdminOrBetterPermission]
 
     def get_queryset(self):
         """Filter by query params"""

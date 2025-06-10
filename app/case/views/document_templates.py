@@ -11,13 +11,13 @@ from case.serializers import (
 )
 from case.utils.react import render_react_page
 from case.views.auth import (
-    CoordinatorOrBetterPermission,
-    coordinator_or_better_required,
+    AdminOrBetterPermission,
+    admin_or_better_required,
 )
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_doc_list_page_view(request):
     context = {
         "choices": {
@@ -31,7 +31,7 @@ def template_doc_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_doc_create_page_view(request):
     context = {
         "choices": {
@@ -45,7 +45,7 @@ def template_doc_create_page_view(request):
 
 
 class DocumentTemplateApiViewset(ViewSet):
-    permission_classes = [CoordinatorOrBetterPermission]
+    permission_classes = [AdminOrBetterPermission]
 
     def list(self, request):
         serializer = DocumentTemplateFilterSerializer(data=request.query_params)
