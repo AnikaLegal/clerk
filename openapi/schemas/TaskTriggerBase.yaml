@@ -9,7 +9,9 @@ properties:
   tasks_assignment_role:
     $ref: ./TaskTriggerRole.yaml
   event_stage:
-    $ref: ./IssueStage.yaml
+    allOf:
+      - $ref: ./IssueStage.yaml
+    nullable: true
   templates:
     type: array
     items:

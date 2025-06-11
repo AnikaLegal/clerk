@@ -3141,7 +3141,9 @@ components:
         tasks_assignment_role:
           $ref: "#/components/schemas/TaskTriggerRole"
         event_stage:
-          $ref: "#/components/schemas/IssueStage"
+          allOf:
+            - $ref: "#/components/schemas/IssueStage"
+          nullable: true
         templates:
           type: array
           items:

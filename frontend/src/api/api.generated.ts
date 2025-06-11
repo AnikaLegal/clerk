@@ -1562,7 +1562,7 @@ export type TaskTriggerBase = {
   topic: TaskTriggerTopic;
   event: IssueEventType;
   tasks_assignment_role: TaskTriggerRole;
-  event_stage?: IssueStage;
+  event_stage?: IssueStage | null;
   templates: TaskTemplate[];
 };
 export type TaskTrigger = TaskTriggerBase & {
