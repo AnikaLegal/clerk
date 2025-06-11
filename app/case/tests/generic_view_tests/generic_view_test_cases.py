@@ -1,18 +1,16 @@
-from typing import Callable
 from dataclasses import dataclass
-
-from factory.django import DjangoModelFactory
+from typing import Callable
 
 from accounts.models import User
 from core.factories import (
+    ClientFactory,
+    EmailTemplateFactory,
+    NotificationFactory,
     PersonFactory,
     TenancyFactory,
-    ClientFactory,
     UserFactory,
-    NotificationFactory,
-    EmailTemplateFactory,
-    IssueFactory,
 )
+from factory.django import DjangoModelFactory
 
 
 class Action:
@@ -71,15 +69,15 @@ GENERIC_API_TEST_CASES = [
     APIViewTestCase(
         factory=EmailTemplateFactory,
         base_view_name="template-email-api",
-        test_read_permission=lambda user: user.is_paralegal_or_better,
-        test_write_permissions=lambda user: user.is_coordinator_or_better,
+        test_read_permission=lambda user: user.is_admin_or_better,
+        test_write_permissions=lambda user: user.is_admin_or_better,
         actions=Action.ALL,
     ),
     APIViewTestCase(
         factory=NotificationFactory,
         base_view_name="template-notify-api",
-        test_read_permission=lambda user: user.is_coordinator_or_better,
-        test_write_permissions=lambda user: user.is_coordinator_or_better,
+        test_read_permission=lambda user: user.is_admin_or_better,
+        test_write_permissions=lambda user: user.is_admin_or_better,
         actions=Action.ALL,
     ),
 ]

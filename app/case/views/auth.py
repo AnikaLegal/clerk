@@ -141,16 +141,13 @@ class CoordinatorOrBetterCanWritePermission(permissions.IsAuthenticated):
         return self.has_permission(request, view)
 
 
-# TODO: remove?
-class LawyerOrBetterPermission(permissions.IsAuthenticated):
+class AdminOrBetterPermission(permissions.IsAuthenticated):
     """
-    Lawyer or better required.
+    Admin or better required.
     """
 
     def has_permission(self, request, view):
-        return (
-            super().has_permission(request, view) and request.user.is_lawyer_or_better
-        )
+        return super().has_permission(request, view) and request.user.is_admin_or_better
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)

@@ -32,7 +32,9 @@
                 <a href="{% url 'person-list' %}" class="item">Parties</a>
                 <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
                 <a href="{% url 'account-list' %}" class="item">Accounts</a>
+                {% if request.user.is_admin_or_better %}
                 <a href="{% url 'template-list' %}" class="item">Templates</a>
+                {% endif %}
                 {% elif request.user.is_authenticated %}
                 <a href="{% url 'case-list' %}" class="item">Cases</a>
                 <a href="{% url 'task-list' %}" class="item">Tasks</a>

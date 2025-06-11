@@ -10,9 +10,8 @@ from emails.models import EmailTemplate
 from core.models.issue import CaseTopic
 
 from case.views.auth import (
-    coordinator_or_better_required,
-    paralegal_or_better_required,
-    CoordinatorOrBetterCanWritePermission,
+    admin_or_better_required,
+    AdminOrBetterPermission,
 )
 
 topic_options = [
@@ -23,7 +22,7 @@ topic_options = [
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_email_list_page_view(request):
     templates = EmailTemplate.objects.order_by("-created_at").all()
     context = {
@@ -35,7 +34,7 @@ def template_email_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_email_create_page_view(request):
     return render_react_page(
         request,
@@ -48,7 +47,7 @@ def template_email_create_page_view(request):
 
 
 @api_view(["GET"])
-@paralegal_or_better_required
+@admin_or_better_required
 def template_email_detail_page_view(request, pk):
     try:
         template = EmailTemplate.objects.get(pk=pk)
@@ -68,7 +67,7 @@ def template_email_detail_page_view(request, pk):
 
 class EmailTemplateApiViewset(ModelViewSet):
     serializer_class = EmailTemplateSerializer
-    permission_classes = [CoordinatorOrBetterCanWritePermission]
+    permission_classes = [AdminOrBetterPermission]
 
     def get_queryset(self):
         """Filter by query params"""

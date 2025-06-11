@@ -7,13 +7,13 @@ def _change_wagtail_default_locale(apps, schema_editor):
     try:
         Locale = apps.get_model("wagtailcore", "Locale")
         Locale.objects.filter(language_code="en").update(language_code="en-au")
-    except(Exception):
+    except Exception:
         pass
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0077_alter_issueevent_event_type"),
+        ("core", "0078_alter_issueevent_event_type"),
     ]
 
     operations = [

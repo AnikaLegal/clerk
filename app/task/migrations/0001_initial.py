@@ -9,12 +9,11 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("core", "0077_alter_issueevent_event_type"),
+        ("core", "0078_alter_issueevent_event_type"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
