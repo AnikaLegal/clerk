@@ -854,30 +854,15 @@ export type User = UserCreate & {
   is_ms_account_set_up: boolean;
   ms_account_created_at: string | null;
 };
+export type ClientBase = {
+  first_name: string;
+  last_name: string;
+  email: string;
+};
 export type TextChoiceField = {
   display: string;
   value: string;
   choices: string[][];
-};
-export type ClientBase = {
-  first_name: string;
-  last_name: string;
-  preferred_name: string | null;
-  email: string;
-  phone_number: string;
-  gender: string | null;
-  pronouns: string | null;
-  centrelink_support: boolean;
-  eligibility_notes: string;
-  requires_interpreter?: TextChoiceField;
-  primary_language_non_english: boolean;
-  primary_language: string;
-  is_aboriginal_or_torres_strait_islander: TextChoiceField;
-  number_of_dependents: number | null;
-  notes: string;
-  date_of_birth: string | null;
-  contact_restriction?: TextChoiceField;
-  contact_notes?: string;
 };
 export type TextChoiceListField = {
   display: string;
@@ -886,9 +871,24 @@ export type TextChoiceListField = {
 };
 export type Client = ClientBase & {
   id: string;
+  date_of_birth: string | null;
+  preferred_name: string | null;
+  phone_number: string;
+  gender: string | null;
+  pronouns: string | null;
+  centrelink_support: boolean;
+  eligibility_notes: string;
+  primary_language_non_english: boolean;
+  primary_language: string;
+  number_of_dependents: number | null;
+  notes: string;
   url: string;
   age: number | null;
   full_name: string;
+  contact_notes?: string;
+  contact_restriction: TextChoiceField;
+  requires_interpreter: TextChoiceField;
+  is_aboriginal_or_torres_strait_islander: TextChoiceField;
   call_times: TextChoiceListField;
   eligibility_circumstances: TextChoiceListField;
 };
@@ -1078,8 +1078,25 @@ export type TenancyCreate = TenancyBase & {
   agent_id?: number | null;
 };
 export type ClientCreate = ClientBase & {
+  date_of_birth: string | null;
+  preferred_name: string | null;
+  phone_number: string;
+  gender: string | null;
+  pronouns: string | null;
+  centrelink_support: boolean;
+  eligibility_notes: string;
+  primary_language_non_english: boolean;
+  primary_language: string;
+  number_of_dependents: number | null;
+  notes: string;
+  url: string;
+  age: number | null;
+  full_name: string;
+  contact_notes?: string;
+  contact_restriction: string;
+  requires_interpreter: string;
+  is_aboriginal_or_torres_strait_islander: string;
   call_times: string[];
-  employment_status: string[];
   eligibility_circumstances: string[];
 };
 export type MicrosoftUserPermissions = {
