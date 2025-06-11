@@ -8,7 +8,7 @@ from case.utils.react import render_react_page
 from core.models.issue import CaseTopic
 from microsoft.service import list_templates, upload_template, delete_template
 from case.serializers import DocumentTemplateSerializer
-from case.views.auth import coordinator_or_better_required
+from case.views.auth import admin_or_better_required
 
 
 topic_options = [
@@ -17,7 +17,7 @@ topic_options = [
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_doc_list_page_view(request):
     context = {
         "topic_options": topic_options,
@@ -30,7 +30,7 @@ def template_doc_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_doc_create_page_view(request):
     context = {"topic_options": topic_options, "list_url": reverse("template-doc-list")}
     return render_react_page(
@@ -40,7 +40,7 @@ def template_doc_create_page_view(request):
 
 class DocumentTemplateApiViewset(ViewSet):
     def list(self, request):
-        if not request.user.is_coordinator_or_better:
+        if not request.user.is_admin_or_better:
             raise PermissionDenied
 
         topic = request.query_params.get("topic", CaseTopic.REPAIRS)
@@ -56,7 +56,7 @@ class DocumentTemplateApiViewset(ViewSet):
         """
         Note: requires muiltipart upload.
         """
-        if not request.user.is_coordinator_or_better:
+        if not request.user.is_admin_or_better:
             raise PermissionDenied
 
         serializer = DocumentTemplateSerializer(data=request.data)
@@ -69,7 +69,7 @@ class DocumentTemplateApiViewset(ViewSet):
         return Response(status=201)
 
     def destroy(self, request, pk=None):
-        if not request.user.is_coordinator_or_better:
+        if not request.user.is_admin_or_better:
             raise PermissionDenied
 
         if pk is not None:

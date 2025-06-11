@@ -9,8 +9,8 @@ from core.models.issue import CaseTopic
 from notify.models import Notification
 
 from case.views.auth import (
-    coordinator_or_better_required,
-    CoordinatorOrBetterPermission,
+    admin_or_better_required,
+    AdminOrBetterPermission,
 )
 
 
@@ -22,7 +22,7 @@ topic_options = [
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_notify_list_page_view(request):
     notifications = Notification.objects.order_by("-created_at").all()
     context = {
@@ -36,7 +36,7 @@ def template_notify_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_notify_create_page_view(request):
     return render_react_page(
         request,
@@ -49,7 +49,7 @@ def template_notify_create_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_notify_detail_page_view(request, pk):
     try:
         template = Notification.objects.get(pk=pk)
@@ -68,7 +68,7 @@ def template_notify_detail_page_view(request, pk):
 
 class NotifyTemplateApiViewset(ModelViewSet):
     serializer_class = NotificationSerializer
-    permission_classes = [CoordinatorOrBetterPermission]
+    permission_classes = [AdminOrBetterPermission]
 
     def get_queryset(self):
         """Filter by query params"""
