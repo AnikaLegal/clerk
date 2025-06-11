@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 from rest_framework.test import APIClient
 from rest_framework.reverse import reverse
@@ -111,7 +109,6 @@ def test_client_list_view__as_coordinator(
 
 @pytest.mark.django_db
 def test_client_list_view__search(superuser_client: APIClient):
-
     client_a = ClientFactory(first_name="John", last_name="Smith")
     client_b = ClientFactory(first_name="Jane", last_name="Smith")
     url = reverse("client-api-list")
