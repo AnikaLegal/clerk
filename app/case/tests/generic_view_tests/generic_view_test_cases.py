@@ -10,6 +10,7 @@ from core.factories import (
     TenancyFactory,
     UserFactory,
 )
+from task.factories import TaskTriggerFactory
 from factory.django import DjangoModelFactory
 
 
@@ -76,6 +77,13 @@ GENERIC_API_TEST_CASES = [
     APIViewTestCase(
         factory=NotificationFactory,
         base_view_name="template-notify-api",
+        test_read_permission=lambda user: user.is_admin_or_better,
+        test_write_permissions=lambda user: user.is_admin_or_better,
+        actions=Action.ALL,
+    ),
+    APIViewTestCase(
+        factory=TaskTriggerFactory,
+        base_view_name="template-task-api",
         test_read_permission=lambda user: user.is_admin_or_better,
         test_write_permissions=lambda user: user.is_admin_or_better,
         actions=Action.ALL,

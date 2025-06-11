@@ -7,13 +7,13 @@ from task.serializers import TaskTriggerSerializer
 
 from case.utils.react import render_react_page
 from case.views.auth import (
-    CoordinatorOrBetterPermission,
-    coordinator_or_better_required,
+    AdminOrBetterPermission,
+    admin_or_better_required,
 )
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_task_list_page_view(request):
     context = {
         "create_url": reverse("template-task-create"),
@@ -22,13 +22,13 @@ def template_task_list_page_view(request):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_task_create_page_view(request):
     return render_react_page(request, "Task Templates", "task-template-create", {})
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def template_task_detail_page_view(request, pk):
     try:
         TaskTrigger.objects.get(pk=pk)
@@ -44,7 +44,7 @@ def template_task_detail_page_view(request, pk):
 
 class TaskTemplateApiViewset(ModelViewSet):
     serializer_class = TaskTriggerSerializer
-    permission_classes = [CoordinatorOrBetterPermission]
+    permission_classes = [AdminOrBetterPermission]
 
     def get_queryset(self):
         queryset = TaskTrigger.objects.order_by("-created_at").all()
