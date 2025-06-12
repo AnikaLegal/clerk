@@ -128,7 +128,7 @@ def test_case_list_view__search(superuser_client: APIClient):
     response = superuser_client.get(url, {"search": "qwsqwsqwsqws"})
     assert response.status_code == 200
     resp_data = response.json()
-    resp_data["item_count"] == 0
+    assert resp_data["item_count"] == 0
     results = resp_data["results"]
     assert len(results) == 0
 
@@ -136,7 +136,7 @@ def test_case_list_view__search(superuser_client: APIClient):
     response = superuser_client.get(url, {"search": "A12345"})
     assert response.status_code == 200
     resp_data = response.json()
-    resp_data["item_count"] == 1
+    assert resp_data["item_count"] == 1
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
