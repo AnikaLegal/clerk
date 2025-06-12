@@ -905,7 +905,7 @@ export type IssueNote = IssueNoteBase & {
 };
 export type Error = {
   detail?: string | object | (string | object | any)[];
-  nonFieldErrors?: string[];
+  non_field_errors?: string[];
 };
 export type IssueUpdate = IssueBase & {
   paralegal_id: User;
