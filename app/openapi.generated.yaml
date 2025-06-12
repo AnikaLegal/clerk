@@ -2239,7 +2239,7 @@ components:
                   - type: string
                   - type: object
                   - type: array
-        nonFieldErrors:
+        non_field_errors:
           type: array
           items:
             type: string

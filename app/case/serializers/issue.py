@@ -119,6 +119,7 @@ class IssueSerializer(serializers.ModelSerializer):
                 issue_id=self.instance.id,
                 category=ServiceCategory.ONGOING,
                 finished_at__isnull=True,
+                is_deleted=False,
             )
             if Service.objects.filter(query).exists():
                 raise serializers.ValidationError(

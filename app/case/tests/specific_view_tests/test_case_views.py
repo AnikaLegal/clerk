@@ -1,15 +1,16 @@
 from unittest.mock import patch
 
 import pytest
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
-
 from accounts.models import User
 from case.middleware import annotate_group_access
-from core import factories
-from core.models.issue import CaseStage
-from core.models import IssueNote
 from conftest import schema_tester
+from core import factories
+from core.models import Issue, IssueNote
+from core.models.issue import CaseStage
+from core.models.service import ServiceCategory
+from django.utils import timezone
+from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -127,7 +128,7 @@ def test_case_list_view__search(superuser_client: APIClient):
     response = superuser_client.get(url, {"search": "qwsqwsqwsqws"})
     assert response.status_code == 200
     resp_data = response.json()
-    resp_data["item_count"] == 0
+    assert resp_data["item_count"] == 0
     results = resp_data["results"]
     assert len(results) == 0
 
@@ -135,7 +136,7 @@ def test_case_list_view__search(superuser_client: APIClient):
     response = superuser_client.get(url, {"search": "A12345"})
     assert response.status_code == 200
     resp_data = response.json()
-    resp_data["item_count"] == 1
+    assert resp_data["item_count"] == 1
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
@@ -282,3 +283,78 @@ def test_case_get_documents_view(
     response = superuser_client.get(url)
     mock_get_case_folder_info.assert_called_once_with(issue)
     schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_case_update_view__prevented_from_closing_case_with_unfinished_ongoing_service(
+    superuser_client: APIClient,
+):
+    service = factories.ServiceFactory(
+        issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
+        category=ServiceCategory.ONGOING,
+        finished_at=None,
+    )
+
+    url = reverse("case-api-detail", args=(service.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+
+    assert response.status_code == 400
+    schema_tester.validate_response(response=response)
+
+    assert Issue.objects.count() == 1
+    assert Issue.objects.last().stage == CaseStage.UNSTARTED
+
+
+@pytest.mark.django_db
+def test_case_update_view__allowed_to_close_case_with_finished_ongoing_service(
+    superuser_client: APIClient,
+):
+    service = factories.ServiceFactory(
+        issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
+        category=ServiceCategory.ONGOING,
+        finished_at=timezone.now(),
+    )
+
+    url = reverse("case-api-detail", args=(service.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+
+    assert response.status_code == 200
+    schema_tester.validate_response(response=response)
+
+    assert Issue.objects.count() == 1
+    assert Issue.objects.last().stage == CaseStage.CLOSED
+
+
+@pytest.mark.django_db
+def test_case_update_view__allowed_to_close_case_with_deleted_unfinished_ongoing_service(
+    superuser_client: APIClient,
+):
+    """
+    Normally we probably wouldn't bother to test this but services are
+    soft-deleted (still present in the db but marked as deleted) so it seems
+    prudent to test.
+    """
+    service = factories.ServiceFactory(
+        issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
+        category=ServiceCategory.ONGOING,
+        finished_at=None,
+    )
+
+    # Make sure that we CANNOT close the case with an unfinished service.
+    url = reverse("case-api-detail", args=(service.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+    assert response.status_code == 400
+
+    # Now delete the service and try again.
+    response = superuser_client.delete(
+        reverse("case-api-service-detail", args=(service.issue.pk, service.pk))
+    )
+    assert response.status_code == 204
+
+    # Make sure that we can now close the case.
+    url = reverse("case-api-detail", args=(service.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+    assert response.status_code == 200
+
+    assert Issue.objects.count() == 1
+    assert Issue.objects.last().stage == CaseStage.CLOSED
