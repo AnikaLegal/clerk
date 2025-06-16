@@ -78,7 +78,7 @@ class Command(BaseCommand):
             if i.outcome_notes:
                 i.outcome_notes = " ".join(fake.sentences())
 
-            # Redact the answers to issue-specific intake form answers.
+            # Redact the answers to issue-specific intake form questions.
             redacted_text = "[REDACTED]"
             redacted_answers = {}
             for key, value in i.answers.items():
