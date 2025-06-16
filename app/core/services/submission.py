@@ -67,11 +67,14 @@ def process_submission(sub_pk: str):
 def process_issue(answers, client, tenancy):
     topic = answers["ISSUES"]
     upload_answers = UPLOAD_ANSWERS[topic]
-    issue_answers = {
-        k: v
-        for k, v in answers.items()
-        if k.startswith(topic) and k not in upload_answers
-    }
+
+    issue_specific_answers = {}
+    for key, value in answers.items():
+        prefix = f"{topic}_"
+        if key.startswith(prefix) and key not in upload_answers:
+            key = key.removeprefix(prefix)
+            issue_specific_answers[key] = value
+
     issue_upload_ids = []
     for k in upload_answers:
         issue_upload_ids += [f["id"] for f in (answers.get(k) or [])]
@@ -97,7 +100,7 @@ def process_issue(answers, client, tenancy):
 
     issue = Issue.objects.create(
         topic=topic,
-        answers=issue_answers,
+        answers=issue_specific_answers,
         support_worker=support_worker,
         # Client data
         client=client,
