@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0082_add_db_collation_natural"),
+        ("core", "0084_remove_issue_answer_prefix"),
     ]
 
     operations = [

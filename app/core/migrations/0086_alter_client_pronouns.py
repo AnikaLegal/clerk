@@ -4,9 +4,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("core", "0083_alter_issue_answers"),
+        ("core", "0085_alter_issue_answers"),
     ]
 
     operations = [
