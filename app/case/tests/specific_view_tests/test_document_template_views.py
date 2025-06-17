@@ -50,8 +50,8 @@ def test_document_template_list_api_view(superuser_client: APIClient):
     assert json[0]["id"] == template.id
     assert json[0]["name"] == template.name
     assert json[0]["url"] == url
-    assert json[0]["created_at"] == now.strftime("%d/%m/%Y")
-    assert json[0]["modified_at"] == now.strftime("%d/%m/%Y")
+    assert json[0]["created_at"] == timezone.localtime(now).strftime("%d/%m/%Y")
+    assert json[0]["modified_at"] == timezone.localtime(now).strftime("%d/%m/%Y")
     assert json[0]["topic"] == template.topic
 
     schema_tester.validate_response(response=response)

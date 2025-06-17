@@ -562,10 +562,9 @@ const getSubmittedDetails = (
 ): { [key: string]: string } =>
   Object.entries(answers).reduce((obj, [k, v]) => {
     if (!v) return obj
-    // Chop off first part of title
-    const title = correctCase(k.split('_').slice(1).join('_'))
+    const title = correctCase(k)
     // Handle answers that are lists of answers
-    const answer = (Array.isArray(v) ? v : [v]).map(correctCase).join(', ')
+    const answer = (Array.isArray(v) ? v : [v]).join(', ')
     return { ...obj, [title]: answer }
   }, {})
 

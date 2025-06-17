@@ -951,7 +951,7 @@ export type Issue = IssueBase & {
 };
 export type Error = {
   detail?: string | object | (string | object | any)[];
-  nonFieldErrors?: string[];
+  non_field_errors?: string[];
 };
 export type IssueCreate = IssueBase & {
   stage?: string;
