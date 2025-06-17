@@ -32,6 +32,7 @@ interface DjangoContext {
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
 
 export const CreateCaseSchema: Yup.ObjectSchema<RequiredProps<IssueCreate>> =
   Yup.object({
@@ -92,7 +93,7 @@ const App = () => {
             placeholder="Select case topic"
             size="md"
             mt="md"
-            data={CONTEXT.choices.topic.map(([value, label]) => ({
+            data={Topics.map(([value, label]) => ({
               value,
               label,
             }))}
