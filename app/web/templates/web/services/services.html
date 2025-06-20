@@ -1,82 +1,77 @@
-{% extends "web/_base.html" %} 
+{% extends 'web/_base.html' %}
 {% load static %}
-{% block title %}Services{% endblock %} 
+{% block title %}
+  Services
+{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="What can Anika help with?" description="Anika provides free legal advice and ongoing casework to vulnerable renters who need repairs performed in their rental or need assistance in getting their bond returned." %}            
+  {% include 'web/snippets/_social_meta.html' with title='What can Anika help with?' description='Anika provides free legal advice and ongoing casework to vulnerable renters who need repairs performed in their rental or need assistance in getting their bond returned.' %}
 {% endblock %}
 {% block content %}
-<div class="segment">
+  <div class="segment">
     <div class="container wide">
-        <div class="story left">
-            <div class="content">
-                <h1>What can Anika help with?</h1>
-                <p>
-		    Anika provides free legal advice and ongoing casework to vulnerable renters who need <strong>repairs</strong> performed in their rental or need assistance in getting their <strong>bond</strong> returned.
-                </p>
-                <a href="https://intake.anikalegal.com/">
-                    <button>Get free help</button>
-                </a>
-            </div>
-            <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/services-hero.jpg' %}">
+      <div class="story left">
+        <div class="content">
+          <h1>What can Anika help with?</h1>
+          <p>
+            Anika provides free legal advice and ongoing casework to vulnerable renters who need <strong>repairs</strong> performed in their rental or need assistance in getting their <strong>bond</strong> returned.
+          </p>
+          <a href="https://intake.anikalegal.com/"><button>Get free help</button></a>
         </div>
+        <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/services-hero.jpg' %}" />
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="segment gold round-large top-right bottom-left">
+  <div class="segment gold round-large top-right bottom-left">
     <div class="container wide">
-        <h2 style="z-index: 1">
-            What type of cases can<br class="mobile-break"> we take?
-        </h2>
-        <div class="divider"></div>
-        <div class="link-list two">
-            <div class="card short">
-                <img class="icon" src="{% static 'web/img/icons/wrench.svg' %}">
-                <h2>Repairs</h2>
-                <p>
-                    We can help Victorian renters who require urgent or non-urgent repairs in their rental property.
-                </p>
-                <a href="{% url 'repairs' %}">
-                    <button>Learn more</button>
-                </a>
-            </div>
-            <div class="card short">
-                <img class="icon" src="{% static 'web/img/icons/cash.svg' %}">
-                <h2>Bond recovery</h2>
-                <p>
-                    We can help Victorian renters negotiate the bond amount that is returned at the end of their tenancy.
-                </p>
-                <a href="{% url 'bonds' %}">
-                    <button>Learn more</button>
-                </a>
-            </div>
+      <h2 style="z-index: 1">What type of cases can<br class="mobile-break" /> we take?</h2>
+      <div class="divider"></div>
+      <div class="link-list two">
+        <div class="card short">
+          <img class="icon" src="{% static 'web/img/icons/wrench.svg' %}" />
+          <h2>Repairs</h2>
+          <p>We can help Victorian renters who require urgent or non-urgent repairs in their rental property.</p>
+          <a href="{% url 'repairs' %}"><button>Learn more</button></a>
         </div>
-
+        <div class="card short">
+          <img class="icon" src="{% static 'web/img/icons/cash.svg' %}" />
+          <h2>Bond recovery</h2>
+          <p>We can help Victorian renters negotiate the bond amount that is returned at the end of their tenancy.</p>
+          <a href="{% url 'bonds' %}"><button>Learn more</button></a>
+        </div>
+        <div class="card">
+          <img class="icon" src="{% static 'web/img/icons/document.svg' %}" />
+          <h2>Eviction for rental arrears</h2>
+          <p>We can help Victorian renters who have received a notice to vacate for rental arrears, and a possession order has not yet been granted.</p>
+          <a href="{% url 'evictions' %}"><button>Learn more</button></a>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="segment" style="padding-bottom: 0;">
+  <div class="segment" style="padding-bottom: 0;">
     <div class="container">
-        <h2>What will we do?</h2>
-        <div class="divider"></div>
-        <div class="card-grid three">
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
-                <p class="header">1. Legal advice</p>
-                <p class="compact">We’ll provide legal advice outlining our client’s rights and options</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/casework.jpg' %}">
-                <p class="header">2. Casework</p>
-                <p class="compact">We’ll communicate with their landlord on our client’s behalf, and apply for VCAT if necessary</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/vcat.jpg' %}">
-                <p class="header">3. VCAT preparation</p>
-                <p class="compact">We’ll work with our client to prepare them to self-represent at VCAT</p>
-            </div>
+      <h2>What will we do?</h2>
+      <div class="divider"></div>
+      <div class="card-grid three">
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+          <p class="header">1. Legal advice</p>
+          <p class="compact">We’ll provide legal advice outlining our client’s rights and options</p>
         </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/casework.jpg' %}" />
+          <p class="header">2. Casework</p>
+          <p class="compact">We’ll communicate with their landlord on our client’s behalf, and apply for VCAT if necessary</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/vcat.jpg' %}" />
+          <p class="header">3. VCAT preparation</p>
+          <p class="compact">We’ll work with our client to prepare them to self-represent at VCAT</p>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
+  {% include 'web/snippets/_footer_cta.html' with cta='Ready to solve your rental problems?' %}
 {% endblock %}

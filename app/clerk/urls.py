@@ -73,6 +73,11 @@ urlpatterns = [
         name="bonds",
     ),
     path(
+        "services/eviction-support/",
+        template("web/services/evictions.html"),
+        name="evictions",
+    ),
+    path(
         "services/refer-someone/",
         template("web/services/refer-someone.html"),
         name="refer",

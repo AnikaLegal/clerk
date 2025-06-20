@@ -2,6 +2,7 @@
 Smoke tests for URLS
 TODO: Test News URLs
 """
+
 import pytest
 from datetime import date
 from django.urls import reverse
@@ -26,6 +27,7 @@ URLS_TO_TEST_BY_NAME = [
     ("services", 200),
     ("repairs", 200),
     ("bonds", 200),
+    ("evictions", 200),
     ("refer", 200),
     ("landing", 200),
     ("philanthropy-partners", 200),
