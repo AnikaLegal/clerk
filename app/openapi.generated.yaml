@@ -2156,26 +2156,6 @@ components:
               type: array
               items:
                 type: string
-          required:
-            - date_of_birth
-            - preferred_name
-            - phone_number
-            - gender
-            - pronouns
-            - centrelink_support
-            - eligibility_notes
-            - primary_language_non_english
-            - primary_language
-            - number_of_dependents
-            - notes
-            - url
-            - age
-            - full_name
-            - contact_restriction
-            - requires_interpreter
-            - is_aboriginal_or_torres_strait_islander
-            - call_times
-            - eligibility_circumstances
     MicrosoftUserPermissions:
       type: object
       properties:
