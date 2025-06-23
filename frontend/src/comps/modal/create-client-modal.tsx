@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form'
 import api, { Client, ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React from 'react'
-import { RequiredProps } from 'utils'
+import { getAPIFormErrors, RequiredProps } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
@@ -48,14 +48,18 @@ const CreateClientModal = (props: CreateClientModalProps) => {
     event: React.FormEvent<HTMLFormElement> | undefined
   ) => {
     event?.stopPropagation()
-    form.setSubmitting(true)
 
+    form.setSubmitting(true)
     createClient({ clientCreate: values })
       .unwrap()
       .then((instance) => {
         props.onSuccess(form, instance)
       })
       .catch((e) => {
+        const errors = getAPIFormErrors(e)
+        if (errors) {
+          form.setErrors(errors)
+        }
         props.onFailure(form, e)
       })
       .finally(() => {
