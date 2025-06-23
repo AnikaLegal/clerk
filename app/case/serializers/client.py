@@ -1,14 +1,15 @@
-from rest_framework import serializers
-from django.urls import reverse
-
 from core.models import Client
 from core.models.client import (
-    CallTime,
-    EligibilityCircumstanceType,
     AboriginalOrTorresStraitIslander,
-    RequiresInterpreter,
+    CallTime,
     ContactRestriction,
+    EligibilityCircumstanceType,
+    RequiresInterpreter,
 )
+from django.urls import reverse
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 from .fields import TextChoiceField, TextChoiceListField
 
 
@@ -47,6 +48,9 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.CharField(read_only=True)
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=Client.objects.all())], required=True
+    )
     date_of_birth = serializers.DateTimeField(
         format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False
     )
