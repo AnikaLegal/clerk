@@ -153,6 +153,7 @@ const ClientSelectField = (props: SelectProps) => {
         onFailure={onCreateFailed}
       />
       <ClientSelectInput
+        {...props}
         label={
           <Group wrap="nowrap" gap="sm" justify="space-between">
             <span>Client</span>
@@ -163,7 +164,6 @@ const ClientSelectField = (props: SelectProps) => {
         }
         labelProps={{ labelElement: 'div' }}
         styles={{ label: { width: '100%' } }}
-        {...props}
       />
     </>
   )
@@ -173,7 +173,6 @@ const TenancySelectField = (props: SelectProps) => {
   const form = useCaseFormContext()
   const [options, setOptions] = useState<ComboboxItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [page, setPage] = useState(1)
   const [getCases] = api.useLazyGetCasesQuery()
 
   const getAddress = (tenancy: Tenancy) => {
@@ -190,6 +189,7 @@ const TenancySelectField = (props: SelectProps) => {
     return address.join(', ')
   }
 
+  /* Load the clients tenancies when the client id changes */
   form.watch('client_id', (clientId) => {
     if (clientId.value !== clientId.previousValue) {
       setOptions([])
@@ -200,7 +200,7 @@ const TenancySelectField = (props: SelectProps) => {
         return
       }
       setIsLoading(true)
-      getCases({ client: clientId.value, page: page })
+      getCases({ client: clientId.value, pageSize: -1 })
         .unwrap()
         .then((response) => {
           const tenancies = response.results.map((issue) => issue.tenancy)
@@ -213,20 +213,17 @@ const TenancySelectField = (props: SelectProps) => {
             value: tenancy.id.toString(),
             label: getAddress(tenancy),
           }))
-          setOptions((prevOptions) => [...prevOptions, ...options])
+          setOptions(options)
 
-          if (response.next) {
-            setPage(response.next)
-          } else {
-            if (options.length == 1) {
-              form.setValues({ tenancy_id: Number(options[0].value) })
-            }
-            setIsLoading(false)
+          if (options.length == 1) {
+            form.setValues({ tenancy_id: Number(options[0].value) })
           }
         })
         .catch(() => {
-          setIsLoading(false)
           enqueueSnackbar('Failed to load tenancies', { variant: 'error' })
+        })
+        .finally(() => {
+          setIsLoading(false)
         })
     }
   })
@@ -244,7 +241,6 @@ const TenancySelectField = (props: SelectProps) => {
       disabled={isLoading}
       rightSection={isLoading && <Loader size="sm" />}
       value={form.getValues().tenancy_id?.toString() || null}
-      withCheckIcon={false}
       label={
         <Group wrap="nowrap" gap="sm" justify="space-between">
           <span>Tenancy</span>
@@ -255,6 +251,7 @@ const TenancySelectField = (props: SelectProps) => {
       }
       labelProps={{ labelElement: 'div' }}
       styles={{ label: { width: '100%', marginBottom: '0' } }}
+      withCheckIcon={false}
     />
   )
 }
