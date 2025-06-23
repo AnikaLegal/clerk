@@ -50,8 +50,6 @@ def client_detail_page_view(request, pk):
 
 class ClientPaginator(ClerkPaginator):
     page_size = 20
-    max_page_size = 200
-    page_size_query_param = "page_size"
 
 
 class ClientApiViewset(
