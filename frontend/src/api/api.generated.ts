@@ -6,6 +6,7 @@ const injectedRtkApi = api.injectEndpoints({
         url: `/clerk/api/case/`,
         params: {
           page: queryArg.page,
+          page_size: queryArg.pageSize,
           search: queryArg.search,
           topic: queryArg.topic,
           stage: queryArg.stage,
@@ -449,6 +450,7 @@ export type GetCasesApiResponse = /** status 200 Successful response. */ {
 };
 export type GetCasesApiArg = {
   page?: number;
+  pageSize?: number;
   search?: string;
   topic?: string;
   stage?: string;

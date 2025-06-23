@@ -13,6 +13,11 @@ paths:
           schema:
             type: integer
           required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
         - name: search
           in: query
           schema:
