@@ -206,7 +206,7 @@ ADVISORS = [
     {
         "image": "web/img/photos/advisors/madeleine-dupuche.png",
         "name": "Madeleine Dupuche",
-        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
+        "title": "Law School Work Integrated Learning Director at La Trobe University",
         "brags": [
             """Madeleine is an experienced strategy and education leader whose
             purpose and career have centred on supporting the creation of a
