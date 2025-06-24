@@ -24,13 +24,22 @@ class TenancySerializer(serializers.ModelSerializer):
             "url",
         )
 
+    suburb = serializers.CharField(required=True)
+    postcode = serializers.CharField(required=True)
+
     landlord = PersonSerializer(read_only=True)
-    landlord_id = serializers.IntegerField(write_only=True, allow_null=True, required=False)
+    landlord_id = serializers.IntegerField(
+        write_only=True, allow_null=True, required=False
+    )
     agent = PersonSerializer(read_only=True)
-    agent_id = serializers.IntegerField(write_only=True, allow_null=True, required=False)
-    is_on_lease = TextChoiceField(LeaseType)
-    rental_circumstances = TextChoiceField(RentalType)
-    started = serializers.DateTimeField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    agent_id = serializers.IntegerField(
+        write_only=True, allow_null=True, required=False
+    )
+    is_on_lease = TextChoiceField(LeaseType, required=False)
+    rental_circumstances = TextChoiceField(RentalType, required=False)
+    started = serializers.DateTimeField(
+        format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False
+    )
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
