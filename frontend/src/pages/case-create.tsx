@@ -12,7 +12,7 @@ import { createFormContext } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
 import { TextButton } from 'comps/button'
-import { CreateClientModal } from 'comps/modal'
+import { CreateClientModal, CreateTenancyModal } from 'comps/modal'
 import { ClientSelectInput } from 'forms/mantine/input'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
@@ -172,8 +172,10 @@ const ClientSelectField = (props: SelectProps) => {
 const TenancySelectField = (props: SelectProps) => {
   const form = useCaseFormContext()
   const [options, setOptions] = useState<ComboboxItem[]>([])
+  const [createdOptions, setCreatedOptions] = useState<ComboboxItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [getCases] = api.useLazyGetCasesQuery()
+  const [opened, handlers] = useDisclosure(false)
 
   const getAddress = (tenancy: Tenancy) => {
     const address: string[] = []
@@ -228,30 +230,59 @@ const TenancySelectField = (props: SelectProps) => {
     }
   })
 
+  const onCreateSuccess = (modalForm, tenancy) => {
+    /* Reset & close the modal */
+    modalForm.reset()
+    handlers.close()
+
+    const option = {
+      value: tenancy.id.toString(),
+      label: getAddress(tenancy),
+    }
+    setCreatedOptions((prev) => [...prev, option])
+    form.setValues({ tenancy_id: tenancy.id })
+
+    enqueueSnackbar('Tenancy created', { variant: 'success' })
+  }
+
+  const onCreateFailed = (modalForm, exception) => {
+    enqueueSnackbar(getAPIErrorMessage(exception, 'Failed to create tenancy'), {
+      variant: 'error',
+    })
+  }
+
   return (
-    <Select
-      {...props}
-      placeholder={
-        !form.getValues().client_id
-          ? 'Select a client first'
-          : 'Select an existing tenancy'
-      }
-      nothingFoundMessage="No tenancies found"
-      data={options}
-      disabled={isLoading}
-      rightSection={isLoading && <Loader size="sm" />}
-      value={form.getValues().tenancy_id?.toString() || null}
-      label={
-        <Group wrap="nowrap" gap="sm" justify="space-between">
-          <span>Tenancy</span>
-          <Button variant="transparent" size="compact-lg" fw="normal">
-            create
-          </Button>
-        </Group>
-      }
-      labelProps={{ labelElement: 'div' }}
-      styles={{ label: { width: '100%', marginBottom: '0' } }}
-      withCheckIcon={false}
-    />
+    <>
+      <CreateTenancyModal
+        opened={opened}
+        onClose={handlers.close}
+        onSuccess={onCreateSuccess}
+        onFailure={onCreateFailed}
+      />
+      <Select
+        {...props}
+        placeholder={
+          !form.getValues().client_id
+            ? 'Select a client first'
+            : 'Select an existing tenancy'
+        }
+        nothingFoundMessage="No tenancies found"
+        data={[...options, ...createdOptions]}
+        disabled={isLoading}
+        rightSection={isLoading && <Loader size="sm" />}
+        value={form.getValues().tenancy_id?.toString() || null}
+        label={
+          <Group wrap="nowrap" gap="sm" justify="space-between">
+            <span>Tenancy</span>
+            <TextButton onClick={handlers.open} aria-label="Create tenancy">
+              create
+            </TextButton>
+          </Group>
+        }
+        labelProps={{ labelElement: 'div' }}
+        styles={{ label: { width: '100%' } }}
+        withCheckIcon={false}
+      />
+    </>
   )
 }
