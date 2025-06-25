@@ -11,7 +11,7 @@ import {
 import { useForm } from '@mantine/form'
 import { modals } from '@mantine/modals'
 import { EmailTemplateCreate } from 'api'
-import MarkdownInfoIconWithPopover from 'comps/markdown-info-icon'
+import MarkdownInfoIconHoverCard from 'comps/markdown-info-icon-hover-card'
 import { RichTextDisplay } from 'comps/rich-text'
 import React, { ChangeEvent, MouseEvent } from 'react'
 import { markdownToHtml } from 'utils'
@@ -93,8 +93,8 @@ export const EmailTemplateForm = ({
       <Grid mt="md">
         <Grid.Col span={6} pb={0}>
           <Group justify="space-between">
-            <span className="mantine-InputWrapper-label">Email body</span>
-            <MarkdownInfoIconWithPopover width={300} shadow="md" />
+            <Text fw={700}>Email body</Text>
+            <MarkdownInfoIconHoverCard position="top" shadow="md" />
           </Group>
         </Grid.Col>
         <Grid.Col span={6} pb={0}>
