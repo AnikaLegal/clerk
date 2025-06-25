@@ -1567,14 +1567,10 @@ components:
         postcode:
           type: string
           nullable: true
-        started:
-          type: string
-          nullable: true
       required:
         - address
         - suburb
         - postcode
-        - started
     PersonBase:
       type: object
       properties:
@@ -1613,6 +1609,9 @@ components:
           properties:
             id:
               type: integer
+            started:
+              type: string
+              nullable: true
             url:
               type: string
             is_on_lease:
@@ -1620,11 +1619,16 @@ components:
             rental_circumstances:
               $ref: "#/components/schemas/TextChoiceField"
             landlord:
-              $ref: "#/components/schemas/Person"
+              allOf:
+                - $ref: "#/components/schemas/Person"
+              nullable: true
             agent:
-              $ref: "#/components/schemas/Person"
+              allOf:
+                - $ref: "#/components/schemas/Person"
+              nullable: true
           required:
             - id
+            - started
             - url
             - is_on_lease
             - rental_circumstances
@@ -2093,6 +2097,9 @@ components:
         - $ref: "#/components/schemas/TenancyBase"
         - type: object
           properties:
+            started:
+              type: string
+              nullable: true
             is_on_lease:
               type: string
             rental_circumstances:
@@ -2103,9 +2110,6 @@ components:
             agent_id:
               type: number
               nullable: true
-          required:
-            - is_on_lease
-            - rental_circumstances
     ClientCreate:
       allOf:
         - $ref: "#/components/schemas/ClientBase"

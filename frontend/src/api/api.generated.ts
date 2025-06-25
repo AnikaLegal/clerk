@@ -898,7 +898,6 @@ export type TenancyBase = {
   address: string;
   suburb: string | null;
   postcode: string | null;
-  started: string | null;
 };
 export type PersonBase = {
   full_name: string;
@@ -913,11 +912,12 @@ export type Person = PersonBase & {
 };
 export type Tenancy = TenancyBase & {
   id: number;
+  started: string | null;
   url: string;
   is_on_lease: TextChoiceField;
   rental_circumstances: TextChoiceField;
-  landlord: Person;
-  agent: Person;
+  landlord: Person | null;
+  agent: Person | null;
 };
 export type Issue = IssueBase & {
   id: string;
@@ -1074,8 +1074,9 @@ export type PersonCreate = PersonBase & {
   support_contact_preferences: string;
 };
 export type TenancyCreate = TenancyBase & {
-  is_on_lease: string;
-  rental_circumstances: string;
+  started?: string | null;
+  is_on_lease?: string;
+  rental_circumstances?: string;
   landlord_id?: number | null;
   agent_id?: number | null;
 };

@@ -4,6 +4,9 @@ allOf:
     properties:
       id:
         type: integer
+      started:
+        type: string
+        nullable: true
       url:
         type: string
       is_on_lease:
@@ -11,11 +14,16 @@ allOf:
       rental_circumstances:
         $ref: ./TextChoiceField.yaml
       landlord:
-        $ref: ./Person.yaml
+        allOf:
+          - $ref: ./Person.yaml
+        nullable: true
       agent:
-        $ref: ./Person.yaml
+        allOf:
+          - $ref: ./Person.yaml
+        nullable: true
     required:
       - id
+      - started
       - url
       - is_on_lease
       - rental_circumstances
