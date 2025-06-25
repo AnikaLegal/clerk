@@ -138,6 +138,11 @@ def lawyer_user_client(lawyer_user) -> APIClient:
 
 
 @pytest.fixture
+def coordinator_user_client(coordinator_user) -> APIClient:
+    return _login_user(coordinator_user)
+
+
+@pytest.fixture
 def superuser_client(superuser: User) -> APIClient:
     return _login_user(superuser)
 
