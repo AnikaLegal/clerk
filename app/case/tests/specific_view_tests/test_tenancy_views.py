@@ -1,36 +1,168 @@
 import pytest
-from rest_framework.test import APIClient
+from conftest import schema_tester
+from core.factories import TenancyFactory, IssueFactory
+from core.models import Tenancy
 from rest_framework.reverse import reverse
-
-from core.factories import TenancyFactory, ClientFactory, IssueFactory
-from case.middleware import annotate_group_access
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_tenancy_view_object_permissions(
-    user, user_client: APIClient, paralegal_group, coordinator_group
+def test_tenancy_create_api(superuser_client: APIClient):
+    url = reverse("tenancy-api-list")
+    data = {
+        "address": "123 Fake St",
+        "suburb": "Noburg",
+        "postcode": "1234",
+    }
+
+    assert Tenancy.objects.count() == 0
+
+    response = superuser_client.post(url, data=data, format="json")
+    assert response.status_code == 201, response.json()
+
+    assert Tenancy.objects.count() == 1
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_tenancy_retrieve_api(superuser_client: APIClient):
+    instance = TenancyFactory()
+    url = reverse("tenancy-api-detail", args=(instance.pk,))
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+    assert data["id"] == instance.pk
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_tenancy_update_api(superuser_client: APIClient):
+    instance = TenancyFactory(
+        address="123 Fake St",
+        suburb="Noburg",
+        postcode="1234",
+    )
+    url = reverse("tenancy-api-detail", args=(instance.pk,))
+    data = {
+        "address": "999 Fake Street",
+        "suburb": "Yesburg",
+        "postcode": "4321",
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 200, response.json()
+
+    instance.refresh_from_db()
+    assert instance.address == "999 Fake Street"
+    assert instance.suburb == "Yesburg"
+    assert instance.postcode == "4321"
+
+    data = response.json()
+    assert data["address"] == instance.address
+    assert data["suburb"] == instance.suburb
+    assert data["postcode"] == instance.postcode
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, client_name, expected_status",
+    [
+        ("unprivileged_user", "user_client", 403),
+        ("paralegal", "paralegal_user_client", 403),
+        ("coordinator", "coordinator_user_client", 201),
+    ],
+)
+def test_tenancy_api_create_perms(
+    test_user: str,
+    client_name: str,
+    expected_status: int,
+    request,
 ):
-    client = ClientFactory()
-    tenancy = TenancyFactory()
-    issue = IssueFactory(client=client, tenancy=tenancy)
-    url = reverse("tenancy-api-detail", args=(tenancy.pk,))
+    """
+    Test creation of a tenancy via the API as different users.
+    """
+    api_client = request.getfixturevalue(client_name)
+    url = reverse("tenancy-api-list")
+    data = {
+        "address": "123 Fake St",
+        "suburb": "Noburg",
+        "postcode": "1234",
+    }
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == expected_status
 
-    # Coordinator can access
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 200),
+        ("unassigned_coordinator", "coordinator_user", False, 200),
+        ("assigned_coordinator", "coordinator_user", True, 200),
+    ],
+)
+def test_tenancy_api_retrieve_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test creation of a tenancy via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+
+    url = reverse("tenancy-api-detail", args=(issue.tenancy.pk,))
     response = user_client.get(url)
-    assert response.status_code == 200, response.json()
 
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    response = user_client.get(url)
+    assert response.status_code == expected_status
 
-    # Paralegal can't access, no object permissions
-    assert response.status_code == 403, response.json()
 
-    issue.paralegal = user
-    issue.save()
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 200),
+        ("unassigned_coordinator", "coordinator_user", False, 200),
+        ("assigned_coordinator", "coordinator_user", True, 200),
+    ],
+)
+def test_tenancy_api_update_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test creation of a tenancy via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
 
-    # Paralegal can access with object permissions
-    response = user_client.get(url)
-    assert response.status_code == 200, response.json()
+    data = {
+        "address": "123 Fake St",
+    }
+    url = reverse("tenancy-api-detail", args=(issue.tenancy.pk,))
+    response = user_client.patch(url, data=data, format="json")
+
+    assert response.status_code == expected_status

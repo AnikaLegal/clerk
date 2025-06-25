@@ -1,116 +1,39 @@
 import pytest
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
-
-from accounts.models import User
-from case.middleware import annotate_group_access
+from conftest import schema_tester
 from core.factories import ClientFactory, IssueFactory
 from core.models import Client
-from conftest import schema_tester
+from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_client_list_view__with_no_access(user_client: APIClient, user: User):
-    """
-    Unprivileged users are forbidden to list clients.
-    """
-    ClientFactory()  # There's an issue but the user can't see it
-    annotate_group_access(user)
+def test_client_list_api(superuser_client: APIClient):
+    instance_1 = ClientFactory()
+    instance_2 = ClientFactory()
+
     url = reverse("client-api-list")
-    response = user_client.get(url)
-    assert response.status_code == 403
+    response = superuser_client.get(url)
 
+    assert response.status_code == 200, response.json()
+    data = response.json()
 
-@pytest.mark.django_db
-def test_client_list_view__as_paralegal_with_no_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-):
-    """
-    Paralegal users can list clients but no results because they're not assigned
-    """
-    ClientFactory()  # There's a client but the user can't see it
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("client-api-list")
-    response = user_client.get(url)
-    assert response.status_code == 200
-    assert response.json() == {
-        "current": 1,
-        "item_count": 0,
-        "next": None,
-        "page_count": 1,
-        "prev": None,
-        "results": [],
-    }
-    schema_tester.validate_response(response=response)
+    assert data["current"] == 1
+    assert data["item_count"] == 2
+    assert data["page_count"] == 1
+    assert data["next"] is None
+    assert data["prev"] is None
 
-
-@pytest.mark.django_db
-def test_client_list_view__as_paralegal_with_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-):
-    """
-    Paralegal users can list client of cases to which they're assigned.
-    """
-    issue = IssueFactory(paralegal=user)
-    IssueFactory()  # There's an issue but the user can't see it
-
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    url = reverse("client-api-list")
-    response = user_client.get(url)
-    assert response.status_code == 200
-    resp_data = response.json()
-
-    assert resp_data["current"] == 1
-    assert resp_data["item_count"] == 1
-    assert resp_data["page_count"] == 1
-    assert resp_data["next"] is None
-    assert resp_data["prev"] is None
-    results = resp_data["results"]
-    assert len(results) == 1
-    assert results[0]["id"] == str(issue.client.pk)
-    schema_tester.validate_response(response=response)
-
-
-@pytest.mark.django_db
-def test_client_list_view__as_coordinator(
-    user_client: APIClient,
-    user: User,
-    coordinator_group,
-):
-    """
-    Coordinator users can list clients.
-    """
-    client_a = ClientFactory()
-    client_b = ClientFactory()
-
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
-    url = reverse("client-api-list")
-    response = user_client.get(url)
-    assert response.status_code == 200
-    resp_data = response.json()
-
-    assert resp_data["current"] == 1
-    assert resp_data["item_count"] == 2
-    assert resp_data["page_count"] == 1
-    assert resp_data["next"] is None
-    assert resp_data["prev"] is None
-    results = resp_data["results"]
+    results = data["results"]
     assert len(results) == 2
-    assert set(r["id"] for r in results) == {str(client_a.pk), str(client_b.pk)}
+    assert set(x["id"] for x in results) == {str(instance_1.pk), str(instance_2.pk)}
+
     schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_client_list_view__search(superuser_client: APIClient):
-    client_a = ClientFactory(first_name="John", last_name="Smith")
-    client_b = ClientFactory(first_name="Jane", last_name="Smith")
+def test_client_list_api__q_filter(superuser_client: APIClient):
+    instance_1 = ClientFactory(first_name="Charlie", last_name="Brown")
+    instance_2 = ClientFactory(first_name="Sally", last_name="Brown")
     url = reverse("client-api-list")
 
     # Empty search parameter.
@@ -126,157 +49,226 @@ def test_client_list_view__search(superuser_client: APIClient):
     assert len(results) == 0
 
     # One search result.
-    response = superuser_client.get(url, {"q": "John"})
+    response = superuser_client.get(url, {"q": "Charlie"})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 1
     results = resp_data["results"]
     assert len(results) == 1
-    assert results[0]["id"] == str(client_a.pk)
+    assert results[0]["id"] == str(instance_1.pk)
     schema_tester.validate_response(response=response)
 
     # Two search results.
-    response = superuser_client.get(url, {"q": "Smith"})
+    response = superuser_client.get(url, {"q": "Brown"})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 2
     results = resp_data["results"]
     assert len(results) == 2
-    assert set(x["id"] for x in results) == {str(client_a.pk), str(client_b.pk)}
+    assert set(x["id"] for x in results) == {str(instance_1.pk), str(instance_2.pk)}
 
     schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_client_detail_view__as_paralegal(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-):
-    """
-    Paralegal users can only display client of cases to which they're assigned.
-    """
-    issue = IssueFactory()
-
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-
-    # Paralegals are not allowed to get the client details when they're not
-    # assigned to the issue.
-    url = reverse("client-api-detail", args=(issue.client.pk,))
-    response = user_client.get(url)
-    assert response.status_code == 403
-
-    # User can display the client now they're assigned.
-    issue.paralegal = user
-    issue.save()
-
-    response = user_client.get(url)
-    assert response.status_code == 200
-    resp_data = response.json()
-    assert resp_data["id"] == str(issue.client.pk)
-
-    schema_tester.validate_response(response=response)
-
-
-@pytest.mark.django_db
-def test_case_update_view_permissions(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-    coordinator_group,
-):
-    """
-    Paralegal users can only update client of cases to which they're assigned.
-    Coordinator users can update any clients.
-    """
-    client = ClientFactory(first_name="John")
-    issue = IssueFactory(client=client)
-    url = reverse("client-api-detail", args=(client.pk,))
-    data = {"first_name": "Jane"}
-
-    # Paralegal user.
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    response = user_client.patch(url, data=data, format="json")
-    assert response.status_code == 403
-
-    # Assigned paralegal user.
-    issue.paralegal = user
-    issue.save()
-
-    response = user_client.patch(url, data=data, format="json")
-    assert response.status_code == 200
-
-    # Coordinator user.
-    client = ClientFactory(first_name="John")
-    url = reverse("client-api-detail", args=(client.pk,))
-
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
-    response = user_client.patch(url, data=data, format="json")
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_client_update_view(superuser_client: APIClient):
-    client = ClientFactory(first_name="John")
-    issue = IssueFactory(client=client)
-    url = reverse("client-api-detail", args=(client.pk,))
-
-    response = superuser_client.patch(url, data={"first_name": "Jane"}, format="json")
-    assert response.status_code == 200
-    client.refresh_from_db()
-    assert client.first_name == "Jane"
-
-    schema_tester.validate_response(response=response)
-
-
-@pytest.mark.django_db
-def test_client_create_view_permissions(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
-    coordinator_group,
-):
-    """
-    Paralegal users can't create clients. Coordinator users can create clients.
-    """
+def test_client_create_api(superuser_client: APIClient):
     url = reverse("client-api-list")
     data = {
-        "first_name": "John",
-        "last_name": "Smith",
-        "email": "john.smith@example.com",
+        "first_name": "Charlie",
+        "last_name": "Brown",
+        "email": "charlie.brown@example.com",
     }
 
-    # Paralegal user.
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
-    response = user_client.post(url, data=data, format="json")
-    assert response.status_code == 403
-
-    # Coordinator user.
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
-    response = user_client.post(url, data=data, format="json")
-    assert response.status_code == 201
-
-
-@pytest.mark.django_db
-def test_client_create_view(superuser_client: APIClient):
-    url = reverse("client-api-list")
-    data = {
-        "first_name": "John",
-        "last_name": "Smith",
-        "email": "john.smith@example.com",
-    }
+    assert Client.objects.count() == 0
 
     response = superuser_client.post(url, data=data, format="json")
-    assert response.status_code == 201
+    assert response.status_code == 201, response.json()
 
-    client = Client.objects.get()
-    assert client.first_name == "John"
-    assert client.last_name == "Smith"
-    assert client.email == "john.smith@example.com"
+    assert Client.objects.count() == 1
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_client_retrieve_api(superuser_client: APIClient):
+    instance = ClientFactory()
+    url = reverse("client-api-detail", args=(instance.pk,))
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+    assert data["id"] == str(instance.pk)
 
     schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_client_update_api(superuser_client: APIClient):
+    instance = ClientFactory()
+    url = reverse("client-api-detail", args=(instance.pk,))
+    data = {
+        "first_name": "Charlie",
+        "last_name": "Brown",
+        "email": "charlie.brown@example.com",
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 200, response.json()
+
+    instance.refresh_from_db()
+    assert instance.first_name == "Charlie"
+    assert instance.last_name == "Brown"
+    assert instance.email == "charlie.brown@example.com"
+
+    data = response.json()
+    assert data["first_name"] == instance.first_name
+    assert data["last_name"] == instance.last_name
+    assert data["email"] == instance.email
+
+    schema_tester.validate_response(response=response)
+
+
+#
+# TODO: test results
+#
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status, expected_count",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403, None),
+        ("assigned_user", "unprivileged_user", True, 403, None),
+        ("unassigned_paralegal", "paralegal_user", False, 200, 0),
+        ("assigned_paralegal", "paralegal_user", True, 200, 1),
+        ("unassigned_coordinator", "coordinator_user", False, 200, 1),
+        ("assigned_coordinator", "coordinator_user", True, 200, 1),
+    ],
+)
+def test_client_api_list_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    expected_count: int,
+    user_client,
+    request,
+):
+    """
+    Test list API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+
+    url = reverse("client-api-list")
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+    if expected_count is not None:
+        data = response.json()
+        assert data["item_count"] == expected_count
+        results = data["results"]
+        assert len(results) == expected_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, client_name, expected_status",
+    [
+        ("unprivileged_user", "user_client", 403),
+        ("paralegal", "paralegal_user_client", 403),
+        ("coordinator", "coordinator_user_client", 201),
+    ],
+)
+def test_client_api_create_perms(
+    test_user: str,
+    client_name: str,
+    expected_status: int,
+    request,
+):
+    """
+    Test create API perms for different users.
+    """
+    api_client = request.getfixturevalue(client_name)
+    url = reverse("client-api-list")
+    data = {
+        "first_name": "Charlie",
+        "last_name": "Brown",
+        "email": "charlie.brown@example.com",
+    }
+
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 200),
+        ("unassigned_coordinator", "coordinator_user", False, 200),
+        ("assigned_coordinator", "coordinator_user", True, 200),
+    ],
+)
+def test_client_api_retrieve_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test display API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+
+    url = reverse("client-api-detail", args=(issue.client.pk,))
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 200),
+        ("unassigned_coordinator", "coordinator_user", False, 200),
+        ("assigned_coordinator", "coordinator_user", True, 200),
+    ],
+)
+def test_client_api_update_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test update API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+
+    data = {
+        "last_name": "Brown",
+    }
+    url = reverse("client-api-detail", args=(issue.client.pk,))
+    response = user_client.patch(url, data=data, format="json")
+
+    assert response.status_code == expected_status

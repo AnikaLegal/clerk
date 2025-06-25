@@ -6,7 +6,6 @@ from core.factories import (
     EmailTemplateFactory,
     NotificationFactory,
     PersonFactory,
-    TenancyFactory,
     UserFactory,
 )
 from factory.django import DjangoModelFactory
@@ -43,13 +42,6 @@ GENERIC_API_TEST_CASES = [
         test_read_permissions=lambda user: user.is_paralegal_or_better,
         test_write_permissions=lambda user: user.is_coordinator_or_better,
         actions=Action.ALL,
-    ),
-    APIViewTestCase(
-        factory=TenancyFactory,
-        base_view_name="tenancy-api",
-        test_read_permissions=lambda user: user.is_coordinator_or_better,
-        test_write_permissions=lambda user: user.is_coordinator_or_better,
-        actions=[Action.RETRIEVE, Action.UPDATE],
     ),
     APIViewTestCase(
         factory=UserFactory,
