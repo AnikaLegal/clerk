@@ -2,7 +2,7 @@ import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import api, { Client, ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React from 'react'
+import React, { useState } from 'react'
 import { getAPIFormErrors, RequiredProps } from 'utils'
 import * as Yup from 'yup'
 
@@ -23,9 +23,11 @@ interface CreateClientModalProps extends ModalProps {
 
 const CreateClientModal = (props: CreateClientModalProps) => {
   const [createClient] = api.useCreateClientMutation()
+  const [isClosing, setIsClosing] = useState(false)
 
   const form = useForm<RequiredClientCreateProps>({
     mode: 'controlled',
+    validateInputOnBlur: !isClosing,
     initialValues: {
       first_name: '',
       last_name: '',
@@ -37,7 +39,10 @@ const CreateClientModal = (props: CreateClientModalProps) => {
         last_name: Yup.string().required(),
         email: Yup.string()
           .email()
-          .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+          .matches(
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            'Please enter a valid email address'
+          )
           .required(),
       })
     ),
@@ -67,10 +72,16 @@ const CreateClientModal = (props: CreateClientModalProps) => {
       })
   }
 
+  const handleClose = () => {
+    form.reset()
+    props.onClose()
+    setIsClosing(false)
+  }
+
   return (
     <Modal
       opened={props.opened}
-      onClose={props.onClose}
+      onClose={handleClose}
       size="lg"
       title="Create a new client"
     >
@@ -96,11 +107,13 @@ const CreateClientModal = (props: CreateClientModalProps) => {
           type="email"
           size="md"
           mt="md"
+          placeholder="name@example.com"
         />
         <Group justify="right" mt="lg">
           <Button
             variant="default"
-            onClick={props.onClose}
+            onMouseDown={() => setIsClosing(true)}
+            onClick={handleClose}
             disabled={form.submitting}
           >
             Close
