@@ -207,6 +207,16 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    createTenancy: build.mutation<
+      CreateTenancyApiResponse,
+      CreateTenancyApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/tenancy/`,
+        method: "POST",
+        body: queryArg.tenancyCreate,
+      }),
+    }),
     getTenancy: build.query<GetTenancyApiResponse, GetTenancyApiArg>({
       query: (queryArg) => ({ url: `/clerk/api/tenancy/${queryArg.id}/` }),
     }),
@@ -645,6 +655,11 @@ export type DeletePersonApiResponse = unknown;
 export type DeletePersonApiArg = {
   /** Entity ID */
   id: number;
+};
+export type CreateTenancyApiResponse =
+  /** status 201 Successful response. */ Tenancy;
+export type CreateTenancyApiArg = {
+  tenancyCreate: TenancyCreate;
 };
 export type GetTenancyApiResponse =
   /** status 200 Successful response. */ Tenancy;
@@ -1177,6 +1192,7 @@ export const {
   useGetPersonQuery,
   useUpdatePersonMutation,
   useDeletePersonMutation,
+  useCreateTenancyMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
   useGetClientsQuery,
