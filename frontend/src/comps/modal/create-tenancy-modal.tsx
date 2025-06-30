@@ -2,14 +2,17 @@ import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import api, { Tenancy, TenancyCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React, { useEffect, useState } from 'react'
-import { getAPIFormErrors, RequiredProps } from 'utils'
+import React, { useState } from 'react'
+import { RequiredKeysOf } from 'type-fest'
+import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
-import { useClickOutside } from '@mantine/hooks'
 
-type RequiredTenancyCreateProps = RequiredProps<TenancyCreate>
+type RequiredTenancyCreateProps = Pick<
+  TenancyCreate,
+  RequiredKeysOf<TenancyCreate>
+>
 
 interface CreateTenancyModalProps extends ModalProps {
   onSuccess: (

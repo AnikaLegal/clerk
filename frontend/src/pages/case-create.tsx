@@ -17,12 +17,8 @@ import { ClientSelectInput } from 'forms/mantine/input'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import {
-  getAPIErrorMessage,
-  getAPIFormErrors,
-  mount,
-  RequiredProps,
-} from 'utils'
+import { RequiredKeysOf } from 'type-fest'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
@@ -36,12 +32,13 @@ interface DjangoContext {
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
 
-export const CreateCaseSchema: Yup.ObjectSchema<RequiredProps<IssueCreate>> =
-  Yup.object({
-    topic: Yup.string().required(),
-    client_id: Yup.string().required(),
-    tenancy_id: Yup.number().required(),
-  })
+export const CreateCaseSchema: Yup.ObjectSchema<
+  Pick<IssueCreate, RequiredKeysOf<IssueCreate>>
+> = Yup.object({
+  topic: Yup.string().required(),
+  client_id: Yup.string().required(),
+  tenancy_id: Yup.number().required(),
+})
 
 type CaseFormValues = Yup.InferType<typeof CreateCaseSchema>
 

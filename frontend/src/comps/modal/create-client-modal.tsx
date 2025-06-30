@@ -3,12 +3,16 @@ import { useForm } from '@mantine/form'
 import api, { Client, ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React, { useState } from 'react'
-import { getAPIFormErrors, RequiredProps } from 'utils'
+import { RequiredKeysOf } from 'type-fest'
+import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
-type RequiredClientCreateProps = RequiredProps<ClientCreate>
+type RequiredClientCreateProps = Pick<
+  ClientCreate,
+  RequiredKeysOf<ClientCreate>
+>
 
 interface CreateClientModalProps extends ModalProps {
   onSuccess: (
