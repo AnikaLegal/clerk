@@ -142,3 +142,8 @@ form .mantine-InputWrapper-label {
   font-weight: bold;
   font-size: var(--mantine-font-size-lg);
 }
+
+.mantine-Title-root .subtitle {
+  color: var(--mantine-color-dark-3);
+  font-size: var(--mantine-font-size-lg);
+}

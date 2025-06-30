@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {
-  Button,
   Container,
   Header,
   Input,
@@ -10,12 +9,14 @@ import {
   Label,
   Dropdown,
 } from 'semantic-ui-react'
-
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
 import { useGetUsersQuery, useGetCasesQuery, GetCasesApiArg } from 'api'
 import { UserPermission } from 'types'
+import { Group, Text, Title, Button } from '@mantine/core'
+
+import '@mantine/core/styles.css'
 
 interface DjangoContext {
   user: UserPermission
@@ -68,19 +69,19 @@ const App = () => {
     paralegalResults.isFetching || lawyerResults.isFetching
   return (
     <Container>
-      <Header as="h1">
-        Cases
-        <Header.Subheader>
+      <Title order={1} mb="md">
+        <Group wrap="nowrap" gap="sm" justify="space-between">
+          <span>Cases</span>
+          {CONTEXT.user.is_coordinator_or_better && (
+            <Button component="a" href={CONTEXT.create_url}>
+              Create a new case
+            </Button>
+          )}
+        </Group>
+        <Text className="subtitle">
           Showing {issues.length} of {totalIssues} cases
-        </Header.Subheader>
-        {CONTEXT.user.is_coordinator_or_better && (
-          <Header.Subheader style={{ marginTop: '1rem' }}>
-            <a href={CONTEXT.create_url}>
-              <Button primary>Create a new case</Button>
-            </a>
-          </Header.Subheader>
-        )}
-      </Header>
+        </Text>
+      </Title>
       <Form>
         <Form.Field>
           <Input
