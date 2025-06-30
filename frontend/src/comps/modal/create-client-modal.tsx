@@ -2,7 +2,7 @@ import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import api, { Client, ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React, { useState } from 'react'
+import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
 import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
@@ -27,11 +27,9 @@ interface CreateClientModalProps extends ModalProps {
 
 const CreateClientModal = (props: CreateClientModalProps) => {
   const [createClient] = api.useCreateClientMutation()
-  const [isClosing, setIsClosing] = useState(false)
 
   const form = useForm<RequiredClientCreateProps>({
     mode: 'controlled',
-    validateInputOnBlur: !isClosing,
     initialValues: {
       first_name: '',
       last_name: '',
@@ -76,10 +74,17 @@ const CreateClientModal = (props: CreateClientModalProps) => {
       })
   }
 
+  const handleValidationFailure = (
+    errors,
+    values,
+    event: React.FormEvent<HTMLFormElement> | undefined
+  ) => {
+    event?.stopPropagation()
+  }
+
   const handleClose = () => {
     form.reset()
     props.onClose()
-    setIsClosing(false)
   }
 
   return (
@@ -89,7 +94,7 @@ const CreateClientModal = (props: CreateClientModalProps) => {
       size="lg"
       title="Create a new client"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
         <TextInput
           {...form.getInputProps('first_name')}
           key={form.key('first_name')}
@@ -108,7 +113,6 @@ const CreateClientModal = (props: CreateClientModalProps) => {
           {...form.getInputProps('email')}
           key={form.key('email')}
           label="Email"
-          type="email"
           size="md"
           mt="md"
           placeholder="name@example.com"
@@ -116,7 +120,6 @@ const CreateClientModal = (props: CreateClientModalProps) => {
         <Group justify="right" mt="lg">
           <Button
             variant="default"
-            onMouseDown={() => setIsClosing(true)}
             onClick={handleClose}
             disabled={form.submitting}
           >
@@ -124,7 +127,7 @@ const CreateClientModal = (props: CreateClientModalProps) => {
           </Button>
           <Button
             type="submit"
-            disabled={form.submitting || !form.isValid()}
+            disabled={form.submitting}
             loading={form.submitting}
           >
             Create client

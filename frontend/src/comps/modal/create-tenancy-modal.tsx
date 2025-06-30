@@ -2,7 +2,7 @@ import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import api, { Tenancy, TenancyCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React, { useState } from 'react'
+import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
 import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
@@ -29,11 +29,9 @@ Yup.setLocale({ mixed: { required: 'This field is required.' } })
 
 const CreateTenancyModal = (props: CreateTenancyModalProps) => {
   const [createTenancy] = api.useCreateTenancyMutation()
-  const [isClosing, setIsClosing] = useState(false)
 
   const form = useForm<RequiredTenancyCreateProps>({
     mode: 'controlled',
-    validateInputOnBlur: !isClosing,
     initialValues: {
       address: '',
       suburb: '',
@@ -74,10 +72,17 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
       })
   }
 
+  const handleValidationFailure = (
+    errors,
+    values,
+    event: React.FormEvent<HTMLFormElement> | undefined
+  ) => {
+    event?.stopPropagation()
+  }
+
   const handleClose = () => {
     form.reset()
     props.onClose()
-    setIsClosing(false)
   }
 
   return (
@@ -87,7 +92,7 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
       size="lg"
       title="Create a new tenancy"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
         <TextInput
           {...form.getInputProps('address')}
           key={form.key('address')}
@@ -102,7 +107,7 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
           label="Suburb"
           size="md"
           mt="md"
-          placeholder="Enter the suburb e.g. Collingwood"
+          placeholder="Collingwood"
         />
         <TextInput
           {...form.getInputProps('postcode')}
@@ -115,7 +120,6 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
         <Group justify="right" mt="lg">
           <Button
             variant="default"
-            onMouseDown={() => setIsClosing(true)}
             onClick={handleClose}
             disabled={form.submitting}
           >
@@ -123,7 +127,7 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
           </Button>
           <Button
             type="submit"
-            disabled={form.submitting || !form.isValid()}
+            disabled={form.submitting}
             loading={form.submitting}
           >
             Create tenancy
