@@ -14,7 +14,7 @@ import {
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
-import { useGetUsersQuery, useGetCasesQuery } from 'api'
+import { useGetUsersQuery, useGetCasesQuery, GetCasesApiArg } from 'api'
 import { UserPermission } from 'types'
 
 interface DjangoContext {
@@ -27,29 +27,6 @@ interface DjangoContext {
   }
   create_url: string
 }
-
-interface SearchQuery {
-  page: number
-  search: string
-  topic: string
-  stage: string
-  outcome: string
-  isOpen: string
-  paralegal: string
-  lawyer: string
-}
-
-const INITIAL_QUERY = {
-  page: null,
-  search: '',
-  topic: '',
-  stage: '',
-  outcome: '',
-  isOpen: '',
-  paralegal: '',
-  lawyer: '',
-}
-
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const TABLE_FIELDS = [
@@ -67,7 +44,7 @@ const TABLE_FIELDS = [
 const App = () => {
   // TODO: Debounce search keystrokes.
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-  const [query, setQuery] = useState<SearchQuery>(INITIAL_QUERY)
+  const [query, setQuery] = useState<GetCasesApiArg>({})
 
   const onPageChange = (e, { activePage }) =>
     setQuery({ ...query, page: activePage })
