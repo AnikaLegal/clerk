@@ -25,6 +25,7 @@ interface DjangoContext {
     outcome: string[][]
     is_open: string[][]
   }
+  create_url: string
 }
 
 interface SearchQuery {
