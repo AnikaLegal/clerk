@@ -1,34 +1,26 @@
 import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import api, { Client, ClientCreate } from 'api'
+import api, { ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
-import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
-type RequiredClientCreateProps = Pick<
-  ClientCreate,
-  RequiredKeysOf<ClientCreate>
->
+type RequiredClientProps = Pick<ClientCreate, RequiredKeysOf<ClientCreate>>
 
-interface CreateClientModalProps extends ModalProps {
-  onSuccess: (
-    form: ReturnType<typeof useForm<RequiredClientCreateProps>>,
-    instance: Client
-  ) => void
-  onFailure: (
-    form: ReturnType<typeof useForm<RequiredClientCreateProps>>,
-    exception: any
+interface MinimalClientFormModalProps extends ModalProps {
+  title: string
+  submitButtonLabel: string
+  onFormSubmit: (
+    form: ReturnType<typeof useForm<RequiredClientProps>>,
+    values: RequiredClientProps
   ) => void
 }
 
-const CreateClientModal = (props: CreateClientModalProps) => {
-  const [createClient] = api.useCreateClientMutation()
-
-  const form = useForm<RequiredClientCreateProps>({
+const MinimalClientFormModal = (props: MinimalClientFormModalProps) => {
+  const form = useForm<RequiredClientProps>({
     mode: 'controlled',
     initialValues: {
       first_name: '',
@@ -51,27 +43,11 @@ const CreateClientModal = (props: CreateClientModalProps) => {
   })
 
   const handleSubmit = (
-    values: RequiredClientCreateProps,
+    values: RequiredClientProps,
     event: React.FormEvent<HTMLFormElement> | undefined
   ) => {
     event?.stopPropagation()
-
-    form.setSubmitting(true)
-    createClient({ clientCreate: values })
-      .unwrap()
-      .then((instance) => {
-        props.onSuccess(form, instance)
-      })
-      .catch((e) => {
-        const errors = getAPIFormErrors(e)
-        if (errors) {
-          form.setErrors(errors)
-        }
-        props.onFailure(form, e)
-      })
-      .finally(() => {
-        form.setSubmitting(false)
-      })
+    props.onFormSubmit(form, values)
   }
 
   const handleValidationFailure = (
@@ -92,7 +68,7 @@ const CreateClientModal = (props: CreateClientModalProps) => {
       opened={props.opened}
       onClose={handleClose}
       size="lg"
-      title="Create a new client"
+      title={props.title}
     >
       <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
         <TextInput
@@ -130,7 +106,7 @@ const CreateClientModal = (props: CreateClientModalProps) => {
             disabled={form.submitting}
             loading={form.submitting}
           >
-            Create client
+            {props.submitButtonLabel}
           </Button>
         </Group>
       </form>
@@ -138,4 +114,4 @@ const CreateClientModal = (props: CreateClientModalProps) => {
   )
 }
 
-export default CreateClientModal
+export default MinimalClientFormModal

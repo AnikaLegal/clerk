@@ -12,7 +12,7 @@ import { createFormContext } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
 import { TextButton } from 'comps/button'
-import { CreateClientModal, CreateTenancyModal } from 'comps/modal'
+import { MinimalClientFormModal, CreateTenancyModal } from 'comps/modal'
 import { ClientSelectInput } from 'forms/mantine/input'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
@@ -125,29 +125,41 @@ mount(App)
 const ClientSelectField = (props: SelectProps) => {
   const [opened, handlers] = useDisclosure(false)
   const form = useCaseFormContext()
+  const [createClient] = api.useCreateClientMutation()
 
-  const onCreateSuccess = (modalForm, client) => {
-    /* Reset & close the modal */
-    modalForm.reset()
-    handlers.close()
+  const handleSubmit = (modalForm, values) => {
+    modalForm.setSubmitting(true)
+    createClient({ clientCreate: values })
+      .unwrap()
+      .then((instance) => {
+        form.setValues({ client_id: instance.id })
+        enqueueSnackbar('Client created', { variant: 'success' })
 
-    form.setValues({ client_id: client.id })
-    enqueueSnackbar('Client created', { variant: 'success' })
-  }
-
-  const onCreateFailed = (modalForm, exception) => {
-    enqueueSnackbar(getAPIErrorMessage(exception, 'Failed to create client'), {
-      variant: 'error',
-    })
+        handlers.close()
+        modalForm.reset()
+      })
+      .catch((e) => {
+        const errors = getAPIFormErrors(e)
+        if (errors) {
+          modalForm.setErrors(errors)
+        }
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create client'), {
+          variant: 'error',
+        })
+      })
+      .finally(() => {
+        modalForm.setSubmitting(false)
+      })
   }
 
   return (
     <>
-      <CreateClientModal
+      <MinimalClientFormModal
+        title="Create a new client"
+        submitButtonLabel="Create client"
         opened={opened}
         onClose={handlers.close}
-        onSuccess={onCreateSuccess}
-        onFailure={onCreateFailed}
+        onFormSubmit={handleSubmit}
       />
       <ClientSelectInput
         {...props}
