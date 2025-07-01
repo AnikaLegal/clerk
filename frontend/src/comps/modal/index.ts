@@ -1,4 +1,4 @@
 import MinimalClientFormModal from './minimal-client-form-modal'
-import CreateTenancyModal from './create-tenancy-modal'
+import MinimalTenancyFormModal from './minimal-tenancy-form-modal'
 
-export { MinimalClientFormModal, CreateTenancyModal }
+export { MinimalClientFormModal, MinimalTenancyFormModal }

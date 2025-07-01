@@ -1,36 +1,28 @@
 import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import api, { Tenancy, TenancyCreate } from 'api'
+import { TenancyCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
-import { getAPIFormErrors } from 'utils'
 import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
-type RequiredTenancyCreateProps = Pick<
-  TenancyCreate,
-  RequiredKeysOf<TenancyCreate>
->
+type RequiredTenancyProps = Pick<TenancyCreate, RequiredKeysOf<TenancyCreate>>
 
-interface CreateTenancyModalProps extends ModalProps {
-  onSuccess: (
-    form: ReturnType<typeof useForm<RequiredTenancyCreateProps>>,
-    instance: Tenancy
-  ) => void
-  onFailure: (
-    form: ReturnType<typeof useForm<RequiredTenancyCreateProps>>,
-    exception: any
+interface MinimalTenancyFormModalProps extends ModalProps {
+  title: string
+  submitButtonLabel: string
+  onFormSubmit: (
+    form: ReturnType<typeof useForm<RequiredTenancyProps>>,
+    values: RequiredTenancyProps
   ) => void
 }
 
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
 
-const CreateTenancyModal = (props: CreateTenancyModalProps) => {
-  const [createTenancy] = api.useCreateTenancyMutation()
-
-  const form = useForm<RequiredTenancyCreateProps>({
+const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
+  const form = useForm<RequiredTenancyProps>({
     mode: 'controlled',
     initialValues: {
       address: '',
@@ -49,27 +41,11 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
   })
 
   const handleSubmit = (
-    values: RequiredTenancyCreateProps,
+    values: RequiredTenancyProps,
     event: React.FormEvent<HTMLFormElement> | undefined
   ) => {
     event?.stopPropagation()
-
-    form.setSubmitting(true)
-    createTenancy({ tenancyCreate: values })
-      .unwrap()
-      .then((instance) => {
-        props.onSuccess(form, instance)
-      })
-      .catch((e) => {
-        const errors = getAPIFormErrors(e)
-        if (errors) {
-          form.setErrors(errors)
-        }
-        props.onFailure(form, e)
-      })
-      .finally(() => {
-        form.setSubmitting(false)
-      })
+    props.onFormSubmit(form, values)
   }
 
   const handleValidationFailure = (
@@ -90,7 +66,7 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
       opened={props.opened}
       onClose={handleClose}
       size="lg"
-      title="Create a new tenancy"
+      title={props.title}
     >
       <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
         <TextInput
@@ -130,7 +106,7 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
             disabled={form.submitting}
             loading={form.submitting}
           >
-            Create tenancy
+            {props.submitButtonLabel}
           </Button>
         </Group>
       </form>
@@ -138,4 +114,4 @@ const CreateTenancyModal = (props: CreateTenancyModalProps) => {
   )
 }
 
-export default CreateTenancyModal
+export default MinimalTenancyFormModal

@@ -12,7 +12,7 @@ import { createFormContext } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
 import { TextButton } from 'comps/button'
-import { MinimalClientFormModal, CreateTenancyModal } from 'comps/modal'
+import { MinimalClientFormModal, MinimalTenancyFormModal } from 'comps/modal'
 import { ClientSelectInput } from 'forms/mantine/input'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
@@ -185,6 +185,7 @@ const TenancySelectField = (props: SelectProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [getCases] = api.useLazyGetCasesQuery()
   const [opened, handlers] = useDisclosure(false)
+  const [createTenancy] = api.useCreateTenancyMutation()
 
   const getAddress = (tenancy: Tenancy) => {
     const address: string[] = []
@@ -239,34 +240,44 @@ const TenancySelectField = (props: SelectProps) => {
     }
   })
 
-  const onCreateSuccess = (modalForm, tenancy) => {
-    /* Reset & close the modal */
-    modalForm.reset()
-    handlers.close()
+  const handleSubmit = (modalForm, values) => {
+    modalForm.setSubmitting(true)
+    createTenancy({ tenancyCreate: values })
+      .unwrap()
+      .then((instance) => {
+        const option = {
+          value: instance.id.toString(),
+          label: getAddress(instance),
+        }
+        setCreatedOptions((prev) => [...prev, option])
+        form.setValues({ tenancy_id: instance.id })
+        enqueueSnackbar('Tenancy created', { variant: 'success' })
 
-    const option = {
-      value: tenancy.id.toString(),
-      label: getAddress(tenancy),
-    }
-    setCreatedOptions((prev) => [...prev, option])
-    form.setValues({ tenancy_id: tenancy.id })
-
-    enqueueSnackbar('Tenancy created', { variant: 'success' })
-  }
-
-  const onCreateFailed = (modalForm, exception) => {
-    enqueueSnackbar(getAPIErrorMessage(exception, 'Failed to create tenancy'), {
-      variant: 'error',
-    })
+        handlers.close()
+        modalForm.reset()
+      })
+      .catch((e) => {
+        const errors = getAPIFormErrors(e)
+        if (errors) {
+          modalForm.setErrors(errors)
+        }
+        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create tenancy'), {
+          variant: 'error',
+        })
+      })
+      .finally(() => {
+        form.setSubmitting(false)
+      })
   }
 
   return (
     <>
-      <CreateTenancyModal
+      <MinimalTenancyFormModal
+        title="Create a new tenancy"
+        submitButtonLabel="Create tenancy"
         opened={opened}
         onClose={handlers.close}
-        onSuccess={onCreateSuccess}
-        onFailure={onCreateFailed}
+        onFormSubmit={handleSubmit}
       />
       <Select
         {...props}
