@@ -12,13 +12,9 @@ interface ClientInfo {
 const ClientSelectInput = (props: SelectProps) => {
   const result = useGetClientsQuery({ pageSize: -1 }) // returns all results.
   const data = result.data?.results || []
-  const lookup = data.reduce((acc, obj) => {
-    acc.set(obj.id, { full_name: obj.full_name, email: obj.email })
-    return acc
-  }, new Map<string, ClientInfo>())
 
   const renderOption = ({ option }) => {
-    const client = lookup.get(option.value)
+    const client = data.find((client) => client.id === option.value)
     if (!client) {
       return undefined
     }
@@ -38,10 +34,12 @@ const ClientSelectInput = (props: SelectProps) => {
     <Select
       clearable
       searchable
-      data={Array.from(lookup, ([id, client]) => ({
-        value: id,
-        label: `${client.full_name} (${client.email})`,
-      }))}
+      data={data.map((client) => {
+        return {
+          value: client.id,
+          label: `${client.full_name} (${client.email})`,
+        }
+      })}
       renderOption={renderOption}
       rightSection={result.isFetching && <Loader size="sm" />}
       nothingFoundMessage="No clients found"
