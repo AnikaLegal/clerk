@@ -1,6 +1,6 @@
 import { Button, Group, Modal, ModalProps, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import api, { ClientCreate } from 'api'
+import { ClientCreate } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
@@ -8,7 +8,23 @@ import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
-type RequiredClientProps = Pick<ClientCreate, RequiredKeysOf<ClientCreate>>
+export type RequiredClientProps = Pick<
+  ClientCreate,
+  RequiredKeysOf<ClientCreate>
+>
+
+export const RequiredClientSchema: Yup.ObjectSchema<RequiredClientProps> =
+  Yup.object().shape({
+    first_name: Yup.string().required(),
+    last_name: Yup.string().required(),
+    email: Yup.string()
+      .email()
+      .matches(
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        'Please enter a valid email address'
+      )
+      .required(),
+  })
 
 interface MinimalClientFormModalProps extends ModalProps {
   title: string
@@ -27,19 +43,7 @@ const MinimalClientFormModal = (props: MinimalClientFormModalProps) => {
       last_name: '',
       email: '',
     },
-    validate: yupResolver(
-      Yup.object({
-        first_name: Yup.string().required(),
-        last_name: Yup.string().required(),
-        email: Yup.string()
-          .email()
-          .matches(
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            'Please enter a valid email address'
-          )
-          .required(),
-      })
-    ),
+    validate: yupResolver(RequiredClientSchema),
   })
 
   const handleSubmit = (
