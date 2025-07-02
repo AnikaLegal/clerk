@@ -4,11 +4,6 @@ import React from 'react'
 
 import '@mantine/core/styles.css'
 
-interface ClientInfo {
-  full_name: string
-  email: string
-}
-
 const ClientSelectInput = (props: SelectProps) => {
   const result = useGetClientsQuery({ pageSize: -1 }) // returns all results.
   const data = result.data?.results || []
