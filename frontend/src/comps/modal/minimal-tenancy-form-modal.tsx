@@ -8,7 +8,21 @@ import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
-type RequiredTenancyProps = Pick<TenancyCreate, RequiredKeysOf<TenancyCreate>>
+Yup.setLocale({ mixed: { required: 'This field is required.' } })
+
+export type RequiredTenancyProps = Pick<
+  TenancyCreate,
+  RequiredKeysOf<TenancyCreate>
+>
+
+export const RequiredTenancySchema: Yup.ObjectSchema<RequiredTenancyProps> =
+  Yup.object().shape({
+    address: Yup.string().required(),
+    suburb: Yup.string().required(),
+    postcode: Yup.string()
+      .matches(/^\d{4}$/, 'Please enter a 4-digit number')
+      .required(),
+  })
 
 interface MinimalTenancyFormModalProps extends ModalProps {
   title: string
@@ -19,8 +33,6 @@ interface MinimalTenancyFormModalProps extends ModalProps {
   ) => void
 }
 
-Yup.setLocale({ mixed: { required: 'This field is required.' } })
-
 const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
   const form = useForm<RequiredTenancyProps>({
     mode: 'controlled',
@@ -29,15 +41,7 @@ const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
       suburb: '',
       postcode: '',
     },
-    validate: yupResolver(
-      Yup.object({
-        address: Yup.string().required(),
-        suburb: Yup.string().required(),
-        postcode: Yup.string()
-          .matches(/^\d{4}$/, 'Please enter a 4-digit number')
-          .required(),
-      })
-    ),
+    validate: yupResolver(RequiredTenancySchema),
   })
 
   const handleSubmit = (
