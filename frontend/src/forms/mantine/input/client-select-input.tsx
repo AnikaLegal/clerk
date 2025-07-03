@@ -1,13 +1,23 @@
 import { Group, Loader, Select, SelectProps, Text } from '@mantine/core'
-import { useGetClientsQuery } from 'api'
+import { Client } from 'api'
 import React from 'react'
 
 import '@mantine/core/styles.css'
 
-const ClientSelectInput = (props: SelectProps) => {
-  const result = useGetClientsQuery({ pageSize: -1 }) // returns all results.
-  const data = result.data?.results || []
+export type ClientLikeData = Pick<
+  Client,
+  'id' | 'first_name' | 'last_name' | 'email'
+>
+export interface ClientSelectInputProps extends Omit<SelectProps, 'data'> {
+  data: ClientLikeData[]
+  isLoading?: boolean
+}
 
+const ClientSelectInput = ({
+  data,
+  isLoading = false,
+  ...props
+}: ClientSelectInputProps) => {
   const renderOption = ({ option }) => {
     const client = data.find((client) => client.id === option.value)
     if (!client) {
@@ -16,7 +26,9 @@ const ClientSelectInput = (props: SelectProps) => {
     return (
       <Group gap="sm">
         <div>
-          <Text size="md">{client.full_name}</Text>
+          <Text size="md">
+            {client.first_name} {client.last_name}
+          </Text>
           <Text size="sm" opacity={0.5}>
             {client.email}
           </Text>
@@ -32,11 +44,11 @@ const ClientSelectInput = (props: SelectProps) => {
       data={data.map((client) => {
         return {
           value: client.id,
-          label: `${client.full_name} (${client.email})`,
+          label: `${client.first_name} ${client.last_name} (${client.email})`,
         }
       })}
       renderOption={renderOption}
-      rightSection={result.isFetching && <Loader size="sm" />}
+      rightSection={isLoading && <Loader size="sm" />}
       nothingFoundMessage="No clients found"
       placeholder="Search for an existing client"
       limit={100}
