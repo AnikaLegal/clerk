@@ -1,7 +1,8 @@
 from accounts.models import User
-from core.models import Issue, IssueNote, Service
+from core.models import Client, Issue, IssueNote, Service, Tenancy
 from core.models.issue import CaseStage, EmploymentType, ReferrerType
 from core.models.service import ServiceCategory
+from django.db import transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -78,11 +79,11 @@ class IssueSerializer(serializers.ModelSerializer):
         required=False,
     )
 
-    client = ClientSerializer(read_only=True)
-    client_id = serializers.UUIDField(write_only=True)
+    client = ClientSerializer(required=False)
+    client_id = serializers.UUIDField(write_only=True, required=False)
 
-    tenancy = TenancySerializer(read_only=True)
-    tenancy_id = serializers.IntegerField(write_only=True)
+    tenancy = TenancySerializer(required=False)
+    tenancy_id = serializers.IntegerField(write_only=True, required=False)
 
     support_worker = PersonSerializer(read_only=True)
     support_worker_id = serializers.IntegerField(
@@ -126,8 +127,21 @@ class IssueSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Cannot close case with unfinished ongoing services"
                 )
-
         return attrs
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            data = validated_data.pop("client", None)
+            if data:
+                instance = Client.objects.create(**data)
+                validated_data["client_id"] = instance.pk
+
+            data = validated_data.pop("tenancy", None)
+            if data:
+                instance = Tenancy.objects.create(**data)
+                validated_data["tenancy_id"] = instance.pk
+
+            return super().create(validated_data)
 
     def validate_paralegal_id(self, paralegal: User):
         return paralegal.id if paralegal else None
