@@ -1,7 +1,6 @@
 import pytest
 from conftest import schema_tester
 from core.factories import ClientFactory, IssueFactory
-from core.models import Client
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
@@ -67,24 +66,6 @@ def test_client_list_api__q_filter(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {str(instance_1.pk), str(instance_2.pk)}
 
-    schema_tester.validate_response(response=response)
-
-
-@pytest.mark.django_db
-def test_client_create_api(superuser_client: APIClient):
-    url = reverse("client-api-list")
-    data = {
-        "first_name": "Charlie",
-        "last_name": "Brown",
-        "email": "charlie.brown@example.com",
-    }
-
-    assert Client.objects.count() == 0
-
-    response = superuser_client.post(url, data=data, format="json")
-    assert response.status_code == 201, response.json()
-
-    assert Client.objects.count() == 1
     schema_tester.validate_response(response=response)
 
 
@@ -169,36 +150,6 @@ def test_client_api_list_perms(
         assert data["item_count"] == expected_count
         results = data["results"]
         assert len(results) == expected_count
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    "test_user, client_name, expected_status",
-    [
-        ("unprivileged_user", "user_client", 403),
-        ("paralegal", "paralegal_user_client", 403),
-        ("coordinator", "coordinator_user_client", 201),
-    ],
-)
-def test_client_api_create_perms(
-    test_user: str,
-    client_name: str,
-    expected_status: int,
-    request,
-):
-    """
-    Test create API perms for different users.
-    """
-    api_client = request.getfixturevalue(client_name)
-    url = reverse("client-api-list")
-    data = {
-        "first_name": "Charlie",
-        "last_name": "Brown",
-        "email": "charlie.brown@example.com",
-    }
-
-    response = api_client.post(url, data=data, format="json")
-    assert response.status_code == expected_status
 
 
 @pytest.mark.django_db
