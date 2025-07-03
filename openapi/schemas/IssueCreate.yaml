@@ -2,6 +2,17 @@ allOf:
   - $ref: ./IssueBase.yaml
   - type: object
     properties:
+      client_id:
+        type: string
+        format: uuid
+        description: One of client_id or client is required.
+      client:
+        $ref: ./ClientCreate.yaml
+      tenancy_id:
+        type: number
+        description: One of tenancy_id or tenancy is required.
+      tenancy:
+        $ref: ./TenancyCreate.yaml
       stage:
         type: string
       outcome:
@@ -17,11 +28,6 @@ allOf:
       lawyer_id:
         type: number
         nullable: true
-      client_id:
-        type: string
-        format: uuid
-      tenancy_id:
-        type: number
       support_worker_id:
         type: number
         nullable: true
@@ -37,6 +43,3 @@ allOf:
       weekly_rent:
         type: integer
         nullable: true
-    required:
-      - client_id
-      - tenancy_id

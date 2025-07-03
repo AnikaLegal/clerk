@@ -970,15 +970,48 @@ export type Error = {
   detail?: string | object | (string | object | any)[];
   non_field_errors?: string[];
 };
+export type ClientCreate = ClientBase & {
+  date_of_birth?: string | null;
+  preferred_name?: string | null;
+  phone_number?: string;
+  gender?: string | null;
+  pronouns?: string | null;
+  centrelink_support?: boolean;
+  eligibility_notes?: string;
+  primary_language_non_english?: boolean;
+  primary_language?: string;
+  number_of_dependents?: number | null;
+  notes?: string;
+  url?: string;
+  age?: number | null;
+  full_name?: string;
+  contact_notes?: string;
+  contact_restriction?: string;
+  requires_interpreter?: string;
+  is_aboriginal_or_torres_strait_islander?: string;
+  call_times?: string[];
+  eligibility_circumstances?: string[];
+};
+export type TenancyCreate = TenancyBase & {
+  started?: string | null;
+  is_on_lease?: string;
+  rental_circumstances?: string;
+  landlord_id?: number | null;
+  agent_id?: number | null;
+};
 export type IssueCreate = IssueBase & {
+  /** One of client_id or client is required. */
+  client_id?: string;
+  client?: ClientCreate;
+  /** One of tenancy_id or tenancy is required. */
+  tenancy_id?: number;
+  tenancy?: TenancyCreate;
   stage?: string;
   outcome?: string | null;
   outcome_notes?: string;
   provided_legal_services?: boolean;
   paralegal_id?: number | null;
   lawyer_id?: number | null;
-  client_id: string;
-  tenancy_id: number;
   support_worker_id?: number | null;
   employment_status?: string;
   weekly_income?: number | null;
@@ -1087,35 +1120,6 @@ export type EmailAttachmentCreate = {
 };
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string;
-};
-export type TenancyCreate = TenancyBase & {
-  started?: string | null;
-  is_on_lease?: string;
-  rental_circumstances?: string;
-  landlord_id?: number | null;
-  agent_id?: number | null;
-};
-export type ClientCreate = ClientBase & {
-  date_of_birth?: string | null;
-  preferred_name?: string | null;
-  phone_number?: string;
-  gender?: string | null;
-  pronouns?: string | null;
-  centrelink_support?: boolean;
-  eligibility_notes?: string;
-  primary_language_non_english?: boolean;
-  primary_language?: string;
-  number_of_dependents?: number | null;
-  notes?: string;
-  url?: string;
-  age?: number | null;
-  full_name?: string;
-  contact_notes?: string;
-  contact_restriction?: string;
-  requires_interpreter?: string;
-  is_aboriginal_or_torres_strait_islander?: string;
-  call_times?: string[];
-  eligibility_circumstances?: string[];
 };
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean;
