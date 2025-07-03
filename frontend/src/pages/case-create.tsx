@@ -10,13 +10,23 @@ import {
 } from '@mantine/core'
 import { createFormContext } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
-import api, { IssueCreate, Tenancy, useCreateCaseMutation } from 'api'
+import api, {
+  IssueCreate,
+  Tenancy,
+  useCreateCaseMutation,
+  useGetClientsQuery,
+} from 'api'
 import { TextButton } from 'comps/button'
-import { MinimalClientFormModal, MinimalTenancyFormModal } from 'comps/modal'
-import { ClientSelectInput } from 'forms/mantine/input'
+import {
+  MinimalClientFormModal,
+  MinimalTenancyFormModal,
+  RequiredClientSchema,
+  RequiredTenancySchema,
+} from 'comps/modal'
+import { ClientLikeData, ClientSelectInput } from 'forms/mantine/input'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RequiredKeysOf } from 'type-fest'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 import * as Yup from 'yup'
@@ -32,13 +42,49 @@ interface DjangoContext {
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
 
-export const CreateCaseSchema: Yup.ObjectSchema<
-  Pick<IssueCreate, RequiredKeysOf<IssueCreate>>
-> = Yup.object({
-  topic: Yup.string().required(),
-  client_id: Yup.string().required(),
-  tenancy_id: Yup.number().required(),
-})
+export type CaseProperties = Pick<
+  IssueCreate,
+  | RequiredKeysOf<IssueCreate>
+  | 'client_id'
+  | 'client'
+  | 'tenancy_id'
+  | 'tenancy'
+>
+
+/* One of each of the following mutually exclusive properties are required:
+ * - client or client_id
+ * - tenancy or tenancy_id
+ */
+export const CreateCaseSchema: Yup.ObjectSchema<CaseProperties> =
+  Yup.object().shape(
+    {
+      topic: Yup.string().required(),
+      client: RequiredClientSchema.when('client_id', {
+        is: (value) => value === undefined,
+        then: (schema) => schema.required().default(undefined),
+        otherwise: (schema) => schema.optional().default(undefined),
+      }),
+      client_id: Yup.string().when('client', {
+        is: (value) => value === undefined || Object.keys(value).length == 0,
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.optional(),
+      }),
+      tenancy: RequiredTenancySchema.when('tenancy_id', {
+        is: (value) => value === undefined,
+        then: (schema) => schema.required().default(undefined),
+        otherwise: (schema) => schema.optional().default(undefined),
+      }),
+      tenancy_id: Yup.number().when('tenancy', {
+        is: (value) => value === undefined || Object.keys(value).length == 0,
+        then: (schema) => schema.required(),
+        otherwise: (schema) => schema.optional(),
+      }),
+    },
+    [
+      ['client_id', 'client'],
+      ['tenancy_id', 'tenancy'],
+    ]
+  )
 
 type CaseFormValues = Yup.InferType<typeof CreateCaseSchema>
 
@@ -49,11 +95,6 @@ const App = () => {
   const [createCase] = useCreateCaseMutation()
   const form = useCaseForm({
     mode: 'controlled',
-    initialValues: {
-      topic: '',
-      client_id: '',
-      tenancy_id: null!,
-    },
     validate: yupResolver(CreateCaseSchema),
   })
 
@@ -123,33 +164,36 @@ const App = () => {
 mount(App)
 
 const ClientSelectField = (props: SelectProps) => {
-  const [opened, handlers] = useDisclosure(false)
+  const result = useGetClientsQuery({ pageSize: -1 }) // returns all results.
   const form = useCaseFormContext()
-  const [createClient] = api.useCreateClientMutation()
+  const [opened, handlers] = useDisclosure(false)
+  const [data, setData] = useState<ClientLikeData[]>([])
+  const [value, setValue] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    setData(result.data?.results || [])
+  }, [result])
+
+  form.watch('client', (client) => {
+    if (client.value) {
+      const { client_id, ...values } = form.getValues()
+      form.setValues(values)
+      setValue(client.value.email)
+    }
+  })
+  form.watch('client_id', (clientId) => {
+    if (clientId.value) {
+      const { client, ...values } = form.getValues()
+      form.setValues(values)
+      setValue(undefined)
+    }
+  })
 
   const handleSubmit = (modalForm, values) => {
-    modalForm.setSubmitting(true)
-    createClient({ clientCreate: values })
-      .unwrap()
-      .then((instance) => {
-        form.setValues({ client_id: instance.id })
-        enqueueSnackbar('Client created', { variant: 'success' })
-
-        handlers.close()
-        modalForm.reset()
-      })
-      .catch((e) => {
-        const errors = getAPIFormErrors(e)
-        if (errors) {
-          modalForm.setErrors(errors)
-        }
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create client'), {
-          variant: 'error',
-        })
-      })
-      .finally(() => {
-        modalForm.setSubmitting(false)
-      })
+    form.setValues({ client: values })
+    setData((prev) => [{ id: values.email, ...values }, ...prev])
+    handlers.close()
+    modalForm.reset()
   }
 
   return (
@@ -173,6 +217,9 @@ const ClientSelectField = (props: SelectProps) => {
         }
         labelProps={{ labelElement: 'div' }}
         styles={{ label: { width: '100%' } }}
+        value={value}
+        data={data}
+        isLoading={result.isFetching}
       />
     </>
   )
@@ -185,7 +232,7 @@ const TenancySelectField = (props: SelectProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [getCases] = api.useLazyGetCasesQuery()
   const [opened, handlers] = useDisclosure(false)
-  const [createTenancy] = api.useCreateTenancyMutation()
+  const [value, setValue] = useState<string | undefined>(undefined)
 
   const getAddress = (tenancy: Tenancy) => {
     const address: string[] = []
@@ -206,6 +253,7 @@ const TenancySelectField = (props: SelectProps) => {
     if (clientId.value !== clientId.previousValue) {
       setOptions([])
       form.setValues({ tenancy_id: null! })
+      setValue(undefined)
 
       if (!clientId.value) {
         setIsLoading(false)
@@ -240,34 +288,33 @@ const TenancySelectField = (props: SelectProps) => {
     }
   })
 
-  const handleSubmit = (modalForm, values) => {
-    modalForm.setSubmitting(true)
-    createTenancy({ tenancyCreate: values })
-      .unwrap()
-      .then((instance) => {
-        const option = {
-          value: instance.id.toString(),
-          label: getAddress(instance),
-        }
-        setCreatedOptions((prev) => [...prev, option])
-        form.setValues({ tenancy_id: instance.id })
-        enqueueSnackbar('Tenancy created', { variant: 'success' })
+  form.watch('tenancy', (tenancy) => {
+    if (tenancy.value) {
+      const { tenancy_id, ...values } = form.getValues()
+      form.setValues(values)
+      setValue(getAddress(tenancy.value))
+    }
+  })
+  form.watch('tenancy_id', (tenancyId) => {
+    if (tenancyId.value) {
+      const { tenancy, ...values } = form.getValues()
+      form.setValues(values)
+      setValue(tenancyId.value.toString())
+    }
+  })
 
-        handlers.close()
-        modalForm.reset()
-      })
-      .catch((e) => {
-        const errors = getAPIFormErrors(e)
-        if (errors) {
-          modalForm.setErrors(errors)
-        }
-        enqueueSnackbar(getAPIErrorMessage(e, 'Failed to create tenancy'), {
-          variant: 'error',
-        })
-      })
-      .finally(() => {
-        form.setSubmitting(false)
-      })
+  const handleSubmit = (modalForm, values) => {
+    form.setValues({ tenancy: values })
+
+    const address = getAddress(values)
+    const option = {
+      value: address,
+      label: address,
+    }
+    setCreatedOptions((prev) => [...prev, option])
+
+    handlers.close()
+    modalForm.reset()
   }
 
   return (
@@ -287,10 +334,10 @@ const TenancySelectField = (props: SelectProps) => {
             : 'Select an existing tenancy'
         }
         nothingFoundMessage="No tenancies found"
+        value={value}
         data={[...options, ...createdOptions]}
         disabled={isLoading}
         rightSection={isLoading && <Loader size="sm" />}
-        value={form.getValues().tenancy_id?.toString() || null}
         label={
           <Group wrap="nowrap" gap="sm" justify="space-between">
             <span>Tenancy</span>
