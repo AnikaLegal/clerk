@@ -6,7 +6,6 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import (
     UpdateModelMixin,
-    CreateModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
 )
@@ -57,21 +56,13 @@ class ClientApiViewset(
     RetrieveModelMixin,
     ListModelMixin,
     UpdateModelMixin,
-    CreateModelMixin,
 ):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     pagination_class = ClientPaginator
-
-    def get_permissions(self):
-        if self.action == "create":
-            permission_classes = [CoordinatorOrBetterPermission]
-        else:
-            permission_classes = [
-                CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
-            ]
-
-        return [p() for p in permission_classes]
+    permission_classes = [
+        CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
+    ]
 
     def get_queryset(self):
         queryset = self.queryset.order_by("-created_at")
