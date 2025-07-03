@@ -8,6 +8,8 @@ import * as Yup from 'yup'
 
 import '@mantine/core/styles.css'
 
+Yup.setLocale({ mixed: { required: 'This field is required.' } })
+
 export type RequiredClientProps = Pick<
   ClientCreate,
   RequiredKeysOf<ClientCreate>
