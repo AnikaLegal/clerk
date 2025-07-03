@@ -96,7 +96,9 @@ class TenancyFactory(TimestampedModelFactory):
 
     agent = factory.SubFactory(PersonFactory)
     landlord = factory.SubFactory(PersonFactory)
-    address = factory.Faker("address")
+    address = factory.Faker("street_address")
+    suburb = factory.Faker("city")
+    postcode = factory.Faker("postcode")
     started = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1y", end_date="-2y"
     )
