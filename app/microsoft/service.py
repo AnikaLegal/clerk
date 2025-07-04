@@ -1,5 +1,4 @@
 import logging
-import os
 from dataclasses import dataclass
 
 from accounts.models import User
@@ -21,11 +20,6 @@ class MicrosoftUserPermissions:
     has_coordinator_perms: bool
     paralegal_perm_issues: list[Issue]
     paralegal_perm_missing_issues: list[Issue]
-
-
-def get_document_template_path(topic: str):
-    assert [x for x in CaseTopic.CHOICES if topic == x[0]]
-    return os.path.join("templates", slugify(topic))
 
 
 def get_user_permissions(user):
