@@ -51,8 +51,6 @@ class DocumentTemplateApiViewset(ViewSet):
         serializer = DocumentTemplateFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        # Annotate the queryset to extract the file name from the file path so
-        # we can filter by name only.
         queryset = DocumentTemplate.objects.all()
         queryset = queryset.order_by("topic", "name")
 
