@@ -10,7 +10,9 @@ import {
   Table,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
 import {
@@ -173,32 +175,69 @@ const DocumentTemplateTableBody = ({
   if (data.length < 1) {
     return <EmptyState />
   }
-
   return (
     <>
       {data.map((template) => (
-        <Table.Tr key={template.url}>
+        <DocumentTemplateTableRow
+          key={template.url || template.name}
+          template={template}
+        />
+      ))}
+    </>
+  )
+}
+
+interface DocumentTemplateTableRowProps {
+  template: DocumentTemplate
+}
+
+const DocumentTemplateTableRow = ({
+  template,
+}: DocumentTemplateTableRowProps) => {
+  const found: boolean = !!template.url
+  return (
+    <Table.Tr>
+      {found ? (
+        <>
           <Table.Td>
             <a href={template.url}>{template.name}</a>
           </Table.Td>
           <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
           <Table.Td>{template.created_at}</Table.Td>
           <Table.Td>{template.modified_at}</Table.Td>
+        </>
+      ) : (
+        <>
           <Table.Td>
-            <DocumentTemplateActionIcons template={template} />
+            <Group gap="xs">
+              <Tooltip label="File Not Found" color="red" withArrow>
+                <ThemeIcon variant="transparent" color="red">
+                  <IconExclamationCircle />
+                </ThemeIcon>
+              </Tooltip>
+              <span>{template.name}</span>
+            </Group>
           </Table.Td>
-        </Table.Tr>
-      ))}
-    </>
+          <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
+          <Table.Td>-</Table.Td>
+          <Table.Td>-</Table.Td>
+        </>
+      )}
+      <Table.Td>
+        <DocumentTemplateActionIcons template={template} disabled={!found} />
+      </Table.Td>
+    </Table.Tr>
   )
 }
 
 interface DocumentTemplateActionIconsProps {
   template: DocumentTemplate
+  disabled?: boolean
 }
 
 const DocumentTemplateActionIcons = ({
   template,
+  disabled = false,
 }: DocumentTemplateActionIconsProps) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
@@ -243,7 +282,7 @@ const DocumentTemplateActionIcons = ({
 
   return (
     <Center>
-      <ActionIcon variant="transparent" color="gray">
+      <ActionIcon variant="transparent" color="gray" disabled={disabled}>
         <IconTrash stroke={1.5} onClick={() => setShowConfirmDelete(true)} />
       </ActionIcon>
     </Center>
