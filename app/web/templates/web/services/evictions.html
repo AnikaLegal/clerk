@@ -1,0 +1,79 @@
+{% extends 'web/_base.html' %}
+{% load static %}
+{% block title %}
+  Evictions Support
+{% endblock %}
+{% block social_meta %}
+  {% include 'web/snippets/_social_meta.html' with title='Evictions Support' description='Getting evicted? Know your rights before you panic!' %}
+{% endblock %}
+{% block content %}
+  <div class="segment">
+    <div class="container wide">
+      <div class="story left">
+        <div class="content">
+          <h1>Getting evicted? Know your rights before you panic!</h1>
+          <p>Is your landlord trying to evict you because you exercised your rights? Perhaps you asked for repairs, or complained about a rent increase. We are here to help.</p>
+          <p>Received a retaliatory notice to vacate? There's no time to waste. Get free, ongoing legal support.</p>
+          <a href="https://intake.anikalegal.com/"><button>Get free help</button></a>
+        </div>
+        <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/evictions-hero.jpg' %}" />
+      </div>
+    </div>
+  </div>
+  <div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
+    <div class="content">
+      <h2>What does it involve?</h2>
+      <p>Start your case with us and you'll receive free legal assistance and advice that is:</p>
+      <ul>
+        <li>Specific to your circumstances</li>
+        <li>Online and easy to understand</li>
+      </ul>
+      <p>Whether it's buying you some time in your home to find a new place, or preparing you to challenge the eviction at VCAT, we've got you covered.</p>
+    </div>
+  </div>
+  <div class="panel right round top-left bottom-left">
+    <div class="content">
+      <h2>Am I eligible?</h2>
+      <p>You are eligible for this service if you're a renter living in Victoria who is being evicted because you stood up for your rental rights.</p>
+      <p>Still not sure if you're eligible? Submit your case, and we'll let you know.</p>
+    </div>
+    <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/services/mum.jpg' %}" />
+  </div>
+  <div class="segment" style="padding-bottom: 0;">
+    <div class="container wide">
+      <h2>Here's the step-by-step breakdown</h2>
+      <div class="divider"></div>
+      <div class="card-grid tight">
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}" />
+          <p class="header">1. Complete our questionnaire</p>
+          <p class="compact">
+            It is <a href="https://intake.anikalegal.com/">fully online</a> and takes less than 10 minutes
+          </p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
+          <p class="header">2. We'll call you</p>
+          <p class="compact">One of our friendly team will call you to discuss your situation</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+          <p class="header">3. Receive your personalised legal advice</p>
+          <p class="compact">You'll get an email outlining your rights and options</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/agreement.jpg' %}" />
+          <p class="header">4. We may negotiate with your landlord</p>
+          <p class="compact">We can contact your Rental Provider or Agent to try and negotiate a resolution or ask that they give you more time while you look for your next rental</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}" />
+          <p class="header">5. Reach a resolution at VCAT</p>
+          <p class="compact">We'll help you prepare for your VCAT hearing, whether it's to stop the eviction process, or ask for one more month in your rental to look for your next accommodation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include 'web/snippets/_footer_cta.html' with cta='Received a Notice to Vacate your home?' %}
+{% endblock %}

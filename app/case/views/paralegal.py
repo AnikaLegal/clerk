@@ -1,11 +1,12 @@
-from django.db.models import Count, Max, Q, F, Case, When
+from accounts.models import CaseGroups, User
+from core.models.issue import CaseTopic
+from django.db.models import Case, Count, F, Max, Q, When
 from rest_framework.decorators import api_view
 
-from accounts.models import User
-from .auth import coordinator_or_better_required
-from case.utils.react import render_react_page
 from case.serializers import ParalegalSerializer
-from accounts.models import CaseGroups
+from case.utils.react import render_react_page
+
+from .auth import coordinator_or_better_required
 
 
 @api_view(["GET"])
@@ -23,7 +24,7 @@ def paralegal_list_page_view(request):
         "paralegals": ParalegalSerializer(paralegals, many=True).data,
         "lawyers": ParalegalSerializer(lawyers, many=True).data,
     }
-    return render_react_page(request, f"Paralegals", "paralegal-list", context)
+    return render_react_page(request, "Paralegals", "paralegal-list", context)
 
 
 def _calculate_user_capacity(user_qs, issue_rel):
@@ -36,17 +37,43 @@ def _calculate_user_capacity(user_qs, issue_rel):
             ),
             open_repairs=Count(
                 issue_rel,
-                Q(**{f"{issue_rel}__is_open": True, f"{issue_rel}__topic": "REPAIRS"}),
+                Q(
+                    **{
+                        f"{issue_rel}__is_open": True,
+                        f"{issue_rel}__topic": CaseTopic.REPAIRS,
+                    }
+                ),
                 distinct=True,
             ),
             open_bonds=Count(
                 issue_rel,
-                Q(**{f"{issue_rel}__is_open": True, f"{issue_rel}__topic": "BONDS"}),
+                Q(
+                    **{
+                        f"{issue_rel}__is_open": True,
+                        f"{issue_rel}__topic": CaseTopic.BONDS,
+                    }
+                ),
                 distinct=True,
             ),
             open_eviction=Count(
                 issue_rel,
-                Q(**{f"{issue_rel}__is_open": True, f"{issue_rel}__topic": "EVICTION"}),
+                Q(
+                    **{
+                        f"{issue_rel}__is_open": True,
+                    }
+                )
+                & Q(
+                    Q(
+                        **{
+                            f"{issue_rel}__topic": CaseTopic.EVICTION_ARREARS,
+                        }
+                    )
+                    | Q(
+                        **{
+                            f"{issue_rel}__topic": CaseTopic.EVICTION_RETALIATORY,
+                        }
+                    )
+                ),
                 distinct=True,
             ),
         )

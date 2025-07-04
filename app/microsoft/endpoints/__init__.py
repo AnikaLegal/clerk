@@ -1,14 +1,9 @@
-from .helpers import create_client, get_token
-from .group import GroupEndpoint
-from .user import UserEndpoint
-from .folder import FolderEndpoint
-
 from django.conf import settings
 
-"""
-from microsoft.endpoints import MSGraphAPI
-api = MSGraphAPI()
-"""
+from .folder import FolderEndpoint
+from .group import GroupEndpoint
+from .helpers import create_client
+from .user import UserEndpoint
 
 
 class MSGraphAPI:
@@ -18,16 +13,25 @@ class MSGraphAPI:
 
     def __init__(self):
         """
-        Constructor authenticates app and obtains access token.
-        Then instantiates endpoint objects and sets them as attributes.
+        Create a new MSGraphAPI instance.
+        This will create a new client using the credentials from the settings.
         """
         client = create_client(
             settings.AZURE_AD_CLIENT_ID,
             settings.MS_AUTHORITY_URL,
             settings.AZURE_AD_CLIENT_SECRET,
         )
-        access_token = get_token(client)
+        self.group = GroupEndpoint(client)
+        self.user = UserEndpoint(client)
+        self.folder = FolderEndpoint(client)
 
-        self.group = GroupEndpoint(access_token)
-        self.user = UserEndpoint(access_token)
-        self.folder = FolderEndpoint(access_token)
+    def is_available(self):
+        """
+        Check if the MS Graph API is available.
+        This will check if a token is available and if an endpoint is reachable.
+        """
+        try:
+            self.group.get()
+            return True
+        except Exception:
+            return False

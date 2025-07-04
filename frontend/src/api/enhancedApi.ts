@@ -1,6 +1,6 @@
 import { generatedApi } from './api.generated'
 
-const ENTITY_TYPES = ['CASE', 'EMAIL'] as const
+const ENTITY_TYPES = ['CASE', 'EMAIL', 'SERVICE', 'DOCUMENT_TEMPLATE'] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
   addTagTypes: ENTITY_TYPES,
@@ -56,6 +56,12 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteCaseService: {
       invalidatesTags: [{ type: 'SERVICE' }],
+    },
+    getDocumentTemplates: {
+      providesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
+    },
+    deleteDocumentTemplate: {
+      invalidatesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
     },
   },
 })

@@ -1,24 +1,16 @@
 import logging
 from dataclasses import dataclass
 
+from accounts.models import User
+from core.models import DocumentTemplate, FileUpload, Issue
 from django.conf import settings
 from django.utils import timezone
-
-from accounts.models import User
-from core.models import CaseTopic, Issue, FileUpload
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
 
 
-# Paths for template folders.
-TEMPLATE_PATHS = {
-    CaseTopic.BONDS: "templates/bonds",
-    CaseTopic.REPAIRS: "templates/repairs",
-    CaseTopic.EVICTION: "templates/evictions",
-    CaseTopic.HEALTH_CHECK: "templates/health-check",
-}
 CLIENT_UPLOAD_FOLDER_NAME = "client-uploads"
 EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
@@ -105,13 +97,20 @@ def set_up_new_case(issue: Issue):
     api = MSGraphAPI()
     case_folder_name = str(issue.id)
     parent_folder_id = settings.CASES_FOLDER_ID
-    template_path = TEMPLATE_PATHS[issue.topic]
+
     # Copy templates to the case folder if not already done.
     case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
     if not case_folder:
         logger.info("Creating case folder for Issue<%s>", issue.pk)
-        api.folder.copy(template_path, case_folder_name, parent_folder_id)
-        case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
+        case_folder = api.folder.create_folder(case_folder_name, parent_folder_id)
+        if case_folder:
+            templates = DocumentTemplate.objects.filter(topic=issue.topic).all()
+            for template in templates:
+                api.folder.copy(
+                    template.api_file_path,
+                    template.name,
+                    case_folder["id"],
+                )
     else:
         logger.info("Case folder already exists for Issue<%s>", issue.pk)
 
@@ -240,35 +239,3 @@ def tear_down_coordinator(user):
         result = api.user.get(user.email)
         user_id = result["id"]
         api.group.remove_user(user_id)
-
-
-def list_templates(topic):
-    api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
-    children = api.folder.get_children(path)
-    return [
-        {
-            "id": doc["id"],
-            "name": doc["name"],
-            "url": doc["webUrl"],
-            "created_at": timezone.datetime.fromisoformat(
-                doc["createdDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-            "modified_at": timezone.datetime.fromisoformat(
-                doc["lastModifiedDateTime"].replace("Z", "")
-            ).strftime("%d/%m/%Y"),
-        }
-        for doc in children
-    ]
-
-
-def upload_template(topic, file):
-    api = MSGraphAPI()
-    path = TEMPLATE_PATHS[topic]
-    parent = api.folder.get(path)
-    api.folder.upload_file(file, parent["id"])
-
-
-def delete_template(file_id):
-    api = MSGraphAPI()
-    api.folder.delete_file(file_id)

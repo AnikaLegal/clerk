@@ -61,7 +61,7 @@ class FolderEndpoint(BaseEndpoint):
 
     def create_folder(self, folder_name, parent_id):
         """
-        Create a folder in the parent
+        Create a folder under the parent folder specified by the supplied id.
         """
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
         return super().post(
@@ -69,9 +69,23 @@ class FolderEndpoint(BaseEndpoint):
             data={
                 "name": folder_name,
                 "folder": {},  # They do it like this in the docs /shrug
-                "@microsoft.graph.conflictBehavior": "rename",
+                "@microsoft.graph.conflictBehavior": "fail",
             },
         )
+
+    def create_path(self, path):
+        """
+        Create a folder path under the root folder.
+        """
+        parent_id = "root"
+        partial_path = ""
+        for part in path.split(os.path.sep):
+            partial_path = os.path.join(partial_path, part)
+            info = self.get(partial_path)
+            if not info:
+                self.create_folder(part, parent_id)
+                info = self.get(partial_path)
+            parent_id = info["id"]
 
     def upload_file(self, file, parent_id, name=None):
         """

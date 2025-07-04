@@ -1,137 +1,252 @@
-import React, { useState, useEffect } from 'react'
 import {
+  ActionIcon,
   Button,
+  Center,
   Container,
-  Header,
+  Grid,
+  Group,
+  Loader,
+  Select,
   Table,
-  Input,
-  Dropdown,
-} from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
+import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
+import {
+  IconExclamationCircle,
+  IconSearch,
+  IconTrash,
+} from '@tabler/icons-react'
+import {
+  DocumentTemplate,
+  GetDocumentTemplatesApiArg,
+  useDeleteDocumentTemplateMutation,
+  useGetDocumentTemplatesQuery,
+} from 'api'
+import { enqueueSnackbar } from 'notistack'
+import React, { useEffect, useState } from 'react'
+import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
-import { mount, debounce, getAPIErrorMessage } from 'utils'
-import { FadeTransition } from 'comps/transitions'
-import api, { useDeleteDocumentTemplateMutation, DocumentTemplate } from 'api'
+import '@mantine/core/styles.css'
 
 interface DjangoContext {
-  topic_options: { key: string; value: string; text: string }[]
-  topic: string
+  choices: {
+    topic: [string, string][]
+  }
   create_url: string
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-
-const debouncer = debounce(300)
+const TopicLabels = choiceToMap(CONTEXT.choices.topic)
+const CreateUrl = CONTEXT.create_url
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [templates, setTemplates] = useState<DocumentTemplate[]>([])
-  const [name, setName] = useState('')
-  const [topic, setTopic] = useState(CONTEXT.topic)
-  const [searchTemplates] = api.useLazyGetDocumentTemplatesQuery()
+  const [args, setArgs] = useState<GetDocumentTemplatesApiArg>({})
+
+  const result = useGetDocumentTemplatesQuery(args)
+
+  const setArgByName = (
+    name: keyof GetDocumentTemplatesApiArg,
+    value: string
+  ) => {
+    setArgs((prev) => {
+      return { ...prev, [name]: value }
+    })
+  }
+
+  const onChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setArgByName('name', event.target.value.trim())
+    },
+    300
+  )
+
+  return (
+    <Container size="xl">
+      <Title order={1}>Document Templates</Title>
+      <Button component="a" href={CreateUrl} size="md" mt="sm">
+        Upload document template
+      </Button>
+      <Grid mt="md">
+        <Grid.Col span={6}>
+          <TextInput
+            placeholder="Search by template name..."
+            rightSection={<IconSearch size={16} stroke={4} />}
+            size="md"
+            onChange={onChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Select
+            clearable
+            searchable
+            size="md"
+            placeholder="Select a case topic"
+            data={Array.from(TopicLabels, ([key, value]) => ({
+              value: key,
+              label: value,
+            }))}
+            onChange={(value) => setArgByName('topic', (value as string) || '')}
+            withCheckIcon={false}
+          />
+        </Grid.Col>
+      </Grid>
+      <Table
+        withColumnBorders
+        withTableBorder
+        verticalSpacing="md"
+        fz="md"
+        mt="md"
+      >
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Topic</Table.Th>
+            <Table.Th>Created</Table.Th>
+            <Table.Th>Modified</Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          <DocumentTemplateTableBody result={result} />
+        </Table.Tbody>
+      </Table>
+    </Container>
+  )
+}
+
+const ErrorState = ({ error }: { error: any }) => {
+  useEffect(() => {
+    const message = getAPIErrorMessage(
+      error,
+      'Could not load document templates'
+    )
+    enqueueSnackbar(message, { variant: 'error' })
+  }, [error])
+
+  return (
+    <Table.Tr>
+      <td colSpan={5}>
+        <Group justify="center" gap="xs" m="sm" c="red">
+          <IconExclamationCircle />
+          <Text>Could not load document templates</Text>
+        </Group>
+      </td>
+    </Table.Tr>
+  )
+}
+
+const LoadingState = () => (
+  <Table.Tr>
+    <td colSpan={5}>
+      <Center m="sm">
+        <Loader />
+      </Center>
+    </td>
+  </Table.Tr>
+)
+
+const EmptyState = () => (
+  <Table.Tr>
+    <td colSpan={5}>
+      <Center m="sm">No templates found</Center>
+    </td>
+  </Table.Tr>
+)
+
+interface DocumentTemplateTableBodyProps {
+  result: ReturnType<typeof useGetDocumentTemplatesQuery>
+}
+
+const DocumentTemplateTableBody = ({
+  result,
+}: DocumentTemplateTableBodyProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} />
+  }
+  if (result.isLoading) {
+    return <LoadingState />
+  }
+
+  const data: DocumentTemplate[] = result.data || []
+  if (data.length < 1) {
+    return <EmptyState />
+  }
+
+  return (
+    <>
+      {data.map((template) => (
+        <Table.Tr key={template.url}>
+          <Table.Td>
+            <a href={template.url}>{template.name}</a>
+          </Table.Td>
+          <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
+          <Table.Td>{template.created_at}</Table.Td>
+          <Table.Td>{template.modified_at}</Table.Td>
+          <Table.Td>
+            <DocumentTemplateActionIcons template={template} />
+          </Table.Td>
+        </Table.Tr>
+      ))}
+    </>
+  )
+}
+
+interface DocumentTemplateActionIconsProps {
+  template: DocumentTemplate
+}
+
+const DocumentTemplateActionIcons = ({
+  template,
+}: DocumentTemplateActionIconsProps) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
-  const { enqueueSnackbar } = useSnackbar()
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    setShowConfirmDelete(false)
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
 
-  const onDelete = (id) => () => {
-    const template = templates.filter((t) => t.id === id).pop()
-    if (template && window.confirm(`Delete file ${template.name}?`)) {
-      deleteDocumentTemplate({ id })
-        .unwrap()
-        .then(() => {
-          setTemplates(templates.filter((t) => t.id !== id))
-        })
-        .catch((err) => {
-          enqueueSnackbar(
-            getAPIErrorMessage(err, 'Failed to delete this document template'),
-            {
-              variant: 'error',
-            }
-          )
-        })
-    }
-  }
-  const search = debouncer(() => {
-    setIsLoading(true)
-    searchTemplates({ name, topic })
+  const handleDelete = () => {
+    deleteDocumentTemplate({ id: template.id })
       .unwrap()
-      .then((templates) => {
-        setTemplates(templates)
-        setIsLoading(false)
+      .then(() => {
+        enqueueSnackbar('Document template deleted', { variant: 'success' })
       })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
-          variant: 'error',
-        })
-        setIsLoading(false)
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to delete document template'),
+          {
+            variant: 'error',
+          }
+        )
       })
-  })
-  useEffect(() => search(), [name, topic])
-  return (
-    <Container>
-      <Header as="h1">Document Templates</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Upload document template</Button>
-      </a>
-      <div
-        style={{
-          margin: '1rem 0',
-          display: 'grid',
-          gap: '1rem',
-          gridTemplateColumns: '1fr 1fr',
-        }}
-      >
-        <Input
-          icon="search"
-          placeholder="Search by template name or subject..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Dropdown
-          fluid
-          selection
-          placeholder="Select a case type"
-          options={CONTEXT.topic_options}
-          onChange={(e, { value }) => setTopic(value as string)}
-          value={topic}
-        />
+  }
+
+  if (showConfirmDelete) {
+    return (
+      <div ref={ref}>
+        <Center>
+          <Button
+            variant="filled"
+            color="red"
+            size="compact-sm"
+            onClick={handleDelete}
+          >
+            Confirm delete
+          </Button>
+        </Center>
       </div>
-      <FadeTransition in={!isLoading}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-              <Table.HeaderCell>Modified</Table.HeaderCell>
-              <Table.HeaderCell>Actions</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {templates.length < 1 && (
-              <Table.Row>
-                <td>No templates found</td>
-              </Table.Row>
-            )}
-            {templates.map((t) => (
-              <Table.Row key={t.url}>
-                <Table.Cell>
-                  <a href={t.url}>{t.name}</a>
-                </Table.Cell>
-                <Table.Cell>{t.topic}</Table.Cell>
-                <Table.Cell>{t.created_at}</Table.Cell>
-                <Table.Cell>{t.modified_at}</Table.Cell>
-                <Table.Cell>
-                  <Button negative basic onClick={onDelete(t.id)}>
-                    Delete
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </FadeTransition>
-    </Container>
+    )
+  }
+
+  return (
+    <Center>
+      <ActionIcon variant="transparent" color="gray">
+        <IconTrash stroke={1.5} onClick={() => setShowConfirmDelete(true)} />
+      </ActionIcon>
+    </Center>
   )
 }
 

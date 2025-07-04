@@ -73,7 +73,7 @@ class Email(models.Model):
 
 
 class EmailTemplate(TimestampedModel):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, db_collation="natural")
     topic = models.CharField(
         max_length=32, choices=(("GENERAL", "General"), *CaseTopic.CHOICES)
     )

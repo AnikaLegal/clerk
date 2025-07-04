@@ -1,111 +1,178 @@
-import React, { useState } from 'react'
 import {
   Button,
+  Center,
   Container,
-  Header,
+  Grid,
+  Group,
+  Loader,
+  Select,
   Table,
-  Input,
-  Dropdown,
-} from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
+import { useDebouncedCallback } from '@mantine/hooks'
+import { IconExclamationCircle, IconSearch } from '@tabler/icons-react'
+import {
+  EmailTemplate,
+  GetEmailTemplatesApiArg,
+  useGetEmailTemplatesQuery,
+} from 'api'
+import { enqueueSnackbar } from 'notistack'
+import React, { useEffect, useState } from 'react'
+import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
-import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
-import { FadeTransition } from 'comps/transitions'
-import api, { EmailTemplate } from 'api'
+import '@mantine/core/styles.css'
 
 interface DjangoContext {
-  topic_options: { key: string; value: string; text: string }[]
-  templates: EmailTemplate[]
+  choices: {
+    topic: [string, string][]
+  }
   create_url: string
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-
-const debouncer = debounce(300)
+const Topics = CONTEXT.choices.topic.sort((a, b) => a[1].localeCompare(b[1]))
+const TopicLabels = choiceToMap(Topics)
+const CreateUrl = CONTEXT.create_url
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [templates, setTemplates] = useState<EmailTemplate[]>(CONTEXT.templates)
-  const [name, setName] = useState('')
-  const [topic, setTopic] = useState('')
-  const [searchTemplates] = api.useLazyGetEmailTemplatesQuery()
-  const { enqueueSnackbar } = useSnackbar()
-  const search = debouncer(() => {
-    setIsLoading(true)
-    searchTemplates({ name, topic })
-      .unwrap()
-      .then((templates) => {
-        setTemplates(templates)
-        setIsLoading(false)
-      })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search templates'), {
-          variant: 'error',
-        })
-        setIsLoading(false)
-      })
-  })
-  useEffectLazy(() => search(), [name, topic])
+  const [args, setArgs] = useState<GetEmailTemplatesApiArg>({})
+
+  const result = useGetEmailTemplatesQuery(args)
+
+  const setArgByName = (name: keyof GetEmailTemplatesApiArg, value: string) => {
+    setArgs((prev) => {
+      return { ...prev, [name]: value }
+    })
+  }
+
+  const onChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setArgByName('name', event.target.value.trim())
+    },
+    300
+  )
+
   return (
-    <Container>
-      <Header as="h1">Email Templates</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Create a new email template</Button>
-      </a>
-      <div
-        style={{
-          margin: '1rem 0',
-          display: 'grid',
-          gap: '1rem',
-          gridTemplateColumns: '1fr 1fr',
-        }}
+    <Container size="xl">
+      <Title order={1}>Email Templates</Title>
+      <Button component="a" href={CreateUrl} size="md" mt="sm">
+        Create email template
+      </Button>
+      <Grid mt="md">
+        <Grid.Col span={6}>
+          <TextInput
+            placeholder="Search by template name or subject..."
+            rightSection={<IconSearch size={16} stroke={4} />}
+            size="md"
+            onChange={onChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Select
+            clearable
+            searchable
+            size="md"
+            placeholder="Select a case topic"
+            data={Topics.map(([value, label]) => ({
+              value,
+              label,
+            }))}
+            onChange={(value) => setArgByName('topic', (value as string) || '')}
+            withCheckIcon={false}
+          />
+        </Grid.Col>
+      </Grid>
+      <Table
+        withColumnBorders
+        withTableBorder
+        verticalSpacing="md"
+        fz="md"
+        mt="md"
       >
-        <Input
-          icon="search"
-          placeholder="Search by template name or subject..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Dropdown
-          fluid
-          selection
-          clearable
-          placeholder="Select a case type"
-          options={CONTEXT.topic_options}
-          onChange={(e, { value }) => setTopic(value as string)}
-          value={topic}
-        />
-      </div>
-      <FadeTransition in={!isLoading}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Topic</Table.HeaderCell>
-              <Table.HeaderCell>Subject</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {templates.length < 1 && (
-              <Table.Row>
-                <td>No templates found</td>
-              </Table.Row>
-            )}
-            {templates.map((t) => (
-              <Table.Row key={t.url}>
-                <Table.Cell>
-                  <a href={t.url}>{t.name}</a>
-                </Table.Cell>
-                <Table.Cell>{t.topic}</Table.Cell>
-                <Table.Cell>{t.subject}</Table.Cell>
-                <Table.Cell>{t.created_at}</Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </FadeTransition>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Topic</Table.Th>
+            <Table.Th>Subject</Table.Th>
+            <Table.Th>Created</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          <EmailTemplateTableBody result={result} />
+        </Table.Tbody>
+      </Table>
     </Container>
+  )
+}
+
+const ErrorState = ({ error }: { error: any }) => {
+  useEffect(() => {
+    const message = getAPIErrorMessage(error, 'Could not load email templates')
+    enqueueSnackbar(message, { variant: 'error' })
+  }, [error])
+
+  return (
+    <Table.Tr>
+      <td colSpan={5}>
+        <Group justify="center" gap="xs" m="sm" c="red">
+          <IconExclamationCircle />
+          <Text>Could not load email templates</Text>
+        </Group>
+      </td>
+    </Table.Tr>
+  )
+}
+
+const LoadingState = () => (
+  <Table.Tr>
+    <td colSpan={5}>
+      <Center m="sm">
+        <Loader />
+      </Center>
+    </td>
+  </Table.Tr>
+)
+
+const EmptyState = () => (
+  <Table.Tr>
+    <td colSpan={5}>
+      <Center m="sm">No templates found</Center>
+    </td>
+  </Table.Tr>
+)
+
+interface EmailTemplateTableBodyProps {
+  result: ReturnType<typeof useGetEmailTemplatesQuery>
+}
+
+const EmailTemplateTableBody = ({ result }: EmailTemplateTableBodyProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} />
+  }
+  if (result.isLoading) {
+    return <LoadingState />
+  }
+
+  const data: EmailTemplate[] = result.data || []
+  if (data.length < 1) {
+    return <EmptyState />
+  }
+
+  return (
+    <>
+      {data.map((template) => (
+        <Table.Tr key={template.url}>
+          <Table.Td>
+            <a href={template.url}>{template.name}</a>
+          </Table.Td>
+          <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
+          <Table.Td>{template.subject}</Table.Td>
+          <Table.Td>{template.created_at}</Table.Td>
+        </Table.Tr>
+      ))}
+    </>
   )
 }
 

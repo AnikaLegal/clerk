@@ -14,10 +14,14 @@ from .tenancy import Tenancy
 from .timestamped import TimestampedModel
 
 
+# NOTE: The first letter of the topic is used as a prefix for the fileref. You
+# will want to exercise caution when adding new topics with the same first
+# letter. See the 'get_fileref_prefix' method for more details.
 class CaseTopic:
     REPAIRS = "REPAIRS"
     RENT_REDUCTION = "RENT_REDUCTION"
-    EVICTION = "EVICTION"
+    EVICTION_ARREARS = "EVICTION_ARREARS"
+    EVICTION_RETALIATORY = "EVICTION_RETALIATORY"
     BONDS = "BONDS"
     OTHER = "OTHER"
     HEALTH_CHECK = "HEALTH_CHECK"
@@ -25,13 +29,15 @@ class CaseTopic:
     ACTIVE_CHOICES = [
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
-        (EVICTION, "Eviction"),
+        (EVICTION_ARREARS, "Eviction (Arrears)"),
+        (EVICTION_RETALIATORY, "Eviction (Retaliatory)"),
         (HEALTH_CHECK, "Housing Health Check"),
     ]
     CHOICES = (
         (REPAIRS, "Repairs"),
         (BONDS, "Bonds"),
-        (EVICTION, "Eviction"),
+        (EVICTION_ARREARS, "Eviction (Arrears)"),
+        (EVICTION_RETALIATORY, "Eviction (Retaliatory)"),
         (HEALTH_CHECK, "Housing Health Check"),
         (RENT_REDUCTION, "Rent reduction"),
         (OTHER, "Other"),
@@ -124,7 +130,10 @@ class EmploymentType(models.TextChoices):
     LOOKING_FOR_WORK = "LOOKING_FOR_WORK", "Looking for work"
     NOT_LOOKING_FOR_WORK = "NOT_LOOKING_FOR_WORK", "Not looking for work"
     # Legacy below - Do not use.
-    INCOME_REDUCED_COVID = "INCOME_REDUCED_COVID", "Income reduced due to COVID-19 (DO NOT USE)"
+    INCOME_REDUCED_COVID = (
+        "INCOME_REDUCED_COVID",
+        "Income reduced due to COVID-19 (DO NOT USE)",
+    )
     UNEMPLOYED = "UNEMPLOYED", "Currently unemployed (DO NOT USE)"
 
 
@@ -174,12 +183,16 @@ class Issue(TimestampedModel):
     )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
+
     # Tracks whether a Slack alert has been successfully sent.
-    is_alert_sent = models.BooleanField(default=False)
-    # Tracks whether the case data has been successfully sent to Actionstep.
-    is_case_sent = models.BooleanField(default=False)
+    is_alert_sent = models.BooleanField(default=True)
     # Tracks we have sent the welcome email.
-    is_welcome_email_sent = models.BooleanField(default=False)
+    is_welcome_email_sent = models.BooleanField(default=True)
+
+    # Tracks whether the case data has been successfully sent to Actionstep.
+    # NOTE: This is no longer used.
+    is_case_sent = models.BooleanField(default=False)
+
     # Tracks whether a matching folder has been set up in Sharepoint.
     is_sharepoint_set_up = models.BooleanField(default=False)
 
@@ -212,13 +225,23 @@ class Issue(TimestampedModel):
             self.fileref = self.get_next_fileref()
         super().save(*args, **kwargs)
 
+    def get_fileref_prefix(self):
+        match self.topic:
+            case CaseTopic.RENT_REDUCTION:
+                # NOTE: Use a different prefix so it doesn't conflict with
+                # repairs. Unsure why this specific prefix was chosen.
+                return "C"
+            case _:
+                return self.topic[0].upper()
+
     def get_next_fileref(self):
         """
         Returns next file reference code (eg. "R0023") for this issue topic.
         """
+        prefix = self.get_fileref_prefix()
         last_fileref = (
             Issue.objects.exclude(fileref="")
-            .filter(topic=self.topic)
+            .filter(fileref__startswith=prefix)
             .order_by("fileref")
             .values_list("fileref", flat=True)
             .last()
@@ -232,7 +255,6 @@ class Issue(TimestampedModel):
             rjust = 4
             next_filref_count = 1
 
-        prefix = self.topic[0].upper()
         return prefix + str(next_filref_count).rjust(rjust, "0")
 
     def __str__(self):

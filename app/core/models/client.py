@@ -21,6 +21,10 @@ class EligibilityCircumstanceType(models.TextChoices):
         "HOUSING",
         "Public housing",
     )
+    SINGLE_PARENT = (
+        "SINGLE_PARENT",
+        "Single Parent",
+    )
     MENTAL_ILLNESS = (
         "MENTAL_ILLNESS",
         "Mental illness",
