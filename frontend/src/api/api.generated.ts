@@ -407,6 +407,16 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    renameDocumentTemplate: build.mutation<
+      RenameDocumentTemplateApiResponse,
+      RenameDocumentTemplateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/template-doc/${queryArg.id}/rename-file/`,
+        method: "PATCH",
+        body: queryArg.documentTemplateRename,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -768,6 +778,13 @@ export type DeleteDocumentTemplateApiArg = {
   /** Entity ID */
   id: number;
 };
+export type RenameDocumentTemplateApiResponse = unknown;
+export type RenameDocumentTemplateApiArg = {
+  /** Entity ID */
+  id: number;
+  /** Successful response. */
+  documentTemplateRename: DocumentTemplateRename;
+};
 export type IssueBase = {
   topic: string;
   stage: string;
@@ -1051,6 +1068,9 @@ export type DocumentTemplateCreate = {
   topic: string;
   files: Blob[];
 };
+export type DocumentTemplateRename = {
+  name: string;
+};
 export const {
   useGetCasesQuery,
   useGetCaseQuery,
@@ -1100,4 +1120,5 @@ export const {
   useGetDocumentTemplatesQuery,
   useCreateDocumentTemplateMutation,
   useDeleteDocumentTemplateMutation,
+  useRenameDocumentTemplateMutation,
 } = injectedRtkApi;

@@ -1230,6 +1230,30 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/template-doc/{id}/rename-file/:
+    patch:
+      operationId: renameDocumentTemplate
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentTemplateRename"
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
     IssueBase:
@@ -2109,6 +2133,13 @@ components:
       required:
         - topic
         - files
+    DocumentTemplateRename:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
   responses:
     BadRequest:
       description: Bad request

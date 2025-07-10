@@ -63,6 +63,9 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteDocumentTemplate: {
       invalidatesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
     },
+    renameDocumentTemplate: {
+      invalidatesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
+    },
   },
 })
 

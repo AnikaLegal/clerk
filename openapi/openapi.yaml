@@ -65,3 +65,5 @@ paths:
     $ref: paths/template-doc-list.yaml
   /clerk/api/template-doc/{id}/:
     $ref: paths/template-doc-detail.yaml
+  /clerk/api/template-doc/{id}/rename-file/:
+    $ref: paths/template-doc-rename.yaml
