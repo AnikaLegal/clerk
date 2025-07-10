@@ -1,5 +1,5 @@
 import os
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 from core.models.issue import CaseTopic
 from core.models.timestamped import TimestampedModel
@@ -28,7 +28,7 @@ class DocumentTemplate(TimestampedModel):
     name = models.CharField(max_length=256, blank=True)
 
     def save(self, *args, **kwargs):
-        self.name = os.path.basename(self.file.name)
+        self.name = unquote(os.path.basename(self.file.name))
         super().save(*args, **kwargs)
 
     @property
