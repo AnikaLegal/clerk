@@ -3,6 +3,7 @@ from .client import ClientSerializer
 from .documents import (
     DocumentTemplateFilterSerializer,
     DocumentTemplateSerializer,
+    DocumentTemplateRenameSerializer,
 )
 from .email import (
     EmailAttachmentSerializer,

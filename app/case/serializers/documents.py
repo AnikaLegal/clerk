@@ -9,6 +9,10 @@ class DocumentTemplateFilterSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
 
 
+class DocumentTemplateRenameSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True)
+
+
 class DocumentTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentTemplate
