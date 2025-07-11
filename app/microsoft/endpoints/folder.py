@@ -1,12 +1,18 @@
-import os
 import logging
+import os
+from typing import TYPE_CHECKING
+from urllib.parse import quote
 
 import requests
 from django.conf import settings
-from django.utils.text import slugify
 
 from .base import BaseEndpoint
 from .helpers import BASE_URL
+
+if TYPE_CHECKING:
+    from typing import Literal, TypeAlias
+
+    ConflictBehaviour: TypeAlias = Literal["fail", "replace", "rename"]
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +35,6 @@ class FolderEndpoint(BaseEndpoint):
         Returns driveItem object or None.
         """
         url = os.path.join(self.MIDDLE_URL, path)
-
         return super().get(url)
 
     def get_children(self, path):
@@ -87,31 +92,22 @@ class FolderEndpoint(BaseEndpoint):
                 info = self.get(partial_path)
             parent_id = info["id"]
 
-    def upload_file(self, file, parent_id, name=None):
+    def upload_file(
+        self,
+        file,
+        parent_id,
+        name=None,
+        conflict_behaviour: "ConflictBehaviour" = "fail",
+    ):
         """
         Uploads file to parent
         """
-        original_filename = name or file.name
-        base, ext = os.path.splitext(original_filename)
-        upload_filename = slugify(base) + ext
-        self.delete_file_if_exists(upload_filename, parent_id)
+        name = name or file.name
         if file.size < FILE_UPLOAD_SIZE_LIMIT:
-            data = self._upload_small_file(file, parent_id, upload_filename)
+            data = self._upload_small_file(file, parent_id, name, conflict_behaviour)
         else:
-            data = self._upload_large_file(file, parent_id, upload_filename)
-
-        # Rename file
-        if upload_filename != original_filename:
-            self.delete_file_if_exists(original_filename, parent_id)
-
-        file_id = data["id"]
-        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
-        return super().patch(url, data={"name": original_filename})
-
-    def delete_file_if_exists(self, filename, parent_id):
-        file = self.get_child_if_exists(filename, parent_id)
-        if file:
-            self.delete_file(file["id"])
+            data = self._upload_large_file(file, parent_id, name, conflict_behaviour)
+        return data
 
     def get_child_if_exists(self, filename, parent_id):
         # Check for existing file.
@@ -155,7 +151,7 @@ class FolderEndpoint(BaseEndpoint):
             "name": name,
             "parentReference": {"driveId": settings.MS_GRAPH_DRIVE_ID, "id": parent_id},
         }
-        url = os.path.join(self.MIDDLE_URL, f"{path}:/copy")
+        url = os.path.join(self.MIDDLE_URL, f"{quote(path)}:/copy")
 
         return super().post(url, data)
 
@@ -208,26 +204,48 @@ class FolderEndpoint(BaseEndpoint):
 
         return super().post(url, data)
 
-    def _upload_small_file(self, file, parent_id, upload_filename):
+    def _upload_small_file(
+        self,
+        file,
+        parent_id,
+        filename,
+        conflict_behaviour: "ConflictBehaviour",
+    ):
         url = os.path.join(
             BASE_URL,
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/content",
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{quote(filename)}:/content",
         )
+        params = {
+            "@microsoft.graph.conflictBehavior": conflict_behaviour,
+        }
+
         headers = {**self.headers}
         content_type = getattr(file, "content_type", "")
         if content_type:
             headers["Content-Type"] = content_type
-        resp = requests.put(url, data=file, headers=headers, stream=True)
+        resp = requests.put(url, params=params, data=file, headers=headers, stream=True)
         return self.handle(resp)
 
-    def _upload_large_file(self, file, parent_id, upload_filename):
+    def _upload_large_file(
+        self,
+        file,
+        parent_id,
+        filename,
+        conflict_behaviour: "ConflictBehaviour",
+    ):
         # Start an upload session
         url = os.path.join(
             BASE_URL,
-            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{upload_filename}:/createUploadSession",
+            f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{quote(filename)}:/createUploadSession",
         )
-        data = {"name": upload_filename}
-        resp = requests.post(url, json=data, headers=self.headers, stream=False)
+        params = {
+            "@microsoft.graph.conflictBehavior": conflict_behaviour,
+        }
+
+        data = {"name": filename}
+        resp = requests.post(
+            url, params=params, json=data, headers=self.headers, stream=False
+        )
 
         session_data = self.handle(resp)
         upload_url = session_data["uploadUrl"]
@@ -252,4 +270,4 @@ class FolderEndpoint(BaseEndpoint):
             resp.raise_for_status()
             start += bytes_read
 
-        return self.get_child_if_exists(upload_filename, parent_id)
+        return self.get_child_if_exists(filename, parent_id)
