@@ -4,6 +4,8 @@ from urllib.parse import quote, unquote
 from core.models.issue import CaseTopic
 from core.models.timestamped import TimestampedModel
 from django.db import models
+from django.db.models import CharField, Value
+from django.db.models.functions import Reverse, Right, StrIndex
 from django.utils.text import slugify
 from django_cleanup import cleanup
 from microsoft.storage import MSGraphStorage
@@ -11,8 +13,25 @@ from microsoft.storage import MSGraphStorage
 STORAGE_BASE_PATH = "templates"
 
 
+class DocumentTemplateManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                name=Right(
+                    "file",
+                    StrIndex(Reverse("file"), Value("/")) - 1,  # type: ignore
+                    output_field=CharField(),
+                ),
+            )
+        )
+
+
 @cleanup.select
 class DocumentTemplate(TimestampedModel):
+    objects = DocumentTemplateManager()
+
     def _get_storage_class():
         return MSGraphStorage(
             base_path=STORAGE_BASE_PATH, enable_directory_caching=True
@@ -25,11 +44,6 @@ class DocumentTemplate(TimestampedModel):
     file = models.FileField(
         storage=_get_storage_class, upload_to=_get_upload_to, max_length=256
     )
-    name = models.CharField(max_length=256, blank=True)
-
-    def save(self, *args, **kwargs):
-        self.name = unquote(os.path.basename(self.file.name))
-        super().save(*args, **kwargs)
 
     @property
     def api_file_path(self):
