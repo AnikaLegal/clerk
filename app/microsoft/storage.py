@@ -18,7 +18,8 @@ class SimpleCache:
         self.timeout = timeout
 
     def _get_key(self, key):
-        return f"{self.cache_prefix}:{key}"
+        # Quote the key to prevent Django cache key warnings.
+        return f"{self.cache_prefix}:{quote(key)}"
 
     def get(self, key):
         key = self._get_key(key)
@@ -78,7 +79,7 @@ class MSGraphStorage(Storage):
             if sibling.get("folder"):
                 logger.debug(f"Skipping folder: {sibling['name']}")
                 continue
-            name = quote(sibling["name"])
+            name = sibling["name"]
             path = os.path.join(dir, name)
             logger.debug(f"Caching sibling: {path}")
             self.cache.set(path, sibling)
