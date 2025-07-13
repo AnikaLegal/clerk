@@ -107,6 +107,8 @@ class MSGraphStorage(Storage):
         if info:
             logger.debug(f"File info fetched from API for: {path}. Caching it.")
             self.cache.set(path, info)
+        else:
+            logger.debug(f"No file info found for: {path}")
         return info
 
     def _open(self, name, mode="rb"):
@@ -114,8 +116,7 @@ class MSGraphStorage(Storage):
 
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
 
         file_name, content_type, bytes = self.api.folder.download_file(info["id"])
         logger.debug(f"File downloaded: {file_name}, content_type: {content_type}")
@@ -163,16 +164,14 @@ class MSGraphStorage(Storage):
         logger.debug(f"Getting created time for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return timezone.datetime.fromisoformat(info["createdDateTime"])
 
     def get_modified_time(self, name: str) -> datetime:
         logger.debug(f"Getting modified time for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return timezone.datetime.fromisoformat(info["lastModifiedDateTime"])
 
     def get_valid_name(self, name: str) -> str:
@@ -191,14 +190,13 @@ class MSGraphStorage(Storage):
         logger.debug(f"Getting size for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return info["size"]
 
     def url(self, name):
         logger.debug(f"Getting URL for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
+            logger.warning(f"File not found: {name}")
             return ""
         return info["webUrl"]
