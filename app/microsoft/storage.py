@@ -178,6 +178,14 @@ class MSGraphStorage(Storage):
         logger.debug(f"Validating name: {name}")
         return name
 
+    def is_name_available(self, name, max_length=None):
+        # We don't check to see if file with the same name already exists here
+        # because when that is the case the base storage code attempts to
+        # generate another name but we want this handled by msgraph according to
+        # the conflict resolution settings.
+        exceeds_max_length = max_length and len(name) > max_length
+        return not exceeds_max_length
+
     def size(self, name):
         logger.debug(f"Getting size for file: {name}")
         info = self._get_file_info(name)
