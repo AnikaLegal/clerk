@@ -130,21 +130,22 @@ class MSGraphStorage(Storage):
     def _save(self, name, content):
         logger.debug(f"Saving file: {name}")
 
-        dir, _ = os.path.split(name)
-        info = self._get_file_info(dir)
-        if not info:
-            path = self._get_full_path(dir)
-            logger.debug(f"Directory not found. Creating path: {path}")
+        dir_name, file_name = os.path.split(name)
+        dir_info = self._get_file_info(dir_name)
+        if not dir_info:
+            path = self._get_full_path(dir_name)
+            logger.debug(f"Folder not found. Creating path: {path}")
             self.api.folder.create_path(path)
-            info = self._get_file_info(dir)
+            dir_info = self._get_file_info(dir_name)
+            if not dir_info:
+                raise FileNotFoundError(f"Folder not found: {dir_name}")
 
-        if not info:
-            logger.error(f"Folder not found: {dir}")
-            raise FileNotFoundError(f"Folder {dir} not found")
-
-        self.api.folder.upload_file(content, info["id"])
-        logger.debug(f"File uploaded: {name}")
-        return name
+        file_info = self.api.folder.upload_file(content, dir_info["id"], file_name)
+        if not file_info:
+            raise Exception(
+                f"Could not save file '{file_name}' to directory '{dir_name}'"
+            )
+        return os.path.join(dir_name, file_info["name"])
 
     def delete(self, name):
         logger.debug(f"Deleting file: {name}")
