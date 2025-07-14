@@ -124,3 +124,39 @@ def test_url_success(storage):
 def test_url_file_not_found(storage):
     storage._get_file_info = MagicMock(return_value=None)
     assert storage.url("file.txt") == ""
+
+
+def test_get_created_time_success(storage):
+    storage._get_file_info = MagicMock(return_value={"createdDateTime": "2024-07-14T12:34:56+00:00"})
+    dt = storage.get_created_time("file.txt")
+    assert dt.isoformat() == "2024-07-14T12:34:56+00:00"
+
+
+def test_get_created_time_file_not_found(storage):
+    storage._get_file_info = MagicMock(return_value=None)
+    with pytest.raises(FileNotFoundError):
+        storage.get_created_time("file.txt")
+
+
+def test_get_modified_time_success(storage):
+    storage._get_file_info = MagicMock(return_value={"lastModifiedDateTime": "2024-07-14T12:34:56+00:00"})
+    dt = storage.get_modified_time("file.txt")
+    assert dt.isoformat() == "2024-07-14T12:34:56+00:00"
+
+
+def test_get_modified_time_file_not_found(storage):
+    storage._get_file_info = MagicMock(return_value=None)
+    with pytest.raises(FileNotFoundError):
+        storage.get_modified_time("file.txt")
+
+
+def test_is_name_available_no_max_length(storage):
+    assert storage.is_name_available("file.txt") is True
+
+
+def test_is_name_available_exceeds_max_length(storage):
+    assert storage.is_name_available("a" * 300, max_length=255) is False
+
+
+def test_is_name_available_within_max_length(storage):
+    assert storage.is_name_available("a" * 10, max_length=255) is True
