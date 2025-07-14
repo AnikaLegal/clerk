@@ -38,7 +38,7 @@ class DocumentTemplate(TimestampedModel):
         )
 
     def _get_upload_to(instance, filename):
-        return os.path.join(slugify(instance.topic), quote(filename))
+        return os.path.join(slugify(instance.topic), filename)
 
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     file = models.FileField(
