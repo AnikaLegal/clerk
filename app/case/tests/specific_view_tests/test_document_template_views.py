@@ -144,8 +144,11 @@ def test_document_template_rename_api_view(superuser_client: APIClient):
     assert response.status_code == 204, response.json()
     schema_tester.validate_response(response=response)
 
-    template.refresh_from_db()
-    assert template.name == new_name
+    # The name property is an annotation so it won't be reset if we call
+    # template.refresh_from_db() here as we might normally do, so we just get
+    # the object instead.
+    template = DocumentTemplate.objects.get(pk=template.pk)
+    assert template.name == new_name  # type: ignore
     assert template.file.name.endswith(new_name)
 
 

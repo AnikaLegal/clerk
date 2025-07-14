@@ -13,6 +13,7 @@ def mock_api():
         "webUrl": "https://example.com",
     }
     api.folder.download_file.return_value = ("file.txt", "text/plain", b"content")
+    api.folder.upload_file.return_value = {"id": "file_id", "name": "file.txt"}
     api.folder.create_path.return_value = None
     api.folder.delete_file.return_value = None
     return api
@@ -21,21 +22,17 @@ def mock_api():
 @pytest.fixture
 def storage(mock_api):
     with patch("microsoft.storage.MSGraphAPI", return_value=mock_api):
-        yield MSGraphStorage(base_path="/base")
-
-
-def test_get_full_path(storage):
-    assert storage._get_full_path("file.txt") == "/base/file.txt"
+        yield MSGraphStorage()
 
 
 def test_get_file_info_cache(storage):
-    storage.cache.set(storage._get_full_path("file.txt"), {"id": "cached"})
+    storage.cache.set("file.txt", {"id": "cached"})
     info = storage._get_file_info("file.txt")
     assert info == {"id": "cached"}
 
 
 def test_get_file_info_api(storage, mock_api):
-    storage.cache.delete(storage._get_full_path("file.txt"))
+    storage.cache.delete("file.txt")
     info = storage._get_file_info("file.txt")
     assert info["id"] == "file_id"
     mock_api.folder.get.assert_called_once()
@@ -56,8 +53,8 @@ def test_open_file_not_found(storage, mock_api):
 
 def test_save_existing_dir(storage):
     content = MagicMock()
-    storage._get_file_info = MagicMock(return_value={"id": "dirid"})
-    storage.api.folder.upload_file = MagicMock()
+    storage._get_file_info = MagicMock(return_value={"id": "dir_id"})
+    storage.api.folder.upload_file = MagicMock(return_value={"name": "file.txt"})
     name = storage._save("dir/file.txt", content)
     storage.api.folder.upload_file.assert_called_once()
     assert name == "dir/file.txt"

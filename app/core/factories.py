@@ -265,7 +265,6 @@ class DocumentTemplateFactory(TimestampedModelFactory):
         "random_element", elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
     )
     file = factory.django.FileField()
-    name = factory.LazyAttribute(lambda obj: os.path.basename(obj.file.name))
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
@@ -278,4 +277,6 @@ class DocumentTemplateFactory(TimestampedModelFactory):
             with patch.object(MSGraphStorage, "_save", return_value=name):
                 template.save()
 
-        return template
+        # We have a custom annotation tied to the default manager that we want
+        # to access in tests.
+        return model_class.objects.get(pk=template.pk)
