@@ -32,7 +32,7 @@ def test_document_template_list_api_view(superuser_client: APIClient):
         ),
     )
 
-    url = "http://example.com/file"
+    url = "https://example.com/file"
     now = timezone.now()
     with (
         patch.object(MSGraphStorage, "url", return_value=url),
@@ -169,7 +169,7 @@ def test_document_template_api_list_perms(
     """
     client = request.getfixturevalue(user_client_name)
     with (
-        patch.object(MSGraphStorage, "url", return_value="http://example.com/file"),
+        patch.object(MSGraphStorage, "url", return_value="https://example.com/file"),
         patch.object(MSGraphStorage, "get_created_time", return_value=timezone.now()),
         patch.object(MSGraphStorage, "get_modified_time", return_value=timezone.now()),
     ):

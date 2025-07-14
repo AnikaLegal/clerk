@@ -168,6 +168,6 @@ def test_handle_other_http_error_logs_and_raises(endpoint):
     resp.raise_for_status.side_effect = requests.exceptions.HTTPError()
     resp.status_code = 500
     resp.request.method = "GET"
-    resp.request.url = "http://example.com"
+    resp.request.url = "https://example.com"
     with pytest.raises(requests.exceptions.HTTPError):
         endpoint.handle(resp)

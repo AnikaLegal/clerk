@@ -232,11 +232,11 @@ def test_case_get_documents_view(
 ):
     issue = factories.IssueFactory()
     url = reverse("case-api-docs", args=(issue.pk,))
-    sharepoint_url = "http://example.com"
+    sharepoint_url = "https://example.com"
     docs = [
         {
             "name": "Name",
-            "url": "http://example.com/blah",
+            "url": "https://example.com/blah",
             "id": "12345",
             "size": 99,
             "is_file": True,

@@ -7,9 +7,12 @@ from microsoft.storage import MSGraphStorage
 @pytest.fixture
 def mock_api():
     api = MagicMock()
-    api.folder.get.return_value = {"id": "fileid", "size": 123, "webUrl": "http://url"}
-    api.folder.download_file.return_value = ("filename.txt", "text/plain", b"content")
-    api.folder.upload_file.return_value = None
+    api.folder.get.return_value = {
+        "id": "file_id",
+        "size": 123,
+        "webUrl": "https://example.com",
+    }
+    api.folder.download_file.return_value = ("file.txt", "text/plain", b"content")
     api.folder.create_path.return_value = None
     api.folder.delete_file.return_value = None
     return api
@@ -34,7 +37,7 @@ def test_get_file_info_cache(storage):
 def test_get_file_info_api(storage, mock_api):
     storage.cache.delete(storage._get_full_path("file.txt"))
     info = storage._get_file_info("file.txt")
-    assert info["id"] == "fileid"
+    assert info["id"] == "file_id"
     mock_api.folder.get.assert_called_once()
 
 
@@ -61,7 +64,7 @@ def test_save_existing_dir(storage):
 
 
 def test_save_creates_dir(storage, mock_api):
-    storage._get_file_info = MagicMock(side_effect=[None, {"id": "dirid"}])
+    storage._get_file_info = MagicMock(side_effect=[None, {"id": "dir_id"}])
     storage.api.folder.create_path = MagicMock()
     content = MagicMock()
     name = storage._save("dir/file.txt", content)
@@ -78,10 +81,10 @@ def test_save_folder_not_found(storage, mock_api):
 
 
 def test_delete_file(storage, mock_api):
-    storage._get_file_info = MagicMock(return_value={"id": "fileid"})
+    storage._get_file_info = MagicMock(return_value={"id": "file_id"})
     storage.cache.delete = MagicMock()
     storage.delete("file.txt")
-    mock_api.folder.delete_file.assert_called_once_with("fileid")
+    mock_api.folder.delete_file.assert_called_once_with("file_id")
     storage.cache.delete.assert_called_once()
 
 
@@ -92,7 +95,7 @@ def test_delete_file_not_found(storage, mock_api):
 
 
 def test_exists_true(storage):
-    storage._get_file_info = MagicMock(return_value={"id": "fileid"})
+    storage._get_file_info = MagicMock(return_value={"id": "file_id"})
     assert storage.exists("file.txt") is True
 
 
@@ -117,8 +120,8 @@ def test_size_file_not_found(storage):
 
 
 def test_url_success(storage):
-    storage._get_file_info = MagicMock(return_value={"webUrl": "http://url"})
-    assert storage.url("file.txt") == "http://url"
+    storage._get_file_info = MagicMock(return_value={"webUrl": "https://example.com"})
+    assert storage.url("file.txt") == "https://example.com"
 
 
 def test_url_file_not_found(storage):
