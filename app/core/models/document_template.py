@@ -32,19 +32,14 @@ class DocumentTemplateManager(models.Manager):
 class DocumentTemplate(TimestampedModel):
     objects = DocumentTemplateManager()
 
+    @staticmethod
     def _get_storage_class():
-        return MSGraphStorage(
-            base_path=STORAGE_BASE_PATH, enable_directory_caching=True
-        )
+        return MSGraphStorage(enable_directory_caching=True)
 
-    def _get_upload_to(instance, filename):
-        return os.path.join(slugify(instance.topic), filename)
+    def _get_upload_to(self, filename):
+        return os.path.join(slugify(STORAGE_BASE_PATH), slugify(self.topic), filename)
 
     topic = models.CharField(max_length=32, choices=CaseTopic.CHOICES)
     file = models.FileField(
         storage=_get_storage_class, upload_to=_get_upload_to, max_length=256
     )
-
-    @property
-    def api_file_path(self):
-        return os.path.join(STORAGE_BASE_PATH, self.file.name)

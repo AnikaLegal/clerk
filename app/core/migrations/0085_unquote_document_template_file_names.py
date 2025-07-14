@@ -1,6 +1,8 @@
+import os
+from urllib.parse import unquote
+
 from django.db import migrations
 from django_cleanup import cleanup
-from urllib.parse import unquote
 
 
 def _unquote_document_template_file_names(apps, schema_editor):
@@ -11,7 +13,7 @@ def _unquote_document_template_file_names(apps, schema_editor):
     cleanup.cleanup_ignore(DocumentTemplate)
 
     for template in DocumentTemplate.objects.all():
-        template.file.name = unquote(template.file.name)
+        template.file.name = os.path.join("templates", unquote(template.file.name))
         template.save()
 
 

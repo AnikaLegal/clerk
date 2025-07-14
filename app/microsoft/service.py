@@ -107,8 +107,8 @@ def set_up_new_case(issue: Issue):
             templates = DocumentTemplate.objects.filter(topic=issue.topic).all()
             for template in templates:
                 api.folder.copy(
-                    template.api_file_path,
-                    template.name,
+                    template.file.name,
+                    template.name,  # type: ignore - annotated field.
                     case_folder["id"],
                 )
     else:

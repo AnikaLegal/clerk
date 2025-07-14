@@ -39,27 +39,19 @@ class SimpleCache:
 
 
 class MSGraphStorage(Storage):
-    def __init__(
-        self, base_path: str, cache_timeout=60, enable_directory_caching=False
-    ):
+    def __init__(self, cache_timeout=60, enable_directory_caching=False):
         self.api = MSGraphAPI()
-        self.base_path = base_path
         self.cache = SimpleCache(
             cache_prefix="ms_graph_file_info", timeout=cache_timeout
         )
         self.enable_directory_caching = enable_directory_caching
         logger.debug(
-            f"Initialized MSGraphStorage with base_path: {base_path}, "
-            f"cache_timeout: {cache_timeout}, enable_directory_caching: {enable_directory_caching}"
+            f"Initialized MSGraphStorage with base_path: "
+            f"cache_timeout: {cache_timeout}, "
+            f"enable_directory_caching: {enable_directory_caching}"
         )
 
-    def _get_full_path(self, name):
-        full_path = os.path.join(self.base_path, name)
-        logger.debug(f"Full path for {name}: {full_path}")
-        return full_path
-
-    def _cache_target_and_siblings(self, name):
-        path = self._get_full_path(name)
+    def _cache_target_and_siblings(self, path):
         dir, _ = os.path.split(path)
         if not dir:
             logger.debug(f"No directory found for path: {path}")
@@ -84,8 +76,7 @@ class MSGraphStorage(Storage):
             logger.debug(f"Caching sibling: {path}")
             self.cache.set(path, sibling)
 
-    def _get_file_info(self, name) -> dict | None:
-        path = self._get_full_path(name)
+    def _get_file_info(self, path) -> dict | None:
         logger.debug(f"Getting file info for: {path}")
         info = self.cache.get(path)
         if info:
@@ -96,7 +87,7 @@ class MSGraphStorage(Storage):
             logger.debug(
                 f"Directory caching enabled. Caching target and siblings for: {path}"
             )
-            self._cache_target_and_siblings(name)
+            self._cache_target_and_siblings(path)
             info = self.cache.get(path)
             if info:
                 logger.debug(f"Cache hit after caching siblings for file: {path}")
@@ -130,22 +121,19 @@ class MSGraphStorage(Storage):
     def _save(self, name, content):
         logger.debug(f"Saving file: {name}")
 
-        dir_name, file_name = os.path.split(name)
-        dir_info = self._get_file_info(dir_name)
+        path, file_name = os.path.split(name)
+        dir_info = self._get_file_info(path)
         if not dir_info:
-            path = self._get_full_path(dir_name)
             logger.debug(f"Folder not found. Creating path: {path}")
             self.api.folder.create_path(path)
-            dir_info = self._get_file_info(dir_name)
+            dir_info = self._get_file_info(path)
             if not dir_info:
-                raise FileNotFoundError(f"Folder not found: {dir_name}")
+                raise FileNotFoundError(f"Folder not found: {path}")
 
         file_info = self.api.folder.upload_file(content, dir_info["id"], file_name)
         if not file_info:
-            raise Exception(
-                f"Could not save file '{file_name}' to directory '{dir_name}'"
-            )
-        return os.path.join(dir_name, file_info["name"])
+            raise Exception(f"Could not save file '{file_name}' to folder '{path}'")
+        return os.path.join(path, file_info["name"])
 
     def delete(self, name):
         logger.debug(f"Deleting file: {name}")
@@ -153,8 +141,7 @@ class MSGraphStorage(Storage):
         info = self._get_file_info(name)
         if info:
             self.api.folder.delete_file(info["id"])
-            path = self._get_full_path(name)
-            self.cache.delete(path)
+            self.cache.delete(name)
             logger.debug(f"File deleted: {name}")
 
     def exists(self, name):
