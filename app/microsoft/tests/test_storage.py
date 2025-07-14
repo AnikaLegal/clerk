@@ -7,9 +7,13 @@ from microsoft.storage import MSGraphStorage
 @pytest.fixture
 def mock_api():
     api = MagicMock()
-    api.folder.get.return_value = {"id": "fileid", "size": 123, "webUrl": "http://url"}
-    api.folder.download_file.return_value = ("filename.txt", "text/plain", b"content")
-    api.folder.upload_file.return_value = None
+    api.folder.get.return_value = {
+        "id": "file_id",
+        "size": 123,
+        "webUrl": "https://example.com",
+    }
+    api.folder.download_file.return_value = ("file.txt", "text/plain", b"content")
+    api.folder.upload_file.return_value = {"id": "file_id", "name": "file.txt"}
     api.folder.create_path.return_value = None
     api.folder.delete_file.return_value = None
     return api
@@ -18,23 +22,19 @@ def mock_api():
 @pytest.fixture
 def storage(mock_api):
     with patch("microsoft.storage.MSGraphAPI", return_value=mock_api):
-        yield MSGraphStorage(base_path="/base")
-
-
-def test_get_full_path(storage):
-    assert storage._get_full_path("file.txt") == "/base/file.txt"
+        yield MSGraphStorage()
 
 
 def test_get_file_info_cache(storage):
-    storage.cache.set(storage._get_full_path("file.txt"), {"id": "cached"})
+    storage.cache.set("file.txt", {"id": "cached"})
     info = storage._get_file_info("file.txt")
     assert info == {"id": "cached"}
 
 
 def test_get_file_info_api(storage, mock_api):
-    storage.cache.delete(storage._get_full_path("file.txt"))
+    storage.cache.delete("file.txt")
     info = storage._get_file_info("file.txt")
-    assert info["id"] == "fileid"
+    assert info["id"] == "file_id"
     mock_api.folder.get.assert_called_once()
 
 
@@ -53,15 +53,15 @@ def test_open_file_not_found(storage, mock_api):
 
 def test_save_existing_dir(storage):
     content = MagicMock()
-    storage._get_file_info = MagicMock(return_value={"id": "dirid"})
-    storage.api.folder.upload_file = MagicMock()
+    storage._get_file_info = MagicMock(return_value={"id": "dir_id"})
+    storage.api.folder.upload_file = MagicMock(return_value={"name": "file.txt"})
     name = storage._save("dir/file.txt", content)
     storage.api.folder.upload_file.assert_called_once()
     assert name == "dir/file.txt"
 
 
 def test_save_creates_dir(storage, mock_api):
-    storage._get_file_info = MagicMock(side_effect=[None, {"id": "dirid"}])
+    storage._get_file_info = MagicMock(side_effect=[None, {"id": "dir_id"}])
     storage.api.folder.create_path = MagicMock()
     content = MagicMock()
     name = storage._save("dir/file.txt", content)
@@ -78,10 +78,10 @@ def test_save_folder_not_found(storage, mock_api):
 
 
 def test_delete_file(storage, mock_api):
-    storage._get_file_info = MagicMock(return_value={"id": "fileid"})
+    storage._get_file_info = MagicMock(return_value={"id": "file_id"})
     storage.cache.delete = MagicMock()
     storage.delete("file.txt")
-    mock_api.folder.delete_file.assert_called_once_with("fileid")
+    mock_api.folder.delete_file.assert_called_once_with("file_id")
     storage.cache.delete.assert_called_once()
 
 
@@ -92,7 +92,7 @@ def test_delete_file_not_found(storage, mock_api):
 
 
 def test_exists_true(storage):
-    storage._get_file_info = MagicMock(return_value={"id": "fileid"})
+    storage._get_file_info = MagicMock(return_value={"id": "file_id"})
     assert storage.exists("file.txt") is True
 
 
@@ -117,10 +117,46 @@ def test_size_file_not_found(storage):
 
 
 def test_url_success(storage):
-    storage._get_file_info = MagicMock(return_value={"webUrl": "http://url"})
-    assert storage.url("file.txt") == "http://url"
+    storage._get_file_info = MagicMock(return_value={"webUrl": "https://example.com"})
+    assert storage.url("file.txt") == "https://example.com"
 
 
 def test_url_file_not_found(storage):
     storage._get_file_info = MagicMock(return_value=None)
     assert storage.url("file.txt") == ""
+
+
+def test_get_created_time_success(storage):
+    storage._get_file_info = MagicMock(return_value={"createdDateTime": "2024-07-14T12:34:56+00:00"})
+    dt = storage.get_created_time("file.txt")
+    assert dt.isoformat() == "2024-07-14T12:34:56+00:00"
+
+
+def test_get_created_time_file_not_found(storage):
+    storage._get_file_info = MagicMock(return_value=None)
+    with pytest.raises(FileNotFoundError):
+        storage.get_created_time("file.txt")
+
+
+def test_get_modified_time_success(storage):
+    storage._get_file_info = MagicMock(return_value={"lastModifiedDateTime": "2024-07-14T12:34:56+00:00"})
+    dt = storage.get_modified_time("file.txt")
+    assert dt.isoformat() == "2024-07-14T12:34:56+00:00"
+
+
+def test_get_modified_time_file_not_found(storage):
+    storage._get_file_info = MagicMock(return_value=None)
+    with pytest.raises(FileNotFoundError):
+        storage.get_modified_time("file.txt")
+
+
+def test_is_name_available_no_max_length(storage):
+    assert storage.is_name_available("file.txt") is True
+
+
+def test_is_name_available_exceeds_max_length(storage):
+    assert storage.is_name_available("a" * 300, max_length=255) is False
+
+
+def test_is_name_available_within_max_length(storage):
+    assert storage.is_name_available("a" * 10, max_length=255) is True

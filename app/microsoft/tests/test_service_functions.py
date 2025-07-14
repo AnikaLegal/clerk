@@ -69,7 +69,7 @@ def test_set_up_new_case(mock_api):
     set_up_new_case(issue)
 
     mock_api.folder.copy.assert_called_once_with(
-        template.api_file_path, template.name, "folder_id"
+        template.file.name, template.name, "folder_id"
     )
 
 

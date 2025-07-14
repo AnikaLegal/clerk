@@ -18,7 +18,8 @@ class SimpleCache:
         self.timeout = timeout
 
     def _get_key(self, key):
-        return f"{self.cache_prefix}:{key}"
+        # Quote the key to prevent Django cache key warnings.
+        return f"{self.cache_prefix}:{quote(key)}"
 
     def get(self, key):
         key = self._get_key(key)
@@ -38,27 +39,19 @@ class SimpleCache:
 
 
 class MSGraphStorage(Storage):
-    def __init__(
-        self, base_path: str, cache_timeout=60, enable_directory_caching=False
-    ):
+    def __init__(self, cache_timeout=60, enable_directory_caching=False):
         self.api = MSGraphAPI()
-        self.base_path = base_path
         self.cache = SimpleCache(
             cache_prefix="ms_graph_file_info", timeout=cache_timeout
         )
         self.enable_directory_caching = enable_directory_caching
         logger.debug(
-            f"Initialized MSGraphStorage with base_path: {base_path}, "
-            f"cache_timeout: {cache_timeout}, enable_directory_caching: {enable_directory_caching}"
+            f"Initialized MSGraphStorage with base_path: "
+            f"cache_timeout: {cache_timeout}, "
+            f"enable_directory_caching: {enable_directory_caching}"
         )
 
-    def _get_full_path(self, name):
-        full_path = os.path.join(self.base_path, name)
-        logger.debug(f"Full path for {name}: {full_path}")
-        return full_path
-
-    def _cache_target_and_siblings(self, name):
-        path = self._get_full_path(name)
+    def _cache_target_and_siblings(self, path):
         dir, _ = os.path.split(path)
         if not dir:
             logger.debug(f"No directory found for path: {path}")
@@ -78,13 +71,12 @@ class MSGraphStorage(Storage):
             if sibling.get("folder"):
                 logger.debug(f"Skipping folder: {sibling['name']}")
                 continue
-            name = quote(sibling["name"])
+            name = sibling["name"]
             path = os.path.join(dir, name)
             logger.debug(f"Caching sibling: {path}")
             self.cache.set(path, sibling)
 
-    def _get_file_info(self, name) -> dict | None:
-        path = self._get_full_path(name)
+    def _get_file_info(self, path) -> dict | None:
         logger.debug(f"Getting file info for: {path}")
         info = self.cache.get(path)
         if info:
@@ -95,7 +87,7 @@ class MSGraphStorage(Storage):
             logger.debug(
                 f"Directory caching enabled. Caching target and siblings for: {path}"
             )
-            self._cache_target_and_siblings(name)
+            self._cache_target_and_siblings(path)
             info = self.cache.get(path)
             if info:
                 logger.debug(f"Cache hit after caching siblings for file: {path}")
@@ -106,6 +98,8 @@ class MSGraphStorage(Storage):
         if info:
             logger.debug(f"File info fetched from API for: {path}. Caching it.")
             self.cache.set(path, info)
+        else:
+            logger.debug(f"No file info found for: {path}")
         return info
 
     def _open(self, name, mode="rb"):
@@ -113,8 +107,7 @@ class MSGraphStorage(Storage):
 
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
 
         file_name, content_type, bytes = self.api.folder.download_file(info["id"])
         logger.debug(f"File downloaded: {file_name}, content_type: {content_type}")
@@ -128,21 +121,19 @@ class MSGraphStorage(Storage):
     def _save(self, name, content):
         logger.debug(f"Saving file: {name}")
 
-        dir, _ = os.path.split(name)
-        info = self._get_file_info(dir)
-        if not info:
-            path = self._get_full_path(dir)
-            logger.debug(f"Directory not found. Creating path: {path}")
+        path, file_name = os.path.split(name)
+        dir_info = self._get_file_info(path)
+        if not dir_info:
+            logger.debug(f"Folder not found. Creating path: {path}")
             self.api.folder.create_path(path)
-            info = self._get_file_info(dir)
+            dir_info = self._get_file_info(path)
+            if not dir_info:
+                raise FileNotFoundError(f"Folder not found: {path}")
 
-        if not info:
-            logger.error(f"Folder not found: {dir}")
-            raise FileNotFoundError(f"Folder {dir} not found")
-
-        self.api.folder.upload_file(content, info["id"])
-        logger.debug(f"File uploaded: {name}")
-        return name
+        file_info = self.api.folder.upload_file(content, dir_info["id"], file_name)
+        if not file_info:
+            raise Exception(f"Could not save file '{file_name}' to folder '{path}'")
+        return os.path.join(path, file_info["name"])
 
     def delete(self, name):
         logger.debug(f"Deleting file: {name}")
@@ -150,8 +141,7 @@ class MSGraphStorage(Storage):
         info = self._get_file_info(name)
         if info:
             self.api.folder.delete_file(info["id"])
-            path = self._get_full_path(name)
-            self.cache.delete(path)
+            self.cache.delete(name)
             logger.debug(f"File deleted: {name}")
 
     def exists(self, name):
@@ -162,34 +152,39 @@ class MSGraphStorage(Storage):
         logger.debug(f"Getting created time for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return timezone.datetime.fromisoformat(info["createdDateTime"])
 
     def get_modified_time(self, name: str) -> datetime:
         logger.debug(f"Getting modified time for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return timezone.datetime.fromisoformat(info["lastModifiedDateTime"])
 
     def get_valid_name(self, name: str) -> str:
         logger.debug(f"Validating name: {name}")
         return name
 
+    def is_name_available(self, name, max_length=None):
+        # We don't check to see if file with the same name already exists here
+        # because when that is the case the base storage code attempts to
+        # generate another name but we want this handled by msgraph according to
+        # the conflict resolution settings.
+        exceeds_max_length = max_length and len(name) > max_length
+        return not exceeds_max_length
+
     def size(self, name):
         logger.debug(f"Getting size for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
-            raise FileNotFoundError(f"File {name} not found")
+            raise FileNotFoundError(f"File not found: {name}")
         return info["size"]
 
     def url(self, name):
         logger.debug(f"Getting URL for file: {name}")
         info = self._get_file_info(name)
         if not info:
-            logger.error(f"File not found: {name}")
+            logger.warning(f"File not found: {name}")
             return ""
         return info["webUrl"]

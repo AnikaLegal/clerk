@@ -107,8 +107,8 @@ def set_up_new_case(issue: Issue):
             templates = DocumentTemplate.objects.filter(topic=issue.topic).all()
             for template in templates:
                 api.folder.copy(
-                    template.api_file_path,
-                    template.name,
+                    template.file.name,
+                    template.name,  # type: ignore - annotated field.
                     case_folder["id"],
                 )
     else:
@@ -147,7 +147,9 @@ def save_email_attachment(email: Email, att: EmailAttachment):
     logger.info(
         "Uploading email attachment %s to Sharepoint for Issue<%s>", name, issue.pk
     )
-    api.folder.upload_file(att.file, uploads_folder["id"], name=name)
+    api.folder.upload_file(
+        att.file, uploads_folder["id"], name=name, conflict_behaviour="rename"
+    )
 
 
 def _create_folder_if_not_exists(api, issue, name, parent_id):

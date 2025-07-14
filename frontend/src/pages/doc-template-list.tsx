@@ -1,20 +1,29 @@
 import {
   ActionIcon,
+  Badge,
   Button,
   Center,
   Container,
   Grid,
   Group,
   Loader,
+  Modal,
+  ModalProps,
   Select,
   Table,
   Text,
   TextInput,
   Title,
 } from '@mantine/core'
-import { useClickOutside, useDebouncedCallback } from '@mantine/hooks'
+import { isNotEmpty, useForm } from '@mantine/form'
+import {
+  useClickOutside,
+  useDebouncedCallback,
+  useDisclosure,
+} from '@mantine/hooks'
 import {
   IconExclamationCircle,
+  IconPencil,
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
@@ -23,6 +32,7 @@ import {
   GetDocumentTemplatesApiArg,
   useDeleteDocumentTemplateMutation,
   useGetDocumentTemplatesQuery,
+  useRenameDocumentTemplateMutation,
 } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
@@ -173,38 +183,65 @@ const DocumentTemplateTableBody = ({
   if (data.length < 1) {
     return <EmptyState />
   }
-
   return (
     <>
       {data.map((template) => (
-        <Table.Tr key={template.url}>
-          <Table.Td>
-            <a href={template.url}>{template.name}</a>
-          </Table.Td>
-          <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
-          <Table.Td>{template.created_at}</Table.Td>
-          <Table.Td>{template.modified_at}</Table.Td>
-          <Table.Td>
-            <DocumentTemplateActionIcons template={template} />
-          </Table.Td>
-        </Table.Tr>
+        <DocumentTemplateTableRow
+          key={template.url || template.name}
+          template={template}
+        />
       ))}
     </>
   )
 }
 
+interface DocumentTemplateTableRowProps {
+  template: DocumentTemplate
+}
+
+const DocumentTemplateTableRow = ({
+  template,
+}: DocumentTemplateTableRowProps) => {
+  const found: boolean = !!template.url
+  return (
+    <Table.Tr>
+      <Table.Td>
+        {found ? (
+          <a href={template.url}>{template.name}</a>
+        ) : (
+          <Group>
+            <span>{template.name}</span>
+            <Badge radius="xs" color="red">
+              File Not Found
+            </Badge>
+          </Group>
+        )}
+      </Table.Td>
+      <Table.Td>{TopicLabels.get(template.topic)}</Table.Td>
+      <Table.Td>{template.created_at || '-'}</Table.Td>
+      <Table.Td>{template.modified_at || '-'}</Table.Td>
+      <Table.Td>
+        <DocumentTemplateActionIcons template={template} isFileFound={found} />
+      </Table.Td>
+    </Table.Tr>
+  )
+}
+
 interface DocumentTemplateActionIconsProps {
   template: DocumentTemplate
+  isFileFound: boolean
 }
 
 const DocumentTemplateActionIcons = ({
   template,
+  isFileFound,
 }: DocumentTemplateActionIconsProps) => {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
+  const [displayRenameModal, renameModalHandlers] = useDisclosure(false)
   const [deleteDocumentTemplate] = useDeleteDocumentTemplateMutation()
 
   const delayedHideConfirmDelete = useDebouncedCallback(() => {
-    setShowConfirmDelete(false)
+    confirmDeleteHandlers.close()
   }, 100)
   const ref = useClickOutside(() => delayedHideConfirmDelete())
 
@@ -224,7 +261,7 @@ const DocumentTemplateActionIcons = ({
       })
   }
 
-  if (showConfirmDelete) {
+  if (displayConfirmDelete) {
     return (
       <div ref={ref}>
         <Center>
@@ -242,11 +279,117 @@ const DocumentTemplateActionIcons = ({
   }
 
   return (
-    <Center>
-      <ActionIcon variant="transparent" color="gray">
-        <IconTrash stroke={1.5} onClick={() => setShowConfirmDelete(true)} />
-      </ActionIcon>
-    </Center>
+    <>
+      <DocumentTemplateRenameModal
+        opened={displayRenameModal}
+        onClose={() => renameModalHandlers.close()}
+        template={template}
+      />
+      <Center>
+        <ActionIcon variant="transparent" color="gray" disabled={!isFileFound}>
+          <IconPencil stroke={1.5} onClick={() => renameModalHandlers.open()} />
+        </ActionIcon>
+        <ActionIcon variant="transparent" color="gray">
+          <IconTrash
+            stroke={1.5}
+            onClick={() => confirmDeleteHandlers.open()}
+          />
+        </ActionIcon>
+      </Center>
+    </>
+  )
+}
+
+interface DocumentTemplateRenameModalProps extends ModalProps {
+  template: DocumentTemplate
+}
+
+const DocumentTemplateRenameModal = (
+  props: DocumentTemplateRenameModalProps
+) => {
+  const [renameDocumentTemplate] = useRenameDocumentTemplateMutation()
+
+  const parts = props.template.name.split('.')
+  const ext = parts.length > 1 ? '.' + parts.pop() : ''
+  const name = parts.join('.')
+
+  type formValues = { name: string }
+  const form = useForm<formValues>({
+    mode: 'uncontrolled',
+    initialValues: {
+      name: name,
+    },
+    validate: {
+      name: isNotEmpty('This field is required.'),
+    },
+  })
+
+  const handleSubmit = (
+    values: formValues,
+    event: React.FormEvent<HTMLFormElement> | undefined
+  ) => {
+    event?.preventDefault()
+
+    form.setSubmitting(true)
+    renameDocumentTemplate({
+      id: props.template.id,
+      documentTemplateRename: { name: values.name + ext },
+    })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Document template renamed', { variant: 'success' })
+        props.onClose()
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to rename document template'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+      .finally(() => form.setSubmitting(false))
+  }
+
+  const handleClose = () => {
+    props.onClose()
+    form.reset()
+  }
+
+  return (
+    <Modal
+      opened={props.opened}
+      onClose={handleClose}
+      title={<Text fw={700}>Rename Document Template</Text>}
+      size="lg"
+    >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <TextInput
+          {...form.getInputProps('name')}
+          key={form.key('name')}
+          data-autofocus
+          rightSection={<Text>{ext}</Text>}
+          rightSectionWidth="3rem"
+          size="md"
+        />
+        <Group justify="right" mt="lg">
+          <Button
+            variant="default"
+            onClick={handleClose}
+            disabled={form.submitting}
+          >
+            Close
+          </Button>
+          <Button
+            type="submit"
+            disabled={form.submitting}
+            loading={form.submitting}
+          >
+            Rename
+          </Button>
+        </Group>
+      </form>
+    </Modal>
   )
 }
 

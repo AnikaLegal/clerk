@@ -83,6 +83,7 @@ const App = () => {
           clearable
           searchable
           size="md"
+          mt="md"
           data={Topics.map(([value, label]) => ({
             value,
             label,

@@ -9,6 +9,10 @@ class DocumentTemplateFilterSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
 
 
+class DocumentTemplateRenameSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True)
+
+
 class DocumentTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentTemplate
@@ -48,9 +52,15 @@ class DocumentTemplateSerializer(serializers.ModelSerializer):
         return validated_data
 
     def get_created_at(self, obj):
-        created_at = obj.file.storage.get_created_time(obj.file.name)
-        return timezone.localtime(created_at).strftime("%d/%m/%Y")
+        try:
+            created_at = obj.file.storage.get_created_time(obj.file.name)
+            return timezone.localtime(created_at).strftime("%d/%m/%Y")
+        except FileNotFoundError:
+            return ""
 
     def get_modified_at(self, obj):
-        modified_at = obj.file.storage.get_modified_time(obj.file.name)
-        return timezone.localtime(modified_at).strftime("%d/%m/%Y")
+        try:
+            modified_at = obj.file.storage.get_modified_time(obj.file.name)
+            return timezone.localtime(modified_at).strftime("%d/%m/%Y")
+        except FileNotFoundError:
+            return ""

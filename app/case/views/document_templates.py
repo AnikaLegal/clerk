@@ -1,12 +1,15 @@
 from core.models.document_template import DocumentTemplate
 from core.models.issue import CaseTopic
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from rest_framework.decorators import api_view
+from rest_framework import status
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from case.serializers import (
     DocumentTemplateFilterSerializer,
+    DocumentTemplateRenameSerializer,
     DocumentTemplateSerializer,
 )
 from case.utils.react import render_react_page
@@ -51,8 +54,6 @@ class DocumentTemplateApiViewset(ViewSet):
         serializer = DocumentTemplateFilterSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
-        # Annotate the queryset to extract the file name from the file path so
-        # we can filter by name only.
         queryset = DocumentTemplate.objects.all()
         queryset = queryset.order_by("topic", "name")
 
@@ -70,9 +71,27 @@ class DocumentTemplateApiViewset(ViewSet):
         serializer = DocumentTemplateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(status=201)
+        return Response(status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk):
         template = DocumentTemplate.objects.get(pk=pk)
         template.delete()
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_path="rename-file",
+    )
+    def rename_file(self, request, pk=None):
+        serializer = DocumentTemplateRenameSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_name = serializer.validated_data.get("name")
+
+        template = get_object_or_404(DocumentTemplate.objects, pk=pk)
+        if new_name and template.name != new_name:
+            field_file = template.file.open()
+            field_file.file.name = new_name
+            template.file.save(new_name, field_file.file)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
