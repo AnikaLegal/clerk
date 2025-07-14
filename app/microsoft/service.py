@@ -147,7 +147,9 @@ def save_email_attachment(email: Email, att: EmailAttachment):
     logger.info(
         "Uploading email attachment %s to Sharepoint for Issue<%s>", name, issue.pk
     )
-    api.folder.upload_file(att.file, uploads_folder["id"], name=name)
+    api.folder.upload_file(
+        att.file, uploads_folder["id"], name=name, conflict_behaviour="rename"
+    )
 
 
 def _create_folder_if_not_exists(api, issue, name, parent_id):
