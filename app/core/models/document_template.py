@@ -32,7 +32,6 @@ class DocumentTemplateManager(models.Manager):
 class DocumentTemplate(TimestampedModel):
     objects = DocumentTemplateManager()
 
-    @staticmethod
     def _get_storage_class():
         return MSGraphStorage(enable_directory_caching=True)
 
