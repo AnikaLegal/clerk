@@ -207,16 +207,6 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    createTenancy: build.mutation<
-      CreateTenancyApiResponse,
-      CreateTenancyApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/clerk/api/tenancy/`,
-        method: "POST",
-        body: queryArg.tenancyCreate,
-      }),
-    }),
     getTenancy: build.query<GetTenancyApiResponse, GetTenancyApiArg>({
       query: (queryArg) => ({ url: `/clerk/api/tenancy/${queryArg.id}/` }),
     }),
@@ -238,13 +228,6 @@ const injectedRtkApi = api.injectEndpoints({
           page_size: queryArg.pageSize,
           q: queryArg.q,
         },
-      }),
-    }),
-    createClient: build.mutation<CreateClientApiResponse, CreateClientApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/client/`,
-        method: "POST",
-        body: queryArg.clientCreate,
       }),
     }),
     getClient: build.query<GetClientApiResponse, GetClientApiArg>({
@@ -666,11 +649,6 @@ export type DeletePersonApiArg = {
   /** Entity ID */
   id: number;
 };
-export type CreateTenancyApiResponse =
-  /** status 201 Successful response. */ Tenancy;
-export type CreateTenancyApiArg = {
-  tenancyCreate: TenancyCreate;
-};
 export type GetTenancyApiResponse =
   /** status 200 Successful response. */ Tenancy;
 export type GetTenancyApiArg = {
@@ -697,11 +675,6 @@ export type GetClientsApiArg = {
   page?: number;
   pageSize?: number;
   q?: string;
-};
-export type CreateClientApiResponse =
-  /** status 201 Successful response. */ Client;
-export type CreateClientApiArg = {
-  clientCreate: ClientCreate;
 };
 export type GetClientApiResponse =
   /** status 200 Successful response. */ Client;
@@ -1216,11 +1189,9 @@ export const {
   useGetPersonQuery,
   useUpdatePersonMutation,
   useDeletePersonMutation,
-  useCreateTenancyMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
   useGetClientsQuery,
-  useCreateClientMutation,
   useGetClientQuery,
   useUpdateClientMutation,
   useGetUsersQuery,

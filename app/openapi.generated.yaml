@@ -732,26 +732,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/tenancy/:
-    post:
-      operationId: createTenancy
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TenancyCreate"
-      responses:
-        "201":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Tenancy"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/tenancy/{id}/:
     get:
       operationId: getTenancy
@@ -846,25 +826,6 @@ paths:
                   - page_count
                   - item_count
                   - results
-    post:
-      operationId: createClient
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ClientCreate"
-      responses:
-        "201":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Client"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/client/{id}/:
     get:
       operationId: getClient

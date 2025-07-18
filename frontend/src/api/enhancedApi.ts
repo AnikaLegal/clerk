@@ -75,9 +75,6 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     getClients: {
       providesTags: [{ type: 'CLIENT' }],
     },
-    createClient: {
-      invalidatesTags: [{ type: 'CLIENT' }],
-    },
   },
 })
 
