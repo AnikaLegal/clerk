@@ -53,6 +53,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     # Case
     path("cases/", case.case_list_page_view, name="case-list"),
+    path("cases/create/", case.case_create_page_view, name="case-create"),
     path("cases/review/", case.case_review_page_view, name="case-review"),
     path("cases/inbox/", case.case_inbox_page_view, name="case-inbox"),
     re_path(

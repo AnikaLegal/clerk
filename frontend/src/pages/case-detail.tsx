@@ -74,7 +74,7 @@ const App = () => {
   const issue = caseResult.data!.issue
   const tenancy = caseResult.data!.tenancy
   const notes = caseResult.data?.notes ?? []
-  const details = getSubmittedDetails(issue)
+  const details = issue.answers ? getSubmittedDetails(issue.answers) : null
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
@@ -286,7 +286,9 @@ const App = () => {
                 initialIssue={issue}
                 updateCase={_updateCase}
               />
-              <EntityCard title="Other submitted data" tableData={details} />
+              {details && (
+                <EntityCard title="Other submitted data" tableData={details} />
+              )}
             </React.Fragment>
           )}
         </div>
@@ -383,7 +385,7 @@ const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
   const fields = [
     {
       label: 'Weekly rent',
-      schema: Yup.number().integer().min(0).nullable(true),
+      schema: Yup.number().integer().min(0).nullable(),
       type: FIELD_TYPES.NUMBER,
       name: 'weekly_rent',
     },
@@ -396,7 +398,7 @@ const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
     {
       label: 'Weekly income',
       name: 'weekly_income',
-      schema: Yup.number().integer().min(0).nullable(true),
+      schema: Yup.number().integer().min(0).nullable(),
       type: FIELD_TYPES.NUMBER,
     },
   ]
@@ -555,8 +557,10 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
   },
 ]
 
-const getSubmittedDetails = (issue: Issue): { [key: string]: string } =>
-  Object.entries(issue.answers).reduce((obj, [k, v]) => {
+const getSubmittedDetails = (
+  answers: Record<string, string>
+): { [key: string]: string } =>
+  Object.entries(answers).reduce((obj, [k, v]) => {
     if (!v) return obj
     const title = correctCase(k)
     // Handle answers that are lists of answers

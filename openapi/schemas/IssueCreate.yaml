@@ -1,0 +1,45 @@
+allOf:
+  - $ref: ./IssueBase.yaml
+  - type: object
+    properties:
+      client_id:
+        type: string
+        format: uuid
+        description: One of client_id or client is required.
+      client:
+        $ref: ./ClientCreate.yaml
+      tenancy_id:
+        type: number
+        description: One of tenancy_id or tenancy is required.
+      tenancy:
+        $ref: ./TenancyCreate.yaml
+      stage:
+        type: string
+      outcome:
+        type: string
+        nullable: true
+      outcome_notes:
+        type: string
+      provided_legal_services:
+        type: boolean
+      paralegal_id:
+        type: number
+        nullable: true
+      lawyer_id:
+        type: number
+        nullable: true
+      support_worker_id:
+        type: number
+        nullable: true
+      employment_status:
+        type: string
+      weekly_income:
+        type: number
+        nullable: true
+      referrer:
+        type: string
+      referrer_type:
+        type: string
+      weekly_rent:
+        type: integer
+        nullable: true

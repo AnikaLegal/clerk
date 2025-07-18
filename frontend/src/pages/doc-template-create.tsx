@@ -75,11 +75,7 @@ const App = () => {
         <Select
           {...form.getInputProps('topic')}
           key={form.key('topic')}
-          label={
-            <Text fw={700} mb="0.25rem">
-              Case topic
-            </Text>
-          }
+          label="Case topic"
           clearable
           searchable
           size="md"
@@ -96,11 +92,7 @@ const App = () => {
         <FileInput
           {...form.getInputProps('files')}
           key={form.key('files')}
-          label={
-            <Text fw={700} mb="0.25rem">
-              <b>Files</b>
-            </Text>
-          }
+          label="Files"
           multiple
           clearable
           placeholder="Select to add files"

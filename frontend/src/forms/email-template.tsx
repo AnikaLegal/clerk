@@ -53,10 +53,9 @@ export const EmailTemplateForm = ({
     event.preventDefault()
     if (onDelete) {
       modals.openConfirmModal({
-        title: <Text fw={700}>Delete Email Template</Text>,
+        title: 'Delete Email Template',
         children: <Text>Are you sure you want to delete this template?</Text>,
-        centered: true,
-        labels: { confirm: 'Delete email template', cancel: 'Cancel' },
+        labels: { confirm: 'Delete email template', cancel: 'Close' },
         confirmProps: { color: 'red' },
         onConfirm: () => onDelete(),
       })
@@ -68,11 +67,7 @@ export const EmailTemplateForm = ({
       <Select
         {...form.getInputProps('topic')}
         key={form.key('topic')}
-        label={
-          <Text fw={700} mb="0.25rem">
-            Case topic
-          </Text>
-        }
+        label="Case topic"
         size="md"
         mt="md"
         data={topicChoices.map(([value, label]) => ({
@@ -84,22 +79,14 @@ export const EmailTemplateForm = ({
       <TextInput
         {...form.getInputProps('name')}
         key={form.key('name')}
-        label={
-          <Text fw={700} mb="0.25rem">
-            Template name
-          </Text>
-        }
+        label="Template name"
         size="md"
         mt="md"
       />
       <TextInput
         {...form.getInputProps('subject')}
         key={form.key('subject')}
-        label={
-          <Text fw={700} mb="0.25rem">
-            Email subject
-          </Text>
-        }
+        label="Email subject"
         size="md"
         mt="md"
       />
@@ -111,9 +98,9 @@ export const EmailTemplateForm = ({
           </Group>
         </Grid.Col>
         <Grid.Col span={6} pb={0}>
-          <Text fw={700}>Preview</Text>
+          <div className="mantine-InputWrapper-label">Preview</div>
         </Grid.Col>
-        <Grid.Col span={6} pt="0.25rem">
+        <Grid.Col span={6} pt={0}>
           <Textarea
             {...form.getInputProps('text')}
             key={form.key('text')}
@@ -125,7 +112,7 @@ export const EmailTemplateForm = ({
             autoComplete="off"
           />
         </Grid.Col>
-        <Grid.Col span={6} pt="0.25rem">
+        <Grid.Col span={6} pt={0}>
           <Paper
             withBorder
             p="xs"

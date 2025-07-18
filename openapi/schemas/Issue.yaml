@@ -7,13 +7,24 @@ allOf:
         format: uuid
       topic_display:
         type: string
+      stage:
+        type: string
       stage_display:
         type: string
+      outcome:
+        type: string
+        nullable: true
       outcome_display:
         type: string
         nullable: true
+      outcome_notes:
+        type: string
       fileref:
         type: string
+      provided_legal_services:
+        type: boolean
+      is_open:
+        type: boolean
       is_sharepoint_set_up:
         type: boolean
       paralegal:
@@ -55,6 +66,7 @@ allOf:
         type: object
         additionalProperties:
           type: string
+        nullable: true
       # Case review fields
       is_conflict_check:
         type: boolean
@@ -68,10 +80,15 @@ allOf:
     required:
       - id
       - topic_display
+      - stage
       - stage_display
+      - outcome
       - outcome_display
+      - outcome_notes
       - fileref
       - paralegal
+      - provided_legal_services
+      - is_open
       - lawyer
       - client
       - employment_status

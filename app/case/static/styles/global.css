@@ -127,3 +127,23 @@ main {
   /* Match the Semantic UI table header background color to ensure consistency */
   background-color: #f9fafb;
 }
+
+form .mantine-InputWrapper-label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.mantine-Modal-header {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  margin-bottom: var(--mantine-spacing-lg);
+}
+
+.mantine-Modal-header .mantine-Modal-title {
+  font-weight: bold;
+  font-size: var(--mantine-font-size-lg);
+}
+
+.mantine-Title-root .subtitle {
+  color: var(--mantine-color-dark-3);
+  font-size: var(--mantine-font-size-lg);
+}

@@ -23,6 +23,5 @@ export {
   RichTextAreaField,
   RichTextAreaFieldProps,
   RichTextEditorField,
-  RichTextEditorFieldProps
+  RichTextEditorFieldProps,
 }
-

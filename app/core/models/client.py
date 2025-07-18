@@ -136,7 +136,7 @@ class Client(TimestampedModel):
 
     # Demographic info for impact analysis.
     gender = models.CharField(max_length=64, null=True, blank=True)
-    pronouns = models.CharField(max_length=32, blank=True)
+    pronouns = models.CharField(max_length=32, blank=True, default="")
 
     # Eligibility
     centrelink_support = models.BooleanField(default=False)

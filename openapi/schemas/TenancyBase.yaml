@@ -8,11 +8,7 @@ properties:
   postcode:
     type: string
     nullable: true
-  started:
-    type: string
-    nullable: true
 required:
   - address
   - suburb
   - postcode
-  - started

@@ -5,22 +5,70 @@ allOf:
       id:
         type: string
         format: uuid
+      date_of_birth:
+        type: string
+        nullable: true
+      preferred_name:
+        type: string
+        nullable: true
+      phone_number:
+        type: string
+      gender:
+        type: string
+        nullable: true
+      pronouns:
+        type: string
+        nullable: true
+      centrelink_support:
+        type: boolean
+      eligibility_notes:
+        type: string
+      primary_language_non_english:
+        type: boolean
+      primary_language:
+        type: string
+      number_of_dependents:
+        type: number
+        nullable: true
+      notes:
+        type: string
       url:
         type: string
       age:
         type: integer
+        nullable: true
       full_name:
         type: string
+      contact_notes:
+        type: string
+      contact_restriction:
+        $ref: ./TextChoiceField.yaml
+      requires_interpreter:
+        $ref: ./TextChoiceField.yaml
+      is_aboriginal_or_torres_strait_islander:
+        $ref: ./TextChoiceField.yaml
       call_times:
         $ref: ./TextChoiceListField.yaml
       eligibility_circumstances:
         $ref: ./TextChoiceListField.yaml
     required:
       - id
+      - date_of_birth
+      - preferred_name
+      - phone_number
+      - gender
+      - pronouns
+      - centrelink_support
+      - eligibility_notes
+      - primary_language_non_english
+      - primary_language
+      - number_of_dependents
+      - notes
       - url
       - age
       - full_name
-      - date_of_birth
-      # Choice fields
+      - contact_restriction
+      - requires_interpreter
+      - is_aboriginal_or_torres_strait_islander
       - call_times
       - eligibility_circumstances
