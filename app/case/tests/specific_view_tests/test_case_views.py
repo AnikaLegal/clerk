@@ -240,6 +240,7 @@ def test_case_validation_stage(
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
 def test_case_create_view_permissions(
     user_client: APIClient,
     user: User,
