@@ -38,7 +38,7 @@ def impact_view(request):
         created_at__gte=start_time, provided_legal_services=True
     )
     repairs_count = issues_serviced.filter(topic=CaseTopic.REPAIRS).count()
-    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION).count()
+    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION_ARREARS).count()
     bonds_count = issues_serviced.filter(topic=CaseTopic.BONDS).count()
     context = {
         "repairs_advice_count": repairs_count,
@@ -110,15 +110,16 @@ BOARD = [
         "name": "Kim Shaw",
         "title": "Chair",
         "brags": [
-            """Kim is an experienced Board Director and Committee member who
-            brings strong governance, legal, risk and strategic capabilities to
-            these environments. She is an Executive Director and the Division
-            Head of Personal Legal Services at Maurice Blackburn Lawyers, as
-            well as a member of the RMIT Law Advisory Board.  She is also a
-            Director of an NGO that supports sustained economic development in
-            disadvantaged and vulnerable communities in the Asia Pacific
-            including through financial literacy in schools and supporting micro
-            enterprises particularly for women."""
+            """Kim is an experienced Board Director with strong governance, legal,
+            risk, and strategic expertise. She also serves on the Board of the
+            Queen Elizabeth Centre, focusing on early parenting and child
+            wellbeing, and is Director and Chair of ARC at CUFA, an NGO
+            supporting economic sustainability in vulnerable Asia Pacific
+            communities.""",
+            """Kim retired from legal practice in June 2025 after 34
+            years at Maurice Blackburn Lawyers, where she served on the firm’s
+            Board for six years. She has also served on advisory boards at RMIT
+            Law School and the Law Institute of Victoria.""",
         ],
     },
     {
@@ -205,7 +206,7 @@ ADVISORS = [
     {
         "image": "web/img/photos/advisors/madeleine-dupuche.png",
         "name": "Madeleine Dupuche",
-        "title": "Director of Education Strategy and Design at Leo Cussen Centre for Law",
+        "title": "Law School Work Integrated Learning Director at La Trobe University",
         "brags": [
             """Madeleine is an experienced strategy and education leader whose
             purpose and career have centred on supporting the creation of a

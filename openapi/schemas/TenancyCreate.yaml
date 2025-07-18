@@ -2,6 +2,9 @@ allOf:
   - $ref: ./TenancyBase.yaml
   - type: object
     properties:
+      started:
+        type: string
+        nullable: true
       is_on_lease:
         type: string
       rental_circumstances:
@@ -12,6 +15,3 @@ allOf:
       agent_id:
         type: number
         nullable: true
-    required:
-      - is_on_lease
-      - rental_circumstances

@@ -75,7 +75,7 @@ const App = () => {
   const issue = caseResult.data!.issue
   const tenancy = caseResult.data!.tenancy
   const notes = caseResult.data?.notes ?? []
-  const details = getSubmittedDetails(issue)
+  const details = issue.answers ? getSubmittedDetails(issue.answers) : null
 
   const filteredNotes = notes
     .filter((note) => note.note_type !== 'EMAIL')
@@ -287,7 +287,9 @@ const App = () => {
                 initialIssue={issue}
                 updateCase={_updateCase}
               />
-              <EntityCard title="Other submitted data" tableData={details} />
+              {details && (
+                <EntityCard title="Other submitted data" tableData={details} />
+              )}
             </React.Fragment>
           )}
         </div>
@@ -556,13 +558,14 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
   },
 ]
 
-const getSubmittedDetails = (issue: Issue): { [key: string]: string } =>
-  Object.entries(issue.answers).reduce((obj, [k, v]) => {
+const getSubmittedDetails = (
+  answers: Record<string, string>
+): { [key: string]: string } =>
+  Object.entries(answers).reduce((obj, [k, v]) => {
     if (!v) return obj
-    // Chop off first part of title
-    const title = correctCase(k.split('_').slice(1).join('_'))
+    const title = correctCase(k)
     // Handle answers that are lists of answers
-    const answer = (Array.isArray(v) ? v : [v]).map(correctCase).join(', ')
+    const answer = (Array.isArray(v) ? v : [v]).join(', ')
     return { ...obj, [title]: answer }
   }, {})
 

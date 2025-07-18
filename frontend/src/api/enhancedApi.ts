@@ -2,11 +2,13 @@ import { generatedApi } from './api.generated'
 
 const ENTITY_TYPES = [
   'CASE',
+  'CLIENT',
+  'DOCUMENT_TEMPLATE',
   'EMAIL',
   'SERVICE',
   'TASKS',
-  'TASK_ATTACHMENT',
   'TASK_ACTIVITY',
+  'TASK_ATTACHMENT',
 ] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
@@ -99,6 +101,18 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     createTaskComment: {
       invalidatesTags: [{ type: 'TASK_ACTIVITY' }],
+    },
+    getDocumentTemplates: {
+      providesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
+    },
+    deleteDocumentTemplate: {
+      invalidatesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
+    },
+    renameDocumentTemplate: {
+      invalidatesTags: [{ type: 'DOCUMENT_TEMPLATE' }],
+    },
+    getClients: {
+      providesTags: [{ type: 'CLIENT' }],
     },
   },
 })

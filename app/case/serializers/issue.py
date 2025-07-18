@@ -1,7 +1,8 @@
 from accounts.models import User
-from core.models import Issue, IssueNote, Service
+from core.models import Client, Issue, IssueNote, Service, Tenancy
 from core.models.issue import CaseStage, EmploymentType, ReferrerType
 from core.models.service import ServiceCategory
+from django.db import transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -40,7 +41,9 @@ class IssueSerializer(serializers.ModelSerializer):
             "lawyer",
             "lawyer_id",
             "client",
+            "client_id",
             "tenancy",
+            "tenancy_id",
             "employment_status",
             "weekly_income",
             "weekly_rent",
@@ -60,28 +63,44 @@ class IssueSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.CharField(read_only=True)
+
     lawyer = UserSerializer(read_only=True)
-    paralegal = UserSerializer(read_only=True)
-    client = ClientSerializer(read_only=True)
-    tenancy = TenancySerializer(read_only=True)
-    support_worker = PersonSerializer(read_only=True)
-    support_worker_id = serializers.IntegerField(write_only=True, allow_null=True)
-    paralegal_id = serializers.PrimaryKeyRelatedField(
-        write_only=True,
-        queryset=User.objects.filter(groups__name="Paralegal"),
-        allow_null=True,
-    )
     lawyer_id = serializers.PrimaryKeyRelatedField(
         write_only=True,
         queryset=User.objects.filter(groups__name="Lawyer"),
         allow_null=True,
+        required=False,
     )
-    topic_display = serializers.CharField(source="get_topic_display")
-    outcome_display = serializers.CharField(source="get_outcome_display")
-    stage_display = serializers.CharField(source="get_stage_display")
+
+    paralegal = UserSerializer(read_only=True)
+    paralegal_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        queryset=User.objects.filter(groups__name="Paralegal"),
+        allow_null=True,
+        required=False,
+    )
+
+    client = ClientSerializer(required=False)
+    client_id = serializers.UUIDField(write_only=True, required=False)
+
+    tenancy = TenancySerializer(required=False)
+    tenancy_id = serializers.IntegerField(write_only=True, required=False)
+
+    support_worker = PersonSerializer(read_only=True)
+    support_worker_id = serializers.IntegerField(
+        write_only=True, allow_null=True, required=False
+    )
+
+    topic_display = serializers.CharField(source="get_topic_display", read_only=True)
+    outcome_display = serializers.CharField(
+        source="get_outcome_display", read_only=True
+    )
+    stage_display = serializers.CharField(source="get_stage_display", read_only=True)
     created_at = LocalDateField()
-    employment_status = TextChoiceListField(EmploymentType)
-    referrer_type = TextChoiceField(ReferrerType)
+    employment_status = TextChoiceListField(EmploymentType, required=False)
+    referrer_type = TextChoiceField(ReferrerType, required=False)
+    answers = serializers.JSONField(read_only=True)
+
     url = serializers.SerializerMethodField()
     # Case review fields.
     is_conflict_check = serializers.SerializerMethodField()
@@ -125,8 +144,21 @@ class IssueSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Cannot close case with unfinished ongoing services"
                 )
-
         return attrs
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            data = validated_data.pop("client", None)
+            if data:
+                instance = Client.objects.create(**data)
+                validated_data["client_id"] = instance.pk
+
+            data = validated_data.pop("tenancy", None)
+            if data:
+                instance = Tenancy.objects.create(**data)
+                validated_data["tenancy_id"] = instance.pk
+
+            return super().create(validated_data)
 
     def validate_paralegal_id(self, paralegal: User):
         return paralegal.id if paralegal else None
@@ -187,10 +219,12 @@ class IssueSearchSerializer(serializers.ModelSerializer):
             "is_open",
             "lawyer",
             "paralegal",
+            "client",
             "search",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
+    client = serializers.UUIDField(required=False)
     search = serializers.CharField(required=False)
 
 

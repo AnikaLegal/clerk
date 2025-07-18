@@ -1,11 +1,13 @@
 import io
 from datetime import timezone
+from unittest.mock import patch
 from uuid import uuid4
 
 import factory
 from accounts.models import User
 from core.models import (
     Client,
+    DocumentTemplate,
     FileUpload,
     Issue,
     IssueEvent,
@@ -21,6 +23,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save, pre_save
 from emails.models import Email, EmailAttachment, EmailTemplate
 from faker import Faker
+from microsoft.storage import MSGraphStorage
 from notify.models import (
     NOTIFY_TOPIC_CHOICES,
     Notification,
@@ -83,8 +86,8 @@ class PersonFactory(TimestampedModelFactory):
 
     full_name = factory.Faker("name")
     email = factory.Faker("ascii_email")
-    address = factory.Faker("address", locale='en_AU')
-    phone_number = factory.Faker("phone_number", locale='en_AU')
+    address = factory.Faker("address", locale="en_AU")
+    phone_number = factory.Faker("phone_number", locale="en_AU")
 
 
 @factory.django.mute_signals(post_save)
@@ -94,9 +97,9 @@ class TenancyFactory(TimestampedModelFactory):
 
     agent = factory.SubFactory(PersonFactory)
     landlord = factory.SubFactory(PersonFactory)
-    address = factory.Faker("street_address", locale='en_AU')
-    suburb = factory.Faker("city", locale='en_AU')
-    postcode = factory.Faker("postcode", locale='en_AU')
+    address = factory.Faker("street_address")
+    suburb = factory.Faker("city")
+    postcode = factory.Faker("postcode")
     started = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-1y", end_date="-2y"
     )
@@ -110,7 +113,7 @@ class IssueFactory(TimestampedModelFactory):
 
     id = factory.LazyAttribute(lambda x: uuid4())
     topic = factory.Faker(
-        "random_element", elements=[CaseTopic.BONDS, CaseTopic.REPAIRS]
+        "random_element", elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
     )
     answers = {}
     client = factory.SubFactory(ClientFactory)
@@ -263,3 +266,29 @@ class ServiceFactory(TimestampedModelFactory):
         yes_declaration=factory.Faker("pyint", min_value=1, max_value=3),
         no_declaration=1,
     )
+
+
+@factory.django.mute_signals(post_save)
+class DocumentTemplateFactory(TimestampedModelFactory):
+    class Meta:
+        model = DocumentTemplate
+
+    topic = factory.Faker(
+        "random_element", elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
+    )
+    file = factory.django.FileField()
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        template = model_class(*args, **kwargs)
+        # Prevent the Django file storage API from using the MS Graph API as it
+        # does not work in tests. This is a convenience as we could do this in
+        # the tests themselves but that would be tedious.
+        with patch.object(MSGraphStorage, "exists", return_value=False):
+            name = DocumentTemplate._get_upload_to(template, template.file.name)
+            with patch.object(MSGraphStorage, "_save", return_value=name):
+                template.save()
+
+        # We have a custom annotation tied to the default manager that we want
+        # to access in tests.
+        return model_class.objects.get(pk=template.pk)

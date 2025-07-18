@@ -1,15 +1,20 @@
-from rest_framework import serializers
-from django.urls import reverse
-
 from core.models import Client
 from core.models.client import (
-    CallTime,
-    EligibilityCircumstanceType,
     AboriginalOrTorresStraitIslander,
-    RequiresInterpreter,
+    CallTime,
     ContactRestriction,
+    EligibilityCircumstanceType,
+    RequiresInterpreter,
 )
+from django.urls import reverse
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 from .fields import TextChoiceField, TextChoiceListField
+
+
+class ClientSearchSerializer(serializers.Serializer):
+    q = serializers.CharField(max_length=256, required=True)
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -43,19 +48,26 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
     id = serializers.CharField(read_only=True)
-    age = serializers.SerializerMethodField()
-    full_name = serializers.SerializerMethodField()
-    url = serializers.SerializerMethodField()
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=Client.objects.all())], required=True
+    )
     date_of_birth = serializers.DateTimeField(
-        format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
+        format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False
     )
-    call_times = TextChoiceListField(CallTime)
-    eligibility_circumstances = TextChoiceListField(EligibilityCircumstanceType)
+    call_times = TextChoiceListField(CallTime, required=False)
+    eligibility_circumstances = TextChoiceListField(
+        EligibilityCircumstanceType, required=False
+    )
     is_aboriginal_or_torres_strait_islander = TextChoiceField(
-        AboriginalOrTorresStraitIslander
+        AboriginalOrTorresStraitIslander, required=False
     )
-    requires_interpreter = TextChoiceField(RequiresInterpreter)
-    contact_restriction = TextChoiceField(ContactRestriction, allow_blank=True)
+    full_name = serializers.SerializerMethodField()
+    age = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+    requires_interpreter = TextChoiceField(RequiresInterpreter, required=False)
+    contact_restriction = TextChoiceField(
+        ContactRestriction, required=False, allow_blank=True
+    )
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))

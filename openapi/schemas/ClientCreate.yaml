@@ -2,11 +2,49 @@ allOf:
   - $ref: ./ClientBase.yaml
   - type: object
     properties:
+      date_of_birth:
+        type: string
+        nullable: true
+      preferred_name:
+        type: string
+        nullable: true
+      phone_number:
+        type: string
+      gender:
+        type: string
+        nullable: true
+      pronouns:
+        type: string
+        nullable: true
+      centrelink_support:
+        type: boolean
+      eligibility_notes:
+        type: string
+      primary_language_non_english:
+        type: boolean
+      primary_language:
+        type: string
+      number_of_dependents:
+        type: number
+        nullable: true
+      notes:
+        type: string
+      url:
+        type: string
+      age:
+        type: integer
+        nullable: true
+      full_name:
+        type: string
+      contact_notes:
+        type: string
+      contact_restriction:
+        type: string
+      requires_interpreter:
+        type: string
+      is_aboriginal_or_torres_strait_islander:
+        type: string
       call_times:
-        type: array
-        items:
-          type: string
-      employment_status:
         type: array
         items:
           type: string
@@ -14,8 +52,3 @@ allOf:
         type: array
         items:
           type: string
-    required:
-      # Choice fields
-      - call_times
-      - employment_status
-      - eligibility_circumstances

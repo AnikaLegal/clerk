@@ -8,7 +8,6 @@
   --gold: #ebb900;
   --gold-light: #fff9e8;
   --peach: #f373655e;
-  --grey: #434343;
   --dark-0: #000;
   --dark-1: #18191f;
   --dark-3: #333;
@@ -23,6 +22,7 @@
   --purple-light: #d8bfb8;
   /* Sizes */
   --container-padding: 100px;
+  --container-width: calc(100vw - 2 * var(--container-padding));
 }
 
 /* Responsive variables (phone) */
@@ -40,34 +40,34 @@ body {
   padding: 0;
   min-height: 100%;
   box-sizing: border-box;
-  background-color: #eff6ff11;
+  background-color: #fdfdff !important;
 }
 
-header {
+body > header {
   background: var(--gold-light);
   margin-bottom: 3rem;
   box-shadow: 0px 0px 10px rgb(0 55 123 / 10%);
 }
 
-header .inner {
+body > header .inner {
   display: flex;
   justify-content: space-between;
   max-width: 1240px;
-  width: calc(100vw - 2 * var(--container-padding));
+  width: var(--container-width);
   margin: 0 auto;
   padding: 1.5rem 0;
   align-items: center;
 }
-header .logo {
+body > header .logo {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 }
-header img.logo {
+body > header img.logo {
   height: 42px;
 }
-header .nav-items {
+body > header .nav-items {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -75,17 +75,16 @@ header .nav-items {
   flex-wrap: wrap;
   margin: 0 1.5rem;
 }
-header .nav-items:last-child {
+body > header .nav-items:last-child {
   margin-right: 0;
 }
-header .nav-items a {
+body > header .nav-items a {
   color: var(--dark-1);
 }
-header .nav-items a:hover {
+body > header .nav-items a:hover {
   text-decoration: underline;
 }
-header .nav-items a:visited {
-  color: var(--dark-1);
+body > header .nav-items a:visited {
 }
 
 .login .messages {
@@ -108,7 +107,8 @@ header .nav-items a:visited {
 }
 
 main {
-  width: calc(100vw - 2 * var(--container-padding));
+  max-width: 1240px;
+  width: var(--container-width);
   margin: 0 auto;
   padding-bottom: 6rem;
 }
@@ -180,4 +180,35 @@ main {
 .animation-tada {
   animation: tada-keyframes 3s ease infinite;
   animation-fill-mode: both;
+
+/* Mantine */
+
+.mantine-Table-table {
+  /* Otherwise the background color set above shows through */
+  background-color: var(--mantine-color-white);
+}
+
+.mantine-Table-thead {
+  /* Match the Semantic UI table header background color to ensure consistency */
+  background-color: #f9fafb;
+}
+
+form .mantine-InputWrapper-label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.mantine-Modal-header {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  margin-bottom: var(--mantine-spacing-lg);
+}
+
+.mantine-Modal-header .mantine-Modal-title {
+  font-weight: bold;
+  font-size: var(--mantine-font-size-lg);
+}
+
+.mantine-Title-root .subtitle {
+  color: var(--mantine-color-dark-3);
+  font-size: var(--mantine-font-size-lg);
 }

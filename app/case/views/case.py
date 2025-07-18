@@ -12,7 +12,7 @@ from django.urls import reverse
 from microsoft.service import get_case_folder_info
 from rest_framework import status
 from rest_framework.decorators import action, api_view
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -52,8 +52,20 @@ def case_list_page_view(request):
                 ("False", "Closed"),
             ],
         },
+        "create_url": reverse("case-create"),
     }
     return render_react_page(request, "Cases", "case-list", context)
+
+
+@api_view(["GET"])
+@coordinator_or_better_required
+def case_create_page_view(request):
+    context = {
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        }
+    }
+    return render_react_page(request, "Create case", "case-create", context)
 
 
 @api_view(["GET"])
@@ -173,7 +185,9 @@ class CasePaginator(ClerkPaginator):
     max_page_size = 14
 
 
-class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
+class CaseApiViewset(
+    GenericViewSet, ListModelMixin, UpdateModelMixin, CreateModelMixin
+):
     serializer_class = IssueSerializer
     pagination_class = CasePaginator
 
@@ -181,8 +195,11 @@ class CaseApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         if self.action == "list":
             # Anyone can try look at the list
             permission_classes = [IsAuthenticated]
+        elif self.action == "create":
+            # To create you need to be a coordinator+
+            permission_classes = [CoordinatorOrBetterPermission]
         else:
-            # But for other stuff you need to be a coordinator+ or have object permission
+            # For other stuff you need to be a coordinator+ or have object permission
             permission_classes = [
                 CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
             ]

@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0077_alter_issue_referrer_type"),
+        ("core", "0088_alter_client_pronouns"),
     ]
 
     operations = [

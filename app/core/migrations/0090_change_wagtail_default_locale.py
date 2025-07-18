@@ -13,7 +13,7 @@ def _change_wagtail_default_locale(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0078_alter_issueevent_event_type"),
+        ("core", "0089_alter_issueevent_event_type"),
     ]
 
     operations = [

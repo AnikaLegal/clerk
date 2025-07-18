@@ -6,6 +6,11 @@ get:
       schema:
         type: integer
       required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
     - name: search
       in: query
       schema:
@@ -41,6 +46,11 @@ get:
       schema:
         type: string
       required: false
+    - name: client
+      in: query
+      schema:
+        type: string
+      required: false
   responses:
     "200":
       description: Successful response.
@@ -48,3 +58,22 @@ get:
         application/json:
           schema:
             $ref: ../responses/CaseListResponse.yaml
+post:
+  operationId: createCase
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IssueCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Issue.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

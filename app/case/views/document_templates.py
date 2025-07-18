@@ -1,27 +1,31 @@
-from django.urls import reverse
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.viewsets import ViewSet
-from django.core.exceptions import PermissionDenied
-
-from case.utils.react import render_react_page
+from core.models.document_template import DocumentTemplate
 from core.models.issue import CaseTopic
-from microsoft.service import list_templates, upload_template, delete_template
-from case.serializers import DocumentTemplateSerializer
-from case.views.auth import admin_or_better_required
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.decorators import action, api_view
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
-
-topic_options = [
-    {"key": key, "value": key, "text": label} for key, label in CaseTopic.ACTIVE_CHOICES
-]
+from case.serializers import (
+    DocumentTemplateFilterSerializer,
+    DocumentTemplateRenameSerializer,
+    DocumentTemplateSerializer,
+)
+from case.utils.react import render_react_page
+from case.views.auth import (
+    AdminOrBetterPermission,
+    admin_or_better_required,
+)
 
 
 @api_view(["GET"])
 @admin_or_better_required
 def template_doc_list_page_view(request):
     context = {
-        "topic_options": topic_options,
-        "topic": CaseTopic.REPAIRS,
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        },
         "create_url": reverse("template-doc-create"),
     }
     return render_react_page(
@@ -32,47 +36,62 @@ def template_doc_list_page_view(request):
 @api_view(["GET"])
 @admin_or_better_required
 def template_doc_create_page_view(request):
-    context = {"topic_options": topic_options, "list_url": reverse("template-doc-list")}
+    context = {
+        "choices": {
+            "topic": CaseTopic.ACTIVE_CHOICES,
+        },
+        "list_url": reverse("template-doc-list"),
+    }
     return render_react_page(
         request, "Document Templates", "doc-template-create", context
     )
 
 
 class DocumentTemplateApiViewset(ViewSet):
+    permission_classes = [AdminOrBetterPermission]
+
     def list(self, request):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
+        serializer = DocumentTemplateFilterSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
 
-        topic = request.query_params.get("topic", CaseTopic.REPAIRS)
-        name = request.query_params.get("name")
-        templates = [{**t, "topic": topic} for t in list_templates(topic)]
-        if name:
-            templates = [t for t in templates if name.lower() in t["name"].lower()]
+        queryset = DocumentTemplate.objects.all()
+        queryset = queryset.order_by("topic", "name")
 
-        templates = sorted(templates, key=lambda t: t["name"])
-        return Response(data=templates)
+        for key, value in serializer.validated_data.items():
+            if value is not None:
+                if key == "name":
+                    queryset = queryset.filter(name__icontains=value)
+                else:
+                    queryset = queryset.filter(**{key: value})
+
+        data = DocumentTemplateSerializer(queryset, many=True).data
+        return Response(data=data)
 
     def create(self, request):
-        """
-        Note: requires muiltipart upload.
-        """
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
-
         serializer = DocumentTemplateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        files = serializer.validated_data["files"]
-        topic = serializer.validated_data["topic"]
-        for f in files:
-            upload_template(topic, f)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
 
-        return Response(status=201)
+    def destroy(self, request, pk):
+        template = DocumentTemplate.objects.get(pk=pk)
+        template.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def destroy(self, request, pk=None):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
+    @action(
+        detail=True,
+        methods=["PATCH"],
+        url_path="rename-file",
+    )
+    def rename_file(self, request, pk=None):
+        serializer = DocumentTemplateRenameSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_name = serializer.validated_data.get("name")
 
-        if pk is not None:
-            delete_template(file_id=pk)
+        template = get_object_or_404(DocumentTemplate.objects, pk=pk)
+        if new_name and template.name != new_name:
+            field_file = template.file.open()
+            field_file.file.name = new_name
+            template.file.save(new_name, field_file.file)
 
-        return Response(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)

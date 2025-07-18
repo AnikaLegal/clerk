@@ -1,34 +1,22 @@
 import React from 'react'
-import { Button, ButtonProps } from 'semantic-ui-react'
-import styled from 'styled-components'
+import { Button, ElementProps } from '@mantine/core'
 
-interface TextButtonProps {
-  children: React.ReactNode
-}
+import '@mantine/core/styles.css'
 
-export const TextButton = ({
-  children,
-  ...props
-}: TextButtonProps | ButtonProps) => {
+export const TextButton = ({ children, ...props }: ElementProps<'button'>) => {
   return (
-    <StyledButton compact {...props}>
+    <Button
+      variant="transparent"
+      size="compact-xs"
+      fz="lg"
+      fw="normal"
+      c="blue.6"
+      radius="xs"
+      {...props}
+    >
       {children}
-    </StyledButton>
+    </Button>
   )
 }
 
-const StyledButton = styled(Button)`
-  &&&& {
-    background-color: inherit;
-    color: inherit;
-    padding: 0;
-    &:focus {
-      background-color: inherit;
-      color: inherit;
-    }
-    &:hover {
-      background-color: inherit;
-      color: inherit;
-    }
-  }
-`
+export default TextButton

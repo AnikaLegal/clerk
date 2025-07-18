@@ -21,6 +21,10 @@ class EligibilityCircumstanceType(models.TextChoices):
         "HOUSING",
         "Public housing",
     )
+    SINGLE_PARENT = (
+        "SINGLE_PARENT",
+        "Single Parent",
+    )
     MENTAL_ILLNESS = (
         "MENTAL_ILLNESS",
         "Mental illness",
@@ -132,7 +136,7 @@ class Client(TimestampedModel):
 
     # Demographic info for impact analysis.
     gender = models.CharField(max_length=64, null=True, blank=True)
-    pronouns = models.CharField(max_length=32, blank=True)
+    pronouns = models.CharField(max_length=32, blank=True, default="")
 
     # Eligibility
     centrelink_support = models.BooleanField(default=False)
