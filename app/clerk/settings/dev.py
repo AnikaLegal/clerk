@@ -2,6 +2,7 @@
 import socket
 from .base import *
 
+ENVIRONMENT = "development"
 DEBUG = True
 
 # Django debug toolbar + Docker setup

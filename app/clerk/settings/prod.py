@@ -4,6 +4,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .base import *
 
+ENVIRONMENT = "production"
 IS_PROD = True
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
@@ -39,10 +40,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 AWS_STORAGE_BUCKET_NAME = "anika-clerk"
 
 
+# Sentry
 sentry_sdk.init(
     dsn=os.environ.get("RAVEN_DSN"),
     integrations=[DjangoIntegration()],
-    environment="prod",
+    environment=ENVIRONMENT,
 )
 
 

@@ -3,16 +3,22 @@ import styled from 'styled-components'
 import { Header } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 
-const SENTRY_JS_DSN = window && (window as any).SENTRY_JS_DSN
-
-if (SENTRY_JS_DSN) {
+interface SentryContext {
+  dsn: string
+  environment: string
+}
+const SENTRY_CONTEXT = (window as any).SENTRY_CONTEXT as SentryContext
+if (SENTRY_CONTEXT.dsn) {
   // Initialize Sentry, if it is enabled.
-  Sentry.init({ dsn: SENTRY_JS_DSN })
+  Sentry.init({
+    dsn: SENTRY_CONTEXT.dsn,
+    environment: SENTRY_CONTEXT.environment,
+  })
 }
 
 export const logException = (error) => {
   console.error('Caught an error:', error)
-  if (SENTRY_JS_DSN) {
+  if (SENTRY_CONTEXT.dsn) {
     // Send error report to Sentry, if it is enabled.
     console.log('Sending error report to Sentry.')
     Sentry.captureException(error)
@@ -22,7 +28,7 @@ export const logException = (error) => {
 }
 
 export class ErrorBoundary extends React.Component<
-  { noRender?: boolean, children?: React.ReactNode | undefined },
+  { noRender?: boolean; children?: React.ReactNode | undefined },
   { hasError: boolean }
 > {
   constructor(props) {

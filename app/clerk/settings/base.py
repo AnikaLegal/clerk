@@ -4,6 +4,7 @@ Django settings for clerk project.
 
 import os
 
+ENVIRONMENT = None
 IS_PROD = False
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
