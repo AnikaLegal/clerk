@@ -17,8 +17,12 @@ def render_react_page(request, title, react_page_name, react_context, public=Fal
             }
         }
     )
+    sentry_context = {
+        "dsn": settings.SENTRY_JS_DSN or "",
+        "environment": settings.ENVIRONMENT or "",
+    }
     context = {
-        "SENTRY_JS_DSN": settings.SENTRY_JS_DSN,
+        "sentry_context": json.dumps(sentry_context),
         "react_context": json.dumps(react_context),
         "react_page_name": react_page_name,
         "title": title,

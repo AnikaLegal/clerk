@@ -1,7 +1,6 @@
 from .base import *
 
-SUBMISSION_EMAILS = ["test@example.com"]
-
+ENVIRONMENT = "test"
 DEBUG = False
 EMAIL_PREFIX = "TEST"
 SECRET_KEY = "test-secret-key"
@@ -29,6 +28,7 @@ Q_CLUSTER = {
 
 
 EMAIL_DOMAIN = "fake.anikalegal.com"
+SUBMISSION_EMAILS = ["test@example.com"]
 
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = ""
