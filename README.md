@@ -2,7 +2,7 @@
 
 ![Test](https://github.com/AnikaLegal/clerk/workflows/Test/badge.svg?branch=develop)
 
-This site is used by new Anika clients who want to submit their legal problem. Clients may submit the facts of their case using a structured form interface. Their case file is then entered into our case managment system.
+The Anika Legal case management system & website.
 
 > Depending on the job, office clerks might answer phones, filing, data processing, faxing, envelope stuffing and mailing, message delivery, running errands, sorting incoming mail and much more. ([source](https://www.snagajob.com/job-descriptions/office-clerk/))
 
