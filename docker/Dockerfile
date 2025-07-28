@@ -14,7 +14,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     uv sync --frozen
 
 # Copy frontend build artifacts (for production only)
-COPY --from=clerk-frontend:local /frontend/dist/ /static/
+COPY --from=clerk-frontend:local /frontend/dist/ /dist/
 
 # Collect static files
 RUN ./manage.py collectstatic --noinput

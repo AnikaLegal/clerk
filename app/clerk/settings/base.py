@@ -115,6 +115,7 @@ TEMPLATES = [
 
 SILENCED_SYSTEM_CHECKS = [
     "wagtailadmin.W004",  # The AWS_S3_FILE_OVERWRITE setting is set to True
+    "django_vite.W001",  # Cannot read Vite manifest file for app default at /static/manifest.json
 ]
 
 
@@ -206,6 +207,8 @@ SHELL_PLUS = "ipython"
 # Media storage & static files
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
+STATICFILES_DIRS = ["/dist/"]
+
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
