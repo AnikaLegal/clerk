@@ -263,7 +263,7 @@ dependencies = [
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-storages" },
-    { name = "django-webpack-loader" },
+    { name = "django-vite" },
     { name = "djangorestframework" },
     { name = "drf-openapi-tester" },
     { name = "faker" },
@@ -316,7 +316,7 @@ requires-dist = [
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-storages" },
-    { name = "django-webpack-loader" },
+    { name = "django-vite", specifier = ">=3.1.0" },
     { name = "djangorestframework" },
     { name = "drf-openapi-tester" },
     { name = "faker" },
@@ -626,12 +626,15 @@ wheels = [
 ]
 
 [[package]]
-name = "django-webpack-loader"
-version = "3.1.1"
+name = "django-vite"
+version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/19/d9/17f799d3fb6af2db945a32aa6a70571dd989458954ec647d279cd3cb21af/django-webpack-loader-3.1.1.tar.gz", hash = "sha256:f11b79700d1bfc1299131bdf4ba479c1ec200f83a1400e1a2feb5c2ba7b6f8c4", size = 18371 }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/23/fe/4be07f538bbf9bf8bf73b045552ec2a1b4fba67e3176abb30490b643368e/django_vite-3.1.0.tar.gz", hash = "sha256:8b4ffe4a9fa81ff568bfb195e74dde8694aaf13fd4b656ae60bf59cce08b85e8", size = 25434 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e9/01/121be0ea43ff35e19a6f66c0d23a2b06b68189e454eb92042dd99f54b378/django_webpack_loader-3.1.1-py2.py3-none-any.whl", hash = "sha256:15c05cb685b113c5e6f947efa8ee3888a03c2969a2dd0da4c7610b3e695f67ba", size = 19004 },
+    { url = "https://files.pythonhosted.org/packages/30/59/7df4b1077fa41b43b4e542696d75138dbb86a65f44248c607b3e0f1014ce/django_vite-3.1.0-py3-none-any.whl", hash = "sha256:4e46572bd6b1ce70784be129205dc2ffcbc7a3c19fea50bebfb72b327bbde5fc", size = 23579 },
 ]
 
 [[package]]

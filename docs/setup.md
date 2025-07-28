@@ -40,8 +40,8 @@ The transcrypt password is available in the Tech team Bitwarden account.
 Next, build the Docker environment that we'll be using:
 
 ```bash
-# Build Webpack container
-inv build -w
+# Build frontend container
+inv build -f
 # Build Django container
 inv build
 ```

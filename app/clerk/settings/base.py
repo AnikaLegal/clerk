@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     "wagtail_localize.locales",
     "modelcluster",
     "taggit",
-    "webpack_loader",
+    "django_vite",
     # django_cleanup must be last.
     "django_cleanup.apps.CleanupSelectedConfig",
 ]
@@ -206,9 +206,6 @@ SHELL_PLUS = "ipython"
 # Media storage & static files
 STATIC_URL = "/static/"
 STATIC_ROOT = "/static/"
-STATICFILES_DIRS = [
-    ("webpack_bundles", "/build/bundles/"),
-]
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -218,13 +215,10 @@ STORAGES = {
     },
 }
 
-# Webpack loader
-WEBPACK_LOADER = {
-    "DEFAULT": {
-        "CACHE": True,
-        "STATS_FILE": "/build/webpack-stats.json",
-        "POLL_INTERVAL": 0.1,
-        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
+# Vite
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": False,
     }
 }
 

@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /frontend
 
-# Install Node modules, build Webpack for prod.
+# Install Node modules, build frontend for prod.
 COPY frontend/package.json .
 COPY frontend/package-lock.json .
 RUN echo "Installing Node modules." && \
@@ -11,6 +11,5 @@ RUN echo "Installing Node modules." && \
 # Mount the codebase
 ADD frontend /frontend
 
-# Build webpack from production
-RUN echo "Building Webpack." && \ 
+RUN echo "Building frontend" && \ 
     npm run build

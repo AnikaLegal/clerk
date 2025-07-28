@@ -17,7 +17,6 @@ dependencies = [
     "django-override-storage",
     "django-q2",
     "django-storages",
-    "django-webpack-loader",
     "django",
     "djangorestframework",
     "drf-openapi-tester",
@@ -45,6 +44,7 @@ dependencies = [
     "wagtail-localize",
     "wagtail",
     "whitenoise",
+    "django-vite>=3.1.0",
 ]
 
 [tool.uv]
@@ -65,7 +65,5 @@ dev-dependencies = [
 override-dependencies = ["django>=5"]
 
 [tool.pytest.ini_options]
-filterwarnings = [
-    "ignore::django.utils.deprecation.RemovedInDjango60Warning",
-]
+filterwarnings = ["ignore::django.utils.deprecation.RemovedInDjango60Warning"]
 addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"

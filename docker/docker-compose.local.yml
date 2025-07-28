@@ -11,7 +11,6 @@ services:
       - clerk-postgres-data:/var/lib/postgresql/data
     ports:
       - 25432:5432
-
   # Django webserver.
   web:
     command: bash /app/scripts/web/local.sh
@@ -22,11 +21,10 @@ services:
     volumes:
       - ../app:/app
       - /app/.venv/ # Exclude
-      - build:/build
       - config_local:/root/.config
     links:
       - worker
-      - webpack
+      - frontend
       - clerk_db
     env_file:
       - ../env/dev.env
@@ -34,7 +32,6 @@ services:
       - SHELLOPTS=vi
       - HISTFILE=/root/.config/bash_history
       - IPYTHON_DIR=/root/.config/ipython
-
   # Django-q worker.
   worker:
     command: bash /app/scripts/worker/local.sh
@@ -46,19 +43,15 @@ services:
       - clerk_db
     env_file:
       - ../env/dev.env
-
-  webpack:
-    image: clerk-webpack:local
+  frontend:
+    image: clerk-frontend:local
     command: npm run dev
     ports:
-      - 3000:3000
+      - 5173:5173
     volumes:
       - ../frontend/src:/frontend/src
-      - ../frontend/webpack.config.js:/frontend/webpack.config.js
-      - ../frontend/babel.config.js:/frontend/babel.config.js
+      - ../frontend/vite.config.ts:/frontend/vite.config.ts
       - ../frontend/package.json:/frontend/package.json
-      - build:/build
-
   # For testing.
   test:
     image: clerk:local
@@ -69,8 +62,6 @@ services:
       - clerk_db
     env_file:
       - ../env/test.env
-
 volumes:
-  build:
   clerk-postgres-data:
   config_local:
