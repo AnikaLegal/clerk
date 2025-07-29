@@ -39,7 +39,7 @@ jobs:
         run: ./transcrypt/transcrypt -c aes-256-cbc -p '${{ secrets.TRANSCRYPT_PASSWORD }}' --yes
 
       - name: Build frontend container image
-        run: docker build -t clerk-webpack:local -f docker/Dockerfile.webpack .
+        run: docker build -t clerk-frontend:local -f docker/Dockerfile.frontend .
 
       # Build the clerk Docker image so that we can run tests
       - name: Build container image

@@ -13,8 +13,9 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     echo "Installing python executable & dependencies..." && \
     uv sync --frozen
 
-# Copy Webpack prod build artifacts from clerk-webpack image
-COPY --from=clerk-webpack:local /build /build
+# Copy frontend build assets (for production only)
+COPY --from=clerk-frontend:local /frontend/dist/ /dist/
 
 # Collect static files
-RUN mkdir -p /static/ && ./manage.py collectstatic --noinput
+RUN ./manage.py collectstatic --noinput
+

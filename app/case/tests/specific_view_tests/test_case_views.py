@@ -203,6 +203,91 @@ def test_case_update_view(superuser_client: APIClient):
     assert not issue.is_open
 
 
+@pytest.mark.django_db
+def test_case_create_view_permissions(
+    user_client: APIClient,
+    user: User,
+    paralegal_group,
+    coordinator_group,
+):
+    """
+    Paralegal users can't create cases. Coordinator users can create cases.
+    """
+    url = reverse("case-api-list")
+    client = factories.ClientFactory()
+    tenancy = factories.TenancyFactory()
+    data = {
+        "topic": "REPAIRS",
+        "client_id": client.pk,
+        "tenancy_id": tenancy.pk,
+    }
+
+    # Paralegal user.
+    user.groups.set([paralegal_group])
+    annotate_group_access(user)
+    response = user_client.post(url, data=data, format="json")
+    assert response.status_code == 403
+
+    # Coordinator user.
+    user.groups.set([coordinator_group])
+    annotate_group_access(user)
+    response = user_client.post(url, data=data, format="json")
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_case_create_view__using_id_relations(superuser_client: APIClient):
+    client = factories.ClientFactory()
+    tenancy = factories.TenancyFactory()
+    data = {
+        "topic": "REPAIRS",
+        "client_id": client.pk,
+        "tenancy_id": tenancy.pk,
+    }
+    url = reverse("case-api-list")
+    response = superuser_client.post(url, data=data, format="json")
+    assert response.status_code == 201
+    schema_tester.validate_response(response=response)
+
+    issue = Issue.objects.get()
+    assert issue.topic == "REPAIRS"
+    assert issue.client == client
+    assert issue.tenancy == tenancy
+
+
+@pytest.mark.django_db
+def test_case_create_view__using_nested_relations(superuser_client: APIClient):
+    issue_stub = factories.IssueFactory.stub()
+    client_stub = factories.ClientFactory.stub()
+    tenancy_stub = factories.TenancyFactory.stub()
+    data = {
+        "topic": issue_stub.topic,
+        "client": {
+            "first_name": client_stub.first_name,
+            "last_name": client_stub.last_name,
+            "email": client_stub.email,
+        },
+        "tenancy": {
+            "address": tenancy_stub.address,
+            "suburb": tenancy_stub.suburb,
+            "postcode": tenancy_stub.postcode,
+        },
+    }
+    url = reverse("case-api-list")
+    response = superuser_client.post(url, data=data, format="json")
+    assert response.status_code == 201
+    schema_tester.validate_response(response=response)
+
+    issue = Issue.objects.get()
+    assert issue.topic == issue_stub.topic
+    assert issue.client.first_name == client_stub.first_name
+    assert issue.client.last_name == client_stub.last_name
+    assert issue.client.email == client_stub.email
+    assert issue.tenancy.address == tenancy_stub.address
+    assert issue.tenancy.suburb == tenancy_stub.suburb
+    assert issue.tenancy.postcode == tenancy_stub.postcode
+
+
 # TODO: Test permissions
 @pytest.mark.django_db
 def test_case_create_note_view(superuser_client: APIClient, superuser: User):

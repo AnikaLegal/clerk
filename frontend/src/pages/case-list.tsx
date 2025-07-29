@@ -9,43 +9,25 @@ import {
   Label,
   Dropdown,
 } from 'semantic-ui-react'
-
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
 import { FadeTransition } from 'comps/transitions'
-import { useGetUsersQuery, useGetCasesQuery } from 'api'
+import { useGetUsersQuery, useGetCasesQuery, GetCasesApiArg } from 'api'
+import { UserPermission } from 'types'
+import { Group, Text, Title, Button } from '@mantine/core'
+
+import '@mantine/core/styles.css'
 
 interface DjangoContext {
+  user: UserPermission
   choices: {
     stage: string[][]
     topic: string[][]
     outcome: string[][]
     is_open: string[][]
   }
+  create_url: string
 }
-
-interface SearchQuery {
-  page: number
-  search: string
-  topic: string
-  stage: string
-  outcome: string
-  isOpen: string
-  paralegal: string
-  lawyer: string
-}
-
-const INITIAL_QUERY = {
-  page: null,
-  search: '',
-  topic: '',
-  stage: '',
-  outcome: '',
-  isOpen: '',
-  paralegal: '',
-  lawyer: '',
-}
-
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const TABLE_FIELDS = [
@@ -63,7 +45,7 @@ const TABLE_FIELDS = [
 const App = () => {
   // TODO: Debounce search keystrokes.
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
-  const [query, setQuery] = useState<SearchQuery>(INITIAL_QUERY)
+  const [query, setQuery] = useState<GetCasesApiArg>({})
 
   const onPageChange = (e, { activePage }) =>
     setQuery({ ...query, page: activePage })
@@ -87,12 +69,19 @@ const App = () => {
     paralegalResults.isFetching || lawyerResults.isFetching
   return (
     <Container>
-      <Header as="h1">
-        Cases
-        <Header.Subheader>
+      <Title order={1} mb="md">
+        <Group wrap="nowrap" gap="sm" justify="space-between">
+          <span>Cases</span>
+          {CONTEXT.user.is_coordinator_or_better && (
+            <Button component="a" href={CONTEXT.create_url}>
+              Create a new case
+            </Button>
+          )}
+        </Group>
+        <Text className="subtitle">
           Showing {issues.length} of {totalIssues} cases
-        </Header.Subheader>
-      </Header>
+        </Text>
+      </Title>
       <Form>
         <Form.Field>
           <Input

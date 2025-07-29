@@ -159,7 +159,7 @@ class Issue(TimestampedModel):
     # File reference number for internal comms
     fileref = models.CharField(max_length=8, default="", blank=True)
     # Questionnaire answers
-    answers = models.JSONField(encoder=DjangoJSONEncoder)
+    answers = models.JSONField(encoder=DjangoJSONEncoder, null=True)
     # The person we are trying to help.
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     # The tenancy relating to the case.

@@ -1,11 +1,15 @@
 {% extends 'case/_base.html' %}
-{% load render_bundle from webpack_loader %}
+{% load django_vite %}
 {% block title %}
   {{ title }}
 {% endblock %}
 
 {% block styles %}
-  {% render_bundle react_page_name 'css' %}
+  {% vite_hmr_client %}
+  {% vite_react_refresh %}
+  {% with asset_name='pages/'|add:react_page_name|add:'.tsx' %}
+    {% vite_asset asset_name %}
+  {% endwith %}
 {% endblock %}
 
 {% block content %}
@@ -17,5 +21,4 @@
     window.REACT_CONTEXT = JSON.parse('{{ react_context | escapejs }}')
     window.SENTRY_CONTEXT = JSON.parse('{{ sentry_context | escapejs }}')
   </script>
-  {% render_bundle react_page_name 'js' %}
 {% endblock %}

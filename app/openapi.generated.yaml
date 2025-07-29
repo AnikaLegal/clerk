@@ -13,6 +13,11 @@ paths:
           schema:
             type: integer
           required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
         - name: search
           in: query
           schema:
@@ -48,6 +53,11 @@ paths:
           schema:
             type: string
           required: false
+        - name: client
+          in: query
+          schema:
+            type: string
+          required: false
       responses:
         "200":
           description: Successful response.
@@ -79,6 +89,25 @@ paths:
                   - page_count
                   - item_count
                   - results
+    post:
+      operationId: createCase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/case/{id}/:
     get:
       operationId: getCase
@@ -747,7 +776,74 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/client/:
+    get:
+      operationId: getClients
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: q
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Client"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
   /clerk/api/client/{id}/:
+    get:
+      operationId: getClient
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
     patch:
       operationId: updateClient
       parameters:
@@ -1261,24 +1357,8 @@ components:
       properties:
         topic:
           type: string
-        stage:
-          type: string
-        outcome:
-          type: string
-          nullable: true
-        outcome_notes:
-          type: string
-        provided_legal_services:
-          type: boolean
-        is_open:
-          type: boolean
       required:
         - topic
-        - stage
-        - outcome
-        - outcome_notes
-        - provided_legal_services
-        - is_open
     UserCreate:
       type: object
       properties:
@@ -1357,6 +1437,19 @@ components:
             - is_paralegal
             - is_ms_account_set_up
             - ms_account_created_at
+    ClientBase:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+      required:
+        - first_name
+        - last_name
+        - email
     TextChoiceField:
       type: object
       properties:
@@ -1374,68 +1467,6 @@ components:
         - display
         - value
         - choices
-    ClientBase:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        preferred_name:
-          type: string
-          nullable: true
-        email:
-          type: string
-        phone_number:
-          type: string
-        gender:
-          type: string
-          nullable: true
-        pronouns:
-          type: string
-          nullable: true
-        centrelink_support:
-          type: boolean
-        eligibility_notes:
-          type: string
-        requires_interpreter:
-          $ref: "#/components/schemas/TextChoiceField"
-        primary_language_non_english:
-          type: boolean
-        primary_language:
-          type: string
-        is_aboriginal_or_torres_strait_islander:
-          $ref: "#/components/schemas/TextChoiceField"
-        number_of_dependents:
-          type: number
-          nullable: true
-        notes:
-          type: string
-        date_of_birth:
-          type: string
-          nullable: true
-        contact_restriction:
-          $ref: "#/components/schemas/TextChoiceField"
-        contact_notes:
-          type: string
-      required:
-        - first_name
-        - last_name
-        - preferred_name
-        - email
-        - phone_number
-        - gender
-        - pronouns
-        - centrelink_support
-        - eligibility_notes
-        - requires_interpreter
-        - primary_language_non_english
-        - primary_language
-        - is_aboriginal_or_torres_strait_islander
-        - number_of_dependents
-        - notes
-        - date_of_birth
-        - contact_restriction
     TextChoiceListField:
       type: object
       properties:
@@ -1463,22 +1494,71 @@ components:
             id:
               type: string
               format: uuid
+            date_of_birth:
+              type: string
+              nullable: true
+            preferred_name:
+              type: string
+              nullable: true
+            phone_number:
+              type: string
+            gender:
+              type: string
+              nullable: true
+            pronouns:
+              type: string
+              nullable: true
+            centrelink_support:
+              type: boolean
+            eligibility_notes:
+              type: string
+            primary_language_non_english:
+              type: boolean
+            primary_language:
+              type: string
+            number_of_dependents:
+              type: number
+              nullable: true
+            notes:
+              type: string
             url:
               type: string
             age:
               type: integer
+              nullable: true
             full_name:
               type: string
+            contact_notes:
+              type: string
+            contact_restriction:
+              $ref: "#/components/schemas/TextChoiceField"
+            requires_interpreter:
+              $ref: "#/components/schemas/TextChoiceField"
+            is_aboriginal_or_torres_strait_islander:
+              $ref: "#/components/schemas/TextChoiceField"
             call_times:
               $ref: "#/components/schemas/TextChoiceListField"
             eligibility_circumstances:
               $ref: "#/components/schemas/TextChoiceListField"
           required:
             - id
+            - date_of_birth
+            - preferred_name
+            - phone_number
+            - gender
+            - pronouns
+            - centrelink_support
+            - eligibility_notes
+            - primary_language_non_english
+            - primary_language
+            - number_of_dependents
+            - notes
             - url
             - age
             - full_name
-            - date_of_birth
+            - contact_restriction
+            - requires_interpreter
+            - is_aboriginal_or_torres_strait_islander
             - call_times
             - eligibility_circumstances
     TenancyBase:
@@ -1492,14 +1572,10 @@ components:
         postcode:
           type: string
           nullable: true
-        started:
-          type: string
-          nullable: true
       required:
         - address
         - suburb
         - postcode
-        - started
     PersonBase:
       type: object
       properties:
@@ -1538,6 +1614,9 @@ components:
           properties:
             id:
               type: integer
+            started:
+              type: string
+              nullable: true
             url:
               type: string
             is_on_lease:
@@ -1545,11 +1624,16 @@ components:
             rental_circumstances:
               $ref: "#/components/schemas/TextChoiceField"
             landlord:
-              $ref: "#/components/schemas/Person"
+              allOf:
+                - $ref: "#/components/schemas/Person"
+              nullable: true
             agent:
-              $ref: "#/components/schemas/Person"
+              allOf:
+                - $ref: "#/components/schemas/Person"
+              nullable: true
           required:
             - id
+            - started
             - url
             - is_on_lease
             - rental_circumstances
@@ -1565,13 +1649,24 @@ components:
               format: uuid
             topic_display:
               type: string
+            stage:
+              type: string
             stage_display:
               type: string
+            outcome:
+              type: string
+              nullable: true
             outcome_display:
               type: string
               nullable: true
+            outcome_notes:
+              type: string
             fileref:
               type: string
+            provided_legal_services:
+              type: boolean
+            is_open:
+              type: boolean
             is_sharepoint_set_up:
               type: boolean
             paralegal:
@@ -1613,6 +1708,7 @@ components:
               type: object
               additionalProperties:
                 type: string
+              nullable: true
             is_conflict_check:
               type: boolean
               nullable: true
@@ -1625,10 +1721,15 @@ components:
           required:
             - id
             - topic_display
+            - stage
             - stage_display
+            - outcome
             - outcome_display
+            - outcome_notes
             - fileref
             - paralegal
+            - provided_legal_services
+            - is_open
             - lawyer
             - client
             - employment_status
@@ -1646,6 +1747,143 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
+    ClientCreate:
+      allOf:
+        - $ref: "#/components/schemas/ClientBase"
+        - type: object
+          properties:
+            date_of_birth:
+              type: string
+              nullable: true
+            preferred_name:
+              type: string
+              nullable: true
+            phone_number:
+              type: string
+            gender:
+              type: string
+              nullable: true
+            pronouns:
+              type: string
+              nullable: true
+            centrelink_support:
+              type: boolean
+            eligibility_notes:
+              type: string
+            primary_language_non_english:
+              type: boolean
+            primary_language:
+              type: string
+            number_of_dependents:
+              type: number
+              nullable: true
+            notes:
+              type: string
+            url:
+              type: string
+            age:
+              type: integer
+              nullable: true
+            full_name:
+              type: string
+            contact_notes:
+              type: string
+            contact_restriction:
+              type: string
+            requires_interpreter:
+              type: string
+            is_aboriginal_or_torres_strait_islander:
+              type: string
+            call_times:
+              type: array
+              items:
+                type: string
+            eligibility_circumstances:
+              type: array
+              items:
+                type: string
+    TenancyCreate:
+      allOf:
+        - $ref: "#/components/schemas/TenancyBase"
+        - type: object
+          properties:
+            started:
+              type: string
+              nullable: true
+            is_on_lease:
+              type: string
+            rental_circumstances:
+              type: string
+            landlord_id:
+              type: number
+              nullable: true
+            agent_id:
+              type: number
+              nullable: true
+    IssueCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueBase"
+        - type: object
+          properties:
+            client_id:
+              type: string
+              format: uuid
+              description: One of client_id or client is required.
+            client:
+              $ref: "#/components/schemas/ClientCreate"
+            tenancy_id:
+              type: number
+              description: One of tenancy_id or tenancy is required.
+            tenancy:
+              $ref: "#/components/schemas/TenancyCreate"
+            stage:
+              type: string
+            outcome:
+              type: string
+              nullable: true
+            outcome_notes:
+              type: string
+            provided_legal_services:
+              type: boolean
+            paralegal_id:
+              type: number
+              nullable: true
+            lawyer_id:
+              type: number
+              nullable: true
+            support_worker_id:
+              type: number
+              nullable: true
+            employment_status:
+              type: string
+            weekly_income:
+              type: number
+              nullable: true
+            referrer:
+              type: string
+            referrer_type:
+              type: string
+            weekly_rent:
+              type: integer
+              nullable: true
+    Error:
+      description: The schema for an error response
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: object
+                  - type: array
+        non_field_errors:
+          type: array
+          items:
+            type: string
     IssueNoteBase:
       type: object
       properties:
@@ -1684,58 +1922,40 @@ components:
             - created_at
             - reviewee
     IssueUpdate:
-      allOf:
-        - $ref: "#/components/schemas/IssueBase"
-        - type: object
-          properties:
-            paralegal_id:
-              $ref: "#/components/schemas/User"
-              nullable: true
-            lawyer_id:
-              $ref: "#/components/schemas/User"
-              nullable: true
-            support_worker_id:
-              $ref: "#/components/schemas/Person"
-              nullable: true
-            weekly_rent:
-              type: integer
-              nullable: true
-            employment_status:
-              $ref: "#/components/schemas/TextChoiceListField"
-            weekly_income:
-              type: number
-              nullable: true
-            referrer:
-              type: string
-            referrer_type:
-              $ref: "#/components/schemas/TextChoiceField"
-          required:
-            - paralegal_id
-            - lawyer_id
-            - support_worker_id
-            - weekly_rent
-            - employment_status
-            - weekly_income
-            - referrer
-            - referrer_type
-    Error:
-      description: The schema for an error response
       type: object
       properties:
-        detail:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
-              items:
-                oneOf:
-                  - type: string
-                  - type: object
-                  - type: array
-        non_field_errors:
-          type: array
-          items:
-            type: string
+        topic:
+          type: string
+        stage:
+          type: string
+        outcome:
+          type: string
+          nullable: true
+        outcome_notes:
+          type: string
+        provided_legal_services:
+          type: boolean
+        paralegal_id:
+          type: number
+          nullable: true
+        lawyer_id:
+          type: number
+          nullable: true
+        support_worker_id:
+          type: number
+          nullable: true
+        weekly_rent:
+          type: integer
+          nullable: true
+        employment_status:
+          type: string
+        weekly_income:
+          type: number
+          nullable: true
+        referrer:
+          type: string
+        referrer_type:
+          type: string
     IssueNoteCreate:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"
@@ -1953,45 +2173,6 @@ components:
               type: string
           required:
             - support_contact_preferences
-    TenancyCreate:
-      allOf:
-        - $ref: "#/components/schemas/TenancyBase"
-        - type: object
-          properties:
-            is_on_lease:
-              type: string
-            rental_circumstances:
-              type: string
-            landlord_id:
-              type: number
-              nullable: true
-            agent_id:
-              type: number
-              nullable: true
-          required:
-            - is_on_lease
-            - rental_circumstances
-    ClientCreate:
-      allOf:
-        - $ref: "#/components/schemas/ClientBase"
-        - type: object
-          properties:
-            call_times:
-              type: array
-              items:
-                type: string
-            employment_status:
-              type: array
-              items:
-                type: string
-            eligibility_circumstances:
-              type: array
-              items:
-                type: string
-          required:
-            - call_times
-            - employment_status
-            - eligibility_circumstances
     MicrosoftUserPermissions:
       type: object
       properties:

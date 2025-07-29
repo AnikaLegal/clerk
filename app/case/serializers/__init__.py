@@ -1,5 +1,5 @@
 from .account import AccountSearchSerializer, AccountSortSerializer
-from .client import ClientSerializer
+from .client import ClientSearchSerializer, ClientSerializer
 from .documents import (
     DocumentTemplateFilterSerializer,
     DocumentTemplateSerializer,

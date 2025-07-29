@@ -12,7 +12,7 @@ def schema(c):
 
 
 @task
-def build(c, base=False, webpack=False, no_cache=False):
+def build(c, base=False, frontend=False, no_cache=False):
     """Build Docker environment locally"""
 
     file = "Dockerfile"
@@ -20,9 +20,9 @@ def build(c, base=False, webpack=False, no_cache=False):
     if base:
         file = "Dockerfile.base"
         tag = "anikalaw/clerkbase:latest"
-    elif webpack:
-        file = "Dockerfile.webpack"
-        tag = f"{APP_NAME}-webpack:local"
+    elif frontend:
+        file = "Dockerfile.frontend"
+        tag = f"{APP_NAME}-frontend:local"
 
     args = ""
     if no_cache:
@@ -34,6 +34,7 @@ def build(c, base=False, webpack=False, no_cache=False):
 @task
 def dev(c):
     """Run Django dev server within a Docker container"""
+
     c.run(f"{COMPOSE} up web", pty=True)
 
 
@@ -121,9 +122,9 @@ def clean(c, volumes=False, images=False):
 
 
 @task
-def bash(c, webpack=False):
+def bash(c, frontend=False):
     """Get a bash shell in a Docker container"""
-    s = "webpack" if webpack else "web"
+    s = "frontend" if frontend else "web"
     run(c, "bash", service=s)
 
 
