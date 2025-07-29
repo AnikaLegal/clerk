@@ -1,6 +1,6 @@
 # Clerk
 
-![Test](https://github.com/AnikaLegal/clerk/workflows/Test/badge.svg?branch=develop)
+[![Test](https://github.com/AnikaLegal/clerk/actions/workflows/test.yml/badge.svg?branch=develop)](https://github.com/AnikaLegal/clerk/actions/workflows/test.yml)
 
 The Anika Legal case management system & website.
 
