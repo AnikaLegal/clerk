@@ -102,6 +102,13 @@ def case_review_page_view(request):
 
 
 @api_view(["GET"])
+@coordinator_or_better_required
+def case_dates_page_view(request):
+    context = {}
+    return render_react_page(request, "Critical Dates", "case-dates", context)
+
+
+@api_view(["GET"])
 @paralegal_or_better_required
 def case_detail_page_view(request, pk):
     """
