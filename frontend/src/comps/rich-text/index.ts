@@ -1,6 +1,9 @@
 import type { Editor, EditorEvents } from '@tiptap/react'
 import type { RichTextAreaProps } from './rich-text-area'
-import type { RichTextEditorProps } from './rich-text-editor'
+import type {
+  RichTextEditorProps,
+  RichTextEditorToolbar,
+} from './rich-text-editor'
 
 import { RichTextArea } from './rich-text-area'
 import { RichTextDisplay } from './rich-text-display'
@@ -14,4 +17,5 @@ export {
   RichTextDisplay,
   RichTextEditor,
   RichTextEditorProps,
+  RichTextEditorToolbar,
 }
