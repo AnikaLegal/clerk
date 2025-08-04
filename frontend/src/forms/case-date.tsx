@@ -24,8 +24,8 @@ export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
     mode: 'uncontrolled',
     initialValues: { type: '', date: '', notes: '', issue_id: issue.id },
     validate: {
-      type: isNotEmpty('required'),
-      date: isNotEmpty('required'),
+      type: isNotEmpty('This field is required.'),
+      date: isNotEmpty('This field is required.'),
     },
   })
 
