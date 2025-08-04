@@ -14,6 +14,7 @@ import React, { useEffect } from 'react'
 import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
+import { RichTextDisplay } from 'comps/rich-text'
 
 interface DjangoContext {
   choices: {
@@ -119,7 +120,9 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
           <Table.Td>
             <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
           </Table.Td>
-          <Table.Td>{date.notes}</Table.Td>
+          <Table.Td>
+            <RichTextDisplay content={date.notes} />
+          </Table.Td>
           <Table.Td>{date.is_reviewed ? 'Yes' : 'No'}</Table.Td>
         </Table.Tr>
       ))}
