@@ -3,6 +3,7 @@
   <head>
     <title>
       {% block title %}
+
       {% endblock %}| Anika Clerk
     </title>
     <!-- Meta tags -->
@@ -16,6 +17,7 @@
     <script type="text/javascript" src="{% static 'semantic/jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'semantic/semantic.min.js' %}"></script>
     {% block styles %}
+
     {% endblock %}
   </head>
   <body>
@@ -30,7 +32,7 @@
             {% if request.user.is_coordinator_or_better %}
               <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
               <a href="{% url 'case-review' %}" class="item">Review</a>
-              <a href="{% url 'case-dates' %}" class="item">Dates</a>
+              <a href="{% url 'date-list' %}" class="item">Dates</a>
             {% endif %}
             {% if request.user.is_authenticated %}
               <a href="{% url 'person-list' %}" class="item">Parties</a>
@@ -66,6 +68,7 @@
       {% endif %}
 
       {% block content %}
+
       {% endblock %}
     </main>
     <!-- Global Scripts -->
@@ -76,6 +79,7 @@
       })
     </script>
     {% block scripts %}
+
     {% endblock %}
   </body>
 </html>
