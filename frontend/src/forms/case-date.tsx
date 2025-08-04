@@ -1,32 +1,59 @@
 import { Button, Group, Paper, Select, Text, Title } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
 import { isNotEmpty, useForm } from '@mantine/form'
+import api, {
+  IssueDateCreate,
+  useAppDispatch,
+  useCreateCaseDateMutation,
+} from 'api'
+import { DATE_TYPES } from 'consts'
+import dayjs from 'dayjs'
+import { RichTextEditorInput } from 'forms/mantine'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { CaseDetailFormProps } from 'types'
-import { getAPIFormErrors } from 'utils'
-import dayjs from 'dayjs'
-import { RichTextEditorInput } from 'forms/mantine'
+import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 
-interface FormValues {
-  type: string
-  date: string
-}
-
 export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
-  const form = useForm<FormValues>({
+  const [createDate] = useCreateCaseDateMutation()
+  const dispatch = useAppDispatch()
+  const form = useForm<IssueDateCreate>({
     mode: 'uncontrolled',
-    initialValues: { type: '', date: null! },
+    initialValues: { type: '', date: '', notes: '', issue_id: issue.id },
     validate: {
       type: isNotEmpty('required'),
       date: isNotEmpty('required'),
     },
   })
 
-  const handleSubmit = () => {}
+  const handleSubmit = (values: IssueDateCreate) => {
+    createDate({
+      issueDateCreate: values,
+    })
+      .unwrap()
+      .then((date) => {
+        enqueueSnackbar('Critical date created', { variant: 'success' })
+        dispatch(api.util.invalidateTags(['CASE']))
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to create critical date'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          form.setErrors(requestErrors)
+        }
+      })
+      .finally(() => {
+        form.setSubmitting(false)
+      })
+  }
 
   return (
     <Paper withBorder p="md">
@@ -43,7 +70,10 @@ export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
           searchable
           size="md"
           mt="md"
-          data={['Filing Deadline', 'Hearing', 'NTV Termination', 'Other']}
+          data={Object.entries(DATE_TYPES).map(([value, label]) => ({
+            value,
+            label,
+          }))}
           withCheckIcon={false}
         />
         <DateInput
