@@ -1,4 +1,5 @@
 from core.models import Issue, IssueDate
+from core.models.issue_date import DateType
 from django.db.models import QuerySet
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
@@ -15,7 +16,11 @@ from case.views.auth import (
 @api_view(["GET"])
 @coordinator_or_better_required
 def date_list_page_view(request):
-    context = {}
+    context = {
+        "choices": {
+            "type": DateType.choices,
+        }
+    }
     return render_react_page(request, "Critical Dates", "date-list", context)
 
 
@@ -32,7 +37,19 @@ class DateApiViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = IssueDate.objects.all()
-        queryset = queryset.select_related("issue__paralegal")
+        queryset = queryset.select_related(
+            "creator",
+            "issue",
+            "issue__client",
+            "issue__tenancy__landlord",
+            "issue__tenancy__agent",
+            "issue__paralegal",
+            "issue__lawyer",
+            "issue__support_worker",
+        )
+        queryset = queryset.prefetch_related(
+            "creator__groups", "issue__paralegal__groups", "issue__lawyer__groups"
+        )
 
         if user.is_paralegal:
             # Paralegals can only see the dates for cases to which they are assigned.
@@ -42,6 +59,7 @@ class DateApiViewSet(viewsets.ModelViewSet):
             queryset = queryset.none()
 
         if self.action == "list":
+            queryset = queryset.order_by("date")
             queryset = self.search_queryset(queryset)
 
         return queryset

@@ -11,12 +11,18 @@ import { IconExclamationCircle } from '@tabler/icons-react'
 import api, { IssueDate, useGetCaseDatesQuery } from 'api'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect } from 'react'
-import { getAPIErrorMessage, mount } from 'utils'
+import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
 
-interface DjangoContext {}
+interface DjangoContext {
+  choices: {
+    type: [string, string][]
+  }
+}
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+const Types = CONTEXT.choices.type.sort((a, b) => a[1].localeCompare(b[1]))
+const TypeLabels = choiceToMap(Types)
 
 const App = () => {
   const result = api.useGetCaseDatesQuery({ isReviewed: false })
@@ -109,7 +115,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
             <a href={date.issue.url}>{date.issue.fileref}</a>
           </Table.Td>
           <Table.Td>{date.date}</Table.Td>
-          <Table.Td>{date.type}</Table.Td>
+          <Table.Td>{TypeLabels.get(date.type)}</Table.Td>
           <Table.Td>
             <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
           </Table.Td>
