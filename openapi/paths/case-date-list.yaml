@@ -1,0 +1,54 @@
+get:
+  operationId: getCaseDates
+  parameters:
+    - name: issue_id
+      description: Entity ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+      required: false
+    - name: type
+      in: query
+      schema:
+        type: string
+        enum:
+          - FILING_DEADLINE
+          - HEARING_LISTED
+          - NTV_TERMINATION
+          - OTHER
+      required: false
+    - name: is_reviewed
+      in: query
+      schema:
+        type: boolean
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/IssueDate.yaml
+post:
+  operationId: createCaseDate
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IssueDateCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IssueDate.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

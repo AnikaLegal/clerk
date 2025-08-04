@@ -623,46 +623,32 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/person/:
+  /clerk/api/date/:
     get:
-      operationId: getPeople
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Person"
-    post:
-      operationId: createPerson
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PersonCreate"
-      responses:
-        "201":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Person"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/person/search/:
-    get:
-      operationId: searchPeople
+      operationId: getCaseDates
       parameters:
-        - name: query
+        - name: issue_id
+          description: Entity ID
           in: query
           schema:
             type: string
-          required: true
+            format: uuid
+          required: false
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - FILING_DEADLINE
+              - HEARING_LISTED
+              - NTV_TERMINATION
+              - OTHER
+          required: false
+        - name: is_reviewed
+          in: query
+          schema:
+            type: boolean
+          required: false
       responses:
         "200":
           description: Successful response.
@@ -671,60 +657,80 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Person"
-  /clerk/api/person/{id}/:
-    get:
-      operationId: getPerson
-      parameters:
-        - description: Entity ID
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Person"
-    put:
-      operationId: updatePerson
-      parameters:
-        - description: Entity ID
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+                  $ref: "#/components/schemas/IssueDate"
+    post:
+      operationId: createCaseDate
       requestBody:
         required: true
         description: Successful response.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PersonCreate"
+              $ref: "#/components/schemas/IssueDateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueDate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/date/{id}/:
+    get:
+      operationId: getCaseDate
+      parameters:
+        - name: id
+          description: Date ID
+          in: path
+          required: true
+          schema:
+            type: number
       responses:
         "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Person"
+                $ref: "#/components/schemas/IssueDate"
+    patch:
+      operationId: updateCaseDate
+      parameters:
+        - name: id
+          description: Date ID
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueDateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueDate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
     delete:
-      operationId: deletePerson
+      operationId: deleteCaseDate
       parameters:
-        - description: Entity ID
+        - name: id
+          description: Date ID
           in: path
-          name: id
           required: true
           schema:
-            type: integer
+            type: number
       responses:
         "204":
           $ref: "#/components/responses/NoContent"
@@ -2164,15 +2170,49 @@ components:
           format: binary
       required:
         - file
-    PersonCreate:
+    IssueDateBase:
+      type: object
+      properties:
+        type:
+          type: string
+        date:
+          type: string
+          format: date
+      required:
+        - type
+        - date
+    IssueDate:
       allOf:
-        - $ref: "#/components/schemas/PersonBase"
+        - $ref: "#/components/schemas/IssueDateBase"
         - type: object
           properties:
-            support_contact_preferences:
+            id:
+              type: number
+            issue:
+              $ref: "#/components/schemas/Issue"
+            notes:
               type: string
+            is_reviewed:
+              type: boolean
           required:
-            - support_contact_preferences
+            - id
+            - issue
+            - notes
+            - is_reviewed
+    IssueDateCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueDateBase"
+        - type: object
+          properties:
+            issue_id:
+              type: string
+              format: uuid
+            notes:
+              type: string
+            is_reviewed:
+              type: boolean
+          required:
+            - issue_id
     MicrosoftUserPermissions:
       type: object
       properties:

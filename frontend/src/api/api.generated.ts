@@ -173,37 +173,45 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
       }),
     }),
-    getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
-      query: () => ({ url: `/clerk/api/person/` }),
-    }),
-    createPerson: build.mutation<CreatePersonApiResponse, CreatePersonApiArg>({
+    getCaseDates: build.query<GetCaseDatesApiResponse, GetCaseDatesApiArg>({
       query: (queryArg) => ({
-        url: `/clerk/api/person/`,
-        method: "POST",
-        body: queryArg.personCreate,
-      }),
-    }),
-    searchPeople: build.query<SearchPeopleApiResponse, SearchPeopleApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/person/search/`,
+        url: `/clerk/api/date/`,
         params: {
-          query: queryArg.query,
+          issue_id: queryArg.issueId,
+          type: queryArg["type"],
+          is_reviewed: queryArg.isReviewed,
         },
       }),
     }),
-    getPerson: build.query<GetPersonApiResponse, GetPersonApiArg>({
-      query: (queryArg) => ({ url: `/clerk/api/person/${queryArg.id}/` }),
-    }),
-    updatePerson: build.mutation<UpdatePersonApiResponse, UpdatePersonApiArg>({
+    createCaseDate: build.mutation<
+      CreateCaseDateApiResponse,
+      CreateCaseDateApiArg
+    >({
       query: (queryArg) => ({
-        url: `/clerk/api/person/${queryArg.id}/`,
-        method: "PUT",
-        body: queryArg.personCreate,
+        url: `/clerk/api/date/`,
+        method: "POST",
+        body: queryArg.issueDateCreate,
       }),
     }),
-    deletePerson: build.mutation<DeletePersonApiResponse, DeletePersonApiArg>({
+    getCaseDate: build.query<GetCaseDateApiResponse, GetCaseDateApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/date/${queryArg.id}/` }),
+    }),
+    updateCaseDate: build.mutation<
+      UpdateCaseDateApiResponse,
+      UpdateCaseDateApiArg
+    >({
       query: (queryArg) => ({
-        url: `/clerk/api/person/${queryArg.id}/`,
+        url: `/clerk/api/date/${queryArg.id}/`,
+        method: "PATCH",
+        body: queryArg.issueDateCreate,
+      }),
+    }),
+    deleteCaseDate: build.mutation<
+      DeleteCaseDateApiResponse,
+      DeleteCaseDateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/date/${queryArg.id}/`,
         method: "DELETE",
       }),
     }),
@@ -617,36 +625,37 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   /** Sharepoint ID */
   sharepointId: string;
 };
-export type GetPeopleApiResponse =
-  /** status 200 Successful response. */ Person[];
-export type GetPeopleApiArg = void;
-export type CreatePersonApiResponse =
-  /** status 201 Successful response. */ Person;
-export type CreatePersonApiArg = {
-  personCreate: PersonCreate;
-};
-export type SearchPeopleApiResponse =
-  /** status 200 Successful response. */ Person[];
-export type SearchPeopleApiArg = {
-  query: string;
-};
-export type GetPersonApiResponse =
-  /** status 200 Successful response. */ Person;
-export type GetPersonApiArg = {
+export type GetCaseDatesApiResponse =
+  /** status 200 Successful response. */ IssueDate[];
+export type GetCaseDatesApiArg = {
   /** Entity ID */
+  issueId?: string;
+  type?: "FILING_DEADLINE" | "HEARING_LISTED" | "NTV_TERMINATION" | "OTHER";
+  isReviewed?: boolean;
+};
+export type CreateCaseDateApiResponse =
+  /** status 201 Successful response. */ IssueDate;
+export type CreateCaseDateApiArg = {
+  /** Successful response. */
+  issueDateCreate: IssueDateCreate;
+};
+export type GetCaseDateApiResponse =
+  /** status 200 Successful response. */ IssueDate;
+export type GetCaseDateApiArg = {
+  /** Date ID */
   id: number;
 };
-export type UpdatePersonApiResponse =
-  /** status 200 Successful response. */ Person;
-export type UpdatePersonApiArg = {
-  /** Entity ID */
+export type UpdateCaseDateApiResponse =
+  /** status 200 Successful response. */ IssueDate;
+export type UpdateCaseDateApiArg = {
+  /** Date ID */
   id: number;
   /** Successful response. */
-  personCreate: PersonCreate;
+  issueDateCreate: IssueDateCreate;
 };
-export type DeletePersonApiResponse = unknown;
-export type DeletePersonApiArg = {
-  /** Entity ID */
+export type DeleteCaseDateApiResponse = unknown;
+export type DeleteCaseDateApiArg = {
+  /** Date ID */
   id: number;
 };
 export type GetTenancyApiResponse =
@@ -1108,8 +1117,20 @@ export type EmailThread = {
 export type EmailAttachmentCreate = {
   file: Blob;
 };
-export type PersonCreate = PersonBase & {
-  support_contact_preferences: string;
+export type IssueDateBase = {
+  type: string;
+  date: string;
+};
+export type IssueDate = IssueDateBase & {
+  id: number;
+  issue: Issue;
+  notes: string;
+  is_reviewed: boolean;
+};
+export type IssueDateCreate = IssueDateBase & {
+  issue_id: string;
+  notes?: string;
+  is_reviewed?: boolean;
 };
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean;
@@ -1183,12 +1204,11 @@ export const {
   useDeleteEmailAttachmentMutation,
   useUploadEmailAttachmentToSharepointMutation,
   useDownloadEmailAttachmentFromSharepointMutation,
-  useGetPeopleQuery,
-  useCreatePersonMutation,
-  useSearchPeopleQuery,
-  useGetPersonQuery,
-  useUpdatePersonMutation,
-  useDeletePersonMutation,
+  useGetCaseDatesQuery,
+  useCreateCaseDateMutation,
+  useGetCaseDateQuery,
+  useUpdateCaseDateMutation,
+  useDeleteCaseDateMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
   useGetClientsQuery,
