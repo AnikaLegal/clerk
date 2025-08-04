@@ -104,7 +104,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
   return (
     <>
       {data.map((date) => (
-        <Table.Tr key={date.issue.fileref}>
+        <Table.Tr key={date.id}>
           <Table.Td>
             <a href={date.issue.url}>{date.issue.fileref}</a>
           </Table.Td>
