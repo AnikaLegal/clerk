@@ -50,7 +50,7 @@ const App = () => {
 
 const ErrorState = ({ error }: { error: any }) => {
   useEffect(() => {
-    const message = getAPIErrorMessage(error, 'Could not load email templates')
+    const message = getAPIErrorMessage(error, 'Could not load critical dates')
     enqueueSnackbar(message, { variant: 'error' })
   }, [error])
 
