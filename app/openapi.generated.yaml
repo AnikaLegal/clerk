@@ -623,6 +623,115 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/person/:
+    get:
+      operationId: getPeople
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+    post:
+      operationId: createPerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/person/search/:
+    get:
+      operationId: searchPeople
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+  /clerk/api/person/{id}/:
+    get:
+      operationId: getPerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+    put:
+      operationId: updatePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deletePerson
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/date/:
     get:
       operationId: getCaseDates
@@ -2170,6 +2279,15 @@ components:
           format: binary
       required:
         - file
+    PersonCreate:
+      allOf:
+        - $ref: "#/components/schemas/PersonBase"
+        - type: object
+          properties:
+            support_contact_preferences:
+              type: string
+          required:
+            - support_contact_preferences
     IssueDateBase:
       type: object
       properties:

@@ -173,6 +173,40 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
       }),
     }),
+    getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
+      query: () => ({ url: `/clerk/api/person/` }),
+    }),
+    createPerson: build.mutation<CreatePersonApiResponse, CreatePersonApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/person/`,
+        method: "POST",
+        body: queryArg.personCreate,
+      }),
+    }),
+    searchPeople: build.query<SearchPeopleApiResponse, SearchPeopleApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/person/search/`,
+        params: {
+          query: queryArg.query,
+        },
+      }),
+    }),
+    getPerson: build.query<GetPersonApiResponse, GetPersonApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/person/${queryArg.id}/` }),
+    }),
+    updatePerson: build.mutation<UpdatePersonApiResponse, UpdatePersonApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/person/${queryArg.id}/`,
+        method: "PUT",
+        body: queryArg.personCreate,
+      }),
+    }),
+    deletePerson: build.mutation<DeletePersonApiResponse, DeletePersonApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/person/${queryArg.id}/`,
+        method: "DELETE",
+      }),
+    }),
     getCaseDates: build.query<GetCaseDatesApiResponse, GetCaseDatesApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/date/`,
@@ -624,6 +658,38 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   emailId: number;
   /** Sharepoint ID */
   sharepointId: string;
+};
+export type GetPeopleApiResponse =
+  /** status 200 Successful response. */ Person[];
+export type GetPeopleApiArg = void;
+export type CreatePersonApiResponse =
+  /** status 201 Successful response. */ Person;
+export type CreatePersonApiArg = {
+  personCreate: PersonCreate;
+};
+export type SearchPeopleApiResponse =
+  /** status 200 Successful response. */ Person[];
+export type SearchPeopleApiArg = {
+  query: string;
+};
+export type GetPersonApiResponse =
+  /** status 200 Successful response. */ Person;
+export type GetPersonApiArg = {
+  /** Entity ID */
+  id: number;
+};
+export type UpdatePersonApiResponse =
+  /** status 200 Successful response. */ Person;
+export type UpdatePersonApiArg = {
+  /** Entity ID */
+  id: number;
+  /** Successful response. */
+  personCreate: PersonCreate;
+};
+export type DeletePersonApiResponse = unknown;
+export type DeletePersonApiArg = {
+  /** Entity ID */
+  id: number;
 };
 export type GetCaseDatesApiResponse =
   /** status 200 Successful response. */ IssueDate[];
@@ -1117,6 +1183,9 @@ export type EmailThread = {
 export type EmailAttachmentCreate = {
   file: Blob;
 };
+export type PersonCreate = PersonBase & {
+  support_contact_preferences: string;
+};
 export type IssueDateBase = {
   type: string;
   date: string;
@@ -1204,6 +1273,12 @@ export const {
   useDeleteEmailAttachmentMutation,
   useUploadEmailAttachmentToSharepointMutation,
   useDownloadEmailAttachmentFromSharepointMutation,
+  useGetPeopleQuery,
+  useCreatePersonMutation,
+  useSearchPeopleQuery,
+  useGetPersonQuery,
+  useUpdatePersonMutation,
+  useDeletePersonMutation,
   useGetCaseDatesQuery,
   useCreateCaseDateMutation,
   useGetCaseDateQuery,
