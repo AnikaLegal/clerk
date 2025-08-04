@@ -41,9 +41,9 @@ paths:
     $ref: paths/person-detail.yaml
 
   /clerk/api/date/:
-    $ref: paths/case-date-list.yaml
+    $ref: paths/date-list.yaml
   /clerk/api/date/{id}/:
-    $ref: paths/case-date-detail.yaml
+    $ref: paths/date-detail.yaml
 
   /clerk/api/tenancy/{id}/:
     $ref: paths/tenancy-detail.yaml

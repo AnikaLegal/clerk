@@ -3,18 +3,19 @@ import {
   Container,
   Group,
   Loader,
+  Pagination,
   Table,
   Text,
   Title,
 } from '@mantine/core'
 import { IconExclamationCircle } from '@tabler/icons-react'
-import api, { IssueDate, useGetCaseDatesQuery } from 'api'
+import api, { GetCaseDatesApiArg, IssueDate, useGetCaseDatesQuery } from 'api'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
+import { RichTextDisplay } from 'comps/rich-text'
 
 import '@mantine/core/styles.css'
-import { RichTextDisplay } from 'comps/rich-text'
 
 interface DjangoContext {
   choices: {
@@ -26,10 +27,21 @@ const Types = CONTEXT.choices.type.sort((a, b) => a[1].localeCompare(b[1]))
 const TypeLabels = choiceToMap(Types)
 
 const App = () => {
-  const result = api.useGetCaseDatesQuery({ isReviewed: false })
+  const [args, setArgs] = useState<GetCaseDatesApiArg>({
+    isReviewed: false,
+    page: 1,
+  })
+  const result = api.useGetCaseDatesQuery(args)
+
   return (
     <Container size="xl">
       <Title order={1}>Critical Dates</Title>
+      {!result.isLoading && result.data && (
+        <Text c="dimmed">
+          Showing {result.data.results.length} of {result.data.item_count}{' '}
+          critical dates
+        </Text>
+      )}
       <Table
         withColumnBorders
         withTableBorder
@@ -40,8 +52,8 @@ const App = () => {
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Fileref</Table.Th>
-            <Table.Th>Critical date</Table.Th>
             <Table.Th>Type</Table.Th>
+            <Table.Th>Critical date</Table.Th>
             <Table.Th>Client</Table.Th>
             <Table.Th>Notes</Table.Th>
             <Table.Th>Reviewed?</Table.Th>
@@ -51,6 +63,15 @@ const App = () => {
           <CriticalDatesTableBody result={result} />
         </Table.Tbody>
       </Table>
+      {!result.isLoading && result.data && (
+        <Pagination
+          total={result.data.page_count}
+          onChange={(page) => setArgs({ ...args, page })}
+          mt="md"
+          withEdges
+          withControls
+        />
+      )}
     </Container>
   )
 }
@@ -103,7 +124,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
     return <LoadingState />
   }
 
-  const data: IssueDate[] = result.data || []
+  const data: IssueDate[] = result.data.results || []
   if (data.length < 1) {
     return <EmptyState />
   }
@@ -115,8 +136,8 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
           <Table.Td>
             <a href={date.issue.url}>{date.issue.fileref}</a>
           </Table.Td>
-          <Table.Td>{date.date}</Table.Td>
           <Table.Td>{TypeLabels.get(date.type)}</Table.Td>
+          <Table.Td>{date.date}</Table.Td>
           <Table.Td>
             <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
           </Table.Td>

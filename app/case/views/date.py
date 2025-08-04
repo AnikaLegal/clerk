@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
 from case.serializers.issue_date import IssueDateSearchSerializer, IssueDateSerializer
-from case.utils import render_react_page
+from case.utils import ClerkPaginator, render_react_page
 from case.views.auth import (
     CoordinatorOrBetterPermission,
     ParalegalOrBetterObjectPermission,
@@ -24,12 +24,17 @@ def date_list_page_view(request):
     return render_react_page(request, "Critical Dates", "date-list", context)
 
 
+class DatePaginator(ClerkPaginator):
+    page_size = 20
+
+
 class DateApiViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing, creating, updating, and deleting IssueDate objects.
     """
 
     serializer_class = IssueDateSerializer
+    pagination_class = DatePaginator
     permission_classes = [
         CoordinatorOrBetterPermission | ParalegalOrBetterObjectPermission
     ]

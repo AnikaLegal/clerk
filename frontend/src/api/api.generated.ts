@@ -211,6 +211,8 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/date/`,
         params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
           issue_id: queryArg.issueId,
           type: queryArg["type"],
           is_reviewed: queryArg.isReviewed,
@@ -691,9 +693,17 @@ export type DeletePersonApiArg = {
   /** Entity ID */
   id: number;
 };
-export type GetCaseDatesApiResponse =
-  /** status 200 Successful response. */ IssueDate[];
+export type GetCaseDatesApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: IssueDate[];
+};
 export type GetCaseDatesApiArg = {
+  page?: number;
+  pageSize?: number;
   /** Entity ID */
   issueId?: string;
   type?: "FILING_DEADLINE" | "HEARING_LISTED" | "NTV_TERMINATION" | "OTHER";
