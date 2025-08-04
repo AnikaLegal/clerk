@@ -1,0 +1,32 @@
+from django.db import models
+from accounts.models import User
+
+from .issue import Issue
+from .timestamped import TimestampedModel
+
+
+class DateType(models.TextChoices):
+    FILING_DEADLINE = "FILING_DEADLINE", "Filing deadline"
+    HEARING_LISTED = "HEARING_LISTED", "Hearing listed"
+    NTV_TERMINATION = "NTV_TERMINATION", "NTV termination"
+    OTHER = "OTHER", "Other"
+
+
+class IssueDate(TimestampedModel):
+    """
+    Model representing a date associated with an issue.
+    """
+
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    type = models.CharField(max_length=32, choices=DateType.choices)
+    date = models.DateField()
+    notes = models.TextField(blank=True, default="")
+    is_reviewed = models.BooleanField(default=False)
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        return self.issue.paralegal_id == user.pk

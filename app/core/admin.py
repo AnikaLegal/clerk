@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.contrib.messages import constants as messages
 from django_q.tasks import async_task
 from utils.admin import admin_link, dict_to_json_html
-from urllib.parse import unquote
 
 from .models import (
     Client,
@@ -17,6 +16,7 @@ from .models import (
     Submission,
     Tenancy,
     DocumentTemplate,
+    IssueDate,
 )
 
 
@@ -189,3 +189,27 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
         "file",
     )
     list_filter = ("topic",)
+
+
+@admin.register(IssueDate)
+class IssueDateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "issue_link",
+        "type",
+        "date",
+        "notes",
+        "is_reviewed",
+        "creator_link",
+        "created_at",
+    )
+    list_filter = ("type", "is_reviewed")
+    ordering = ("-created_at",)
+
+    @admin_link("issue", "Issue")
+    def issue_link(self, issue):
+        return issue.fileref if issue else None
+
+    @admin_link("creator", "Creator")
+    def creator_link(self, creator):
+        return creator.get_full_name() if creator else None
