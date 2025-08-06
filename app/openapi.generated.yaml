@@ -746,6 +746,11 @@ paths:
           schema:
             type: integer
           required: false
+        - name: q
+          in: query
+          schema:
+            type: string
+          required: false
         - name: issue_id
           description: Entity ID
           in: query

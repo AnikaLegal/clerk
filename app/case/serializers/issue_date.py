@@ -34,8 +34,12 @@ class IssueDateSearchSerializer(serializers.ModelSerializer):
             "type",
             "issue",
             "is_reviewed",
+            "q",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
     issue = serializers.UUIDField()
     type = serializers.ChoiceField(choices=DateType.choices)
+
+    # Generic search field - not part of the model.
+    q = serializers.CharField(required=False)

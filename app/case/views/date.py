@@ -1,6 +1,6 @@
 from core.models import Issue, IssueDate
 from core.models.issue_date import DateType
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
@@ -64,7 +64,7 @@ class DateApiViewSet(viewsets.ModelViewSet):
             queryset = queryset.none()
 
         if self.action == "list":
-            queryset = queryset.order_by("date")
+            queryset = queryset.order_by("date", "type", "created_at")
             queryset = self.search_queryset(queryset)
 
         return queryset
@@ -82,7 +82,16 @@ class DateApiViewSet(viewsets.ModelViewSet):
         search_query = serializer.validated_data
         for key, value in search_query.items():
             if value is not None:
-                queryset = queryset.filter(**{key: value})
+                if key == "q":
+                    # Search by fileref or client details
+                    queryset = queryset.filter(
+                        Q(issue__fileref__icontains=value)
+                        | Q(issue__client__first_name__icontains=value)
+                        | Q(issue__client__last_name__icontains=value)
+                        | Q(issue__client__email__icontains=value)
+                    )
+                else:
+                    queryset = queryset.filter(**{key: value})
 
         return queryset
 

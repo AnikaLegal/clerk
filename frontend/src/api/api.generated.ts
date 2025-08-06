@@ -213,6 +213,7 @@ const injectedRtkApi = api.injectEndpoints({
         params: {
           page: queryArg.page,
           page_size: queryArg.pageSize,
+          q: queryArg.q,
           issue_id: queryArg.issueId,
           type: queryArg["type"],
           is_reviewed: queryArg.isReviewed,
@@ -704,6 +705,7 @@ export type GetCaseDatesApiResponse = /** status 200 Successful response. */ {
 export type GetCaseDatesApiArg = {
   page?: number;
   pageSize?: number;
+  q?: string;
   /** Entity ID */
   issueId?: string;
   type?: "FILING_DEADLINE" | "HEARING_LISTED" | "NTV_TERMINATION" | "OTHER";
