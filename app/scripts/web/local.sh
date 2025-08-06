@@ -1,10 +1,12 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+
+set -o errexit
+
 watchmedo \
     auto-restart \
     --directory /app/ \
     --recursive \
-    --pattern '*.py;*.html' \
+    --pattern '*.py;*.html;*.css' \
     --signal SIGHUP \
     -- \
     python -Xfrozen_modules=off manage.py runserver --noreload 0.0.0.0:8000
