@@ -6,9 +6,11 @@ import {
   Loader,
   Pagination,
   Select,
+  SelectProps,
   Table,
   Text,
   TextInput,
+  TextInputProps,
   Title,
 } from '@mantine/core'
 import { useDebouncedCallback } from '@mantine/hooks'
@@ -44,64 +46,50 @@ const App = () => {
       page: 1, // Reset to first page on filter change
     }))
   }
-  const debouncedFilterChange = useDebouncedCallback(
-    (key: keyof GetCaseDatesApiArg, value: any) => {
-      handleFilterChange(key, value)
-    },
-    300 // Adjust the debounce delay as needed
-  )
 
   return (
     <Container size="xl">
       <Title order={1}>Critical Dates</Title>
-
       {!result.isLoading && result.data && (
         <Text c="dimmed">
           Showing {result.data.results.length} of {result.data.item_count}{' '}
           critical dates
         </Text>
       )}
-
       <Grid mt="lg">
         <Grid.Col span={12}>
-          <TextInput
-            size="md"
+          <TextInputFilter
+            name="q"
             label="Search"
-            placeholder="Find dates with the name or email of clients or by using the file ref"
-            onChange={(event) =>
-              debouncedFilterChange('q', event.currentTarget.value)
-            }
+            placeholder="Search by client name, email, or file ref"
+            onFilterChange={handleFilterChange}
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Select
-            clearable
-            size="md"
-            label="Date type"
-            data={Types.map((choice) => ({
-              value: choice[0],
-              label: choice[1],
+          <SelectFilter
+            name="type"
+            data={Types.map((type) => ({
+              value: type[0],
+              label: type[1],
             }))}
-            onChange={(value) => handleFilterChange('type', value)}
-            withCheckIcon={false}
+            label="Date type"
+            value={args.type || ''}
+            onFilterChange={handleFilterChange}
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Select
-            clearable
-            size="md"
-            label="Reviewed?"
+          <SelectFilter
+            name="isReviewed"
             data={[
               { value: 'true', label: 'Yes' },
               { value: 'false', label: 'No' },
             ]}
-            onChange={(value) => handleFilterChange('isReviewed', value)}
-            withCheckIcon={false}
+            label="Reviewed?"
             value={args.isReviewed?.toString() || ''}
+            onFilterChange={handleFilterChange}
           />
         </Grid.Col>
       </Grid>
-
       <Table
         withColumnBorders
         withTableBorder
@@ -126,6 +114,7 @@ const App = () => {
       {!result.isLoading && result.data && (
         <Pagination
           total={result.data.page_count}
+          value={args.page || 1}
           onChange={(page) => setArgs({ ...args, page })}
           mt="md"
           withEdges
@@ -133,6 +122,62 @@ const App = () => {
         />
       )}
     </Container>
+  )
+}
+
+interface TextInputFilterProps extends TextInputProps {
+  name: keyof GetCaseDatesApiArg
+  onFilterChange: (key: keyof GetCaseDatesApiArg, value: any) => void
+  isLoading?: boolean
+}
+
+const TextInputFilter = ({
+  name,
+  onFilterChange,
+  isLoading = false,
+  ...props
+}: TextInputFilterProps) => {
+  const debouncedFilterChange = useDebouncedCallback(
+    (key: keyof GetCaseDatesApiArg, value: any) => {
+      onFilterChange(key, value)
+    },
+    300 // Adjust the debounce delay as needed
+  )
+
+  return (
+    <TextInput
+      size="md"
+      value={props.value}
+      onChange={(event) =>
+        debouncedFilterChange(name, event.currentTarget.value)
+      }
+      rightSection={isLoading ? <Loader size="sm" /> : null}
+      {...props}
+    />
+  )
+}
+
+interface SelectFilterProps extends SelectProps {
+  name: keyof GetCaseDatesApiArg
+  onFilterChange: (key: keyof GetCaseDatesApiArg, value: any) => void
+  isLoading?: boolean
+}
+
+const SelectFilter = ({
+  name,
+  onFilterChange,
+  isLoading = false,
+  ...props
+}: SelectFilterProps) => {
+  return (
+    <Select
+      clearable
+      size="md"
+      withCheckIcon={false}
+      onChange={(value) => onFilterChange(name, value)}
+      rightSection={isLoading ? <Loader size="sm" /> : null}
+      {...props}
+    />
   )
 }
 
@@ -180,7 +225,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
   if (result.isError) {
     return <ErrorState error={result.error} />
   }
-  if (result.isLoading) {
+  if (result.isFetching) {
     return <LoadingState />
   }
 
