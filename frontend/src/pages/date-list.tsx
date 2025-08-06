@@ -4,6 +4,7 @@ import {
   Grid,
   Group,
   Loader,
+  MantineColor,
   Pagination,
   Select,
   SelectProps,
@@ -17,9 +18,16 @@ import { useDebouncedCallback } from '@mantine/hooks'
 import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
 import api, { GetCaseDatesApiArg, IssueDate, useGetCaseDatesQuery } from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
+import dayjs from 'dayjs'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
+
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(isSameOrBefore)
 
 import '@mantine/core/styles.css'
 
@@ -217,6 +225,18 @@ const EmptyState = () => (
   </Table.Tr>
 )
 
+const getDateColor = (dateString: string): MantineColor => {
+  const date = dayjs(dateString, 'DD/MM/YYYY')
+  const now = dayjs()
+  if (date.isSameOrBefore(now.add(7, 'day'), 'day')) {
+    return 'red.2'
+  }
+  if (date.isSameOrBefore(now.add(14, 'day'), 'day')) {
+    return 'yellow.2'
+  }
+  return 'green.2'
+}
+
 interface CriticalDatesTableBodyProps {
   result: ReturnType<typeof useGetCaseDatesQuery>
 }
@@ -242,7 +262,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
             <a href={date.issue.url}>{date.issue.fileref}</a>
           </Table.Td>
           <Table.Td>{TypeLabels.get(date.type)}</Table.Td>
-          <Table.Td>{date.date}</Table.Td>
+          <Table.Td bg={getDateColor(date.date)}>{date.date}</Table.Td>
           <Table.Td>
             <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
           </Table.Td>
