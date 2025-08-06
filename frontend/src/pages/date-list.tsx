@@ -1,19 +1,23 @@
 import {
   Center,
   Container,
+  Grid,
   Group,
   Loader,
   Pagination,
+  Select,
   Table,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core'
-import { IconExclamationCircle } from '@tabler/icons-react'
+import { useDebouncedCallback } from '@mantine/hooks'
+import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
 import api, { GetCaseDatesApiArg, IssueDate, useGetCaseDatesQuery } from 'api'
+import { RichTextDisplay } from 'comps/rich-text'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
-import { RichTextDisplay } from 'comps/rich-text'
 
 import '@mantine/core/styles.css'
 
@@ -33,21 +37,77 @@ const App = () => {
   })
   const result = api.useGetCaseDatesQuery(args)
 
+  const handleFilterChange = (key: keyof GetCaseDatesApiArg, value: any) => {
+    setArgs((prevArgs) => ({
+      ...prevArgs,
+      [key]: value !== null ? value : undefined,
+      page: 1, // Reset to first page on filter change
+    }))
+  }
+  const debouncedFilterChange = useDebouncedCallback(
+    (key: keyof GetCaseDatesApiArg, value: any) => {
+      handleFilterChange(key, value)
+    },
+    300 // Adjust the debounce delay as needed
+  )
+
   return (
     <Container size="xl">
       <Title order={1}>Critical Dates</Title>
+
       {!result.isLoading && result.data && (
         <Text c="dimmed">
           Showing {result.data.results.length} of {result.data.item_count}{' '}
           critical dates
         </Text>
       )}
+
+      <Grid mt="lg">
+        <Grid.Col span={12}>
+          <TextInput
+            size="md"
+            label="Search"
+            placeholder="Find dates with the name or email of clients or by using the file ref"
+            onChange={(event) =>
+              debouncedFilterChange('q', event.currentTarget.value)
+            }
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Select
+            clearable
+            size="md"
+            label="Date type"
+            data={Types.map((choice) => ({
+              value: choice[0],
+              label: choice[1],
+            }))}
+            onChange={(value) => handleFilterChange('type', value)}
+            withCheckIcon={false}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Select
+            clearable
+            size="md"
+            label="Reviewed?"
+            data={[
+              { value: 'true', label: 'Yes' },
+              { value: 'false', label: 'No' },
+            ]}
+            onChange={(value) => handleFilterChange('isReviewed', value)}
+            withCheckIcon={false}
+            value={args.isReviewed?.toString() || ''}
+          />
+        </Grid.Col>
+      </Grid>
+
       <Table
         withColumnBorders
         withTableBorder
         verticalSpacing="md"
         fz="md"
-        mt="md"
+        mt="lg"
       >
         <Table.Thead>
           <Table.Tr>
@@ -144,7 +204,15 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
           <Table.Td>
             <RichTextDisplay content={date.notes} />
           </Table.Td>
-          <Table.Td>{date.is_reviewed ? 'Yes' : 'No'}</Table.Td>
+          <Table.Td>
+            <Center>
+              {date.is_reviewed ? (
+                <IconCheck color="var(--mantine-color-green-6)" stroke={3} />
+              ) : (
+                <IconX color="var(--mantine-color-yellow-6)" stroke={3} />
+              )}
+            </Center>
+          </Table.Td>
         </Table.Tr>
       ))}
     </>
