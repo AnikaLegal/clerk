@@ -1,4 +1,6 @@
 import {
+  ActionIcon,
+  Button,
   Center,
   Container,
   Grid,
@@ -14,20 +16,32 @@ import {
   TextInputProps,
   Title,
 } from '@mantine/core'
-import { useDebouncedCallback } from '@mantine/hooks'
-import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
-import api, { GetCaseDatesApiArg, IssueDate, useGetCaseDatesQuery } from 'api'
+import {
+  useClickOutside,
+  useDebouncedCallback,
+  useDisclosure,
+} from '@mantine/hooks'
+import {
+  IconCheck,
+  IconExclamationCircle,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react'
+import api, {
+  GetCaseDatesApiArg,
+  IssueDate,
+  useDeleteCaseDateMutation,
+  useGetCaseDatesQuery,
+} from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
 import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
+import { UserPermission } from 'types'
 import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
 
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-
 dayjs.extend(customParseFormat)
-dayjs.extend(isSameOrBefore)
 
 import '@mantine/core/styles.css'
 
@@ -35,6 +49,7 @@ interface DjangoContext {
   choices: {
     type: [string, string][]
   }
+  user: UserPermission
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 const Types = CONTEXT.choices.type.sort((a, b) => a[1].localeCompare(b[1]))
@@ -113,6 +128,7 @@ const App = () => {
             <Table.Th>Client</Table.Th>
             <Table.Th>Notes</Table.Th>
             <Table.Th>Reviewed?</Table.Th>
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -225,13 +241,13 @@ const EmptyState = () => (
   </Table.Tr>
 )
 
-const getDateColor = (dateString: string): MantineColor => {
+const getDateBackgroundColor = (dateString: string): MantineColor => {
   const date = dayjs(dateString, 'DD/MM/YYYY')
   const now = dayjs()
-  if (date.isSameOrBefore(now.add(7, 'day'), 'day')) {
+  if (date.isBefore(now.add(7 + 1, 'day'), 'day')) {
     return 'red.2'
   }
-  if (date.isSameOrBefore(now.add(14, 'day'), 'day')) {
+  if (date.isBefore(now.add(14 + 1, 'day'), 'day')) {
     return 'yellow.2'
   }
   return 'green.2'
@@ -245,7 +261,7 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
   if (result.isError) {
     return <ErrorState error={result.error} />
   }
-  if (result.isFetching) {
+  if (result.isLoading) {
     return <LoadingState />
   }
 
@@ -262,7 +278,9 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
             <a href={date.issue.url}>{date.issue.fileref}</a>
           </Table.Td>
           <Table.Td>{TypeLabels.get(date.type)}</Table.Td>
-          <Table.Td bg={getDateColor(date.date)}>{date.date}</Table.Td>
+          <Table.Td bg={getDateBackgroundColor(date.date)}>
+            {date.date}
+          </Table.Td>
           <Table.Td>
             <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
           </Table.Td>
@@ -278,8 +296,71 @@ const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
               )}
             </Center>
           </Table.Td>
+          <Table.Td>
+            <CriticalDateActionIcons date={date} />
+          </Table.Td>
         </Table.Tr>
       ))}
+    </>
+  )
+}
+
+interface CriticalDateActionIconsProps {
+  date: IssueDate
+}
+
+const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
+  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
+  const [deleteCaseDate] = useDeleteCaseDateMutation()
+
+  const delayedHideConfirmDelete = useDebouncedCallback(() => {
+    confirmDeleteHandlers.close()
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirmDelete())
+
+  const handleDelete = () => {
+    deleteCaseDate({ id: date.id })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Critical date deleted', { variant: 'success' })
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to delete critical date'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+  }
+
+  if (displayConfirmDelete) {
+    return (
+      <div ref={ref}>
+        <Center>
+          <Button
+            variant="filled"
+            color="red"
+            size="compact-sm"
+            onClick={handleDelete}
+          >
+            Confirm delete
+          </Button>
+        </Center>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Center>
+        <ActionIcon variant="transparent" color="gray">
+          <IconTrash
+            stroke={1.5}
+            onClick={() => confirmDeleteHandlers.open()}
+          />
+        </ActionIcon>
+      </Center>
     </>
   )
 }

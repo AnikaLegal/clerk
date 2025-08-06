@@ -2,6 +2,7 @@ import { generatedApi } from './api.generated'
 
 const ENTITY_TYPES = [
   'CASE',
+  'CASE_DATES',
   'EMAIL',
   'SERVICE',
   'DOCUMENT_TEMPLATE',
@@ -74,6 +75,21 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     getClients: {
       providesTags: [{ type: 'CLIENT' }],
+    },
+    getCaseDates: {
+      providesTags: [{ type: 'CASE_DATES' }],
+    },
+    getCaseDate: {
+      providesTags: [{ type: 'CASE_DATES' }],
+    },
+    createCaseDate: {
+      invalidatesTags: [{ type: 'CASE_DATES' }],
+    },
+    updateCaseDate: {
+      invalidatesTags: [{ type: 'CASE_DATES' }],
+    },
+    deleteCaseDate: {
+      invalidatesTags: [{ type: 'CASE_DATES' }],
     },
   },
 })
