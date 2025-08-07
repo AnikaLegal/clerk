@@ -20,6 +20,7 @@ import {
   useClickOutside,
   useDebouncedCallback,
   useDisclosure,
+  UseDisclosureHandlers,
 } from '@mantine/hooks'
 import {
   IconCheck,
@@ -32,6 +33,7 @@ import api, {
   IssueDate,
   useDeleteCaseDateMutation,
   useGetCaseDatesQuery,
+  useUpdateCaseDateMutation,
 } from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
 import dayjs from 'dayjs'
@@ -310,13 +312,11 @@ interface CriticalDateActionIconsProps {
 }
 
 const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
-  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
   const [deleteCaseDate] = useDeleteCaseDateMutation()
+  const [updateCaseDate] = useUpdateCaseDateMutation()
 
-  const delayedHideConfirmDelete = useDebouncedCallback(() => {
-    confirmDeleteHandlers.close()
-  }, 100)
-  const ref = useClickOutside(() => delayedHideConfirmDelete())
+  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
+  const [displayConfirmReviewed, confirmReviewedHandlers] = useDisclosure(false)
 
   const handleDelete = () => {
     deleteCaseDate({ id: date.id })
@@ -334,26 +334,62 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
       })
   }
 
+  const handleReviewed = () => {
+    updateCaseDate({
+      id: date.id,
+      issueDateCreate: {
+        is_reviewed: !date.is_reviewed,
+        issue_id: date.issue.id,
+        type: date.type,
+        date: date.date,
+      },
+    })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Critical date updated', { variant: 'success' })
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to update critical date'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+      .finally(() => {
+        confirmReviewedHandlers.close()
+      })
+  }
+
   if (displayConfirmDelete) {
     return (
-      <div ref={ref}>
-        <Center>
-          <Button
-            variant="filled"
-            color="red"
-            size="compact-sm"
-            onClick={handleDelete}
-          >
-            Confirm delete
-          </Button>
-        </Center>
-      </div>
+      <ActionConfirmation
+        onConfirm={handleDelete}
+        confirmHandler={confirmDeleteHandlers}
+        label="Confirm delete"
+        color="red"
+      />
+    )
+  }
+  if (displayConfirmReviewed) {
+    return (
+      <ActionConfirmation
+        onConfirm={handleReviewed}
+        confirmHandler={confirmReviewedHandlers}
+        label={date.is_reviewed ? 'Confirm not reviewed' : 'Confirm reviewed'}
+      />
     )
   }
 
   return (
     <>
       <Center>
+        <ActionIcon variant="transparent" color="gray">
+          <IconCheck
+            stroke={1.5}
+            onClick={() => confirmReviewedHandlers.open()}
+          />
+        </ActionIcon>
         <ActionIcon variant="transparent" color="gray">
           <IconTrash
             stroke={1.5}
@@ -362,6 +398,40 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
         </ActionIcon>
       </Center>
     </>
+  )
+}
+
+interface ActionConfirmationProps {
+  onConfirm: () => void
+  confirmHandler: UseDisclosureHandlers
+  label: string
+  color?: MantineColor
+}
+
+const ActionConfirmation = ({
+  onConfirm,
+  confirmHandler,
+  label,
+  color,
+}: ActionConfirmationProps) => {
+  const delayedHideConfirm = useDebouncedCallback(() => {
+    confirmHandler.close()
+  }, 100)
+  const ref = useClickOutside(() => delayedHideConfirm())
+
+  return (
+    <div ref={ref}>
+      <Center>
+        <Button
+          variant="filled"
+          color={color}
+          size="compact-sm"
+          onClick={onConfirm}
+        >
+          {label}
+        </Button>
+      </Center>
+    </div>
   )
 }
 
