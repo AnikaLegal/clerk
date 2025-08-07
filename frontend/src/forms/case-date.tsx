@@ -66,6 +66,7 @@ export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
         <Select
           {...form.getInputProps('type')}
           key={form.key('type')}
+          clearable
           label="Type"
           searchable
           size="md"
@@ -79,6 +80,8 @@ export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
         <DateInput
           {...form.getInputProps('date')}
           key={form.key('date')}
+          clearable
+          highlightToday
           locale="en-au"
           label="Date"
           size="md"
