@@ -25,19 +25,23 @@ import {
 import {
   IconCheck,
   IconExclamationCircle,
+  IconPencil,
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
 import api, {
   GetCaseDatesApiArg,
   IssueDate,
+  IssueDateCreate,
   useDeleteCaseDateMutation,
   useGetCaseDatesQuery,
   useUpdateCaseDateMutation,
 } from 'api'
+import { CaseDateFormModal } from 'comps/modal'
 import { RichTextDisplay } from 'comps/rich-text'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { useCaseDateForm } from 'forms/case-date'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { UserPermission } from 'types'
@@ -315,8 +319,17 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
   const [deleteCaseDate] = useDeleteCaseDateMutation()
   const [updateCaseDate] = useUpdateCaseDateMutation()
 
-  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
   const [displayConfirmReviewed, confirmReviewedHandlers] = useDisclosure(false)
+  const [displayEdit, displayEditHandlers] = useDisclosure(false)
+  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
+
+  const initialValues: IssueDateCreate = {
+    is_reviewed: date.is_reviewed,
+    issue_id: date.issue.id,
+    type: date.type,
+    date: dayjs(date.date, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+    notes: date.notes,
+  }
 
   const handleDelete = () => {
     deleteCaseDate({ id: date.id })
@@ -338,10 +351,8 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
     updateCaseDate({
       id: date.id,
       issueDateCreate: {
-        is_reviewed: !date.is_reviewed,
-        issue_id: date.issue.id,
-        type: date.type,
-        date: date.date,
+        ...initialValues,
+        is_reviewed: !initialValues.is_reviewed,
       },
     })
       .unwrap()
@@ -358,6 +369,34 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
       })
       .finally(() => {
         confirmReviewedHandlers.close()
+      })
+  }
+
+  const handleUpdate = (
+    form: ReturnType<typeof useCaseDateForm>,
+    values: IssueDateCreate
+  ) => {
+    form.setSubmitting(true)
+    updateCaseDate({
+      id: date.id,
+      issueDateCreate: values,
+    })
+      .unwrap()
+      .then(() => {
+        enqueueSnackbar('Critical date updated', { variant: 'success' })
+        displayEditHandlers.close()
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to update critical date'),
+          {
+            variant: 'error',
+          }
+        )
+      })
+      .finally(() => {
+        form.setSubmitting(false)
+        form.setValues({})
       })
   }
 
@@ -383,19 +422,35 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
 
   return (
     <>
+      <CaseDateFormModal
+        opened={displayEdit}
+        onClose={() => displayEditHandlers.close()}
+        initialValues={initialValues}
+        title="Update critical date"
+        submitButtonLabel="Update critical date"
+        onFormSubmit={handleUpdate}
+      />
       <Center>
-        <ActionIcon variant="transparent" color="gray">
-          <IconCheck
-            stroke={1.5}
-            onClick={() => confirmReviewedHandlers.open()}
-          />
-        </ActionIcon>
-        <ActionIcon variant="transparent" color="gray">
-          <IconTrash
-            stroke={1.5}
-            onClick={() => confirmDeleteHandlers.open()}
-          />
-        </ActionIcon>
+        <ActionIcon.Group>
+          <ActionIcon variant="transparent" color="gray">
+            <IconCheck
+              stroke={2.5}
+              onClick={() => confirmReviewedHandlers.open()}
+            />
+          </ActionIcon>
+          <ActionIcon variant="transparent" color="gray">
+            <IconPencil
+              stroke={1.5}
+              onClick={() => displayEditHandlers.open()}
+            />
+          </ActionIcon>
+          <ActionIcon variant="transparent" color="gray">
+            <IconTrash
+              stroke={1.5}
+              onClick={() => confirmDeleteHandlers.open()}
+            />
+          </ActionIcon>
+        </ActionIcon.Group>
       </Center>
     </>
   )
