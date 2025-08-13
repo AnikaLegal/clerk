@@ -15,6 +15,7 @@ import {
   TextInput,
   TextInputProps,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import {
   useClickOutside,
@@ -433,22 +434,28 @@ const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
       <Center>
         <ActionIcon.Group>
           <ActionIcon variant="transparent" color="gray">
-            <IconCheck
-              stroke={2.5}
-              onClick={() => confirmReviewedHandlers.open()}
-            />
+            <Tooltip label="Toggle reviewed" openDelay={750}>
+              <IconCheck
+                stroke={2.5}
+                onClick={() => confirmReviewedHandlers.open()}
+              />
+            </Tooltip>
           </ActionIcon>
           <ActionIcon variant="transparent" color="gray">
-            <IconPencil
-              stroke={1.5}
-              onClick={() => displayEditHandlers.open()}
-            />
+            <Tooltip label="Update" openDelay={750}>
+              <IconPencil
+                stroke={1.5}
+                onClick={() => displayEditHandlers.open()}
+              />
+            </Tooltip>
           </ActionIcon>
           <ActionIcon variant="transparent" color="gray">
-            <IconTrash
-              stroke={1.5}
-              onClick={() => confirmDeleteHandlers.open()}
-            />
+            <Tooltip label="Delete" openDelay={750}>
+              <IconTrash
+                stroke={1.5}
+                onClick={() => confirmDeleteHandlers.open()}
+              />
+            </Tooltip>
           </ActionIcon>
         </ActionIcon.Group>
       </Center>
