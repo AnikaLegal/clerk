@@ -40,6 +40,7 @@ export const RichTextEditorInput = ({
           variant={variant}
           toolbar={toolbar}
           onUpdate={handleUpdate}
+          initialContent={props.defaultValue?.toString()}
         />
       </Box>
     </Input.Wrapper>
