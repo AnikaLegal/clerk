@@ -43,7 +43,7 @@ def pytest_configure(config):
 
 
 def pytest_sessionstart(session):
-    if os.environ.get("DEBUG_PYTEST"):
+    if os.environ.get("DEBUGPY"):
         debugpy.listen(("0.0.0.0", 8123))
         print("Waiting for debug client to attach...")
         debugpy.wait_for_client()

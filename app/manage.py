@@ -6,7 +6,7 @@ from django.conf import settings
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "clerk.settings")
 
-    if settings.DEBUG:
+    if settings.DEBUG and os.environ.get("DEBUGPY"):
         import debugpy
 
         debugpy.listen(("0.0.0.0", 8123))
