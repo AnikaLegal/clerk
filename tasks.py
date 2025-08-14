@@ -34,7 +34,6 @@ def build(c, base=False, frontend=False, no_cache=False):
 @task
 def dev(c):
     """Run Django dev server within a Docker container"""
-
     c.run(f"{COMPOSE} up web", pty=True)
 
 
@@ -156,7 +155,7 @@ def test(
     if interactive:
         cmd = "bash"
     else:
-        cmd = "pytest"
+        cmd = "python -Xfrozen_modules=off -m pytest"
         if recreate:
             cmd += " --create-db"
         else:
@@ -169,7 +168,7 @@ def test(
 
     debug_args = ""
     if debug:
-        debug_args = "-p 8123:8123 -e DEBUG_PYTEST=true"
+        debug_args = "-p 8123:8123 -e DEBUGPY=true"
 
     c.run(
         f"{COMPOSE} run --rm {debug_args} test {cmd}",

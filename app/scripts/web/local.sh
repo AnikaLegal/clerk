@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -o errexit
+export DEBUGPY=true
 
 watchmedo \
     auto-restart \
