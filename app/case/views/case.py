@@ -3,9 +3,10 @@ from core.events.service import (
     on_service_delete,
     on_service_update,
 )
-from core.models import Issue, IssueNote, ServiceEvent
+from core.models import AuditEvent, Issue, IssueNote, ServiceEvent, IssueDate
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
 from django.contrib.contenttypes.prefetch import GenericPrefetch
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -16,6 +17,7 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelM
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from auditlog.models import LogEntry
 
 from case.serializers import (
     IssueNoteSerializer,
@@ -251,6 +253,11 @@ class CaseApiViewset(
         prefetch = GenericPrefetch(
             "content_object",
             [
+                AuditEvent.objects.filter(
+                    log_entry__content_type=ContentType.objects.get_for_model(IssueDate)
+                ).select_related(
+                    "log_entry", "log_entry__content_type", "log_entry__actor"
+                ),
                 ServiceEvent.objects.filter(service__issue=issue)
                 .select_related("user")
                 .prefetch_related("user__groups"),
@@ -259,6 +266,7 @@ class CaseApiViewset(
 
         notes = (
             IssueNote.objects.filter(issue=issue.pk)
+            .select_related("issue", "creator", "content_type")
             .prefetch_related(prefetch, "creator__groups")
             .filter(note_type__in=note_types)
             .order_by("-created_at")

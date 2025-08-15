@@ -19,14 +19,11 @@ class AuditEvent(models.Model):
 
     def _get_custom_text(self) -> str | None:
         """
-        Allow each model to define its own audit text output.
+        Allow each model to define its own text output via a static method.
         """
         try:
-            log_entry = self.log_entry
-            object = log_entry.content_type.get_object_for_this_type(
-                pk=log_entry.object_pk
-            )
-            return object.log_entry_to_text(self.log_entry)  # type: ignore
+            model_class = self.log_entry.content_type.model_class()
+            return model_class.log_entry_to_text(self.log_entry)  # type: ignore
         except Exception:
             pass
         return None
