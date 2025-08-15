@@ -1,3 +1,4 @@
+from .audit_event import AuditEvent
 from .client import Client
 from .document_template import DocumentTemplate
 from .issue import CaseTopic, Issue

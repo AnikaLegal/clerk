@@ -1,5 +1,6 @@
-from django.db import models
 from accounts.models import User
+from auditlog.registry import auditlog
+from django.db import models
 
 from .issue import Issue
 from .timestamped import TimestampedModel
@@ -30,3 +31,10 @@ class IssueDate(TimestampedModel):
         Returns True if the user has object level permission to access this instance.
         """
         return self.issue.paralegal_id == user.pk
+
+
+auditlog.register(
+    IssueDate,
+    exclude_fields=["created_at", "modified_at"],
+    serialize_data=True,
+)
