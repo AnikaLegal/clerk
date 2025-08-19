@@ -254,7 +254,10 @@ class CaseApiViewset(
             "content_object",
             [
                 AuditEvent.objects.filter(
-                    log_entry__content_type=ContentType.objects.get_for_model(IssueDate)
+                    log_entry__content_type=ContentType.objects.get_for_model(
+                        IssueDate
+                    ),
+                    log_entry__serialized_data__fields__issue=str(issue.id),
                 ).select_related(
                     "log_entry", "log_entry__content_type", "log_entry__actor"
                 ),
