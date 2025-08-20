@@ -200,7 +200,6 @@ class IssueDateAdmin(admin.ModelAdmin):
         "date",
         "notes",
         "is_reviewed",
-        "creator_link",
         "created_at",
     )
     list_filter = ("type", "is_reviewed")
@@ -210,6 +209,3 @@ class IssueDateAdmin(admin.ModelAdmin):
     def issue_link(self, issue):
         return issue.fileref if issue else None
 
-    @admin_link("creator", "Creator")
-    def creator_link(self, creator):
-        return creator.get_full_name() if creator else None

@@ -19,8 +19,6 @@ class IssueDate(TimestampedModel):
     """
 
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    creator = models.ForeignKey(User, on_delete=models.PROTECT)
-
     type = models.CharField(max_length=32, choices=DateType.choices)
     date = models.DateField()
     notes = models.TextField(blank=True, default="")

@@ -11,7 +11,6 @@ class IssueDateSerializer(serializers.ModelSerializer):
             "id",
             "issue",
             "issue_id",
-            "creator_id",
             "type",
             "date",
             "notes",

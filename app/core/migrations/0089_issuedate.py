@@ -47,13 +47,6 @@ class Migration(migrations.Migration):
                 ("notes", models.TextField(blank=True, default="")),
                 ("is_reviewed", models.BooleanField(default=False)),
                 (
-                    "creator",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT,
-                        to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
-                (
                     "issue",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE, to="core.issue"

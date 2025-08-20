@@ -43,7 +43,6 @@ class DateApiViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = IssueDate.objects.all()
         queryset = queryset.select_related(
-            "creator",
             "issue",
             "issue__client",
             "issue__tenancy__landlord",
@@ -53,7 +52,7 @@ class DateApiViewSet(viewsets.ModelViewSet):
             "issue__support_worker",
         )
         queryset = queryset.prefetch_related(
-            "creator__groups", "issue__paralegal__groups", "issue__lawyer__groups"
+            "issue__paralegal__groups", "issue__lawyer__groups"
         )
 
         if user.is_paralegal:
@@ -106,6 +105,3 @@ class DateApiViewSet(viewsets.ModelViewSet):
                 pass  # Handled by serializer validation
 
         return super().create(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        return serializer.save(creator_id=self.request.user.pk)
