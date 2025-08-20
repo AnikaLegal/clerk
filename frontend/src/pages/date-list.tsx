@@ -131,7 +131,7 @@ const App = () => {
           <Table.Tr>
             <Table.Th>Fileref</Table.Th>
             <Table.Th>Type</Table.Th>
-            <Table.Th>Critical date</Table.Th>
+            <Table.Th>Date</Table.Th>
             <Table.Th>Client</Table.Th>
             <Table.Th>Notes</Table.Th>
             <Table.Th>Reviewed?</Table.Th>
