@@ -1,5 +1,7 @@
 from auditlog.models import LogEntry
+from core.audit import get_action_info, get_field_values
 from django.db import models
+from django.template.loader import render_to_string
 
 
 class AuditEvent(models.Model):
@@ -14,19 +16,23 @@ class AuditEvent(models.Model):
         if not text:
             # Fall back on a default text output.
             text = self._get_text()
-
         return text
 
     def _get_custom_text(self) -> str | None:
         """
         Allow each model to define its own text output via a static method.
         """
+        model_class = self.log_entry.content_type.model_class()
         try:
-            model_class = self.log_entry.content_type.model_class()
-            return model_class.log_entry_to_text(self.log_entry)  # type: ignore
-        except Exception:
+            return model_class.audit_event_to_text(self)  # type: ignore
+        except AttributeError:
             pass
         return None
 
     def _get_text(self) -> str:
-        return str(self.log_entry)
+        context = {
+            "log_entry": self.log_entry,
+            "action": get_action_info(self.log_entry),
+            "fields": get_field_values(self.log_entry),
+        }
+        return render_to_string("case/audit_event.html", context)
