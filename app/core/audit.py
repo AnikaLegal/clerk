@@ -39,7 +39,7 @@ def get_action_info(log_entry: LogEntry) -> ActionInfo:
     }
 
 
-def get_field_values(log_entry: LogEntry) -> dict[str, FieldInfo]:
+def get_field_info(log_entry: LogEntry) -> dict[str, FieldInfo]:
     field_values: dict[str, FieldInfo] = {}
 
     if log_entry.serialized_data:

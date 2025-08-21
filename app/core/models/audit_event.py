@@ -1,5 +1,5 @@
 from auditlog.models import LogEntry
-from core.audit import get_action_info, get_field_values
+from core.audit import get_action_info, get_field_info
 from django.db import models
 from django.template.loader import render_to_string
 
@@ -33,6 +33,6 @@ class AuditEvent(models.Model):
         context = {
             "log_entry": self.log_entry,
             "action": get_action_info(self.log_entry),
-            "fields": get_field_values(self.log_entry),
+            "fields": get_field_info(self.log_entry),
         }
         return render_to_string("case/audit_event.html", context)
