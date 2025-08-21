@@ -92,13 +92,13 @@ def _get_ignored_fields(model_class) -> set:
     return set()
 
 
-def _is_field_excluded(model_class, field_name) -> bool:
+def _is_field_excluded(model_class, field_name: str) -> bool:
     model = model_class._meta.model
     config = auditlog.get_model_fields(model) if auditlog.contains(model) else None
     return config is not None and field_name in config["exclude_fields"]
 
 
-def _get_field(model_class, field_name) -> Field | None:
+def _get_field(model_class, field_name: str) -> Field | None:
     try:
         return model_class._meta.get_field(field_name)
     except FieldDoesNotExist:
@@ -106,7 +106,7 @@ def _get_field(model_class, field_name) -> Field | None:
     return None
 
 
-def _get_field_type(field):
+def _get_field_type(field: Field):
     try:
         type = field.get_internal_type()
         type = re.sub(r"(?<!^)(?=[A-Z])", "_", type).lower()  # Camel to snake case.
@@ -117,16 +117,16 @@ def _get_field_type(field):
     return "unknown"
 
 
-def _get_field_value(field, value):
+def _get_field_value(field: Field, value: Any):
     # Get the display value for fields that have choices.
     choices = None
     if getattr(field, "choices", None):
-        choices = dict(field.choices)
+        choices = dict(field.choices)  # type: ignore
     if getattr(getattr(field, "base_field", None), "choices", None):
-        choices = dict(field.base_field.choices)
+        choices = dict(field.base_field.choices)  # type: ignore
     if choices:
         if type(value) is [].__class__:
-            return ", ".join([choices.get(choice, "") for choice in value])
+            return ", ".join([choices.get(choice, "") for choice in value])  # type: ignore
         else:
             return choices.get(value, "")
 
