@@ -1,5 +1,6 @@
 import datetime
 import re
+from typing import TypedDict, Any
 
 from auditlog.models import LogEntry
 from auditlog.registry import auditlog
@@ -9,7 +10,20 @@ from django.core.exceptions import (
 from django.db.models import DateField, DateTimeField, Field, TimeField
 
 
-def get_action_info(log_entry: LogEntry) -> dict:
+class ActionInfo(TypedDict):
+    model_name: str
+    indefinite_article: str
+    verb: str
+
+
+class FieldInfo(TypedDict):
+    verbose_name: str
+    value: Any
+    type: str
+    is_changed: bool
+
+
+def get_action_info(log_entry: LogEntry) -> ActionInfo:
     model_class = log_entry.content_type.model_class()
 
     verbose_model_name = model_class._meta.verbose_name
@@ -25,14 +39,16 @@ def get_action_info(log_entry: LogEntry) -> dict:
     }
 
 
-def get_field_values(log_entry: LogEntry) -> dict:
-    field_values = {}
+def get_field_values(log_entry: LogEntry) -> dict[str, FieldInfo]:
+    field_values: dict[str, FieldInfo] = {}
+
     if log_entry.serialized_data:
         model_class = log_entry.content_type.model_class()
-        changes = log_entry.changes_dict
         ignore = _get_ignored_fields(model_class)
 
+        changes = log_entry.changes_dict
         data = log_entry.serialized_data
+
         for field_name, value in data["fields"].items():  # type: ignore
             if _is_field_excluded(model_class, field_name) or field_name in ignore:
                 continue
@@ -52,6 +68,7 @@ def get_field_values(log_entry: LogEntry) -> dict:
                 "type": type,
                 "is_changed": field_name in changes,
             }
+
     return field_values
 
 
