@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0088_alter_client_pronouns"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -55,6 +54,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "abstract": False,
+                "verbose_name": "critical date",
             },
         ),
     ]

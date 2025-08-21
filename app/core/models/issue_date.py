@@ -24,11 +24,18 @@ class IssueDate(TimestampedModel):
     notes = models.TextField(blank=True, default="")
     is_reviewed = models.BooleanField(default=False)
 
+    class Meta(TimestampedModel.Meta):
+        verbose_name = "critical date"
+
     def check_permission(self, user: User) -> bool:
         """
         Returns True if the user has object level permission to access this instance.
         """
         return self.issue.paralegal_id == user.pk
+
+    @staticmethod
+    def audit_event_ignore_fields() -> set:
+        return {IssueDate.issue.field.name}
 
 
 auditlog.register(
