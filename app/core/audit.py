@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import TypedDict, Any
+from typing import Any, TypedDict
 
 from auditlog.models import LogEntry
 from auditlog.registry import auditlog

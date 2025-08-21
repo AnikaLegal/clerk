@@ -17,7 +17,6 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelM
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from auditlog.models import LogEntry
 
 from case.serializers import (
     IssueNoteSerializer,
