@@ -1,5 +1,7 @@
 from auditlog.models import LogEntry
 from core.audit import get_action_info, get_field_info
+from core.models.issue_note import IssueNote
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.template.loader import render_to_string
 
@@ -10,6 +12,7 @@ class AuditEvent(models.Model):
     """
 
     log_entry = models.ForeignKey(LogEntry, on_delete=models.PROTECT, related_name="+")
+    issue_notes = GenericRelation(IssueNote)
 
     def get_text(self) -> str:
         text = self._get_custom_text()
