@@ -11,14 +11,16 @@
     <table class="ui definition table small very compact">
       <tbody>
         {% for field in fields.values %}
-          <tr>
-            <td class="three wide">{{ field.verbose_name|capfirst }}</td>
-            {% if field.type == 'date' %}
-              <td>{{ field.value|date:'d/m/Y' }}</td>
-            {% else %}
-              <td>{{ field.value|safe }}</td>
-            {% endif %}
-          </tr>
+          {% if field.value is not None and field.value != '' %}
+            <tr>
+              <td class="three wide">{{ field.verbose_name|capfirst }}</td>
+              {% if field.type == 'date' %}
+                <td>{{ field.value|date:'d/m/Y' }}</td>
+              {% else %}
+                <td>{{ field.value|safe }}</td>
+              {% endif %}
+            </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </table>
