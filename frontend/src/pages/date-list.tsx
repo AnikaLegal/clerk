@@ -4,7 +4,6 @@ import {
   Center,
   Container,
   Grid,
-  Group,
   Loader,
   MantineColor,
   Pagination,
@@ -23,44 +22,33 @@ import {
   useDisclosure,
   UseDisclosureHandlers,
 } from '@mantine/hooks'
-import {
-  IconCheck,
-  IconExclamationCircle,
-  IconPencil,
-  IconTrash,
-  IconX,
-} from '@tabler/icons-react'
+import { IconCheck, IconPencil, IconTrash, IconX } from '@tabler/icons-react'
 import api, {
   GetCaseDatesApiArg,
   IssueDate,
   IssueDateCreate,
   useDeleteCaseDateMutation,
-  useGetCaseDatesQuery,
   useUpdateCaseDateMutation,
 } from 'api'
 import { CaseDateFormModal } from 'comps/modal'
 import { RichTextDisplay } from 'comps/rich-text'
+import { CASE_DATE_TYPES } from 'consts'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import {
+  DateTable,
+  DateTableDateCell,
+  DateTableIsReviewedCell,
+  DateTableTypeCell,
+} from 'features/date'
 import { useCaseDateForm } from 'forms/case-date'
 import { enqueueSnackbar } from 'notistack'
-import React, { useEffect, useState } from 'react'
-import { UserPermission } from 'types'
-import { choiceToMap, getAPIErrorMessage, mount } from 'utils'
-
-dayjs.extend(customParseFormat)
+import React, { useState } from 'react'
+import { getAPIErrorMessage, mount } from 'utils'
 
 import '@mantine/core/styles.css'
 
-interface DjangoContext {
-  choices: {
-    type: [string, string][]
-  }
-  user: UserPermission
-}
-const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
-const Types = CONTEXT.choices.type.sort((a, b) => a[1].localeCompare(b[1]))
-const TypeLabels = choiceToMap(Types)
+dayjs.extend(customParseFormat)
 
 const App = () => {
   const [args, setArgs] = useState<GetCaseDatesApiArg>({
@@ -76,6 +64,18 @@ const App = () => {
       page: 1, // Reset to first page on filter change
     }))
   }
+
+  const tableHeader = (
+    <Table.Tr>
+      <Table.Th>Fileref</Table.Th>
+      <Table.Th>Type</Table.Th>
+      <Table.Th>Date</Table.Th>
+      <Table.Th>Client</Table.Th>
+      <Table.Th>Notes</Table.Th>
+      <Table.Th>Reviewed?</Table.Th>
+      <Table.Th></Table.Th>
+    </Table.Tr>
+  )
 
   return (
     <Container size="xl">
@@ -98,7 +98,7 @@ const App = () => {
         <Grid.Col span={6}>
           <SelectFilter
             name="type"
-            data={Types.map((type) => ({
+            data={Object.entries(CASE_DATE_TYPES).map((type) => ({
               value: type[0],
               label: type[1],
             }))}
@@ -120,28 +120,11 @@ const App = () => {
           />
         </Grid.Col>
       </Grid>
-      <Table
-        withColumnBorders
-        withTableBorder
-        verticalSpacing="md"
-        fz="md"
-        mt="lg"
-      >
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Fileref</Table.Th>
-            <Table.Th>Type</Table.Th>
-            <Table.Th>Date</Table.Th>
-            <Table.Th>Client</Table.Th>
-            <Table.Th>Notes</Table.Th>
-            <Table.Th>Reviewed?</Table.Th>
-            <Table.Th></Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          <CriticalDatesTableBody result={result} />
-        </Table.Tbody>
-      </Table>
+      <DateTable
+        result={result}
+        headerRow={tableHeader}
+        dataRow={DateTableDataRow}
+      />
       {!result.isLoading && result.data && (
         <Pagination
           total={result.data.page_count}
@@ -212,103 +195,25 @@ const SelectFilter = ({
   )
 }
 
-const ErrorState = ({ error }: { error: any }) => {
-  useEffect(() => {
-    const message = getAPIErrorMessage(error, 'Could not load critical dates')
-    enqueueSnackbar(message, { variant: 'error' })
-  }, [error])
-
+const DateTableDataRow = ({ date }: { date: IssueDate }) => {
   return (
     <Table.Tr>
-      <td colSpan={5}>
-        <Group justify="center" gap="xs" m="sm" c="red">
-          <IconExclamationCircle />
-          <Text>Could not load critical dates</Text>
-        </Group>
-      </td>
+      <Table.Td>
+        <a href={date.issue.url}>{date.issue.fileref}</a>
+      </Table.Td>
+      <DateTableTypeCell date={date} />
+      <DateTableDateCell date={date} />
+      <Table.Td>
+        <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
+      </Table.Td>
+      <Table.Td>
+        <RichTextDisplay content={date.notes} />
+      </Table.Td>
+      <DateTableIsReviewedCell date={date} />
+      <Table.Td>
+        <CriticalDateActionIcons date={date} />
+      </Table.Td>
     </Table.Tr>
-  )
-}
-
-const LoadingState = () => (
-  <Table.Tr>
-    <td colSpan={5}>
-      <Center m="sm">
-        <Loader />
-      </Center>
-    </td>
-  </Table.Tr>
-)
-
-const EmptyState = () => (
-  <Table.Tr>
-    <td colSpan={5}>
-      <Center m="sm">No dates found</Center>
-    </td>
-  </Table.Tr>
-)
-
-const getDateBackgroundColor = (dateString: string): MantineColor => {
-  const date = dayjs(dateString, 'DD/MM/YYYY')
-  const now = dayjs()
-  if (date.isBefore(now.add(7 + 1, 'day'), 'day')) {
-    return 'red.2'
-  }
-  if (date.isBefore(now.add(14 + 1, 'day'), 'day')) {
-    return 'yellow.2'
-  }
-  return 'green.2'
-}
-
-interface CriticalDatesTableBodyProps {
-  result: ReturnType<typeof useGetCaseDatesQuery>
-}
-
-const CriticalDatesTableBody = ({ result }: CriticalDatesTableBodyProps) => {
-  if (result.isError) {
-    return <ErrorState error={result.error} />
-  }
-  if (result.isLoading) {
-    return <LoadingState />
-  }
-
-  const data: IssueDate[] = result.data.results || []
-  if (data.length < 1) {
-    return <EmptyState />
-  }
-
-  return (
-    <>
-      {data.map((date) => (
-        <Table.Tr key={date.id}>
-          <Table.Td>
-            <a href={date.issue.url}>{date.issue.fileref}</a>
-          </Table.Td>
-          <Table.Td>{TypeLabels.get(date.type)}</Table.Td>
-          <Table.Td bg={getDateBackgroundColor(date.date)}>
-            {date.date}
-          </Table.Td>
-          <Table.Td>
-            <a href={date.issue.client.url}>{date.issue.client.full_name}</a>
-          </Table.Td>
-          <Table.Td>
-            <RichTextDisplay content={date.notes} />
-          </Table.Td>
-          <Table.Td>
-            <Center>
-              {date.is_reviewed ? (
-                <IconCheck color="var(--mantine-color-green-6)" stroke={3} />
-              ) : (
-                <IconX color="var(--mantine-color-yellow-6)" stroke={3} />
-              )}
-            </Center>
-          </Table.Td>
-          <Table.Td>
-            <CriticalDateActionIcons date={date} />
-          </Table.Td>
-        </Table.Tr>
-      ))}
-    </>
   )
 }
 

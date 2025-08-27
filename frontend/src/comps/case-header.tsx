@@ -7,6 +7,7 @@ export const CASE_TABS = {
   DETAIL: 'DETAIL',
   EMAIL: 'EMAIL',
   DOCUMENTS: 'DOCUMENTS',
+  DATES: 'DATES',
   SERVICES: 'SERVICES',
 }
 
@@ -14,6 +15,7 @@ export interface CaseTabUrls {
   detail: string
   email: string
   docs: string
+  dates: string
   services: string
 }
 
@@ -129,6 +131,14 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         >
           <Icon name="folder open outline" />
           Documents
+        </Menu.Item>
+        <Menu.Item
+          as="a"
+          href={urls.dates}
+          active={activeTab === CASE_TABS.DATES}
+        >
+          <Icon name="calendar alternate outline" />
+          Dates
         </Menu.Item>
         <Menu.Item
           as="a"
