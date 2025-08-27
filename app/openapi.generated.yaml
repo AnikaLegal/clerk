@@ -2325,11 +2325,18 @@ components:
               type: string
           required:
             - support_contact_preferences
+    IssueDateType:
+      type: string
+      enum:
+        - FILING_DEADLINE
+        - HEARING_LISTED
+        - NTV_TERMINATION
+        - OTHER
     IssueDateBase:
       type: object
       properties:
         type:
-          type: string
+          $ref: "#/components/schemas/IssueDateType"
         date:
           type: string
           format: date

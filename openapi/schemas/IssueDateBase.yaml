@@ -1,7 +1,7 @@
 type: object
 properties:
   type:
-    type: string
+    $ref: ./IssueDateType.yaml
   date:
     type: string
     format: date

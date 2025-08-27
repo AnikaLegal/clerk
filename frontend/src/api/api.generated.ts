@@ -1198,8 +1198,13 @@ export type EmailAttachmentCreate = {
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string;
 };
+export type IssueDateType =
+  | "FILING_DEADLINE"
+  | "HEARING_LISTED"
+  | "NTV_TERMINATION"
+  | "OTHER";
 export type IssueDateBase = {
-  type: string;
+  type: IssueDateType;
   date: string;
 };
 export type IssueDate = IssueDateBase & {
