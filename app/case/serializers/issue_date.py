@@ -31,13 +31,13 @@ class IssueDateSearchSerializer(serializers.ModelSerializer):
         model = IssueDate
         fields = (
             "type",
-            "issue",
+            "issue_id",
             "is_reviewed",
             "q",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
-    issue = serializers.UUIDField()
+    issue_id = serializers.UUIDField()
     type = serializers.ChoiceField(choices=DateType.choices)
 
     # Generic search field - not part of the model.
