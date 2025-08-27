@@ -1,4 +1,5 @@
 import {
+  CaseDateTypes,
   DiscreteServiceTypes,
   OngoingServiceTypes,
   ServiceCategories,
@@ -63,7 +64,7 @@ export const ONGOING_SERVICE_TYPES: OngoingServiceTypes = {
   REPRESENTATION_OTHER: 'Other representation',
 } as const
 
-export const CASE_DATE_TYPES = {
+export const CASE_DATE_TYPES: CaseDateTypes = {
   FILING_DEADLINE: 'Filing deadline',
   HEARING_LISTED: 'Hearing listed',
   NTV_TERMINATION: 'NTV termination',

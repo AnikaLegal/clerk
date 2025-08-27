@@ -1,5 +1,6 @@
 import {
   Issue,
+  IssueDateType,
   ServiceCategory,
   ServiceTypeDiscrete,
   ServiceTypeOngoing,
@@ -24,6 +25,10 @@ export type DiscreteServiceTypes = {
 
 export type OngoingServiceTypes = {
   [key in ServiceTypeOngoing]: string
+}
+
+export type CaseDateTypes = {
+  [key in IssueDateType]: string
 }
 
 export interface CaseDetailFormProps {
