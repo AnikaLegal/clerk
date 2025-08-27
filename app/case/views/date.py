@@ -30,7 +30,7 @@ class DatePaginator(ClerkPaginator):
 
 class DateApiViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for viewing, creating, updating, and deleting IssueDate objects.
+    API endpoint for case dates.
     """
 
     serializer_class = IssueDateSerializer

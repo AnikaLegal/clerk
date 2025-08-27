@@ -70,6 +70,11 @@ urlpatterns = [
         name="case-docs",
     ),
     re_path(
+        f"^cases/{UUID_PK}/dates/$",
+        case.case_detail_dates_page_view,
+        name="case-date-list",
+    ),
+    re_path(
         f"^cases/{UUID_PK}/services/$",
         case.case_detail_services_page_view,
         name="case-services",

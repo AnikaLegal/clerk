@@ -12,6 +12,7 @@ class AuditEvent(models.Model):
     """
 
     log_entry = models.ForeignKey(LogEntry, on_delete=models.PROTECT, related_name="+")
+
     issue_notes = GenericRelation(IssueNote)
 
     def get_text(self) -> str:

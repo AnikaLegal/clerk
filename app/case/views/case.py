@@ -129,6 +129,22 @@ def case_detail_documents_page_view(request, pk):
 
 @api_view(["GET"])
 @paralegal_or_better_required
+def case_detail_dates_page_view(request, pk):
+    """
+    The dates related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+    }
+    return render_react_page(
+        request, f"Case {issue.fileref}", "case-date-list", context
+    )
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
 def case_detail_services_page_view(request, pk):
     """
     The services related to a case.
@@ -146,6 +162,7 @@ def get_detail_urls(issue: Issue):
         "detail": reverse("case-detail", args=(issue.pk,)),
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
+        "dates": reverse("case-date-list", args=(issue.pk,)),
         "services": reverse("case-services", args=(issue.pk,)),
     }
 
