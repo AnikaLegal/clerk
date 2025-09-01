@@ -17,16 +17,18 @@ def build(c, base=False, frontend=False, no_cache=False):
 
     file = "Dockerfile"
     tag = f"{APP_NAME}:local"
+    args = ""
+
     if base:
         file = "Dockerfile.base"
         tag = "anikalaw/clerkbase:latest"
+        args += " --platform=linux/amd64,linux/arm64"
     elif frontend:
         file = "Dockerfile.frontend"
         tag = f"{APP_NAME}-frontend:local"
 
-    args = ""
     if no_cache:
-        args += "--no-cache"
+        args += " --no-cache"
 
     c.run(f"docker build {args} --file docker/{file} --tag {tag} .")
 
