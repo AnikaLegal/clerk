@@ -1,11 +1,8 @@
 import {
-  ActionIcon,
-  Button,
   Center,
   Container,
   Grid,
   Loader,
-  MantineColor,
   Pagination,
   Select,
   SelectProps,
@@ -14,41 +11,22 @@ import {
   TextInput,
   TextInputProps,
   Title,
-  Tooltip,
 } from '@mantine/core'
-import {
-  useClickOutside,
-  useDebouncedCallback,
-  useDisclosure,
-  UseDisclosureHandlers,
-} from '@mantine/hooks'
-import { IconCheck, IconPencil, IconTrash, IconX } from '@tabler/icons-react'
-import api, {
-  GetCaseDatesApiArg,
-  IssueDate,
-  IssueDateCreate,
-  useDeleteCaseDateMutation,
-  useUpdateCaseDateMutation,
-} from 'api'
-import { CaseDateFormModal } from 'comps/modal'
+import { useDebouncedCallback } from '@mantine/hooks'
+import api, { GetCaseDatesApiArg, IssueDate } from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
 import { CASE_DATE_TYPES } from 'consts'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import {
+  DateActionIconGroup,
   DateTable,
   DateTableDateCell,
   DateTableIsReviewedCell,
   DateTableTypeCell,
 } from 'features/date'
-import { useCaseDateForm } from 'forms/case-date'
-import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { getAPIErrorMessage, mount } from 'utils'
+import { mount } from 'utils'
 
 import '@mantine/core/styles.css'
-
-dayjs.extend(customParseFormat)
 
 const App = () => {
   const [args, setArgs] = useState<GetCaseDatesApiArg>({
@@ -211,194 +189,11 @@ const DateTableDataRow = ({ date }: { date: IssueDate }) => {
       </Table.Td>
       <DateTableIsReviewedCell date={date} />
       <Table.Td>
-        <CriticalDateActionIcons date={date} />
+        <Center>
+          <DateActionIconGroup date={date} />
+        </Center>
       </Table.Td>
     </Table.Tr>
-  )
-}
-
-interface CriticalDateActionIconsProps {
-  date: IssueDate
-}
-
-const CriticalDateActionIcons = ({ date }: CriticalDateActionIconsProps) => {
-  const [deleteCaseDate] = useDeleteCaseDateMutation()
-  const [updateCaseDate] = useUpdateCaseDateMutation()
-
-  const [displayConfirmReviewed, confirmReviewedHandlers] = useDisclosure(false)
-  const [displayEdit, displayEditHandlers] = useDisclosure(false)
-  const [displayConfirmDelete, confirmDeleteHandlers] = useDisclosure(false)
-
-  const initialValues: IssueDateCreate = {
-    is_reviewed: date.is_reviewed,
-    issue_id: date.issue.id,
-    type: date.type,
-    date: dayjs(date.date, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-    notes: date.notes,
-  }
-
-  const handleDelete = () => {
-    deleteCaseDate({ id: date.id })
-      .unwrap()
-      .then(() => {
-        enqueueSnackbar('Critical date deleted', { variant: 'success' })
-      })
-      .catch((e) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to delete critical date'),
-          {
-            variant: 'error',
-          }
-        )
-      })
-  }
-
-  const handleReviewed = () => {
-    updateCaseDate({
-      id: date.id,
-      issueDateCreate: {
-        ...initialValues,
-        is_reviewed: !initialValues.is_reviewed,
-      },
-    })
-      .unwrap()
-      .then(() => {
-        enqueueSnackbar('Critical date updated', { variant: 'success' })
-      })
-      .catch((e) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to update critical date'),
-          {
-            variant: 'error',
-          }
-        )
-      })
-      .finally(() => {
-        confirmReviewedHandlers.close()
-      })
-  }
-
-  const handleUpdate = (
-    form: ReturnType<typeof useCaseDateForm>,
-    values: IssueDateCreate
-  ) => {
-    form.setSubmitting(true)
-    updateCaseDate({
-      id: date.id,
-      issueDateCreate: values,
-    })
-      .unwrap()
-      .then(() => {
-        enqueueSnackbar('Critical date updated', { variant: 'success' })
-        displayEditHandlers.close()
-      })
-      .catch((e) => {
-        enqueueSnackbar(
-          getAPIErrorMessage(e, 'Failed to update critical date'),
-          {
-            variant: 'error',
-          }
-        )
-      })
-      .finally(() => {
-        form.setSubmitting(false)
-        form.setValues({})
-      })
-  }
-
-  if (displayConfirmDelete) {
-    return (
-      <ActionConfirmation
-        onConfirm={handleDelete}
-        confirmHandler={confirmDeleteHandlers}
-        label="Confirm delete"
-        color="red"
-      />
-    )
-  }
-  if (displayConfirmReviewed) {
-    return (
-      <ActionConfirmation
-        onConfirm={handleReviewed}
-        confirmHandler={confirmReviewedHandlers}
-        label={date.is_reviewed ? 'Confirm not reviewed' : 'Confirm reviewed'}
-      />
-    )
-  }
-
-  return (
-    <>
-      <CaseDateFormModal
-        opened={displayEdit}
-        onClose={() => displayEditHandlers.close()}
-        initialValues={initialValues}
-        title="Update critical date"
-        submitButtonLabel="Update critical date"
-        onFormSubmit={handleUpdate}
-      />
-      <Center>
-        <ActionIcon.Group>
-          <ActionIcon variant="transparent" color="gray">
-            <Tooltip label="Toggle reviewed" openDelay={750}>
-              <IconCheck
-                stroke={2.5}
-                onClick={() => confirmReviewedHandlers.open()}
-              />
-            </Tooltip>
-          </ActionIcon>
-          <ActionIcon variant="transparent" color="gray">
-            <Tooltip label="Update" openDelay={750}>
-              <IconPencil
-                stroke={1.5}
-                onClick={() => displayEditHandlers.open()}
-              />
-            </Tooltip>
-          </ActionIcon>
-          <ActionIcon variant="transparent" color="gray">
-            <Tooltip label="Delete" openDelay={750}>
-              <IconTrash
-                stroke={1.5}
-                onClick={() => confirmDeleteHandlers.open()}
-              />
-            </Tooltip>
-          </ActionIcon>
-        </ActionIcon.Group>
-      </Center>
-    </>
-  )
-}
-
-interface ActionConfirmationProps {
-  onConfirm: () => void
-  confirmHandler: UseDisclosureHandlers
-  label: string
-  color?: MantineColor
-}
-
-const ActionConfirmation = ({
-  onConfirm,
-  confirmHandler,
-  label,
-  color,
-}: ActionConfirmationProps) => {
-  const delayedHideConfirm = useDebouncedCallback(() => {
-    confirmHandler.close()
-  }, 100)
-  const ref = useClickOutside(() => delayedHideConfirm())
-
-  return (
-    <div ref={ref}>
-      <Center>
-        <Button
-          variant="filled"
-          color={color}
-          size="compact-sm"
-          onClick={onConfirm}
-        >
-          {label}
-        </Button>
-      </Center>
-    </div>
   )
 }
 

@@ -1,8 +1,16 @@
-import { Container, Pagination, Table, Text, Title } from '@mantine/core'
+import {
+  Center,
+  Container,
+  Pagination,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core'
 import api, { GetCaseDatesApiArg, Issue, IssueDate } from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { RichTextDisplay } from 'comps/rich-text'
 import {
+  DateActionIconGroup,
   DateTable,
   DateTableDateCell,
   DateTableIsReviewedCell,
@@ -99,7 +107,11 @@ const DateTableDataRow = ({ date }: { date: IssueDate }) => {
         <RichTextDisplay content={date.notes} />
       </Table.Td>
       <DateTableIsReviewedCell date={date} />
-      <Table.Td></Table.Td>
+      <Table.Td>
+        <Center>
+          <DateActionIconGroup date={date} />
+        </Center>
+      </Table.Td>
     </Table.Tr>
   )
 }
