@@ -3,7 +3,17 @@ import os
 from io import BytesIO
 
 from accounts.models import CaseGroups, User
-from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
+from auditlog.context import disable_auditlog
+from core.models import (
+    Client,
+    FileUpload,
+    Issue,
+    IssueDate,
+    IssueNote,
+    Person,
+    Service,
+    Tenancy,
+)
 from core.models.issue_note import NoteType
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -32,6 +42,7 @@ class Command(BaseCommand):
         emails = Email.objects.all()
         issues = Issue.objects.all()
         notes = IssueNote.objects.exclude(note_type=NoteType.EVENT)
+        dates = IssueDate.objects.all()
         people = Person.objects.all()
         services = Service.objects.all()
         tenancies = Tenancy.objects.all()
@@ -72,6 +83,7 @@ class Command(BaseCommand):
                 c.preferred_name = fake.first_name()
             c.email = fake.email()
             c.phone_number = fake.phone_number()
+            c.contact_notes = " ".join(fake.sentences())
             c.save()
 
         for i in issues.iterator():
@@ -96,6 +108,11 @@ class Command(BaseCommand):
         for n in notes.iterator():
             n.text = " ".join(fake.sentences())
             n.save()
+
+        with disable_auditlog():
+            for d in dates.iterator():
+                d.notes = " ".join(fake.sentences())
+                d.save()
 
         for e in emails.iterator():
             e.received_data = None
