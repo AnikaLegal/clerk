@@ -16,12 +16,7 @@ from case.views.auth import (
 @api_view(["GET"])
 @coordinator_or_better_required
 def date_list_page_view(request):
-    context = {
-        "choices": {
-            "type": DateType.choices,
-        }
-    }
-    return render_react_page(request, "Critical Dates", "date-list", context)
+    return render_react_page(request, "Critical Dates", "date-list", {})
 
 
 class DatePaginator(ClerkPaginator):
@@ -33,6 +28,7 @@ class DateApiViewSet(viewsets.ModelViewSet):
     API endpoint for case dates.
     """
 
+    queryset = IssueDate.objects.all()
     serializer_class = IssueDateSerializer
     pagination_class = DatePaginator
     permission_classes = [
@@ -40,9 +36,7 @@ class DateApiViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = IssueDate.objects.all()
-        queryset = queryset.select_related(
+        queryset = self.queryset.select_related(
             "issue",
             "issue__client",
             "issue__tenancy__landlord",
@@ -55,17 +49,21 @@ class DateApiViewSet(viewsets.ModelViewSet):
             "issue__paralegal__groups", "issue__lawyer__groups"
         )
 
+        if self.action == "list":
+            queryset = self.list_queryset(queryset)
+            queryset = self.search_queryset(queryset)
+            queryset = queryset.order_by("date", "type", "created_at")
+
+        return queryset
+
+    def list_queryset(self, queryset: QuerySet[IssueDate]) -> QuerySet[IssueDate]:
+        user = self.request.user
         if user.is_paralegal:
             # Paralegals can only see the dates for cases to which they are assigned.
             queryset = queryset.filter(issue__paralegal=user)
         elif not user.is_coordinator_or_better:
             # If you're not a paralegal or coordinator you can't see anything.
             queryset = queryset.none()
-
-        if self.action == "list":
-            queryset = queryset.order_by("date", "type", "created_at")
-            queryset = self.search_queryset(queryset)
-
         return queryset
 
     def search_queryset(self, queryset: QuerySet[IssueDate]) -> QuerySet[IssueDate]:
