@@ -84,6 +84,7 @@ export const DateForm = ({
         placeholder="Select a date"
         valueFormat="DD/MM/YYYY"
         dateParser={(value) => dayjs(value, 'DD/MM/YYYY').toDate()}
+        minDate={dayjs().format('YYYY-MM-DD')}
       />
       <RichTextEditorInput
         {...form.getInputProps('notes')}

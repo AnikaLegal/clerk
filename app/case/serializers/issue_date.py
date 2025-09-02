@@ -2,6 +2,7 @@ from rest_framework import serializers
 from core.models import IssueDate
 from core.models.issue_date import DateType
 from case.serializers.issue import IssueSerializer
+from datetime import date
 
 
 class IssueDateSerializer(serializers.ModelSerializer):
@@ -24,6 +25,11 @@ class IssueDateSerializer(serializers.ModelSerializer):
     issue = IssueSerializer(read_only=True)
     issue_id = serializers.UUIDField(write_only=True, required=True)
     type = serializers.ChoiceField(choices=DateType.choices, required=True)
+
+    def validate_date(self, value):
+        if value < date.today():
+            raise serializers.ValidationError("Date cannot be prior to today.")
+        return value
 
 
 class IssueDateSearchSerializer(serializers.ModelSerializer):
