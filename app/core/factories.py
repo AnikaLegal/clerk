@@ -1,5 +1,4 @@
 import io
-import os
 from datetime import timezone
 from unittest.mock import patch
 from uuid import uuid4
@@ -15,9 +14,11 @@ from core.models import (
     Person,
     Service,
     Tenancy,
+    IssueDate,
 )
 from core.models.issue import CaseStage, CaseTopic
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
+from core.models.issue_date import DateType
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from emails.models import Email, EmailAttachment, EmailTemplate
@@ -130,6 +131,18 @@ class IssueNoteFactory(TimestampedModelFactory):
     creator = factory.SubFactory(UserFactory)
     note_type = "PARALEGAL"
     text = factory.Faker("sentence")
+
+
+@factory.django.mute_signals(post_save)
+class IssueDateFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueDate
+
+    issue = factory.SubFactory(IssueFactory)
+    type = factory.Faker("random_element", elements=DateType)
+    date = factory.Faker("date_between", start_date="now", end_date="+3M")
+    notes = factory.Faker("sentence")
+    is_reviewed = factory.Faker("boolean")
 
 
 @factory.django.mute_signals(post_save)
