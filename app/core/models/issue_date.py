@@ -35,6 +35,7 @@ class IssueDate(TimestampedModel):
 
     @staticmethod
     def audit_event_ignore_fields() -> set:
+        # Ignore the issue field in audit events.
         return {IssueDate.issue.field.name}
 
 
