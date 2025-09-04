@@ -24,6 +24,7 @@ class EmailAdmin(admin.ModelAdmin):
         "created_at",
         "is_alert_sent",
     )
+    readonly_fields = ("thread_name",)
     inlines = [AttachmentInline]
     actions = ["ingest"]
 

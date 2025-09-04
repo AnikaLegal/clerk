@@ -1,11 +1,13 @@
-from django.db import models
-from django.utils import timezone
-from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.postgres.fields import ArrayField
+import re
 
 from accounts.models import User
-from core.models import Issue, TimestampedModel, CaseTopic
-from utils.uploads import get_s3_key, FILE_FIELD_MAX_LENGTH_S3
+from core.models import CaseTopic, Issue, TimestampedModel
+from django.contrib.postgres.fields import ArrayField
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+from utils.uploads import FILE_FIELD_MAX_LENGTH_S3, get_s3_key
 
 
 class EmailState:
@@ -36,6 +38,7 @@ class Email(models.Model):
     to_address = models.EmailField(default="", blank=True)
     cc_addresses = ArrayField(models.EmailField(), default=list, blank=True)
     subject = models.CharField(max_length=1024, default="")
+    thread_name = models.SlugField(max_length=1024, default="", blank=True)
     state = models.CharField(max_length=32, choices=STATE_CHOICES)
     text = models.TextField(default="", blank=True)
     html = models.TextField(default="", blank=True)
@@ -55,6 +58,12 @@ class Email(models.Model):
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.thread_name = slugify(
+            re.sub(r"re\s*:\s*", "", self.subject, flags=re.IGNORECASE)
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.pk}: {self.subject}"
