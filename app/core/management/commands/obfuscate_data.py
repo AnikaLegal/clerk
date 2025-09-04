@@ -79,17 +79,18 @@ class Command(BaseCommand):
                 i.outcome_notes = " ".join(fake.sentences())
 
             # Redact the answers to issue-specific intake form questions.
-            redacted_text = "[REDACTED]"
-            redacted_answers = {}
-            for key, value in i.answers.items():
-                if value is not None:
-                    value = (
-                        [redacted_text] * len(value)
-                        if isinstance(value, list)
-                        else redacted_text
-                    )
-                redacted_answers[key] = value
-            i.answers = redacted_answers
+            if i.answers:
+                redacted_text = "[REDACTED]"
+                redacted_answers = {}
+                for key, value in i.answers.items():
+                    if value is not None:
+                        value = (
+                            [redacted_text] * len(value)
+                            if isinstance(value, list)
+                            else redacted_text
+                        )
+                    redacted_answers[key] = value
+                i.answers = redacted_answers
 
             i.save()
 
