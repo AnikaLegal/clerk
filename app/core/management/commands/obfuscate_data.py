@@ -98,21 +98,38 @@ class Command(BaseCommand):
             n.text = " ".join(fake.sentences())
             n.save()
 
-        for e in emails.iterator():
-            e.received_data = None
-            e.subject = fake.sentence()
-            e.text = "\n\n".join(fake.paragraphs())
-            e.html = ""
+        # Emails are grouped by subject (normalised in the thread_name field).
+        # We want to keep the same grouping when we obfuscate them so we attempt
+        # to use the same obfuscated subject for all emails in the same group.
+        for thread in (
+            emails.order_by("issue", "thread_name")
+            .distinct("issue", "thread_name")
+            .iterator()
+        ):
+            thread_subject = fake.sentence()
+            thread_addresses = dict()
 
-            # This could be smarter and attempt to match the sender related user
-            # or the client with the to/from address and use the same obfuscated
-            # email but it's unclear if that is actually useful.
-            if e.from_address:
-                e.from_address = fake.email()
-            if e.to_address:
-                e.to_address = fake.email()
-            e.cc_addresses = [fake.email() for _ in e.cc_addresses]
-            e.save()
+            for e in emails.filter(
+                issue=thread.issue, thread_name=thread.thread_name
+            ).iterator():
+                e.subject = thread_subject
+                e.received_data = None
+                e.text = "\n\n".join(fake.paragraphs())
+                e.html = ""
+
+                if e.from_address:
+                    e.from_address = get_email_thread_address(
+                        fake, thread_addresses, e.from_address
+                    )
+                if e.to_address:
+                    e.to_address = get_email_thread_address(
+                        fake, thread_addresses, e.to_address
+                    )
+                e.cc_addresses = [
+                    get_email_thread_address(fake, thread_addresses, addr)
+                    for addr in e.cc_addresses
+                ]
+                e.save()
 
         for s in services.iterator():
             if s.notes:
@@ -138,3 +155,9 @@ class Command(BaseCommand):
         FileUpload.objects.update(file=file_upload)
 
         restore_signals()
+
+
+def get_email_thread_address(fake, thread_addresses: dict, email: str) -> str:
+    if email not in thread_addresses:
+        thread_addresses[email] = fake.email()
+    return thread_addresses[email]
