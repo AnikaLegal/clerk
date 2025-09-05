@@ -1,8 +1,10 @@
-from rest_framework import serializers
+from datetime import date
+
 from core.models import IssueDate
 from core.models.issue_date import DateType
+from rest_framework import exceptions, serializers
+
 from case.serializers.issue import IssueSerializer
-from datetime import date
 
 
 class IssueDateSerializer(serializers.ModelSerializer):
@@ -30,6 +32,20 @@ class IssueDateSerializer(serializers.ModelSerializer):
         if value < date.today():
             raise serializers.ValidationError("Date cannot be prior to today.")
         return value
+
+    def update(self, instance, validated_data):
+        if "is_reviewed" in validated_data:
+            request = self.context.get("request", None)
+            if not request or not request.user.is_admin_or_better:
+                raise exceptions.PermissionDenied()
+        return super().update(instance, validated_data)
+
+    def create(self, validated_data):
+        if "is_reviewed" in validated_data:
+            request = self.context.get("request", None)
+            if not request or not request.user.is_admin_or_better:
+                raise exceptions.PermissionDenied()
+        return super().create(validated_data)
 
 
 class IssueDateSearchSerializer(serializers.ModelSerializer):

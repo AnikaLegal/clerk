@@ -245,6 +245,51 @@ def test_issue_date_api_create_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 403),
+        ("unassigned_coordinator", "coordinator_user", False, 403),
+        ("assigned_coordinator", "coordinator_user", True, 403),
+        ("unassigned_admin", "admin_user", False, 201),
+        ("assigned_admin", "admin_user", True, 201),
+    ],
+)
+def test_issue_date_api_create_with_is_reviewed_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    The is_reviewed field is only editable by admins. Test the create API perms
+    including this field for different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+
+    issue_date_stub = IssueDateFactory.stub()
+    data = {
+        "issue_id": issue.pk,
+        "type": issue_date_stub.type,
+        "date": issue_date_stub.date.isoformat(),
+        "is_reviewed": issue_date_stub.is_reviewed,
+    }
+    url = reverse("date-api-list")
+    response = user_client.post(url, data=data, format="json")
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
     "test_user, user_name, is_assigned, expected_status, expected_count",
     [
         ("unassigned_user", "unprivileged_user", False, 403, None),
@@ -354,6 +399,47 @@ def test_issue_date_api_update_perms(
 
     data = {
         "type": DateType.HEARING_LISTED,
+    }
+    url = reverse("date-api-detail", args=(issue_date.pk,))
+    response = user_client.patch(url, data=data, format="json")
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "test_user, user_name, is_assigned, expected_status",
+    [
+        ("unassigned_user", "unprivileged_user", False, 403),
+        ("assigned_user", "unprivileged_user", True, 403),
+        ("unassigned_paralegal", "paralegal_user", False, 403),
+        ("assigned_paralegal", "paralegal_user", True, 403),
+        ("unassigned_coordinator", "coordinator_user", False, 403),
+        ("assigned_coordinator", "coordinator_user", True, 403),
+        ("unassigned_admin", "admin_user", False, 200),
+        ("assigned_admin", "admin_user", True, 200),
+    ],
+)
+def test_issue_date_api_update_with_is_reviewed_perms(
+    test_user: str,
+    user_name: str,
+    is_assigned: bool,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test update API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+    issue = IssueFactory()
+    if is_assigned:
+        issue.paralegal = user
+        issue.save()
+    issue_date = IssueDateFactory(issue=issue)
+
+    data = {
+        "is_reviewed": not issue_date.is_reviewed,
     }
     url = reverse("date-api-detail", args=(issue_date.pk,))
     response = user_client.patch(url, data=data, format="json")
