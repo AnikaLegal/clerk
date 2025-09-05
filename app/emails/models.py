@@ -100,7 +100,7 @@ class SharepointState(models.TextChoices):
 class EmailAttachment(models.Model):
     UPLOAD_KEY = "email-attachments"
 
-    email = models.ForeignKey(Email, on_delete=models.PROTECT, null=True, blank=True)
+    email = models.ForeignKey(Email, on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(upload_to=get_s3_key, max_length=FILE_FIELD_MAX_LENGTH_S3)
     content_type = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=timezone.now)

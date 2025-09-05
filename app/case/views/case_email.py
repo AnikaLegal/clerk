@@ -217,10 +217,7 @@ class EmailApiViewset(GenericViewSet):
         if not email.state == EmailState.DRAFT:
             raise Http404()
 
-        with transaction.atomic():
-            email.emailattachment_set.all().delete()
-            email.delete()
-
+        email.delete()
         return Response(status=204)
 
     @action(
