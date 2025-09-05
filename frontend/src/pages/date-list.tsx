@@ -24,9 +24,15 @@ import {
   DateTableTypeCell,
 } from 'features/date'
 import React, { useState } from 'react'
+import { UserPermission } from 'types'
 import { mount } from 'utils'
 
 import '@mantine/core/styles.css'
+
+interface DjangoContext {
+  user: UserPermission
+}
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [args, setArgs] = useState<GetCaseDatesApiArg>({
@@ -190,7 +196,7 @@ const DateTableDataRow = ({ date }: { date: IssueDate }) => {
       <DateTableIsReviewedCell date={date} />
       <Table.Td>
         <Center>
-          <DateActionIconGroup date={date} />
+          <DateActionIconGroup date={date} user={CONTEXT.user} />
         </Center>
       </Table.Td>
     </Table.Tr>

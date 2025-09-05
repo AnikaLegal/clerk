@@ -109,7 +109,7 @@ const DateTableDataRow = ({ date }: { date: IssueDate }) => {
       <DateTableIsReviewedCell date={date} />
       <Table.Td>
         <Center>
-          <DateActionIconGroup date={date} />
+          <DateActionIconGroup date={date} user={CONTEXT.user} />
         </Center>
       </Table.Td>
     </Table.Tr>

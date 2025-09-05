@@ -21,6 +21,7 @@ import {
 } from 'features/date'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
+import { UserPermission } from 'types'
 import { getAPIErrorMessage } from 'utils'
 
 import '@mantine/core/styles.css'
@@ -29,9 +30,10 @@ dayjs.extend(customParseFormat)
 
 interface DateActionIconGroupProps {
   date: IssueDate
+  user: UserPermission
 }
 
-const DateActionIconGroup = ({ date }: DateActionIconGroupProps) => {
+const DateActionIconGroup = ({ date, user }: DateActionIconGroupProps) => {
   const [deleteCaseDate] = useDeleteCaseDateMutation()
   const [updateCaseDate] = useUpdateCaseDateMutation()
   const [isUpdateModalOpen, updateModalHandler] = useDisclosure(false)
@@ -119,16 +121,18 @@ const DateActionIconGroup = ({ date }: DateActionIconGroupProps) => {
         controls={ModalDateFormControls}
       />
       <ActionIconWithConfirmation.Group>
-        <ActionIconWithConfirmation
-          tooltip={{ label: 'Toggle reviewed' }}
-          icon={<IconCheck stroke={1.5} />}
-          onClick={handleReviewed}
-          confirmButton={{
-            label: date.is_reviewed
-              ? 'Confirm not reviewed'
-              : 'Confirm reviewed',
-          }}
-        />
+        {user.is_admin_or_better && (
+          <ActionIconWithConfirmation
+            tooltip={{ label: 'Toggle reviewed' }}
+            icon={<IconCheck stroke={1.5} />}
+            onClick={handleReviewed}
+            confirmButton={{
+              label: date.is_reviewed
+                ? 'Confirm not reviewed'
+                : 'Confirm reviewed',
+            }}
+          />
+        )}
         <UpdateActionIcon onClick={() => updateModalHandler.open()} />
         <DeleteActionIconWithConfirmation
           onClick={handleDelete}
