@@ -36,7 +36,8 @@ class DateApiViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
-        queryset = self.queryset.select_related(
+        queryset = super().get_queryset()
+        queryset = queryset.select_related(
             "issue",
             "issue__client",
             "issue__tenancy__landlord",
