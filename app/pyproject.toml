@@ -54,6 +54,7 @@ dev-dependencies = [
     "django-debug-toolbar",
     "django-extensions",
     "django-querycount",
+    "invoke>=2.2.0",
     "ipython",
     "setuptools",
     "watchdog[watchmedo]",
