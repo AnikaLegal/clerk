@@ -1,8 +1,10 @@
 from .base import BaseEndpoint
 from .helpers import generate_password
 
-# https://www.microsoft.com/en-au/microsoft-365/enterprise/office-365-e1
-OFFICE_E1_LICENSE_SKU_ID = "18181a46-0d4e-45cd-891e-60aabd171b4e"
+# See https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
+MS_OFFICE_LICENSE_SKU_ID = (
+    "3b555118-da6a-4418-894f-7df1e2096870"  # Microsoft 365 Business Basic plan
+)
 
 
 class UserEndpoint(BaseEndpoint):
@@ -48,7 +50,7 @@ class UserEndpoint(BaseEndpoint):
         """
         data = {
             # Do not remove fields or POST request might fail.
-            "addLicenses": [{"skuId": OFFICE_E1_LICENSE_SKU_ID}],
+            "addLicenses": [{"skuId": MS_OFFICE_LICENSE_SKU_ID}],
             "removeLicenses": [],
         }
         return super().post(f"users/{userPrincipalName}/assignLicense", data)
@@ -60,7 +62,7 @@ class UserEndpoint(BaseEndpoint):
         data = {
             # Do not remove fields or POST request might fail.
             "addLicenses": [],
-            "removeLicenses": [OFFICE_E1_LICENSE_SKU_ID],
+            "removeLicenses": [MS_OFFICE_LICENSE_SKU_ID],
         }
         return super().post(f"users/{userPrincipalName}/assignLicense", data)
 
