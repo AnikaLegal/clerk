@@ -17,16 +17,18 @@ def build(c, base=False, frontend=False, no_cache=False):
 
     file = "Dockerfile"
     tag = f"{APP_NAME}:local"
+    args = ""
+
     if base:
         file = "Dockerfile.base"
         tag = "anikalaw/clerkbase:latest"
+        args += " --platform=linux/amd64,linux/arm64"
     elif frontend:
         file = "Dockerfile.frontend"
         tag = f"{APP_NAME}-frontend:local"
 
-    args = ""
     if no_cache:
-        args += "--no-cache"
+        args += " --no-cache"
 
     c.run(f"docker build {args} --file docker/{file} --tag {tag} .")
 
@@ -34,7 +36,6 @@ def build(c, base=False, frontend=False, no_cache=False):
 @task
 def dev(c):
     """Run Django dev server within a Docker container"""
-
     c.run(f"{COMPOSE} up web", pty=True)
 
 
@@ -156,7 +157,7 @@ def test(
     if interactive:
         cmd = "bash"
     else:
-        cmd = "pytest"
+        cmd = "python -Xfrozen_modules=off -m pytest"
         if recreate:
             cmd += " --create-db"
         else:
@@ -169,7 +170,7 @@ def test(
 
     debug_args = ""
     if debug:
-        debug_args = "-p 8123:8123 -e DEBUG_PYTEST=true"
+        debug_args = "-p 8123:8123 -e DEBUGPY=true"
 
     c.run(
         f"{COMPOSE} run --rm {debug_args} test {cmd}",

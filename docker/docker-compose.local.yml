@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   # Local development database.
   clerk_db:
