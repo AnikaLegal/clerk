@@ -1,15 +1,22 @@
-import logging
 import json
+import logging
+from os.path import basename
 
-from django.conf import settings
-from django.utils.datastructures import MultiValueDict
-from django.db import transaction
-from django.utils import timezone
-
-from utils.sentry import sentry_task
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
-from emails.models import Email, EmailAttachment, EmailState
+from django.conf import settings
+from django.core.files import File
+from django.db import transaction
+from django.utils import timezone
+from django.utils.datastructures import MultiValueDict
+from emails.models import (
+    Email,
+    EmailAttachment,
+    EmailState,
+    ReceivedAttachment,
+    ReceivedEmail,
+)
+from utils.sentry import sentry_task
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +29,43 @@ EMAIL_RECEIVE_RULES = (
 )
 
 
+def save_inbound_email(data: MultiValueDict, files: MultiValueDict):
+    """
+    Save inbound email data for processing later.
+    """
+    with transaction.atomic():
+        email = ReceivedEmail.objects.create(received_data=data)
+        for file in files.values():
+            ReceivedAttachment.objects.create(
+                email=email, file=file, name=file.name, content_type=file.content_type
+            )
+
+
 @sentry_task
 def receive_email_task(email_pk: int):
+    """
+    Process received email data.
+    """
+    received_email = ReceivedEmail.objects.get(pk=email_pk)
+    with transaction.atomic():
+        email = Email.objects.create(
+            received_data=received_email.received_data, state=EmailState.RECEIVED
+        )
+        for received_attachment in received_email.attachments.all():
+            file = File(
+                received_attachment.file.file,
+                name=received_attachment.name,
+            )
+            EmailAttachment.objects.create(
+                email=email,
+                file=file,
+                content_type=received_attachment.content_type,
+            )
+    received_email.delete()
+
+
+@sentry_task
+def ingest_email_task(email_pk: int):
     """
     Ingests a received email and attempts to associate it with a case.
     """
@@ -62,23 +104,6 @@ def receive_email_task(email_pk: int):
         logger.error(f"Cannot ingest Email[{email_pk}]: Parsing failure")
         email.state = EmailState.INGEST_FAILURE
         email.save()
-
-
-def save_inbound_email(data: MultiValueDict, files: MultiValueDict):
-    """
-    Parse an inbound email from SendGrid and save as an Email.
-    """
-    email_data = {
-        "received_data": data,
-        "state": EmailState.RECEIVED,
-    }
-    with transaction.atomic():
-        email = Email.objects.create(**email_data)
-        # FIXME: Mangles non-ASCII UTF-8 text.
-        for file in files.values():
-            EmailAttachment.objects.create(
-                email=email, file=file, content_type=file.content_type
-            )
 
 
 def parse_received_data(email_data: dict) -> dict | None:

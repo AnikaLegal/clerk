@@ -3,7 +3,7 @@ from django_q.tasks import async_task
 from django.contrib.messages import constants as messages
 
 from .models import Email, EmailAttachment, EmailTemplate
-from .service.receive import receive_email_task
+from .service.receive import ingest_email_task
 
 
 class AttachmentInline(admin.TabularInline):
@@ -30,7 +30,7 @@ class EmailAdmin(admin.ModelAdmin):
 
     def ingest(self, request, queryset):
         for email in queryset:
-            async_task(receive_email_task, str(email.pk))
+            async_task(ingest_email_task, str(email.pk))
 
         self.message_user(
             request, "Email ingestion task dispatched.", level=messages.INFO

@@ -1,12 +1,15 @@
+import os
 import re
 
 from accounts.models import User
 from core.models import CaseTopic, Issue, TimestampedModel
 from django.contrib.postgres.fields import ArrayField
+from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
+from django_cleanup import cleanup
 from utils.uploads import FILE_FIELD_MAX_LENGTH_S3, get_s3_key
 
 
@@ -31,6 +34,32 @@ STATE_CHOICES = (
     (EmailState.INGESTED, "Ingested"),
     (EmailState.INGEST_FAILURE, "Ingest failed"),
 )
+
+
+class ReceivedEmail(models.Model):
+    received_data = models.JSONField(encoder=DjangoJSONEncoder)
+
+
+@cleanup.select
+class ReceivedAttachment(models.Model):
+    def _get_storage_class():
+        return FileSystemStorage()
+
+    def _get_upload_to(self, filename):
+        return os.path.join("received_email_attachments", str(self.email_id), filename)  # type: ignore
+
+    email = models.ForeignKey(
+        ReceivedEmail,
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+    name = models.CharField()
+    file = models.FileField(
+        storage=_get_storage_class,
+        upload_to=_get_upload_to,
+        max_length=FILE_FIELD_MAX_LENGTH_S3,
+    )
+    content_type = models.CharField(max_length=128)
 
 
 class Email(models.Model):
