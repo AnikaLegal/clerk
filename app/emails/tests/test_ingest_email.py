@@ -2,7 +2,7 @@ from re import I
 import pytest
 from unittest import mock
 
-from emails.service import receive_email_task
+from emails.service import ingest_email_task
 
 from emails.models import EmailState
 from core.factories import EmailFactory, IssueFactory
@@ -77,7 +77,7 @@ def test_ingest_email__with_success(settings, test_data):
     email = EmailFactory(
         state=EmailState.RECEIVED, received_data=received_data, issue=None
     )
-    receive_email_task(email.pk)
+    ingest_email_task(email.pk)
     email.refresh_from_db()
     assert email.state == EmailState.INGESTED
     assert str(email.issue_id) == issue_pk

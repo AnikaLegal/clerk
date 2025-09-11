@@ -1,88 +1,66 @@
-"""
-Test email receive view.
-TODO: Rewrite tests to test the view as well as the service functions.
-"""
-from io import BytesIO
+import os
 
 import pytest
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.utils.datastructures import MultiValueDict
-
-from emails.models import Email, EmailAttachment, EmailState
-from emails.service import save_inbound_email
-from utils.signals import DisableSignals
-
-
-@pytest.mark.django_db
-def test_receive_email__with_no_files():
-    data = {
-        "subject": ["Hello World!"],
-        "envelope": ['{"to":["foo@fake.anikalegal.com"],"from":"matt@anikalegal.com"}'],
-        "to": [
-            "foo@fake.anikalegal.com, bar@fake.anikalegal.com,  joe blow <joe@gmail.com>"
-        ],
-        "text": [
-            "Hi Matt\r\n\r\nOn Sun, Jul 18, 2021 at 12:51 PM Matt Segal <matt@anikalegal.com> wrote:\r\n\r\n> hmmm\r\n>\r\n> --\r\n>\r\n> Matthew Segal\r\n>\r\n> Head of Technology\r\n>\r\n> mobile: 0431 417 373\r\n>\r\n> email: matt@anikalegal.com\r\n>\r\n> site: www.anikalegal.com\r\n>\r\n> Level 2/520 Bourke Street\r\n>\r\n> Melbourne VIC 3000\r\n>\n"
-        ],
-        "html": ["<div><h1>Hello World</h1></div>"],
-    }
-    files = {}
-    assert Email.objects.count() == 0
-    with DisableSignals():
-        save_inbound_email(MultiValueDict(data), MultiValueDict(files))
-    assert Email.objects.count() == 1
-    email = Email.objects.last()
-    assert email.state == EmailState.RECEIVED
-    assert email.received_data == {
-        "subject": "Hello World!",
-        "envelope": '{"to":["foo@fake.anikalegal.com"],"from":"matt@anikalegal.com"}',
-        "to": "foo@fake.anikalegal.com, bar@fake.anikalegal.com,  joe blow <joe@gmail.com>",
-        "text": "Hi Matt\r\n\r\nOn Sun, Jul 18, 2021 at 12:51 PM Matt Segal <matt@anikalegal.com> wrote:\r\n\r\n> hmmm\r\n>\r\n> --\r\n>\r\n> Matthew Segal\r\n>\r\n> Head of Technology\r\n>\r\n> mobile: 0431 417 373\r\n>\r\n> email: matt@anikalegal.com\r\n>\r\n> site: www.anikalegal.com\r\n>\r\n> Level 2/520 Bourke Street\r\n>\r\n> Melbourne VIC 3000\r\n>\n",
-        "html": "<div><h1>Hello World</h1></div>",
-    }
+from emails.factories import ReceivedEmailFactory
+from emails.models import (
+    Email,
+    EmailAttachment,
+    EmailState,
+    ReceivedAttachment,
+    ReceivedEmail,
+)
+from emails.service.receive import receive_email_task
 
 
 @pytest.mark.django_db
-def test_receive_email__with_files(settings, tmpdir):
+def test_receive_email_task_creates_email_and_attachments(settings, tmpdir):
     settings.MEDIA_ROOT = str(tmpdir)
-    data = {
-        "subject": ["Hello World!"],
-        "envelope": ['{"to":["foo@fake.anikalegal.com"],"from":"matt@anikalegal.com"}'],
-        "to": ["foo@fake.anikalegal.com"],
-        "text": ["Hi Matt\n"],
-    }
-    text_bytes = BytesIO("This is the file contents".encode("utf-8"))
-    files = {
-        "attachment1": [
-            InMemoryUploadedFile(
-                text_bytes,
-                field_name="blank",
-                size=25,
-                name="foo.txt",
-                charset="UTF-8",
-                content_type="text/plain",
-            )
-        ]
-    }
-    assert EmailAttachment.objects.count() == 0
+    received_email = ReceivedEmailFactory()
+    received_attachments = list(received_email.attachments.all())
+
+    assert ReceivedEmail.objects.count() == 1
+    assert ReceivedAttachment.objects.count() == len(received_attachments)
     assert Email.objects.count() == 0
-    with DisableSignals():
-        save_inbound_email(MultiValueDict(data), MultiValueDict(files))
+    assert EmailAttachment.objects.count() == 0
+
+    receive_email_task(received_email.pk)
+
     assert Email.objects.count() == 1
     email = Email.objects.last()
     assert email.state == EmailState.RECEIVED
-    assert email.received_data == {
-        "subject": "Hello World!",
-        "envelope": '{"to":["foo@fake.anikalegal.com"],"from":"matt@anikalegal.com"}',
-        "to": "foo@fake.anikalegal.com",
-        "text": "Hi Matt\n",
-    }
-    assert EmailAttachment.objects.count() == 1
-    attach = EmailAttachment.objects.last()
-    assert attach.email_id == email.pk
-    assert (
-        attach.file.name
-        == f"email-attachments/d11e110ae03fcfe315ca3e20c9a82db7/foo.txt"
-    )
-    assert attach.content_type == "text/plain"
-    assert attach.file.read() == b"This is the file contents"
+    assert email.received_data == received_email.received_data
+
+    assert EmailAttachment.objects.count() == len(received_attachments)
+
+    for received_attachment in received_attachments:
+        email_attachment = EmailAttachment.objects.get(
+            file__endswith=received_attachment.name
+        )
+        assert email_attachment.email == email
+        assert email_attachment.content_type == received_attachment.content_type
+        assert email_attachment.file.read() == received_attachment.file.read()
+
+    assert ReceivedEmail.objects.count() == 0
+    assert ReceivedAttachment.objects.count() == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.enable_signals
+def test_deleting_received_email_cleans_local_files(
+    settings, tmpdir, django_capture_on_commit_callbacks
+):
+    settings.MEDIA_ROOT = str(tmpdir)
+    received_email = ReceivedEmailFactory()
+    received_attachments = list(received_email.attachments.all())
+
+    assert ReceivedEmail.objects.count() == 1
+    assert ReceivedAttachment.objects.count() == len(received_attachments)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        received_email.delete()
+
+    assert ReceivedEmail.objects.count() == 0
+    assert ReceivedAttachment.objects.count() == 0
+
+    for received_attachment in received_attachments:
+        assert not os.path.exists(received_attachment.file.path)

@@ -1,11 +1,16 @@
-from django.db import models
-from django.utils import timezone
-from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.postgres.fields import ArrayField
+import os
+import re
 
 from accounts.models import User
-from core.models import Issue, TimestampedModel, CaseTopic
-from utils.uploads import get_s3_key, FILE_FIELD_MAX_LENGTH_S3
+from core.models import CaseTopic, Issue, TimestampedModel
+from django.contrib.postgres.fields import ArrayField
+from django.core.files.storage import FileSystemStorage
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+from django_cleanup import cleanup
+from utils.uploads import FILE_FIELD_MAX_LENGTH_S3, get_s3_key
 
 
 class EmailState:
@@ -31,11 +36,49 @@ STATE_CHOICES = (
 )
 
 
+class ReceivedEmail(models.Model):
+    """
+    An inbound email received from our Email Service Provider (ESP), saved for
+    processing later.
+
+    We do this because some ESPs impose strict time limits on webhooks and will
+    consider them failed if they don't respond within a certain timeframe. Due
+    to the set up of the Email model, attachments are uploaded to S3 which can
+    take too long for the ESP. This model acts as an intermediate store for the
+    raw email data and attachments, which we then process asynchronously.
+    """
+
+    received_data = models.JSONField(encoder=DjangoJSONEncoder)
+
+
+@cleanup.select
+class ReceivedAttachment(models.Model):
+    def _get_storage_class():
+        return FileSystemStorage()
+
+    def _get_upload_to(self, filename):
+        return os.path.join("received_email_attachments", str(self.email_id), filename)  # type: ignore
+
+    email = models.ForeignKey(
+        ReceivedEmail,
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+    name = models.CharField()
+    file = models.FileField(
+        storage=_get_storage_class,
+        upload_to=_get_upload_to,
+        max_length=FILE_FIELD_MAX_LENGTH_S3,
+    )
+    content_type = models.CharField(max_length=128)
+
+
 class Email(models.Model):
     from_address = models.EmailField(default="")
     to_address = models.EmailField(default="", blank=True)
     cc_addresses = ArrayField(models.EmailField(), default=list, blank=True)
     subject = models.CharField(max_length=1024, default="")
+    thread_name = models.SlugField(max_length=1024, default="", blank=True)
     state = models.CharField(max_length=32, choices=STATE_CHOICES)
     text = models.TextField(default="", blank=True)
     html = models.TextField(default="", blank=True)
@@ -55,6 +98,12 @@ class Email(models.Model):
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.thread_name = slugify(
+            re.sub(r"re\s*:\s*", "", self.subject, flags=re.IGNORECASE)
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.pk}: {self.subject}"
@@ -91,7 +140,7 @@ class SharepointState(models.TextChoices):
 class EmailAttachment(models.Model):
     UPLOAD_KEY = "email-attachments"
 
-    email = models.ForeignKey(Email, on_delete=models.PROTECT, null=True, blank=True)
+    email = models.ForeignKey(Email, on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(upload_to=get_s3_key, max_length=FILE_FIELD_MAX_LENGTH_S3)
     content_type = models.CharField(max_length=128)
     created_at = models.DateTimeField(default=timezone.now)

@@ -8,6 +8,7 @@ from emails.models import Email, EmailState
 from emails.service import save_inbound_email
 from rest_framework.decorators import api_view
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,8 +16,13 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["POST"])
 def receive_email_view(request):
     """
-    Receive an inbound email from SendGrid, parse and save to database.
-    SendGrid will retry email send if 2xx status code is not returned.
+    Receive an inbound email from SendGrid and save to database. SendGrid will
+    retry email send if 2xx status code is not returned.
+
+    Some ESPs impose strict time limits on webhooks, and will consider them
+    failed if they don't respond within a certain timeframe, so we save the
+    email and attachments synchronously and then process the received email
+    asynchronously.
 
     See docs/emails.md for more details.
     """
