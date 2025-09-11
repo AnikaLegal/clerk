@@ -1,6 +1,5 @@
 import json
 import logging
-from os.path import basename
 
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
