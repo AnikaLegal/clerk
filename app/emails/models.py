@@ -37,6 +37,17 @@ STATE_CHOICES = (
 
 
 class ReceivedEmail(models.Model):
+    """
+    An inbound email received from our Email Service Provider (ESP), saved for
+    processing later.
+
+    We do this because some ESPs impose strict time limits on webhooks and will
+    consider them failed if they don't respond within a certain timeframe. Due
+    to the set up of the Email model, attachments are uploaded to S3 which can
+    take too long for the ESP. This model acts as an intermediate store for the
+    raw email data and attachments, which we then process asynchronously.
+    """
+
     received_data = models.JSONField(encoder=DjangoJSONEncoder)
 
 
