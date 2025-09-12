@@ -7,7 +7,6 @@ services:
     volumes:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/test/web:/var/log
-      - media:/app/clerk/media
     env_file:
       - ../env/staging.env
 
@@ -17,8 +16,5 @@ services:
     volumes:
       - /var/run/postgresql:/app/postgres.sock
       - /var/log/clerk/test/worker:/var/log
-      - media:/app/clerk/media
     env_file:
       - ../env/staging.env
-volumes:
-  media:

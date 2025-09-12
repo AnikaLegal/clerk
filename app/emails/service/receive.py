@@ -4,7 +4,6 @@ import logging
 from core.models import Issue, IssueNote
 from core.models.issue_note import NoteType
 from django.conf import settings
-from django.core.files import File
 from django.db import transaction
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -12,8 +11,6 @@ from emails.models import (
     Email,
     EmailAttachment,
     EmailState,
-    ReceivedAttachment,
-    ReceivedEmail,
 )
 from utils.sentry import sentry_task
 
@@ -28,39 +25,17 @@ EMAIL_RECEIVE_RULES = (
 )
 
 
+@sentry_task
 def save_inbound_email(data: MultiValueDict, files: MultiValueDict):
     """
-    Save inbound email data for processing later.
+    Parse an inbound email from SendGrid and save as an Email.
     """
     with transaction.atomic():
-        email = ReceivedEmail.objects.create(received_data=data)
+        email = Email.objects.create(received_data=data, state=EmailState.RECEIVED)
         for file in files.values():
-            ReceivedAttachment.objects.create(
-                email=email, file=file, name=file.name, content_type=file.content_type
-            )
-
-
-@sentry_task
-def receive_email_task(email_pk: int):
-    """
-    Process received email data.
-    """
-    received_email = ReceivedEmail.objects.get(pk=email_pk)
-    with transaction.atomic():
-        email = Email.objects.create(
-            received_data=received_email.received_data, state=EmailState.RECEIVED
-        )
-        for received_attachment in received_email.attachments.all():
-            file = File(
-                received_attachment.file.file,
-                name=received_attachment.name,
-            )
             EmailAttachment.objects.create(
-                email=email,
-                file=file,
-                content_type=received_attachment.content_type,
+                email=email, file=file, content_type=file.content_type
             )
-    received_email.delete()
 
 
 @sentry_task
