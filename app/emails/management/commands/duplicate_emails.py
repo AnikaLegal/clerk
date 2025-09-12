@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 .order_by("created_at")
                 .iterator()
             ):
-                attachments = list(email.emailattachment_set.all().order_by("file"))
+                attachments = list(email.attachments.all().order_by("file"))
                 data = EmailData(email=email, attachments=attachments)
 
                 hash = self.get_hash_of_email_and_attachments(data)

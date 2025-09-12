@@ -75,9 +75,7 @@ class EmailSerializer(serializers.ModelSerializer):
         )
 
     sender = UserSerializer(read_only=True)
-    attachments = EmailAttachmentSerializer(
-        many=True, read_only=True, source="emailattachment_set"
-    )
+    attachments = EmailAttachmentSerializer(many=True, read_only=True)
     edit_url = serializers.SerializerMethodField()
     reply_url = serializers.SerializerMethodField()
     created_at = LocalTimeField()
