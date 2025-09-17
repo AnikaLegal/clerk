@@ -24,7 +24,7 @@ def send_email_task(email_pk: int):
     """
     email = (
         Email.objects.select_related("issue", "sender")
-        .prefetch_related("emailattachment_set")
+        .prefetch_related("attachments")
         .get(pk=email_pk)
     )
     for rule, msg in EMAIL_SEND_RULES:
@@ -36,7 +36,7 @@ def send_email_task(email_pk: int):
     attachments = []
     if email.issue:
         from_addr = build_clerk_address(email.issue, email_only=True)
-        for att in email.emailattachment_set.all():
+        for att in email.attachments.all():
             file_name = os.path.basename(att.file.name)
             file_bytes = att.file.read()
             attachments.append((file_name, file_bytes, att.content_type))

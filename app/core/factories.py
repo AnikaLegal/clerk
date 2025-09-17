@@ -176,7 +176,6 @@ class EmailFactory(factory.django.DjangoModelFactory):
     subject = factory.Faker("sentence")
     state = "RECEIVED"
     text = factory.Faker("sentence")
-    received_data = {}
     created_at = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2M", end_date="now"
     )
