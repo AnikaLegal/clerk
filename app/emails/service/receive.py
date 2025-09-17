@@ -65,6 +65,8 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
         logger.info(f"{str(e)} - finished saving? {is_saved}")
         return is_saved
 
+    logger.info(f"Saved inbound email data, hash: {email.received_data_hash}")
+
     with transaction.atomic():
         try:
             for file in files.values():
@@ -78,7 +80,8 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
             # SendGrid sends the email again.
             email.delete()
             raise
-    logger.info(f"Email data saved successfully, hash: {email.received_data_hash}")
+
+    logger.info(f"Finished saving inbound email, hash: {email.received_data_hash}")
     return True
 
 
