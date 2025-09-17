@@ -3,7 +3,7 @@ from django_q.tasks import async_task
 from django.contrib.messages import constants as messages
 
 from .models import Email, EmailAttachment, EmailTemplate
-from .service.receive import receive_email_task
+from .service.receive import ingest_email_task
 
 
 class AttachmentInline(admin.TabularInline):
@@ -13,7 +13,13 @@ class AttachmentInline(admin.TabularInline):
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
-    list_filter = ("state",)
+    list_filter = ("state", "is_alert_sent")
+    search_fields = [
+        "from_address",
+        "to_address",
+        "subject",
+        "received_data_hash__exact",
+    ]
 
     list_display = (
         "id",
@@ -24,12 +30,13 @@ class EmailAdmin(admin.ModelAdmin):
         "created_at",
         "is_alert_sent",
     )
+    readonly_fields = ("thread_name", "received_data", "received_data_hash")
     inlines = [AttachmentInline]
     actions = ["ingest"]
 
     def ingest(self, request, queryset):
         for email in queryset:
-            async_task(receive_email_task, str(email.pk))
+            async_task(ingest_email_task, str(email.pk))
 
         self.message_user(
             request, "Email ingestion task dispatched.", level=messages.INFO

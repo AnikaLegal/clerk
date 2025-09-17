@@ -136,7 +136,7 @@ class EmailApiViewset(GenericViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Issue.objects.prefetch_related("email_set__emailattachment_set")
+        queryset = Issue.objects.prefetch_related("email_set__attachments")
         if user.is_paralegal:
             # Paralegals can only see assigned cases
             queryset = queryset.filter(paralegal=user)
@@ -178,9 +178,7 @@ class EmailApiViewset(GenericViewSet):
     def get_email(self, email_pk: int) -> Email:
         issue = self.get_object()
         try:
-            email = issue.email_set.prefetch_related("emailattachment_set").get(
-                pk=email_pk
-            )
+            email = issue.email_set.prefetch_related("attachments").get(pk=email_pk)
         except Email.DoesNotExist:
             raise Http404()
 
@@ -217,10 +215,7 @@ class EmailApiViewset(GenericViewSet):
         if not email.state == EmailState.DRAFT:
             raise Http404()
 
-        with transaction.atomic():
-            email.emailattachment_set.all().delete()
-            email.delete()
-
+        email.delete()
         return Response(status=204)
 
     @action(
@@ -242,7 +237,7 @@ class EmailApiViewset(GenericViewSet):
 
     def get_attachment(self, email: Email, attachment_id: int) -> EmailAttachment:
         try:
-            attachment = email.emailattachment_set.get(pk=attachment_id)
+            attachment = email.attachments.get(pk=attachment_id)
         except EmailAttachment.DoesNotExist:
             raise Http404()
 
@@ -320,7 +315,7 @@ def get_email_threads(issue: Issue) -> List[EmailThread]:
     email_qs = (
         issue.email_set.filter(state__in=DISPLAY_EMAIL_STATES)
         .select_related("sender")
-        .prefetch_related("sender__groups", "emailattachment_set")
+        .prefetch_related("sender__groups", "attachments")
         .order_by("created_at")
     )
 
@@ -346,5 +341,5 @@ def get_email_threads(issue: Issue) -> List[EmailThread]:
 
 def process_email_for_display(email: Email):
     email.html = parse_email_html(email)
-    for attachment in email.emailattachment_set.all():
+    for attachment in email.attachments.all():
         attachment.file.display_name = os.path.basename(attachment.file.name)

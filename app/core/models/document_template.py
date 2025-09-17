@@ -1,5 +1,4 @@
 import os
-from urllib.parse import quote
 
 from core.models.issue import CaseTopic
 from core.models.timestamped import TimestampedModel
