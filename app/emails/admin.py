@@ -13,7 +13,13 @@ class AttachmentInline(admin.TabularInline):
 
 @admin.register(Email)
 class EmailAdmin(admin.ModelAdmin):
-    list_filter = ("state",)
+    list_filter = ("state", "is_alert_sent")
+    search_fields = [
+        "from_address",
+        "to_address",
+        "subject",
+        "received_data_hash__exact",
+    ]
 
     list_display = (
         "id",
