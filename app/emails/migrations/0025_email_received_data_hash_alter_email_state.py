@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                     ("SENT", "Sent"),
                     ("DELIVERED", "Delivered"),
                     ("DELIVERY_FAILURE", "Delivery failed"),
-                    ("SAVED", "Saved"),
+                    ("SAVING", "Saving"),
                     ("RECEIVED", "Received"),
                     ("INGESTED", "Ingested"),
                     ("INGEST_FAILURE", "Ingest failed"),
