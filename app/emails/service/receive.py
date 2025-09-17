@@ -11,6 +11,7 @@ from emails.models import (
     Email,
     EmailAttachment,
     EmailState,
+    DuplicateEmailDataError,
 )
 from utils.sentry import sentry_task
 
@@ -25,17 +26,60 @@ EMAIL_RECEIVE_RULES = (
 )
 
 
-@sentry_task
-def save_inbound_email(data: MultiValueDict, files: MultiValueDict):
+def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
     """
-    Parse an inbound email from SendGrid and save as an Email.
+    Parse inbound email and attachment data from SendGrid and save to the database.
+
+    Some ESPs impose strict time limits on webhooks, and will consider them
+    failed if they don't respond within a certain timeframe. We have to have a
+    mechanism to prevent adding duplicate emails when SendGrid resends the email
+    data after a timeout because we haven't finished processing it.
+
+    ### Parameters
+        1. data: data in SendGrid inbound parse default (i.e. not raw) format.
+        2. files: Django file upload objects for the files attached to the email.
+
+    ### Returns
+        A boolean indicating whether the email and all attachments have been
+        successfully saved to the database.
+
+    ### See
+        - https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/setting-up-the-inbound-parse-webhook#default-parameters
+        - https://docs.djangoproject.com/en/5.2/topics/http/file-uploads/
     """
+
+    logger.info("Saving inbound email data")
+    try:
+        email = Email.objects.create(received_data=data, state=EmailState.SAVING)
+    except DuplicateEmailDataError as e:
+        # We need to figure out if we are still saving the email and attachments
+        # so we can respond appropriately back to SendGrid. Note that we
+        # indicate that we haven't successfully saved to the database if the
+        # save is still in progress so we can get SendGrid to resend in case
+        # something goes wrong before we finish.
+        is_saved = (
+            Email.objects.filter(received_data_hash=e.hash)
+            .exclude(state=EmailState.SAVING)
+            .exists()
+        )
+        logger.info(f"{str(e)} - finished saving? {is_saved}")
+        return is_saved
+
     with transaction.atomic():
-        email = Email.objects.create(received_data=data, state=EmailState.RECEIVED)
-        for file in files.values():
-            EmailAttachment.objects.create(
-                email=email, file=file, content_type=file.content_type
-            )
+        try:
+            for file in files.values():
+                EmailAttachment.objects.create(
+                    email=email, file=file, content_type=file.content_type
+                )
+            email.state = EmailState.RECEIVED
+            email.save()
+        except Exception:
+            # Remove the email instance we created so that we can retry when
+            # SendGrid sends the email again.
+            email.delete()
+            raise
+    logger.info(f"Email data saved successfully, hash: {email.received_data_hash}")
+    return True
 
 
 @sentry_task

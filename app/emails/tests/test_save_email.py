@@ -8,10 +8,7 @@ from io import BytesIO
 import pytest
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.datastructures import MultiValueDict
-from emails.models import (
-    ReceivedAttachment,
-    ReceivedEmail,
-)
+from emails.models import Email, EmailAttachment
 from emails.service import save_inbound_email
 
 data = MultiValueDict(
@@ -48,10 +45,14 @@ file_2 = InMemoryUploadedFile(
 @pytest.mark.django_db
 def test_save_inbound_email_no_attachments():
     files = MultiValueDict()
-    assert ReceivedEmail.objects.count() == 0
+    assert Email.objects.count() == 0
+    assert EmailAttachment.objects.count() == 0
+
     save_inbound_email(data, files)
-    assert ReceivedEmail.objects.count() == 1
-    email = ReceivedEmail.objects.last()
+
+    assert Email.objects.count() == 1
+    assert EmailAttachment.objects.count() == 0
+    email = Email.objects.last()
     assert email.received_data == data.dict()
 
 
@@ -60,17 +61,16 @@ def test_save_inbound_email_with_single_attachment(settings, tmpdir):
     settings.MEDIA_ROOT = str(tmpdir)
     files = MultiValueDict({"attachment1": [file_1]})
 
-    assert ReceivedEmail.objects.count() == 0
-    assert ReceivedAttachment.objects.count() == 0
+    assert Email.objects.count() == 0
+    assert EmailAttachment.objects.count() == 0
 
     save_inbound_email(data, files)
 
-    assert ReceivedEmail.objects.count() == 1
-    email = ReceivedEmail.objects.last()
+    assert Email.objects.count() == 1
+    email = Email.objects.last()
 
     assert email.attachments.count() == 1
     attachment = email.attachments.first()
-    assert attachment.name == file_1.name
     assert attachment.content_type == file_1.content_type
     assert attachment.file.name.endswith(file_1.name)
     assert attachment.file.read() == file_1_content.getvalue()
@@ -81,23 +81,21 @@ def test_save_inbound_email_with_multiple_attachments(settings, tmpdir):
     settings.MEDIA_ROOT = str(tmpdir)
     files = MultiValueDict({"attachment1": [file_1], "attachment2": [file_2]})
 
-    assert ReceivedEmail.objects.count() == 0
-    assert ReceivedAttachment.objects.count() == 0
+    assert Email.objects.count() == 0
+    assert EmailAttachment.objects.count() == 0
 
     save_inbound_email(data, files)
 
-    assert ReceivedEmail.objects.count() == 1
-    email = ReceivedEmail.objects.last()
+    assert Email.objects.count() == 1
+    email = Email.objects.last()
     assert email.attachments.count() == 2
 
     attachment_1 = email.attachments.first()
-    assert attachment_1.name == file_1.name
     assert attachment_1.content_type == file_1.content_type
     assert attachment_1.file.name.endswith(file_1.name)
     assert attachment_1.file.read() == file_1_content.getvalue()
 
     attachment_2 = email.attachments.last()
-    assert attachment_2.name == file_2.name
     assert attachment_2.content_type == file_2.content_type
     assert attachment_2.file.name.endswith(file_2.name)
     assert attachment_2.file.read() == file_2_content.getvalue()
@@ -108,23 +106,21 @@ def test_save_inbound_email_with_duplicate_attachments(settings, tmpdir):
     settings.MEDIA_ROOT = str(tmpdir)
     files = MultiValueDict({"attachment1": [file_1], "attachment2": [file_1]})
 
-    assert ReceivedEmail.objects.count() == 0
-    assert ReceivedAttachment.objects.count() == 0
+    assert Email.objects.count() == 0
+    assert EmailAttachment.objects.count() == 0
 
     save_inbound_email(data, files)
 
-    assert ReceivedEmail.objects.count() == 1
-    email = ReceivedEmail.objects.last()
+    assert Email.objects.count() == 1
+    email = Email.objects.last()
     assert email.attachments.count() == 2
 
     attachment_1 = email.attachments.first()
-    assert attachment_1.name == file_1.name
     assert attachment_1.content_type == file_1.content_type
     assert attachment_1.file.name.endswith(file_1.name)
     assert attachment_1.file.read() == file_1_content.getvalue()
 
     attachment_2 = email.attachments.last()
-    assert attachment_2.name == file_1.name
     assert attachment_2.content_type == file_1.content_type
     # Note that the file name will be different due to how Django handles
     # duplicate file names.
