@@ -17,10 +17,8 @@ export const CaseDateForm = ({ issue, onCancel }: CaseDetailFormProps) => {
   const dispatch = useAppDispatch()
 
   const initialValues: IssueDateCreate = {
-    // @ts-expect-error
-    type: '',
-    date: '',
-    notes: '',
+    type: undefined!,
+    date: undefined!,
     issue_id: issue.id,
   }
 

@@ -1,16 +1,27 @@
 import {
+  Button,
   Center,
   Container,
+  Group,
   Pagination,
   Table,
   Text,
   Title,
 } from '@mantine/core'
-import api, { GetCaseDatesApiArg, Issue, IssueDate } from 'api'
+import api, {
+  GetCaseDatesApiArg,
+  Issue,
+  IssueDate,
+  IssueDateCreate,
+  useCreateCaseDateMutation,
+} from 'api'
 import { CASE_TABS, CaseHeader, CaseTabUrls } from 'comps/case-header'
 import { RichTextDisplay } from 'comps/rich-text'
 import {
   DateActionIconGroup,
+  DateFormControlProps,
+  DateFormModal,
+  DateFormType,
   DateTable,
   DateTableDateCell,
   DateTableIsReviewedCell,
@@ -18,9 +29,11 @@ import {
 } from 'features/date'
 import React, { useState } from 'react'
 import { UserPermission } from 'types'
-import { mount } from 'utils'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
 import '@mantine/core/styles.css'
+import { useDisclosure } from '@mantine/hooks'
+import { enqueueSnackbar } from 'notistack'
 
 interface DjangoContext {
   case_pk: string
@@ -42,11 +55,99 @@ const App = () => {
   return (
     <Container size="xl">
       <CaseHeader issue={issue} activeTab={CASE_TABS.DATES} urls={urls} />
-      <Title order={2} mt="xl">
-        Critical Dates
-      </Title>
+      <CaseDateHeader issue={issue} />
       <CaseDateTable issue={issue} />
     </Container>
+  )
+}
+
+interface CaseDateHeaderProps {
+  issue: Issue
+}
+
+const CaseDateHeader = ({ issue }: CaseDateHeaderProps) => {
+  const [isOpen, handler] = useDisclosure(false)
+  const [createDate] = useCreateCaseDateMutation()
+
+  const initialValues: IssueDateCreate = {
+    type: undefined!,
+    date: undefined!,
+    issue_id: issue.id,
+  }
+
+  const handleSubmit = (form: DateFormType, values: IssueDateCreate) => {
+    form.setSubmitting(true)
+    createDate({
+      issueDateCreate: values,
+    })
+      .unwrap()
+      .then((date) => {
+        enqueueSnackbar('Critical date created', { variant: 'success' })
+        handler.close()
+      })
+      .catch((e) => {
+        enqueueSnackbar(
+          getAPIErrorMessage(e, 'Failed to create critical date'),
+          {
+            variant: 'error',
+          }
+        )
+        const requestErrors = getAPIFormErrors(e)
+        if (requestErrors) {
+          form.setErrors(requestErrors)
+        }
+      })
+      .finally(() => {
+        form.setSubmitting(false)
+      })
+  }
+
+  return (
+    <>
+      <Title order={2} mt="xl">
+        <Group wrap="nowrap" gap="sm" justify="space-between">
+          <span>Critical Dates</span>
+          <Button onClick={() => handler.open()}>
+            Create a new critical date
+          </Button>
+        </Group>
+      </Title>
+      <DateFormModal
+        input={{
+          initialValues: initialValues,
+        }}
+        modal={{
+          opened: isOpen,
+          title: 'Create a new critical date',
+        }}
+        onSubmit={handleSubmit}
+        onCancel={() => handler.close()}
+        controls={ModalDateFormControls}
+      />
+    </>
+  )
+}
+
+const ModalDateFormControls = ({ form, onCancel }: DateFormControlProps) => {
+  return (
+    <Group justify="right" mt="lg">
+      <Button
+        variant="default"
+        onClick={onCancel}
+        disabled={form.submitting}
+        size="md"
+      >
+        Close
+      </Button>
+      <Button
+        type="submit"
+        disabled={form.submitting}
+        loading={form.submitting}
+        size="md"
+      >
+        Create critical date
+      </Button>
+    </Group>
   )
 }
 
