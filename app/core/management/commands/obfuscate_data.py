@@ -4,7 +4,9 @@ from io import BytesIO
 
 from accounts.models import CaseGroups, User
 from auditlog.context import disable_auditlog
+from auditlog.models import LogEntry
 from core.models import (
+    AuditEvent,
     Client,
     FileUpload,
     Issue,
@@ -46,6 +48,8 @@ class Command(BaseCommand):
         people = Person.objects.all()
         services = Service.objects.all()
         tenancies = Tenancy.objects.all()
+        audit_events = AuditEvent.objects.all()
+        log_entries = LogEntry.objects.all()
 
         # Obfuscate any user that isn't an admin or superuser. We want to keep
         # the accounts unchanged for users in those groups so they can be used
@@ -147,6 +151,17 @@ class Command(BaseCommand):
             if s.notes:
                 s.notes = " ".join(fake.sentences())
                 s.save()
+
+        with disable_auditlog():
+            for d in dates.iterator():
+                if d.notes:
+                    d.notes = " ".join(fake.sentences())
+                    d.save()
+
+        # We just delete audit events and log entries as it's too fiddly to
+        # update them with obfuscated data.
+        audit_events.delete()
+        log_entries.delete()
 
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
