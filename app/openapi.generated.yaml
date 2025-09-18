@@ -2332,12 +2332,22 @@ components:
         - HEARING_LISTED
         - NTV_TERMINATION
         - OTHER
+    IssueDateHearingType:
+      type: string
+      enum:
+        - IN_PERSON
+        - VIRTUAL
+        - ""
     IssueDateBase:
       type: object
       properties:
         type:
           $ref: "#/components/schemas/IssueDateType"
         date:
+          type: string
+        hearing_type:
+          $ref: "#/components/schemas/IssueDateHearingType"
+        hearing_location:
           type: string
       required:
         - type

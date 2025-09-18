@@ -4,6 +4,10 @@ properties:
     $ref: ./IssueDateType.yaml
   date:
     type: string
+  hearing_type:
+    $ref: ./IssueDateHearingType.yaml
+  hearing_location:
+    type: string
 required:
   - type
   - date

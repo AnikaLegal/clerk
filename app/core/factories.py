@@ -18,7 +18,7 @@ from core.models import (
 )
 from core.models.issue import CaseStage, CaseTopic
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
-from core.models.issue_date import DateType
+from core.models.issue_date import DateType, HearingType
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from emails.models import Email, EmailAttachment, EmailTemplate
@@ -143,6 +143,16 @@ class IssueDateFactory(TimestampedModelFactory):
     date = factory.Faker("date_between", start_date="now", end_date="+3M")
     notes = factory.Faker("sentence")
     is_reviewed = factory.Faker("boolean")
+    hearing_type = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.type == DateType.HEARING_LISTED),
+        yes_declaration=factory.Faker("random_element", elements=HearingType),
+        no_declaration="",
+    )
+    hearing_location = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.type == DateType.HEARING_LISTED),
+        yes_declaration=factory.Faker("sentence"),
+        no_declaration="",
+    )
 
 
 @factory.django.mute_signals(post_save)

@@ -1,0 +1,5 @@
+type: string
+enum:
+  - IN_PERSON
+  - VIRTUAL
+  - ""

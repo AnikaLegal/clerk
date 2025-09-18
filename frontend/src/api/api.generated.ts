@@ -1203,9 +1203,12 @@ export type IssueDateType =
   | "HEARING_LISTED"
   | "NTV_TERMINATION"
   | "OTHER";
+export type IssueDateHearingType = "IN_PERSON" | "VIRTUAL" | "";
 export type IssueDateBase = {
   type: IssueDateType;
   date: string;
+  hearing_type?: IssueDateHearingType;
+  hearing_location?: string;
 };
 export type IssueDate = IssueDateBase & {
   id: number;

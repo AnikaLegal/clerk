@@ -1,10 +1,11 @@
+from datetime import date, timedelta
+
 import pytest
 from conftest import schema_tester
-from core.factories import ClientFactory, IssueFactory, IssueDateFactory
-from core.models.issue_date import DateType, IssueDate
+from core.factories import ClientFactory, IssueDateFactory, IssueFactory
+from core.models.issue_date import DateType, HearingType, IssueDate
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-from datetime import date, timedelta
 
 
 @pytest.mark.django_db
@@ -19,6 +20,8 @@ def test_issue_date_create_api(superuser_client: APIClient):
         "date": issue_date_stub.date.isoformat(),
         "notes": issue_date_stub.notes,
         "is_reviewed": issue_date_stub.is_reviewed,
+        "hearing_type": issue_date_stub.hearing_type,
+        "hearing_location": issue_date_stub.hearing_location,
     }
     url = reverse("date-api-list")
     response = superuser_client.post(url, data=data, format="json")
@@ -154,13 +157,13 @@ def test_issue_date_update_api(superuser_client: APIClient):
 
     instance = IssueDateFactory(type=DateType.FILING_DEADLINE, date=today.isoformat())
     url = reverse("date-api-detail", args=(instance.pk,))
-    data = {"type": DateType.HEARING_LISTED, "date": tomorrow.isoformat()}
+    data = {"type": DateType.NTV_TERMINATION, "date": tomorrow.isoformat()}
     response = superuser_client.patch(url, data=data, format="json")
 
     assert response.status_code == 200, response.json()
 
     instance.refresh_from_db()
-    assert instance.type == DateType.HEARING_LISTED
+    assert instance.type == DateType.NTV_TERMINATION
     assert instance.date == tomorrow
 
     data = response.json()
@@ -204,6 +207,71 @@ def test_issue_date_delete_api(superuser_client: APIClient):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
+    "field_names, expected_status, expected_count",
+    [
+        ([], 400, 0),
+        (["hearing_type"], 400, 0),
+        (["hearing_location"], 400, 0),
+        (["hearing_type", "hearing_location"], 201, 1),
+    ],
+)
+def test_issue_date_create_hearing_listed(
+    field_names,
+    expected_status,
+    expected_count,
+    superuser_client: APIClient,
+):
+    """
+    Dates for hearings must include the hearing type and environment (location).
+    """
+    issue_date_stub = IssueDateFactory.stub(type=DateType.HEARING_LISTED)
+    assert IssueDate.objects.count() == 0
+
+    issue = IssueFactory()
+    data = {
+        "issue_id": issue.pk,
+        "type": issue_date_stub.type,
+        "date": issue_date_stub.date.isoformat(),
+    }
+    for field_name in field_names:
+        data.update({field_name: getattr(issue_date_stub, field_name)})
+
+    url = reverse("date-api-list")
+    response = superuser_client.post(url, data=data, format="json")
+    assert response.status_code == expected_status, response.json()
+    assert IssueDate.objects.count() == expected_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "data, expected_status",
+    [
+        ({}, 400),
+        ({"hearing_type": HearingType.IN_PERSON}, 400),
+        ({"hearing_location": "HERE"}, 400),
+        ({"hearing_type": HearingType.IN_PERSON, "hearing_location": "HERE"}, 200),
+    ],
+)
+def test_issue_date_update_hearing_listed(
+    data,
+    expected_status,
+    superuser_client: APIClient,
+):
+    """
+    Dates for hearings must include the hearing type and environment (location).
+    """
+    instance = IssueDateFactory(type=DateType.OTHER)
+    assert IssueDate.objects.count() == 1
+
+    url = reverse("date-api-detail", args=(instance.pk,))
+    data.update({"type": DateType.HEARING_LISTED})
+    response = superuser_client.patch(url, data=data, format="json")
+
+    assert response.status_code == expected_status, response.json()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
     "test_user, user_name, is_assigned, expected_status",
     [
         ("unassigned_user", "unprivileged_user", False, 403),
@@ -236,6 +304,8 @@ def test_issue_date_api_create_perms(
         "issue_id": issue.pk,
         "type": issue_date_stub.type,
         "date": issue_date_stub.date.isoformat(),
+        "hearing_type": issue_date_stub.hearing_type,
+        "hearing_location": issue_date_stub.hearing_location,
     }
     url = reverse("date-api-list")
     response = user_client.post(url, data=data, format="json")
@@ -281,6 +351,8 @@ def test_issue_date_api_create_with_is_reviewed_perms(
         "type": issue_date_stub.type,
         "date": issue_date_stub.date.isoformat(),
         "is_reviewed": issue_date_stub.is_reviewed,
+        "hearing_type": issue_date_stub.hearing_type,
+        "hearing_location": issue_date_stub.hearing_location,
     }
     url = reverse("date-api-list")
     response = user_client.post(url, data=data, format="json")
@@ -398,7 +470,7 @@ def test_issue_date_api_update_perms(
     issue_date = IssueDateFactory(issue=issue, type=DateType.FILING_DEADLINE)
 
     data = {
-        "type": DateType.HEARING_LISTED,
+        "type": DateType.OTHER,
     }
     url = reverse("date-api-detail", args=(issue_date.pk,))
     response = user_client.patch(url, data=data, format="json")

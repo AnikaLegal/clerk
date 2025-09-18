@@ -13,6 +13,11 @@ class DateType(models.TextChoices):
     OTHER = "OTHER", "Other"
 
 
+class HearingType(models.TextChoices):
+    IN_PERSON = "IN_PERSON", "In person"
+    VIRTUAL = "VIRTUAL", "Virtual"
+
+
 class IssueDate(TimestampedModel):
     """
     Model representing a date associated with an issue.
@@ -24,8 +29,20 @@ class IssueDate(TimestampedModel):
     notes = models.TextField(blank=True, default="")
     is_reviewed = models.BooleanField(default=False)
 
+    hearing_type = models.CharField(
+        max_length=32, choices=HearingType.choices, blank=True, default=""
+    )
+    # Name / address of physical location or link to virtual space.
+    hearing_location = models.CharField(blank=True, default="")
+
     class Meta(TimestampedModel.Meta):
         verbose_name = "critical date"
+
+    def save(self, *args, **kwargs):
+        if self.type != DateType.HEARING_LISTED:
+            self.hearing_type = ""
+            self.hearing_location = ""
+        return super().save(*args, **kwargs)
 
     def check_permission(self, user: User) -> bool:
         """
