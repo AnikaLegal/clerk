@@ -51,7 +51,7 @@ def process_submission(sub_pk: str):
 
             logger.info("Processing Issue for Submission[%s]", sub_pk)
             try:
-                issue = process_issue(answers, client, tenancy)
+                issue = process_issue(sub, answers, client, tenancy)
                 logger.info("Processed Issue[%s] for Submission[%s]", issue.pk, sub_pk)
             except Exception:
                 logger.exception("Could not process Issue for Submission[%s]", sub_pk)
@@ -64,7 +64,7 @@ def process_submission(sub_pk: str):
     Submission.objects.filter(pk=sub.pk).update(is_processed=True)
 
 
-def process_issue(answers, client, tenancy):
+def process_issue(submission, answers, client, tenancy):
     topic = answers["ISSUES"]
     upload_answers = UPLOAD_ANSWERS[topic]
 
@@ -99,6 +99,7 @@ def process_issue(answers, client, tenancy):
     referrer = get_with_default(answers, "SOCIAL_REFERRER", referrer)
 
     issue = Issue.objects.create(
+        submission=submission,
         topic=topic,
         answers=issue_specific_answers,
         support_worker=support_worker,

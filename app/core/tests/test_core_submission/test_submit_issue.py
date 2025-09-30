@@ -310,7 +310,7 @@ def test_process_submission(
     assert FileUpload.objects.count() == len(expected_uploads)
 
     sub = Submission.objects.create(answers=answers)
-    process_issue(answers, client, tenancy)
+    process_issue(sub, answers, client, tenancy)
 
     assert Issue.objects.count() == 1
     assert FileUpload.objects.count() == len(expected_uploads)

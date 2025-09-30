@@ -90,7 +90,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    readonly_fields = ("answers_json",)
+    readonly_fields = ("answers_json", "submission")
     exclude = ("answers",)
     list_display = (
         "id",
