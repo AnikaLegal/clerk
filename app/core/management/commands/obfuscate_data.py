@@ -147,7 +147,20 @@ class Command(BaseCommand):
                 s.save()
 
         # Remove all answers from submissions as they contain personal info.
-        submissions.update(answers={})
+        for s in submissions.iterator():
+            if s.answers:
+                redacted_text = "[REDACTED]"
+                redacted_answers = {}
+                for key, value in s.answers.items():
+                    if value is not None:
+                        value = (
+                            [redacted_text] * len(value)
+                            if isinstance(value, list)
+                            else redacted_text
+                        )
+                    redacted_answers[key] = value
+                s.answers = redacted_answers
+            s.save()
 
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
