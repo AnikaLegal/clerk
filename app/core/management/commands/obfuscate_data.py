@@ -3,7 +3,16 @@ import os
 from io import BytesIO
 
 from accounts.models import CaseGroups, User
-from core.models import Client, FileUpload, Issue, IssueNote, Person, Service, Tenancy
+from core.models import (
+    Client,
+    FileUpload,
+    Issue,
+    IssueNote,
+    Person,
+    Service,
+    Submission,
+    Tenancy,
+)
 from core.models.issue_note import NoteType
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -35,6 +44,7 @@ class Command(BaseCommand):
         people = Person.objects.all()
         services = Service.objects.all()
         tenancies = Tenancy.objects.all()
+        submissions = Submission.objects.all()
 
         # Obfuscate any user that isn't an admin or superuser. We want to keep
         # the accounts unchanged for users in those groups so they can be used
@@ -135,6 +145,9 @@ class Command(BaseCommand):
             if s.notes:
                 s.notes = " ".join(fake.sentences())
                 s.save()
+
+        # Remove all answers from submissions as they contain personal info.
+        submissions.update(answers={})
 
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
