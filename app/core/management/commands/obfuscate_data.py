@@ -25,6 +25,9 @@ from utils.signals import disable_signals, restore_signals
 
 logger = logging.getLogger(__name__)
 
+fake = Faker("en_AU")
+email_addresses = dict()
+
 
 class Command(BaseCommand):
     help = "Hide personal information"
@@ -35,7 +38,7 @@ class Command(BaseCommand):
         self.stdout.write("\nObfuscating personal information...")
         disable_signals()
 
-        fake = Faker("en_AU")
+        email_addresses = dict()
 
         clients = Client.objects.all()
         emails = Email.objects.all()
@@ -62,7 +65,7 @@ class Command(BaseCommand):
             t.save()
 
         for u in users.iterator():
-            u.email = fake.unique.email()
+            u.email = get_email(u.email)
             u.username = u.email  # Username same as fake email.
             u.first_name = fake.first_name()
             u.last_name = fake.last_name()
@@ -70,7 +73,7 @@ class Command(BaseCommand):
 
         for p in people.iterator():
             p.full_name = fake.name()
-            p.email = fake.email()
+            p.email = get_email(p.email)
             p.address = fake.address()
             p.phone_number = fake.phone_number()
             p.save()
@@ -80,7 +83,7 @@ class Command(BaseCommand):
             c.last_name = fake.last_name()
             if c.preferred_name:
                 c.preferred_name = fake.first_name()
-            c.email = fake.email()
+            c.email = get_email(c.email)
             c.phone_number = fake.phone_number()
             c.save()
 
@@ -90,17 +93,7 @@ class Command(BaseCommand):
 
             # Redact the answers to issue-specific intake form questions.
             if i.answers:
-                redacted_text = "[REDACTED]"
-                redacted_answers = {}
-                for key, value in i.answers.items():
-                    if value is not None:
-                        value = (
-                            [redacted_text] * len(value)
-                            if isinstance(value, list)
-                            else redacted_text
-                        )
-                    redacted_answers[key] = value
-                i.answers = redacted_answers
+                i.answers = get_redacted_answers(i.answers)
 
             i.save()
 
@@ -117,7 +110,6 @@ class Command(BaseCommand):
             .iterator()
         ):
             thread_subject = fake.sentence()
-            thread_addresses = dict()
 
             for e in emails.filter(
                 issue=thread.issue, thread_name=thread.thread_name
@@ -128,17 +120,10 @@ class Command(BaseCommand):
                 e.html = ""
 
                 if e.from_address:
-                    e.from_address = get_email_thread_address(
-                        fake, thread_addresses, e.from_address
-                    )
+                    e.from_address = get_email(e.from_address)
                 if e.to_address:
-                    e.to_address = get_email_thread_address(
-                        fake, thread_addresses, e.to_address
-                    )
-                e.cc_addresses = [
-                    get_email_thread_address(fake, thread_addresses, addr)
-                    for addr in e.cc_addresses
-                ]
+                    e.to_address = get_email(e.to_address)
+                e.cc_addresses = [get_email(addr) for addr in e.cc_addresses]
                 e.save()
 
         for s in services.iterator():
@@ -149,18 +134,8 @@ class Command(BaseCommand):
         # Remove all answers from submissions as they contain personal info.
         for s in submissions.iterator():
             if s.answers:
-                redacted_text = "[REDACTED]"
-                redacted_answers = {}
-                for key, value in s.answers.items():
-                    if value is not None:
-                        value = (
-                            [redacted_text] * len(value)
-                            if isinstance(value, list)
-                            else redacted_text
-                        )
-                    redacted_answers[key] = value
-                s.answers = redacted_answers
-            s.save()
+                s.answers = get_redacted_answers(s.answers)
+                s.save()
 
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
@@ -183,7 +158,27 @@ class Command(BaseCommand):
         restore_signals()
 
 
-def get_email_thread_address(fake, thread_addresses: dict, email: str) -> str:
-    if email not in thread_addresses:
-        thread_addresses[email] = fake.email()
-    return thread_addresses[email]
+def get_email(email: str) -> str:
+    email = email.lower()
+    if email not in email_addresses:
+        email_addresses[email] = fake.unique.email()
+    return email_addresses[email]
+
+
+def get_redacted_answers(answers: dict) -> dict:
+    redacted_text = "[REDACTED]"
+    redacted_answers = {}
+    for key, value in answers.items():
+        if value is not None:
+            if key == "EMAIL" or key == "CLIENT_EMAIL":
+                # Keep email addresses consistent with other
+                # obfuscated emails.
+                value = get_email(value)
+            else:
+                value = (
+                    [redacted_text] * len(value)
+                    if isinstance(value, list)
+                    else redacted_text
+                )
+        redacted_answers[key] = value
+    return redacted_answers
