@@ -18,9 +18,6 @@ def _link_submissions_to_issues(apps, schema_editor):
                 elif "CLIENT_EMAIL" in submission.answers:
                     email = submission.answers["CLIENT_EMAIL"]
                 else:
-                    print(
-                        f"Could not find email in submission {submission.id}, skipping"
-                    )
                     continue
 
                 q_filter = Q(client__email__iexact=email)
@@ -36,10 +33,6 @@ def _link_submissions_to_issues(apps, schema_editor):
                     issue = issues.first()
                     issue.submission = submission
                     issue.save()
-                elif issues.count() == 0:
-                    print(f"No issues found for email {email}, skipping")
-                else:
-                    print(f"Multiple issues found for email {email}, skipping")
             except Issue.DoesNotExist:
                 pass
 
