@@ -2,10 +2,49 @@
 
 import django.db.models.deletion
 from django.db import migrations, models
+from django.db.models import Q
+from utils.signals import DisableSignals
+
+
+def _link_submissions_to_issues(apps, schema_editor):
+    Submission = apps.get_model("core", "Submission")
+    Issue = apps.get_model("core", "Issue")
+
+    with DisableSignals():
+        for submission in Submission.objects.filter(is_processed=True):
+            try:
+                if "EMAIL" in submission.answers:
+                    email = submission.answers["EMAIL"]
+                elif "CLIENT_EMAIL" in submission.answers:
+                    email = submission.answers["CLIENT_EMAIL"]
+                else:
+                    print(
+                        f"Could not find email in submission {submission.id}, skipping"
+                    )
+                    continue
+
+                q_filter = Q(client__email__iexact=email)
+                issues = Issue.objects.filter(q_filter)
+
+                if issues.count() > 1:
+                    if "ISSUES" in submission.answers:
+                        q_filter &= Q(topic=submission.answers["ISSUES"])
+                    q_filter &= Q(created_at__date=submission.created_at.date())
+                    issues = Issue.objects.filter(q_filter)
+
+                if issues.count() == 1:
+                    issue = issues.first()
+                    issue.submission = submission
+                    issue.save()
+                elif issues.count() == 0:
+                    print(f"No issues found for email {email}, skipping")
+                else:
+                    print(f"Multiple issues found for email {email}, skipping")
+            except Issue.DoesNotExist:
+                pass
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0088_alter_client_pronouns"),
     ]
@@ -20,5 +59,9 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.PROTECT,
                 to="core.submission",
             ),
+        ),
+        migrations.RunPython(
+            _link_submissions_to_issues,
+            reverse_code=migrations.RunPython.noop,
         ),
     ]
