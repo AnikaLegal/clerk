@@ -96,6 +96,8 @@ class Command(BaseCommand):
                 c.email = get_email(c.email)
             if c.phone_number:
                 c.phone_number = fake.phone_number()
+            if c.contact_notes:
+                c.contact_notes = " ".join(fake.sentences())
             c.save()
 
         for i in issues.iterator():
