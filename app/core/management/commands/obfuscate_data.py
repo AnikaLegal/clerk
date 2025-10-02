@@ -59,9 +59,12 @@ class Command(BaseCommand):
         ).distinct()
 
         for t in tenancies.iterator():
-            t.address = fake.street_address()
-            t.suburb = fake.city()
-            t.postcode = fake.postcode()
+            if t.address:
+                t.address = fake.street_address()
+            if t.suburb:
+                t.suburb = fake.city()
+            if t.postcode:
+                t.postcode = fake.postcode()
             t.save()
 
         for u in users.iterator():
@@ -72,19 +75,27 @@ class Command(BaseCommand):
             u.save()
 
         for p in people.iterator():
-            p.full_name = fake.name()
-            p.email = get_email(p.email)
-            p.address = fake.address()
-            p.phone_number = fake.phone_number()
+            if p.full_name:
+                p.full_name = fake.name()
+            if p.email:
+                p.email = get_email(p.email)
+            if p.address:
+                p.address = fake.address()
+            if p.phone_number:
+                p.phone_number = fake.phone_number()
             p.save()
 
         for c in clients.iterator():
-            c.first_name = fake.first_name()
-            c.last_name = fake.last_name()
+            if c.first_name:
+                c.first_name = fake.first_name()
+            if c.last_name:
+                c.last_name = fake.last_name()
             if c.preferred_name:
                 c.preferred_name = fake.first_name()
-            c.email = get_email(c.email)
-            c.phone_number = fake.phone_number()
+            if c.email:
+                c.email = get_email(c.email)
+            if c.phone_number:
+                c.phone_number = fake.phone_number()
             c.save()
 
         for i in issues.iterator():
