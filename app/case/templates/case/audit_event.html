@@ -1,0 +1,28 @@
+<div>
+  <span>
+    {% if log_entry.actor %}
+      <a href="{% url 'account-detail' log_entry.actor.pk %}">{{ log_entry.actor.get_full_name|title }}</a>
+      {{ action.verb }} {{ action.indefinite_article }} {{ action.model_name }}{{ fields|yesno:':,.' }}
+    {% else %}
+      {{ action.indefinite_article|capfirst }} {{ action.model_name }} was {{ action.verb }}{{ fields|yesno:':,.' }}
+    {% endif %}
+  </span>
+  {% if fields %}
+    <table class="ui definition table small very compact">
+      <tbody>
+        {% for field in fields.values %}
+          {% if field.value is not None and field.value != '' %}
+            <tr>
+              <td class="three wide">{{ field.verbose_name|capfirst }}</td>
+              {% if field.type == 'date' %}
+                <td>{{ field.value|date:'d/m/Y' }}</td>
+              {% else %}
+                <td>{{ field.value|safe }}</td>
+              {% endif %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>

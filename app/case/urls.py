@@ -2,6 +2,7 @@ from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    date,
     person,
     tenancy,
     client,
@@ -26,6 +27,7 @@ SLUG = "(?P<slug>[\-\w]+)"
 
 router = DefaultRouter()
 router.register("case", case.CaseApiViewset, basename="case-api")
+router.register("date", date.DateApiViewSet, basename="date-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
@@ -54,8 +56,9 @@ urlpatterns = [
     # Case
     path("cases/", case.case_list_page_view, name="case-list"),
     path("cases/create/", case.case_create_page_view, name="case-create"),
-    path("cases/review/", case.case_review_page_view, name="case-review"),
     path("cases/inbox/", case.case_inbox_page_view, name="case-inbox"),
+    path("cases/review/", case.case_review_page_view, name="case-review"),
+    path("cases/date/", date.date_list_page_view, name="date-list"),
     re_path(
         f"^cases/{UUID_PK}/$",
         case.case_detail_page_view,
@@ -65,6 +68,11 @@ urlpatterns = [
         f"^cases/{UUID_PK}/docs/$",
         case.case_detail_documents_page_view,
         name="case-docs",
+    ),
+    re_path(
+        f"^cases/{UUID_PK}/dates/$",
+        case.case_detail_dates_page_view,
+        name="case-date-list",
     ),
     re_path(
         f"^cases/{UUID_PK}/services/$",

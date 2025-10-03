@@ -9,9 +9,11 @@ import { PerformanceForm } from './case-performance-note'
 import { ProgressForm } from './case-progress'
 import { ReopenForm } from './case-reopen'
 import { ReviewForm } from './case-review-note'
+import { CaseDateForm } from './case-date'
 import { ServiceForm } from './case-service'
 import { EmailTemplateForm } from './email-template'
 import { TenancyForm } from './tenancy'
+
 export {
   AccountForm,
   AssignForm,
@@ -26,5 +28,6 @@ export {
   ReopenForm,
   ReviewForm,
   ServiceForm,
+  CaseDateForm,
   TenancyForm,
 }

@@ -1,0 +1,7 @@
+type: string
+enum:
+  - FILING_DEADLINE
+  - HEARING_LISTED
+  - LIMITATION
+  - NTV_TERMINATION
+  - OTHER

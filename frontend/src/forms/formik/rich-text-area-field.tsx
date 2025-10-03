@@ -17,11 +17,15 @@ export const RichTextAreaField = ({
 }: RichTextAreaFieldProps) => {
   const [, meta, helpers] = useField(name)
 
-  const handleUpdate = ({ editor, transaction }: EditorEvents['update']) => {
+  const handleUpdate = ({
+    editor,
+    transaction,
+    appendedTransactions,
+  }: EditorEvents['update']) => {
     if (editor) {
       helpers.setValue(editor.getText() != '' ? editor.getHTML() : '')
       if (props.onUpdate) {
-        props.onUpdate({ editor, transaction })
+        props.onUpdate({ editor, transaction, appendedTransactions })
       }
     }
   }

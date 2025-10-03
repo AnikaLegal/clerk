@@ -33,8 +33,6 @@ import { RequiredKeysOf } from 'type-fest'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 import * as Yup from 'yup'
 
-import '@mantine/core/styles.css'
-
 interface DjangoContext {
   choices: {
     topic: string[][]

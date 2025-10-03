@@ -11,8 +11,6 @@ import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { getAPIErrorMessage, mount } from 'utils'
 
-import '@mantine/core/styles.css'
-
 interface DjangoContext {
   choices: {
     topic: [string, string][]
