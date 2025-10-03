@@ -48,8 +48,8 @@ dependencies = [
     "django-auditlog>=3.2.1",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "debugpy",
     "django-browser-reload",
     "django-debug-toolbar",
@@ -60,6 +60,8 @@ dev-dependencies = [
     "setuptools",
     "watchdog[watchmedo]",
 ]
+
+[tool.uv]
 # Our dependency on drf-openapi-tester limits django to version >=3 & <=4 but we
 # can safely use a later django version. We should find a replacement for
 # drf-openapi-tester anyway as it has been archived and is no longer being
