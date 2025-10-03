@@ -16,8 +16,6 @@ import { useGetUsersQuery, useGetCasesQuery, GetCasesApiArg } from 'api'
 import { UserPermission } from 'types'
 import { Group, Text, Title, Button } from '@mantine/core'
 
-import '@mantine/core/styles.css'
-
 interface DjangoContext {
   user: UserPermission
   choices: {

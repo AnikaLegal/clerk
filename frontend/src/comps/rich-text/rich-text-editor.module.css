@@ -1,0 +1,5 @@
+.content {
+  & :global(.tiptap) {
+    padding: var(--mantine-spacing-xs);
+  }
+}

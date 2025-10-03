@@ -39,6 +39,7 @@ import {
   ReopenForm,
   ReviewForm,
   ServiceForm,
+  CaseDateForm,
 } from 'forms'
 import { CaseDetailFormProps, UserPermission } from 'types'
 import { getAPIErrorMessage, mount } from 'utils'
@@ -473,6 +474,7 @@ const CASE_FORMS: { [name: string]: React.FC<CaseDetailFormProps> } = {
   eligibility: EligibilityForm,
   assign: AssignForm,
   progress: ProgressForm,
+  critical_date: CaseDateForm,
   service: ServiceForm,
   close: CloseForm,
   reopen: ReopenForm,
@@ -527,6 +529,12 @@ const CASE_FORM_OPTIONS: CaseFormOption[] = [
     id: 'progress',
     icon: 'chart line',
     text: 'Progress the case status',
+    when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
+  },
+  {
+    id: 'critical_date',
+    icon: 'calendar alternate outline',
+    text: 'Add a critical date',
     when: (perms, issue) => perms.is_paralegal_or_better && issue.is_open,
   },
   {

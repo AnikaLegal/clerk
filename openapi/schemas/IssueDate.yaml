@@ -1,0 +1,17 @@
+allOf:
+  - $ref: ./IssueDateBase.yaml
+  - type: object
+    properties:
+      id:
+        type: number
+      issue:
+        $ref: ./Issue.yaml
+      notes:
+        type: string
+      is_reviewed:
+        type: boolean
+    required:
+      - id
+      - issue
+      - notes
+      - is_reviewed

@@ -1,8 +1,6 @@
 import React from 'react'
 import { Button, ElementProps } from '@mantine/core'
 
-import '@mantine/core/styles.css'
-
 export const TextButton = ({ children, ...props }: ElementProps<'button'>) => {
   return (
     <Button

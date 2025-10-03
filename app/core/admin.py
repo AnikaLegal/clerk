@@ -1,22 +1,26 @@
+from auditlog.mixins import LogEntryAdminMixin
 from core.services.slack import send_issue_slack
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
+from django.contrib.auth import get_user_model
 from django.contrib.messages import constants as messages
 from django_q.tasks import async_task
 from utils.admin import admin_link, dict_to_json_html
-from urllib.parse import unquote
 
 from .models import (
+    AuditEvent,
     Client,
+    DocumentTemplate,
     FileUpload,
     Issue,
+    IssueDate,
     IssueEvent,
     IssueNote,
+    Person,
     Service,
     ServiceEvent,
-    Person,
     Submission,
     Tenancy,
-    DocumentTemplate,
 )
 
 
@@ -189,3 +193,88 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
         "file",
     )
     list_filter = ("topic",)
+
+
+@admin.register(IssueDate)
+class IssueDateAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "issue_link",
+        "type",
+        "date",
+        "notes",
+        "is_reviewed",
+        "created_at",
+    )
+    list_filter = ("type", "is_reviewed")
+    ordering = ("-created_at",)
+
+    @admin_link("issue", "Issue")
+    def issue_link(self, issue):
+        return issue.fileref if issue else None
+
+
+class ResourceTypeFilter(SimpleListFilter):
+    title = "Resource Type"
+    parameter_name = "resource_type"
+
+    def lookups(self, request, model_admin):
+        qs = model_admin.get_queryset(request)
+        types = qs.values_list(
+            "log_entry__content_type_id", "log_entry__content_type__model"
+        )
+        return list(types.order_by("log_entry__content_type__model").distinct())
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        return queryset.filter(log_entry__content_type_id=self.value())
+
+
+@admin.register(AuditEvent)
+class AuditEventAdmin(admin.ModelAdmin, LogEntryAdminMixin):
+    list_display = (
+        "created",
+        "action",
+        "resource_url",
+        "msg_short",
+        "user_url",
+    )
+    list_filter = ["log_entry__action", ResourceTypeFilter]
+    list_select_related = ["log_entry__content_type", "log_entry__actor"]
+    search_fields = [
+        "log_entry__timestamp",
+        "log_entry__object_repr",
+        "log_entry__changes",
+        "log_entry__actor__first_name",
+        "log_entry__actor__last_name",
+        f"log_entry__actor__{get_user_model().USERNAME_FIELD}",
+    ]
+    fieldsets = [
+        (None, {"fields": ["created", "user_url", "resource_url"]}),
+        ("Changes", {"fields": ["action", "msg"]}),
+    ]
+    readonly_fields = ["created", "resource_url", "action", "user_url", "msg"]
+
+    def action(self, obj):
+        obj = obj.log_entry
+        return obj.get_action_display()
+
+    def created(self, obj):
+        return super().created(obj.log_entry)
+
+    @admin.display(description="resource")
+    def resource_url(self, obj):
+        return super().resource_url(obj.log_entry)
+
+    @admin.display(description="changes")
+    def msg_short(self, obj):
+        return super().msg_short(obj.log_entry)
+
+    @admin.display(description="user")
+    def user_url(self, obj):
+        return super().user_url(obj.log_entry)
+
+    @admin.display(description="changes")
+    def msg(self, obj):
+        return super().msg(obj.log_entry)

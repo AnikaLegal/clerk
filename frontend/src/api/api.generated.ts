@@ -207,6 +207,51 @@ const injectedRtkApi = api.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getCaseDates: build.query<GetCaseDatesApiResponse, GetCaseDatesApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/date/`,
+        params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
+          q: queryArg.q,
+          issue_id: queryArg.issueId,
+          type: queryArg["type"],
+          is_reviewed: queryArg.isReviewed,
+        },
+      }),
+    }),
+    createCaseDate: build.mutation<
+      CreateCaseDateApiResponse,
+      CreateCaseDateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/date/`,
+        method: "POST",
+        body: queryArg.issueDateCreate,
+      }),
+    }),
+    getCaseDate: build.query<GetCaseDateApiResponse, GetCaseDateApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/date/${queryArg.id}/` }),
+    }),
+    updateCaseDate: build.mutation<
+      UpdateCaseDateApiResponse,
+      UpdateCaseDateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/date/${queryArg.id}/`,
+        method: "PATCH",
+        body: queryArg.issueDateCreate,
+      }),
+    }),
+    deleteCaseDate: build.mutation<
+      DeleteCaseDateApiResponse,
+      DeleteCaseDateApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/date/${queryArg.id}/`,
+        method: "DELETE",
+      }),
+    }),
     getTenancy: build.query<GetTenancyApiResponse, GetTenancyApiArg>({
       query: (queryArg) => ({ url: `/clerk/api/tenancy/${queryArg.id}/` }),
     }),
@@ -647,6 +692,48 @@ export type UpdatePersonApiArg = {
 export type DeletePersonApiResponse = unknown;
 export type DeletePersonApiArg = {
   /** Entity ID */
+  id: number;
+};
+export type GetCaseDatesApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: IssueDate[];
+};
+export type GetCaseDatesApiArg = {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  /** Entity ID */
+  issueId?: string;
+  type?: IssueDateType;
+  isReviewed?: boolean;
+};
+export type CreateCaseDateApiResponse =
+  /** status 201 Successful response. */ IssueDate;
+export type CreateCaseDateApiArg = {
+  /** Successful response. */
+  issueDateCreate: IssueDateCreate;
+};
+export type GetCaseDateApiResponse =
+  /** status 200 Successful response. */ IssueDate;
+export type GetCaseDateApiArg = {
+  /** Date ID */
+  id: number;
+};
+export type UpdateCaseDateApiResponse =
+  /** status 200 Successful response. */ IssueDate;
+export type UpdateCaseDateApiArg = {
+  /** Date ID */
+  id: number;
+  /** Successful response. */
+  issueDateCreate: IssueDateCreate;
+};
+export type DeleteCaseDateApiResponse = unknown;
+export type DeleteCaseDateApiArg = {
+  /** Date ID */
   id: number;
 };
 export type GetTenancyApiResponse =
@@ -1111,6 +1198,30 @@ export type EmailAttachmentCreate = {
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string;
 };
+export type IssueDateType =
+  | "FILING_DEADLINE"
+  | "HEARING_LISTED"
+  | "LIMITATION"
+  | "NTV_TERMINATION"
+  | "OTHER";
+export type IssueDateHearingType = "IN_PERSON" | "VIRTUAL";
+export type IssueDateBase = {
+  type: IssueDateType;
+  date: string;
+  hearing_type?: IssueDateHearingType;
+  hearing_location?: string;
+};
+export type IssueDate = IssueDateBase & {
+  id: number;
+  issue: Issue;
+  notes: string;
+  is_reviewed: boolean;
+};
+export type IssueDateCreate = IssueDateBase & {
+  issue_id: string;
+  notes?: string;
+  is_reviewed?: boolean;
+};
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean;
   paralegal_perm_issues: Issue[];
@@ -1189,6 +1300,11 @@ export const {
   useGetPersonQuery,
   useUpdatePersonMutation,
   useDeletePersonMutation,
+  useGetCaseDatesQuery,
+  useCreateCaseDateMutation,
+  useGetCaseDateQuery,
+  useUpdateCaseDateMutation,
+  useDeleteCaseDateMutation,
   useGetTenancyQuery,
   useUpdateTenancyMutation,
   useGetClientsQuery,

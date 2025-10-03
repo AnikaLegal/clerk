@@ -732,6 +732,153 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/date/:
+    get:
+      operationId: getCaseDates
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: q
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: issue_id
+          description: Entity ID
+          in: query
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - name: type
+          in: query
+          schema:
+            $ref: "#/components/schemas/IssueDateType"
+          required: false
+        - name: is_reviewed
+          in: query
+          schema:
+            type: boolean
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IssueDate"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
+    post:
+      operationId: createCaseDate
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueDateCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueDate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/date/{id}/:
+    get:
+      operationId: getCaseDate
+      parameters:
+        - name: id
+          description: Date ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueDate"
+    patch:
+      operationId: updateCaseDate
+      parameters:
+        - name: id
+          description: Date ID
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        description: Successful response.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueDateCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueDate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    delete:
+      operationId: deleteCaseDate
+      parameters:
+        - name: id
+          description: Date ID
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/tenancy/{id}/:
     get:
       operationId: getTenancy
@@ -2173,6 +2320,65 @@ components:
               type: string
           required:
             - support_contact_preferences
+    IssueDateType:
+      type: string
+      enum:
+        - FILING_DEADLINE
+        - HEARING_LISTED
+        - LIMITATION
+        - NTV_TERMINATION
+        - OTHER
+    IssueDateHearingType:
+      type: string
+      enum:
+        - IN_PERSON
+        - VIRTUAL
+    IssueDateBase:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/IssueDateType"
+        date:
+          type: string
+        hearing_type:
+          $ref: "#/components/schemas/IssueDateHearingType"
+        hearing_location:
+          type: string
+      required:
+        - type
+        - date
+    IssueDate:
+      allOf:
+        - $ref: "#/components/schemas/IssueDateBase"
+        - type: object
+          properties:
+            id:
+              type: number
+            issue:
+              $ref: "#/components/schemas/Issue"
+            notes:
+              type: string
+            is_reviewed:
+              type: boolean
+          required:
+            - id
+            - issue
+            - notes
+            - is_reviewed
+    IssueDateCreate:
+      allOf:
+        - $ref: "#/components/schemas/IssueDateBase"
+        - type: object
+          properties:
+            issue_id:
+              type: string
+              format: uuid
+            notes:
+              type: string
+            is_reviewed:
+              type: boolean
+          required:
+            - issue_id
     MicrosoftUserPermissions:
       type: object
       properties:

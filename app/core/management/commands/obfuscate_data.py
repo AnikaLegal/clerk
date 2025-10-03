@@ -3,10 +3,14 @@ import os
 from io import BytesIO
 
 from accounts.models import CaseGroups, User
+from auditlog.context import disable_auditlog
+from auditlog.models import LogEntry
 from core.models import (
+    AuditEvent,
     Client,
     FileUpload,
     Issue,
+    IssueDate,
     IssueNote,
     Person,
     Service,
@@ -44,9 +48,12 @@ class Command(BaseCommand):
         emails = Email.objects.all()
         issues = Issue.objects.all()
         notes = IssueNote.objects.exclude(note_type=NoteType.EVENT)
+        dates = IssueDate.objects.all()
         people = Person.objects.all()
         services = Service.objects.all()
         tenancies = Tenancy.objects.all()
+        audit_events = AuditEvent.objects.all()
+        log_entries = LogEntry.objects.all()
         submissions = Submission.objects.all()
 
         # Obfuscate any user that isn't an admin or superuser. We want to keep
@@ -143,6 +150,17 @@ class Command(BaseCommand):
             if s.notes:
                 s.notes = " ".join(fake.sentences())
                 s.save()
+
+        with disable_auditlog():
+            for d in dates.iterator():
+                if d.notes:
+                    d.notes = " ".join(fake.sentences())
+                    d.save()
+
+        # We just delete audit events and log entries as it's too fiddly to
+        # update them with obfuscated data.
+        audit_events.delete()
+        log_entries.delete()
 
         # Remove all answers from submissions as they contain personal info.
         for s in submissions.iterator():

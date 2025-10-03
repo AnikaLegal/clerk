@@ -1,87 +1,85 @@
 {% load static %}
 <html lang="en" data-mantine-color-scheme="light">
-<head>
+  <head>
     <title>
-        {% block title %}{% endblock %} | Anika Clerk
+      {% block title %}
+
+      {% endblock %}| Anika Clerk
     </title>
     <!-- Meta tags -->
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'brand/logo-icon-color.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'brand/logo-icon-color.png' %}" />
     <!-- Styling -->
-    <link rel="stylesheet" type="text/css" href="{% static 'semantic/semantic.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'styles/global.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'semantic/semantic.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/global.css' %}" />
     <script type="text/javascript" src="{% static 'semantic/jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'semantic/semantic.min.js' %}"></script>
-    {% block styles %}{% endblock %}
-</head>
-<body>
+    {% block styles %}
+
+    {% endblock %}
+  </head>
+  <body>
     <header>
-        <div class="inner">
-            <img class="logo" src="{% static 'web/brand/logo-icon-color.svg' %}">
-            {% if not public %}
-                <div class="nav-items">
-                    {% if request.user.is_authenticated %}
-                        <a href="{% url 'case-list' %}" class="item">Cases</a>
-                    {% endif %}
-                    {% if request.user.is_coordinator_or_better %}
-                        <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
-                        <a href="{% url 'case-review' %}" class="item">Review</a>
-                    {% endif %}
-                    {% if request.user.is_authenticated %}
-                        <a href="{% url 'person-list' %}" class="item">Parties</a>
-                    {% endif %}
-                    {% if request.user.is_coordinator_or_better %}
-                        <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
-                        <a href="{% url 'account-list' %}" class="item">Accounts</a>
-                    {% endif %}
-                    {% if request.user.is_admin_or_better %}
-                        <a href="{% url 'template-list' %}" class="item">Templates</a>
-                    {% endif %}
-                </div>           
-                <div class="nav-items">                     
-                    {% if request.user.is_authenticated %}
-                    <a 
-                        href="{% url 'logout' %}"
-                        class="item"
-                        title="You are logged in as {{ request.user.get_full_name }}"
-                    >
-                        Logout
-                    </a>
-                    {% else %}
-                    <a href="{% url 'login' %}" class="item">Login</a>
-                    {% endif %}
-                </div>
+      <div class="inner">
+        <img class="logo" src="{% static 'web/brand/logo-icon-color.svg' %}" />
+        {% if not public %}
+          <div class="nav-items">
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'case-list' %}" class="item">Cases</a>
             {% endif %}
-        </div>
+            {% if request.user.is_coordinator_or_better %}
+              <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
+              <a href="{% url 'case-review' %}" class="item">Review</a>
+              <a href="{% url 'date-list' %}" class="item">Dates</a>
+            {% endif %}
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'person-list' %}" class="item">Parties</a>
+            {% endif %}
+            {% if request.user.is_coordinator_or_better %}
+              <a href="{% url 'paralegal-list' %}" class="item">Paralegals</a>
+              <a href="{% url 'account-list' %}" class="item">Accounts</a>
+            {% endif %}
+            {% if request.user.is_admin_or_better %}
+              <a href="{% url 'template-list' %}" class="item">Templates</a>
+            {% endif %}
+          </div>
+          <div class="nav-items">
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'logout' %}" class="item" title="You are logged in as {{ request.user.get_full_name }}">Logout</a>
+            {% else %}
+              <a href="{% url 'login' %}" class="item">Login</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
     </header>
     <main>
-        {% if not public and request.user.is_authenticated and not request.user.is_paralegal_or_better %}
-            <div class="ui container" style="margin-bottom:1rem";>
-                <div class="ui teal message">
-                    <div class="content">
-                        <div class="header">
-                            Welcome to Clerk!
-                        </div>
-                        <p>
-                            You have not yet been set up in the system and don't have permission to do anything.
-                            Please wait for a coordinator to configure your account.
-                        </p>
-                    </div>
-                </div>
+      {% if not public and request.user.is_authenticated and not request.user.is_paralegal_or_better %}
+        <div class="ui container" style="margin-bottom:1rem">
+          <div class="ui teal message">
+            <div class="content">
+              <div class="header">Welcome to Clerk!</div>
+              <p>You have not yet been set up in the system and don't have permission to do anything. Please wait for a coordinator to configure your account.</p>
             </div>
-        {% endif %}
+          </div>
+        </div>
+      {% endif %}
 
-        {% block content %}{% endblock %}
+      {% block content %}
+
+      {% endblock %}
     </main>
     <!-- Global Scripts -->
     <script type="text/javascript" src="{% static 'htmx.min.js' %}"></script>
     <script>
       document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}'
       })
     </script>
-    {% block scripts %}{% endblock %}
-</body>
+    {% block scripts %}
+
+    {% endblock %}
+  </body>
 </html>

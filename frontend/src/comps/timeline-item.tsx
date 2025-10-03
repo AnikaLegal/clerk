@@ -11,7 +11,7 @@ export const TimelineItem = ({
   bottomLabel,
   color,
 }) => (
-  <div className="ui segment padded">
+  <div className="ui segment padded" style={{ overflowWrap: 'anywhere' }}>
     <div className={`ui top attached label ${color}`}>
       {title}
       <div className="detail">{detail}</div>
@@ -103,7 +103,9 @@ const NOTE_TYPES = {
       content={note.text_display}
       label="Case review"
       color="orange"
-      bottomLabel={<span>Next review {moment(note.event).format("DD/MM/YY")}</span>}
+      bottomLabel={
+        <span>Next review {moment(note.event).format('DD/MM/YY')}</span>
+      }
     />
   ),
   PERFORMANCE: (note) => (
@@ -115,8 +117,7 @@ const NOTE_TYPES = {
       color="teal"
       bottomLabel={
         <span>
-          About{" "}
-          <a href={note.reviewee.url}>{note.reviewee.full_name}</a>
+          About <a href={note.reviewee.url}>{note.reviewee.full_name}</a>
         </span>
       }
     />

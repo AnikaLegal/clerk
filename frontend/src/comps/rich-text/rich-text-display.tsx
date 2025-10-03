@@ -1,15 +1,12 @@
-import { Link, RichTextEditor, RichTextEditorProps } from '@mantine/tiptap'
-import Highlight from '@tiptap/extension-highlight'
-import Underline from '@tiptap/extension-underline'
-import { useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import React, { useEffect } from 'react'
+import {
+  RichTextEditor,
+  RichTextEditorProps,
+} from 'comps/rich-text/rich-text-editor'
+import React from 'react'
+import classes1 from './rich-text-display.module.css'
+import { default as classes2 } from './prosemirror.module.css'
 
-import '@mantine/core/styles.css'
-import '@mantine/tiptap/styles.css'
-
-interface RichTextDisplayProps
-  extends Omit<RichTextEditorProps, 'editor' | 'children'> {
+interface RichTextDisplayProps extends RichTextEditorProps {
   content?: string
 }
 
@@ -17,32 +14,16 @@ export const RichTextDisplay = ({
   content,
   ...props
 }: RichTextDisplayProps) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Link.configure({
-        HTMLAttributes: {
-          target: null,
-        },
-      }),
-      Highlight,
-      Underline,
-    ],
-    editable: false,
-  })
-
-  useEffect(() => {
-    editor?.commands.setContent(content ?? '')
-  }, [editor, content])
-
   return (
     <RichTextEditor
-      className="rich-text-display"
-      editor={editor}
-      styles={{ root: { border: 'none' } }}
       {...props}
-    >
-      <RichTextEditor.Content />
-    </RichTextEditor>
+      disabled={true}
+      initialContent={content}
+      updateOnContentChange
+      classNames={{
+        content: `${classes1.content} ${classes2.content}`,
+        root: classes1.root,
+      }}
+    />
   )
 }
