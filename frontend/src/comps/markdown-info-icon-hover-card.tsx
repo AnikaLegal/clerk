@@ -2,8 +2,6 @@ import { Anchor, HoverCard, HoverCardProps, Text } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import React from 'react'
 
-import '@mantine/core/styles.css'
-
 const MarkdownInfoIconHoverCard = (props: HoverCardProps) => (
   <HoverCard {...props}>
     <HoverCard.Target>

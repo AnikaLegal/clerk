@@ -1,0 +1,59 @@
+get:
+  operationId: getCaseDate
+  parameters:
+    - name: id
+      description: Date ID
+      in: path
+      required: true
+      schema:
+        type: number
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IssueDate.yaml
+patch:
+  operationId: updateCaseDate
+  parameters:
+    - name: id
+      description: Date ID
+      in: path
+      required: true
+      schema:
+        type: number
+  requestBody:
+    required: true
+    description: Successful response.
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IssueDateCreate.yaml
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IssueDate.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+delete:
+  operationId: deleteCaseDate
+  parameters:
+    - name: id
+      description: Date ID
+      in: path
+      required: true
+      schema:
+        type: number
+  responses:
+    "204":
+      $ref: ../responses/NoContent.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

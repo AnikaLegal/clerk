@@ -1,0 +1,12 @@
+.content {
+  & :global(.tiptap) {
+    padding: 0;
+  }
+  & :global(.ProseMirror-trailingBreak) {
+    display: none;
+  }
+}
+
+.root {
+  border: none;
+}

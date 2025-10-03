@@ -12,6 +12,18 @@ import slackifyMarkdown from 'slackify-markdown'
 import styled from 'styled-components'
 import xss, { OnTagAttrHandler } from 'xss'
 
+import 'dayjs/locale/en-au'
+import { DatesProvider } from '@mantine/dates'
+
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+
+import '@mantine/core/styles.css'
+import '@mantine/tiptap/styles.css'
+import '@mantine/dates/styles.css'
+
+dayjs.extend(customParseFormat)
+
 const theme = createTheme({
   fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
 })
@@ -72,13 +84,15 @@ export const mount = (App: React.ComponentType) => {
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
         <MantineProvider theme={theme}>
-          <ModalsProvider>
-            <ErrorBoundary>
-              <FadeInOnLoad>
-                <App />
-              </FadeInOnLoad>
-            </ErrorBoundary>
-          </ModalsProvider>
+          <DatesProvider settings={{ locale: 'en-au' }}>
+            <ModalsProvider>
+              <ErrorBoundary>
+                <FadeInOnLoad>
+                  <App />
+                </FadeInOnLoad>
+              </ErrorBoundary>
+            </ModalsProvider>
+          </DatesProvider>
         </MantineProvider>
       </SnackbarProvider>
     </Provider>

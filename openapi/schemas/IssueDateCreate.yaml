@@ -1,0 +1,13 @@
+allOf:
+  - $ref: ./IssueDateBase.yaml
+  - type: object
+    properties:
+      issue_id:
+        type: string
+        format: uuid
+      notes:
+        type: string
+      is_reviewed:
+        type: boolean
+    required:
+      - issue_id

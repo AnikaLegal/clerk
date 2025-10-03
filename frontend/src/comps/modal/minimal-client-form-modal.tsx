@@ -6,8 +6,6 @@ import React from 'react'
 import { RequiredKeysOf } from 'type-fest'
 import * as Yup from 'yup'
 
-import '@mantine/core/styles.css'
-
 Yup.setLocale({ mixed: { required: 'This field is required.' } })
 
 export type RequiredClientProps = Pick<

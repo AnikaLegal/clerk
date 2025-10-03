@@ -3,9 +3,10 @@ from core.events.service import (
     on_service_delete,
     on_service_update,
 )
-from core.models import Issue, IssueNote, ServiceEvent
+from core.models import AuditEvent, Issue, IssueNote, ServiceEvent, IssueDate
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
 from django.contrib.contenttypes.prefetch import GenericPrefetch
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -128,6 +129,22 @@ def case_detail_documents_page_view(request, pk):
 
 @api_view(["GET"])
 @paralegal_or_better_required
+def case_detail_dates_page_view(request, pk):
+    """
+    The dates related to a case.
+    """
+    issue = get_object_or_404(Issue, pk=pk)
+    context = {
+        "case_pk": pk,
+        "urls": get_detail_urls(issue),
+    }
+    return render_react_page(
+        request, f"Case {issue.fileref}", "case-date-list", context
+    )
+
+
+@api_view(["GET"])
+@paralegal_or_better_required
 def case_detail_services_page_view(request, pk):
     """
     The services related to a case.
@@ -145,6 +162,7 @@ def get_detail_urls(issue: Issue):
         "detail": reverse("case-detail", args=(issue.pk,)),
         "email": reverse("case-email-list", args=(issue.pk,)),
         "docs": reverse("case-docs", args=(issue.pk,)),
+        "dates": reverse("case-date-list", args=(issue.pk,)),
         "services": reverse("case-services", args=(issue.pk,)),
     }
 
@@ -251,6 +269,14 @@ class CaseApiViewset(
         prefetch = GenericPrefetch(
             "content_object",
             [
+                AuditEvent.objects.filter(
+                    log_entry__content_type=ContentType.objects.get_for_model(
+                        IssueDate
+                    ),
+                    log_entry__serialized_data__fields__issue=str(issue.id),
+                ).select_related(
+                    "log_entry", "log_entry__content_type", "log_entry__actor"
+                ),
                 ServiceEvent.objects.filter(service__issue=issue)
                 .select_related("user")
                 .prefetch_related("user__groups"),
@@ -259,6 +285,7 @@ class CaseApiViewset(
 
         notes = (
             IssueNote.objects.filter(issue=issue.pk)
+            .select_related("issue", "creator", "content_type")
             .prefetch_related(prefetch, "creator__groups")
             .filter(note_type__in=note_types)
             .order_by("-created_at")
