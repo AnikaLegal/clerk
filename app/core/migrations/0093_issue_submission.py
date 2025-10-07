@@ -39,7 +39,7 @@ def _link_submissions_to_issues(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0088_alter_client_pronouns"),
+        ("core", "0092_alter_issuedate_type"),
     ]
 
     operations = [
