@@ -19,7 +19,10 @@ class ClientSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     preferred_name = serializers.CharField(allow_null=True)
     email = serializers.EmailField()
-    date_of_birth = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    date_of_birth = serializers.DateField(
+        format="%d/%m/%Y",  # pyright: ignore[reportArgumentType]
+        input_formats=["%d/%m/%Y"],
+    )
     phone_number = serializers.CharField()
     gender = serializers.CharField()
     centrelink_support = serializers.BooleanField()
