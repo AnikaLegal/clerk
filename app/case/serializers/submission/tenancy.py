@@ -1,11 +1,10 @@
-from datetime import datetime
-
 from core.models.tenancy import LeaseType, RentalType
 from rest_framework import serializers
 
 from case.serializers.fields import ChoiceDisplayField
 
 from .person import PersonSerializer
+from .helpers import string_to_date
 
 
 class TenancySerializer(serializers.Serializer):
@@ -16,11 +15,7 @@ class TenancySerializer(serializers.Serializer):
     rental_circumstances = ChoiceDisplayField(
         allow_null=True, choices=RentalType.choices
     )
-    start_date = serializers.DateField(
-        allow_null=True,
-        format="%d/%m/%Y",  # pyright: ignore[reportArgumentType]
-        input_formats=["%d/%m/%Y"],
-    )
+    start_date = serializers.DateField(allow_null=True)
     landlord = PersonSerializer(allow_null=True)
     agent = PersonSerializer(allow_null=True)
 
@@ -32,9 +27,7 @@ class TenancySerializer(serializers.Serializer):
             "postcode": answers.get("POSTCODE"),
             "is_on_lease": answers.get("IS_ON_LEASE"),
             "rental_circumstances": answers.get("RENTAL_CIRCUMSTANCES"),
-            "start_date": datetime.strptime(
-                answers.get("START_DATE"), "%Y-%m-%d"
-            ).date(),
+            "start_date": string_to_date(answers.get("START_DATE")),
             "landlord": {
                 "name": answers.get("LANDLORD_NAME"),
                 "address": answers.get("LANDLORD_ADDRESS"),

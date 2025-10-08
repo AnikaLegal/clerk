@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from core.models.client import (
     AboriginalOrTorresStraitIslander,
     CallTime,
@@ -12,6 +10,7 @@ from rest_framework import serializers
 from case.serializers.fields import ChoiceDisplayField
 
 from .fields import StringOrListField
+from .helpers import string_to_date
 
 
 class ClientSerializer(serializers.Serializer):
@@ -19,10 +18,7 @@ class ClientSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     preferred_name = serializers.CharField(allow_null=True)
     email = serializers.EmailField()
-    date_of_birth = serializers.DateField(
-        format="%d/%m/%Y",  # pyright: ignore[reportArgumentType]
-        input_formats=["%d/%m/%Y"],
-    )
+    date_of_birth = serializers.DateField()
     phone_number = serializers.CharField()
     gender = serializers.CharField()
     centrelink_support = serializers.BooleanField()
@@ -37,9 +33,8 @@ class ClientSerializer(serializers.Serializer):
     )
     number_of_dependents = serializers.IntegerField(allow_null=True)
     eligibility_circumstances = StringOrListField(
-        child=ChoiceDisplayField(
-            allow_null=True, choices=EligibilityCircumstanceType.choices
-        ),
+        allow_null=True,
+        child=ChoiceDisplayField(choices=EligibilityCircumstanceType.choices),
     )
     contact_restriction = ChoiceDisplayField(
         allow_null=True, choices=ContactRestriction.choices
@@ -57,7 +52,7 @@ class ClientSerializer(serializers.Serializer):
             "last_name": answers.get("LAST_NAME"),
             "preferred_name": answers.get("PREFERRED_NAME"),
             "email": answers.get("EMAIL"),
-            "date_of_birth": datetime.strptime(answers.get("DOB"), "%Y-%m-%d").date(),
+            "date_of_birth": string_to_date(answers.get("DOB")),
             "phone_number": answers.get("PHONE"),
             "gender": answers.get("GENDER"),
             "centrelink_support": answers.get("CENTRELINK_SUPPORT"),

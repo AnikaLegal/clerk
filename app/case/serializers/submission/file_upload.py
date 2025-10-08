@@ -8,7 +8,9 @@ class FileUploadListSerializer(serializers.ListSerializer):
         topic = answers.get("ISSUES")
         if topic:
             upload_answers = UPLOAD_ANSWERS.get(topic, [])
-            uploads = [item for key in upload_answers for item in answers.get(key, [])]
+            uploads = []
+            for key in upload_answers:
+                uploads.extend(answers.get(key) or [])
         else:
             uploads = []
         return super().to_representation(uploads)
