@@ -1,5 +1,15 @@
-from rest_framework import serializers
 from django.utils import timezone
+from rest_framework import serializers
+
+
+class ChoiceDisplayField(serializers.ChoiceField):
+    def to_representation(self, value):
+        value = super().to_representation(value)
+        label = self.choices.get(value)
+        return {"label": label, "value": value}
+
+    def to_internal_value(self, data):
+        return super().to_internal_value(data.get("value"))
 
 
 class TextChoiceField(serializers.CharField):
