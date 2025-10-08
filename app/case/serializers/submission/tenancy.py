@@ -17,7 +17,9 @@ class TenancySerializer(serializers.Serializer):
         allow_null=True, choices=RentalType.choices
     )
     start_date = serializers.DateField(
-        allow_null=True, format="%d/%m/%Y", input_formats=["%d/%m/%Y"]
+        allow_null=True,
+        format="%d/%m/%Y",  # pyright: ignore[reportArgumentType]
+        input_formats=["%d/%m/%Y"],
     )
     landlord = PersonSerializer(allow_null=True)
     agent = PersonSerializer(allow_null=True)
