@@ -40,7 +40,7 @@ CASE_1_ANSWERS = {
     "INTERPRETER": "NO",
     "CENTRELINK_SUPPORT": False,
     "ELIGIBILITY_NOTES": "I need help pls.",
-    "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
+    "AVAILABILITY": ["WEEK_DAY", "WEEK_EVENING"],
     "CAN_SPEAK_NON_ENGLISH": True,
     "FIRST_LANGUAGE": "Chinese",
     "GENDER": "male",
@@ -73,7 +73,7 @@ Test case #2
 CASE_2_ANSWERS = {
     **BASE_ANSWERS,
     "PREFERRED_NAME": None,
-    "AVAILIBILITY": ["WEEK_DAY", "SUNDAY"],
+    "AVAILABILITY": ["WEEK_DAY", "SUNDAY"],
     "CAN_SPEAK_NON_ENGLISH": False,
     "FIRST_LANGUAGE": None,
     "FIRST_NAME": "Matthew",
@@ -103,7 +103,7 @@ Test case #3
 CASE_3_ANSWERS = {
     **BASE_ANSWERS,
     "PREFERRED_NAME": None,
-    "AVAILIBILITY": ["SUNDAY"],
+    "AVAILABILITY": ["SUNDAY"],
     "CAN_SPEAK_NON_ENGLISH": True,
     "FIRST_LANGUAGE": "Russian",
     "GENDER": "omitted",
@@ -134,7 +134,7 @@ Test case #3
 CASE_4_ANSWERS = {
     **BASE_ANSWERS,
     "PREFERRED_NAME": "Matt",
-    "AVAILIBILITY": ["WEEK_DAY", "WEEK_EVENING"],
+    "AVAILABILITY": ["WEEK_DAY", "WEEK_EVENING"],
     "CAN_SPEAK_NON_ENGLISH": True,
     "FIRST_LANGUAGE": "Chinese",
     "GENDER": "male",

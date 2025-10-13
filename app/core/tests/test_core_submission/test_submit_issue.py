@@ -2,7 +2,6 @@ import pytest
 
 from core.factories import FileUploadFactory, ClientFactory, TenancyFactory
 from core.models import FileUpload, Issue, Submission
-from core.models.upload import FileUpload
 from core.services.submission import process_issue
 
 """
@@ -17,7 +16,7 @@ REPAIRS_ANSWERS = {
     "WEEKLY_HOUSEHOLD_INCOME": 1000,
     "WEEKLY_RENT": 500,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
-    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "LEGAL_CENTRE_REFERRER": "Justice Connect",
     "REFERRER_TYPE": "LEGAL_CENTRE",
     "REPAIRS_REQUIRED": ["Water", "Roof"],
     "REPAIRS_ISSUE_DESCRIPTION": "Water pipe burst, damaging roof.",

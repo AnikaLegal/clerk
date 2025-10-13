@@ -1,8 +1,6 @@
+from accounts.models import User
 from django.db import models
 
-from accounts.models import User
-
-from .client import Client
 from .person import Person
 from .timestamped import TimestampedModel
 
