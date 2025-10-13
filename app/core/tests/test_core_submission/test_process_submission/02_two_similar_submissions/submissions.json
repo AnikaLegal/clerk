@@ -3,7 +3,7 @@
     "CENTRELINK_SUPPORT": true,
     "ELIGIBILITY_NOTES": null,
     "ADDRESS": "123 Fake St",
-    "AVAILIBILITY": [
+    "AVAILABILITY": [
       "WEEK_DAY",
       "WEEK_EVENING"
     ],
@@ -24,7 +24,7 @@
     "ELIGIBILITY_CIRCUMSTANCES": [
       "SUBSTANCE_ABUSE"
     ],
-    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "LEGAL_CENTRE_REFERRER": "Justice Connect",
     "NUMBER_OF_DEPENDENTS": 0,
     "PHONE": "0431417373",
     "POSTCODE": 3065,
@@ -58,7 +58,7 @@
     "CENTRELINK_SUPPORT": true,
     "ELIGIBILITY_NOTES": null,
     "ADDRESS": "123 Fake St",
-    "AVAILIBILITY": [
+    "AVAILABILITY": [
       "WEEK_DAY",
       "WEEK_EVENING"
     ],
@@ -79,7 +79,7 @@
     "ELIGIBILITY_CIRCUMSTANCES": [
       "SUBSTANCE_ABUSE"
     ],
-    "LEGAL_CENTER_REFERRER": "Justice Connect",
+    "LEGAL_CENTRE_REFERRER": "Justice Connect",
     "NUMBER_OF_DEPENDENTS": 0,
     "PHONE": "0431417373",
     "POSTCODE": 3065,
