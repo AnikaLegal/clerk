@@ -93,7 +93,7 @@ def process_issue(answers, client, tenancy):
         )
 
     referrer = ""
-    referrer = get_with_default(answers, "LEGAL_CENTER_REFERRER", referrer)
+    referrer = get_with_default(answers, "LEGAL_CENTRE_REFERRER", referrer)
     referrer = get_with_default(answers, "HOUSING_SERVICE_REFERRER", referrer)
     referrer = get_with_default(answers, "COMMUNITY_ORGANISATION_REFERRER", referrer)
     referrer = get_with_default(answers, "SOCIAL_REFERRER", referrer)
@@ -156,7 +156,7 @@ def process_client(answers):
             "is_aboriginal_or_torres_strait_islander": get_as_string(
                 answers, "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
             ),
-            "call_times": get_as_list(answers, "AVAILIBILITY"),
+            "call_times": get_as_list(answers, "AVAILABILITY"),
             "eligibility_circumstances": get_as_list(
                 answers, "ELIGIBILITY_CIRCUMSTANCES"
             ),
