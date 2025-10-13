@@ -59,6 +59,10 @@ class SubmissionAdmin(admin.ModelAdmin):
         "is_processed",
         "is_reminder_sent",
     )
+    readonly_fields = ("answers_json",)
+
+    def answers_json(self, instance):
+        return dict_to_json_html(instance.answers)
 
 
 @admin.register(FileUpload)
