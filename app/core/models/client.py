@@ -68,8 +68,7 @@ class EligibilityCircumstanceType(models.TextChoices):
 
 
 # YES_CONFIRM is the placeholder value for true values migrated from the
-# previous boolean field type. It can be removed when no values remain in the
-# db.
+# previous boolean field type.
 class AboriginalOrTorresStraitIslander(models.TextChoices):
     NO = "NO", "No"
     YES_ABORIGINAL = "YES_ABORIGINAL", "Yes, Aboriginal"
@@ -87,8 +86,7 @@ class AboriginalOrTorresStraitIslander(models.TextChoices):
 
 
 # YES_CONFIRM is the placeholder value for true values migrated from the
-# previous boolean field type. It can be removed when no values remain in the
-# db.
+# previous boolean field type.
 class RequiresInterpreter(models.TextChoices):
     NO = "NO", "No"
     YES_WRITTEN = "YES_WRITTEN", "Yes (written communication)"
