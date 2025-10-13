@@ -2,6 +2,18 @@ from django.utils import timezone
 from rest_framework import serializers
 
 
+class BooleanYesNoDisplayField(serializers.BooleanField):
+    def to_representation(self, value):  # pyright: ignore [reportIncompatibleMethodOverride]
+        value = super().to_representation(value)
+        if value is True:
+            return {"label": "Yes", "value": True}
+        else:
+            return {"label": "No", "value": False}
+
+    def to_internal_value(self, data):
+        return super().to_internal_value(data.get("value"))
+
+
 class ChoiceDisplayField(serializers.ChoiceField):
     def to_representation(self, value):
         value = super().to_representation(value)

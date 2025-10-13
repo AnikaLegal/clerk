@@ -2,8 +2,8 @@ from .account import AccountSearchSerializer, AccountSortSerializer
 from .client import ClientSearchSerializer, ClientSerializer
 from .documents import (
     DocumentTemplateFilterSerializer,
-    DocumentTemplateSerializer,
     DocumentTemplateRenameSerializer,
+    DocumentTemplateSerializer,
 )
 from .email import (
     EmailAttachmentSerializer,
@@ -19,5 +19,33 @@ from .issue import (
 from .notification import NotificationSerializer
 from .person import PersonSearchRequestSerializer, PersonSerializer
 from .service import ServiceSearchSerializer, ServiceSerializer
+from .submission import SubmissionSerializer
 from .tenancy import TenancySerializer
 from .user import ParalegalSerializer, UserCreateSerializer, UserSerializer
+
+__all__ = [
+    "AccountSearchSerializer",
+    "AccountSortSerializer",
+    "ClientSearchSerializer",
+    "ClientSerializer",
+    "DocumentTemplateFilterSerializer",
+    "DocumentTemplateRenameSerializer",
+    "DocumentTemplateSerializer",
+    "EmailAttachmentSerializer",
+    "EmailSerializer",
+    "EmailTemplateSerializer",
+    "EmailThreadSerializer",
+    "IssueNoteSerializer",
+    "IssueSearchSerializer",
+    "IssueSerializer",
+    "NotificationSerializer",
+    "PersonSearchRequestSerializer",
+    "PersonSerializer",
+    "ServiceSearchSerializer",
+    "ServiceSerializer",
+    "SubmissionSerializer",
+    "TenancySerializer",
+    "ParalegalSerializer",
+    "UserCreateSerializer",
+    "UserSerializer",
+]

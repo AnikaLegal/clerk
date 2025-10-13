@@ -8,7 +8,9 @@ from .helpers import string_to_date
 
 
 class TenancySerializer(serializers.Serializer):
-    address = serializers.CharField()
+    address = serializers.CharField(
+        allow_null=True, allow_blank=True, trim_whitespace=True
+    )
     suburb = serializers.CharField(allow_null=True)
     postcode = serializers.CharField(allow_null=True)
     is_on_lease = ChoiceDisplayField(allow_null=True, choices=LeaseType.choices)

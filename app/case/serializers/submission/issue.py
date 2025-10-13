@@ -5,8 +5,9 @@ from .fields import StringOrListField
 
 
 class IssueSerializer(serializers.Serializer):
-    topic = ChoiceDisplayField(choices=CaseTopic.CHOICES, allow_null=True)
-
+    issues = StringOrListField(
+        allow_null=True, child=ChoiceDisplayField(choices=CaseTopic.CHOICES)
+    )
     weekly_rent = serializers.IntegerField(allow_null=True)
     weekly_income = serializers.IntegerField(allow_null=True)
     employment_status = StringOrListField(
@@ -17,23 +18,28 @@ class IssueSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         answers = instance.answers
+
+        # Handle some legacy values in submission data.
         instance = {
-            "topic": answers.get("ISSUES"),
-            "weekly_income": answers.get("WEEKLY_HOUSEHOLD_INCOME"),
+            "issues": answers.get("ISSUES"),
+            "weekly_income": answers.get("WEEKLY_HOUSEHOLD_INCOME")
+            or answers.get("WEEKLY_INCOME_MULTI")  # NB legacy value
+            or answers.get("WEEKLY_INCOME"),  # NB legacy value
             "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES"),
             "referrer": answers.get("SOCIAL_REFERRER")
             or answers.get("COMMUNITY_ORGANISATION_REFERRER")
             or answers.get("HOUSING_SERVICE_REFERRER")
-            or answers.get("LEGAL_CENTER_REFERRER"),
+            or answers.get("LEGAL_CENTRE_REFERRER"),
             "referrer_type": answers.get("REFERRER_TYPE"),
-            "weekly_rent": answers.get("WEEKLY_RENT"),
+            "weekly_rent": answers.get("WEEKLY_RENT")
+            or answers.get("WEEKLY_RENT_MULTI"),  # NB legacy value
             "support_worker": {
                 "name": answers.get("SUPPORT_WORKER_NAME"),
                 "address": answers.get("SUPPORT_WORKER_ADDRESS"),
                 "email": answers.get("SUPPORT_WORKER_EMAIL"),
                 "phone": answers.get("SUPPORT_WORKER_PHONE"),
                 "support_contact_preferences": answers.get(
-                    "SUPPORT_WORKER_CONTACT_PREFERENCES"
+                    "SUPPORT_WORKER_CONTACT_PREFERENCE"
                 ),
             },
         }

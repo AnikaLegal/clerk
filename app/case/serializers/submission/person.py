@@ -4,10 +4,18 @@ from case.serializers.fields import ChoiceDisplayField
 
 
 class PersonSerializer(serializers.Serializer):
-    name = serializers.CharField(allow_null=True)
-    address = serializers.CharField(allow_null=True)
-    email = serializers.EmailField(allow_null=True)
-    phone = serializers.CharField(allow_null=True)
+    name = serializers.CharField(
+        allow_null=True, allow_blank=True, trim_whitespace=True
+    )
+    address = serializers.CharField(
+        allow_null=True, allow_blank=True, trim_whitespace=True
+    )
+    email = serializers.CharField(
+        allow_null=True, allow_blank=True, trim_whitespace=True
+    )
+    phone = serializers.CharField(
+        allow_null=True, allow_blank=True, trim_whitespace=True
+    )
     support_contact_preferences = ChoiceDisplayField(
         allow_null=True, choices=SupportContactPreferences.choices
     )
