@@ -29,7 +29,7 @@ class TextChoiceField(serializers.CharField):
         super().__init__(*args, **kwargs)
         self.text_choice_cls = text_choice_cls
 
-    def to_representation(self, value):
+    def to_representation(self, value):  # pyright: ignore [reportIncompatibleMethodOverride]
         display = self.text_choice_cls[value].label if value else ""
         choices = self.text_choice_cls.choices
         if self.allow_blank:
@@ -48,7 +48,7 @@ class TextChoiceListField(serializers.ListField):
         super().__init__(*args, **kwargs)
         self.text_choice_cls = text_choice_cls
 
-    def to_representation(self, value):
+    def to_representation(self, value):  # pyright: ignore [reportIncompatibleMethodOverride]
         display = " | ".join(self.text_choice_cls[s].label for s in value if s)
         return {
             "display": display,
