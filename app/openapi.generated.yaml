@@ -1865,6 +1865,10 @@ components:
             next_review:
               type: string
               nullable: true
+            submission_id:
+              type: string
+              format: uuid
+              nullable: true
           required:
             - id
             - topic_display
@@ -1894,6 +1898,7 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
+            - submission_id
     ClientCreate:
       allOf:
         - $ref: "#/components/schemas/ClientBase"

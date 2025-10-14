@@ -1042,6 +1042,7 @@ export type Issue = IssueBase & {
   is_conflict_check: boolean | null;
   is_eligibility_check: boolean | null;
   next_review: string | null;
+  submission_id: string | null;
 };
 export type Error = {
   detail?: string | object | (string | object | any)[];
