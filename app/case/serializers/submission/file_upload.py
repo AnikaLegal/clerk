@@ -4,9 +4,7 @@ from core.services.submission import UPLOAD_ANSWERS
 
 class FileUploadListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
-        answers = data.answers
-
-        issues = answers.get("ISSUES")
+        issues = data.get("ISSUES")
         if not isinstance(issues, list):
             issues = [issues]
 
@@ -14,7 +12,7 @@ class FileUploadListSerializer(serializers.ListSerializer):
         for topic in issues:
             upload_answers = UPLOAD_ANSWERS.get(topic, [])
             for key in upload_answers:
-                uploads.extend(answers.get(key) or [])
+                uploads.extend(data.get(key) or [])
 
         return super().to_representation(uploads)
 

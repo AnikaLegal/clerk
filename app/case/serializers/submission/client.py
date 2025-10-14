@@ -76,27 +76,26 @@ class ClientSerializer(serializers.Serializer):
     )
 
     def to_representation(self, instance):
-        answers = instance.answers
         instance = {
-            "first_name": answers.get("FIRST_NAME"),
-            "last_name": answers.get("LAST_NAME"),
-            "preferred_name": answers.get("PREFERRED_NAME"),
-            "email": answers.get("EMAIL"),
-            "date_of_birth": string_to_date(answers.get("DOB")),
-            "phone_number": answers.get("PHONE"),
-            "gender": answers.get("GENDER"),
-            "centrelink_support": answers.get("CENTRELINK_SUPPORT"),
-            "eligibility_notes": answers.get("ELIGIBILITY_NOTES"),
-            "requires_interpreter": answers.get("INTERPRETER"),
-            "primary_language_non_english": answers.get("CAN_SPEAK_NON_ENGLISH"),
-            "primary_language": answers.get("FIRST_LANGUAGE"),
-            "is_aboriginal_or_torres_strait_islander": answers.get(
+            "first_name": instance.get("FIRST_NAME"),
+            "last_name": instance.get("LAST_NAME"),
+            "preferred_name": instance.get("PREFERRED_NAME"),
+            "email": instance.get("EMAIL"),
+            "date_of_birth": string_to_date(instance.get("DOB")),
+            "phone_number": instance.get("PHONE"),
+            "gender": instance.get("GENDER"),
+            "centrelink_support": instance.get("CENTRELINK_SUPPORT"),
+            "eligibility_notes": instance.get("ELIGIBILITY_NOTES"),
+            "requires_interpreter": instance.get("INTERPRETER"),
+            "primary_language_non_english": instance.get("CAN_SPEAK_NON_ENGLISH"),
+            "primary_language": instance.get("FIRST_LANGUAGE"),
+            "is_aboriginal_or_torres_strait_islander": instance.get(
                 "IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER"
             ),
-            "number_of_dependents": answers.get("NUMBER_OF_DEPENDENTS"),
-            "eligibility_circumstances": answers.get("ELIGIBILITY_CIRCUMSTANCES"),
-            "special_circumstances": answers.get("SPECIAL_CIRCUMSTANCES"),
-            "call_times": answers.get("AVAILABILITY"),
+            "number_of_dependents": instance.get("NUMBER_OF_DEPENDENTS"),
+            "eligibility_circumstances": instance.get("ELIGIBILITY_CIRCUMSTANCES"),
+            "special_circumstances": instance.get("SPECIAL_CIRCUMSTANCES"),
+            "call_times": instance.get("AVAILABILITY"),
         }
         return super().to_representation(instance)
 

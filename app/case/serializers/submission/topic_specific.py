@@ -8,25 +8,24 @@ from .helpers import string_to_date
 
 class TopicSpecificSerializer(serializers.Serializer):
     def to_representation(self, instance):
-        answers = instance.answers
-        issues = answers.get("ISSUES")
+        issues = instance.get("ISSUES")
         if not isinstance(issues, list):
             issues = [issues]
 
         representation = {}
         for topic in issues:
             if topic == CaseTopic.REPAIRS:
-                serializer = RepairsSpecificSerializer(answers)
+                serializer = RepairsSpecificSerializer(instance)
             elif topic == CaseTopic.BONDS:
-                serializer = BondsSpecificSerializer(answers)
+                serializer = BondsSpecificSerializer(instance)
             elif topic == CaseTopic.EVICTION_ARREARS:
-                serializer = EvictionArrearsSpecificSerializer(answers)
+                serializer = EvictionArrearsSpecificSerializer(instance)
             elif topic == CaseTopic.EVICTION_RETALIATORY:
-                serializer = EvictionRetaliatorySpecificSerializer(answers)
+                serializer = EvictionRetaliatorySpecificSerializer(instance)
             elif topic == CaseTopic.RENT_REDUCTION:
-                serializer = RentReductionSpecificSerializer(answers)
+                serializer = RentReductionSpecificSerializer(instance)
             elif topic == CaseTopic.OTHER:
-                serializer = OtherSpecificSerializer(answers)
+                serializer = OtherSpecificSerializer(instance)
             else:
                 continue
             representation[topic] = serializer.data

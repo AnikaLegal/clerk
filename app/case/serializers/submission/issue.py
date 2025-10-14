@@ -17,28 +17,25 @@ class IssueSerializer(serializers.Serializer):
     referrer = serializers.CharField(allow_null=True)
 
     def to_representation(self, instance):
-        answers = instance.answers
-
-        # Handle some legacy values in submission data.
         instance = {
-            "issues": answers.get("ISSUES"),
-            "weekly_income": answers.get("WEEKLY_HOUSEHOLD_INCOME")
-            or answers.get("WEEKLY_INCOME_MULTI")  # NB legacy value
-            or answers.get("WEEKLY_INCOME"),  # NB legacy value
-            "employment_status": answers.get("WORK_OR_STUDY_CIRCUMSTANCES"),
-            "referrer": answers.get("SOCIAL_REFERRER")
-            or answers.get("COMMUNITY_ORGANISATION_REFERRER")
-            or answers.get("HOUSING_SERVICE_REFERRER")
-            or answers.get("LEGAL_CENTRE_REFERRER"),
-            "referrer_type": answers.get("REFERRER_TYPE"),
-            "weekly_rent": answers.get("WEEKLY_RENT")
-            or answers.get("WEEKLY_RENT_MULTI"),  # NB legacy value
+            "issues": instance.get("ISSUES"),
+            "weekly_income": instance.get("WEEKLY_HOUSEHOLD_INCOME")
+            or instance.get("WEEKLY_INCOME_MULTI")  # NB legacy value
+            or instance.get("WEEKLY_INCOME"),  # NB legacy value
+            "employment_status": instance.get("WORK_OR_STUDY_CIRCUMSTANCES"),
+            "referrer": instance.get("SOCIAL_REFERRER")
+            or instance.get("COMMUNITY_ORGANISATION_REFERRER")
+            or instance.get("HOUSING_SERVICE_REFERRER")
+            or instance.get("LEGAL_CENTRE_REFERRER"),
+            "referrer_type": instance.get("REFERRER_TYPE"),
+            "weekly_rent": instance.get("WEEKLY_RENT")
+            or instance.get("WEEKLY_RENT_MULTI"),  # NB legacy value
             "support_worker": {
-                "name": answers.get("SUPPORT_WORKER_NAME"),
-                "address": answers.get("SUPPORT_WORKER_ADDRESS"),
-                "email": answers.get("SUPPORT_WORKER_EMAIL"),
-                "phone": answers.get("SUPPORT_WORKER_PHONE"),
-                "support_contact_preferences": answers.get(
+                "name": instance.get("SUPPORT_WORKER_NAME"),
+                "address": instance.get("SUPPORT_WORKER_ADDRESS"),
+                "email": instance.get("SUPPORT_WORKER_EMAIL"),
+                "phone": instance.get("SUPPORT_WORKER_PHONE"),
+                "support_contact_preferences": instance.get(
                     "SUPPORT_WORKER_CONTACT_PREFERENCE"
                 ),
             },
