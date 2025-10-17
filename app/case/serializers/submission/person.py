@@ -19,3 +19,9 @@ class PersonSerializer(serializers.Serializer):
     support_contact_preferences = ChoiceDisplayField(
         allow_null=True, choices=SupportContactPreferences.choices
     )
+
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance

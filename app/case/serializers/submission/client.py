@@ -1,7 +1,6 @@
 from core.models.client import (
     AboriginalOrTorresStraitIslander,
     CallTime,
-    ContactRestriction,
     EligibilityCircumstanceType,
     RequiresInterpreter,
 )
@@ -70,7 +69,7 @@ class ClientSerializer(serializers.Serializer):
         child=ChoiceDisplayField(choices=SpecialCircumstances.choices),
     )
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "first_name": instance.get("FIRST_NAME"),
             "last_name": instance.get("LAST_NAME"),
@@ -92,7 +91,10 @@ class ClientSerializer(serializers.Serializer):
             "special_circumstances": instance.get("SPECIAL_CIRCUMSTANCES"),
             "call_times": instance.get("AVAILABILITY"),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
     def to_internal_value(self, data):
         data = super().to_internal_value(data)

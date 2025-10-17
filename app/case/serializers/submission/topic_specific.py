@@ -7,7 +7,7 @@ from .helpers import string_to_date
 
 
 class TopicSpecificSerializer(serializers.Serializer):
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         issues = instance.get("ISSUES")
         if not isinstance(issues, list):
             issues = [issues]
@@ -29,6 +29,9 @@ class TopicSpecificSerializer(serializers.Serializer):
             else:
                 continue
             representation[topic] = serializer.data
+
+        if all(value is None for value in representation.values()):
+            return None
         return representation
 
     def to_internal_value(self, data):
@@ -45,7 +48,7 @@ class RepairsSpecificSerializer(serializers.Serializer):
     issue_description = BooleanYesNoDisplayField(allow_null=True)
     required = serializers.ListField(allow_null=True, child=serializers.CharField())
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "issue_start": string_to_date(instance.get("REPAIRS_ISSUE_START")),
             "applied_vcat": instance.get("REPAIRS_APPLIED_VCAT"),
@@ -53,7 +56,10 @@ class RepairsSpecificSerializer(serializers.Serializer):
             "issue_description": instance.get("REPAIRS_ISSUE_DESCRIPTION"),
             "required": instance.get("REPAIRS_REQUIRED"),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
 
 class BondsSpecificSerializer(serializers.Serializer):
@@ -77,7 +83,7 @@ class BondsSpecificSerializer(serializers.Serializer):
     other_reasons_description = serializers.CharField(allow_null=True)
     tenant_has_rtba_application_copy = BooleanYesNoDisplayField(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "claim_reasons": instance.get("BONDS_CLAIM_REASONS"),
             "cleaning_claim_amount": instance.get("BONDS_CLEANING_CLAIM_AMOUNT"),
@@ -109,7 +115,10 @@ class BondsSpecificSerializer(serializers.Serializer):
                 "BONDS_TENANT_HAS_RTBA_APPLICATION_COPY"
             ),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
 
 class EvictionArrearsSpecificSerializer(serializers.Serializer):
@@ -140,7 +149,7 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
     rent_cycle = serializers.CharField(allow_null=True)
     rent_unpaid = serializers.IntegerField(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "doc_delivery_time_notice_to_vacate": instance.get(
                 "EVICTION_ARREARS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE"
@@ -187,7 +196,10 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
             "rent_cycle": instance.get("EVICTION_ARREARS_RENT_CYCLE"),
             "rent_unpaid": instance.get("EVICTION_ARREARS_RENT_UNPAID"),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
 
 class EvictionRetaliatorySpecificSerializer(serializers.Serializer):
@@ -203,7 +215,7 @@ class EvictionRetaliatorySpecificSerializer(serializers.Serializer):
     vcat_hearing = BooleanYesNoDisplayField(allow_null=True)
     vcat_hearing_date = serializers.DateField(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "date_received_ntv": string_to_date(
                 instance.get("EVICTION_RETALIATORY_DATE_RECEIVED_NTV")
@@ -227,7 +239,10 @@ class EvictionRetaliatorySpecificSerializer(serializers.Serializer):
                 instance.get("EVICTION_RETALIATORY_VCAT_HEARING_DATE")
             ),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
 
 class RentReductionSpecificSerializer(serializers.Serializer):
@@ -236,21 +251,27 @@ class RentReductionSpecificSerializer(serializers.Serializer):
     issue_start = serializers.DateField(allow_null=True)
     is_notice_to_vacate = BooleanYesNoDisplayField(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "issues": instance.get("RENT_REDUCTION_ISSUES"),
             "issue_description": instance.get("RENT_REDUCTION_ISSUE_DESCRIPTION"),
             "issue_start": string_to_date(instance.get("RENT_REDUCTION_ISSUE_START")),
             "is_notice_to_vacate": instance.get("RENT_REDUCTION_IS_NOTICE_TO_VACATE"),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
 
 class OtherSpecificSerializer(serializers.Serializer):
     issue_description = serializers.CharField(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "issue_description": instance.get("OTHER_ISSUE_DESCRIPTION"),
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance

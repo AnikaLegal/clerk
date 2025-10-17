@@ -2,21 +2,23 @@ from rest_framework import serializers
 from core.models.issue import CaseTopic, EmploymentType, ReferrerType
 from case.serializers.fields import ChoiceDisplayField
 from .fields import StringOrListField
+from .person import PersonSerializer
 
 
 class IssueSerializer(serializers.Serializer):
     issues = StringOrListField(
         allow_null=True, child=ChoiceDisplayField(choices=CaseTopic.CHOICES)
     )
-    weekly_rent = serializers.IntegerField(allow_null=True)
     weekly_income = serializers.IntegerField(allow_null=True)
     employment_status = StringOrListField(
         allow_null=True, child=ChoiceDisplayField(choices=EmploymentType.choices)
     )
-    referrer_type = ChoiceDisplayField(allow_null=True, choices=ReferrerType.choices)
     referrer = serializers.CharField(allow_null=True)
+    referrer_type = ChoiceDisplayField(allow_null=True, choices=ReferrerType.choices)
+    weekly_rent = serializers.IntegerField(allow_null=True)
+    support_worker = PersonSerializer(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "issues": instance.get("ISSUES"),
             "weekly_income": instance.get("WEEKLY_HOUSEHOLD_INCOME")
@@ -40,7 +42,10 @@ class IssueSerializer(serializers.Serializer):
                 ),
             },
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
     def to_internal_value(self, data):
         data = super().to_internal_value(data)

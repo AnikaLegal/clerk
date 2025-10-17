@@ -21,7 +21,7 @@ class TenancySerializer(serializers.Serializer):
     landlord = PersonSerializer(allow_null=True)
     agent = PersonSerializer(allow_null=True)
 
-    def to_representation(self, instance):
+    def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "address": instance.get("ADDRESS"),
             "suburb": instance.get("SUBURB"),
@@ -42,7 +42,10 @@ class TenancySerializer(serializers.Serializer):
                 "phone": instance.get("AGENT_PHONE"),
             },
         }
-        return super().to_representation(instance)
+        instance = super().to_representation(instance)
+        if all(value is None for value in instance.values()):
+            return None
+        return instance
 
     def to_internal_value(self, data):
         data = super().to_internal_value(data)
