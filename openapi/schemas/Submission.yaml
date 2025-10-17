@@ -1,0 +1,15 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  answers_raw:
+    type: object
+  answers:
+    oneOf:
+      - $ref: ./SubmissionAnswers.yaml
+      - type: "null"
+required:
+  - id
+  - answers_raw
+  - answers

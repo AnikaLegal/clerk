@@ -1,6 +1,9 @@
 import { baseApi as api } from "./baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
+    getSubmission: build.query<GetSubmissionApiResponse, GetSubmissionApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/submission/${queryArg.id}/` }),
+    }),
     getCases: build.query<GetCasesApiResponse, GetCasesApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/case/`,
@@ -488,6 +491,12 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as generatedApi };
+export type GetSubmissionApiResponse =
+  /** status 200 Successful response. */ Submission;
+export type GetSubmissionApiArg = {
+  /** Submission ID */
+  id: string;
+};
 export type GetCasesApiResponse = /** status 200 Successful response. */ {
   current: number;
   next: number | null;
@@ -920,6 +929,66 @@ export type RenameDocumentTemplateApiArg = {
   /** Successful response. */
   documentTemplateRename: DocumentTemplateRename;
 };
+export type BooleanYesNo = {
+  label: "Yes" | "No";
+  value: boolean;
+};
+export type ChoiceDisplay = {
+  label: string;
+  value: string;
+};
+export type SubmissionPerson = {
+  name?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  support_contact_preferences?: ChoiceDisplay | null;
+};
+export type SubmissionAnswers = {
+  client?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    preferred_name?: string | null;
+    email?: string | null;
+    date_of_birth?: string | null;
+    phone_number?: string | null;
+    gender?: string | null;
+    centrelink_support?: BooleanYesNo | null;
+    eligibility_notes?: string | null;
+    requires_interpreter?: ChoiceDisplay | null;
+    primary_language_non_english?: BooleanYesNo | null;
+    primary_language?: string | null;
+    is_aboriginal_or_torres_strait_islander?: ChoiceDisplay | null;
+    number_of_dependents?: number | null;
+    eligibility_circumstances?: ChoiceDisplay[] | null;
+    call_times?: ChoiceDisplay[] | null;
+    special_circumstances?: ChoiceDisplay[] | null;
+  };
+  tenancy?: {
+    address?: string | null;
+    suburb?: string | null;
+    postcode?: string | null;
+    is_on_lease?: BooleanYesNo | null;
+    rental_circumstances?: ChoiceDisplay | null;
+    start_date?: string | null;
+    landlord?: SubmissionPerson | null;
+    agent?: SubmissionPerson | null;
+  };
+  issue?: {
+    issues?: ChoiceDisplay[] | null;
+    weekly_income?: number | null;
+    employment_status?: ChoiceDisplay[] | null;
+    referrer?: string | null;
+    referrer_type?: ChoiceDisplay | null;
+    weekly_rent?: number | null;
+    support_worker?: SubmissionPerson | null;
+  };
+};
+export type Submission = {
+  id: string;
+  answers_raw: object;
+  answers: SubmissionAnswers | null;
+};
 export type IssueBase = {
   topic: string;
 };
@@ -1275,6 +1344,7 @@ export type DocumentTemplateRename = {
   name: string;
 };
 export const {
+  useGetSubmissionQuery,
   useGetCasesQuery,
   useCreateCaseMutation,
   useGetCaseQuery,

@@ -4,6 +4,24 @@ info:
   description: API that the Django backend will provide.
   version: 0.1.0
 paths:
+  /clerk/api/submission/{id}/:
+    get:
+      operationId: getSubmission
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submission"
   /clerk/api/case/:
     get:
       operationId: getCases
@@ -1499,6 +1517,190 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    BooleanYesNo:
+      type: object
+      properties:
+        label:
+          type: string
+          enum:
+            - "Yes"
+            - "No"
+        value:
+          type: boolean
+      required:
+        - label
+        - value
+    ChoiceDisplay:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+      required:
+        - label
+        - value
+    SubmissionPerson:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        support_contact_preferences:
+          allOf:
+            - $ref: "#/components/schemas/ChoiceDisplay"
+          nullable: true
+    SubmissionAnswers:
+      type: object
+      properties:
+        client:
+          type: object
+          properties:
+            first_name:
+              type: string
+              nullable: true
+            last_name:
+              type: string
+              nullable: true
+            preferred_name:
+              type: string
+              nullable: true
+            email:
+              type: string
+              nullable: true
+            date_of_birth:
+              type: string
+              nullable: true
+            phone_number:
+              type: string
+              nullable: true
+            gender:
+              type: string
+              nullable: true
+            centrelink_support:
+              allOf:
+                - $ref: "#/components/schemas/BooleanYesNo"
+              nullable: true
+            eligibility_notes:
+              type: string
+              nullable: true
+            requires_interpreter:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            primary_language_non_english:
+              allOf:
+                - $ref: "#/components/schemas/BooleanYesNo"
+              nullable: true
+            primary_language:
+              type: string
+              nullable: true
+            is_aboriginal_or_torres_strait_islander:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            number_of_dependents:
+              type: integer
+              nullable: true
+            eligibility_circumstances:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            call_times:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            special_circumstances:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+        tenancy:
+          properties:
+            address:
+              type: string
+              nullable: true
+            suburb:
+              type: string
+              nullable: true
+            postcode:
+              type: string
+              nullable: true
+            is_on_lease:
+              allOf:
+                - $ref: "#/components/schemas/BooleanYesNo"
+              nullable: true
+            rental_circumstances:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            start_date:
+              type: string
+              nullable: true
+            landlord:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+            agent:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+        issue:
+          properties:
+            issues:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            weekly_income:
+              type: integer
+              nullable: true
+            employment_status:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            referrer:
+              type: string
+              nullable: true
+            referrer_type:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            weekly_rent:
+              type: integer
+              nullable: true
+            support_worker:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+    Submission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        answers_raw:
+          type: object
+        answers:
+          oneOf:
+            - $ref: "#/components/schemas/SubmissionAnswers"
+            - type: "null"
+      required:
+        - id
+        - answers_raw
+        - answers
     IssueBase:
       type: object
       properties:
