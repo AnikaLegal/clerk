@@ -1,5 +1,4 @@
 from core.models import Issue, IssueDate
-from core.models.issue_date import DateType
 from django.db.models import QuerySet, Q
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
