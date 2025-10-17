@@ -1,9 +1,10 @@
 import uuid
 
+from accounts.models import User
+from core.models.timestamped import TimestampedModel
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-
-from core.models.timestamped import TimestampedModel
 
 
 class Submission(TimestampedModel):
@@ -19,3 +20,12 @@ class Submission(TimestampedModel):
     is_processed = models.BooleanField(default=False)
     # Tracks whether MailChimp reminder email has been successfully sent.
     is_reminder_sent = models.BooleanField(default=False)
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+        """
+        try:
+            return self.issue.paralegal_id == user.pk
+        except ObjectDoesNotExist:
+            return False
