@@ -16,7 +16,7 @@ export const DateTable = ({ result, headerRow, dataRow }: DateTableProps) => {
     <Table
       withColumnBorders
       withTableBorder
-      verticalSpacing="md"
+      verticalSpacing="xs"
       fz="md"
       mt="lg"
     >
