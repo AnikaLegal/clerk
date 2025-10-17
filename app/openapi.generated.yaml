@@ -1694,9 +1694,9 @@ components:
         answers_raw:
           type: object
         answers:
-          oneOf:
+          allOf:
             - $ref: "#/components/schemas/SubmissionAnswers"
-            - type: "null"
+          nullable: true
       required:
         - id
         - answers_raw

@@ -6,9 +6,9 @@ properties:
   answers_raw:
     type: object
   answers:
-    oneOf:
+    allOf:
       - $ref: ./SubmissionAnswers.yaml
-      - type: "null"
+    nullable: true
 required:
   - id
   - answers_raw
