@@ -59,11 +59,6 @@ class ClientSerializer(serializers.Serializer):
         allow_null=True,
         child=ChoiceDisplayField(choices=EligibilityCircumstanceType.choices),
     )
-    contact_restriction = ChoiceDisplayField(
-        allow_null=True, choices=ContactRestriction.choices
-    )
-    contact_notes = serializers.CharField(allow_null=True)
-    notes = serializers.CharField(allow_null=True)
     call_times = StringOrListField(
         allow_null=True, child=ChoiceDisplayField(choices=CallTime.choices)
     )
