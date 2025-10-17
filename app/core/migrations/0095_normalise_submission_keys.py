@@ -129,7 +129,7 @@ def _normalise_submission_keys(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0093_issue_submission"),
+        ("core", "0094_issue_submission"),
     ]
 
     operations = [
