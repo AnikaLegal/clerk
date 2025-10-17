@@ -10,7 +10,7 @@ def move_or_discard_key(old_key: str, new_key: str, answers: dict):
         if answers[old_key] is None:
             answers.pop(old_key)
             return
-        if new_key in answers:
+        if new_key in answers and answers[new_key] != answers[old_key]:
             raise Exception(f"Both {old_key} and {new_key} are present in answers")
         answers[new_key] = answers.pop(old_key)
 
