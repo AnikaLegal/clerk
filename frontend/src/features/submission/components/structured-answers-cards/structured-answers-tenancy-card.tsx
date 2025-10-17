@@ -12,25 +12,24 @@ export const StructuredAnswersTenancyCard = ({
   answers,
   card,
 }: StructuredAnswersTenancyCardProps) => {
-  if (!answers.tenancy) {
+  if (!answers.tenancy && !answers.issue?.weekly_rent) {
     return null
   }
-  const tenancy = answers.tenancy
   const data = [
     [
-      { label: 'Address', value: tenancy.address },
-      { label: 'Suburb', value: tenancy.suburb },
-      { label: 'Postcode', value: tenancy.postcode },
+      { label: 'Address', value: answers.tenancy?.address },
+      { label: 'Suburb', value: answers.tenancy?.suburb },
+      { label: 'Postcode', value: answers.tenancy?.postcode },
     ],
     [
-      { label: 'Start date', value: tenancy.start_date },
+      { label: 'Start date', value: answers.tenancy?.start_date },
       {
         label: 'Is client on lease?',
-        value: tenancy.is_on_lease?.label,
+        value: answers.tenancy?.is_on_lease?.label,
       },
       {
         label: 'Rental circumstances',
-        value: tenancy.rental_circumstances?.label,
+        value: answers.tenancy?.rental_circumstances?.label,
       },
     ],
     [{ label: 'Weekly rent', value: answers.issue?.weekly_rent }],
