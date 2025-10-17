@@ -1,7 +1,7 @@
-import { Card, CardProps, Center } from '@mantine/core'
+import { Card, CardProps, Group, Text } from '@mantine/core'
+import { IconExclamationCircle } from '@tabler/icons-react'
 import { SubmissionAnswers } from 'api'
 import React from 'react'
-import { EmptyState } from './answers-display-states'
 import {
   StructuredAnswersAgentCard,
   StructuredAnswersCaseCard,
@@ -20,22 +20,26 @@ export const SubmissionStructuredAnswersCard = ({
   data,
   card,
 }: SubmissionStructuredAnswersCardProps) => {
-  if (!data) {
-    return (
-      <Center>
-        <EmptyState />
-      </Center>
-    )
-  }
-
   return (
     <Card {...card}>
-      <StructuredAnswersCaseCard answers={data} />
-      <StructuredAnswersClientCard answers={data} card={{ mt: 'md' }} />
-      <StructuredAnswersSupportWorkerCard answers={data} card={{ mt: 'md' }} />
-      <StructuredAnswersTenancyCard answers={data} card={{ mt: 'md' }} />
-      <StructuredAnswersAgentCard answers={data} card={{ mt: 'md' }} />
-      <StructuredAnswersLandlordCard answers={data} card={{ mt: 'md' }} />
+      {data ? (
+        <>
+          <StructuredAnswersCaseCard answers={data} />
+          <StructuredAnswersClientCard answers={data} card={{ mt: 'md' }} />
+          <StructuredAnswersSupportWorkerCard
+            answers={data}
+            card={{ mt: 'md' }}
+          />
+          <StructuredAnswersTenancyCard answers={data} card={{ mt: 'md' }} />
+          <StructuredAnswersAgentCard answers={data} card={{ mt: 'md' }} />
+          <StructuredAnswersLandlordCard answers={data} card={{ mt: 'md' }} />
+        </>
+      ) : (
+        <Group justify="center" gap="xs" m="sm">
+          <IconExclamationCircle />
+          <Text>Could not structure submission data</Text>
+        </Group>
+      )}
     </Card>
   )
 }
