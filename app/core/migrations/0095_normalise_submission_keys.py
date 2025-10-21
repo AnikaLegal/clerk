@@ -61,7 +61,7 @@ def _normalise_submission_keys(apps, schema_editor):
         for submission in Submission.objects.all():
             copy_of_answers = copy.deepcopy(submission.answers)
 
-            # Fix misspelled key. cSpell:ignore AVAILIBILITY
+            # Fix misspelled key. spell-checker:ignore AVAILIBILITY
             move_or_discard_key("AVAILIBILITY", "AVAILABILITY", copy_of_answers)
 
             # Fix non-AU spelling.
