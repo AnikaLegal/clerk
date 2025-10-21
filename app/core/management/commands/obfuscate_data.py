@@ -6,6 +6,7 @@ import factory
 from accounts.models import CaseGroups, User
 from auditlog.context import disable_auditlog
 from auditlog.models import LogEntry
+from core.factories import SubmissionFactory
 from core.models import (
     AuditEvent,
     Client,
@@ -43,8 +44,6 @@ class Command(BaseCommand):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
         self.stdout.write("\nObfuscating personal information...")
         disable_signals()
-
-        email_addresses = dict()
 
         clients = Client.objects.all()
         emails = Email.objects.all()
@@ -115,7 +114,12 @@ class Command(BaseCommand):
 
             # Redact the answers to issue-specific intake form questions.
             if i.answers:
-                i.answers = get_redacted_answers(i.answers)
+                answers = SubmissionFactory.get_topic_specific_answers(i.topic)  # pyright: ignore [reportAttributeAccessIssue]
+                answers = {
+                    key.removeprefix(f"{i.topic}_"): value
+                    for key, value in answers.items()
+                }
+                i.answers = answers  # pyright: ignore [reportAttributeAccessIssue]
 
             i.save()
 
@@ -167,7 +171,11 @@ class Command(BaseCommand):
         # Remove all answers from submissions as they contain personal info.
         for s in submissions.iterator():
             if s.answers:
-                s.answers = get_redacted_answers(s.answers)
+                if s.is_processed:
+                    submission = SubmissionFactory.build()  # pyright: ignore [reportAttributeAccessIssue]
+                    s.answers = submission.answers
+                else:
+                    s.answers = {}
                 s.save()
 
         # Save sample files to storage (AWS S3) to use for email attachments &
@@ -196,22 +204,3 @@ def get_email(email: str) -> str:
     if email not in email_addresses:
         email_addresses[email] = fake.unique.email()
     return email_addresses[email]
-
-
-def get_redacted_answers(answers: dict) -> dict:
-    redacted_text = "[REDACTED]"
-    redacted_answers = {}
-    for key, value in answers.items():
-        if value is not None:
-            if key == "EMAIL" or key == "CLIENT_EMAIL":
-                # Keep email addresses consistent with other
-                # obfuscated emails.
-                value = get_email(value)
-            else:
-                value = (
-                    [redacted_text] * len(value)
-                    if isinstance(value, list)
-                    else redacted_text
-                )
-        redacted_answers[key] = value
-    return redacted_answers
