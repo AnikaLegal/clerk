@@ -33,13 +33,13 @@ class TenancySerializer(serializers.Serializer):
                 "name": instance.get("LANDLORD_NAME"),
                 "address": instance.get("LANDLORD_ADDRESS"),
                 "email": instance.get("LANDLORD_EMAIL"),
-                "phone": instance.get("LANDLORD_PHONE"),
+                "phone_number": instance.get("LANDLORD_PHONE"),
             },
             "agent": {
                 "name": instance.get("AGENT_NAME"),
                 "address": instance.get("AGENT_ADDRESS"),
                 "email": instance.get("AGENT_EMAIL"),
-                "phone": instance.get("AGENT_PHONE"),
+                "phone_number": instance.get("AGENT_PHONE"),
             },
         }
         instance = super().to_representation(instance)

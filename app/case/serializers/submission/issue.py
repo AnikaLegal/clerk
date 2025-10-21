@@ -36,7 +36,7 @@ class IssueSerializer(serializers.Serializer):
                 "name": instance.get("SUPPORT_WORKER_NAME"),
                 "address": instance.get("SUPPORT_WORKER_ADDRESS"),
                 "email": instance.get("SUPPORT_WORKER_EMAIL"),
-                "phone": instance.get("SUPPORT_WORKER_PHONE"),
+                "phone_number": instance.get("SUPPORT_WORKER_PHONE"),
                 "support_contact_preferences": instance.get(
                     "SUPPORT_WORKER_CONTACT_PREFERENCE"
                 ),

@@ -13,7 +13,7 @@ class PersonSerializer(serializers.Serializer):
     email = serializers.CharField(
         allow_null=True, allow_blank=True, trim_whitespace=True
     )
-    phone = serializers.CharField(
+    phone_number = serializers.CharField(
         allow_null=True, allow_blank=True, trim_whitespace=True
     )
     support_contact_preferences = ChoiceDisplayField(

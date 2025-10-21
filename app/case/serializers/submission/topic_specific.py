@@ -122,7 +122,7 @@ class BondsSpecificSerializer(serializers.Serializer):
 
 
 class EvictionArrearsSpecificSerializer(serializers.Serializer):
-    doc_delivery_time_notice_to_vacate = serializers.CharField(allow_null=True)
+    doc_delivery_time_notice_to_vacate = serializers.DateField(allow_null=True)
     has_notice = BooleanYesNoDisplayField(allow_null=True)
     is_already_removed = BooleanYesNoDisplayField(allow_null=True)
     is_unpaid_rent = BooleanYesNoDisplayField(allow_null=True)
@@ -151,8 +151,8 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
 
     def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
-            "doc_delivery_time_notice_to_vacate": instance.get(
-                "EVICTION_ARREARS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE"
+            "doc_delivery_time_notice_to_vacate": string_to_date(
+                instance.get("EVICTION_ARREARS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE")
             ),
             "has_notice": instance.get("EVICTION_ARREARS_HAS_NOTICE"),
             "is_already_removed": instance.get("EVICTION_ARREARS_IS_ALREADY_REMOVED"),
