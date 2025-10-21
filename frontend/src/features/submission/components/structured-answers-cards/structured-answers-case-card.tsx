@@ -18,10 +18,6 @@ export const StructuredAnswersCaseCard = ({
   const issue = answers.issue
   const data = [
     [
-      {
-        label: 'Topic(s)',
-        value: issue.issues?.map(({ label }) => label).join(' | '),
-      },
       { label: 'Referrer type', value: issue.referrer_type?.label },
       { label: 'Referrer', value: issue.referrer },
     ],
