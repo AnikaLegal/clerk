@@ -2,6 +2,7 @@ import logging
 import os
 from io import BytesIO
 
+import factory
 from accounts.models import CaseGroups, User
 from auditlog.context import disable_auditlog
 from auditlog.models import LogEntry
@@ -37,6 +38,7 @@ class Command(BaseCommand):
     help = "Hide personal information"
 
     @transaction.atomic
+    @factory.Faker.override_default_locale("en_AU")
     def handle(self, *args, **kwargs):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
         self.stdout.write("\nObfuscating personal information...")
