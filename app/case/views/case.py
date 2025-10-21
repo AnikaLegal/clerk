@@ -25,7 +25,6 @@ from case.serializers import (
     ServiceSearchSerializer,
     ServiceSerializer,
     TenancySerializer,
-    SubmissionSerializer,
 )
 from case.utils import ClerkPaginator, render_react_page
 from case.views.auth import (
