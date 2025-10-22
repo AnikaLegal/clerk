@@ -22,10 +22,8 @@ jobs:
         run: |
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
               echo "TAG=prod" >> $GITHUB_ENV
-          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
-              echo "TAG=staging" >> $GITHUB_ENV
           else
-              echo "TAG=dev" >> $GITHUB_ENV
+              echo "TAG=staging" >> $GITHUB_ENV
           fi
 
       # Setup transcrypt so that we can read secrets
