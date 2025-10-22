@@ -3,9 +3,9 @@ import {
   StructuredAnswersAgentCardProps,
 } from './structured-answers-agent-card'
 import {
-  StructuredAnswersCaseCard,
-  StructuredAnswersCaseCardProps,
-} from './structured-answers-case-card'
+  StructuredAnswersOtherCard,
+  StructuredAnswersOtherCardProps,
+} from './structured-answers-other-card'
 import {
   StructuredAnswersClientCard,
   StructuredAnswersClientCardProps,
@@ -25,7 +25,7 @@ import {
 
 export {
   StructuredAnswersAgentCard,
-  StructuredAnswersCaseCard,
+  StructuredAnswersOtherCard,
   StructuredAnswersClientCard,
   StructuredAnswersLandlordCard,
   StructuredAnswersSupportWorkerCard,
@@ -33,7 +33,7 @@ export {
 }
 export type {
   StructuredAnswersAgentCardProps,
-  StructuredAnswersCaseCardProps,
+  StructuredAnswersOtherCardProps,
   StructuredAnswersClientCardProps,
   StructuredAnswersLandlordCardProps,
   StructuredAnswersSupportWorkerCardProps,

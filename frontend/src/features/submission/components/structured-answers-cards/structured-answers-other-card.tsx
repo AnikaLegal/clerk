@@ -3,15 +3,15 @@ import { SubmissionAnswers } from 'api'
 import React from 'react'
 import { StructuredAnswersCard } from './structured-answers-card'
 
-export interface StructuredAnswersCaseCardProps {
+export interface StructuredAnswersOtherCardProps {
   answers: SubmissionAnswers
   card?: CardProps
 }
 
-export const StructuredAnswersCaseCard = ({
+export const StructuredAnswersOtherCard = ({
   answers,
   card,
-}: StructuredAnswersCaseCardProps) => {
+}: StructuredAnswersOtherCardProps) => {
   if (!answers.issue) {
     return null
   }
@@ -22,5 +22,5 @@ export const StructuredAnswersCaseCard = ({
       { label: 'Referrer', value: issue.referrer },
     ],
   ]
-  return <StructuredAnswersCard title="Case" data={data} card={card} />
+  return <StructuredAnswersCard title="Other" data={data} card={card} />
 }

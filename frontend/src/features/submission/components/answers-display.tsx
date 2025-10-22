@@ -1,9 +1,9 @@
-import { Box, Center, Loader } from '@mantine/core'
+import { Box, Center } from '@mantine/core'
 import api from 'api'
 import React from 'react'
 import { SubmissionRawAnswersCard } from './raw-answers-card'
 import { EmptyState, LoadingState } from './answers-display-states'
-import { SubmissionStructuredAnswersCard } from './structured-answers-card'
+import { SubmissionStructuredAnswers } from './structured-answers'
 
 export interface SubmissionAnswersDisplayProps {
   submissionId: string
@@ -38,10 +38,7 @@ export const SubmissionAnswersDisplay = ({
           card={{ withBorder: true }}
         />
       ) : (
-        <SubmissionStructuredAnswersCard
-          data={result.data.answers}
-          card={{ withBorder: true }}
-        />
+        <SubmissionStructuredAnswers data={result.data.answers} />
       )}
     </Box>
   )

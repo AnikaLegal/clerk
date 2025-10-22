@@ -1,4 +1,4 @@
-import { Card, CardProps, Table, Text, Title } from '@mantine/core'
+import { Card, CardProps, Center, Table, Text, Title } from '@mantine/core'
 import React from 'react'
 
 export interface StructuredAnswersCardProps {
@@ -14,39 +14,39 @@ export const StructuredAnswersCard = ({
 }: StructuredAnswersCardProps) => {
   return (
     <Card {...card}>
-      <Card.Section>
-        <Title order={3}>{title}</Title>
+      <Card.Section inheritPadding>
+        <Title order={4} p="sm" mt="md" bg="blue.0">
+          {title}
+        </Title>
       </Card.Section>
-      <Card.Section>
-        {data.map(
-          (subSection, index) =>
-            subSection.some((v) => v.value) && (
-              <Table
-                key={index}
-                variant="vertical"
-                withTableBorder
-                withColumnBorders
-                mt="sm"
-              >
-                <Table.Tbody>
-                  {subSection.map(
-                    (row) =>
-                      row.value != null && (
-                        <Table.Tr key={row.label}>
-                          <Table.Th w="25%">
-                            <Text fw={700} inherit>
-                              {row.label}
-                            </Text>
-                          </Table.Th>
-                          <Table.Td>{row.value}</Table.Td>
-                        </Table.Tr>
-                      )
-                  )}
-                </Table.Tbody>
-              </Table>
-            )
-        )}
-      </Card.Section>
+      {data.map(
+        (subSection, index) =>
+          subSection.some((v) => v.value) && (
+            <Table
+              key={index}
+              variant="vertical"
+              withTableBorder
+              withColumnBorders
+              mt="sm"
+            >
+              <Table.Tbody>
+                {subSection.map(
+                  (row) =>
+                    row.value != null && (
+                      <Table.Tr key={row.label}>
+                        <Table.Th w="25%">
+                          <Text fw={700} inherit>
+                            {row.label}
+                          </Text>
+                        </Table.Th>
+                        <Table.Td>{row.value}</Table.Td>
+                      </Table.Tr>
+                    )
+                )}
+              </Table.Tbody>
+            </Table>
+          )
+      )}
     </Card>
   )
 }
