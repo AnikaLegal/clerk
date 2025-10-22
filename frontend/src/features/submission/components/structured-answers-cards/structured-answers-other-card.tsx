@@ -22,5 +22,7 @@ export const StructuredAnswersOtherCard = ({
       { label: 'Referrer', value: issue.referrer },
     ],
   ]
-  return <StructuredAnswersCard title="Other" data={data} card={card} />
+  return (
+    <StructuredAnswersCard title="Other information" data={data} card={card} />
+  )
 }
