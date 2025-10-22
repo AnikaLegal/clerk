@@ -80,7 +80,7 @@ class ClientFactory(TimestampedModelFactory):
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    email = factory.Faker("ascii_email")
+    email = factory.Faker("email")
     date_of_birth = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-50y", end_date="-18y"
     )
@@ -94,7 +94,7 @@ class PersonFactory(TimestampedModelFactory):
         model = Person
 
     full_name = factory.Faker("name")
-    email = factory.Faker("ascii_email")
+    email = factory.Faker("email")
     address = factory.Faker("address")
     phone_number = factory.Faker("phone_number")
 
@@ -328,7 +328,7 @@ class SubmissionFactory(TimestampedModelFactory):
         # spell-checker: ignore SISTERGIRL BROTHERBOY CENTRELINK
         answers = {
             # Client
-            "EMAIL": fake.ascii_email(),
+            "EMAIL": fake.email(),
             "FIRST_NAME": fake.first_name(),
             "LAST_NAME": fake.last_name(),
             "PREFERRED_NAME": fake.first_name()
@@ -380,11 +380,11 @@ class SubmissionFactory(TimestampedModelFactory):
             ).strftime("%Y-%m-%d"),
             "LANDLORD_NAME": fake.name(),
             "LANDLORD_ADDRESS": fake.address(),
-            "LANDLORD_EMAIL": fake.ascii_email(),
+            "LANDLORD_EMAIL": fake.email(),
             "LANDLORD_PHONE": fake.phone_number(),
             "AGENT_NAME": fake.name(),
             "AGENT_ADDRESS": fake.address(),
-            "AGENT_EMAIL": fake.ascii_email(),
+            "AGENT_EMAIL": fake.email(),
             "AGENT_PHONE": fake.phone_number(),
             # Issue
             "ISSUES": fake.random_element(
@@ -400,7 +400,7 @@ class SubmissionFactory(TimestampedModelFactory):
             "WEEKLY_RENT": fake.random_int(),
             "SUPPORT_WORKER_NAME": fake.name(),
             "SUPPORT_WORKER_ADDRESS": fake.address(),
-            "SUPPORT_WORKER_EMAIL": fake.ascii_email(),
+            "SUPPORT_WORKER_EMAIL": fake.email(),
             "SUPPORT_WORKER_PHONE": fake.phone_number(),
             "SUPPORT_WORKER_CONTACT_PREFERENCE": fake.random_element(
                 elements=[x[0] for x in SupportContactPreferences.choices] + [None],
