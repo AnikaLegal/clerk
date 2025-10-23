@@ -14,8 +14,8 @@ from .helpers import string_to_date
 
 
 class SpecialCircumstances(models.TextChoices):
-    CENTRELINK = ("CENTRELINK", "Centrelink payment or concession card holder")
-    FAMILY_VIOLENCE = ("FAMILY_VIOLENCE", "Experiencing or at risk of family violence")
+    CENTRELINK = "CENTRELINK", "Centrelink payment or concession card holder"
+    FAMILY_VIOLENCE = "FAMILY_VIOLENCE", "Experiencing or at risk of family violence"
     HEALTH_CONDITION = (
         "HEALTH_CONDITION",
         "Long-term health condition or disability that affects work or education",
@@ -24,9 +24,9 @@ class SpecialCircumstances(models.TextChoices):
         "MENTAL_ILLNESS_OR_DISABILITY",
         "Mental illness or intellectual disability",
     )
-    PUBLIC_HOUSING = ("PUBLIC_HOUSING", "Public or community housing")
-    REFUGEE = ("REFUGEE", "Refugee or asylum seeker status")
-    SINGLE_PARENT = ("SINGLE_PARENT", "Single parent")
+    PUBLIC_HOUSING = "PUBLIC_HOUSING", "Public or community housing"
+    REFUGEE = "REFUGEE", "Refugee or asylum seeker status"
+    SINGLE_PARENT = "SINGLE_PARENT", "Single parent"
 
 
 class ClientSerializer(serializers.Serializer):
