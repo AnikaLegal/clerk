@@ -1,9 +1,9 @@
-import { Card, CardProps, Center, Table, Text, Title } from '@mantine/core'
+import { Card, CardProps, Table, Text, Title } from '@mantine/core'
 import React from 'react'
 
 export interface StructuredAnswersCardProps {
   title: string
-  data: { label: string; value: string | number | null | undefined }[][]
+  data: { label: string; value: React.ReactNode }[][]
   card?: CardProps
 }
 

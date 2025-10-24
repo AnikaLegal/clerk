@@ -9,6 +9,8 @@ import {
   StructuredAnswersLandlordCard,
   StructuredAnswersSupportWorkerCard,
   StructuredAnswersTenancyCard,
+  StructuredAnswersRepairsCard,
+  StructuredAnswersBondsCard,
 } from './structured-answers-cards'
 
 export interface SubmissionStructuredAnswersProps {
@@ -43,6 +45,14 @@ export const SubmissionStructuredAnswers = ({
             card={{ mt: 'md', withBorder: true }}
           />
           <StructuredAnswersOtherCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersRepairsCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersBondsCard
             answers={data}
             card={{ mt: 'md', withBorder: true }}
           />

@@ -16,10 +16,11 @@ export const StructuredAnswersOtherCard = ({
     return null
   }
   const issue = answers.issue
+
   const data = [
     [
-      { label: 'Referrer type', value: issue.referrer_type?.label },
-      { label: 'Referrer', value: issue.referrer },
+      { label: 'Referrer type', value: issue?.referrer_type?.label },
+      { label: 'Referrer', value: issue?.referrer },
     ],
   ]
   return (
