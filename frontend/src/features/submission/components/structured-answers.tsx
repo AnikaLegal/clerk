@@ -4,13 +4,14 @@ import { SubmissionAnswers } from 'api'
 import React from 'react'
 import {
   StructuredAnswersAgentCard,
-  StructuredAnswersOtherCard,
+  StructuredAnswersBondsCard,
   StructuredAnswersClientCard,
+  StructuredAnswersEvictionArrearsCard,
   StructuredAnswersLandlordCard,
+  StructuredAnswersOtherCard,
+  StructuredAnswersRepairsCard,
   StructuredAnswersSupportWorkerCard,
   StructuredAnswersTenancyCard,
-  StructuredAnswersRepairsCard,
-  StructuredAnswersBondsCard,
 } from './structured-answers-cards'
 
 export interface SubmissionStructuredAnswersProps {
@@ -53,6 +54,10 @@ export const SubmissionStructuredAnswers = ({
             card={{ mt: 'md', withBorder: true }}
           />
           <StructuredAnswersBondsCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersEvictionArrearsCard
             answers={data}
             card={{ mt: 'md', withBorder: true }}
           />

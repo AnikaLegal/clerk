@@ -33,10 +33,16 @@ import {
   StructuredAnswersBondsCardProps,
 } from './case-specific/structured-answers-bonds-card'
 
+import {
+  StructuredAnswersEvictionArrearsCard,
+  StructuredAnswersEvictionArrearsCardProps,
+} from './case-specific/structured-answers-evictions-arrears'
+
 export {
   StructuredAnswersAgentCard,
   StructuredAnswersBondsCard,
   StructuredAnswersClientCard,
+  StructuredAnswersEvictionArrearsCard,
   StructuredAnswersLandlordCard,
   StructuredAnswersOtherCard,
   StructuredAnswersRepairsCard,
@@ -47,6 +53,7 @@ export type {
   StructuredAnswersAgentCardProps,
   StructuredAnswersBondsCardProps,
   StructuredAnswersClientCardProps,
+  StructuredAnswersEvictionArrearsCardProps,
   StructuredAnswersLandlordCardProps,
   StructuredAnswersOtherCardProps,
   StructuredAnswersRepairsCardProps,

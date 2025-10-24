@@ -135,5 +135,7 @@ export const StructuredAnswersBondsCard = ({
       },
     ],
   ]
-  return <StructuredAnswersCard title="Bond" data={data} card={card} />
+  return (
+    <StructuredAnswersCard title="Bond information" data={data} card={card} />
+  )
 }

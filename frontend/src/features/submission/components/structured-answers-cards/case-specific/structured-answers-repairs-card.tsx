@@ -44,5 +44,11 @@ export const StructuredAnswersRepairsCard = ({
       },
     ],
   ]
-  return <StructuredAnswersCard title="Repairs" data={data} card={card} />
+  return (
+    <StructuredAnswersCard
+      title="Repairs information"
+      data={data}
+      card={card}
+    />
+  )
 }
