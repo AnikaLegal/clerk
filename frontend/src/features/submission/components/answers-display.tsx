@@ -1,8 +1,8 @@
 import { Box, Center } from '@mantine/core'
 import api from 'api'
 import React from 'react'
+import { EmptyState, ErrorState, LoadingState } from './answers-display-states'
 import { SubmissionRawAnswersCard } from './raw-answers-card'
-import { EmptyState, LoadingState } from './answers-display-states'
 import { SubmissionStructuredAnswers } from './structured-answers'
 
 export interface SubmissionAnswersDisplayProps {
@@ -16,6 +16,13 @@ export const SubmissionAnswersDisplay = ({
 }: SubmissionAnswersDisplayProps) => {
   const result = api.useGetSubmissionQuery({ id: submissionId })
 
+  if (result.isError) {
+    return (
+      <Center>
+        <ErrorState error={result.error} />
+      </Center>
+    )
+  }
   if (result.isFetching) {
     return (
       <Center>
