@@ -119,6 +119,18 @@ def _normalise_submission_keys(apps, schema_editor):
             # Convert ISSUES value EVICTION to EVICTION_ARREARS
             replace_value("ISSUES", "EVICTION", "EVICTION_ARREARS", copy_of_answers)
 
+            # spell-checker:ignore POSSESION
+            move_or_discard_key(
+                "EVICTION_ARREARS_DOC_DELIVERY_METHOD_POSSESION_ORDER",
+                "EVICTION_ARREARS_DOC_DELIVERY_METHOD_POSSESSION_ORDER",
+                copy_of_answers,
+            )
+            move_or_discard_key(
+                "EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESION_ORDER",
+                "EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESSION_ORDER",
+                copy_of_answers,
+            )
+
             # Correct known incorrect value due to bug.
             replace_value("INTERPRETER", "chinese", "UNKNOWN", copy_of_answers)
 
@@ -129,7 +141,7 @@ def _normalise_submission_keys(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("core", "0094_issue_submission"),
+        ("core", "0093_alter_client_requires_interpreter"),
     ]
 
     operations = [
