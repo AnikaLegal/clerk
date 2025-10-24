@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import factory
 from accounts.models import User
+from case.serializers.submission.topic_specific import RepairActions
 from core.models import (
     Client,
     DocumentTemplate,
@@ -433,6 +434,19 @@ class SubmissionFactory(TimestampedModelFactory):
 
     @staticmethod
     def get_topic_specific_answers(topic: str) -> dict:
+        def fake_file_uploads(min: int, max: int) -> list[dict]:
+            uploads = []
+            for _ in range(fake.random_int(min=min, max=max)):
+                uuid = uuid4()
+                ext = fake.file_extension(category="image")
+                uploads.append(
+                    {
+                        "id": uuid,
+                        "file": f"https://example.com/{uuid}.{ext}",
+                    }
+                )
+            return uploads
+
         answers = {}
         if topic == CaseTopic.REPAIRS:
             answers = {
@@ -441,9 +455,10 @@ class SubmissionFactory(TimestampedModelFactory):
                     start_date="-1y", end_date="-14d"
                 ).strftime("%Y-%m-%d"),
                 "REPAIRS_VCAT": fake.random_sample(
-                    elements=fake.words(nb=3, unique=True),
-                    length=fake.random_int(min=1, max=3),
+                    elements=[x[0] for x in RepairActions.choices],
+                    length=fake.random_int(min=1, max=2),
                 ),
+                "REPAIRS_ISSUE_PHOTO": fake_file_uploads(min=0, max=3),
             }
         elif topic == CaseTopic.BONDS:
             answers = {
@@ -457,6 +472,7 @@ class SubmissionFactory(TimestampedModelFactory):
                     start_date="-1y", end_date="today"
                 ).strftime("%Y-%m-%d"),
                 "BONDS_TENANT_HAS_RTBA_APPLICATION_COPY": fake.boolean(),
+                "BONDS_RTBA_APPLICATION_UPLOAD": fake_file_uploads(min=0, max=1),
             }
 
             for reason in answers["BONDS_CLAIM_REASONS"]:
@@ -465,6 +481,9 @@ class SubmissionFactory(TimestampedModelFactory):
                         {
                             "BONDS_CLEANING_CLAIM_AMOUNT": fake.random_int(),
                             "BONDS_CLEANING_CLAIM_DESCRIPTION": fake.paragraph(),
+                            "BONDS_CLEANING_DOCUMENT_UPLOADS": fake_file_uploads(
+                                min=0, max=4
+                            ),
                         }
                     )
                 elif reason == "Damage":
@@ -475,6 +494,10 @@ class SubmissionFactory(TimestampedModelFactory):
                             "BONDS_DAMAGE_CLAIM_DESCRIPTION": fake.paragraph(),
                         }
                     )
+                    if answers.get("BONDS_DAMAGE_CAUSED_BY_TENANT"):
+                        answers.update(
+                            {"BONDS_DAMAGE_QUOTE_UPLOAD": fake_file_uploads(0, 1)}
+                        )
                 elif reason == "Locks and security devices":
                     answers.update(
                         {
@@ -482,6 +505,10 @@ class SubmissionFactory(TimestampedModelFactory):
                             "BONDS_LOCKS_CLAIM_AMOUNT": fake.random_int(),
                         }
                     )
+                    if answers.get("BONDS_LOCKS_CHANGED_BY_TENANT"):
+                        answers.update(
+                            {"BONDS_LOCKS_CHANGE_QUOTE": fake_file_uploads(0, 1)}
+                        )
                 elif reason == "Rent or other money owing":
                     answers.update(
                         {
@@ -525,6 +552,7 @@ class SubmissionFactory(TimestampedModelFactory):
                 "EVICTION_ARREARS_VCAT_DATE": fake.date_between(
                     start_date="today", end_date="+3M"
                 ).strftime("%Y-%m-%d"),
+                "EVICTION_ARREARS_DOCUMENTS_UPLOAD": fake_file_uploads(min=0, max=1),
             }
         elif topic == CaseTopic.EVICTION_RETALIATORY:
             answers = {
@@ -551,6 +579,9 @@ class SubmissionFactory(TimestampedModelFactory):
                 "EVICTION_RETALIATORY_VCAT_HEARING_DATE": fake.date_between(
                     start_date="today", end_date="+3M"
                 ).strftime("%Y-%m-%d"),
+                "EVICTION_RETALIATORY_DOCUMENTS_UPLOAD": fake_file_uploads(
+                    min=0, max=1
+                ),
             }
 
             if answers["EVICTION_RETALIATORY_RETALIATORY_REASON"] == "Other":
@@ -570,6 +601,16 @@ class SubmissionFactory(TimestampedModelFactory):
                 "RENT_REDUCTION_IS_NOTICE_TO_VACATE": fake.boolean(
                     chance_of_getting_true=50
                 ),
+                "RENT_REDUCTION_ISSUE_PHOTO": fake_file_uploads(min=0, max=1),
+            }
+            if answers["RENT_REDUCTION_IS_NOTICE_TO_VACATE"]:
+                answers["RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT"] = fake_file_uploads(
+                    min=0, max=1
+                )
+        elif topic == CaseTopic.HEALTH_CHECK:
+            answers = {
+                "SUPPORT_WORKER_AUTHORITY_UPLOAD": fake_file_uploads(min=0, max=1),
+                "TENANCY_DOCUMENTS_UPLOAD": fake_file_uploads(min=0, max=3),
             }
         elif topic == CaseTopic.OTHER:
             answers = {

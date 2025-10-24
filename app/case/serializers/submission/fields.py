@@ -1,4 +1,20 @@
 from rest_framework import serializers
+import os
+
+
+class FileUploadField(serializers.DictField):
+    """A field for handling file uploads represented as a dictionary."""
+
+    def to_representation(self, value):
+        file = value.get("file")
+        basename = os.path.basename(file) if file else None
+
+        return super().to_representation(
+            {
+                "name": basename,
+                "url": file,
+            }
+        )
 
 
 class StringOrListField(serializers.ListField):
