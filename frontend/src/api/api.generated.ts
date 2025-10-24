@@ -1028,10 +1028,10 @@ export type SubmissionAnswers = {
       notice_send_date?: string | null;
       notice_vacate_date?: string | null;
       payment_fail_description?: string | null;
-      payment_fail_reason?: string | null;
+      payment_fail_reason?: string[] | null;
       vcat_date?: string | null;
       documents?: SubmissionFiles | null;
-      can_afford_payment_plan?: string | null;
+      can_afford_payment_plan?: ChoiceDisplay | null;
       documents_provided?: string[] | null;
       delivery_method_notice_to_vacate?: string | null;
       delivery_method_other_docs?: string | null;

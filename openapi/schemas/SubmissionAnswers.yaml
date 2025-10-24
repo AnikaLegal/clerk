@@ -266,7 +266,9 @@ properties:
             type: string
             nullable: true
           payment_fail_reason:
-            type: string
+            type: array
+            items:
+              type: string
             nullable: true
           vcat_date:
             type: string
@@ -276,7 +278,8 @@ properties:
               - $ref: ./SubmissionFiles.yaml
             nullable: true
           can_afford_payment_plan:
-            type: string
+            allOf:
+              - $ref: ./ChoiceDisplay.yaml
             nullable: true
           documents_provided:
             type: array
