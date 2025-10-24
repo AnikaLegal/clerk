@@ -161,6 +161,11 @@ class BondsSpecificSerializer(serializers.Serializer):
 
 
 class EvictionArrearsSpecificSerializer(serializers.Serializer):
+    class CanAffordPaymentPlan(models.TextChoices):
+        APPLIED_RP = "YES", "Yes"
+        ISSUED_BREACH = "NO", "No"
+        APPLIED_CAV = "DISCUSS_OVER_PHONE", "Would like to discuss over phone"
+
     doc_delivery_time_notice_to_vacate = serializers.DateField(allow_null=True)
     has_notice = BooleanYesNoDisplayField(allow_null=True)
     is_already_removed = BooleanYesNoDisplayField(allow_null=True)
@@ -169,21 +174,24 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
     notice_send_date = serializers.DateField(allow_null=True)
     notice_vacate_date = serializers.DateField(allow_null=True)
     payment_fail_description = serializers.CharField(allow_null=True)
-    payment_fail_reason = serializers.CharField(allow_null=True)
+    payment_fail_reason = serializers.ListField(
+        allow_null=True, child=serializers.CharField()
+    )
     vcat_date = serializers.DateField(allow_null=True)
     documents = serializers.ListField(
         allow_null=True, child=FileUploadField(allow_null=True)
     )
 
-    can_afford_payment_plan = serializers.CharField(allow_null=True)
+    can_afford_payment_plan = ChoiceDisplayField(
+        allow_null=True, choices=CanAffordPaymentPlan.choices
+    )
     documents_provided = serializers.ListField(
         allow_null=True, child=serializers.CharField()
     )
     delivery_method_notice_to_vacate = serializers.CharField(allow_null=True)
     delivery_method_other_docs = serializers.CharField(allow_null=True)
     delivery_method_possession_order = serializers.CharField(allow_null=True)
-    doc_delivery_time_other_docs = serializers.CharField(allow_null=True)
-    doc_delivery_time_possession_order = serializers.CharField(allow_null=True)
+    doc_delivery_time_other_docs = serializers.DateField(allow_null=True)
     is_on_payment_plan = BooleanYesNoDisplayField(allow_null=True)
     miscellaneous = serializers.CharField(allow_null=True)
     payment_amount = serializers.IntegerField(allow_null=True)
@@ -226,11 +234,11 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
             "delivery_method_possession_order": instance.get(
                 "EVICTION_ARREARS_DOC_DELIVERY_METHOD_POSSESSION_ORDER"
             ),
-            "doc_delivery_time_other_docs": instance.get(
-                "EVICTION_ARREARS_DOC_DELIVERY_TIME_OTHER_DOCS"
+            "doc_delivery_time_other_docs": string_to_date(
+                instance.get("EVICTION_ARREARS_DOC_DELIVERY_TIME_OTHER_DOCS")
             ),
-            "doc_delivery_time_possession_order": instance.get(
-                "EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESSION_ORDER"
+            "doc_delivery_time_possession_order": string_to_date(
+                instance.get("EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESSION_ORDER")
             ),
             "is_on_payment_plan": instance.get("EVICTION_ARREARS_IS_ON_PAYMENT_PLAN"),
             "miscellaneous": instance.get("EVICTION_ARREARS_MISC"),
