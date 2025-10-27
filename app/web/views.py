@@ -163,15 +163,18 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/mike.png",
-        "name": "Michael Choong",
+        "image": "web/img/photos/board/agata.png",
+        "name": "Agata Weirzbowski",
         "title": "Board Member",
         "brags": [
-            """Michael has over seven years of experience across the technology,
-            retail, and not-for-profit sectors. He is currently a Senior
-            Strategy Manager at SEEK, responsible for supporting their Latin
-            American businesses. He joined Anika Legal’s leadership team in
-            January 2020.""",
+            """Agata is an experienced leader in service design, policy analysis,
+            and advocacy, with a strong commitment to supporting people
+            experiencing disadvantage. As a Principal Adviser at the Victorian
+            Legal Services Board and Commissioner, she brings deep expertise in
+            shaping legal policy and practice, alongside executive leadership
+            experience at Tenants Victoria and Southside Justice. Her wealth of
+            experience strengthens Anika Legal’s mission to create a fairer
+            housing system for renters.""",
         ],
     },
     {
