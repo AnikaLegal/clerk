@@ -130,12 +130,12 @@ def bash(c, frontend=False):
 
 
 @task
-def shell(c, print_sql=False):
+def shell(c, print_sql=False, debug=False):
     """Get a Django shell in a Docker container"""
     cmd = "shell_plus"
     if print_sql:
         cmd += " --print-sql"
-    run(c, f"./manage.py {cmd}")
+    run(c, f"./manage.py {cmd}", debug=debug)
 
 
 @task
@@ -168,23 +168,16 @@ def test(
         elif verbose:
             cmd += " -" + ("v" * verbose)
 
-    debug_args = ""
-    if debug:
-        debug_args = "-p 8123:8123 -e DEBUGPY=true"
-
-    c.run(
-        f"{COMPOSE} run --rm {debug_args} test {cmd}",
-        pty=True,
-        env={
-            "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
-        },
-    )
+    env = {
+        "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
+    }
+    run(c, cmd, service="test", env=env, debug=debug)
 
 
 @task
-def obfuscate(c):
+def obfuscate(c, debug=False):
     """Obfuscate personally identifiable info"""
-    run(c, "./manage.py obfuscate_data")
+    run(c, "./manage.py obfuscate_data", debug=debug)
 
 
 @task
@@ -211,5 +204,8 @@ def superuser(c, email):
     run(c, f"./manage.py createsuperuser --no-input --username {email} --email {email}")
 
 
-def run(c, cmd: str, service="web"):
-    c.run(f"{COMPOSE} run --rm {service} {cmd}", pty=True)
+def run(c, cmd: str, service="web", env: dict = {}, debug=False):
+    debug_args = ""
+    if debug:
+        debug_args = "-p 8123:8123 -e DEBUGPY=true"
+    c.run(f"{COMPOSE} run --rm {debug_args} {service} {cmd}", pty=True, env=env)
