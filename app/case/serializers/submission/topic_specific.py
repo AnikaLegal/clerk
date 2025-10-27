@@ -39,7 +39,7 @@ class TopicSpecificSerializer(serializers.Serializer):
                 serializer = OtherSpecificSerializer(instance)
             else:
                 continue
-            representation[topic] = serializer.data
+            representation[topic] = serializer.data or None
 
         if all(value is None for value in representation.values()):
             return None
@@ -75,7 +75,7 @@ class RepairsSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 
@@ -156,7 +156,7 @@ class BondsSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 
@@ -296,7 +296,7 @@ class EvictionRetaliatorySpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 
@@ -325,7 +325,7 @@ class RentReductionSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 
@@ -344,7 +344,7 @@ class HealthCheckSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 
@@ -357,5 +357,5 @@ class OtherSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
