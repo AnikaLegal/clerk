@@ -318,11 +318,28 @@ class DocumentTemplateFactory(TimestampedModelFactory):
 
 @factory.django.mute_signals(post_save)
 class SubmissionFactory(TimestampedModelFactory):
-    class Meta:
+    class Meta:  # pyright: ignore [reportIncompatibleVariableOverride]
         model = Submission
 
     id = factory.LazyAttribute(lambda x: uuid4())
     is_processed = True
+
+    @classmethod
+    def _generate(cls, strategy, params):
+        # Merge provided answers instead of overwriting them.
+        answers = params.pop("answers", None)
+        instance = super()._generate(strategy, params)
+        if answers:
+            instance.answers.update(answers)
+
+        # Add topic specific answers here because we need to know the topic
+        # (contained in ISSUES) and it may have been overridden in params.
+        topic_specific_answers = cls._topic_specific_answers(
+            instance.answers.get("ISSUES", None)
+        )
+        instance.answers.update(topic_specific_answers)
+
+        return instance
 
     @factory.lazy_attribute
     def answers(self):
@@ -423,18 +440,11 @@ class SubmissionFactory(TimestampedModelFactory):
             ]
         )
         answers[referrer] = fake.company()
-
-        # Topic-specific answers
-        topic_specific_answers = SubmissionFactory.get_topic_specific_answers(  # pyright: ignore [reportAttributeAccessIssue]
-            answers["ISSUES"]
-        )
-        answers.update(topic_specific_answers)
-
         return answers
 
-    @staticmethod
-    def get_topic_specific_answers(topic: str) -> dict:
-        def fake_file_uploads(min: int, max: int) -> list[dict]:
+    @classmethod
+    def _topic_specific_answers(cls, topic) -> dict:
+        def fake_file_uploads(min: int, max: int) -> list[dict] | None:
             uploads = []
             for _ in range(fake.random_int(min=min, max=max)):
                 uuid = uuid4()
@@ -445,7 +455,7 @@ class SubmissionFactory(TimestampedModelFactory):
                         "file": f"https://example.com/{uuid}.{ext}",
                     }
                 )
-            return uploads
+            return uploads or None
 
         answers = {}
         if topic == CaseTopic.REPAIRS:
@@ -546,8 +556,9 @@ class SubmissionFactory(TimestampedModelFactory):
                     start_date="today", end_date="+1M"
                 ).strftime("%Y-%m-%d"),
                 "EVICTION_ARREARS_PAYMENT_FAIL_DESCRIPTION": fake.paragraph(),
-                "EVICTION_ARREARS_PAYMENT_FAIL_REASON": fake.random_element(
+                "EVICTION_ARREARS_PAYMENT_FAIL_REASON": fake.random_elements(
                     elements=fake.words(nb=3, unique=True),
+                    length=fake.random_int(min=1, max=3),
                 ),
                 "EVICTION_ARREARS_VCAT_DATE": fake.date_between(
                     start_date="today", end_date="+3M"
