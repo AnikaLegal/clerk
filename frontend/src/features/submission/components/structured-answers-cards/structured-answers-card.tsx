@@ -15,7 +15,7 @@ export const StructuredAnswersCard = ({
   return (
     <Card {...card}>
       <Card.Section inheritPadding>
-        <Title order={4} p="sm" mt="md" bg="blue.0">
+        <Title order={4} p="sm" mt="md" bg="var(--gold-light)">
           {title}
         </Title>
       </Card.Section>
