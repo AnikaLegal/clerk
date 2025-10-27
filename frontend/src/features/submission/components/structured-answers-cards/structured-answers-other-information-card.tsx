@@ -3,15 +3,15 @@ import { SubmissionAnswers } from 'api'
 import React from 'react'
 import { StructuredAnswersCard } from './structured-answers-card'
 
-export interface StructuredAnswersOtherCardProps {
+export interface StructuredAnswersOtherInformationCardProps {
   answers: SubmissionAnswers
   card?: CardProps
 }
 
-export const StructuredAnswersOtherCard = ({
+export const StructuredAnswersOtherInformationCard = ({
   answers,
   card,
-}: StructuredAnswersOtherCardProps) => {
+}: StructuredAnswersOtherInformationCardProps) => {
   if (!answers.issue) {
     return null
   }

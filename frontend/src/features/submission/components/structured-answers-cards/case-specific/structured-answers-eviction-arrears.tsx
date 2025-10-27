@@ -18,23 +18,12 @@ export const StructuredAnswersEvictionArrearsCard = ({
   const evictions = answers.topic_specific.EVICTION_ARREARS
   const data = [
     [
-      {
-        label: 'Notice to vacate',
-        value: evictions.documents?.map((file, index) => (
-          <>
-            {index > 0 && ' | '}
-            <Anchor key={file.url} href={file.url} target="_blank">
-              {file.name}
-            </Anchor>
-          </>
-        )),
-      },
       { label: 'Has VCAT hearing date?', value: evictions.is_vcat_date?.label },
       { label: 'VCAT hearing date', value: evictions.vcat_date },
-      { label: 'Notice vacate date', value: evictions.notice_vacate_date },
-      { label: 'Notice send date', value: evictions.notice_send_date },
+      { label: 'NTV vacate date', value: evictions.notice_vacate_date },
+      { label: 'NTV send date', value: evictions.notice_send_date },
       {
-        label: 'Notice received date',
+        label: 'NTV received date',
         value: evictions.doc_delivery_time_notice_to_vacate,
       },
       {
@@ -52,7 +41,18 @@ export const StructuredAnswersEvictionArrearsCard = ({
         value: evictions.documents_provided?.join(' | '),
       },
       {
-        label: 'Notice to vacate delivery method',
+        label: 'Documents',
+        value: evictions.documents?.map((file, index) => (
+          <>
+            {index > 0 && ' | '}
+            <Anchor key={file.url} href={file.url} target="_blank">
+              {file.name}
+            </Anchor>
+          </>
+        )),
+      },
+      {
+        label: 'NTV delivery method',
         value: evictions.delivery_method_notice_to_vacate,
       },
       {
@@ -105,7 +105,7 @@ export const StructuredAnswersEvictionArrearsCard = ({
   ]
   return (
     <StructuredAnswersCard
-      title="Eviction (Arrears) information"
+      title="Eviction information"
       data={data}
       card={card}
     />

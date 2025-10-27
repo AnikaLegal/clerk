@@ -7,8 +7,12 @@ import {
   StructuredAnswersBondsCard,
   StructuredAnswersClientCard,
   StructuredAnswersEvictionArrearsCard,
+  StructuredAnswersEvictionRetaliatoryCard,
+  StructuredAnswersHealthCheckCard,
   StructuredAnswersLandlordCard,
-  StructuredAnswersOtherCard,
+  StructuredAnswersOtherCaseCard,
+  StructuredAnswersOtherInformationCard,
+  StructuredAnswersRentReductionCard,
   StructuredAnswersRepairsCard,
   StructuredAnswersSupportWorkerCard,
   StructuredAnswersTenancyCard,
@@ -45,7 +49,7 @@ export const SubmissionStructuredAnswers = ({
             answers={data}
             card={{ mt: 'md', withBorder: true }}
           />
-          <StructuredAnswersOtherCard
+          <StructuredAnswersOtherInformationCard
             answers={data}
             card={{ mt: 'md', withBorder: true }}
           />
@@ -58,6 +62,22 @@ export const SubmissionStructuredAnswers = ({
             card={{ mt: 'md', withBorder: true }}
           />
           <StructuredAnswersEvictionArrearsCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersEvictionRetaliatoryCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersHealthCheckCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersRentReductionCard
+            answers={data}
+            card={{ mt: 'md', withBorder: true }}
+          />
+          <StructuredAnswersOtherCaseCard
             answers={data}
             card={{ mt: 'md', withBorder: true }}
           />

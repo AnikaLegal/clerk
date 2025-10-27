@@ -11,9 +11,9 @@ import {
   StructuredAnswersLandlordCardProps,
 } from './structured-answers-landlord-card'
 import {
-  StructuredAnswersOtherCard,
-  StructuredAnswersOtherCardProps,
-} from './structured-answers-other-card'
+  StructuredAnswersOtherInformationCard,
+  StructuredAnswersOtherInformationCardProps,
+} from './structured-answers-other-information-card'
 import {
   StructuredAnswersSupportWorkerCard,
   StructuredAnswersSupportWorkerCardProps,
@@ -36,15 +36,39 @@ import {
 import {
   StructuredAnswersEvictionArrearsCard,
   StructuredAnswersEvictionArrearsCardProps,
-} from './case-specific/structured-answers-evictions-arrears'
+} from './case-specific/structured-answers-eviction-arrears'
+
+import {
+  StructuredAnswersEvictionRetaliatoryCard,
+  StructuredAnswersEvictionRetaliatoryCardProps,
+} from './case-specific/structured-answers-eviction-retaliatory-card'
+
+import {
+  StructuredAnswersHealthCheckCard,
+  StructuredAnswersHealthCheckCardProps,
+} from './case-specific/structured-answers-health-check-card'
+
+import {
+  StructuredAnswersRentReductionCard,
+  StructuredAnswersRentReductionCardProps,
+} from './case-specific/structured-answers-rent-reduction-card'
+
+import {
+  StructuredAnswersOtherCaseCard,
+  StructuredAnswersOtherCaseCardProps,
+} from './case-specific/structured-answers-other-case-card'
 
 export {
   StructuredAnswersAgentCard,
   StructuredAnswersBondsCard,
   StructuredAnswersClientCard,
   StructuredAnswersEvictionArrearsCard,
+  StructuredAnswersEvictionRetaliatoryCard,
+  StructuredAnswersHealthCheckCard,
   StructuredAnswersLandlordCard,
-  StructuredAnswersOtherCard,
+  StructuredAnswersOtherCaseCard,
+  StructuredAnswersOtherInformationCard,
+  StructuredAnswersRentReductionCard,
   StructuredAnswersRepairsCard,
   StructuredAnswersSupportWorkerCard,
   StructuredAnswersTenancyCard,
@@ -54,8 +78,12 @@ export type {
   StructuredAnswersBondsCardProps,
   StructuredAnswersClientCardProps,
   StructuredAnswersEvictionArrearsCardProps,
+  StructuredAnswersEvictionRetaliatoryCardProps,
+  StructuredAnswersHealthCheckCardProps,
   StructuredAnswersLandlordCardProps,
-  StructuredAnswersOtherCardProps,
+  StructuredAnswersOtherCaseCardProps,
+  StructuredAnswersOtherInformationCardProps,
+  StructuredAnswersRentReductionCardProps,
   StructuredAnswersRepairsCardProps,
   StructuredAnswersSupportWorkerCardProps,
   StructuredAnswersTenancyCardProps,
