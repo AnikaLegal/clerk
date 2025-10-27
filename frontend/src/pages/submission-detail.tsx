@@ -41,16 +41,18 @@ const App = () => {
             disabled={!issue.submission_id}
           />
         </Group>
-        {issue.submission_id ? (
-          <SubmissionAnswersDisplay
-            submissionId={issue.submission_id}
-            showRawAnswers={showRawAnswers}
-          />
-        ) : (
-          <Center>
-            <EmptyState />
-          </Center>
-        )}
+        <Box mt="lg">
+          {issue.submission_id ? (
+            <SubmissionAnswersDisplay
+              submissionId={issue.submission_id}
+              showRawAnswers={showRawAnswers}
+            />
+          ) : (
+            <Center>
+              <EmptyState />
+            </Center>
+          )}
+        </Box>
       </Box>
     </Container>
   )

@@ -24,7 +24,7 @@ export const StructuredAnswersRepairsCard = ({
         value: repairs.issue_description?.label,
       },
       {
-        label: 'Problem photos',
+        label: 'Problem photo(s)',
         value: repairs.issue_photos?.map((file, index) => (
           <>
             {index > 0 && ' | '}
