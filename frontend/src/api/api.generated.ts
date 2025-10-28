@@ -972,7 +972,7 @@ export type SubmissionAnswers = {
     address?: string | null;
     suburb?: string | null;
     postcode?: string | null;
-    is_on_lease?: BooleanYesNo | null;
+    is_on_lease?: ChoiceDisplay | null;
     rental_circumstances?: ChoiceDisplay | null;
     start_date?: string | null;
     landlord?: SubmissionPerson | null;
@@ -1076,8 +1076,11 @@ export type SubmissionAnswers = {
 };
 export type Submission = {
   id: string;
-  answers_raw: object;
+  answers_raw: {
+    [key: string]: any;
+  };
   answers: SubmissionAnswers | null;
+  created_at: string;
 };
 export type IssueBase = {
   topic: string;

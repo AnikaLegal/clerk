@@ -1648,7 +1648,7 @@ components:
               nullable: true
             is_on_lease:
               allOf:
-                - $ref: "#/components/schemas/BooleanYesNo"
+                - $ref: "#/components/schemas/ChoiceDisplay"
               nullable: true
             rental_circumstances:
               allOf:
@@ -1985,14 +1985,18 @@ components:
           format: uuid
         answers_raw:
           type: object
+          additionalProperties: true
         answers:
           allOf:
             - $ref: "#/components/schemas/SubmissionAnswers"
           nullable: true
+        created_at:
+          type: string
       required:
         - id
         - answers_raw
         - answers
+        - created_at
     IssueBase:
       type: object
       properties:

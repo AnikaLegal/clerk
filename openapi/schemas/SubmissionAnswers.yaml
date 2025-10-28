@@ -77,7 +77,7 @@ properties:
         nullable: true
       is_on_lease:
         allOf:
-          - $ref: ./BooleanYesNo.yaml
+          - $ref: ./ChoiceDisplay.yaml
         nullable: true
       rental_circumstances:
         allOf:
