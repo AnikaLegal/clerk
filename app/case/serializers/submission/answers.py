@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .client import ClientSerializer
-from .file_upload import FileUploadSerializer
 from .issue import IssueSerializer
 from .tenancy import TenancySerializer
 from .topic_specific import TopicSpecificSerializer
@@ -28,7 +27,6 @@ class AnswersSerializer(serializers.Serializer):
     client = ClientSerializer(source="*", partial=True)
     tenancy = TenancySerializer(source="*", partial=True)
     issue = IssueSerializer(source="*", partial=True)
-    file_uploads = FileUploadSerializer(source="*", partial=True, many=True)
     topic_specific = TopicSpecificSerializer(source="*", partial=True)
 
     def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
