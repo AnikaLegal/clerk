@@ -9,7 +9,7 @@ from .helpers import string_to_date
 
 
 class RepairActions(models.TextChoices):
-    APPLIED_RP = "Landlord", "Applied to RP"
+    APPLIED_RP = "Landlord", "Informed RP"
     ISSUED_BREACH = "Breaches", "Issued breach notice"
     APPLIED_CAV = "CAV", "Applied to CAV"
     APPLIED_VCAT = "APPLIED_VCAT", "Applied to VCAT"
