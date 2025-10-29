@@ -118,7 +118,7 @@ class Command(BaseCommand):
 
             i.answers = None
             if i.submission:
-                submission = SubmissionFactory.build(answers={"ISSUES": i.topic})  # pyright: ignore [reportAttributeAccessIssue]
+                submission = SubmissionFactory.build(update_answers={"ISSUES": i.topic})  # pyright: ignore [reportAttributeAccessIssue]
                 i.submission.answers = submission.answers
                 i.submission.save()
 

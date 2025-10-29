@@ -321,25 +321,14 @@ class SubmissionFactory(TimestampedModelFactory):
     class Meta:  # pyright: ignore [reportIncompatibleVariableOverride]
         model = Submission
 
+    class Params:
+        # Allow setting specific answer values without needing to override the
+        # entire answers dict. This is particularly useful if we want to
+        # generate submissions with specific topics.
+        update_answers = {}
+
     id = factory.LazyAttribute(lambda x: uuid4())
     is_processed = True
-
-    @classmethod
-    def _generate(cls, strategy, params):
-        # Merge provided answers instead of overwriting them.
-        answers = params.pop("answers", None)
-        instance = super()._generate(strategy, params)
-        if answers:
-            instance.answers.update(answers)
-
-        # Add topic specific answers here because we need to know the topic
-        # (contained in ISSUES) and it may have been overridden in params.
-        topic_specific_answers = cls._topic_specific_answers(
-            instance.answers.get("ISSUES", None)
-        )
-        instance.answers.update(topic_specific_answers)
-
-        return instance
 
     @factory.lazy_attribute
     def answers(self):
@@ -440,10 +429,11 @@ class SubmissionFactory(TimestampedModelFactory):
             ]
         )
         answers[referrer] = fake.company()
-        return answers
 
-    @classmethod
-    def _topic_specific_answers(cls, topic) -> dict:
+        # Update answers with user-specified values.
+        answers.update(self.update_answers)  # pyright: ignore [reportAttributeAccessIssue]
+
+        # Topic specific answers
         def fake_file_uploads(min: int, max: int) -> list[dict] | None:
             uploads = []
             for _ in range(fake.random_int(min=min, max=max)):
@@ -457,9 +447,10 @@ class SubmissionFactory(TimestampedModelFactory):
                 )
             return uploads or None
 
-        answers = {}
+        topic = answers.get("ISSUES", None)
+        topic_specific_answers = {}
         if topic == CaseTopic.REPAIRS:
-            answers = {
+            topic_specific_answers = {
                 "REPAIRS_APPLIED_VCAT": fake.boolean(chance_of_getting_true=50),
                 "REPAIRS_ISSUE_START": fake.date_between(
                     start_date="-1y", end_date="-14d"
@@ -471,7 +462,7 @@ class SubmissionFactory(TimestampedModelFactory):
                 "REPAIRS_ISSUE_PHOTO": fake_file_uploads(min=0, max=3),
             }
         elif topic == CaseTopic.BONDS:
-            answers = {
+            topic_specific_answers = {
                 "BONDS_CLAIM_REASONS": fake.random_sample(
                     elements=fake.words(nb=3, unique=True),
                     length=fake.random_int(min=1, max=3),
@@ -485,9 +476,9 @@ class SubmissionFactory(TimestampedModelFactory):
                 "BONDS_RTBA_APPLICATION_UPLOAD": fake_file_uploads(min=0, max=1),
             }
 
-            for reason in answers["BONDS_CLAIM_REASONS"]:
+            for reason in topic_specific_answers["BONDS_CLAIM_REASONS"]:
                 if reason == "Cleaning":
-                    answers.update(
+                    topic_specific_answers.update(
                         {
                             "BONDS_CLEANING_CLAIM_AMOUNT": fake.random_int(),
                             "BONDS_CLEANING_CLAIM_DESCRIPTION": fake.paragraph(),
@@ -497,30 +488,30 @@ class SubmissionFactory(TimestampedModelFactory):
                         }
                     )
                 elif reason == "Damage":
-                    answers.update(
+                    topic_specific_answers.update(
                         {
                             "BONDS_DAMAGE_CAUSED_BY_TENANT": fake.boolean(),
                             "BONDS_DAMAGE_CLAIM_AMOUNT": fake.random_int(),
                             "BONDS_DAMAGE_CLAIM_DESCRIPTION": fake.paragraph(),
                         }
                     )
-                    if answers.get("BONDS_DAMAGE_CAUSED_BY_TENANT"):
-                        answers.update(
+                    if topic_specific_answers.get("BONDS_DAMAGE_CAUSED_BY_TENANT"):
+                        topic_specific_answers.update(
                             {"BONDS_DAMAGE_QUOTE_UPLOAD": fake_file_uploads(0, 1)}
                         )
                 elif reason == "Locks and security devices":
-                    answers.update(
+                    topic_specific_answers.update(
                         {
                             "BONDS_LOCKS_CHANGED_BY_TENANT": fake.boolean(),
                             "BONDS_LOCKS_CLAIM_AMOUNT": fake.random_int(),
                         }
                     )
-                    if answers.get("BONDS_LOCKS_CHANGED_BY_TENANT"):
-                        answers.update(
+                    if topic_specific_answers.get("BONDS_LOCKS_CHANGED_BY_TENANT"):
+                        topic_specific_answers.update(
                             {"BONDS_LOCKS_CHANGE_QUOTE": fake_file_uploads(0, 1)}
                         )
                 elif reason == "Rent or other money owing":
-                    answers.update(
+                    topic_specific_answers.update(
                         {
                             "BONDS_MONEY_IS_OWED_BY_TENANT": fake.boolean(),
                             "BONDS_MONEY_OWED_CLAIM_AMOUNT": fake.random_int(),
@@ -528,14 +519,14 @@ class SubmissionFactory(TimestampedModelFactory):
                         }
                     )
                 elif reason == "Other reason":
-                    answers.update(
+                    topic_specific_answers.update(
                         {
                             "BONDS_OTHER_REASONS_AMOUNT": fake.random_int(),
                             "BONDS_OTHER_REASONS_DESCRIPTION": fake.paragraph(),
                         }
                     )
         elif topic == CaseTopic.EVICTION_ARREARS:
-            answers = {
+            topic_specific_answers = {
                 "EVICTION_ARREARS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE": fake.date_between(
                     start_date="-3M", end_date="today"
                 ).strftime("%Y-%m-%d"),
@@ -566,7 +557,7 @@ class SubmissionFactory(TimestampedModelFactory):
                 "EVICTION_ARREARS_DOCUMENTS_UPLOAD": fake_file_uploads(min=0, max=1),
             }
         elif topic == CaseTopic.EVICTION_RETALIATORY:
-            answers = {
+            topic_specific_answers = {
                 "EVICTION_RETALIATORY_DATE_RECEIVED_NTV": fake.date_between(
                     start_date="-3M", end_date="today"
                 ).strftime("%Y-%m-%d"),
@@ -595,12 +586,15 @@ class SubmissionFactory(TimestampedModelFactory):
                 ),
             }
 
-            if answers["EVICTION_RETALIATORY_RETALIATORY_REASON"] == "Other":
-                answers["EVICTION_RETALIATORY_RETALIATORY_REASON_OTHER"] = (
-                    fake.sentence()
-                )
+            if (
+                topic_specific_answers["EVICTION_RETALIATORY_RETALIATORY_REASON"]
+                == "Other"
+            ):
+                topic_specific_answers[
+                    "EVICTION_RETALIATORY_RETALIATORY_REASON_OTHER"
+                ] = fake.sentence()
         elif topic == CaseTopic.RENT_REDUCTION:
-            answers = {
+            topic_specific_answers = {
                 "RENT_REDUCTION_ISSUES": fake.random_sample(
                     elements=fake.words(nb=3, unique=True),
                     length=fake.random_int(min=1, max=3),
@@ -614,17 +608,20 @@ class SubmissionFactory(TimestampedModelFactory):
                 ),
                 "RENT_REDUCTION_ISSUE_PHOTO": fake_file_uploads(min=0, max=1),
             }
-            if answers["RENT_REDUCTION_IS_NOTICE_TO_VACATE"]:
-                answers["RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT"] = fake_file_uploads(
-                    min=0, max=1
+            if topic_specific_answers["RENT_REDUCTION_IS_NOTICE_TO_VACATE"]:
+                topic_specific_answers["RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT"] = (
+                    fake_file_uploads(min=0, max=1)
                 )
         elif topic == CaseTopic.HEALTH_CHECK:
-            answers = {
+            topic_specific_answers = {
                 "SUPPORT_WORKER_AUTHORITY_UPLOAD": fake_file_uploads(min=0, max=1),
                 "TENANCY_DOCUMENTS_UPLOAD": fake_file_uploads(min=0, max=3),
             }
         elif topic == CaseTopic.OTHER:
-            answers = {
+            topic_specific_answers = {
                 "OTHER_ISSUE_DESCRIPTION": fake.paragraph(),
             }
+
+        answers.update(topic_specific_answers)
+
         return answers
