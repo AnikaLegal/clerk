@@ -361,6 +361,23 @@ TEAM_MEMBERS = [
             sector.""",
         ],
     },
+    {
+        "image": "web/img/photos/team/sharon.png",
+        "name": "Sharon Tate",
+        "title": "Lawyer",
+        "brags": [
+            """Sharon's journey at Anika is a story of growth, passion, and
+            making a real difference in the legal world. Starting out as a
+            volunteer paralegal through a Deakin University internship, Sharon
+            quickly rose through the ranks, becoming a paralegal lead. After she
+            was admitted to practice, she continued volunteering with Anika
+            Legal as a volunteer lawyer, whilst gaining experience working in
+            one of the busiest Tribunals in Australia.""",
+            """Sharon joined the employee team in 2025, supporting our
+            paralegals to deliver much-needed legal services to Victorian
+            renters.""",
+        ],
+    },
 ]
 
 TESTIMONIALS = [
