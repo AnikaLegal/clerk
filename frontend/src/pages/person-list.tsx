@@ -36,7 +36,7 @@ const App = () => {
 
   // pagination state (client-side paging over the fetched people list)
   const [page, setPage] = useState(1)
-  const pageSize = 25
+  const pageSize = 14
 
   const isLoading = searchResults.isFetching || listResults.isFetching
   const people = (query ? searchResults.data : listResults.data) || []
@@ -82,34 +82,39 @@ const App = () => {
       </Center>
 
       <FadeTransition in={!isLoading}>
-        <Table highlightOnHover verticalSpacing="md">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Address</th>
-              <th>Phone number</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table 
+          withColumnBorders
+          withTableBorder
+          verticalSpacing="md"
+          fz="md"
+          mt="md">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Email</Table.Th>
+              <Table.Th>Address</Table.Th>
+              <Table.Th>Phone number</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {total < 1 && (
-              <tr>
-                <td colSpan={4}>
+              <Table.Tr>
+                <Table.Td>
                   <Text align="center">No people found</Text>
-                </td>
-              </tr>
+                </Table.Td>
+              </Table.Tr>
             )}
             {pagedPeople.map((person) => (
-              <tr key={person.url}>
-                <td>
+              <Table.Tr key={person.url}>
+                <Table.Td>
                   <a href={person.url}>{person.full_name}</a>
-                </td>
-                <td>{person.email}</td>
-                <td>{person.address}</td>
-                <td>{person.phone_number}</td>
-              </tr>
+                </Table.Td>
+                <Table.Td>{person.email}</Table.Td>
+                <Table.Td>{person.address}</Table.Td>
+                <Table.Td>{person.phone_number}</Table.Td>
+              </Table.Tr>
             ))}
-          </tbody>
+          </Table.Tbody>
         </Table>
       </FadeTransition>
 
