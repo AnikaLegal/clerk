@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
 import {
-  Button,
+  Center,
   Container,
-  Header,
-  Table,
-  Input,
+  Grid,
   Loader,
-} from 'semantic-ui-react'
+  Pagination,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
+import type { TextInputProps } from '@mantine/core'
 import { useSnackbar } from 'notistack'
 
 import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
@@ -28,8 +32,15 @@ const App = () => {
   const listResults = useGetPeopleQuery()
   const [searchQuery, searchResults] = api.useLazySearchPeopleQuery()
 
+  // pagination state (client-side paging over the fetched people list)
+  const [page, setPage] = useState(1)
+  const pageSize = 25
+
   const isLoading = searchResults.isFetching || listResults.isFetching
   const people = (query ? searchResults.data : listResults.data) || []
+  const total = people.length
+  const pageCount = Math.max(1, Math.ceil(total / pageSize))
+  const pagedPeople = people.slice((page - 1) * pageSize, page * pageSize)
 
   const search = debouncer(() => {
     searchQuery({ query }).catch((err) => {
@@ -40,52 +51,76 @@ const App = () => {
   })
   useEffectLazy(() => search(), [query])
   return (
-    <Container>
-      <Header as="h1">Parties</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Add a party</Button>
-      </a>
-      <div style={{ margin: '1em 0' }}>
-        <Input
-          fluid
-          icon="search"
-          placeholder="Search by name, email, phone or address..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+    <Container size="lg" style={{ padding: '1.5rem 0' }}>
+      <Title order={1}>Parties</Title>
+
+      <div style={{ margin: '0.75rem 0' }}>
+        <a href={CONTEXT.create_url}>
+          <Text component="span" style={{ color: '#1971c2', fontWeight: 600 }}>
+            + Add a party
+          </Text>
+        </a>
       </div>
-      <Loader active={listResults.isLoading} inline="centered">
-        Loading...
-      </Loader>
+
+      <Grid align="center" gutter="sm" style={{ marginBottom: 12 }}>
+        <Grid.Col span={8}>
+          <TextInput
+            placeholder="Search by name, email, phone or address ..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(1)
+            }}
+            icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Center style={{ minHeight: 40 }}>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <Text color="dimmed">{`Showing ${pagedPeople.length} of ${total} parties`}</Text>
+        )}
+      </Center>
+
       <FadeTransition in={!isLoading}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Email</Table.HeaderCell>
-              <Table.HeaderCell>Address</Table.HeaderCell>
-              <Table.HeaderCell>Phone number</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {people.length < 1 && (
-              <Table.Row>
-                <td>No people found</td>
-              </Table.Row>
+        <Table highlightOnHover verticalSpacing="md">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Phone number</th>
+            </tr>
+          </thead>
+          <tbody>
+            {total < 1 && (
+              <tr>
+                <td colSpan={4}>
+                  <Text align="center">No people found</Text>
+                </td>
+              </tr>
             )}
-            {people.map((person) => (
-              <Table.Row key={person.url}>
-                <Table.Cell>
+            {pagedPeople.map((person) => (
+              <tr key={person.url}>
+                <td>
                   <a href={person.url}>{person.full_name}</a>
-                </Table.Cell>
-                <Table.Cell>{person.email}</Table.Cell>
-                <Table.Cell>{person.address}</Table.Cell>
-                <Table.Cell>{person.phone_number}</Table.Cell>
-              </Table.Row>
+                </td>
+                <td>{person.email}</td>
+                <td>{person.address}</td>
+                <td>{person.phone_number}</td>
+              </tr>
             ))}
-          </Table.Body>
+          </tbody>
         </Table>
       </FadeTransition>
+
+      {pageCount > 1 && (
+        <Center style={{ marginTop: 12 }}>
+          <Pagination page={page} onChange={setPage} total={pageCount} />
+        </Center>
+      )}
     </Container>
   )
 }
