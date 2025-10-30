@@ -55,6 +55,7 @@ const App = () => {
   return (
     <Container size="xl" style={{ padding: '1.5rem 0' }}>
       <Title order={1}>Parties</Title>
+      {!isLoading && (<Text mt={4} color="dimmed">Showing {pagedPeople.length} of {total} parties</Text>)}
       <Button component="a" href={CONTEXT.create_url} size="md" mt="sm">
         Add a party
       </Button>
@@ -73,13 +74,11 @@ const App = () => {
         </Grid.Col>
       </Grid>
 
-      <Center style={{ minHeight: 40 }}>
-        {isLoading ? (
+      {isLoading && (
+        <Center style={{ minHeight: 40, marginTop: 20 }}>
           <Loader />
-        ) : (
-          <Text color="dimmed">{`Showing ${pagedPeople.length} of ${total} parties`}</Text>
-        )}
-      </Center>
+        </Center>
+      )}
 
       <FadeTransition in={!isLoading}>
         <Table 
