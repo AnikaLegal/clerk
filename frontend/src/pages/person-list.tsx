@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+  Button,
   Center,
   Container,
   Grid,
@@ -11,6 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import type { TextInputProps } from '@mantine/core'
+import { IconSearch } from '@tabler/icons-react'
 import { useSnackbar } from 'notistack'
 
 import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
@@ -51,27 +53,22 @@ const App = () => {
   })
   useEffectLazy(() => search(), [query])
   return (
-    <Container size="lg" style={{ padding: '1.5rem 0' }}>
+    <Container size="xl" style={{ padding: '1.5rem 0' }}>
       <Title order={1}>Parties</Title>
-
-      <div style={{ margin: '0.75rem 0' }}>
-        <a href={CONTEXT.create_url}>
-          <Text component="span" style={{ color: '#1971c2', fontWeight: 600 }}>
-            + Add a party
-          </Text>
-        </a>
-      </div>
-
-      <Grid align="center" gutter="sm" style={{ marginBottom: 12 }}>
-        <Grid.Col span={8}>
+      <Button component="a" href={CONTEXT.create_url} size="md" mt="sm">
+        Add a party
+      </Button>
+      <Grid mt="md">
+        <Grid.Col span={6}>
           <TextInput
             placeholder="Search by name, email, phone or address ..."
+            rightSection={<IconSearch size={16} stroke={4} />}
+            size="md"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value)
               setPage(1)
             }}
-            icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
           />
         </Grid.Col>
       </Grid>
