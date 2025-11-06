@@ -51,14 +51,14 @@ dependencies = [
 [dependency-groups]
 dev = [
     "debugpy",
-    "django-browser-reload",
-    "django-debug-toolbar",
+    "django-browser-reload>=1.21.0",
+    "django-debug-toolbar>=6.0.0",
     "django-extensions",
-    "django-querycount",
+    "django-zeal>=2.0.4",
     "invoke>=2.2.0",
     "ipython",
     "setuptools",
-    "watchdog[watchmedo]",
+    "watchdog[watchmedo]>=5.0.2",
 ]
 
 [tool.uv]
