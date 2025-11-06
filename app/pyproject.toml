@@ -42,7 +42,7 @@ dependencies = [
     "twilio",
     "tzdata",
     "wagtail-localize",
-    "wagtail",
+    "wagtail>=7.2.0",
     "whitenoise",
     "django-vite>=3.1.0",
     "django-auditlog>=3.2.1",

@@ -12,7 +12,7 @@ from webhooks.models import WebflowContact
 @pytest.fixture
 @pytest.mark.django_db
 @transaction.atomic()
-def blog_list_page():
+def blog_list_page(django_capture_on_commit_callbacks):
     root_page = RootPage.objects.get()
     list_page = BlogListPage(title="Blog", slug="blog")
     root_page.add_child(instance=list_page)
@@ -28,7 +28,8 @@ def blog_list_page():
     for page_datum in page_data:
         blog_page = BlogPage(**page_datum)
         list_page.add_child(instance=blog_page)
-        blog_page.save_revision().publish()
+        with django_capture_on_commit_callbacks(execute=True):
+            blog_page.save_revision().publish()
 
     return list_page
 
