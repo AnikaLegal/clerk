@@ -1,0 +1,46 @@
+{% extends 'web/_base.html' %}
+{% load static %}
+{% load wagtailcore_tags %}
+{% block title %}
+  Download
+{% endblock %}
+{% block styles %}
+  <style>
+    #download {
+      padding-top: 75px;
+      padding-bottom: 75px;
+      display: flex;
+      text-align: left;
+      justify-content: space-between;
+    }
+    #download .text {
+      max-width: 400px;
+      margin-right: 92px;
+    }
+    #download form {
+      box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
+      border-radius: 22px;
+      padding: 80px 75px 70px 75px;
+      max-width: 630px;
+      box-sizing: border-box;
+      gap: 3rem;
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <div id="download">
+      <div class="text">
+        <h2>Help us</h2>
+        <p class="light">Please provide some information to help us understand how our resources are being used.</p>
+      </div>
+      <form action="{{ document.url }}" method="post">
+        {% csrf_token %}
+        {{ form.state }}
+        {{ form.sector }}
+        {{ form.referrer }}
+        <button type="submit" class="btn btn-primary">View</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

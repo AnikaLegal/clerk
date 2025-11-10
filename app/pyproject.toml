@@ -46,6 +46,7 @@ dependencies = [
     "whitenoise",
     "django-vite>=3.1.0",
     "django-auditlog>=3.2.1",
+    "crawler-user-agents>=1.21.0",
 ]
 
 [dependency-groups]

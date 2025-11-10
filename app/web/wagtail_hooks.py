@@ -1,10 +1,14 @@
+from django.shortcuts import render
 from django.templatetags.static import static
 from django.utils.html import format_html
 from wagtail import hooks
+from wagtail.admin.ui.tables import LiveStatusTagColumn, UpdatedAtColumn
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .models import Banner, DashboardItem, ExternalNews
+from .forms import DocumentLogForm
+from .models import Banner, DashboardItem, DocumentLog, ExternalNews, Report
+import crawleruseragents
 
 
 @hooks.register("insert_global_admin_css")
@@ -12,6 +16,43 @@ def global_admin_css():
     return format_html(
         '<link rel="stylesheet" href="{}">', static("web/styles/wagtail-admin.css")
     )
+
+
+@hooks.register("before_serve_document")
+def before_serve_document(document, request):
+    if request.user.is_authenticated or not getattr(document, "track_download", False):
+        return None
+
+    # Allow bots to access documents without logging a download.
+    user_agent = request.META.get("HTTP_USER_AGENT", "")
+    if crawleruseragents.is_crawler(user_agent):
+        return None
+
+    # Check IP address from request to see if we already have a log for this
+    # download.
+    ip_address = request.META.get("REMOTE_ADDR")
+    if DocumentLog.objects.filter(document=document, ip_address=ip_address).exists():
+        return None
+
+    if request.method == "POST":
+        form = DocumentLogForm(request.POST)
+        if form.is_valid():
+            DocumentLog.objects.create(
+                document=document,
+                ip_address=ip_address,
+                state=form.cleaned_data["state"],
+                referrer=form.cleaned_data["referrer"],
+                sector=form.cleaned_data["sector"],
+            )
+            return None
+    else:
+        form = DocumentLogForm()
+
+    context = {
+        "form": form,
+        "document": document,
+    }
+    return render(request, "web/_download.html", context)
 
 
 class BannerAdmin(SnippetViewSet):
