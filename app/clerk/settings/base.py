@@ -233,6 +233,7 @@ DJANGO_VITE = {
 # Wagtail
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
+WAGTAILDOCS_DOCUMENT_MODEL = "web.CustomDocument"
 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
