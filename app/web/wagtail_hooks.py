@@ -57,3 +57,22 @@ class ExternalNewsAdmin(SnippetViewSet):
 
 
 register_snippet(ExternalNewsAdmin)
+
+
+class ReportAdmin(SnippetViewSet):
+    model = Report
+    menu_label = "Reports"
+    icon = "doc-full"
+    menu_order = 203
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    list_display = (
+        "title",
+        "is_featured",
+        UpdatedAtColumn(),
+        LiveStatusTagColumn(),
+    )
+    search_fields = ("title",)
+
+
+register_snippet(ReportAdmin)
