@@ -43,7 +43,7 @@ Landing page only styles.
   :root {
     --hero-curve-height: 46px;
     /* FIXME: CHRISTMAS */
-    --hero-padding-top: -72px; 
+    --hero-padding-top: -72px;
 
     --hero-padding-bottom: 0;
     --hero-small-image-height: 275px;
@@ -341,35 +341,9 @@ Landing page only styles.
   box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
   border-radius: 22px;
   padding: 80px 75px 70px 75px;
-  width: 100%;
   max-width: 630px;
-  display: flex;
-  flex-direction: column;
   box-sizing: border-box;
-}
-#contact form button {
-  align-self: baseline;
-}
-
-#contact form input,
-#contact form select,
-#contact form .checkbox {
-  margin-bottom: 60px;
-}
-#contact form input,
-#contact form select {
-  line-height: var(--body-line-height);
-  font-size: var(--body-font-size);
-  border: none;
-  outline: none;
-  color: var(--dark-6);
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--dark-6);
-  padding: 8px 8px 8px 8px;
-  background-color: var(--white);
-}
-#contact form select {
-  opacity: 0.8;
+  gap: 3rem;
 }
 
 @media (max-width: 1300px) {
