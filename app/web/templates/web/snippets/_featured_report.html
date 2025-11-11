@@ -1,0 +1,8 @@
+{% load wagtailcore_tags %}
+{% if report %}
+  {% if report.document %}
+    <a href="{{ report.document.url }}"><button>Read our {{ title }} report</button></a>
+  {% elif report.blog_page %}
+    <a href="{% pageurl report.blog_page %}"><button>Read our {{ title }} report</button></a>
+  {% endif %}
+{% endif %}
