@@ -22,15 +22,7 @@ def show_featured_report(context):
         .select_related("document", "accessible_document", "blog_page")
         .first()
     )
-
-    title = None
-    if report:
-        title = report.title
-        if title.lower().endswith(" report"):
-            title = title[: -len(" report")]
-
     return {
         "report": report,
-        "title": title,
         "request": context["request"],
     }
