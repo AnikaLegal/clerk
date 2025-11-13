@@ -7,6 +7,10 @@ from wagtail.models import DraftStateMixin, RevisionMixin
 
 
 class Report(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[reportIncompatibleVariableOverride]
+    """
+    Represents a report which can be either a document or a blog page, but not both.
+    """
+
     title = models.CharField()
     description = models.TextField(blank=True)
     document = models.ForeignKey(
@@ -21,7 +25,7 @@ class Report(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
         blank=True,
         null=True,
         related_name="+",
-        help_text="An accessible version of the report file (e.g. tagged PDF, Word document). Optional.",
+        help_text="An accessible version of the report document (e.g., tagged PDF or Word document). Optional.",
     )
     blog_page = models.ForeignKey(
         "web.BlogPage",
@@ -48,7 +52,7 @@ class Report(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
                 FieldPanel("blog_page"),
             ],
             heading="Report content",
-            help_text="Choose a document (including an optional accessible version) OR a blog post as the report content.",
+            help_text="Choose a document (including an optional accessible version) OR a blog post as the report content. Not both.",
         ),
         PublishingPanel(),
     ]

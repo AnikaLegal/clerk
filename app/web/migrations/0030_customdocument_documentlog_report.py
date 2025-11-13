@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         (
             "taggit",
@@ -233,7 +232,7 @@ class Migration(migrations.Migration):
                     "accessible_document",
                     models.ForeignKey(
                         blank=True,
-                        help_text="An accessible version of the report file (e.g. tagged PDF, Word document). Optional.",
+                        help_text="An accessible version of the report document (e.g., tagged PDF or Word document). Optional.",
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="+",
