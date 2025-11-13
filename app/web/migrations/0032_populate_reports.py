@@ -131,6 +131,9 @@ def _get_static_file(file_name: str) -> File:
 
 
 def _populate_report_db(apps, schema_editor):
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return
+
     Report = apps.get_model("web", "Report")
     Document = apps.get_model("web", "CustomDocument")
     BlogPage = apps.get_model("web", "BlogPage")
