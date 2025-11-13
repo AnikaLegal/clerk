@@ -1,24 +1,25 @@
+import crawleruseragents
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.utils.html import format_html
 from wagtail import hooks
-from wagtail.admin.ui.tables import LiveStatusTagColumn, UpdatedAtColumn
+from wagtail.admin.ui.tables import BooleanColumn, LiveStatusTagColumn, UpdatedAtColumn
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet
 
 from .forms import DocumentLogForm
 from .models import Banner, DashboardItem, DocumentLog, ExternalNews, Report
-import crawleruseragents
 
 
-@hooks.register("insert_global_admin_css")
 def global_admin_css():
     return format_html(
         '<link rel="stylesheet" href="{}">', static("web/styles/wagtail-admin.css")
     )
 
 
-@hooks.register("before_serve_document")
+hooks.register("insert_global_admin_css", global_admin_css)
+
+
 def before_serve_document(document, request):
     if request.user.is_authenticated or not getattr(document, "track_download", False):
         return None
@@ -53,6 +54,9 @@ def before_serve_document(document, request):
         "document": document,
     }
     return render(request, "web/_download.html", context)
+
+
+hooks.register("before_serve_document", before_serve_document)
 
 
 class BannerAdmin(SnippetViewSet):
@@ -109,10 +113,11 @@ class ReportAdmin(SnippetViewSet):
     exclude_from_explorer = False
     list_display = (
         "title",
-        "is_featured",
+        BooleanColumn("is_featured"),
         UpdatedAtColumn(),
         LiveStatusTagColumn(),
     )
+    list_filter = ("is_featured",)
     search_fields = ("title",)
 
 
