@@ -3,6 +3,7 @@ import os
 from typing import NotRequired, TypedDict
 
 from django.contrib.staticfiles import finders
+from django.core import management
 from django.core.files.base import File
 from django.db import migrations
 from django.utils import timezone
@@ -166,6 +167,10 @@ def _populate_report_db(apps, schema_editor):
         report.is_featured = document.get("is_featured", False)
         report.first_published_at = timezone.now()
         report.save()
+
+    # Rebuild the references index so documents reference the newly created
+    # reports.
+    management.call_command("rebuild_references_index")
 
 
 class Migration(migrations.Migration):
