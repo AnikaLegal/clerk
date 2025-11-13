@@ -23,8 +23,11 @@ class ReportAdmin(admin.ModelAdmin):
 
 @admin.register(DocumentLog)
 class DocumentLogAdmin(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        # Disable editing.
+        return False
+
     list_display = (
-        "id",
         "document",
         "ip_address",
         "state",
