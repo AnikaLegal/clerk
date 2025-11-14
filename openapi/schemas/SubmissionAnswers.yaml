@@ -1,0 +1,408 @@
+type: object
+properties:
+  client:
+    type: object
+    properties:
+      first_name:
+        type: string
+        nullable: true
+      last_name:
+        type: string
+        nullable: true
+      preferred_name:
+        type: string
+        nullable: true
+      email:
+        type: string
+        nullable: true
+      date_of_birth:
+        type: string
+        nullable: true
+      phone_number:
+        type: string
+        nullable: true
+      gender:
+        type: string
+        nullable: true
+      centrelink_support:
+        allOf:
+          - $ref: ./BooleanYesNo.yaml
+        nullable: true
+      eligibility_notes:
+        type: string
+        nullable: true
+      requires_interpreter:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      primary_language_non_english:
+        allOf:
+          - $ref: ./BooleanYesNo.yaml
+        nullable: true
+      primary_language:
+        type: string
+        nullable: true
+      is_aboriginal_or_torres_strait_islander:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      number_of_dependents:
+        type: integer
+        nullable: true
+      eligibility_circumstances:
+        type: array
+        items:
+          $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      call_times:
+        type: array
+        items:
+          $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      special_circumstances:
+        type: array
+        items:
+          $ref: ./ChoiceDisplay.yaml
+        nullable: true
+  tenancy:
+    properties:
+      address:
+        type: string
+        nullable: true
+      suburb:
+        type: string
+        nullable: true
+      postcode:
+        type: string
+        nullable: true
+      is_on_lease:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      rental_circumstances:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      start_date:
+        type: string
+        nullable: true
+      landlord:
+        allOf:
+          - $ref: ./SubmissionPerson.yaml
+        nullable: true
+      agent:
+        allOf:
+          - $ref: ./SubmissionPerson.yaml
+        nullable: true
+  issue:
+    properties:
+      issues:
+        type: array
+        items:
+          $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      weekly_income:
+        type: integer
+        nullable: true
+      employment_status:
+        type: array
+        items:
+          $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      referrer:
+        type: string
+        nullable: true
+      referrer_type:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
+      weekly_rent:
+        type: integer
+        nullable: true
+      support_worker:
+        allOf:
+          - $ref: ./SubmissionPerson.yaml
+        nullable: true
+  topic_specific:
+    properties:
+      REPAIRS:
+        type: object
+        nullable: true
+        properties:
+          issue_start:
+            type: string
+            nullable: true
+          issue_photos:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          applied_vcat:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          vcat:
+            type: array
+            items:
+              $ref: ./ChoiceDisplay.yaml
+            nullable: true
+          issue_description:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          required:
+            type: array
+            items:
+              type: string
+            nullable: true
+      BONDS:
+        type: object
+        nullable: true
+        properties:
+          claim_reasons:
+            type: array
+            items:
+              type: string
+            nullable: true
+          cleaning_claim_amount:
+            type: integer
+            nullable: true
+          cleaning_claim_description:
+            type: string
+            nullable: true
+          cleaning_documents:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          damage_caused_by_tenant:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          damage_claim_amount:
+            type: integer
+            nullable: true
+          damage_claim_description:
+            type: string
+            nullable: true
+          damage_quote:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          has_landlord_made_rtba_application:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          landlord_intents_to_make_claim:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          locks_changed_by_tenant:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          locks_claim_amount:
+            type: integer
+            nullable: true
+          locks_change_quote:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          money_is_owed_by_tenant:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          money_owed_claim_amount:
+            type: integer
+            nullable: true
+          money_owed_claim_description:
+            type: string
+            nullable: true
+          move_out_date:
+            type: string
+            nullable: true
+          other_reasons_amount:
+            type: integer
+            nullable: true
+          other_reasons_description:
+            type: string
+            nullable: true
+          tenant_has_rtba_application_copy:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          rtba_application:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+      EVICTION_ARREARS:
+        type: object
+        nullable: true
+        properties:
+          doc_delivery_time_notice_to_vacate:
+            type: string
+            nullable: true
+          has_notice:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          is_already_removed:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          is_unpaid_rent:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          is_vcat_date:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          notice_send_date:
+            type: string
+            nullable: true
+          notice_vacate_date:
+            type: string
+            nullable: true
+          payment_fail_description:
+            type: string
+            nullable: true
+          payment_fail_reason:
+            type: array
+            items:
+              type: string
+            nullable: true
+          vcat_date:
+            type: string
+            nullable: true
+          documents:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          can_afford_payment_plan:
+            allOf:
+              - $ref: ./ChoiceDisplay.yaml
+            nullable: true
+          documents_provided:
+            type: array
+            items:
+              type: string
+            nullable: true
+          delivery_method_notice_to_vacate:
+            type: string
+            nullable: true
+          delivery_method_other_docs:
+            type: string
+            nullable: true
+          delivery_method_possession_order:
+            type: string
+            nullable: true
+          doc_delivery_time_other_docs:
+            type: string
+            nullable: true
+          doc_delivery_time_possession_order:
+            type: string
+            nullable: true
+          is_on_payment_plan:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          miscellaneous:
+            type: string
+            nullable: true
+          payment_amount:
+            type: integer
+            nullable: true
+          payment_fail_change:
+            type: string
+            nullable: true
+          rent_cycle:
+            type: string
+            nullable: true
+          rent_unpaid:
+            type: integer
+            nullable: true
+      EVICTION_RETALIATORY:
+        type: object
+        nullable: true
+        properties:
+          date_received_ntv:
+            type: string
+            nullable: true
+          has_notice:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          is_already_removed:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          ntv_type:
+            type: string
+            nullable: true
+          retaliatory_reason:
+            type: array
+            items:
+              type: string
+            nullable: true
+          retaliatory_reason_other:
+            type: string
+            nullable: true
+          termination_date:
+            type: string
+            nullable: true
+          vcat_hearing:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          vcat_hearing_date:
+            type: string
+            nullable: true
+          documents:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+      RENT_REDUCTION:
+        type: object
+        nullable: true
+        properties:
+          issues:
+            type: array
+            items:
+              type: string
+            nullable: true
+          issue_description:
+            type: string
+            nullable: true
+          issue_photos:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          issue_start:
+            type: string
+            nullable: true
+          is_notice_to_vacate:
+            allOf:
+              - $ref: ./BooleanYesNo.yaml
+            nullable: true
+          notice_to_vacate:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+      HEALTH_CHECK:
+        type: object
+        nullable: true
+        properties:
+          support_worker_authority:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+          tenancy_documents:
+            allOf:
+              - $ref: ./SubmissionFiles.yaml
+            nullable: true
+      OTHER:
+        type: object
+        nullable: true
+        properties:
+          issue_description:
+            type: string
+            nullable: true

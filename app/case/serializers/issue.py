@@ -53,6 +53,7 @@ class IssueSerializer(serializers.ModelSerializer):
             "is_open",
             "is_sharepoint_set_up",
             "actionstep_id",
+            "submission_id",
             "created_at",
             "url",
             # Case review fields.
@@ -98,6 +99,9 @@ class IssueSerializer(serializers.ModelSerializer):
     created_at = LocalDateField()
     employment_status = TextChoiceListField(EmploymentType, required=False)
     referrer_type = TextChoiceField(ReferrerType, required=False)
+
+    # Submission-related fields.
+    submission_id = serializers.UUIDField(read_only=True)
     answers = serializers.JSONField(read_only=True)
 
     url = serializers.SerializerMethodField()

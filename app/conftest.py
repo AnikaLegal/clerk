@@ -2,20 +2,26 @@
 Pytest configuration
 """
 
-import pytest
 import os
+
 import debugpy
-from django.contrib.auth.models import Group
-from rest_framework.test import APIClient
-from openapi_tester import SchemaTester
-
+import factory
+import pytest
 from accounts.models import CaseGroups, User
-from utils.signals import disable_signals, restore_signals
-from core import factories
 from case.middleware import annotate_group_access
-
+from core import factories
+from django.contrib.auth.models import Group
+from openapi_tester import SchemaTester
+from rest_framework.test import APIClient
+from utils.signals import disable_signals, restore_signals
 
 schema_tester = SchemaTester(schema_file_path="/app/openapi.generated.yaml")
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_faker_locale():
+    with factory.Faker.override_default_locale("en_AU"):
+        yield
 
 
 @pytest.fixture(autouse=True)  # Automatically use in tests.
