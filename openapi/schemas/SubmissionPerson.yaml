@@ -1,0 +1,18 @@
+type: object
+properties:
+  name:
+    type: string
+    nullable: true
+  address:
+    type: string
+    nullable: true
+  email:
+    type: string
+    nullable: true
+  phone_number:
+    type: string
+    nullable: true
+  support_contact_preferences:
+    allOf:
+      - $ref: ./ChoiceDisplay.yaml
+    nullable: true

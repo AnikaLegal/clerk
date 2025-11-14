@@ -1,28 +1,22 @@
+from caller.views import answer_view, collect_view, message_view
+from core import views as core_views
+from debug_toolbar.toolbar import debug_toolbar_urls
+from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
-from django.urls import path, re_path
-from django.conf import settings
-from rest_framework import routers
-from django.views.generic.base import RedirectView
-
-from emails import urls as email_urls
-from caller.views import answer_view, collect_view, message_view
-from core import views as core_views
-from webhooks.views import jotform_form_view, webflow_form_view, intake_no_email_view
-from wagtail import urls as wagtail_urls
-
-from django.urls import path, re_path
-from django.conf.urls import include
-from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from wagtail.admin import urls as wagtailadmin_urls
+from django.urls import path, re_path
+from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
+from emails import urls as email_urls
+from rest_framework import routers
 from wagtail import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from web.sitemaps import SITEMAPS
-
 from web import views
-from intake.views import intake_view
+from web.sitemaps import SITEMAPS
+from webhooks.views import intake_no_email_view, jotform_form_view, webflow_form_view
 
 
 def template(name):
@@ -136,8 +130,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
-        path("__debug__/", include("debug_toolbar.urls")),
     ]
+    urlpatterns += debug_toolbar_urls()
+
 
 # Wagtail pages + internationalized urls
 urlpatterns += i18n_patterns(

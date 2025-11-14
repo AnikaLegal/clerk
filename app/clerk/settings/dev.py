@@ -1,13 +1,12 @@
 # flake8: noqa
-import socket
 from .base import *
 
 ENVIRONMENT = "development"
 DEBUG = True
 
-# Django debug toolbar + Docker setup
-hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": "debug_toolbar.middleware.show_toolbar_with_docker",
+}
 
 SECRET_KEY = "its-a-secret-key!"
 
@@ -51,10 +50,7 @@ WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
 
 DJANGO_VITE["default"]["dev_mode"] = True
 
-MIDDLEWARE += [
-    "querycount.middleware.QueryCountMiddleware",
-]
-
-QUERYCOUNT = {
-    "DISPLAY_DUPLICATES": None,
-}
+INSTALLED_APPS += ["zeal"]
+MIDDLEWARE += ["zeal.middleware.zeal_middleware"]
+ZEAL_RAISE = False
+ZEAL_SHOW_ALL_CALLERS = False
