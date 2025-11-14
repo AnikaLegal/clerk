@@ -77,6 +77,10 @@ allOf:
       next_review:
         type: string
         nullable: true
+      submission_id:
+        type: string
+        format: uuid
+        nullable: true
     required:
       - id
       - topic_display
@@ -106,3 +110,4 @@ allOf:
       - is_conflict_check
       - is_eligibility_check
       - next_review
+      - submission_id

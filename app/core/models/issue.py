@@ -1,15 +1,15 @@
 import uuid
 
+from accounts.models import User
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.urls import reverse
-from django.conf import settings
 
-from accounts.models import User
-
-from .person import Person
 from .client import Client
+from .person import Person
+from .submission import Submission
 from .tenancy import Tenancy
 from .timestamped import TimestampedModel
 
@@ -219,6 +219,11 @@ class Issue(TimestampedModel):
 
     # Actionstep ID
     actionstep_id = models.IntegerField(blank=True, null=True)
+
+    # Submission
+    submission = models.OneToOneField(
+        Submission, null=True, blank=True, on_delete=models.PROTECT
+    )
 
     def save(self, *args, **kwargs):
         if not self.fileref:

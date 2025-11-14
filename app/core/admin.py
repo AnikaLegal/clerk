@@ -59,6 +59,10 @@ class SubmissionAdmin(admin.ModelAdmin):
         "is_processed",
         "is_reminder_sent",
     )
+    readonly_fields = ("answers_json",)
+
+    def answers_json(self, instance):
+        return dict_to_json_html(instance.answers)
 
 
 @admin.register(FileUpload)
@@ -94,7 +98,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    readonly_fields = ("answers_json",)
+    readonly_fields = ("answers_json", "submission")
     exclude = ("answers",)
     list_display = (
         "id",

@@ -1,0 +1,12 @@
+type: object
+properties:
+  label:
+    type: string
+    enum:
+      - Yes
+      - No
+  value:
+    type: boolean
+required:
+  - label
+  - value

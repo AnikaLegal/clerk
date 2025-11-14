@@ -4,6 +4,24 @@ info:
   description: API that the Django backend will provide.
   version: 0.1.0
 paths:
+  /clerk/api/submission/{id}/:
+    get:
+      operationId: getSubmission
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submission"
   /clerk/api/case/:
     get:
       operationId: getCases
@@ -1499,6 +1517,486 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    BooleanYesNo:
+      type: object
+      properties:
+        label:
+          type: string
+          enum:
+            - "Yes"
+            - "No"
+        value:
+          type: boolean
+      required:
+        - label
+        - value
+    ChoiceDisplay:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+      required:
+        - label
+        - value
+    SubmissionPerson:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        support_contact_preferences:
+          allOf:
+            - $ref: "#/components/schemas/ChoiceDisplay"
+          nullable: true
+    SubmissionFiles:
+      type: array
+      items:
+        type: object
+        properties:
+          url:
+            type: string
+          name:
+            type: string
+    SubmissionAnswers:
+      type: object
+      properties:
+        client:
+          type: object
+          properties:
+            first_name:
+              type: string
+              nullable: true
+            last_name:
+              type: string
+              nullable: true
+            preferred_name:
+              type: string
+              nullable: true
+            email:
+              type: string
+              nullable: true
+            date_of_birth:
+              type: string
+              nullable: true
+            phone_number:
+              type: string
+              nullable: true
+            gender:
+              type: string
+              nullable: true
+            centrelink_support:
+              allOf:
+                - $ref: "#/components/schemas/BooleanYesNo"
+              nullable: true
+            eligibility_notes:
+              type: string
+              nullable: true
+            requires_interpreter:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            primary_language_non_english:
+              allOf:
+                - $ref: "#/components/schemas/BooleanYesNo"
+              nullable: true
+            primary_language:
+              type: string
+              nullable: true
+            is_aboriginal_or_torres_strait_islander:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            number_of_dependents:
+              type: integer
+              nullable: true
+            eligibility_circumstances:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            call_times:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            special_circumstances:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+        tenancy:
+          properties:
+            address:
+              type: string
+              nullable: true
+            suburb:
+              type: string
+              nullable: true
+            postcode:
+              type: string
+              nullable: true
+            is_on_lease:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            rental_circumstances:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            start_date:
+              type: string
+              nullable: true
+            landlord:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+            agent:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+        issue:
+          properties:
+            issues:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            weekly_income:
+              type: integer
+              nullable: true
+            employment_status:
+              type: array
+              items:
+                $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            referrer:
+              type: string
+              nullable: true
+            referrer_type:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
+            weekly_rent:
+              type: integer
+              nullable: true
+            support_worker:
+              allOf:
+                - $ref: "#/components/schemas/SubmissionPerson"
+              nullable: true
+        topic_specific:
+          properties:
+            REPAIRS:
+              type: object
+              nullable: true
+              properties:
+                issue_start:
+                  type: string
+                  nullable: true
+                issue_photos:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                applied_vcat:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                vcat:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ChoiceDisplay"
+                  nullable: true
+                issue_description:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                required:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+            BONDS:
+              type: object
+              nullable: true
+              properties:
+                claim_reasons:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                cleaning_claim_amount:
+                  type: integer
+                  nullable: true
+                cleaning_claim_description:
+                  type: string
+                  nullable: true
+                cleaning_documents:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                damage_caused_by_tenant:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                damage_claim_amount:
+                  type: integer
+                  nullable: true
+                damage_claim_description:
+                  type: string
+                  nullable: true
+                damage_quote:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                has_landlord_made_rtba_application:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                landlord_intents_to_make_claim:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                locks_changed_by_tenant:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                locks_claim_amount:
+                  type: integer
+                  nullable: true
+                locks_change_quote:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                money_is_owed_by_tenant:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                money_owed_claim_amount:
+                  type: integer
+                  nullable: true
+                money_owed_claim_description:
+                  type: string
+                  nullable: true
+                move_out_date:
+                  type: string
+                  nullable: true
+                other_reasons_amount:
+                  type: integer
+                  nullable: true
+                other_reasons_description:
+                  type: string
+                  nullable: true
+                tenant_has_rtba_application_copy:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                rtba_application:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+            EVICTION_ARREARS:
+              type: object
+              nullable: true
+              properties:
+                doc_delivery_time_notice_to_vacate:
+                  type: string
+                  nullable: true
+                has_notice:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                is_already_removed:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                is_unpaid_rent:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                is_vcat_date:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                notice_send_date:
+                  type: string
+                  nullable: true
+                notice_vacate_date:
+                  type: string
+                  nullable: true
+                payment_fail_description:
+                  type: string
+                  nullable: true
+                payment_fail_reason:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                vcat_date:
+                  type: string
+                  nullable: true
+                documents:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                can_afford_payment_plan:
+                  allOf:
+                    - $ref: "#/components/schemas/ChoiceDisplay"
+                  nullable: true
+                documents_provided:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                delivery_method_notice_to_vacate:
+                  type: string
+                  nullable: true
+                delivery_method_other_docs:
+                  type: string
+                  nullable: true
+                delivery_method_possession_order:
+                  type: string
+                  nullable: true
+                doc_delivery_time_other_docs:
+                  type: string
+                  nullable: true
+                doc_delivery_time_possession_order:
+                  type: string
+                  nullable: true
+                is_on_payment_plan:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                miscellaneous:
+                  type: string
+                  nullable: true
+                payment_amount:
+                  type: integer
+                  nullable: true
+                payment_fail_change:
+                  type: string
+                  nullable: true
+                rent_cycle:
+                  type: string
+                  nullable: true
+                rent_unpaid:
+                  type: integer
+                  nullable: true
+            EVICTION_RETALIATORY:
+              type: object
+              nullable: true
+              properties:
+                date_received_ntv:
+                  type: string
+                  nullable: true
+                has_notice:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                is_already_removed:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                ntv_type:
+                  type: string
+                  nullable: true
+                retaliatory_reason:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                retaliatory_reason_other:
+                  type: string
+                  nullable: true
+                termination_date:
+                  type: string
+                  nullable: true
+                vcat_hearing:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                vcat_hearing_date:
+                  type: string
+                  nullable: true
+                documents:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+            RENT_REDUCTION:
+              type: object
+              nullable: true
+              properties:
+                issues:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                issue_description:
+                  type: string
+                  nullable: true
+                issue_photos:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                issue_start:
+                  type: string
+                  nullable: true
+                is_notice_to_vacate:
+                  allOf:
+                    - $ref: "#/components/schemas/BooleanYesNo"
+                  nullable: true
+                notice_to_vacate:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+            HEALTH_CHECK:
+              type: object
+              nullable: true
+              properties:
+                support_worker_authority:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+                tenancy_documents:
+                  allOf:
+                    - $ref: "#/components/schemas/SubmissionFiles"
+                  nullable: true
+            OTHER:
+              type: object
+              nullable: true
+              properties:
+                issue_description:
+                  type: string
+                  nullable: true
+    Submission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        answers_raw:
+          type: object
+          additionalProperties: true
+        answers:
+          allOf:
+            - $ref: "#/components/schemas/SubmissionAnswers"
+          nullable: true
+        created_at:
+          type: string
+      required:
+        - id
+        - answers_raw
+        - answers
+        - created_at
     IssueBase:
       type: object
       properties:
@@ -1865,6 +2363,10 @@ components:
             next_review:
               type: string
               nullable: true
+            submission_id:
+              type: string
+              format: uuid
+              nullable: true
           required:
             - id
             - topic_display
@@ -1894,6 +2396,7 @@ components:
             - is_conflict_check
             - is_eligibility_check
             - next_review
+            - submission_id
     ClientCreate:
       allOf:
         - $ref: "#/components/schemas/ClientBase"
