@@ -21,23 +21,42 @@ class StateChoices(models.TextChoices):
     TAS = "TAS", "Tasmania"
     VIC = "VIC", "Victoria"
     WA = "WA", "Western Australia"
-    NOT_APPLICABLE = "N/A", "Not applicable"
+    ELSEWHERE = "ELSEWHERE", "I am from outside Australia"
 
 
 class SectorChoices(models.TextChoices):
-    GOVERNMENT = "GOVERNMENT", "Government"
+    ACCESS_TO_JUSTICE = "ACCESS_TO_JUSTICE", "Access to Justice"
+    CLIMATE_RESILIENCE = "CLIMATE_RESILIENCE", "Climate Resilience"
+    COMMUNITY_SERVICES = "COMMUNITY_SERVICES", "Community Services"
+    CONSUMER_PROTECTION = "CONSUMER_PROTECTION", "Consumer Protection"
+    DESIGN_AND_INNOVATION = "DESIGN_AND_INNOVATION", "Design and Innovation"
+    DISABILITY = "DISABILITY", "Disability"
     EDUCATION = "EDUCATION", "Education"
-    HEALTHCARE = "HEALTHCARE", "Healthcare"
-    FINANCE = "FINANCE", "Finance"
-    TECHNOLOGY = "TECHNOLOGY", "Technology"
+    FINANCIAL_COUNSELLING = "FINANCIAL_COUNSELLING", "Financial Counselling"
+    GOVERNMENT = "GOVERNMENT", "Government Departments and Agencies"
+    HEALTH = "HEALTH", "Health"
+    HOUSING_SUPPORT_SERVICES = "HOUSING_SUPPORT_SERVICES", "Housing Support Services"
+    MEDIA = "MEDIA", "Media"
+    PHILANTHROPY = "PHILANTHROPY", "Philanthropy"
+    POLICY_AND_RESEARCH = "POLICY_AND_RESEARCH", "Policy and Research"
+    REAL_ESTATE_AND_PROPERTY = "REAL_ESTATE_AND_PROPERTY", "Real Estate and Property"
+    REGULATION_AND_DISPUTE_RESOLUTION = (
+        "REGULATION_AND_DISPUTE_RESOLUTION",
+        "Regulation and Dispute Resolution",
+    )
+    RENTER = "RENTER", "Renter"
     OTHER = "OTHER", "Other"
 
 
 class ReferrerChoices(models.TextChoices):
-    SEARCH_ENGINE = "SEARCH_ENGINE", "Search Engine"
+    NEWSLETTER = "NEWSLETTER", "Anika Newsletter"
+    INTERNET_SEARCH = "INTERNET_SEARCH", "Internet Search"
+    NEWSPAPER = "NEWSPAPER", "Newspaper"
+    PODCAST = "PODCAST", "Podcast"
+    RADIO = "RADIO", "Radio"
     SOCIAL_MEDIA = "SOCIAL_MEDIA", "Social Media"
-    FRIEND_OR_COLLEAGUE = "FRIEND_OR_COLLEAGUE", "Friend or Colleague"
-    ADVERTISEMENT = "ADVERTISEMENT", "Advertisement"
+    TELEVISION = "TELEVISION", "Television"
+    WORD_OF_MOUTH = "WORD_OF_MOUTH", "Word of Mouth / Colleague"
     OTHER = "OTHER", "Other"
 
 
@@ -46,8 +65,8 @@ class DocumentLog(models.Model):
         get_document_model(),
         on_delete=models.CASCADE,
     )
-    state = models.CharField(choices=StateChoices.choices, max_length=3)
-    sector = models.CharField(choices=SectorChoices.choices, max_length=12)
-    referrer = models.CharField(choices=ReferrerChoices.choices, max_length=20)
+    state = models.CharField(choices=StateChoices.choices, max_length=16)
+    sector = models.CharField(choices=SectorChoices.choices, max_length=64)
+    referrer = models.CharField(choices=ReferrerChoices.choices, max_length=32)
     ip_address = models.GenericIPAddressField()
     created_at = models.DateTimeField(auto_now_add=True)
