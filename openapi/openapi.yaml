@@ -5,6 +5,9 @@ info:
   version: 0.1.0
 
 paths:
+  /clerk/api/submission/{id}/:
+    $ref: paths/submission-detail.yaml
+
   /clerk/api/case/:
     $ref: paths/case-list.yaml
   /clerk/api/case/{id}/:

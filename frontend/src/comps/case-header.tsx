@@ -9,6 +9,7 @@ export const CASE_TABS = {
   DOCUMENTS: 'DOCUMENTS',
   DATES: 'DATES',
   SERVICES: 'SERVICES',
+  SUBMISSION: 'SUBMISSION',
 }
 
 export interface CaseTabUrls {
@@ -17,6 +18,7 @@ export interface CaseTabUrls {
   docs: string
   dates: string
   services: string
+  submission: string
 }
 
 interface CaseHeaderProps {
@@ -147,6 +149,14 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
         >
           <Icon name="balance scale" />
           Services
+        </Menu.Item>
+        <Menu.Item
+          as="a"
+          href={urls.submission}
+          active={activeTab === CASE_TABS.SUBMISSION}
+        >
+          <Icon name="file alternate outline" />
+          Submission
         </Menu.Item>
       </Menu>
     </>

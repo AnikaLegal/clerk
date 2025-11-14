@@ -1,0 +1,19 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  answers_raw:
+    type: object
+    additionalProperties: true
+  answers:
+    allOf:
+      - $ref: ./SubmissionAnswers.yaml
+    nullable: true
+  created_at:
+    type: string
+required:
+  - id
+  - answers_raw
+  - answers
+  - created_at

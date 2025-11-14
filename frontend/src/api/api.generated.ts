@@ -1,6 +1,9 @@
 import { baseApi as api } from "./baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
+    getSubmission: build.query<GetSubmissionApiResponse, GetSubmissionApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/submission/${queryArg.id}/` }),
+    }),
     getCases: build.query<GetCasesApiResponse, GetCasesApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/case/`,
@@ -488,6 +491,12 @@ const injectedRtkApi = api.injectEndpoints({
   overrideExisting: false,
 });
 export { injectedRtkApi as generatedApi };
+export type GetSubmissionApiResponse =
+  /** status 200 Successful response. */ Submission;
+export type GetSubmissionApiArg = {
+  /** Submission ID */
+  id: string;
+};
 export type GetCasesApiResponse = /** status 200 Successful response. */ {
   current: number;
   next: number | null;
@@ -920,6 +929,159 @@ export type RenameDocumentTemplateApiArg = {
   /** Successful response. */
   documentTemplateRename: DocumentTemplateRename;
 };
+export type BooleanYesNo = {
+  label: "Yes" | "No";
+  value: boolean;
+};
+export type ChoiceDisplay = {
+  label: string;
+  value: string;
+};
+export type SubmissionPerson = {
+  name?: string | null;
+  address?: string | null;
+  email?: string | null;
+  phone_number?: string | null;
+  support_contact_preferences?: ChoiceDisplay | null;
+};
+export type SubmissionFiles = {
+  url?: string;
+  name?: string;
+}[];
+export type SubmissionAnswers = {
+  client?: {
+    first_name?: string | null;
+    last_name?: string | null;
+    preferred_name?: string | null;
+    email?: string | null;
+    date_of_birth?: string | null;
+    phone_number?: string | null;
+    gender?: string | null;
+    centrelink_support?: BooleanYesNo | null;
+    eligibility_notes?: string | null;
+    requires_interpreter?: ChoiceDisplay | null;
+    primary_language_non_english?: BooleanYesNo | null;
+    primary_language?: string | null;
+    is_aboriginal_or_torres_strait_islander?: ChoiceDisplay | null;
+    number_of_dependents?: number | null;
+    eligibility_circumstances?: ChoiceDisplay[] | null;
+    call_times?: ChoiceDisplay[] | null;
+    special_circumstances?: ChoiceDisplay[] | null;
+  };
+  tenancy?: {
+    address?: string | null;
+    suburb?: string | null;
+    postcode?: string | null;
+    is_on_lease?: ChoiceDisplay | null;
+    rental_circumstances?: ChoiceDisplay | null;
+    start_date?: string | null;
+    landlord?: SubmissionPerson | null;
+    agent?: SubmissionPerson | null;
+  };
+  issue?: {
+    issues?: ChoiceDisplay[] | null;
+    weekly_income?: number | null;
+    employment_status?: ChoiceDisplay[] | null;
+    referrer?: string | null;
+    referrer_type?: ChoiceDisplay | null;
+    weekly_rent?: number | null;
+    support_worker?: SubmissionPerson | null;
+  };
+  topic_specific?: {
+    REPAIRS?: {
+      issue_start?: string | null;
+      issue_photos?: SubmissionFiles | null;
+      applied_vcat?: BooleanYesNo | null;
+      vcat?: ChoiceDisplay[] | null;
+      issue_description?: BooleanYesNo | null;
+      required?: string[] | null;
+    } | null;
+    BONDS?: {
+      claim_reasons?: string[] | null;
+      cleaning_claim_amount?: number | null;
+      cleaning_claim_description?: string | null;
+      cleaning_documents?: SubmissionFiles | null;
+      damage_caused_by_tenant?: BooleanYesNo | null;
+      damage_claim_amount?: number | null;
+      damage_claim_description?: string | null;
+      damage_quote?: SubmissionFiles | null;
+      has_landlord_made_rtba_application?: BooleanYesNo | null;
+      landlord_intents_to_make_claim?: BooleanYesNo | null;
+      locks_changed_by_tenant?: BooleanYesNo | null;
+      locks_claim_amount?: number | null;
+      locks_change_quote?: SubmissionFiles | null;
+      money_is_owed_by_tenant?: BooleanYesNo | null;
+      money_owed_claim_amount?: number | null;
+      money_owed_claim_description?: string | null;
+      move_out_date?: string | null;
+      other_reasons_amount?: number | null;
+      other_reasons_description?: string | null;
+      tenant_has_rtba_application_copy?: BooleanYesNo | null;
+      rtba_application?: SubmissionFiles | null;
+    } | null;
+    EVICTION_ARREARS?: {
+      doc_delivery_time_notice_to_vacate?: string | null;
+      has_notice?: BooleanYesNo | null;
+      is_already_removed?: BooleanYesNo | null;
+      is_unpaid_rent?: BooleanYesNo | null;
+      is_vcat_date?: BooleanYesNo | null;
+      notice_send_date?: string | null;
+      notice_vacate_date?: string | null;
+      payment_fail_description?: string | null;
+      payment_fail_reason?: string[] | null;
+      vcat_date?: string | null;
+      documents?: SubmissionFiles | null;
+      can_afford_payment_plan?: ChoiceDisplay | null;
+      documents_provided?: string[] | null;
+      delivery_method_notice_to_vacate?: string | null;
+      delivery_method_other_docs?: string | null;
+      delivery_method_possession_order?: string | null;
+      doc_delivery_time_other_docs?: string | null;
+      doc_delivery_time_possession_order?: string | null;
+      is_on_payment_plan?: BooleanYesNo | null;
+      miscellaneous?: string | null;
+      payment_amount?: number | null;
+      payment_fail_change?: string | null;
+      rent_cycle?: string | null;
+      rent_unpaid?: number | null;
+    } | null;
+    EVICTION_RETALIATORY?: {
+      date_received_ntv?: string | null;
+      has_notice?: BooleanYesNo | null;
+      is_already_removed?: BooleanYesNo | null;
+      ntv_type?: string | null;
+      retaliatory_reason?: string[] | null;
+      retaliatory_reason_other?: string | null;
+      termination_date?: string | null;
+      vcat_hearing?: BooleanYesNo | null;
+      vcat_hearing_date?: string | null;
+      documents?: SubmissionFiles | null;
+    } | null;
+    RENT_REDUCTION?: {
+      issues?: string[] | null;
+      issue_description?: string | null;
+      issue_photos?: SubmissionFiles | null;
+      issue_start?: string | null;
+      is_notice_to_vacate?: BooleanYesNo | null;
+      notice_to_vacate?: SubmissionFiles | null;
+    } | null;
+    HEALTH_CHECK?: {
+      support_worker_authority?: SubmissionFiles | null;
+      tenancy_documents?: SubmissionFiles | null;
+    } | null;
+    OTHER?: {
+      issue_description?: string | null;
+    } | null;
+  };
+};
+export type Submission = {
+  id: string;
+  answers_raw: {
+    [key: string]: any;
+  };
+  answers: SubmissionAnswers | null;
+  created_at: string;
+};
 export type IssueBase = {
   topic: string;
 };
@@ -1042,6 +1204,7 @@ export type Issue = IssueBase & {
   is_conflict_check: boolean | null;
   is_eligibility_check: boolean | null;
   next_review: string | null;
+  submission_id: string | null;
 };
 export type Error = {
   detail?: string | object | (string | object | any)[];
@@ -1274,6 +1437,7 @@ export type DocumentTemplateRename = {
   name: string;
 };
 export const {
+  useGetSubmissionQuery,
   useGetCasesQuery,
   useCreateCaseMutation,
   useGetCaseQuery,

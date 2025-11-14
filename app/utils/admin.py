@@ -32,7 +32,7 @@ def admin_link(attr: str, short_description: str, empty_description: str = "-"):
 
 def dict_to_json_html(data):
     json_str = json.dumps(data, sort_keys=True, indent=2)
-    formatter = HtmlFormatter(style="colorful")
+    formatter = HtmlFormatter()
     highlighted = highlight(json_str, JsonLexer(), formatter)
     style = "<style>" + formatter.get_style_defs() + "</style><br>"
     return mark_safe(style + highlighted)

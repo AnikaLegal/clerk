@@ -83,8 +83,8 @@ EVICTIONS_ANSWERS = {
     "EVICTION_ARREARS_NOTICE_VACATE_DATE": "2022-01-01",
     "EVICTION_ARREARS_DOC_DELIVERY_METHOD_NOTICE_TO_VACATE": "By registered post",
     "EVICTION_ARREARS_DOC_DELIVERY_TIME_NOTICE_TO_VACATE": "2000-12-31",
-    "EVICTION_ARREARS_DOC_DELIVERY_METHOD_POSSESION_ORDER": "Another delivery method",
-    "EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESION_ORDER": "2020-03-01",
+    "EVICTION_ARREARS_DOC_DELIVERY_METHOD_POSSESSION_ORDER": "Another delivery method",
+    "EVICTION_ARREARS_DOC_DELIVERY_TIME_POSSESSION_ORDER": "2020-03-01",
     "EVICTION_ARREARS_IS_VCAT_DATE": True,
     "EVICTION_ARREARS_VCAT_DATE": "2022-02-01",
     "EVICTION_ARREARS_RENT_UNPAID": 11000,
@@ -124,8 +124,8 @@ EVICTIONS_ISSUE = {
         "NOTICE_VACATE_DATE": "2022-01-01",
         "DOC_DELIVERY_METHOD_NOTICE_TO_VACATE": "By registered post",
         "DOC_DELIVERY_TIME_NOTICE_TO_VACATE": "2000-12-31",
-        "DOC_DELIVERY_METHOD_POSSESION_ORDER": "Another delivery method",
-        "DOC_DELIVERY_TIME_POSSESION_ORDER": "2020-03-01",
+        "DOC_DELIVERY_METHOD_POSSESSION_ORDER": "Another delivery method",
+        "DOC_DELIVERY_TIME_POSSESSION_ORDER": "2020-03-01",
         "IS_VCAT_DATE": True,
         "VCAT_DATE": "2022-02-01",
         "RENT_UNPAID": 11000,
@@ -309,7 +309,7 @@ def test_process_submission(
     assert FileUpload.objects.count() == len(expected_uploads)
 
     sub = Submission.objects.create(answers=answers)
-    process_issue(answers, client, tenancy)
+    process_issue(sub, answers, client, tenancy)
 
     assert Issue.objects.count() == 1
     assert FileUpload.objects.count() == len(expected_uploads)

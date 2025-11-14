@@ -2,21 +2,21 @@ from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
-    date,
-    person,
-    tenancy,
-    client,
     accounts,
-    paralegal,
-    templates_list,
-    email_templates,
-    notification_templates,
-    document_templates,
     case,
     case_email,
+    client,
+    date,
+    document_templates,
+    email_templates,
+    notification_templates,
+    paralegal,
+    person,
+    root,
+    submission,
+    templates_list,
+    tenancy,
 )
-
-from .views import root
 
 INT_PK = "(?P<pk>[0-9]+)"
 INT_EMAIL_PK = "(?P<email_pk>[0-9]+)"
@@ -26,6 +26,9 @@ UUID_PK = "(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA
 SLUG = "(?P<slug>[\-\w]+)"
 
 router = DefaultRouter()
+router.register(
+    "submission", submission.SubmissionApiViewSet, basename="submission-api"
+)
 router.register("case", case.CaseApiViewset, basename="case-api")
 router.register("date", date.DateApiViewSet, basename="date-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
@@ -78,6 +81,11 @@ urlpatterns = [
         f"^cases/{UUID_PK}/services/$",
         case.case_detail_services_page_view,
         name="case-services",
+    ),
+    re_path(
+        f"^cases/{UUID_PK}/submission/$",
+        case.case_detail_submission_page_view,
+        name="case-submission",
     ),
     # Email
     re_path(

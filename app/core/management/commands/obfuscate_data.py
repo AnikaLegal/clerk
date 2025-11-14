@@ -2,9 +2,11 @@ import logging
 import os
 from io import BytesIO
 
+import factory
 from accounts.models import CaseGroups, User
 from auditlog.context import disable_auditlog
 from auditlog.models import LogEntry
+from core.factories import SubmissionFactory
 from core.models import (
     AuditEvent,
     Client,
@@ -26,23 +28,26 @@ from django.db.models import Q
 from emails.models import Email, EmailAttachment
 from faker import Faker
 from utils.signals import disable_signals, restore_signals
+from core.services.submission import UPLOAD_ANSWERS
 
 logger = logging.getLogger(__name__)
 
 fake = Faker("en_AU")
 email_addresses = dict()
+skip_answers = set(
+    [answer for answers in UPLOAD_ANSWERS.values() for answer in answers]
+)
 
 
 class Command(BaseCommand):
     help = "Hide personal information"
 
     @transaction.atomic
+    @factory.Faker.override_default_locale("en_AU")
     def handle(self, *args, **kwargs):
         assert not settings.IS_PROD, "NEVER RUN THIS IN PROD!"
         self.stdout.write("\nObfuscating personal information...")
         disable_signals()
-
-        email_addresses = dict()
 
         clients = Client.objects.all()
         emails = Email.objects.all()
@@ -111,9 +116,19 @@ class Command(BaseCommand):
             if i.outcome_notes:
                 i.outcome_notes = " ".join(fake.sentences())
 
-            # Redact the answers to issue-specific intake form questions.
-            if i.answers:
-                i.answers = get_redacted_answers(i.answers)
+            i.answers = None
+            if i.submission:
+                submission = SubmissionFactory.build(update_answers={"ISSUES": i.topic})  # pyright: ignore [reportAttributeAccessIssue]
+                i.submission.answers = submission.answers
+                i.submission.save()
+
+                # Include only answers specific to the issue topic and remove
+                # uploads. Also remove the topic prefix from the keys.
+                i.answers = {  # pyright: ignore [reportAttributeAccessIssue]
+                    key.removeprefix(f"{i.topic}_"): value
+                    for key, value in submission.answers.items()
+                    if key.startswith(f"{i.topic}_") and key not in skip_answers
+                }
 
             i.save()
 
@@ -162,11 +177,8 @@ class Command(BaseCommand):
         audit_events.delete()
         log_entries.delete()
 
-        # Remove all answers from submissions as they contain personal info.
-        for s in submissions.iterator():
-            if s.answers:
-                s.answers = get_redacted_answers(s.answers)
-                s.save()
+        # Remove submissions that are not linked to an issue.
+        submissions.filter(issue__isnull=True).delete()
 
         # Save sample files to storage (AWS S3) to use for email attachments &
         # uploaded files.
@@ -194,22 +206,3 @@ def get_email(email: str) -> str:
     if email not in email_addresses:
         email_addresses[email] = fake.unique.email()
     return email_addresses[email]
-
-
-def get_redacted_answers(answers: dict) -> dict:
-    redacted_text = "[REDACTED]"
-    redacted_answers = {}
-    for key, value in answers.items():
-        if value is not None:
-            if key == "EMAIL" or key == "CLIENT_EMAIL":
-                # Keep email addresses consistent with other
-                # obfuscated emails.
-                value = get_email(value)
-            else:
-                value = (
-                    [redacted_text] * len(value)
-                    if isinstance(value, list)
-                    else redacted_text
-                )
-        redacted_answers[key] = value
-    return redacted_answers
