@@ -12,6 +12,8 @@ def _migrate_existing_documents(apps, schema_editor):
         CustomDocument.objects.create(
             title=doc.title,
             file=doc.file,
+            file_size=doc.file_size,
+            file_hash=doc.file_hash,
             uploaded_by_user=doc.uploaded_by_user,
         )
 

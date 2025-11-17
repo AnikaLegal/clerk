@@ -7,6 +7,7 @@ from django.core import management
 from django.core.files.base import File
 from django.db import migrations
 from django.utils import timezone
+from wagtail.utils.file import hash_filelike
 
 
 class BaseDocument(TypedDict):
@@ -154,12 +155,16 @@ def _populate_report_db(apps, schema_editor):
                 document=Document.objects.create(
                     title=document["title"],
                     file=file,
+                    file_size=file.size,
+                    file_hash=hash_filelike(file),
                 ),
             )
             if accessible_file:
                 report.accessible_document = Document.objects.create(
                     title=f"Accessible version of {document['title']}",
                     file=accessible_file,
+                    file_size=accessible_file.size,
+                    file_hash=hash_filelike(accessible_file),
                 )
 
         report.title = document["title"]
