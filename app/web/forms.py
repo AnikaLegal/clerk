@@ -32,16 +32,15 @@ class DocumentLogForm(forms.ModelForm):
         ]
 
     state = forms.ChoiceField(
-        choices=[("", "What state/territory are you from?")]
-        + list(StateChoices.choices),
+        choices=[("", "Where are you located?")] + list(StateChoices.choices),
         required=True,
     )
     sector = forms.ChoiceField(
-        choices=[("", "What sector are you in?")] + list(SectorChoices.choices),
+        choices=[("", "What sector do you work in?")] + list(SectorChoices.choices),
         required=True,
     )
     referrer = forms.ChoiceField(
-        choices=[("", "How did you hear about this report?")]
+        choices=[("", "Where did you hear about this report?")]
         + list(ReferrerChoices.choices),
         required=True,
     )
