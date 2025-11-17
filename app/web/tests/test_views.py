@@ -101,6 +101,15 @@ def test_tracked_document_download(client):
             "referrer": document_log_stub.referrer,
         },
     )
+
+    # Handle redirect used to set cookie.
+    assert response.status_code == 302
+    assert response["Content-Type"].startswith("text/html")
+    assert response["Location"] == document.url
+    assert f"document_logged_{document.get_file_hash()}" in response.cookies
+
+    # Follow redirect to get the actual document
+    response = client.get(response["Location"])
     assert response.status_code == 200
     assert not response["Content-Type"].startswith("text/html")
     assert response["Content-Disposition"].startswith("attachment")
