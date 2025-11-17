@@ -1,5 +1,5 @@
 import crawleruseragents
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.templatetags.static import static
 from django.utils.html import format_html
 from wagtail import hooks
@@ -29,15 +29,16 @@ def before_serve_document(document, request):
     if crawleruseragents.is_crawler(user_agent):
         return None
 
-    # Check IP address from request to see if we already have a log for this
-    # download.
-    ip_address = request.META.get("REMOTE_ADDR")
-    if DocumentLog.objects.filter(document=document, ip_address=ip_address).exists():
+    # Check cookie from request to see if the user has already logged a
+    # response.
+    cookie_name = f"document_logged_{document.file_hash}"
+    if request.COOKIES.get(cookie_name) is not None:
         return None
 
     if request.method == "POST":
         form = DocumentLogForm(request.POST)
         if form.is_valid():
+            ip_address = request.META.get("REMOTE_ADDR")
             DocumentLog.objects.create(
                 document=document,
                 ip_address=ip_address,
@@ -45,7 +46,16 @@ def before_serve_document(document, request):
                 referrer=form.cleaned_data["referrer"],
                 sector=form.cleaned_data["sector"],
             )
-            return None
+            response = redirect(document.url)
+            response.set_cookie(
+                cookie_name,
+                "true",
+                max_age=60 * 60 * 24 * 365,  # 1 year
+                secure=True,
+                httponly=True,
+                samesite="Strict",
+            )
+            return response
     else:
         form = DocumentLogForm()
 
