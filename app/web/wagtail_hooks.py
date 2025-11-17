@@ -31,7 +31,8 @@ def before_serve_document(document, request):
 
     # Check cookie from request to see if the user has already logged a
     # response.
-    cookie_name = f"document_logged_{document.file_hash}"
+    file_hash = document.get_file_hash()
+    cookie_name = f"document_logged_{file_hash}"
     if request.COOKIES.get(cookie_name) is not None:
         return None
 
