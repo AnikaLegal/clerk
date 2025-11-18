@@ -973,3 +973,56 @@ before the final footer.
     align-items: center;
   }
 }
+
+/* Forms */
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+form button {
+  align-self: baseline;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+}
+form input,
+form select {
+  line-height: var(--body-line-height);
+  font-size: var(--body-font-size);
+  border: none;
+  outline: none;
+  color: var(--dark-6);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--dark-6);
+  padding: 8px 8px 8px 8px;
+  background-color: var(--white);
+}
+form select {
+  opacity: 0.8;
+}
+
+@media (max-width: 1300px) {
+  form input,
+  form select,
+  form .checkbox {
+    margin-bottom: 44px;
+  }
+}
+@media (max-width: 800px) {
+  form {
+    width: calc(100vw);
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    margin-bottom: -63px;
+    padding: 50px 38px 48px 38px;
+    z-index: 1;
+  }
+}

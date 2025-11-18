@@ -1,0 +1,33 @@
+{% load static %}
+{% load wagtailcore_tags %}
+
+{% for report in reports %}
+  <div class="card">
+    <img class="icon" src="{% static 'web/img/icons/document.svg' %}" />
+    <h2>{{ report.title }}</h2>
+    <div>{{ report.description|linebreaks }}</div>
+    <div class="buttons">
+      {% if report.document %}
+        <a href="{{ report.document.url }}"><button>View</button></a>
+        {% if report.accessible_document %}
+          <a href="{{ report.accessible_document.url }}"><button>Accessible</button></a>
+        {% endif %}
+      {% elif report.blog_page %}
+        <a href="{% pageurl report.blog_page %}"><button>View</button></a>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <p>No reports available at this time.</p>
+{% endfor %}
+{% block styles %}
+  <style>
+    .buttons {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      margin-top: auto;
+    }
+  </style>
+{% endblock %}
