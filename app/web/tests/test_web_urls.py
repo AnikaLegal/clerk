@@ -3,19 +3,17 @@ Smoke tests for URLS
 TODO: Test News URLs
 """
 
-import pytest
 from datetime import date
+
+import pytest
 from django.urls import reverse
-
-
+from web.factories import BlogListPageFactory, BlogPageFactory
 from web.models import (
-    RootPage,
-    ResourceListPage,
-    ResourcePage,
-    BlogListPage,
-    BlogPage,
     JobListPage,
     JobPage,
+    ResourceListPage,
+    ResourcePage,
+    RootPage,
 )
 
 URLS_TO_TEST_BY_NAME = [
@@ -78,21 +76,15 @@ def test_job_urls(client):
 
 @pytest.mark.django_db
 def test_blog_urls(client):
-    root_page = RootPage.objects.get()
-    blog_list_page = BlogListPage(title="Blog", slug="blog")
-    root_page.add_child(instance=blog_list_page)
-    blog_list_page.save_revision().publish()
-
     # Blog list page works
-    response = client.get("/blog/")
+    blog_list_page = BlogListPageFactory(slug="blog")
+    response = client.get(f"/{blog_list_page.slug}/")
     assert response.status_code == 200
 
     # Blog page works
-    blog_page = BlogPage(title="Blog Post", slug="blog-post")
-    blog_list_page.add_child(instance=blog_page)
-    blog_page.save_revision().publish()
+    blog_page = BlogPageFactory(parent=blog_list_page)
 
-    response = client.get("/blog/blog-post/")
+    response = client.get(f"/blog/{blog_page.slug}/")
     assert response.status_code == 200
 
 

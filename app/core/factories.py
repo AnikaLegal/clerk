@@ -270,7 +270,7 @@ class ServiceFactory(TimestampedModelFactory):
     notes = factory.Faker("paragraph")
 
     # Yikes!
-    # If service is discrete the finished_at always None.
+    # If service is discrete then finished_at is always None.
     # If service is ongoing then 50/50 chance of None or date from started_at to now.
     finished_at = factory.Maybe(
         factory.LazyAttribute(lambda self: self.category == ServiceCategory.ONGOING),
