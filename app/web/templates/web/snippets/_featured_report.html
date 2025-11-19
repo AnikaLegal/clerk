@@ -6,6 +6,12 @@
   {% else %}
     <a href="{% pageurl report.blog_page %}">
   {% endif %}
-  <button>Read our {{ report.title }}{% if 'report' not in report.title|lower %} report{% endif %}</button>
+  <button>
+  {% if report.featured_text %}
+      {{ report.featured_text }}
+  {% else %}
+    Read our {{ report.title }}{% if 'report' not in report.title|lower %} report{% endif %}
+  {% endif %}
+  </button>
   </a>
 {% endif %}

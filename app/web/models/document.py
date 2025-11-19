@@ -68,5 +68,4 @@ class DocumentLog(models.Model):
     state = models.CharField(choices=StateChoices.choices, max_length=16)
     sector = models.CharField(choices=SectorChoices.choices, max_length=64)
     referrer = models.CharField(choices=ReferrerChoices.choices, max_length=32)
-    ip_address = models.GenericIPAddressField()
     created_at = models.DateTimeField(auto_now_add=True)

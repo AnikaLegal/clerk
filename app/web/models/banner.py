@@ -1,10 +1,12 @@
 import uuid
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from wagtail.admin.panels import FieldPanel
+from wagtail.models import DraftStateMixin, RevisionMixin
 
 
-class Banner(models.Model):
+class Banner(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[reportIncompatibleVariableOverride]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=128)
     subtitle = models.TextField(max_length=512, blank=True)
@@ -14,16 +16,18 @@ class Banner(models.Model):
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        help_text="""Minimum image width is 800px. Landscape images are
-        preferable to portrait images. The ideal image ratio is 4:1, so the
-        image should be sized 800x200px or any multiple thereof.""",
+        help_text="""Images should ideally have a minimum width of 800px and a
+        ratio of approximately 4:1 (width:height) to display the entire image in
+        the available space. Landscape images are preferable to portrait
+        images. So an image with dimensions of 800x200px or any multiple
+        thereof is ideal.""",
     )
     call_to_action_text = models.CharField(max_length=32)
     call_to_action_url = models.URLField()
-    is_active = models.BooleanField(default=False)
+
+    _revisions = GenericRelation("wagtailcore.Revision")
 
     panels = [
-        FieldPanel("is_active"),
         FieldPanel("title"),
         FieldPanel("subtitle"),
         FieldPanel("image"),
@@ -32,13 +36,7 @@ class Banner(models.Model):
     ]
 
     def save(self, *args, **kwargs):
-        # Ensure only one active record exists
-        if self.is_active:
-            Banner.objects.filter(is_active=True).exclude(pk=self.pk).update(
-                is_active=False
-            )
+        # Ensure only one live banner exists.
+        if self.live:
+            Banner.objects.filter(live=True).exclude(pk=self.pk).update(live=False)
         super().save(*args, **kwargs)
-
-    @classmethod
-    def get_active(cls):
-        return cls.objects.filter(is_active=True).last()

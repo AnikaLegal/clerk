@@ -62,9 +62,9 @@ class DocumentFactory(factory.django.DjangoModelFactory[CustomDocument]):
 
     file = factory.django.FileField(
         from_file=SimpleUploadedFile(
-            name=fake.file_name(),
+            name=fake.file_name(extension="pdf"),
             content=fake.paragraph().encode(),
-            content_type=fake.mime_type(),
+            content_type="application/pdf",
         )
     )
     title = factory.Faker("sentence")
@@ -85,7 +85,6 @@ class DocumentLogFactory(factory.django.DjangoModelFactory[DocumentLog]):
     referrer = factory.Faker(
         "random_element", elements=[c[0] for c in ReferrerChoices.choices]
     )
-    ip_address = factory.Faker("ipv4")
 
 
 class ReportFactory(factory.django.DjangoModelFactory[Report]):

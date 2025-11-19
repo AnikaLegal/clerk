@@ -39,10 +39,8 @@ def before_serve_document(document, request):
     if request.method == "POST":
         form = DocumentLogForm(request.POST)
         if form.is_valid():
-            ip_address = request.META.get("REMOTE_ADDR")
             DocumentLog.objects.create(
                 document=document,
-                ip_address=ip_address,
                 state=form.cleaned_data["state"],
                 referrer=form.cleaned_data["referrer"],
                 sector=form.cleaned_data["sector"],
@@ -77,7 +75,11 @@ class BannerAdmin(SnippetViewSet):
     menu_order = 200
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ("title", "is_active")
+    list_display = (
+        "title",
+        UpdatedAtColumn(),
+        LiveStatusTagColumn(),
+    )
     search_fields = ("title",)
 
 

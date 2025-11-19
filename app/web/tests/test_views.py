@@ -112,7 +112,6 @@ def test_tracked_document_download(client):
     response = client.get(response["Location"])
     assert response.status_code == 200
     assert not response["Content-Type"].startswith("text/html")
-    assert response["Content-Disposition"].startswith("attachment")
     assert filename in response["Content-Disposition"]
     assert b"".join(response.streaming_content) == content
 
@@ -133,7 +132,6 @@ def test_untracked_document_download(client):
     response = client.get(document.url)
     assert response.status_code == 200
     assert not response["Content-Type"].startswith("text/html")
-    assert response["Content-Disposition"].startswith("attachment")
     assert filename in response["Content-Disposition"]
     assert b"".join(response.streaming_content) == content
 

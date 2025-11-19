@@ -7,7 +7,7 @@ cookie_prefix = "dismiss_banner"
 
 @register.inclusion_tag("web/snippets/_banner.html", takes_context=True)
 def banner(context):
-    banner = Banner.get_active()
+    banner = Banner.objects.filter(live=True).last()
     if not banner:
         return {}
 
