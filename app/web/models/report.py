@@ -38,13 +38,23 @@ class Report(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
         default=False,
         help_text="Whether to feature this report prominently on the reports page. Only one report can be featured at a time.",
     )
+    featured_text = models.TextField(
+        blank=True,
+        help_text='Optional text to use for the featured report link. Defaults to "Read our [report title] report" if left blank.',
+    )
 
     _revisions = GenericRelation("wagtailcore.Revision")
 
     panels = [
         FieldPanel("title"),
         FieldPanel("description"),
-        FieldPanel("is_featured"),
+        MultiFieldPanel(
+            [
+                FieldPanel("is_featured"),
+                FieldPanel("featured_text"),
+            ],
+            heading="Featured settings",
+        ),
         MultiFieldPanel(
             [
                 FieldPanel("document"),
