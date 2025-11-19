@@ -85,7 +85,6 @@ class DocumentLogFactory(factory.django.DjangoModelFactory[DocumentLog]):
     referrer = factory.Faker(
         "random_element", elements=[c[0] for c in ReferrerChoices.choices]
     )
-    ip_address = factory.Faker("ipv4")
 
 
 class ReportFactory(factory.django.DjangoModelFactory[Report]):
