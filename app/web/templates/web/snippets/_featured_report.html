@@ -1,0 +1,11 @@
+{% load wagtailcore_tags %}
+
+{% if report %}
+  {% if report.document %}
+    <a href="{{ report.document.url }}">
+  {% else %}
+    <a href="{% pageurl report.blog_page %}">
+  {% endif %}
+  <button>Read our {{ report.title }}{% if 'report' not in report.title|lower %} report{% endif %}</button>
+  </a>
+{% endif %}
