@@ -39,10 +39,8 @@ def before_serve_document(document, request):
     if request.method == "POST":
         form = DocumentLogForm(request.POST)
         if form.is_valid():
-            ip_address = request.META.get("REMOTE_ADDR")
             DocumentLog.objects.create(
                 document=document,
-                ip_address=ip_address,
                 state=form.cleaned_data["state"],
                 referrer=form.cleaned_data["referrer"],
                 sector=form.cleaned_data["sector"],

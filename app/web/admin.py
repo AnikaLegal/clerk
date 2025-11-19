@@ -29,7 +29,6 @@ class DocumentLogAdmin(admin.ModelAdmin):
 
     list_display = (
         "document",
-        "ip_address",
         "state",
         "sector",
         "referrer",
