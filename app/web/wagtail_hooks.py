@@ -75,7 +75,11 @@ class BannerAdmin(SnippetViewSet):
     menu_order = 200
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ("title", "is_active")
+    list_display = (
+        "title",
+        UpdatedAtColumn(),
+        LiveStatusTagColumn(),
+    )
     search_fields = ("title",)
 
 
