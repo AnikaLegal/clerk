@@ -16,9 +16,11 @@ class Banner(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
         on_delete=models.PROTECT,
         blank=True,
         null=True,
-        help_text="""Minimum image width is 800px. Landscape images are
-        preferable to portrait images. The ideal image ratio is 4:1, so the
-        image should be sized 800x200px or any multiple thereof.""",
+        help_text="""Images should ideally have a minimum width of 800px and a
+        ratio of approximately 4:1 (width:height) to display the entire image in
+        the available space. Landscape images are preferable to portrait
+        images. So an image with dimensions of 800x200px or any multiple
+        thereof is ideal.""",
     )
     call_to_action_text = models.CharField(max_length=32)
     call_to_action_url = models.URLField()
