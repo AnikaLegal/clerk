@@ -62,9 +62,9 @@ class DocumentFactory(factory.django.DjangoModelFactory[CustomDocument]):
 
     file = factory.django.FileField(
         from_file=SimpleUploadedFile(
-            name=fake.file_name(),
+            name=fake.file_name(extension="pdf"),
             content=fake.paragraph().encode(),
-            content_type=fake.mime_type(),
+            content_type="application/pdf",
         )
     )
     title = factory.Faker("sentence")
