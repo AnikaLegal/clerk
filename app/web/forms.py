@@ -1,8 +1,9 @@
 from django import forms
-
 from webhooks.models import WebflowContact
+
+from web.fields import HtmxReCaptchaV3Field
 from web.models import ContentFeedback, DocumentLog
-from web.models.document import StateChoices, SectorChoices, ReferrerChoices
+from web.models.document import ReferrerChoices, SectorChoices, StateChoices
 
 
 class ContactForm(forms.ModelForm):
@@ -13,7 +14,10 @@ class ContactForm(forms.ModelForm):
             "email",
             "phone",
             "referral",
+            "captcha",
         ]
+
+    captcha = HtmxReCaptchaV3Field(action="contact")
 
 
 class ContentFeedbackForm(forms.ModelForm):

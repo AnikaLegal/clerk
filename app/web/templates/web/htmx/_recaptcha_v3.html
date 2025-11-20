@@ -1,0 +1,32 @@
+<script src="https://{{ recaptcha_domain }}/recaptcha/api.js?render={{ public_key }}{% if api_params %}&{{ api_params }}{% endif %}"></script>
+<script>
+    var element
+    grecaptcha.ready(function() {
+        element = document.querySelector('.g-recaptcha[data-widget-uuid="{{ widget_uuid }}"]');
+        element.form.addEventListener('submit', recaptchaFormSubmit);
+    });
+    function recaptchaFormSubmit(event) {
+        event.preventDefault();
+        {% if action %}
+            grecaptcha.execute('{{ public_key }}', {action: '{{ action|escape }}'})
+        {% else %}
+            grecaptcha.execute('{{ public_key }}', {})
+        {% endif %}
+        .then(function(token) {
+            console.log("reCAPTCHA validated for 'data-widget-uuid=\"{{ widget_uuid }}\"'. Setting input value...")
+            element.value = token;
+            const event = new Event('captcha-token-received');
+            element.form.dispatchEvent(event);
+        });
+    }
+</script>
+<input
+    type="hidden"
+    name="{{ widget.name }}"
+    {% for name, value in widget.attrs.items %}
+        {% if value is not False %} {{ name }}
+            {% if value is not True %}="{{ value|stringformat:'s' }}"
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+>

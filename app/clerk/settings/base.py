@@ -68,6 +68,8 @@ INSTALLED_APPS = [
     "wagtail_localize.locales",
     "modelcluster",
     "taggit",
+    # Web
+    "django_recaptcha",
     "django_vite",
     # django_cleanup must be last.
     "django_cleanup.apps.CleanupSelectedConfig",
@@ -178,6 +180,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+
+# Google Recaptcha
+RECAPTCHA_PUBLIC_KEY = str(os.environ.get("RECAPTCHA_PUBLIC_KEY"))
+RECAPTCHA_PRIVATE_KEY = str(os.environ.get("RECAPTCHA_PRIVATE_KEY"))
+RECAPTCHA_REQUIRED_SCORE = 0.5
+
 
 # Email backend
 EMAIL_HOST = "smtp.sendgrid.net"
@@ -365,6 +374,5 @@ MS_AUTHORITY_URL = (
 MS_GRAPH_GROUP_ID = None
 MS_GRAPH_DRIVE_ID = None
 MS_REMOVE_OFFICE_LICENCES = False
-
 
 SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN")

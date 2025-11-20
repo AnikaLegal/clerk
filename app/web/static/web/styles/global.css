@@ -238,7 +238,7 @@ header nav.small .dropdown {
   margin-bottom: 4px;
 }
 
-header nav.small .dropdown.active>.options {
+header nav.small .dropdown.active > .options {
   display: flex;
   flex-direction: column;
   padding: 0 12px 0 18px;
@@ -269,8 +269,8 @@ header nav.large .dropdown:hover {
   border-radius: 0 12px 0 0;
 }
 
-header nav.large .dropdown:hover>.options,
-header nav.large .dropdown:focus-within>.options,
+header nav.large .dropdown:hover > .options,
+header nav.large .dropdown:focus-within > .options,
 header nav.large .dropdown .options:hover {
   visibility: visible;
   opacity: 1;
@@ -432,4 +432,14 @@ Optional call to action section thar sits just above the footer.
     line-height: 26px;
     margin-bottom: 35px;
   }
+}
+
+/* Hide the reCAPTCHA badge */
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+.grecaptcha-branding {
+  font-size: 11px;
+  color: #adb5bd;
 }

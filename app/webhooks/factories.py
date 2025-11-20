@@ -12,3 +12,4 @@ class WebflowContactFactory(TimestampedModelFactory):
     name = factory.Faker("name")
     email = factory.Faker("email")
     phone = factory.Faker("phone_number")
+    referral = factory.Faker("word")
