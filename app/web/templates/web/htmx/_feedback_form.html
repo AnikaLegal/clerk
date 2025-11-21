@@ -39,6 +39,7 @@ Args:
   }
 </style>
 <form id="feedback" hx-post="{% url 'content-feedback' %}" hx-target="this" hx-swap="outerHTML" hx-trigger="captcha-token-received">
+  {% csrf_token %}
   {% if not is_submitted %}
     <h2>How useful was this content?</h2>
     <select name="score" required>
@@ -55,6 +56,11 @@ Args:
     <input type="hidden" name="page" value="{{ page_id }}" />
     {{ form.captcha }}
     <button type="submit">Submit</button>
+    <div class="grecaptcha-branding">
+      This site is protected by reCAPTCHA and the Google
+      <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+      <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+    </div>
   {% endif %}
   {% for message in messages %}
     <div class="message">{{ message }}</div>
@@ -67,9 +73,4 @@ Args:
   {% for error in form.non_field_errors %}
     <div class="error message">Submission error: {{ error }}</div>
   {% endfor %}
-  <div class="grecaptcha-branding">
-    This site is protected by reCAPTCHA and the Google
-    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-  </div>
 </form>
