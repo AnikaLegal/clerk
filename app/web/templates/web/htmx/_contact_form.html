@@ -1,4 +1,10 @@
-{% comment %}Renders a ContactForm Args: form: ContactForm{% endcomment %}
+{# prettier-ignore-start #}
+{% comment %}
+Renders a ContactForm 
+Args: 
+  form: ContactForm
+{% endcomment %}
+{# prettier-ignore-end #}
 <form hx-post="{% url 'landing-contact' %}" hx-target="this" hx-swap="outerHTML" hx-trigger="captcha-token-received">
   <input type="text" name="name" placeholder="Name" required minlength="2" maxlength="64" />
   <input type="email" name="email" placeholder="Email" required />
