@@ -23,7 +23,16 @@ class ContactForm(forms.ModelForm):
 class ContentFeedbackForm(forms.ModelForm):
     class Meta:
         model = ContentFeedback
-        fields = ["score", "reason", "name", "email", "page"]
+        fields = [
+            "score",
+            "reason",
+            "name",
+            "email",
+            "page",
+            "captcha",
+        ]
+
+    captcha = HtmxReCaptchaV3Field(action="feedback")
 
 
 class DocumentLogForm(forms.ModelForm):
@@ -33,6 +42,7 @@ class DocumentLogForm(forms.ModelForm):
             "state",
             "sector",
             "referrer",
+            "captcha",
         ]
 
     state = forms.ChoiceField(
@@ -48,3 +58,4 @@ class DocumentLogForm(forms.ModelForm):
         + list(ReferrerChoices.choices),
         required=True,
     )
+    captcha = HtmxReCaptchaV3Field(action="document_log")
