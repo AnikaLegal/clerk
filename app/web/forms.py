@@ -1,4 +1,6 @@
 from django import forms
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV3
 from webhooks.models import WebflowContact
 
 from web.fields import HtmxReCaptchaV3Field
@@ -58,4 +60,4 @@ class DocumentLogForm(forms.ModelForm):
         + list(ReferrerChoices.choices),
         required=True,
     )
-    captcha = HtmxReCaptchaV3Field(action="document_log")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(action="document_log"))
