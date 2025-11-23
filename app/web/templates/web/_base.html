@@ -40,7 +40,6 @@
     {% block styles %}{% endblock %}
 
 </head>
-
 <body>
     {% notice %}
     <header>
@@ -99,7 +98,9 @@
         </script>
     </header>
     {% block content %}{% endblock %}
-    {% banner %}
+    {% block banner %}
+        {% banner %}
+    {% endblock %}
     <footer>
         <div class=inner>
             <div class=column>
