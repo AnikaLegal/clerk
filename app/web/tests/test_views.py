@@ -1,9 +1,10 @@
 import os
+from unittest.mock import patch
 
 import pytest
 from django.test import RequestFactory
 from django.urls import reverse
-from utils.signals import DisableSignals
+from django_recaptcha.client import RecaptchaResponse
 from web.factories import (
     BlogListPageFactory,
     BlogPageFactory,
@@ -11,6 +12,7 @@ from web.factories import (
     DocumentLogFactory,
 )
 from web.models import DocumentLog
+from webhooks.factories import WebflowContactFactory
 from webhooks.models import WebflowContact
 
 # By default, search only works for specific fields (e.g., title) but others can
@@ -47,22 +49,30 @@ def test_blog_list_search(query, expected_titles, django_capture_on_commit_callb
 
 
 @pytest.mark.django_db
-def test_contact_form(client):
+@patch("django_recaptcha.fields.client.submit")
+def test_contact_form(mocked_submit, client):
     """
     Test submitting the contact form on the landing page.
     """
+
+    # Mock a successful ReCaptcha response.
+    mocked_submit.return_value = RecaptchaResponse(
+        is_valid=True, action="contact", extra_data={"score": 1.0}
+    )
+
     assert WebflowContact.objects.count() == 0
     url = reverse("landing-contact")
-    data = {
-        "name": "Matt Segal",
-        "email": "matt@email.com",
-        "phone": "0431 111 222 66",
-        "referral": "A ghost told me!",
-    }
-    with DisableSignals():
-        resp = client.post(url, data)
 
-    assert resp.status_code == 200
+    contact_stub = WebflowContactFactory.stub()
+    data = {
+        "name": contact_stub.name,
+        "email": contact_stub.email,
+        "phone": contact_stub.phone,
+        "referral": contact_stub.referral,
+        "captcha": "dummy-captcha-response",
+    }
+    response = client.post(url, data)
+    assert response.status_code == 200
 
     assert WebflowContact.objects.count() == 1
     contact = WebflowContact.objects.first()
@@ -74,11 +84,48 @@ def test_contact_form(client):
 
 
 @pytest.mark.django_db
-def test_tracked_document_download(client):
+def test_contact_form_captcha_required_and_valid(client):
+    """
+    Test submitting the contact form on the landing page without a captcha or
+    with an invalid captcha.
+    """
+
+    assert WebflowContact.objects.count() == 0
+    url = reverse("landing-contact")
+
+    contact_stub = WebflowContactFactory.stub()
+    data = {
+        "name": contact_stub.name,
+        "email": contact_stub.email,
+        "phone": contact_stub.phone,
+        "referral": contact_stub.referral,
+    }
+    response = client.post(url, data)
+
+    assert response.status_code == 200
+    assert "captcha: this field is required" in response.content.decode().lower()
+    assert WebflowContact.objects.count() == 0
+
+    data["captcha"] = "invalid-captcha-response"
+    response = client.post(url, data)
+
+    assert response.status_code == 200
+    assert "captcha: error verifying recaptcha" in response.content.decode().lower()
+    assert WebflowContact.objects.count() == 0
+
+
+@pytest.mark.django_db
+@patch("django_recaptcha.fields.client.submit")
+def test_tracked_document_download(mocked_submit, client):
     """
     Test that we intercept tracked document download with a form page and that
     we get the actual document on form submission.
     """
+    # Mock a successful ReCaptcha response.
+    mocked_submit.return_value = RecaptchaResponse(
+        is_valid=True, action="document_log", extra_data={"score": 1.0}
+    )
+
     document = DocumentFactory(track_download=True)
     filename = os.path.basename(document.file.name)
     content = document.file.read()
@@ -99,6 +146,7 @@ def test_tracked_document_download(client):
             "state": document_log_stub.state,
             "sector": document_log_stub.sector,
             "referrer": document_log_stub.referrer,
+            "captcha": "dummy-captcha-response",
         },
     )
 

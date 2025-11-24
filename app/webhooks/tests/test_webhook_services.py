@@ -1,8 +1,6 @@
 from unittest import mock
 
 import pytest
-from django.conf import settings
-
 from webhooks.factories import WebflowContactFactory
 from webhooks.models import WebflowContact
 from webhooks.services import slack

@@ -1,8 +1,11 @@
 from django import forms
-
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV3
 from webhooks.models import WebflowContact
+
+from web.fields import HtmxReCaptchaV3Field
 from web.models import ContentFeedback, DocumentLog
-from web.models.document import StateChoices, SectorChoices, ReferrerChoices
+from web.models.document import ReferrerChoices, SectorChoices, StateChoices
 
 
 class ContactForm(forms.ModelForm):
@@ -13,13 +16,25 @@ class ContactForm(forms.ModelForm):
             "email",
             "phone",
             "referral",
+            "captcha",
         ]
+
+    captcha = HtmxReCaptchaV3Field(action="contact")
 
 
 class ContentFeedbackForm(forms.ModelForm):
     class Meta:
         model = ContentFeedback
-        fields = ["score", "reason", "name", "email", "page"]
+        fields = [
+            "score",
+            "reason",
+            "name",
+            "email",
+            "page",
+            "captcha",
+        ]
+
+    captcha = HtmxReCaptchaV3Field(action="feedback")
 
 
 class DocumentLogForm(forms.ModelForm):
@@ -29,6 +44,7 @@ class DocumentLogForm(forms.ModelForm):
             "state",
             "sector",
             "referrer",
+            "captcha",
         ]
 
     state = forms.ChoiceField(
@@ -44,3 +60,4 @@ class DocumentLogForm(forms.ModelForm):
         + list(ReferrerChoices.choices),
         required=True,
     )
+    captcha = ReCaptchaField(widget=ReCaptchaV3(action="document_log"))

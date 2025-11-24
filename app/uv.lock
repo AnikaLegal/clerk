@@ -265,6 +265,7 @@ dependencies = [
     { name = "django-cors-headers" },
     { name = "django-override-storage" },
     { name = "django-q2" },
+    { name = "django-recaptcha" },
     { name = "django-storages" },
     { name = "django-vite" },
     { name = "djangorestframework" },
@@ -321,6 +322,7 @@ requires-dist = [
     { name = "django-cors-headers" },
     { name = "django-override-storage" },
     { name = "django-q2" },
+    { name = "django-recaptcha", specifier = ">=4.1.0" },
     { name = "django-storages" },
     { name = "django-vite", specifier = ">=3.1.0" },
     { name = "djangorestframework" },
@@ -609,6 +611,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/9d/ae/434a0554fd26fb3824a6b4babb9ac3c434d1a6973d2efc85142f92447e84/django_q2-1.7.2.tar.gz", hash = "sha256:ab30bbf597cc8ade99ed4deeea37c3ade1c4e5976a61be6452930d14d9ebcd1c", size = 78120, upload-time = "2024-09-09T22:17:21.925Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c5/1d/155a16f9858a033d61889245fbc5a7679d448d4159016f72adf4a41b9e25/django_q2-1.7.2-py3-none-any.whl", hash = "sha256:3c480d8afd90a87006404b208a49766d370d5fc864a8dd1d3a0221ec22b12bc0", size = 103215, upload-time = "2024-09-09T22:17:19.894Z" },
+]
+
+[[package]]
+name = "django-recaptcha"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bd/a2/480cd2df8031c30afe0d67b0a5e6299ced20f2e65135a3c160c4031d7052/django_recaptcha-4.1.0.tar.gz", hash = "sha256:73097b958733f65b729d4e4630c51fc2bf147aca6f026017d18898dfc25cb4c5", size = 28676, upload-time = "2025-03-28T13:52:26.589Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/e7/0765f98e4953e26573512284995648c439b0eb252877b655683d28c90be2/django_recaptcha-4.1.0-py3-none-any.whl", hash = "sha256:463aa65967e973de466b28ce8e8b6abb2faffb1ce0c7faa1bf0e5b041e0497cb", size = 39473, upload-time = "2025-03-28T13:52:24.92Z" },
 ]
 
 [[package]]

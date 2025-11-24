@@ -1,81 +1,81 @@
-{% extends "web/_base.html" %} 
+{% extends 'web/_base.html' %}
 {% load wagtailcore_tags %}
 {% load wagtailimages_tags %}
 {% load i18n %}
-{% block title %}{{ page.title }}{% endblock %} 
+{% block title %}
+  {{ page.title }}
+{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title=page.title description=page.search_description %}            
+  {% include 'web/snippets/_social_meta.html' with title=page.title description=page.search_description %}
 {% endblock %}
 {% block social_meta_card %}
-    {% image page.main_image fill-1200x630 as social_image %}
-    <meta property="og:image" content="{{ social_image.url }}" />
-    <meta property="og:image:width" content="{{ social_image.width }}" />
-    <meta property="og:image:height" content="{{ social_image.height }}" />
-    <meta name="twitter:image" content="{{ social_image.url }}" />
-    <meta name="twitter:card" content="summary_large_image" />
+  {# prettier-ignore #}
+  {% image page.main_image fill-1200x630 as social_image %}
+  <meta property="og:image" content="{{ social_image.url }}" />
+  <meta property="og:image:width" content="{{ social_image.width }}" />
+  <meta property="og:image:height" content="{{ social_image.height }}" />
+  <meta name="twitter:image" content="{{ social_image.url }}" />
+  <meta name="twitter:card" content="summary_large_image" />
 {% endblock %}
 {% block content %}
-<style>
-.hero-segment h1 {
-    margin: 0;
-}
-.alt-lang-list {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    padding-top: 1rem;
-    flex-wrap: wrap;
-}
-.alt-lang {
-    background: var(--blue-dark);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 5px;
-}
-.meta {
-    display: flex;
-    justify-content: center;
-    margin: 0 auto !important;
-    font-weight: bold;
-    gap: 30px;
-    opacity: 0.8;
-}
-@media (max-width: 1300px) {
+  <style>
+    .hero-segment h1 {
+      margin: 0;
+    }
+    .alt-lang-list {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .alt-lang {
+      background: var(--blue-dark);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
     .meta {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto !important;
+      font-weight: bold;
+      gap: 30px;
+      opacity: 0.8;
+    }
+    @media (max-width: 1300px) {
+      .meta {
         flex-direction: column;
         gap: 4px;
+      }
     }
-}
-</style>
-<div class="hero-gold round-large bottom-left">
+  </style>
+  <div class="hero-gold round-large bottom-left">
     <div class="hero-segment">
-        <div class="container wide">
-            <h1>{{ page.title }}</h1>
-            <p class="compact meta">
-                <span>By {{ page.owner.get_full_name }}</span>
-                <span class="desktop-break">|</span>
-                <span>{{ page.first_published_at|date:"D jS N 'y" }}</span>
-            </p>
-            {% if page.get_translations.live %}
-                <div class="alt-lang-list">
-                    {% for translation in page.get_translations.live %}
-                    {% get_language_info for translation.locale.language_code as lang %}
-                    <a class="alt-lang" href="{% pageurl translation %}" rel="alternate" hreflang="{{ language_code }}">
-                        {{ lang.name_local }}
-                    </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+      <div class="container wide">
+        <h1>{{ page.title }}</h1>
+        <p class="compact meta">
+          <span>By {{ page.owner.get_full_name }}</span>
+          <span class="desktop-break">|</span>
+          <span>{{ page.first_published_at|date:"D jS N 'y" }}</span>
+        </p>
+        {% if page.get_translations.live %}
+          <div class="alt-lang-list">
+            {% for translation in page.get_translations.live %}
+              {% get_language_info for translation.locale.language_code as lang %}
+              <a class="alt-lang" href="{% pageurl translation %}" rel="alternate" hreflang="{{ language_code }}">{{ lang.name_local }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 
-</div>
-
-<div class="segment" style="padding-bottom: 0;">
+  <div class="segment" style="padding-bottom: 0;">
     <div class="container article {% if page.locale.language_code == 'ar' %}arabic{% endif %}">
-        {% include_block page.body %}
-        {% include 'web/htmx/_feedback_form.html' with page_id=page.pk %}
+      {% include_block page.body %}
+      {% include 'web/htmx/_feedback_form.html' with page_id=page.pk form=feedback_form %}
     </div>
-</div>
-{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
+  </div>
+  {% include 'web/snippets/_footer_cta.html' with cta='Ready to solve your rental problems?' %}
 {% endblock %}
