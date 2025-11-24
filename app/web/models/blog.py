@@ -81,3 +81,10 @@ class BlogPage(Page):
             resp.render()
 
         return resp
+
+    def get_context(self, request, *args, **kwargs):
+        from web.forms import ContentFeedbackForm
+
+        context = super().get_context(request, *args, **kwargs)
+        context["feedback_form"] = ContentFeedbackForm()
+        return context

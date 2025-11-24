@@ -1,12 +1,13 @@
-{% comment %} 
-Renders a ContentFeedbackForm
-Args:
-    form: ContentFeedbackForm
-    page_id: page_id of page
-
+{# prettier-ignore-start #}
+{% comment %}
+Renders a ContentFeedbackForm 
+Args: 
+  form: ContentFeedbackForm 
+  page_id: page_id of page
 {% endcomment %}
+{# prettier-ignore-end #}
 <style>
-#feedback {
+  #feedback {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -15,68 +16,61 @@ Args:
     padding: 2rem;
     box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
     border-radius: 22px;
-}
-#feedback input,
-#feedback textarea,
-#feedback select {
+  }
+  #feedback input,
+  #feedback textarea,
+  #feedback select {
     font-family: var(--font-sans);
-
-  line-height: var(--body-line-height);
-  font-size: var(--body-font-size);
-  border: 1px solid var(--grey);
-  outline: none;
-  color: var(--dark-6);
-  padding: 8px;
-  background-color: var(--white);
-  border-radius: 8px;
-}
-#feedback .message {
+    line-height: var(--body-line-height);
+    font-size: var(--body-font-size);
+    border: 1px solid var(--grey);
+    outline: none;
+    color: var(--dark-6);
+    padding: 8px;
+    background-color: var(--white);
+    border-radius: 8px;
+  }
+  #feedback .message {
     margin-top: 0;
-}
-#feedback h2 {
+  }
+  #feedback h2 {
     margin: 0;
     font-size: 1.5rem;
-}
+  }
 </style>
-<form 
-    id="feedback"
-    hx-post="{% url 'content-feedback' %}"
-    hx-target="this"
-    hx-swap="outerHTML"
->
-    {% if not is_submitted %}
-        <h2>How useful was this content?</h2>
-        <select name="score" required>
-            <option value="">Pick a score</option>
-            <option value="1">⭐</option>
-            <option value="2">⭐⭐</option>
-            <option value="3">⭐⭐⭐</option>
-            <option value="4">⭐⭐⭐⭐</option>
-            <option value="5">⭐⭐⭐⭐⭐</option>
-        </select>
-        <textarea 
-            rows="3"
-            name="reason"
-            placeholder="Why did you choose this score? (optional)"
-        ></textarea>
-        <input type="text" name="name" placeholder="Name (optional)">
-        <input type="email" name="email" placeholder="Email (optional)">
-        <input type="hidden" name="page" value="{{ page_id }}" />  
-        <button type="submit">Submit</button>
-    {% endif %}
-    {% for message in messages %}
-        <div class="message">{{ message }}</div>
+<form id="feedback" hx-post="{% url 'content-feedback' %}" hx-target="this" hx-swap="outerHTML" hx-trigger="captcha-token-received">
+  {% csrf_token %}
+  {% if not is_submitted %}
+    <h2>How useful was this content?</h2>
+    <select name="score" required>
+      <option value="">Pick a score</option>
+      <option value="1">⭐</option>
+      <option value="2">⭐⭐</option>
+      <option value="3">⭐⭐⭐</option>
+      <option value="4">⭐⭐⭐⭐</option>
+      <option value="5">⭐⭐⭐⭐⭐</option>
+    </select>
+    <textarea rows="3" name="reason" placeholder="Why did you choose this score? (optional)"></textarea>
+    <input type="text" name="name" placeholder="Name (optional)" />
+    <input type="email" name="email" placeholder="Email (optional)" />
+    <input type="hidden" name="page" value="{{ page_id }}" />
+    {{ form.captcha }}
+    <button type="submit">Submit</button>
+    <div class="grecaptcha-branding">
+      This site is protected by reCAPTCHA and the Google
+      <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+      <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+    </div>
+  {% endif %}
+  {% for message in messages %}
+    <div class="message">{{ message }}</div>
+  {% endfor %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="message">{{ field.label }}: {{ error }}</div>
     {% endfor %}
-    {% for field in form %}
-        {% for error in field.errors %}
-            <div class="message">
-                {{ field.label }}: {{ error }}
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-        <div class="error message">
-            Submission error: {{ error }}
-        </div>
-    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="error message">Submission error: {{ error }}</div>
+  {% endfor %}
 </form>

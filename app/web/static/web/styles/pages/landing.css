@@ -343,7 +343,7 @@ Landing page only styles.
   padding: 80px 75px 70px 75px;
   max-width: 630px;
   box-sizing: border-box;
-  gap: 3rem;
+  gap: 2.5rem;
 }
 
 @media (max-width: 1300px) {

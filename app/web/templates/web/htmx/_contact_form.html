@@ -1,47 +1,46 @@
-{% comment %} 
-Renders a ContactForm
-Args:
-    form: ContactForm
-
+{# prettier-ignore-start #}
+{% comment %}
+Renders a ContactForm 
+Args: 
+  form: ContactForm
 {% endcomment %}
-<form 
-    hx-post="{% url 'landing-contact' %}"
-    hx-target="this"
-    hx-swap="outerHTML"
->
-    <input type="text" name="name" placeholder="Name" required minlength="2" maxlength="64">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="tel" name="phone" placeholder="Phone number" required minlength="8" maxlength="16">
-    <select name="referrer" required>
-        <option value="">Where did you hear about us?</option>
-        <option value="Word of mouth">Word of mouth</option>
-        <option value="Legal centre">Legal centre</option>
-        <option value="Charity">Charity</option>
-        <option value="Other">Other</option>
-        <option value="Pintrest">Pintrest</option>
-        <option value="Google">Google</option>
-        <option value="Facebook">Facebook</option>
-        <option value="Instagram">Instagram</option>
-    </select>
-    <label class="checkbox">
-        I agree to share my details with Anika Legal by ticking this box.
-        <input type="checkbox" checked="checked" required>
-        <span class="checkmark"></span>
-    </label>
-    <button type="submit">Contact us</button>
-    {% for message in messages %}
-        <div class="message">{{ message }}</div>
+{# prettier-ignore-end #}
+<form hx-post="{% url 'landing-contact' %}" hx-target="this" hx-swap="outerHTML" hx-trigger="captcha-token-received">
+  {% csrf_token %}
+  <input type="text" name="name" placeholder="Name" required minlength="2" maxlength="64" />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="tel" name="phone" placeholder="Phone number" required minlength="8" maxlength="16" />
+  <select name="referrer" required>
+    <option value="">Where did you hear about us?</option>
+    <option value="Word of mouth">Word of mouth</option>
+    <option value="Legal centre">Legal centre</option>
+    <option value="Charity">Charity</option>
+    <option value="Other">Other</option>
+    <option value="Pintrest">Pintrest</option>
+    <option value="Google">Google</option>
+    <option value="Facebook">Facebook</option>
+    <option value="Instagram">Instagram</option>
+  </select>
+  <label class="checkbox">
+    I agree to share my details with Anika Legal by ticking this box.<input type="checkbox" checked="checked" required />
+    <span class="checkmark"></span>
+  </label>
+  {{ form.captcha }}
+  <button type="submit">Contact us</button>
+  {% for message in messages %}
+    <div class="message">{{ message }}</div>
+  {% endfor %}
+  {% for field in form %}
+    {% for error in field.errors %}
+      <div class="message">{{ field.label }}: {{ error }}</div>
     {% endfor %}
-    {% for field in form %}
-        {% for error in field.errors %}
-            <div class="message">
-                {{ field.label }}: {{ error }}
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-        <div class="error message">
-            Submission error: {{ error }}
-        </div>
-    {% endfor %}
+  {% endfor %}
+  {% for error in form.non_field_errors %}
+    <div class="error message">Submission error: {{ error }}</div>
+  {% endfor %}
+  <div class="grecaptcha-branding">
+    This site is protected by reCAPTCHA and the Google
+    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+  </div>
 </form>
