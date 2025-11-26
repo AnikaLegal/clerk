@@ -4,11 +4,24 @@ import os
 
 from django.core import management
 from django.db import migrations
+from wagtail.documents import get_document_model_string
 
 
 def _update_index(apps, schema_editor):
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return
+
+    model_string = get_document_model_string()
+    app_label, model_name = model_string.split(".")
+    try:
+        apps.get_model(app_label, model_name)
+    except LookupError:
+        # We get an error when attempting to rebuild the indexes for the custom
+        # document model whose migration file runs after this one because the
+        # table hasn't been created yet. We can check if the model has been
+        # created yet and if not, just ignore the error.
+        return
+
     management.call_command("wagtail_update_index")
 
 
