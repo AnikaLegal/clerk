@@ -59,9 +59,10 @@ class SubmissionAdmin(admin.ModelAdmin):
         "is_processed",
         "is_reminder_sent",
     )
-    readonly_fields = ("answers_json",)
+    readonly_fields = ("answers_formatted",)
 
-    def answers_json(self, instance):
+    @admin.display(description="answers (formatted)")
+    def answers_formatted(self, instance):
         return dict_to_json_html(instance.answers)
 
 
@@ -98,8 +99,6 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
-    readonly_fields = ("answers_json", "submission")
-    exclude = ("answers",)
     list_display = (
         "id",
         "fileref",
@@ -113,25 +112,19 @@ class IssueAdmin(admin.ModelAdmin):
         "created_at",
     )
     list_filter = ("topic", "is_alert_sent", "is_case_sent", "referrer_type")
-
     list_select_related = ("client",)
+    actions = ["notify"]
 
     @admin_link("client", "Client")
     def client_link(self, client):
         return client.get_full_name()
 
-    actions = ["notify"]
-
+    @admin.action(description="Send notifications")
     def notify(self, request, queryset):
         for issue in queryset:
             async_task(send_issue_slack, str(issue.pk))
 
         self.message_user(request, "Notifications sent.", level=messages.INFO)
-
-    notify.short_description = "Send notifications"
-
-    def answers_json(self, instance):
-        return dict_to_json_html(instance.answers)
 
 
 @admin.register(Tenancy)
