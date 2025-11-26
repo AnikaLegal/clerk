@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django_q.tasks import async_task
 from django.contrib.messages import constants as messages
+from django_q.tasks import async_task
 
 from .models import Email, EmailAttachment, EmailTemplate
 from .service.receive import ingest_email_task
@@ -20,7 +20,6 @@ class EmailAdmin(admin.ModelAdmin):
         "subject",
         "received_data_hash__exact",
     ]
-
     list_display = (
         "id",
         "state",
@@ -30,10 +29,11 @@ class EmailAdmin(admin.ModelAdmin):
         "created_at",
         "is_alert_sent",
     )
-    readonly_fields = ("thread_name", "received_data", "received_data_hash")
+    readonly_fields = ("thread_name",)
     inlines = [AttachmentInline]
     actions = ["ingest"]
 
+    @admin.action(description="Ingest selected emails")
     def ingest(self, request, queryset):
         for email in queryset:
             async_task(ingest_email_task, str(email.pk))
@@ -41,8 +41,6 @@ class EmailAdmin(admin.ModelAdmin):
         self.message_user(
             request, "Email ingestion task dispatched.", level=messages.INFO
         )
-
-    ingest.short_description = "Ingest received emails."
 
 
 @admin.register(EmailTemplate)
