@@ -3,10 +3,17 @@ from core.events.service import (
     on_service_delete,
     on_service_update,
 )
-from core.models import AuditEvent, Issue, IssueNote, ServiceEvent, IssueDate
+from core.models import (
+    AuditEvent,
+    Issue,
+    IssueDate,
+    IssueEvent,
+    IssueNote,
+    ServiceEvent,
+)
 from core.models.issue import CaseOutcome, CaseStage, CaseTopic
-from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -286,6 +293,10 @@ class CaseApiViewset(
         prefetch = GenericPrefetch(
             "content_object",
             [
+                IssueEvent.objects.filter(issue=issue).select_related(
+                    "prev_user",
+                    "next_user",
+                ),
                 AuditEvent.objects.filter(
                     log_entry__content_type=ContentType.objects.get_for_model(
                         IssueDate

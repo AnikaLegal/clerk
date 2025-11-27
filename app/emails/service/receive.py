@@ -96,38 +96,38 @@ def ingest_email_task(email_pk: int):
             logger.error(f"Cannot ingest Email[{email_pk}]: {msg}")
             return
 
-    parsed_data = None
     try:
-        if email.received_data:
-            parsed_data = parse_received_data(email.received_data)
-    except Exception:
-        pass
+        if not email.received_data:
+            raise Exception("No received data to parse")
 
-    if parsed_data:
-        email.state = EmailState.INGESTED
-        email.issue = parsed_data["issue"]
-        email.from_address = parsed_data["from_address"]
-        email.to_address = parsed_data["to_address"]
-        email.cc_addresses = parsed_data["cc_addresses"]
-        email.subject = parsed_data["subject"]
-        email.text = parsed_data["text"]
-        email.html = parsed_data["html"]
-        email.processed_at = timezone.now()
-        email.save()
-        IssueNote.objects.create(
-            issue=parsed_data["issue"],
-            created_at=email.created_at,
-            note_type=NoteType.EMAIL,
-            content_object=email,
-            text=email.get_received_note_text(),
-        )
-    else:
-        logger.error(f"Cannot ingest Email[{email_pk}]: Parsing failure")
+        parsed_data = parse_received_data(email.received_data)
+
+        with transaction.atomic():
+            email.state = EmailState.INGESTED
+            email.issue = parsed_data["issue"]
+            email.from_address = parsed_data["from_address"]
+            email.to_address = parsed_data["to_address"]
+            email.cc_addresses = parsed_data["cc_addresses"]
+            email.subject = parsed_data["subject"]
+            email.text = parsed_data["text"]
+            email.html = parsed_data["html"]
+            email.processed_at = timezone.now()
+            email.save()
+
+            IssueNote.objects.create(
+                note_type=NoteType.EMAIL,
+                content_object=email,
+                issue=email.issue,
+                created_at=email.created_at,
+                text=email.get_received_note_text(),
+            )
+    except Exception:
+        logger.exception(f"Error ingesting Email[{email_pk}]")
         email.state = EmailState.INGEST_FAILURE
         email.save()
 
 
-def parse_received_data(email_data: dict) -> dict | None:
+def parse_received_data(email_data: dict) -> dict:
     """
     Returns the parsed email data as a dict or None
     data is in format: {
@@ -144,7 +144,9 @@ def parse_received_data(email_data: dict) -> dict | None:
     envelope = json.loads(email_data["envelope"])
     to_addrs = envelope["to"]
     if len(to_addrs) != 1:
-        return None
+        if len(to_addrs) == 0:
+            raise Exception("No 'to' address found")
+        raise Exception(f"Multiple 'to' addresses found: {to_addrs}")
 
     to_addr = clean_email_addr(to_addrs[0])
     parsed_data["to_address"] = to_addr
@@ -166,16 +168,11 @@ def parse_received_data(email_data: dict) -> dict | None:
     # Try find the issue from to_addr.
     user, domain = to_addr.split("@")
     if domain != settings.EMAIL_DOMAIN:
-        logger.exception(f"Incorrect domain in to address {to_addr}")
-        return None
+        raise Exception(f"Incorrect domain in 'to' address {to_addr}")
 
-    try:
-        user_parts = user.split(".")
-        issue_prefix = user_parts[-1]
-        parsed_data["issue"] = Issue.objects.get(id__startswith=issue_prefix)
-    except Exception:
-        logger.exception(f"Could not parse email address {to_addr}")
-        return None
+    user_parts = user.split(".")
+    issue_prefix = user_parts[-1]
+    parsed_data["issue"] = Issue.objects.get(id__startswith=issue_prefix)
 
     return parsed_data
 

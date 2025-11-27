@@ -1695,6 +1695,7 @@ components:
                 - $ref: "#/components/schemas/SubmissionPerson"
               nullable: true
         topic_specific:
+          nullable: true
           properties:
             REPAIRS:
               type: object

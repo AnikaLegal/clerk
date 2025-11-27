@@ -1072,7 +1072,7 @@ export type SubmissionAnswers = {
     OTHER?: {
       issue_description?: string | null;
     } | null;
-  };
+  } | null;
 };
 export type Submission = {
   id: string;
