@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
-      - clerk-postgres-data:/var/lib/postgresql/data
+      - clerk-postgres-data:/var/lib/postgresql
     ports:
       - 25432:5432
   # Django webserver.
