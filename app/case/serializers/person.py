@@ -7,7 +7,7 @@ from .fields import TextChoiceField
 
 
 class PersonSearchRequestSerializer(serializers.Serializer):
-    query = serializers.CharField(max_length=256)
+    query = serializers.CharField(max_length=256, required=False, allow_blank=True)
 
 
 class PersonSerializer(serializers.ModelSerializer):
