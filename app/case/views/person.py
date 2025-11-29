@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Person, Issue
+from case.utils.pagination import ClerkPaginator
 from case.utils.react import render_react_page
 from case.serializers import (
     PersonSerializer,
@@ -48,9 +49,14 @@ def person_detail_page_view(request, pk):
     return render_react_page(request, person.full_name, "person-detail", context)
 
 
+class PersonPaginator(ClerkPaginator):
+    page_size = 20
+
+
 class PersonApiViewset(ModelViewSet):
     queryset = Person.objects.order_by("full_name").all()
     serializer_class = PersonSerializer
+    pagination_class = PersonPaginator
     permission_classes = [CoordinatorOrBetterCanWritePermission]
 
     def get_queryset(self):
