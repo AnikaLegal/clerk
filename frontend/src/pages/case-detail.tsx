@@ -70,7 +70,8 @@ const App = () => {
 
   if (caseResult.isError) {
     // Most common errors here (403, 404) should be handled by our routing
-    // logic, so we just re-throw the error to be caught by the error boundary.
+    // logic, so this is likely a different error and we just re-throw the error
+    // to be caught by the error boundary.
     throw caseResult.error
   }
   if (caseResult.isLoading) {
