@@ -26,13 +26,21 @@ const App = () => {
   const caseResult = useGetCaseQuery({ id: case_pk })
   const threadResult = useGetEmailThreadsQuery({ id: case_pk })
 
-  if (caseResult.isLoading || threadResult.isLoading) return null
+  if (caseResult.isLoading || threadResult.isLoading) {
+    return null
+  }
+  if (caseResult.isError) {
+    throw caseResult.error
+  }
+  if (threadResult.isError) {
+    throw threadResult.error
+  }
+  if (!caseResult.isSuccess || !threadResult.isSuccess) {
+    throw new Error('Unexpected query state')
+  }
 
-  const issue = caseResult.data!.issue
-  const emailThreads =
-    threadResult.isError && threadResult.error.status === 404
-      ? []
-      : threadResult.data
+  const issue = caseResult.data.issue
+  const emailThreads = threadResult.data
 
   return (
     <Container>

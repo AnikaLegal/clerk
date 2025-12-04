@@ -158,9 +158,8 @@ class EmailApiViewset(GenericViewSet):
         slug = request.query_params.get("slug")
         if slug:
             email_threads = [t for t in email_threads if t.slug == slug]
-
-        if not email_threads:
-            raise Http404()
+            if not email_threads:
+                raise Http404()
 
         return Response(EmailThreadSerializer(email_threads, many=True).data)
 
