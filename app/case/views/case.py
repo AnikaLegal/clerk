@@ -19,7 +19,10 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from microsoft.service import get_case_folder_info
 from rest_framework import status
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import (
+    action,
+    api_view,
+)
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -115,7 +118,9 @@ def case_detail_page_view(request, pk):
     """
     The details of a given case.
     """
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
+    issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
@@ -129,7 +134,9 @@ def case_detail_documents_page_view(request, pk):
     """
     The documents of a given case.
     """
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
+    issue = viewset.get_object()
+
     context = {"case_pk": pk, "urls": get_detail_urls(issue)}
     return render_react_page(request, f"Case {issue.fileref}", "document-list", context)
 
@@ -140,7 +147,9 @@ def case_detail_dates_page_view(request, pk):
     """
     The dates related to a case.
     """
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
+    issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
@@ -156,7 +165,9 @@ def case_detail_services_page_view(request, pk):
     """
     The services related to a case.
     """
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
+    issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
@@ -170,7 +181,9 @@ def case_detail_submission_page_view(request, pk):
     """
     The submission related to a case.
     """
-    issue = get_object_or_404(Issue, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
+    issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "urls": get_detail_urls(issue),
@@ -194,6 +207,12 @@ def get_detail_urls(issue: Issue):
 class CasePaginator(ClerkPaginator):
     page_size = 14
     max_page_size = 14
+
+
+def get_viewset(request, action, **kwargs):
+    viewset = CaseApiViewset(action=action)
+    viewset.setup(request, **kwargs)
+    return viewset
 
 
 class CaseApiViewset(
@@ -226,14 +245,14 @@ class CaseApiViewset(
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
         )
-        if user.is_paralegal:
-            # Paralegals can only see assigned cases
-            queryset = queryset.filter(paralegal=user)
-        elif not user.is_coordinator_or_better:
-            # If you're not a paralegal or coordinator you can't see nuthin.
-            queryset = queryset.none()
-
         if self.action == "list":
+            if user.is_paralegal:
+                # Paralegals can only see assigned cases
+                queryset = queryset.filter(paralegal=user)
+            elif not user.is_coordinator_or_better:
+                # If you're not a paralegal or coordinator you can't see nuthin.
+                queryset = queryset.none()
+
             queryset = self.search_queryset(queryset)
 
         return queryset

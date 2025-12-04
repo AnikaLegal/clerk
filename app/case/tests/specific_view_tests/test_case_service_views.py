@@ -145,7 +145,7 @@ def test_case_list_api__filter(superuser_client: APIClient):
     "test_user, group_name, expected_status",
     [
         ("unassigned_user", None, 403),
-        ("unassigned_paralegal", "paralegal_group", 404),
+        ("unassigned_paralegal", "paralegal_group", 403),
     ],
 )
 def test_case_service_api_perms__as_user_without_access(
