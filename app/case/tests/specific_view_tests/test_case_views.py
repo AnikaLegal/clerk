@@ -171,12 +171,12 @@ def test_case_get_view__as_paralegal(
     # Should be hidden from to a paralegal
     factories.IssueNoteFactory(issue=issue, note_type="PERFORMANCE")
 
-    # User cannot get the case because they're not assigned
+    # User cannot access the case because they're not assigned.
     url = reverse("case-api-detail", args=(issue.pk,))
     response = user_client.get(url)
-    assert response.status_code == 404  # Not found
+    assert response.status_code == 403
 
-    # User can get the case now they're assigned
+    # User can access the case now they're assigned.
     issue.paralegal = user
     issue.save()
     response = user_client.get(url)

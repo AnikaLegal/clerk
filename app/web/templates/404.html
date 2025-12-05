@@ -1,12 +1,14 @@
-{% extends "web/_base.html" %} 
-{% block title %}Not found {% endblock %} 
+{% extends 'web/_base.html' %}
+{% block title %}
+  Not found
+{% endblock %}
 {% block content %}
-<div class="container">
+  <div class="container">
     <div class="brag">
-        <h1>
-            This page was <span class="callout">not found</span>.<br>
-            Sorry! Try navigate back to our <a href="/"><span class="callout">home page</span></a>.
-        </h1>
+      <h1>Not Found</h1>
+      <p>
+        Oops! That page could not be found. <br /> Try navigating to our <a href="/"><span class="callout">home page</span></a>.
+      </p>
     </div>
-</div>
+  </div>
 {% endblock %}

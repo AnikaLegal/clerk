@@ -1,18 +1,18 @@
-import React from 'react'
-import { Container, Header, Label } from 'semantic-ui-react'
-import styled from 'styled-components'
-import { useSnackbar } from 'notistack'
-
-import { mount, getAPIErrorMessage } from 'utils'
 import {
+  Email,
+  EmailAttachment,
+  Issue,
   useGetCaseQuery,
   useGetEmailThreadsQuery,
   useUploadEmailAttachmentToSharepointMutation,
-  Email,
-  Issue,
-  EmailAttachment,
 } from 'api'
+import { NotFound } from 'comps/error'
+import { enqueueSnackbar } from 'notistack'
+import React, { useState } from 'react'
+import { Container, Header, Label } from 'semantic-ui-react'
+import styled from 'styled-components'
 import { UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   case_pk: string
@@ -25,20 +25,33 @@ const { case_pk, thread_slug, case_email_list_url, user } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const { enqueueSnackbar } = useSnackbar()
-  const [loadingAttachment, setLoadingAttachment] = React.useState<
-    number | null
-  >(null)
+  const [loadingAttachment, setLoadingAttachment] = useState<number | null>(
+    null
+  )
   const [upload] = useUploadEmailAttachmentToSharepointMutation()
   const caseResult = useGetCaseQuery({ id: case_pk })
   const threadResult = useGetEmailThreadsQuery({
     id: case_pk,
     slug: thread_slug,
   })
-  const isInitialLoad = caseResult.isLoading || threadResult.isLoading
-  if (isInitialLoad) return null
 
-  const issue = caseResult.data!.issue
+  if (caseResult.isLoading || threadResult.isLoading) {
+    return null
+  }
+  if (caseResult.isError) {
+    throw caseResult.error
+  }
+  if (threadResult.isError) {
+    if ('status' in threadResult.error && threadResult.error.status === 404) {
+      return <NotFound />
+    }
+    throw threadResult.error
+  }
+  if (!caseResult.isSuccess || !threadResult.isSuccess) {
+    throw new Error('Unexpected query state')
+  }
+
+  const issue = caseResult.data.issue
   const emailThreads = threadResult.data
   const emailThread = emailThreads[0] // Assume a single result
   const { emails } = emailThread

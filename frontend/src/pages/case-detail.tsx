@@ -29,6 +29,7 @@ import { TimelineNote } from 'comps/timeline-item'
 import { URLS } from 'consts'
 import {
   AssignForm,
+  CaseDateForm,
   CloseForm,
   ConflictForm,
   EligibilityForm,
@@ -39,7 +40,6 @@ import {
   ReopenForm,
   ReviewForm,
   ServiceForm,
-  CaseDateForm,
 } from 'forms'
 import { CaseDetailFormProps, UserPermission } from 'types'
 import { getAPIErrorMessage, mount } from 'utils'
@@ -62,18 +62,28 @@ const App = () => {
   const [showSystemNotes, setShowSystemNotes] = useState(true)
   const [_updateTenancy, updateTenancyResult] = useUpdateTenancyMutation()
   const [_updateCase, updateCaseResult] = useUpdateCaseMutation()
-
   const caseResult = useGetCaseQuery({ id: case_pk })
 
   const ActiveForm = activeFormId ? CASE_FORMS[activeFormId] : null
-  const isInitialLoad = caseResult.isLoading
   const isIssueLoading = caseResult.isFetching || updateCaseResult.isLoading
   const isTenancyLoading = updateTenancyResult.isLoading
 
-  if (isInitialLoad) return null
+  if (caseResult.isError) {
+    // Most common errors here (403, 404) should be handled by our routing
+    // logic, so this is likely a different error and we just re-throw the error
+    // to be caught by the error boundary.
+    throw caseResult.error
+  }
+  if (caseResult.isLoading) {
+    return null
+  }
+  if (!caseResult.isSuccess) {
+    // Should be handled by previous checks, used for type narrowing.
+    throw new Error('Unexpected case result state')
+  }
 
-  const issue = caseResult.data!.issue
-  const tenancy = caseResult.data!.tenancy
+  const issue = caseResult.data.issue
+  const tenancy = caseResult.data.tenancy
   const notes = caseResult.data?.notes ?? []
   const details = issue.answers ? getSubmittedDetails(issue.answers) : null
 

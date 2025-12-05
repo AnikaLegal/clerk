@@ -256,6 +256,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
     ),
+    "EXCEPTION_HANDLER": "clerk.utils.custom_exception_handler",
     "DATE_FORMAT": "%d/%m/%Y",
     "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
 }

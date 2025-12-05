@@ -4,7 +4,9 @@ from django.shortcuts import render
 from django.conf import settings
 
 
-def render_react_page(request, title, react_page_name, react_context, public=False):
+def render_react_page(
+    request, title, react_page_name, react_context, public=False, status=None
+):
     react_context.update(
         {
             "user": {
@@ -28,4 +30,9 @@ def render_react_page(request, title, react_page_name, react_context, public=Fal
         "title": title,
         "public": public,
     }
-    return render(request, "case/react_base.html", context)
+    return render(
+        request=request,
+        template_name="case/react_base.html",
+        context=context,
+        status=status,
+    )

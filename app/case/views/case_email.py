@@ -1,43 +1,41 @@
 import os
-from typing import List
 from io import BytesIO
+from typing import List
 
+from core.models import Issue
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.urls import reverse
-from django.db.models import Q
-from django.db import transaction
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from rest_framework.decorators import api_view, action
+from emails.models import (
+    Email,
+    EmailAttachment,
+    EmailState,
+    EmailTemplate,
+    SharepointState,
+)
+from emails.service import build_clerk_address
+from emails.utils.html import parse_email_html, render_email_template
+from emails.utils.threads import EmailThread
+from microsoft.endpoints import MSGraphAPI
+from microsoft.service import save_email_attachment
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from emails.utils.threads import EmailThread
-from emails.utils.html import parse_email_html, render_email_template
-from core.models import Issue
-from case.views.auth import (
-    paralegal_or_better_required,
-    CoordinatorOrBetterPermission,
-    ParalegalOrBetterObjectPermission,
-)
-from emails.service import build_clerk_address
-from emails.models import (
-    EmailState,
-    Email,
-    EmailTemplate,
-    EmailAttachment,
-    SharepointState,
-)
-from microsoft.endpoints import MSGraphAPI
-from microsoft.service import save_email_attachment
-from case.utils.react import render_react_page
 from case.serializers import (
-    EmailSerializer,
     EmailAttachmentSerializer,
+    EmailSerializer,
     EmailTemplateSerializer,
     EmailThreadSerializer,
 )
+from case.utils.react import render_react_page
+from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    ParalegalOrBetterObjectPermission,
+    paralegal_or_better_required,
+)
 from case.views.case import get_detail_urls
-
 
 DRAFT_EMAIL_STATES = [EmailState.READY_TO_SEND, EmailState.DRAFT]
 DISPLAY_EMAIL_STATES = [
@@ -52,8 +50,9 @@ DISPLAY_EMAIL_STATES = [
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_list_page_view(request, pk):
-    viewset = get_viewset(request=request, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
     issue = viewset.get_object()
+
     case_email_address = build_clerk_address(issue)
     context = {
         "case_pk": pk,
@@ -67,8 +66,9 @@ def email_list_page_view(request, pk):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_thread_page_view(request, pk, slug):
-    viewset = get_viewset(request=request, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
     issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "thread_slug": slug,
@@ -80,8 +80,9 @@ def email_thread_page_view(request, pk, slug):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_create_page_view(request, pk):
-    viewset = get_viewset(request=request, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
     issue = viewset.get_object()
+
     templates = EmailTemplate.objects.filter(
         Q(topic=issue.topic) | Q(topic="GENERAL")
     ).order_by("created_at")
@@ -100,8 +101,9 @@ def email_draft_create_page_view(request, pk):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_edit_page_view(request, pk, email_pk):
-    viewset = get_viewset(request=request, pk=pk)
+    viewset = get_viewset(request=request, action="retrieve", pk=pk)
     issue = viewset.get_object()
+
     context = {
         "case_pk": pk,
         "email_pk": email_pk,
@@ -116,14 +118,15 @@ def email_draft_edit_page_view(request, pk, email_pk):
 @api_view(["GET"])
 @paralegal_or_better_required
 def email_draft_preview_page_view(request, pk, email_pk):
-    viewset = get_viewset(request=request, pk=pk)
+    viewset = get_viewset(request=request, pk=pk, action="retrieve")
     email = viewset.get_email(email_pk=email_pk)
+
     html = render_email_template(email.html)
     return HttpResponse(html, "text/html", 200)
 
 
-def get_viewset(request, **kwargs):
-    viewset = EmailApiViewset(request=request, **kwargs)
+def get_viewset(request, action, **kwargs):
+    viewset = EmailApiViewset(action=action)
     viewset.setup(request, **kwargs)
     return viewset
 
@@ -137,12 +140,14 @@ class EmailApiViewset(GenericViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Issue.objects.prefetch_related("email_set__attachments")
-        if user.is_paralegal:
-            # Paralegals can only see assigned cases
-            queryset = queryset.filter(paralegal=user)
-        elif not user.is_coordinator_or_better:
-            # If you're not a paralegal or coordinator you can't see nuthin.
-            queryset = queryset.none()
+
+        if self.action == "list":
+            if user.is_paralegal:
+                # Paralegals can only see assigned cases
+                queryset = queryset.filter(paralegal=user)
+            elif not user.is_coordinator_or_better:
+                # If you're not a paralegal or coordinator you can't see nuthin.
+                queryset = queryset.none()
 
         return queryset
 
@@ -153,9 +158,8 @@ class EmailApiViewset(GenericViewSet):
         slug = request.query_params.get("slug")
         if slug:
             email_threads = [t for t in email_threads if t.slug == slug]
-
-        if not email_threads:
-            raise Http404()
+            if not email_threads:
+                raise Http404()
 
         return Response(EmailThreadSerializer(email_threads, many=True).data)
 

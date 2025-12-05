@@ -18,6 +18,8 @@ from web import views
 from web.sitemaps import SITEMAPS
 from webhooks.views import intake_no_email_view, jotform_form_view, webflow_form_view
 
+from .views import custom_403_handler, custom_404_handler
+
 
 def template(name):
     return TemplateView.as_view(template_name=name)
@@ -139,3 +141,6 @@ urlpatterns += i18n_patterns(
     path("", include(wagtail_urls)),
     prefix_default_language=False,
 )
+
+handler403 = custom_403_handler
+handler404 = custom_404_handler
