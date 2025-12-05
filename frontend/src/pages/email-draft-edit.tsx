@@ -50,10 +50,21 @@ const App = () => {
 
   const caseResult = useGetCaseQuery({ id: case_pk })
   const emailResult = useGetEmailQuery({ id: case_pk, emailId: email_pk })
-  const isInitialLoad = caseResult.isLoading || emailResult.isLoading
-  if (isInitialLoad) return null
 
-  const issue = caseResult.data!.issue
+  if (caseResult.isLoading || emailResult.isLoading) {
+    return null
+  }
+  if (caseResult.isError) {
+    throw caseResult.error
+  }
+  if (emailResult.isError) {
+    throw emailResult.error
+  }
+  if (!caseResult.isSuccess || !emailResult.isSuccess) {
+    throw new Error('Unexpected query state')
+  }
+
+  const issue = caseResult.data.issue
   const email = emailResult.data
   const { attachments } = email
 
@@ -343,8 +354,10 @@ const FileUploadAttachForm = () => {
           .test('file-required', 'Please select a file', (file) =>
             Boolean(file)
           )
-          .test('file-size', 'File size must be no greater than 30MB', (file) =>
-            file ? file.size / 1024 / 1024 <= 30 : true
+          .test(
+            'file-size',
+            'File size must be no greater than 30MB',
+            (file) => (file ? file.size / 1024 / 1024 <= 30 : true)
           ),
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {

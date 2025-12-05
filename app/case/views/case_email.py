@@ -102,13 +102,14 @@ def email_draft_create_page_view(request, pk):
 @paralegal_or_better_required
 def email_draft_edit_page_view(request, pk, email_pk):
     viewset = get_viewset(request=request, action="retrieve", pk=pk)
-    issue = viewset.get_object()
+    email = viewset.get_email(email_pk=email_pk)
+    issue: Issue = email.issue  # type: ignore
 
     context = {
         "case_pk": pk,
         "email_pk": email_pk,
-        "email_preview_url": reverse("case-email-preview", args=(issue.pk, email_pk)),
-        "case_email_url": reverse("case-email-list", args=(issue.pk,)),
+        "email_preview_url": reverse("case-email-preview", args=(pk, email_pk)),
+        "case_email_url": reverse("case-email-list", args=(pk,)),
     }
     return render_react_page(
         request, f"Case {issue.fileref}", "email-draft-edit", context
