@@ -36,11 +36,13 @@ def get_user_permissions(user):
             case_path = f"cases/{issue.id}"
             permissions = api.folder.list_permissions(case_path)
             has_access = False
-            for perm in permissions or []:
-                _, perm_data = perm
-                email = perm_data.get("user", {}).get("email")
-                if email == user.email:
-                    has_access = True
+            if permissions:
+                for perm in permissions:
+                    _, granted_to_v2 = perm
+                    email = granted_to_v2.get("user", {}).get("email")
+                    if email and email == user.email:
+                        has_access = True
+                        break
             if has_access:
                 paralegal_perm_issues.append(issue)
             else:
@@ -184,9 +186,9 @@ def remove_user_from_case(user, issue):
 
     # Iterate through the permissions and delete those belonging to the User.
     if permissions:
-        for perm_id, user_object in permissions:
-            email = user_object["user"].get("email")
-            if email == user.email:
+        for perm_id, granted_to_v2 in permissions:
+            email = granted_to_v2.get("user", {}).get("email")
+            if email and email == user.email:
                 api.folder.delete_permission(case_path, perm_id)
 
 
