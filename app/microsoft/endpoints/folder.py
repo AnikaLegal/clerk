@@ -161,20 +161,17 @@ class FolderEndpoint(BaseEndpoint):
         Returns list of permissions or None if Folder doesn't exist.
         """
         url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions")
-
         perms = super().get_list(url)
-
         if perms:
             list_permissions = []
             for item in perms:
                 try:
-                    list_permissions.append((item["id"], item["grantedTo"]))
+                    list_permissions.append((item["id"], item["grantedToV2"]))
                 except Exception:
                     logger.exception("Malformed Sharepoint permission")
-
             return list_permissions
-        else:
-            return None
+
+        return None
 
     def delete_permission(self, path, perm_id):
         """
