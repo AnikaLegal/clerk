@@ -103,10 +103,21 @@ class FolderEndpoint(BaseEndpoint):
         Uploads file to parent
         """
         name = name or file.name
-        if file.size < FILE_UPLOAD_SIZE_LIMIT:
-            data = self._upload_small_file(file, parent_id, name, conflict_behaviour)
-        else:
-            data = self._upload_large_file(file, parent_id, name, conflict_behaviour)
+        try:
+            if file.size < FILE_UPLOAD_SIZE_LIMIT:
+                data = self._upload_small_file(
+                    file, parent_id, name, conflict_behaviour
+                )
+            else:
+                data = self._upload_large_file(
+                    file, parent_id, name, conflict_behaviour
+                )
+        except requests.HTTPError as e:
+            if e.response.status_code == 409:
+                raise FileExistsError(
+                    f"File {name} already exists in folder with id {parent_id}"
+                ) from e
+            raise
         return data
 
     def get_child_if_exists(self, filename, parent_id):
