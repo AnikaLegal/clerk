@@ -9,6 +9,9 @@ from django.conf import settings
 from django.utils import timezone
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
+from msgraph.generated.models.drive_item import DriveItem
+
+from .msgraph import create_case_folder, get_case_folder, get_drive_item_by_path
 
 logger = logging.getLogger(__name__)
 
@@ -98,9 +101,25 @@ def set_up_new_case(issue: Issue):
     """
     Make a copy of the relevant templates folder with the name of the new case.
     """
+    from pprint import pprint
+
     logger.info("Setting up new case folder for Issue<%s>", issue.pk)
-    case_folder, created = get_or_create_case_folder(issue)
-    case_folder_id = case_folder["id"]
+
+    # Get or create case folder.
+    case_folder = get_case_folder(issue)
+    if not case_folder:
+        case_folder = create_case_folder(issue)
+        if not case_folder:
+            raise Exception(f"Failed to create case folder for Issue<{issue.pk}>")
+        logger.info("Created case folder for Issue<%s>:", issue.pk)
+
+    copy_templates_to_case_folder(issue, case_folder)
+
+    pprint(case_folder)
+    return
+
+    drive_item, created = get_or_create_case_folder(issue)
+    case_folder_id = drive_item["id"]
 
     if created:
         logger.info("Created case folder for Issue<%s>", issue.pk)
@@ -111,25 +130,18 @@ def set_up_new_case(issue: Issue):
     copy_client_uploads_to_case_folder(issue, case_folder_id)
 
 
-def get_or_create_case_folder(issue: Issue) -> Tuple[dict, bool]:
-    """
-    Create case folder for an issue if it does not already exist.
-    """
-    return _get_or_create_folder(str(issue.id), settings.CASES_FOLDER_ID)
-
-
-def get_or_create_case_upload_folder(case_folder_id: str) -> Tuple[dict, bool]:
-    """
-    Create case folder for an issue if it does not already exist.
-    """
-    return _get_or_create_folder(CLIENT_UPLOAD_FOLDER_NAME, case_folder_id)
-
-
-def get_or_create_case_attachment_folder(case_folder_id: str) -> Tuple[dict, bool]:
-    """
-    Create case folder for an issue if it does not already exist.
-    """
-    return _get_or_create_folder(EMAIL_ATTACHMENT_FOLDER_NAME, case_folder_id)
+def copy_templates_to_case_folder(issue: Issue, case_folder: DriveItem):
+    for template in DocumentTemplate.objects.filter(topic=issue.topic):
+        try:
+            drive_item = get_drive_item_by_path(template.file.name)
+            pass
+        except Exception as e:
+            logger.error(
+                "Failed to get DriveItem for template %s: %s",
+                template.file.name,
+                str(e),
+            )
+            continue
 
 
 def copy_document_templates_to_case_folder(issue: Issue, case_folder_id: str):

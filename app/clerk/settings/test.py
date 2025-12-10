@@ -48,6 +48,7 @@ SLACK_MESSAGE_DISABLED = True
 # Ensure no access to API secrets in tests (even in dev container).
 AWS_S3_ACCESS_KEY_ID = None
 AWS_S3_SECRET_ACCESS_KEY = None
+AZURE_AD_TENANT_ID = None
 AZURE_AD_CLIENT_ID = None
 AZURE_AD_CLIENT_SECRET = None
 EMAIL_HOST_PASSWORD = None
