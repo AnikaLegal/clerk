@@ -40,6 +40,7 @@ sentry_sdk.init(
     dsn=os.environ.get("RAVEN_DSN"),
     integrations=[DjangoIntegration()],
     environment=ENVIRONMENT,
+    enable_logs=True,
 )
 
 

@@ -344,7 +344,7 @@ requires-dist = [
     { name = "requests" },
     { name = "responses" },
     { name = "sendgrid" },
-    { name = "sentry-sdk" },
+    { name = "sentry-sdk", specifier = ">=2.35.0" },
     { name = "social-auth-app-django" },
     { name = "twilio" },
     { name = "tzdata" },
@@ -1713,15 +1713,15 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.14.0"
+version = "2.47.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/23/6527e56fb17817153c37d702d6b9ed0a2f75ed213fd98a176c1b8894ad20/sentry_sdk-2.14.0.tar.gz", hash = "sha256:1e0e2eaf6dad918c7d1e0edac868a7bf20017b177f242cefe2a6bcd47955961d", size = 282948, upload-time = "2024-09-09T12:50:03.673Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/2a/d225cbf87b6c8ecce5664db7bcecb82c317e448e3b24a2dcdaacb18ca9a7/sentry_sdk-2.47.0.tar.gz", hash = "sha256:8218891d5e41b4ea8d61d2aed62ed10c80e39d9f2959d6f939efbf056857e050", size = 381895, upload-time = "2025-12-03T14:06:36.846Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/de/956ce1d71459fa1af0486ca141fc605ac16f7c8855750668ff663e2b436a/sentry_sdk-2.14.0-py2.py3-none-any.whl", hash = "sha256:b8bc3dc51d06590df1291b7519b85c75e2ced4f28d9ea655b6d54033503b5bf4", size = 311425, upload-time = "2024-09-09T12:50:01.764Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/ac/d6286ea0d49e7b58847faf67b00e56bb4ba3d525281e2ac306e1f1f353da/sentry_sdk-2.47.0-py2.py3-none-any.whl", hash = "sha256:d72f8c61025b7d1d9e52510d03a6247b280094a327dd900d987717a4fce93412", size = 411088, upload-time = "2025-12-03T14:06:35.374Z" },
 ]
 
 [[package]]
