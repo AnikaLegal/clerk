@@ -1,5 +1,7 @@
 import logging
 from dataclasses import dataclass
+from os.path import basename
+from typing import Tuple
 
 from accounts.models import User
 from core.models import DocumentTemplate, FileUpload, Issue
@@ -96,73 +98,114 @@ def set_up_new_case(issue: Issue):
     """
     Make a copy of the relevant templates folder with the name of the new case.
     """
+    logger.info("Setting up new case folder for Issue<%s>", issue.pk)
+    case_folder, created = get_or_create_case_folder(issue)
+    case_folder_id = case_folder["id"]
+
+    if created:
+        logger.info("Created case folder for Issue<%s>", issue.pk)
+        logger.info("Copying document templates to case folder for Issue<%s>", issue.pk)
+        copy_document_templates_to_case_folder(issue, case_folder_id)
+
+    logger.info("Copying client uploads to case folder for Issue<%s>", issue.pk)
+    copy_client_uploads_to_case_folder(issue, case_folder_id)
+
+
+def get_or_create_case_folder(issue: Issue) -> Tuple[dict, bool]:
+    """
+    Create case folder for an issue if it does not already exist.
+    """
+    return _get_or_create_folder(str(issue.id), settings.CASES_FOLDER_ID)
+
+
+def get_or_create_case_upload_folder(case_folder_id: str) -> Tuple[dict, bool]:
+    """
+    Create case folder for an issue if it does not already exist.
+    """
+    return _get_or_create_folder(CLIENT_UPLOAD_FOLDER_NAME, case_folder_id)
+
+
+def get_or_create_case_attachment_folder(case_folder_id: str) -> Tuple[dict, bool]:
+    """
+    Create case folder for an issue if it does not already exist.
+    """
+    return _get_or_create_folder(EMAIL_ATTACHMENT_FOLDER_NAME, case_folder_id)
+
+
+def copy_document_templates_to_case_folder(issue: Issue, case_folder_id: str):
     api = MSGraphAPI()
-    case_folder_name = str(issue.id)
-    parent_folder_id = settings.CASES_FOLDER_ID
-
-    # Copy templates to the case folder if not already done.
-    case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
-    if not case_folder:
-        logger.info("Creating case folder for Issue<%s>", issue.pk)
-        case_folder = api.folder.create_folder(case_folder_name, parent_folder_id)
-        if case_folder:
-            templates = DocumentTemplate.objects.filter(topic=issue.topic).all()
-            for template in templates:
-                api.folder.copy(
-                    template.file.name,
-                    template.name,  # type: ignore - annotated field.
-                    case_folder["id"],
-                )
-    else:
-        logger.info("Case folder already exists for Issue<%s>", issue.pk)
-
-    # Copy client uploaded files to the case folder
-    assert case_folder, f"Expect a case folder to exist for Issue<{issue.pk}>"
-    file_uploads = FileUpload.objects.filter(issue=issue).all()
-    if file_uploads.exists():
-        uploads_folder = _create_folder_if_not_exists(
-            api, issue, CLIENT_UPLOAD_FOLDER_NAME, case_folder["id"]
+    for template in DocumentTemplate.objects.filter(topic=issue.topic):
+        api.folder.copy(
+            template.file.name,
+            template.name,  # type: ignore - annotated field.
+            case_folder_id,
         )
+
+
+def copy_client_uploads_to_case_folder(issue: Issue, case_folder_id: str):
+    file_uploads = FileUpload.objects.filter(issue=issue)
+    if file_uploads.exists():
+        upload_folder, _ = get_or_create_case_upload_folder(case_folder_id)
+        upload_folder_id = upload_folder["id"]
+
+        api = MSGraphAPI()
         for file_upload in file_uploads:
-            name = file_upload.file.name.split("/")[1]
-            logger.info(
-                "Uploading case file %s to Sharepoint for Issue<%s>", name, issue.pk
-            )
-            api.folder.upload_file(file_upload.file, uploads_folder["id"], name=name)
+            name = basename(file_upload.file.name)
+            logger.info("Uploading file %s for Issue<%s>", name, issue.pk)
+
+            try:
+                api.folder.upload_file(file_upload.file, upload_folder_id, name=name)
+            except FileExistsError:
+                logger.warning(
+                    "File %s already exists for Issue<%s>, skipping upload.",
+                    name,
+                    issue.pk,
+                )
 
 
-def save_email_attachment(email: Email, att: EmailAttachment):
+def _get_or_create_folder(name: str, parent_folder_id: str) -> Tuple[dict, bool]:
+    api = MSGraphAPI()
+    case_folder = api.folder.get_child_if_exists(name, parent_folder_id)
+    if case_folder:
+        return case_folder, False
+
+    case_folder = api.folder.create_folder(name, parent_folder_id)
+    if not case_folder:
+        raise Exception(
+            f"Failed to create folder {name} under parent {parent_folder_id}"
+        )
+    return case_folder, True
+
+
+def save_email_attachment(email: Email, attachment: EmailAttachment):
     """
     Send email attachments to Sharepoint
     """
+    if not email.issue:
+        raise Exception(f"Email<{email.pk}> is not linked to an Issue")
+
     api = MSGraphAPI()
     issue = email.issue
-    case_folder_name = str(issue.id)
-    parent_folder_id = settings.CASES_FOLDER_ID
-    case_folder = api.folder.get_child_if_exists(case_folder_name, parent_folder_id)
-    assert case_folder, f"Case folder not found for Issue<{issue.pk}>"
-    uploads_folder = _create_folder_if_not_exists(
-        api, issue, EMAIL_ATTACHMENT_FOLDER_NAME, case_folder["id"]
+
+    case_folder_name = str(issue.pk)
+    case_folder = api.folder.get_child_if_exists(
+        case_folder_name, settings.CASES_FOLDER_ID
     )
-    name = att.file.name.split("/")[-1]
-    att.file.content_type = att.content_type
-    logger.info(
-        "Uploading email attachment %s to Sharepoint for Issue<%s>", name, issue.pk
-    )
+
+    if not case_folder:
+        raise Exception(f"Case folder not found for Issue<{issue.pk}>")
+
+    case_folder_id = case_folder["id"]
+    attachment_folder, _ = get_or_create_case_attachment_folder(case_folder_id)
+    attachments_folder_id = attachment_folder["id"]
+
+    name = basename(attachment.file.name)
+    logger.info("Uploading email attachment %s for Issue<%s>", name, issue.pk)
+
+    attachment.file.content_type = attachment.content_type  # type: ignore
     api.folder.upload_file(
-        att.file, uploads_folder["id"], name=name, conflict_behaviour="rename"
+        attachment.file, attachments_folder_id, name=name, conflict_behaviour="rename"
     )
-
-
-def _create_folder_if_not_exists(api, issue, name, parent_id):
-    folder = api.folder.get_child_if_exists(name, parent_id)
-    if not folder:
-        logger.info("Creating folder %s for Issue<%s>", name, issue.pk)
-        folder = api.folder.create_folder(name, parent_id)
-    else:
-        logger.info("Folder %s already exists for Issue<%s>", name, issue.pk)
-
-    return folder
 
 
 def add_user_to_case(user, issue):

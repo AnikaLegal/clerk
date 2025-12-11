@@ -76,10 +76,6 @@ class BaseEndpoint:
         except requests.exceptions.HTTPError:
             if resp.status_code == 404:
                 return None
-            else:
-                logger.error(
-                    f"{resp.request.method} {resp.request.url} failed with response body: {json}"
-                )
-                raise
+            raise
 
         return json
