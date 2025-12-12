@@ -32,8 +32,11 @@ def get_user_permissions(user):
     api = MSGraphAPI()
     if api.user.get(user.email):
         members = api.group.members()
-        has_coordinator_perms = user.email in members
+        owners = api.group.owners()
+        has_coordinator_perms = user.email in members or user.email in owners
 
+        # NOTE: when we add lawyer permissions, we will need to check those here
+        # too.
         for issue in Issue.objects.filter(paralegal=user):
             case_path = f"cases/{issue.id}"
             has_access = False
@@ -265,9 +268,7 @@ def set_up_coordinator(user):
     Add User as Group member.
     """
     api = MSGraphAPI()
-
     members = api.group.members()
-
     if user.email not in members:
         api.group.add_user(user.email)
 
@@ -277,9 +278,7 @@ def tear_down_coordinator(user):
     Remove User as Group member.
     """
     api = MSGraphAPI()
-
     members = api.group.members()
-
     if user.email in members:
         result = api.user.get(user.email)
         user_id = result["id"]
