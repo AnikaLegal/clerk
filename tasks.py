@@ -147,6 +147,7 @@ def psql(c):
 @task(incrementable=["verbose"])
 def test(
     c,
+    path=None,
     recreate=False,
     interactive=False,
     quiet=False,
@@ -167,6 +168,9 @@ def test(
             cmd += " --quiet --no-summary --exitfirst"
         elif verbose:
             cmd += " -" + ("v" * verbose)
+
+        if path:
+            cmd += f" {path}"
 
     env = {
         "DJANGO_SETTINGS_MODULE": f"{APP_NAME}.settings.test",
