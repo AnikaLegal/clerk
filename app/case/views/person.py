@@ -1,11 +1,12 @@
 from django.http import Http404
-from django.db.models import Q
+from django.db.models import QuerySet, Q
 from django.urls import reverse
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.models import Person, Issue
+from case.utils.pagination import ClerkPaginator
 from case.utils.react import render_react_page
 from case.serializers import (
     PersonSerializer,
@@ -48,22 +49,29 @@ def person_detail_page_view(request, pk):
     return render_react_page(request, person.full_name, "person-detail", context)
 
 
+class PersonPaginator(ClerkPaginator):
+    page_size = 20
+
+
 class PersonApiViewset(ModelViewSet):
     queryset = Person.objects.order_by("full_name").all()
     serializer_class = PersonSerializer
+    pagination_class = PersonPaginator
     permission_classes = [CoordinatorOrBetterCanWritePermission]
 
-    @action(
-        detail=False,
-        methods=["GET"],
-        url_path="search",
-        url_name="search",
-    )
-    def search(self, request):
-        people_qs = self.get_queryset()
-        serializer = PersonSearchRequestSerializer(data=request.query_params)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if self.action == "list":
+            queryset = self.search_queryset(queryset)
+
+        return queryset
+
+    def search_queryset(self, queryset: QuerySet[Person]) -> QuerySet[Person]:
+        serializer = PersonSearchRequestSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
-        query = serializer.validated_data["query"]
+        query = serializer.validated_data.get("query", "")
+
         if query:
             q_filter = (
                 Q(full_name__icontains=query)
@@ -71,6 +79,6 @@ class PersonApiViewset(ModelViewSet):
                 | Q(address__icontains=query)
                 | Q(phone_number__icontains=query)
             )
-            people_qs = people_qs.filter(q_filter)
+            queryset = queryset.filter(q_filter)
 
-        return Response(data=PersonSerializer(people_qs, many=True).data)
+        return queryset

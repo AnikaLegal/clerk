@@ -1,14 +1,48 @@
 get:
   operationId: getPeople
+  parameters:
+    - name: query
+      in: query
+      schema:
+        type: string
+      required: false
+    - name: page
+      in: query
+      description: Page number (pagination)
+      schema:
+        type: integer
+      required: false
   responses:
     "200":
       description: Successful response.
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../schemas/Person.yaml
+            type: object
+            properties:
+              current:
+                type: number
+              next:
+                type: number
+                nullable: true
+              prev:
+                type: number
+                nullable: true
+              page_count:
+                type: number
+              item_count:
+                type: number
+              results:
+                type: array
+                items:
+                  $ref: ../schemas/Person.yaml
+            required:
+              - current
+              - next
+              - prev
+              - page_count
+              - item_count
+              - results
 
 post:
   operationId: createPerson
