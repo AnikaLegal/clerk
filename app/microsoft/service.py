@@ -25,26 +25,29 @@ class MicrosoftUserPermissions:
 
 
 def get_user_permissions(user):
-    api = MSGraphAPI()
-    ms_account = api.user.get(user.email)
     has_coordinator_perms = False
     paralegal_perm_issues = []
     paralegal_perm_missing_issues = []
 
-    if ms_account:
+    api = MSGraphAPI()
+    if api.user.get(user.email):
         members = api.group.members()
-        has_coordinator_perms = user.email in members
-        for issue in Issue.objects.filter(paralegal=user).all():
+        owners = api.group.owners()
+        has_coordinator_perms = user.email in members or user.email in owners
+
+        # NOTE: when we add lawyer permissions, we will need to check those here
+        # too.
+        for issue in Issue.objects.filter(paralegal=user):
             case_path = f"cases/{issue.id}"
-            permissions = api.folder.list_permissions(case_path)
             has_access = False
-            if permissions:
-                for perm in permissions:
-                    _, granted_to_v2 = perm
+
+            for permission in api.folder.list_permissions(case_path):
+                if granted_to_v2 := permission.get("grantedToV2"):
                     email = granted_to_v2.get("user", {}).get("email")
                     if email and email == user.email:
                         has_access = True
                         break
+
             if has_access:
                 paralegal_perm_issues.append(issue)
             else:
@@ -224,14 +227,12 @@ def remove_user_from_case(user, issue):
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
 
-    # Get the permissions for the case.
-    permissions = api.folder.list_permissions(case_path)
-
     # Iterate through the permissions and delete those belonging to the User.
-    if permissions:
-        for perm_id, granted_to_v2 in permissions:
+    for permission in api.folder.list_permissions(case_path):
+        if granted_to_v2 := permission.get("grantedToV2"):
             email = granted_to_v2.get("user", {}).get("email")
             if email and email == user.email:
+                perm_id = permission.get("id")
                 api.folder.delete_permission(case_path, perm_id)
 
 
@@ -267,9 +268,7 @@ def set_up_coordinator(user):
     Add User as Group member.
     """
     api = MSGraphAPI()
-
     members = api.group.members()
-
     if user.email not in members:
         api.group.add_user(user.email)
 
@@ -279,9 +278,7 @@ def tear_down_coordinator(user):
     Remove User as Group member.
     """
     api = MSGraphAPI()
-
     members = api.group.members()
-
     if user.email in members:
         result = api.user.get(user.email)
         user_id = result["id"]

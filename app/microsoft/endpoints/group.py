@@ -23,13 +23,19 @@ class GroupEndpoint(BaseEndpoint):
         """
         return super().get(f"groups/{settings.MS_GRAPH_GROUP_ID}/drive")
 
-    def members(self):
+    def members(self) -> list[str]:
         """
-        List Group members.
-        Returns list of members or empty list.
+        List group members.
         """
         members = super().get_list(f"groups/{settings.MS_GRAPH_GROUP_ID}/members")
         return [item["userPrincipalName"] for item in members]
+
+    def owners(self) -> list[str]:
+        """
+        List group owners.
+        """
+        owners = super().get_list(f"groups/{settings.MS_GRAPH_GROUP_ID}/owners")
+        return [item["userPrincipalName"] for item in owners]
 
     def add_user(self, userPrincipalName):
         """
