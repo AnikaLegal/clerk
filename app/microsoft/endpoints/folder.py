@@ -166,23 +166,13 @@ class FolderEndpoint(BaseEndpoint):
 
         return super().post(url, data)
 
-    def list_permissions(self, path):
+    def list_permissions(self, path: str) -> list:
         """
-        List the Folder's permissions.
-        Returns list of permissions or None if Folder doesn't exist.
+        List the items users or groups that have permissions for a resource.
+        Returns a list of permissions or None if the resource does not exist.
         """
         url = os.path.join(self.MIDDLE_URL, f"{path}:/permissions")
-        perms = super().get_list(url)
-        if perms:
-            list_permissions = []
-            for item in perms:
-                try:
-                    list_permissions.append((item["id"], item["grantedToV2"]))
-                except Exception:
-                    logger.exception("Malformed Sharepoint permission")
-            return list_permissions
-
-        return None
+        return super().get_list(url)
 
     def delete_permission(self, path, perm_id):
         """

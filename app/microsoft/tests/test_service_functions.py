@@ -91,7 +91,7 @@ def test_remove_user_from_case_A(mock_api):
     """Check service function when there are no permissions on the case folder."""
     user = UserFactory()
     issue = IssueFactory()
-    mock_api.folder.list_permissions.return_value = None
+    mock_api.folder.list_permissions.return_value = []
 
     remove_user_from_case(user, issue)
 
@@ -105,7 +105,7 @@ def test_remove_user_from_case_B(mock_api):
     user = UserFactory(email="donald.duck@anikalegal.com")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
-        ("666", {"user": {"email": "bugs.bunny@anikalegal.com"}})
+        {"id": "666", "grantedToV2": {"user": {"email": "bugs.bunny@anikalegal.com"}}}
     ]
 
     remove_user_from_case(user, issue)
@@ -120,7 +120,7 @@ def test_remove_user_from_case_C(mock_api):
     user = UserFactory(email="donald.duck@anikalegal.com")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
-        ("666", {"user": {"email": "donald.duck@anikalegal.com"}})
+        {"id": "666", "grantedToV2": {"user": {"email": "donald.duck@anikalegal.com"}}}
     ]
 
     remove_user_from_case(user, issue)
