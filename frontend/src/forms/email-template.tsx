@@ -129,6 +129,7 @@ export const EmailTemplateForm = ({
           mt="md"
           disabled={form.submitting || !form.isValid()}
           loading={form.submitting}
+          size="md"
         >
           {isUpdate ? 'Update email template' : 'Create email template'}
         </Button>
@@ -139,6 +140,7 @@ export const EmailTemplateForm = ({
             loading={form.submitting}
             onClick={handleDelete}
             color="red"
+            size="md"
           >
             Delete
           </Button>
