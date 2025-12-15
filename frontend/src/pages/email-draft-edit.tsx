@@ -45,13 +45,24 @@ const { case_pk, email_pk, case_email_url, email_preview_url } = (window as any)
 const App = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [updateEmail] = useUpdateEmailMutation()
-  const [deleteEmail] = useDeleteEmailMutation()
+  const [deleteEmail, deleteEmailResult] = useDeleteEmailMutation()
   const [deleteAttachment] = useDeleteEmailAttachmentMutation()
 
   const caseResult = useGetCaseQuery({ id: case_pk })
   const emailResult = useGetEmailQuery({ id: case_pk, emailId: email_pk })
 
-  if (caseResult.isLoading || emailResult.isLoading) {
+  if (
+    caseResult.isLoading ||
+    emailResult.isLoading ||
+    /* Awaiting deletion to complete. We get a render after deleting an email but
+     * before redirecting. The email query will fail, so we return null to avoid
+     * an error. This doesn't matter because we redirect immediately.
+     *
+     * TODO: This is messy, we shouldn't make a query for an email we know is
+     * deleted; refactor so that it isn't necessary. */
+    deleteEmailResult.isLoading ||
+    deleteEmailResult.isSuccess
+  ) {
     return null
   }
   if (caseResult.isError) {
@@ -128,6 +139,7 @@ const App = () => {
   const onDelete = (setSubmitting) => {
     const confirmed = confirm('Delete this draft email?')
     if (!confirmed) return
+
     setSubmitting(true)
     deleteEmail({ id: case_pk, emailId: email_pk })
       .unwrap()
@@ -144,6 +156,7 @@ const App = () => {
         setSubmitting(false)
       })
   }
+
   return (
     <Container>
       <div
