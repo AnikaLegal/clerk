@@ -2052,11 +2052,15 @@ components:
               type: boolean
             is_coordinator_or_better:
               type: boolean
+            is_lawyer_or_better:
+              type: boolean
             is_paralegal_or_better:
               type: boolean
             is_admin:
               type: boolean
             is_coordinator:
+              type: boolean
+            is_lawyer:
               type: boolean
             is_paralegal:
               type: boolean
@@ -2077,9 +2081,11 @@ components:
             - url
             - is_admin_or_better
             - is_coordinator_or_better
+            - is_lawyer_or_better
             - is_paralegal_or_better
             - is_admin
             - is_coordinator
+            - is_lawyer
             - is_paralegal
             - is_ms_account_set_up
             - ms_account_created_at
