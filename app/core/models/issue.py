@@ -274,4 +274,4 @@ class Issue(TimestampedModel):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return self.paralegal == user
+        return self.paralegal == user or self.lawyer == user
