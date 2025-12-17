@@ -51,9 +51,11 @@ class UserSerializer(serializers.ModelSerializer):
             "url",
             "is_admin_or_better",
             "is_coordinator_or_better",
+            "is_lawyer_or_better",
             "is_paralegal_or_better",
             "is_admin",
             "is_coordinator",
+            "is_lawyer",
             "is_paralegal",
             "is_ms_account_set_up",
             "ms_account_created_at",
@@ -66,9 +68,11 @@ class UserSerializer(serializers.ModelSerializer):
     groups = serializers.SerializerMethodField()
     is_admin_or_better = serializers.BooleanField(read_only=True)
     is_coordinator_or_better = serializers.BooleanField(read_only=True)
+    is_lawyer_or_better = serializers.BooleanField(read_only=True)
     is_paralegal_or_better = serializers.BooleanField(read_only=True)
     is_admin = serializers.BooleanField(read_only=True)
     is_coordinator = serializers.BooleanField(read_only=True)
+    is_lawyer = serializers.BooleanField(read_only=True)
     is_paralegal = serializers.BooleanField(read_only=True)
     is_ms_account_set_up = serializers.SerializerMethodField()
     ms_account_created_at = LocalDateField()

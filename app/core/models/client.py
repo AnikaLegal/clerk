@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from accounts.models import User
@@ -195,6 +196,7 @@ class Client(TimestampedModel):
 
     def check_permission(self, user: User) -> bool:
         """
-        Returns True if the user has object level permission to access this instance.
+        Returns True if the user has object level permission to access this
+        instance.
         """
-        return self.issue_set.filter(paralegal=user).exists()
+        return self.issue_set.filter(Q(paralegal=user) | Q(lawyer=user)).exists()
