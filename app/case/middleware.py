@@ -67,9 +67,11 @@ def annotate_group_access_middleware(get_response):
             # TODO: remove I can figure out if it is unused elsewhere.
             user.is_admin = False
             user.is_coordinator = False
+            user.is_lawyer = False
             user.is_paralegal = False
             user.is_admin_or_better = False
             user.is_coordinator_or_better = False
+            user.is_lawyer_or_better = False
             user.is_paralegal_or_better = False
 
         return get_response(request)
