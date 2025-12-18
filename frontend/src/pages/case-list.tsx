@@ -71,7 +71,7 @@ const App = () => {
         <Group wrap="nowrap" gap="sm" justify="space-between">
           <span>Cases</span>
           {CONTEXT.user.is_coordinator_or_better && (
-            <Button component="a" href={CONTEXT.create_url}>
+            <Button component="a" href={CONTEXT.create_url} size="md">
               Create a new case
             </Button>
           )}
