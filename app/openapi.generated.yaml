@@ -644,15 +644,49 @@ paths:
   /clerk/api/person/:
     get:
       operationId: getPeople
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: page
+          in: query
+          description: Page number (pagination)
+          schema:
+            type: integer
+          required: false
       responses:
         "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Person"
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Person"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
     post:
       operationId: createPerson
       requestBody:
@@ -672,24 +706,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/person/search/:
-    get:
-      operationId: searchPeople
-      parameters:
-        - name: query
-          in: query
-          schema:
-            type: string
-          required: true
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Person"
   /clerk/api/person/{id}/:
     get:
       operationId: getPerson
