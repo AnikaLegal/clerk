@@ -11,11 +11,11 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import type { TextInputProps } from '@mantine/core'
+import { useDebouncedCallback } from '@mantine/hooks'
 import { IconSearch } from '@tabler/icons-react'
 import { useSnackbar } from 'notistack'
 
-import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
+import { mount, useEffectLazy, getAPIErrorMessage } from 'utils'
 import { useGetPeopleQuery } from 'api'
 
 import { FadeTransition } from 'comps/transitions'
@@ -26,12 +26,19 @@ interface DjangoContext {
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-const debouncer = debounce(300)
-
 const App = () => {
   const [query, setQuery] = useState('')
-  const { enqueueSnackbar } = useSnackbar()
   const [page, setPage] = useState(1)
+  const { enqueueSnackbar } = useSnackbar()
+
+  const debouncedSetQueryAndPage = useDebouncedCallback(
+    (value: string) => {
+      // Batch into single state update and render
+      setPage(1)
+      setQuery(value)
+    },
+    300 // Debounce delay in milliseconds
+  )
 
   const results = useGetPeopleQuery({ query: query || undefined, page })
 
@@ -52,10 +59,8 @@ const App = () => {
             placeholder="Search by name, email, phone or address ..."
             rightSection={<IconSearch size={16} stroke={4} />}
             size="md"
-            value={query}
             onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(1)
+              debouncedSetQueryAndPage(e.target.value)
             }}
           />
         </Grid.Col>
@@ -106,7 +111,7 @@ const App = () => {
 
       {pageCount > 1 && (
         <Center style={{ marginTop: 12 }}>
-          <Pagination page={page} onChange={setPage} total={pageCount} />
+          <Pagination value={page} onChange={setPage} total={pageCount} />
         </Center>
       )}
     </Container>
