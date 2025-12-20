@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
   Center,
@@ -15,7 +15,7 @@ import { useDebouncedCallback } from '@mantine/hooks'
 import { IconSearch } from '@tabler/icons-react'
 import { useSnackbar } from 'notistack'
 
-import { mount, useEffectLazy, getAPIErrorMessage } from 'utils'
+import { mount, getAPIErrorMessage } from 'utils'
 import { useGetPeopleQuery } from 'api'
 
 import { FadeTransition } from 'comps/transitions'
@@ -42,18 +42,24 @@ const App = () => {
 
   const results = useGetPeopleQuery({ query: query || undefined, page })
 
+  useEffect(() => {
+    if (results.error) {
+      enqueueSnackbar(getAPIErrorMessage(results.error, 'Failed to load parties'), { variant: 'error' })
+    }
+  }, [results.error, enqueueSnackbar])
+
   const isLoading = results.isFetching
   const people = results.data?.results || []
   const pageCount = results.data?.page_count || 1
   const total = results.data?.item_count || 0
   return (
-    <Container size="xl" style={{ padding: '1.5rem 0' }}>
+    <Container size="xl">
       <Title order={1}>Parties</Title>
       {!isLoading && (<Text mt={4} color="dimmed">Showing {people.length} of {total} parties</Text>)}
       <Button component="a" href={CONTEXT.create_url} size="md" mt="sm">
         Add a party
       </Button>
-      <Grid mt="md">
+      <Grid mt="lg">
         <Grid.Col span={6}>
           <TextInput
             placeholder="Search by name, email, phone or address ..."
