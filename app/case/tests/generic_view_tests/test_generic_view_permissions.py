@@ -1,6 +1,7 @@
 """
 Tests to check authorization for generic view test cases.
 """
+
 import pytest
 
 from rest_framework.test import APIClient
@@ -16,21 +17,13 @@ from case.tests.generic_view_tests.generic_view_test_cases import (
 )
 
 
-TEST_GROUPS = [
-    CaseGroups.ADMIN,
-    CaseGroups.COORDINATOR,
-    CaseGroups.PARALEGAL,
-    CaseGroups.LAWYER,
-]
-
-
 LIST_TEST_CASES = [tc for tc in GENERIC_API_TEST_CASES if Action.LIST in tc.actions]
 LIST_TEST_CASE_IDS = [tc.base_view_name for tc in LIST_TEST_CASES]
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_case", LIST_TEST_CASES, ids=LIST_TEST_CASE_IDS)
-@pytest.mark.parametrize("group_name", TEST_GROUPS)
+@pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_generic_list_view_requires_permissions(
     user_client: APIClient, user: User, test_case: APIViewTestCase, group_name: str
 ) -> None:
@@ -64,7 +57,7 @@ CREATE_TEST_CASE_IDS = [tc.base_view_name for tc in CREATE_TEST_CASES]
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_case", CREATE_TEST_CASES, ids=CREATE_TEST_CASE_IDS)
-@pytest.mark.parametrize("group_name", TEST_GROUPS)
+@pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_generic_create_view_requires_permissions(
     user_client: APIClient, user: User, test_case: APIViewTestCase, group_name: str
 ) -> None:
@@ -100,7 +93,7 @@ RETRIEVE_TEST_CASE_IDS = [tc.base_view_name for tc in RETRIEVE_TEST_CASES]
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_case", RETRIEVE_TEST_CASES, ids=RETRIEVE_TEST_CASE_IDS)
-@pytest.mark.parametrize("group_name", TEST_GROUPS)
+@pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_generic_detail_view_requires_permissions(
     user_client: APIClient, user: User, test_case: APIViewTestCase, group_name: str
 ) -> None:
@@ -136,7 +129,7 @@ UPDATE_TEST_CASE_IDS = [tc.base_view_name for tc in UPDATE_TEST_CASES]
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_case", UPDATE_TEST_CASES, ids=UPDATE_TEST_CASE_IDS)
-@pytest.mark.parametrize("group_name", TEST_GROUPS)
+@pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_generic_update_view_requires_permissions(
     user_client: APIClient, user: User, test_case: APIViewTestCase, group_name: str
 ) -> None:
@@ -172,7 +165,7 @@ DELETE_TEST_CASE_IDS = [tc.base_view_name for tc in DELETE_TEST_CASES]
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("test_case", DELETE_TEST_CASES, ids=DELETE_TEST_CASE_IDS)
-@pytest.mark.parametrize("group_name", TEST_GROUPS)
+@pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_generic_delete_view_requires_permissions(
     user_client: APIClient, user: User, test_case: APIViewTestCase, group_name: str
 ) -> None:
