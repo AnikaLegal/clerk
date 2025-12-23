@@ -1,76 +1,61 @@
-# User / Group / Permission signals go here
-# set_up_coordinator / tear_down_coordinator
+from auditlog.models import LogEntry
+from auditlog.receivers import post_log
 from django.contrib.auth.models import Group
-from django.db.models.signals import m2m_changed, pre_save
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
-from core.models import Issue
-from case.middleware import COORDINATOR_GROUPS
-from accounts.models import User, CaseGroups
-from microsoft.service import (
-    remove_user_from_case,
-    set_up_coordinator,
-    tear_down_coordinator,
-    remove_office_licence,
-    add_office_licence,
-)
+from accounts import events
+from accounts.models import User
 
 
-POST_ADD = "post_add"
-POST_REMOVE = "post_remove"
-
-
-@receiver(pre_save, sender=User)
-def pre_save_user(sender, instance, **kwargs):
-    user = instance
-    if not user.pk:
-        return
-
-    try:
-        prev_user = User.objects.get(pk=user.pk)
-    except User.DoesNotExist:
-        return
-
-    if prev_user.is_active and not user.is_active:
-        remove_office_licence(user)
-    elif (not prev_user.is_active) and user.is_active:
-        add_office_licence(user)
+@receiver(post_log, sender=User)
+def post_log_user(sender, instance, action, changes, **kwargs):
+    user: User = instance
+    if action == LogEntry.Action.CREATE:
+        if user.is_active:
+            events.user_activated.send(sender=User, user=user)
+    elif action == LogEntry.Action.UPDATE:
+        if "is_active" in changes:
+            old_value, new_value = changes["is_active"]
+            if not old_value and new_value:
+                events.user_activated.send(sender=User, user=user)
+            elif old_value and not new_value:
+                events.user_deactivated.send(sender=User, user=user)
+    elif action == LogEntry.Action.DELETE:
+        if user.is_active:
+            events.user_deactivated.send(sender=User, user=user)
 
 
 @receiver(m2m_changed, sender=User.groups.through)
-def post_save_group(sender, instance, action, **kwargs):
+def m2m_changed_user_groups(sender, instance, action, **kwargs):
     if kwargs.get("reverse"):
         # Do nothing if it's a Group instance rather than a User.
         return
 
-    user = instance
-    if action == POST_ADD:
-        if not user.is_active:
-            return
+    user: User = instance
+    if not user.is_active:
+        return
 
-        # We've added these groups to the user.
-        is_now_coordinator_or_better = Group.objects.filter(
-            pk__in=kwargs["pk_set"], name__in=COORDINATOR_GROUPS
-        ).exists()
-        if is_now_coordinator_or_better:
-            # If the user becomes a coordinator or is a super user,
-            # then try set up their Microsoft account permissions.
-            set_up_coordinator(user)
+    # Convert the incoming pk_set into group names for the event payload.
+    pk_set = kwargs.get("pk_set")
+    if pk_set is None:
+        return
 
-    elif action == POST_REMOVE:
-        # We've removed these groups from the user.
-        is_still_coordinator_or_better = user.groups.filter(
-            name__in=COORDINATOR_GROUPS
-        ).exists()
-        if (not user.is_active) or (not is_still_coordinator_or_better):
-            # If the user is not coordinator and is not a super user,
-            # then try tear down their Microsoft account permissions.
-            tear_down_coordinator(user)
+    # Clear cached role to ensure it is recalculated based on current groups.
+    user.clear_role()
 
-        is_paralegal_or_better = user.groups.filter(name__in=CaseGroups.GROUPS).exists()
-        if (not user.is_active) or (not is_paralegal_or_better):
-            # If the user is not a paralegal or better then tear down
-            # their Microsoft account permissions for every case they are assigned to.
-            issues = Issue.objects.filter(paralegal=user)
-            for issue in issues:
-                remove_user_from_case(user, issue)
+    # Emit appropriate events based on the action.
+    if action == "post_add":
+        for group in Group.objects.filter(pk__in=pk_set):
+            events.user_added_to_group.send(
+                sender=User,
+                user=user,
+                group=group,
+            )
+    elif action == "post_remove":
+        for group in Group.objects.filter(pk__in=pk_set):
+            events.user_removed_from_group.send(
+                sender=User,
+                user=user,
+                group=group,
+            )

@@ -6,10 +6,10 @@ from microsoft.service import (
     add_user_to_case,
     get_case_folder_info,
     remove_user_from_case,
-    set_up_coordinator,
+    add_group_member,
     set_up_new_case,
     set_up_new_user,
-    tear_down_coordinator,
+    remove_group_member,
 )
 from microsoft.storage import MSGraphStorage
 
@@ -183,7 +183,7 @@ def test_set_up_coordinator_A(mock_api):
     user = UserFactory()
     mock_api.group.members.return_value = [user.email]
 
-    set_up_coordinator(user)
+    add_group_member(user)
 
     mock_api.group.members.assert_called_once()
     mock_api.group.add_user.assert_not_called()
@@ -195,7 +195,7 @@ def test_set_up_coordinator_B(mock_api):
     user = UserFactory()
     mock_api.group.members.return_value = []
 
-    set_up_coordinator(user)
+    add_group_member(user)
 
     mock_api.group.members.assert_called_once()
     mock_api.group.add_user.assert_called_once_with(user.email)
@@ -208,7 +208,7 @@ def test_tear_down_coordinator_A(mock_api):
     mock_api.group.members.return_value = [user.email]
     mock_api.user.get.return_value = {"id": user.id}
 
-    tear_down_coordinator(user)
+    remove_group_member(user)
 
     mock_api.group.members.assert_called_once()
     mock_api.user.get.assert_called_once_with(user.email)
@@ -221,7 +221,7 @@ def test_tear_down_coordinator_B(mock_api):
     user = UserFactory()
     mock_api.group.members.return_value = []
 
-    tear_down_coordinator(user)
+    remove_group_member(user)
 
     mock_api.group.members.assert_called_once()
     mock_api.user.get.assert_not_called()

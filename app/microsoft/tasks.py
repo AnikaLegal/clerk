@@ -1,70 +1,61 @@
 import logging
 
-from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth.models import Group
-
-from utils.sentry import sentry_task
+from accounts import events
+from accounts.models import CaseGroups, User
 from core.models import Issue
-from accounts.models import User, CaseGroups
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.db.models import Q
+from django.utils import timezone
 from emails.service.send import send_email
+from utils.sentry import sentry_task
+
 from .service import (
     set_up_new_case,
     set_up_new_user,
-    add_user_to_case,
-    set_up_coordinator,
 )
-
 
 logger = logging.getLogger(__name__)
 
 
-def refresh_ms_permissions(user):
-    """
-    Ensure all users who should have MS accounts get those accounts with correct permissions.
-    """
-    logger.info(
-        "Refreshing MS account creation for User<%s:%s>",
-        user.pk,
-        user.get_full_name(),
-    )
+def reset_ms_access(user):
+    if not user.is_active:
+        logger.info("Skipping as User<%s> is inactive", user.pk)
+        return
+
     _invite_user_if_not_exists(user)
 
     fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-    is_ms_account_set_up = user.ms_account_created_at and (
+    is_account_too_new = user.ms_account_created_at and (
         user.ms_account_created_at < fifteen_minutes_ago
     )
-    if not is_ms_account_set_up:
-        logger.info(
-            "Halting MS permission refresh for User<%s:%s> - account too new.",
-            user.pk,
-            user.get_full_name(),
-        )
+    if not is_account_too_new:
+        logger.info("Skipping as User<%s> account is too new", user.pk)
         return
 
-    is_coordinator_or_better = (
-        user.is_superuser
-        or user.groups.filter(
-            name__in=[CaseGroups.COORDINATOR, CaseGroups.ADMIN]
-        ).exists()
-    )
-    is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-    if is_coordinator_or_better:
-        set_up_coordinator(user)
-    elif is_paralegal:
-        sharepoint_issues = (
-            user.issue_set.select_related("paralegal")
-            .filter(is_sharepoint_set_up=True, created_at__year__gte=2022)
-            .all()
+    for group in user.groups.all():
+        logger.info(
+            "Sending event for User<%s> added to Group<%s>", user.pk, group.name
         )
-        for issue in sharepoint_issues:
-            logger.info(
-                "Refreshing Sharepoint access for User<%s:%s> + Issue<%s>",
-                issue.paralegal.pk,
-                issue.paralegal.get_full_name(),
-                issue.pk,
-            )
-            add_user_to_case(issue.paralegal, issue)
+        events.user_added_to_group.send(
+            sender=User,
+            user=user,
+            group=group,
+        )
+
+    # NOTE: Not sure why 2022 used below. Maybe that was when Sharepoint was
+    # introduced?
+    for issue in Issue.objects.filter(
+        Q(paralegal=user) | Q(lawyer=user),
+        is_sharepoint_set_up=True,
+        created_at__year__gte=2022,
+    ).all():
+        logger.info("Sending event for User<%s> added to Case <%s>", user.pk, issue.pk)
+        events.user_added_to_case.send(
+            sender=User,
+            user=user,
+            issue=issue,
+        )
 
 
 @sentry_task

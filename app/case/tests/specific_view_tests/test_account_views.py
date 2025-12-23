@@ -69,10 +69,10 @@ def test_get_account_permissions_view(
 
 
 @pytest.mark.django_db
-@patch("case.views.accounts.refresh_ms_permissions")
+@patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_resync_account_permissions_view(
-    mock_get_user_permissions, mock_refresh_ms_permissions, superuser_client: APIClient
+    mock_get_user_permissions, mock_reset_ms_access, superuser_client: APIClient
 ):
     user = UserFactory()
     url = reverse("account-api-perms-resync", args=(user.pk,))
@@ -83,7 +83,7 @@ def test_resync_account_permissions_view(
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
-    mock_refresh_ms_permissions.assert_called_with(user)
+    mock_reset_ms_access.assert_called_with(user)
     resp_data = response.json()
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {
@@ -94,11 +94,11 @@ def test_resync_account_permissions_view(
 
 
 @pytest.mark.django_db
-@patch("case.views.accounts.refresh_ms_permissions")
+@patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_promote_account_permissions_view__as_paralegal(
     mock_get_user_permissions,
-    mock_refresh_ms_permissions,
+    mock_reset_ms_access,
     superuser_client: APIClient,
     paralegal_group,
     coordinator_group,
@@ -113,7 +113,7 @@ def test_promote_account_permissions_view__as_paralegal(
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
-    mock_refresh_ms_permissions.assert_not_called()
+    mock_reset_ms_access.assert_not_called()
     resp_data = response.json()
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {
@@ -125,11 +125,11 @@ def test_promote_account_permissions_view__as_paralegal(
 
 
 @pytest.mark.django_db
-@patch("case.views.accounts.refresh_ms_permissions")
+@patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_promote_account_permissions_view__with_no_group(
     mock_get_user_permissions,
-    mock_refresh_ms_permissions,
+    mock_reset_ms_access,
     superuser_client: APIClient,
     paralegal_group,
 ):
@@ -143,7 +143,7 @@ def test_promote_account_permissions_view__with_no_group(
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
-    mock_refresh_ms_permissions.assert_called_with(user)
+    mock_reset_ms_access.assert_called_with(user)
     resp_data = response.json()
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {
@@ -155,11 +155,11 @@ def test_promote_account_permissions_view__with_no_group(
 
 
 @pytest.mark.django_db
-@patch("case.views.accounts.refresh_ms_permissions")
+@patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_demote_account_permissions_view__as_paralegal(
     mock_get_user_permissions,
-    mock_refresh_ms_permissions,
+    mock_reset_ms_access,
     superuser_client: APIClient,
     paralegal_group,
 ):
@@ -173,7 +173,7 @@ def test_demote_account_permissions_view__as_paralegal(
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
-    mock_refresh_ms_permissions.assert_not_called()
+    mock_reset_ms_access.assert_not_called()
     resp_data = response.json()
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {
@@ -185,11 +185,11 @@ def test_demote_account_permissions_view__as_paralegal(
 
 
 @pytest.mark.django_db
-@patch("case.views.accounts.refresh_ms_permissions")
+@patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_demote_account_permissions_view__as_coordinator(
     mock_get_user_permissions,
-    mock_refresh_ms_permissions,
+    mock_reset_ms_access,
     superuser_client: APIClient,
     paralegal_group,
     coordinator_group,
@@ -204,7 +204,7 @@ def test_demote_account_permissions_view__as_coordinator(
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
-    mock_refresh_ms_permissions.assert_not_called()
+    mock_reset_ms_access.assert_not_called()
     resp_data = response.json()
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {

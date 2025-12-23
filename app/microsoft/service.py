@@ -6,6 +6,7 @@ from typing import Tuple
 from accounts.models import User
 from core.models import DocumentTemplate, FileUpload, Issue
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
@@ -35,9 +36,7 @@ def get_user_permissions(user):
         owners = api.group.owners()
         has_coordinator_perms = user.email in members or user.email in owners
 
-        # NOTE: when we add lawyer permissions, we will need to check those here
-        # too.
-        for issue in Issue.objects.filter(paralegal=user):
+        for issue in Issue.objects.filter(Q(paralegal=user) | Q(lawyer=user)).all():
             case_path = f"cases/{issue.id}"
             has_access = False
 
@@ -263,7 +262,7 @@ def get_case_folder_info(issue):
     return list_files, folder_url
 
 
-def set_up_coordinator(user):
+def add_group_member(user):
     """
     Add User as Group member.
     """
@@ -273,7 +272,7 @@ def set_up_coordinator(user):
         api.group.add_user(user.email)
 
 
-def tear_down_coordinator(user):
+def remove_group_member(user):
     """
     Remove User as Group member.
     """

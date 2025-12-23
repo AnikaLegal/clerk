@@ -1,6 +1,4 @@
-from re import I
 import pytest
-from unittest import mock
 
 from emails.service import ingest_email_task
 

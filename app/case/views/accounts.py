@@ -1,35 +1,37 @@
 import logging
 from typing import Optional
 
-from django.http import Http404
+from accounts.models import CaseGroups, User
 from django.contrib.auth.models import Group
-from django.db.models import QuerySet, Q
-from rest_framework.decorators import api_view, action
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, ListModelMixin
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q, QuerySet
+from django.http import Http404
 from django.urls import reverse
 from django_q.tasks import async_task
-from django.core.exceptions import PermissionDenied
-
-from accounts.models import User, CaseGroups
-from case.utils.react import render_react_page
-from accounts.models import User
-from case.views.auth import (
-    paralegal_or_better_required,
-    coordinator_or_better_required,
-    CoordinatorOrBetterPermission,
+from microsoft.service import get_user_permissions
+from microsoft.tasks import (
+    reset_ms_access,
+    set_up_new_user_task,
 )
+from rest_framework.decorators import action, api_view
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
 from case.serializers import (
     AccountSearchSerializer,
     AccountSortSerializer,
-    UserSerializer,
-    UserCreateSerializer,
-    IssueSerializer,
     IssueNoteSerializer,
+    IssueSerializer,
+    UserCreateSerializer,
+    UserSerializer,
 )
-from microsoft.service import get_user_permissions
-from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from case.utils.react import render_react_page
+from case.views.auth import (
+    CoordinatorOrBetterPermission,
+    coordinator_or_better_required,
+    paralegal_or_better_required,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -98,9 +100,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def sort_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
-        serializer = AccountSortSerializer(
-            data=self.request.query_params, partial=True
-        )
+        serializer = AccountSortSerializer(data=self.request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         sort = serializer.validated_data.get("sort", ["-date_joined"])
         return queryset.order_by(*sort)
@@ -168,7 +168,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         except User.DoesNotExist:
             raise Http404()
 
-        refresh_ms_permissions(user)
+        reset_ms_access(user)
         perms_data = _load_ms_permissions(user)
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
@@ -196,7 +196,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         else:
             group = Group.objects.get(name=CaseGroups.PARALEGAL)
             user.groups.add(group)
-            refresh_ms_permissions(user)
+            reset_ms_access(user)
 
         perms_data = _load_ms_permissions(user)
         return Response(
