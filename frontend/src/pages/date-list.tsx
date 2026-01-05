@@ -13,6 +13,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useDebouncedCallback } from '@mantine/hooks'
+import { IconSearch } from '@tabler/icons-react'
 import api, { GetCaseDatesApiArg, IssueDate } from 'api'
 import { CASE_DATE_TYPES } from 'consts'
 import {
@@ -151,7 +152,7 @@ const TextInputFilter = ({
       onChange={(event) =>
         debouncedFilterChange(name, event.currentTarget.value)
       }
-      rightSection={isLoading ? <Loader size="sm" /> : null}
+      rightSection={isLoading ? <Loader size="sm" /> : <IconSearch size={16} />}
       {...props}
     />
   )
