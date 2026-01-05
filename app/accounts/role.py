@@ -73,6 +73,8 @@ class UserRole:
 
     def reset(self):
         self._groups = set()
+        self._set_no_role()
+
         if self._user:
             # NOTE: Use all() to make sure we hit the "groups" prefetch_related
             # cache if it is specified.
@@ -160,3 +162,14 @@ class UserRole:
         self.is_coordinator_or_better = False
         self.is_lawyer_or_better = False
         self.is_paralegal_or_better = True
+
+    def _set_no_role(self):
+        self.is_admin = False
+        self.is_coordinator = False
+        self.is_lawyer = False
+        self.is_paralegal = False
+
+        self.is_admin_or_better = False
+        self.is_coordinator_or_better = False
+        self.is_lawyer_or_better = False
+        self.is_paralegal_or_better = False
