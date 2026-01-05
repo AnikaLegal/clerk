@@ -29,14 +29,12 @@ def reset_ms_access(user):
     is_account_too_new = user.ms_account_created_at and (
         user.ms_account_created_at < fifteen_minutes_ago
     )
-    if not is_account_too_new:
+    if is_account_too_new:
         logger.info("Skipping as User<%s> account is too new", user.pk)
         return
 
     for group in user.groups.all():
-        logger.info(
-            "Sending event for User<%s> added to Group<%s>", user.pk, group.name
-        )
+        logger.info("Sending event for User<%s> added to Group<%s>", user.pk, group.pk)
         events.user_added_to_group.send(
             sender=User,
             user=user,
@@ -50,7 +48,7 @@ def reset_ms_access(user):
         is_sharepoint_set_up=True,
         created_at__year__gte=2022,
     ).all():
-        logger.info("Sending event for User<%s> added to Case <%s>", user.pk, issue.pk)
+        logger.info("Sending event for User<%s> added to Case<%s>", user.pk, issue.pk)
         events.user_added_to_case.send(
             sender=User,
             user=user,
