@@ -36,7 +36,6 @@ def m2m_changed_user_groups(sender, instance, action, **kwargs):
     if not user.is_active:
         return
 
-    # Convert the incoming pk_set into group names for the event payload.
     pk_set = kwargs.get("pk_set")
     if pk_set is None:
         return
