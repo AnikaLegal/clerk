@@ -44,15 +44,16 @@ def m2m_changed_user_groups(sender, instance, action, **kwargs):
     user.clear_role()
 
     # Emit appropriate events based on the action.
+    queryset = Group.objects.filter(pk__in=pk_set)
     if action == "post_add":
-        for group in Group.objects.filter(pk__in=pk_set):
+        for group in queryset:
             events.user_added_to_group.send(
                 sender=User,
                 user=user,
                 group=group,
             )
     elif action == "post_remove":
-        for group in Group.objects.filter(pk__in=pk_set):
+        for group in queryset:
             events.user_removed_from_group.send(
                 sender=User,
                 user=user,
