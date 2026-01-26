@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils import timezone
 from microsoft.service import set_up_new_user
 
 User = get_user_model()
