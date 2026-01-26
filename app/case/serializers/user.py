@@ -12,7 +12,7 @@ from .fields import LocalDateField
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "username", "url")
+        fields = ("first_name", "last_name", "email", "url")
 
     url = serializers.SerializerMethodField()
 
@@ -21,14 +21,12 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value: str):
         if not value.endswith("@anikalegal.com"):
-            raise ValidationError("Can only invite users with an anikalegal.com email.")
-
+            raise ValidationError("Can only invite users with an anikalegal.com email")
         return value
 
-    def validate(self, attrs):
-        if attrs["email"] != attrs["username"]:
-            raise ValidationError("Username must be the same as email.")
-        return attrs
+    def create(self, validated_data):
+        validated_data["username"] = validated_data.get("email")
+        return super().create(validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,7 +37,6 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "username",
             "case_capacity",
             "is_intern",
             "is_active",

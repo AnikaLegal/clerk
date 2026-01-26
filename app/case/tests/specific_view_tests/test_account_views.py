@@ -20,11 +20,10 @@ def test_create_account_view(
         "first_name": "Jane",
         "last_name": "Doe",
         "email": "jane.doe@anikalegal.com",
-        "username": "jane.doe@anikalegal.com",
     }
     response = superuser_client.post(url, data, format="json")
     assert response.status_code == 201, response.json()
-    assert response.json()["username"] == "jane.doe@anikalegal.com"
+    assert response.json()["email"] == "jane.doe@anikalegal.com"
     assert User.objects.count() == 2
     user = User.objects.get(email="jane.doe@anikalegal.com")
     mock_invite_user_if_not_exists.assert_called_with(user)
@@ -40,7 +39,6 @@ def test_create_account_view__with_external_email(superuser_client: APIClient):
         "first_name": "Jane",
         "last_name": "Doe",
         "email": "jane.doe@gmail.com",
-        "username": "jane.doe@gmail.com",
     }
     response = superuser_client.post(url, data, format="json")
     assert response.status_code == 400, response.json()

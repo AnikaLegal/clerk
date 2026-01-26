@@ -7,11 +7,7 @@ properties:
   email:
     type: string
     format: email
-  username:
-    type: string
-    format: email
 required:
   - first_name
   - last_name
   - email
-  - username
