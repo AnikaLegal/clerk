@@ -123,30 +123,53 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/denis.png",
-        "name": "Denis Nelthorpe AM",
+        "image": "web/img/photos/board/simon-goodrich.png",
+        "name": "Simon Goodrich",
         "title": "Board Member",
         "brags": [
-            """Denis joined the Board of Anika Legal in June 2021 and is the
-            organisation’s Chair. He brings a wealth of experience from over 40
-            years in the legal assistance sector including as the CEO of
-            WEstjustice and other leadership roles. He is currently also the
-            Chair of Southside Justice and the Deputy Chair of the National
-            Consumer Advisory Committee at the Insurance Council of
-            Australia.""",
+            """Simon is a leader in social innovation and access to justice with
+            over 25 years of experience blending design, technology, and systems
+            thinking to create social impact. As a Co-Founder and Director of
+            Portable, innovation partners for public good, he has led the
+            development of transformative digital tools for the justice sector,
+            including the internationally recognised family law platform
+            amica.gov.au. Simon has collaborated with Legal Aid Commissions and
+            community legal centres nationwide to secure over $10 million in
+            funding for access to justice initiatives. His extensive history
+            leadership and expertise in digital transformation supports Anika
+            Legal’s mission to scale innovative, tech-driven legal solutions for
+            access to justice."""
         ],
     },
     {
-        "image": "web/img/photos/board/david-mandel.png",
-        "name": "David Mandel",
+        "image": "web/img/photos/board/agata.png",
+        "name": "Agata Weirzbowski",
         "title": "Board Member",
         "brags": [
-            """David is a non-executive director for both ASX listed and
-            not-for-profit organisations with a portfolio across the healthcare,
-            technology, e-commerce and sport sectors. With a total of 15 years
-            NED experience, David makes valuable contributions to Anika both in
-            terms of commercial acumen, vision and to the cultural aspirations
-            of the organisation.""",
+            """Agata is an experienced leader in service design, policy analysis,
+            and advocacy, with a strong commitment to supporting people
+            experiencing disadvantage. As a Principal Adviser at the Victorian
+            Legal Services Board and Commissioner, she brings deep expertise in
+            shaping legal policy and practice, alongside executive leadership
+            experience at Tenants Victoria and Southside Justice. Her wealth of
+            experience strengthens Anika Legal’s mission to create a fairer
+            housing system for renters.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/board/tricia-ciampa.png",
+        "name": "Tricia Ciampa",
+        "title": "Board Member",
+        "brags": [
+            """Tricia is a strategic executive leader with over two decades of
+            experience driving innovation and social equity across the community
+            sector. As the Executive Officer at Women and Mentoring (WAM), she
+            has strengthened governance frameworks and led evidence-based
+            justice reforms. Tricia has successfully scaled community programs
+            and secured multi-year government funding to support sustainable
+            organisational growth. Her expertise in not-for-profit leadership
+            and systemic advocacy supports Anika Legal to scale its impact in
+            service of a world where everyone can access justice."""
         ],
     },
     {
@@ -163,18 +186,23 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/agata.png",
-        "name": "Agata Weirzbowski",
-        "title": "Board Member",
+        "image": "web/img/photos/board/peter-dikranis.png",
+        "name": "Peter Dikranis",
+        "title": "Treasurer",
         "brags": [
-            """Agata is an experienced leader in service design, policy analysis,
-            and advocacy, with a strong commitment to supporting people
-            experiencing disadvantage. As a Principal Adviser at the Victorian
-            Legal Services Board and Commissioner, she brings deep expertise in
-            shaping legal policy and practice, alongside executive leadership
-            experience at Tenants Victoria and Southside Justice. Her wealth of
-            experience strengthens Anika Legal’s mission to create a fairer
-            housing system for renters.""",
+            """Peter is an experienced Finance Executive and Chartered Accountant
+            with a strong track record in financial management and governance
+            across the public and private sectors. He currently serves as a
+            Manager at the City of Melbourne and sits on the Victorian Regional
+            Council for Chartered Accountants Australia & New Zealand. Peter
+            brings over two decades of senior leadership experience from roles
+            at National Australia Bank, Telstra, and the Victorian Department of
+            Health.""",
+            """Dedicated to the community legal sector, Peter also serves as the
+            Treasurer and Board Member at Southside Justice. His expertise in
+            strategic business planning and financial stewardship ensures Anika
+            Legal maintains rigorous oversight of its resources to support
+            sustainable growth.""",
         ],
     },
     {
