@@ -109,6 +109,7 @@ BOARD = [
         "image": "web/img/photos/board/kim.png",
         "name": "Kim Shaw",
         "title": "Chair",
+        "linkedin": "https://www.linkedin.com/in/kimshaw1/",
         "brags": [
             """Kim is an experienced Board Director with strong governance, legal,
             risk, and strategic expertise. She also serves on the Board of the
@@ -126,25 +127,28 @@ BOARD = [
         "image": "web/img/photos/board/simon-goodrich.png",
         "name": "Simon Goodrich",
         "title": "Board Member",
+        "linkedin": "https://www.linkedin.com/in/simongoodrich/",
         "brags": [
             """Simon is a leader in social innovation and access to justice with
             over 25 years of experience blending design, technology, and systems
             thinking to create social impact. As a Co-Founder and Director of
-            Portable, innovation partners for public good, he has led the
-            development of transformative digital tools for the justice sector,
-            including the internationally recognised family law platform
-            amica.gov.au. Simon has collaborated with Legal Aid Commissions and
-            community legal centres nationwide to secure over $10 million in
-            funding for access to justice initiatives. His extensive history
-            leadership and expertise in digital transformation supports Anika
-            Legal’s mission to scale innovative, tech-driven legal solutions for
-            access to justice."""
+            <a href="https://portable.com.au">Portable</a>, innovation partners
+            for public good, he has led the development of transformative
+            digital tools for the justice sector, including the internationally
+            recognised family law platform <a
+            href="https://amica.gov.au">amica.gov.au</a>. Simon has collaborated
+            with Legal Aid Commissions and community legal centres nationwide to
+            secure over $10 million in funding for access to justice
+            initiatives. His extensive history of leadership and expertise in
+            digital transformation supports Anika Legal’s mission to scale
+            innovative, tech-driven legal solutions for access to justice."""
         ],
     },
     {
         "image": "web/img/photos/board/agata.png",
         "name": "Agata Weirzbowski",
         "title": "Board Member",
+        "linkedin": "https://www.linkedin.com/in/agata-wierzbowski-9964b0125/",
         "brags": [
             """Agata is an experienced leader in service design, policy analysis,
             and advocacy, with a strong commitment to supporting people
@@ -160,22 +164,26 @@ BOARD = [
         "image": "web/img/photos/board/tricia-ciampa.png",
         "name": "Tricia Ciampa",
         "title": "Board Member",
+        "linkedin": "https://www.linkedin.com/in/tricia-ciampa-b8338629/",
         "brags": [
             """Tricia is a strategic executive leader with over two decades of
             experience driving innovation and social equity across the community
-            sector. As the Executive Officer at Women and Mentoring (WAM), she
-            has strengthened governance frameworks and led evidence-based
-            justice reforms. Tricia has successfully scaled community programs
-            and secured multi-year government funding to support sustainable
-            organisational growth. Her expertise in not-for-profit leadership
-            and systemic advocacy supports Anika Legal to scale its impact in
-            service of a world where everyone can access justice."""
+            sector. As the Executive Officer at <a
+            href="https://womenandmentoring.org.au">Women and Mentoring
+            (WAM)</a>, she has strengthened governance frameworks and led
+            evidence-based justice reforms. Tricia has successfully scaled
+            community programs and secured multi-year government funding to
+            support sustainable organisational growth. Her expertise in
+            not-for-profit leadership and systemic advocacy supports Anika Legal
+            to scale its impact in service of a world where everyone can access
+            justice."""
         ],
     },
     {
         "image": "web/img/photos/board/jacinta.png",
         "name": "Jacinta Lewin",
         "title": "Board Member",
+        "linkedin": "https://www.linkedin.com/in/jacinta-lewin-0675a156/",
         "brags": [
             """Jacinta brings experience in governance, business, human rights
             and administrative law. She is a Principal Lawyer in Maurice
@@ -189,6 +197,7 @@ BOARD = [
         "image": "web/img/photos/board/peter-dikranis.png",
         "name": "Peter Dikranis",
         "title": "Treasurer",
+        "linkedin": "https://www.linkedin.com/in/peter-dikranis-fca-0961422/",
         "brags": [
             """Peter is an experienced Finance Executive and Chartered Accountant
             with a strong track record in financial management and governance
@@ -209,6 +218,7 @@ BOARD = [
         "image": "web/img/photos/board/maggie.png",
         "name": "Maggie Hill",
         "title": "Board Member",
+        "linkedin": "https://www.linkedin.com/in/maggie-hill-735bb452/",
         "brags": [
             """Maggie has fifteen years of specialist communications, marketing,
             and media experience, across varied sectors and issue complexity.
@@ -221,6 +231,7 @@ BOARD = [
         "image": "web/img/photos/team/noel.png",
         "name": "Noel Lim",
         "title": "Board Member & CEO",
+        "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
         "brags": [
             """Noel is the Chief Executive Officer and co-founder of Anika
             Legal, and has led the founding team to become an organisation of 62
@@ -238,6 +249,7 @@ ADVISORS = [
         "image": "web/img/photos/advisors/madeleine-dupuche.png",
         "name": "Madeleine Dupuche",
         "title": "Law School Work Integrated Learning Director at La Trobe University",
+        "linkedin": "https://www.linkedin.com/in/madeleine-dupuche-b2939a47/",
         "brags": [
             """Madeleine is an experienced strategy and education leader whose
             purpose and career have centred on supporting the creation of a
@@ -252,6 +264,7 @@ ADVISORS = [
         "image": "web/img/photos/advisors/gary-adler.png",
         "name": "Gary Adler",
         "title": "Chief Digital Officer at MinterEllison",
+        "linkedin": "https://www.linkedin.com/in/gadler/",
         "brags": [
             """Gary is an experienced Chief Information and Digital Officer
             skilled in digital transformation, leveraging generative AI and
@@ -267,9 +280,10 @@ ADVISORS = [
     },
     {
         "image": "web/img/photos/advisors/helga-svendsen.png",
-        "name": "Helga Svendsen FAICD",
+        "name": "Helga Svendsen OAM",
         "title": """Host of Take on Board podcast, Leadership & Executive Coach &
         Non Executive Director""",
+        "linkedin": "https://www.linkedin.com/in/helgasvendsen/",
         "brags": [
             """Helga specialises in strategy and planning, governance and
             stakeholder engagement. Building on her extensive leadership roles
@@ -289,6 +303,7 @@ ADVISORS = [
         "image": "web/img/photos/advisors/brendan-lacota.png",
         "name": "Brendan Lacota",
         "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
+        "linkedin": "https://www.linkedin.com/in/brendan-lacota/",
         "brags": [
             """Brendan is a leader in designing innovative ways to provide
             community services. With over a decade's experience in both the
@@ -306,6 +321,7 @@ ADVISORS = [
         "name": "Alan Peckham",
         "title": """Head of Legal at Australian Institute of Company Directors
         and former Chief Administrative Officer at Herbert Smith Freehills""",
+        "linkedin": "https://www.linkedin.com/in/alanjpeckham/",
         "brags": [
             """Alan has spent over 25 years working in the legal sector as a
             practitioner and in a range of executive roles, most recently as
@@ -327,6 +343,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/noel.png",
         "name": "Noel Lim",
         "title": "Chief Executive Officer",
+        "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
         "brags": [
             """Noel drives the direction of our organisation and ensures that
             each portfolio is successfully managed.""",
@@ -337,6 +354,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/jacqui.png",
         "name": "Jacqui Siebel",
         "title": "Head of Operations",
+        "linkedin": "https://www.linkedin.com/in/jacqui-siebel-a4984337/",
         "brags": [
             """Jacqui leads Anika’s operations portfolio, keeping the engine of
             our legal practice running.""",
@@ -350,6 +368,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/dale.png",
         "name": "Dale Walker",
         "title": "Head of Partnerships & Fundraising",
+        "linkedin": "https://www.linkedin.com/in/dale-walker/",
         "brags": [
             """Dale leads our Partnerships & Fundraising function, ensuring that
             Anika can continue to grow sustainably.""",
@@ -365,6 +384,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/emily.png",
         "name": "Emily Southwell",
         "title": "Principal Lawyer",
+        "linkedin": "https://www.linkedin.com/in/emily-southwell-95459213a/",
         "brags": [
             """Emily is our Principal lawyer, and is responsible for developing
             and delivering the legal service we provide.""",
@@ -379,6 +399,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/luca.png",
         "name": "Luca Vari",
         "title": "Lead Software Developer",
+        "linkedin": "https://www.linkedin.com/in/luca-vari/",
         "brags": [
             """Luca leads the development and implementation of our tech
             strategy with responsibility for our tech portfolio, including
@@ -393,6 +414,7 @@ TEAM_MEMBERS = [
         "image": "web/img/photos/team/sharon.png",
         "name": "Sharon Tate",
         "title": "Lawyer",
+        "linkedin": "",
         "brags": [
             """Sharon's journey at Anika is a story of growth, passion, and
             making a real difference in the legal world. Starting out as a
