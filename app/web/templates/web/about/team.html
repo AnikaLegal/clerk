@@ -1,120 +1,115 @@
-{% extends "web/_base.html" %} 
+{% extends 'web/_base.html' %}
 {% load static %}
 {% load wagtail_clerk %}
-{% block title %}Our Team{% endblock %} 
+{% block title %}
+  Our Team
+{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="Our Team" description="Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice." %}            
+  {% include 'web/snippets/_social_meta.html' with title='Our Team' description='Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice.' %}
 {% endblock %}
 {% block content %}
-<div class="hero-story tall">
+  <div class="hero-story tall">
     <div class="inner">
-        <div class="content">
-            <h1>Meet our team</h1>
-            <p class="compact" style="max-width: 342px">
-                Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice. 
-            </p>
-        </div>
-        <img 
-            class="round top-left bottom-left" 
-            src="{% static 'web/img/photos/team-hero.jpg' %}"
-            style="object-position: 50% 0%;"
-        >
+      <div class="content">
+        <h1>Meet our team</h1>
+        <p class="compact" style="max-width: 342px">Our team is a mix of employees and volunteers united by a vision of a world where everyone can access justice.</p>
+      </div>
+      <img class="round top-left bottom-left" src="{% static 'web/img/photos/team-hero.jpg' %}" style="object-position: 50% 0%;" />
     </div>
-</div>
-<div class="segment">
+  </div>
+  <div class="segment">
     <div class="container wide">
-        <h2>Anika Legal’s Board</h2>
-        <div class="divider"></div>
-        <div class="card-grid tight">
-            {% for member in board %}
-                <div class="card profile blue round-small bottom-right  top-right">
-                    <img 
-                        class="round-small top-right bottom-left headshot"
-                        src="{% static member.image %}"
-                    >
-                    <div class="content">
-                        <p class="name">{{member.name}}</p>
-                        <p class="title">{{member.title}}</p>
-                        {% for brag in member.brags %}
-                            <p class="line-compact">{{ brag }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-
-    </div>
-</div>
-
-<div class="segment">
-    <div class="container">
-        <h2>Our Team</h2>
-        <div class="divider"></div>
-        <div class="card-grid tight">
-            {% for member in members %}
-                <div class="card profile blue round-small bottom-right top-right">
-                    <img class="round-small top-right bottom-left headshot" src="{% static member.image %}">
-                    <div class="content">
-                        <p class="name">{{member.name}}</p>
-                        <p class="title">{{member.title}}</p>
-                        {% for brag in member.brags %}
-                            <p class="line-compact">{{ brag }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-<div class="segment gold round-large top-right bottom-left">
-    <div class="container wide">
-        <h2>Our Advisory Council</h2>
-        <div class="divider"></div>
-        <div class="card-grid tight">
-            {% for member in advisors %}
-                <div class="card profile round-small bottom-right top-right">
-                    <img 
-                        class="round-small top-right bottom-left headshot"
-                        src="{% static member.image %}"
-                    >
-                    <div class="content">
-                        <p class="name">{{member.name}}</p>
-                        <p class="title">{{member.title}}</p>
-                        {% for brag in member.brags %}
-                            <p class="line-compact">{{ brag }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-
-    </div>
-</div>
-
-<div class="segment">
-    <div class="container wide">
-        <div class="story right">
-            <div class="blue-ball">
-                <img
-                style="object-position: 50% 20%;max-height: 465px;"
-                    class="round not-responsive top-left bottom-left bottom-right"
-                    src="{% static 'web/img/photos/volunteers.jpeg' %}"
-                >
-            </div>
+      <h2>Anika Legal’s Board</h2>
+      <div class="divider"></div>
+      <div class="card-grid tight">
+        {% for member in board %}
+          <div class="card profile blue round-small bottom-right top-right">
+            <img class="round-small top-right bottom-left headshot" src="{% static member.image %}" />
             <div class="content">
-                <h2>Our volunteers</h2>
-                <p class="light">
-                    Anika’s volunteers comprise 90% of our team. They assist with cases, build our partnerships, design our services, and do our marketing.
-                </p>
-                <p class="light">The dedication of our exceptional volunteers make Anika’s impact possible.</p>
-                <a href="{% clerk_slugurl 'jobs' %}">
-                    <button>
-                        Join the team
-                    </button>
-                </a>
+              <p class="name">
+                {% if member.linkedin %}
+                  <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer">{{ member.name }}</a>
+                {% else %}
+                  {{ member.name }}
+                {% endif %}
+              </p>
+              <p class="title">{{ member.title }}</p>
+              {% for brag in member.brags %}
+                <p class="line-compact">{{ brag|safe }}</p>
+              {% endfor %}
             </div>
-        </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-</div>
+  </div>
 
+  <div class="segment">
+    <div class="container">
+      <h2>Our Team</h2>
+      <div class="divider"></div>
+      <div class="card-grid tight">
+        {% for member in members %}
+          <div class="card profile blue round-small bottom-right top-right">
+            <img class="round-small top-right bottom-left headshot" src="{% static member.image %}" />
+            <div class="content">
+              <p class="name">
+                {% if member.linkedin %}
+                  <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer">{{ member.name }}</a>
+                {% else %}
+                  {{ member.name }}
+                {% endif %}
+              </p>
+              <p class="title">{{ member.title }}</p>
+              {% for brag in member.brags %}
+                <p class="line-compact">{{ brag }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="segment gold round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>Our Advisory Council</h2>
+      <div class="divider"></div>
+      <div class="card-grid tight">
+        {% for member in advisors %}
+          <div class="card profile round-small bottom-right top-right">
+            <img class="round-small top-right bottom-left headshot" src="{% static member.image %}" />
+            <div class="content">
+              <p class="name">
+                {% if member.linkedin %}
+                  <a href="{{ member.linkedin }}" target="_blank" rel="noopener noreferrer">{{ member.name }}</a>
+                {% else %}
+                  {{ member.name }}
+                {% endif %}
+              </p>
+              <p class="title">{{ member.title }}</p>
+              {% for brag in member.brags %}
+                <p class="line-compact">{{ brag }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <div class="story right">
+        <div class="blue-ball">
+          <img style="object-position: 50% 20%;max-height: 465px;" class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/photos/volunteers.jpeg' %}" />
+        </div>
+        <div class="content">
+          <h2>Our volunteers</h2>
+          <p class="light">Anika’s volunteers comprise 90% of our team. They assist with cases, build our partnerships, design our services, and do our marketing.</p>
+          <p class="light">The dedication of our exceptional volunteers make Anika’s impact possible.</p>
+          <a href="{% clerk_slugurl 'jobs' %}"><button>Join the team</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
