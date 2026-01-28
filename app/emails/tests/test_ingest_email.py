@@ -8,6 +8,13 @@ from emails.service import ingest_email_task
 SUCCESS_TEST_CASES = [
     # Single recipient.
     {
+        "received_data": {
+            "from": "Example From <from@example.com>",
+            "to": "case.0e62ccc2@fake.anikalegal.com",
+            "subject": "Hello World 1",
+            "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
+        },
         "expected_parsed": {
             "from_address": "from@example.com",
             "to_address": "case.0e62ccc2@fake.anikalegal.com",
@@ -15,48 +22,41 @@ SUCCESS_TEST_CASES = [
             "subject": "Hello World 1",
             "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
         },
-        "received_data": {
-            "to": "case.0e62ccc2@fake.anikalegal.com",
-            "from": "Example From <from@example.com>",
-            "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
-            "subject": "Hello World 1",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
-        },
     },
     # Multiple recipients and cc addresses.
     {
+        "received_data": {
+            "from": "From Example <from@example.com>",
+            "to": "case.0e62ccc2@fake.anikalegal.com, Example To <to@example.com>",
+            "cc": "CC1 <cc_1@example.com>",
+            "subject": "Hello World 2",
+            "text": "Elinor’s heart, which had undergone many changes in the course of this",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
+        },
         "expected_parsed": {
             "from_address": "from@example.com",
             "to_address": "case.0e62ccc2@fake.anikalegal.com",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 2",
             "text": "Elinor’s heart, which had undergone many changes in the course of this",
-        },
-        "received_data": {
-            "cc": "CC1 <cc_1@example.com>",
-            "to": "case.0e62ccc2@fake.anikalegal.com, Example To <to@example.com>",
-            "from": "From Example <from@example.com>",
-            "text": "Elinor’s heart, which had undergone many changes in the course of this",
-            "subject": "Hello World 2",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
         },
     },
     # Multiple recipients and cc addresses, different ordering of addresses.
     {
+        "received_data": {
+            "from": "Example From <from@example.com>",
+            "to": "To Example <to@example.com>, case.0e62ccc2@fake.anikalegal.com",
+            "cc": "CC1 <cc_1@example.com>",
+            "subject": "Hello World 3",
+            "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
+            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
+        },
         "expected_parsed": {
             "from_address": "from@example.com",
             "to_address": "case.0e62ccc2@fake.anikalegal.com",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 3",
             "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
-        },
-        "received_data": {
-            "cc": "CC1 <cc_1@example.com>",
-            "to": "To Example <to@example.com>, case.0e62ccc2@fake.anikalegal.com",
-            "from": "Example From <from@example.com>",
-            "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
-            "subject": "Hello World 3",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.com"],"from":"from@example.com"}',
         },
     },
 ]
