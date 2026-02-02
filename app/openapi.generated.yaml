@@ -1100,6 +1100,30 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/account/potential:
+    get:
+      operationId: getPotentialUsers
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                  required:
+                    - email
+                    - first_name
+                    - last_name
   /clerk/api/account/{id}/:
     patch:
       operationId: updateUser
