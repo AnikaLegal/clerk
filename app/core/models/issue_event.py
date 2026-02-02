@@ -40,10 +40,10 @@ class IssueEvent(TimestampedModel):
     prev_stage = models.CharField(max_length=32, null=True, blank=True)
     next_stage = models.CharField(max_length=32, null=True, blank=True)
     prev_user = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        User, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
     )
     next_user = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        User, null=True, blank=True, on_delete=models.PROTECT, related_name="+"
     )
 
     # The case that this event is for

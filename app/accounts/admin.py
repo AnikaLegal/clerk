@@ -27,6 +27,7 @@ class UserAdmin(BaseUserAdmin):
         *BaseUserAdmin.list_display,
         "date_joined",
     )
+    ordering = ("-date_joined",)
 
     def invite(self, request, queryset):
         for user in queryset:
