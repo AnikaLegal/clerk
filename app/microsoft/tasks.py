@@ -73,10 +73,6 @@ def set_up_new_user_task(user_pk: int):
     logger.info("Setting up MS account for new User<%s>", user_pk)
     user = User.objects.get(pk=user_pk)
 
-    # Add user to paralegals group.
-    paralegal_group = Group.objects.get(name=CaseGroups.PARALEGAL)
-    user.groups.add(paralegal_group)
-
     _invite_user_if_not_exists(user)
     User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
     logger.info("Finished setting up MS account for new User<%s>", user_pk)

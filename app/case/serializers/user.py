@@ -1,11 +1,12 @@
-from rest_framework import serializers
+from accounts.models import CaseGroups, User
+from django.contrib.auth.models import Group
+from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from case.middleware import annotate_group_access
-from accounts.models import User
 
 from .fields import LocalDateField
 
@@ -19,8 +20,11 @@ class PotentialUserSerializer(serializers.Serializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "url")
+        fields = ("first_name", "last_name", "email", "groups", "url")
 
+    groups = serializers.ListField(
+        child=serializers.CharField(), required=True, write_only=True
+    )
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
@@ -31,9 +35,34 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise ValidationError("Can only invite users with an anikalegal.com email")
         return value
 
+    @transaction.atomic
     def create(self, validated_data):
         validated_data["username"] = validated_data.get("email")
-        return super().create(validated_data)
+
+        groups = validated_data.pop("groups", [])
+        user = super().create(validated_data)
+
+        # Validate and assign groups
+        group_set = set(groups)
+        groups_qs = Group.objects.filter(name__in=groups)
+
+        if len(groups) != groups_qs.count():
+            found_names = set(g.name for g in groups_qs)
+            unknown = group_set.difference(found_names)
+            raise ValidationError(
+                {"groups": "Unknown group(s): %s" % ", ".join(unknown)}
+            )
+
+        case_group_set = set(CaseGroups.values)
+        if not group_set.issubset(case_group_set):
+            invalid = group_set.difference(case_group_set)
+            raise ValidationError(
+                {"groups": "Invalid group(s): %s" % ", ".join(invalid)}
+            )
+
+        user.groups.set(groups_qs)
+
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -133,13 +133,10 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Invite a paralegal to join the platform"""
+        """Create a new user account and set up their Microsoft access asynchronously."""
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data["email"]
-        user = User.objects.filter(email=email).last()
-        if not user:
-            user = serializer.save()
+        user = serializer.save()
 
         async_task(set_up_new_user_task, user.pk)
         return Response(serializer.data, status=201)

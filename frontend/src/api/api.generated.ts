@@ -306,6 +306,12 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.userCreate,
       }),
     }),
+    getPotentialUsers: build.query<
+      GetPotentialUsersApiResponse,
+      GetPotentialUsersApiArg
+    >({
+      query: () => ({ url: `/clerk/api/account/potential` }),
+    }),
     updateUser: build.mutation<UpdateUserApiResponse, UpdateUserApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/account/${queryArg.id}/`,
@@ -807,6 +813,13 @@ export type CreateUserApiResponse = /** status 201 Successful response. */ User;
 export type CreateUserApiArg = {
   userCreate: UserCreate;
 };
+export type GetPotentialUsersApiResponse =
+  /** status 200 Successful response. */ {
+    email: string;
+    first_name: string;
+    last_name: string;
+  }[];
+export type GetPotentialUsersApiArg = void;
 export type UpdateUserApiResponse = /** status 200 Successful response. */ User;
 export type UpdateUserApiArg = {
   /** Entity ID */
@@ -1089,6 +1102,7 @@ export type UserCreate = {
   first_name: string;
   last_name: string;
   email: string;
+  groups: string[];
 };
 export type User = UserCreate & {
   id: number;
@@ -1477,6 +1491,7 @@ export const {
   useUpdateClientMutation,
   useGetUsersQuery,
   useCreateUserMutation,
+  useGetPotentialUsersQuery,
   useUpdateUserMutation,
   useGetUserAccountPermissionsQuery,
   useResyncUserAccountPermissionsMutation,
