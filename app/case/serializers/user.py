@@ -1,12 +1,19 @@
 from rest_framework import serializers
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from case.middleware import annotate_group_access
 from accounts.models import User
 
 from .fields import LocalDateField
+
+
+class PotentialUserSerializer(serializers.Serializer):
+    email = serializers.CharField(source="primaryEmail")
+    first_name = serializers.CharField(source="name.givenName")
+    last_name = serializers.CharField(source="name.familyName")
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

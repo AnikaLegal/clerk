@@ -24,6 +24,7 @@ from case.serializers import (
     AccountSortSerializer,
     IssueNoteSerializer,
     IssueSerializer,
+    PotentialUserSerializer,
     UserCreateSerializer,
     UserSerializer,
 )
@@ -246,21 +247,23 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     )
     def account_list_potential_users(self, request):
         # Fetch active users from Google Directory.
-        active_users_emails = set(
-            [
-                user["primaryEmail"]
-                for user in list_directory_users(
-                    subject_email=request.user.email,
-                )
-                if user.get("suspended") is False
-            ]
-        )
+        active_users = [
+            user
+            for user in list_directory_users(
+                subject_email=request.user.email,
+            )
+            if user.get("suspended") is False
+        ]
 
         # Exclude users that are already in the system.
         existing_emails = set(self.get_queryset().values_list("email", flat=True))
-        potential_users = active_users_emails.difference(existing_emails)
+        potential_users = [
+            user for user in active_users if user["primaryEmail"] not in existing_emails
+        ]
+        potential_users.sort(key=lambda u: u["primaryEmail"])
 
-        return Response(sorted(potential_users))
+        serializer = PotentialUserSerializer(potential_users, many=True)
+        return Response(serializer.data)
 
 
 def _load_ms_permissions(user) -> Optional[dict]:

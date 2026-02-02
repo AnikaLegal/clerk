@@ -8,4 +8,16 @@ get:
           schema:
             type: array
             items:
-              type: string
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+              required:
+                - email
+                - first_name
+                - last_name
