@@ -8,6 +8,7 @@ from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
 from django_q.tasks import async_task
+from google.service import list_directory_users
 from microsoft.service import get_user_permissions
 from microsoft.tasks import (
     reset_ms_access,
@@ -28,6 +29,7 @@ from case.serializers import (
 )
 from case.utils.react import render_react_page
 from case.views.auth import (
+    AdminOrBetterPermission,
     CoordinatorOrBetterPermission,
     coordinator_or_better_required,
     paralegal_or_better_required,
@@ -234,6 +236,31 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
         )
+
+    @action(
+        detail=False,
+        methods=["GET"],
+        url_path="potential",
+        url_name="potential",
+        permission_classes=[AdminOrBetterPermission],
+    )
+    def account_list_potential_users(self, request):
+        # Fetch active users from Google Directory.
+        active_users_emails = set(
+            [
+                user["primaryEmail"]
+                for user in list_directory_users(
+                    subject_email=request.user.email,
+                )
+                if user.get("suspended") is False
+            ]
+        )
+
+        # Exclude users that are already in the system.
+        existing_emails = set(self.get_queryset().values_list("email", flat=True))
+        potential_users = active_users_emails.difference(existing_emails)
+
+        return Response(sorted(potential_users))
 
 
 def _load_ms_permissions(user) -> Optional[dict]:

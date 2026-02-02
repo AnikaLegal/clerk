@@ -1,0 +1,11 @@
+get:
+  operationId: getPotentialUsers
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string

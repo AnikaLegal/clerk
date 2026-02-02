@@ -58,6 +58,8 @@ paths:
 
   /clerk/api/account/:
     $ref: paths/account-list.yaml
+  /clerk/api/account/potential:
+    $ref: paths/account-potential-list.yaml
   /clerk/api/account/{id}/:
     $ref: paths/account-detail.yaml
   /clerk/api/account/{id}/perms/:

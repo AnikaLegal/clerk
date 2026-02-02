@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
     "emails.apps.EmailsConfig",
+    "google.apps.GoogleConfig",
     "microsoft.apps.MicrosoftConfig",
     "notify.apps.NotifyConfig",
     "intake.apps.IntakeConfig",
@@ -180,6 +181,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+
+# Google Service Account
+GOOGLE_SERVICE_ACCOUNT_EMAIL = os.environ.get("GOOGLE_SERVICE_ACCOUNT_EMAIL")
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY = os.environ.get(
+    "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+)
 
 
 # Google Recaptcha
