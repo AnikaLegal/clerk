@@ -245,11 +245,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
     def account_list_potential_users(self, request):
         # Fetch active users from Google Directory.
         active_users = [
-            user
-            for user in list_directory_users(
-                subject_email=request.user.email,
-            )
-            if user.get("suspended") is False
+            user for user in list_directory_users() if user.get("suspended") is False
         ]
 
         # Exclude users that are already in the system.

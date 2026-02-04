@@ -14,23 +14,20 @@ SERVICE_ACCOUNT_INFO = {
 }
 
 
-def _get_delegated_credentials(subject_email, scope_list):
+def _get_credentials(scope_list):
     return service_account.Credentials.from_service_account_info(
         SERVICE_ACCOUNT_INFO, scopes=scope_list
-    ).with_subject(subject_email)
+    )
 
 
-def list_directory_users(subject_email, order_by="email"):
-    credentials = _get_delegated_credentials(
-        subject_email=subject_email,
+def list_directory_users(order_by="email"):
+    credentials = _get_credentials(
         scope_list=["https://www.googleapis.com/auth/admin.directory.user.readonly"],
     )
 
     service = build("admin", "directory_v1", credentials=credentials)
-    domain = subject_email.split("@", 1)[1]
-
     # TODO: can we add caching here?
-    request = service.users().list(domain=domain, orderBy=order_by)
+    request = service.users().list(domain="anikalegal.com", orderBy=order_by)
 
     users = []
     while request is not None:
