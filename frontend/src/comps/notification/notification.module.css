@@ -1,0 +1,24 @@
+.root.root {
+  background-color: var(
+    --notification-color,
+    var(--mantine-primary-color-filled)
+  );
+  padding-inline-start: var(--mantine-spacing-xs);
+}
+
+.title.title {
+  color: var(--mantine-color-white);
+  font-weight: 600;
+}
+
+.description.description {
+  color: var(--mantine-color-white);
+}
+
+.closeButton.closeButton {
+  color: var(--mantine-color-white);
+
+  @mixin hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
