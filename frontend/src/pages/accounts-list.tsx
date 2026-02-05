@@ -53,7 +53,7 @@ const App = () => {
     <Container>
       <Header as="h1">Accounts</Header>
       <a href={CONTEXT.create_url}>
-        <Button primary>Invite a paralegal</Button>
+        <Button primary>Invite users</Button>
       </a>
       <div
         style={{

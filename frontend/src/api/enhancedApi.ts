@@ -3,10 +3,11 @@ import { generatedApi } from './api.generated'
 const ENTITY_TYPES = [
   'CASE',
   'CASE_DATE',
+  'CLIENT',
+  'DOCUMENT_TEMPLATE',
   'EMAIL',
   'SERVICE',
-  'DOCUMENT_TEMPLATE',
-  'CLIENT',
+  'POTENTIAL_USER',
 ] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
@@ -90,6 +91,12 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteCaseDate: {
       invalidatesTags: [{ type: 'CASE_DATE' }],
+    },
+    getPotentialUsers: {
+      providesTags: [{ type: 'POTENTIAL_USER' }],
+    },
+    createUser: {
+      invalidatesTags: [{ type: 'POTENTIAL_USER' }],
     },
   },
 })
