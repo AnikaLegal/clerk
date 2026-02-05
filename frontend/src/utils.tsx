@@ -1,5 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
+import { Notifications } from '@mantine/notifications'
 import { Error as ErrorType } from 'api'
 import { store } from 'api/store'
 import { ErrorBoundary } from 'comps/error-boundary'
@@ -12,15 +13,16 @@ import slackifyMarkdown from 'slackify-markdown'
 import styled from 'styled-components'
 import xss, { OnTagAttrHandler } from 'xss'
 
-import 'dayjs/locale/en-au'
 import { DatesProvider } from '@mantine/dates'
+import 'dayjs/locale/en-au'
 
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 import '@mantine/core/styles.css'
-import '@mantine/tiptap/styles.css'
 import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
+import '@mantine/tiptap/styles.css'
 
 dayjs.extend(customParseFormat)
 
@@ -88,6 +90,7 @@ export const mount = (App: React.ComponentType) => {
             <ModalsProvider>
               <ErrorBoundary>
                 <FadeInOnLoad>
+                  <Notifications limit={3} />
                   <App />
                 </FadeInOnLoad>
               </ErrorBoundary>
