@@ -26,11 +26,11 @@ def reset_ms_access(user):
     _invite_user_if_not_exists(user)
 
     fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)
-    is_account_too_new = user.ms_account_created_at and (
+    is_account_creation_finished = user.ms_account_created_at and (
         user.ms_account_created_at < fifteen_minutes_ago
     )
-    if is_account_too_new:
-        logger.info("Skipping as User<%s> account is too new", user.pk)
+    if not is_account_creation_finished:
+        logger.info("Skipping as User<%s> account is not created or too new", user.pk)
         return
 
     for group in user.groups.all():

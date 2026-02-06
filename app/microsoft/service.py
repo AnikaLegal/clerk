@@ -34,9 +34,21 @@ def get_user_permissions(user):
     if api.user.get(user.email):
         members = api.group.members()
         owners = api.group.owners()
+
+        # TODO: has_coordinator_perms is misnamed - it has nothing to do with
+        # coordinator perms, it's just whether the user is in the relevant
+        # group. We should rename it.
         has_coordinator_perms = user.email in members or user.email in owners
 
-        for issue in Issue.objects.filter(Q(paralegal=user) | Q(lawyer=user)).all():
+        queryset = (
+            Issue.objects.select_related(
+                "client", "tenancy__agent", "tenancy__landlord"
+            )
+            .prefetch_related("paralegal__groups", "lawyer__groups")
+            .filter(Q(paralegal=user) | Q(lawyer=user))
+            .all()
+        )
+        for issue in queryset:
             case_path = f"cases/{issue.id}"
             has_access = False
 
