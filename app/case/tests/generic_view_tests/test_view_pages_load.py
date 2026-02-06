@@ -26,8 +26,10 @@ PAGE_TEST_CASE = [
     PageTestCase(name="case-inbox", factory=factories.IssueFactory, is_detail=False),
     PageTestCase(name="case-detail", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="case-docs", factory=factories.IssueFactory, is_detail=True),
+    PageTestCase(name="case-date-list", factory=factories.IssueFactory, is_detail=True),
     PageTestCase(name="case-create", factory=None, is_detail=False),
     PageTestCase(name="case-services", factory=factories.IssueFactory, is_detail=True),
+    PageTestCase(name="date-list", factory=None, is_detail=False),
     PageTestCase(name="person-list", factory=factories.PersonFactory, is_detail=False),
     PageTestCase(
         name="person-create", factory=factories.PersonFactory, is_detail=False
