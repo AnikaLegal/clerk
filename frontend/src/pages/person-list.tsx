@@ -1,16 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Button,
+  Center,
   Container,
-  Header,
-  Table,
-  Input,
+  Grid,
   Loader,
-} from 'semantic-ui-react'
+  Pagination,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
+import { useDebouncedCallback } from '@mantine/hooks'
+import { IconSearch } from '@tabler/icons-react'
 import { useSnackbar } from 'notistack'
 
-import { mount, debounce, useEffectLazy, getAPIErrorMessage } from 'utils'
-import api, { useGetPeopleQuery } from 'api'
+import { mount, getAPIErrorMessage } from 'utils'
+import { useGetPeopleQuery } from 'api'
 
 import { FadeTransition } from 'comps/transitions'
 
@@ -20,72 +26,100 @@ interface DjangoContext {
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-const debouncer = debounce(300)
-
 const App = () => {
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
   const { enqueueSnackbar } = useSnackbar()
-  const listResults = useGetPeopleQuery()
-  const [searchQuery, searchResults] = api.useLazySearchPeopleQuery()
 
-  const isLoading = searchResults.isFetching || listResults.isFetching
-  const people = (query ? searchResults.data : listResults.data) || []
+  const debouncedSetQueryAndPage = useDebouncedCallback(
+    (value: string) => {
+      // Batch into single state update and render
+      setPage(1)
+      setQuery(value)
+    },
+    300 // Debounce delay in milliseconds
+  )
 
-  const search = debouncer(() => {
-    searchQuery({ query }).catch((err) => {
-      enqueueSnackbar(getAPIErrorMessage(err, 'Failed to search parties'), {
-        variant: 'error',
-      })
-    })
-  })
-  useEffectLazy(() => search(), [query])
+  const results = useGetPeopleQuery({ query: query || undefined, page })
+
+  useEffect(() => {
+    if (results.error) {
+      enqueueSnackbar(getAPIErrorMessage(results.error, 'Failed to load parties'), { variant: 'error' })
+    }
+  }, [results.error, enqueueSnackbar])
+
+  const isLoading = results.isFetching
+  const people = results.data?.results || []
+  const pageCount = results.data?.page_count || 1
+  const total = results.data?.item_count || 0
   return (
-    <Container>
-      <Header as="h1">Parties</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Add a party</Button>
-      </a>
-      <div style={{ margin: '1em 0' }}>
-        <Input
-          fluid
-          icon="search"
-          placeholder="Search by name, email, phone or address..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
-      <Loader active={listResults.isLoading} inline="centered">
-        Loading...
-      </Loader>
+    <Container size="xl">
+      <Title order={1}>Parties</Title>
+      {!isLoading && (<Text mt={4} color="dimmed">Showing {people.length} of {total} parties</Text>)}
+      <Button component="a" href={CONTEXT.create_url} size="md" mt="sm">
+        Add a party
+      </Button>
+      <Grid mt="lg">
+        <Grid.Col span={6}>
+          <TextInput
+            placeholder="Search by name, email, phone or address ..."
+            rightSection={<IconSearch size={16} stroke={4} />}
+            size="md"
+            onChange={(e) => {
+              debouncedSetQueryAndPage(e.target.value)
+            }}
+          />
+        </Grid.Col>
+      </Grid>
+
+      {isLoading && (
+        <Center style={{ minHeight: 40, marginTop: 20 }}>
+          <Loader />
+        </Center>
+      )}
+
       <FadeTransition in={!isLoading}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Email</Table.HeaderCell>
-              <Table.HeaderCell>Address</Table.HeaderCell>
-              <Table.HeaderCell>Phone number</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {people.length < 1 && (
-              <Table.Row>
-                <td>No people found</td>
-              </Table.Row>
+        <Table 
+          withColumnBorders
+          withTableBorder
+          verticalSpacing="md"
+          fz="md"
+          mt="md">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Email</Table.Th>
+              <Table.Th>Address</Table.Th>
+              <Table.Th>Phone number</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {total < 1 && (
+              <Table.Tr>
+                <Table.Td>
+                  <Text align="center">No people found</Text>
+                </Table.Td>
+              </Table.Tr>
             )}
             {people.map((person) => (
-              <Table.Row key={person.url}>
-                <Table.Cell>
+              <Table.Tr key={person.url}>
+                <Table.Td>
                   <a href={person.url}>{person.full_name}</a>
-                </Table.Cell>
-                <Table.Cell>{person.email}</Table.Cell>
-                <Table.Cell>{person.address}</Table.Cell>
-                <Table.Cell>{person.phone_number}</Table.Cell>
-              </Table.Row>
+                </Table.Td>
+                <Table.Td>{person.email}</Table.Td>
+                <Table.Td>{person.address}</Table.Td>
+                <Table.Td>{person.phone_number}</Table.Td>
+              </Table.Tr>
             ))}
-          </Table.Body>
+          </Table.Tbody>
         </Table>
       </FadeTransition>
+
+      {pageCount > 1 && (
+        <Center style={{ marginTop: 12 }}>
+          <Pagination value={page} onChange={setPage} total={pageCount} />
+        </Center>
+      )}
     </Container>
   )
 }

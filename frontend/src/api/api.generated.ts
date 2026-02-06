@@ -177,21 +177,19 @@ const injectedRtkApi = api.injectEndpoints({
       }),
     }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
-      query: () => ({ url: `/clerk/api/person/` }),
+      query: (queryArg) => ({
+        url: `/clerk/api/person/`,
+        params: {
+          query: queryArg.query,
+          page: queryArg.page,
+        },
+      }),
     }),
     createPerson: build.mutation<CreatePersonApiResponse, CreatePersonApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/person/`,
         method: "POST",
         body: queryArg.personCreate,
-      }),
-    }),
-    searchPeople: build.query<SearchPeopleApiResponse, SearchPeopleApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/person/search/`,
-        params: {
-          query: queryArg.query,
-        },
       }),
     }),
     getPerson: build.query<GetPersonApiResponse, GetPersonApiArg>({
@@ -671,18 +669,23 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   /** Sharepoint ID */
   sharepointId: string;
 };
-export type GetPeopleApiResponse =
-  /** status 200 Successful response. */ Person[];
-export type GetPeopleApiArg = void;
+export type GetPeopleApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: Person[];
+};
+export type GetPeopleApiArg = {
+  query?: string;
+  /** Page number (pagination) */
+  page?: number;
+};
 export type CreatePersonApiResponse =
   /** status 201 Successful response. */ Person;
 export type CreatePersonApiArg = {
   personCreate: PersonCreate;
-};
-export type SearchPeopleApiResponse =
-  /** status 200 Successful response. */ Person[];
-export type SearchPeopleApiArg = {
-  query: string;
 };
 export type GetPersonApiResponse =
   /** status 200 Successful response. */ Person;
@@ -1460,7 +1463,6 @@ export const {
   useDownloadEmailAttachmentFromSharepointMutation,
   useGetPeopleQuery,
   useCreatePersonMutation,
-  useSearchPeopleQuery,
   useGetPersonQuery,
   useUpdatePersonMutation,
   useDeletePersonMutation,
