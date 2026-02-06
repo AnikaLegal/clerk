@@ -1,10 +1,9 @@
 import logging
 
 from accounts import events
-from accounts.models import CaseGroups, User
+from accounts.models import User
 from core.models import Issue
 from django.conf import settings
-from django.contrib.auth.models import Group
 from django.db.models import Q
 from django.utils import timezone
 from emails.service.send import send_email
