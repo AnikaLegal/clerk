@@ -4,7 +4,7 @@ import { useGetPotentialUsersQuery } from 'api'
 import { GROUPS } from 'consts'
 import { UsersCreate, UsersInvite, UsersInviteSchema } from 'features/invite'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React, { useState } from 'react'
+import React from 'react'
 
 export type InviteFormType = ReturnType<typeof useForm<UsersInvite>>
 
