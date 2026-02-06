@@ -42,9 +42,7 @@ logger = logging.getLogger(__name__)
 @api_view(["GET"])
 @paralegal_or_better_required
 def account_list_page_view(request):
-    users = User.objects.prefetch_related("groups").order_by("-date_joined").all()
     context = {
-        "users": UserSerializer(users, many=True).data,
         "create_url": reverse("account-create"),
     }
     return render_react_page(request, "Accounts", "accounts-list", context)
