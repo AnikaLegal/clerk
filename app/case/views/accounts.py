@@ -56,9 +56,13 @@ def account_detail_page_view(request, pk):
                 "issue_set__paralegal__groups",
                 "issue_set__lawyer__groups",
                 "issue_set__client",
+                "issue_set__tenancy__agent",
+                "issue_set__tenancy__landlord",
                 "lawyer_issues__paralegal__groups",
                 "lawyer_issues__lawyer__groups",
                 "lawyer_issues__client",
+                "lawyer_issues__tenancy__agent",
+                "lawyer_issues__tenancy__landlord",
             )
             .distinct()
             .get(pk=pk)
@@ -72,7 +76,7 @@ def account_detail_page_view(request, pk):
         "issue_set": IssueSerializer(user.issue_set.all(), many=True).data,
         "lawyer_issues": IssueSerializer(user.lawyer_issues.all(), many=True).data,
         "performance_notes": IssueNoteSerializer(
-            user.issue_notes.all(), many=True
+            user.issue_notes.prefetch_related("creator__groups").all(), many=True
         ).data,
     }
     return render_react_page(request, f"User {name}", "account-detail", context)
