@@ -20,6 +20,7 @@ def test_create_account_view(
         "first_name": "Jane",
         "last_name": "Doe",
         "email": "jane.doe@anikalegal.com",
+        "groups": ["Paralegal"],
     }
     response = superuser_client.post(url, data, format="json")
     assert response.status_code == 201, response.json()
@@ -39,6 +40,7 @@ def test_create_account_view__with_external_email(superuser_client: APIClient):
         "first_name": "Jane",
         "last_name": "Doe",
         "email": "jane.doe@gmail.com",
+        "groups": ["Paralegal"],
     }
     response = superuser_client.post(url, data, format="json")
     assert response.status_code == 400, response.json()
