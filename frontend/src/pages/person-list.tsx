@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
 import {
   Button,
   Center,
   Container,
   Grid,
+  Group,
   Loader,
   Pagination,
   Table,
@@ -13,60 +13,68 @@ import {
 } from '@mantine/core'
 import { useDebouncedCallback } from '@mantine/hooks'
 import { IconSearch } from '@tabler/icons-react'
+import { GetPeopleApiArg, useGetPeopleQuery } from 'api'
 import { useSnackbar } from 'notistack'
-
-import { mount, getAPIErrorMessage } from 'utils'
-import { useGetPeopleQuery } from 'api'
-
-import { FadeTransition } from 'comps/transitions'
+import React, { useEffect, useState } from 'react'
+import { UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
+  user: UserPermission
   create_url: string
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [query, setQuery] = useState('')
-  const [page, setPage] = useState(1)
+  const [args, setArgs] = useState<GetPeopleApiArg>({ page: 1 })
   const { enqueueSnackbar } = useSnackbar()
 
-  const debouncedSetQueryAndPage = useDebouncedCallback(
-    (value: string) => {
-      // Batch into single state update and render
-      setPage(1)
-      setQuery(value)
-    },
-    300 // Debounce delay in milliseconds
-  )
+  const handleFilterChange = useDebouncedCallback((value: string) => {
+    setArgs({ page: 1, query: value })
+  }, 300)
 
-  const results = useGetPeopleQuery({ query: query || undefined, page })
+  const results = useGetPeopleQuery(args)
 
   useEffect(() => {
     if (results.error) {
-      enqueueSnackbar(getAPIErrorMessage(results.error, 'Failed to load parties'), { variant: 'error' })
+      enqueueSnackbar(
+        getAPIErrorMessage(results.error, 'Failed to load parties'),
+        { variant: 'error' }
+      )
     }
-  }, [results.error, enqueueSnackbar])
+  }, [results.error])
 
   const isLoading = results.isFetching
   const people = results.data?.results || []
   const pageCount = results.data?.page_count || 1
   const total = results.data?.item_count || 0
+
   return (
     <Container size="xl">
-      <Title order={1}>Parties</Title>
-      {!isLoading && (<Text mt={4} color="dimmed">Showing {people.length} of {total} parties</Text>)}
-      <Button component="a" href={CONTEXT.create_url} size="md" mt="sm">
-        Add a party
-      </Button>
+      <Group wrap="nowrap" gap="sm" justify="space-between">
+        <Title order={1}>
+          <span>Parties</span>
+        </Title>
+        {CONTEXT.user.is_coordinator_or_better && (
+          <Button component="a" href={CONTEXT.create_url} size="md">
+            Add a party
+          </Button>
+        )}
+      </Group>
+      <Text c="dimmed">
+        Showing {people.length} of {total} parties
+      </Text>
+
       <Grid mt="lg">
-        <Grid.Col span={6}>
+        <Grid.Col>
           <TextInput
+            label="Search"
             placeholder="Search by name, email, phone or address ..."
             rightSection={<IconSearch size={16} stroke={4} />}
             size="md"
             onChange={(e) => {
-              debouncedSetQueryAndPage(e.target.value)
+              handleFilterChange(e.target.value)
             }}
           />
         </Grid.Col>
@@ -78,47 +86,50 @@ const App = () => {
         </Center>
       )}
 
-      <FadeTransition in={!isLoading}>
-        <Table 
-          withColumnBorders
-          withTableBorder
-          verticalSpacing="md"
-          fz="md"
-          mt="md">
-          <Table.Thead>
+      <Table
+        withColumnBorders
+        withTableBorder
+        verticalSpacing="xs"
+        fz="md"
+        mt="md"
+      >
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Email</Table.Th>
+            <Table.Th>Address</Table.Th>
+            <Table.Th>Phone number</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {people.length < 1 && (
             <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Address</Table.Th>
-              <Table.Th>Phone number</Table.Th>
+              <td colSpan={99}>
+                <Center m="sm">No people found</Center>
+              </td>
             </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {total < 1 && (
-              <Table.Tr>
-                <Table.Td>
-                  <Text align="center">No people found</Text>
-                </Table.Td>
-              </Table.Tr>
-            )}
-            {people.map((person) => (
-              <Table.Tr key={person.url}>
-                <Table.Td>
-                  <a href={person.url}>{person.full_name}</a>
-                </Table.Td>
-                <Table.Td>{person.email}</Table.Td>
-                <Table.Td>{person.address}</Table.Td>
-                <Table.Td>{person.phone_number}</Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </FadeTransition>
-
-      {pageCount > 1 && (
-        <Center style={{ marginTop: 12 }}>
-          <Pagination value={page} onChange={setPage} total={pageCount} />
-        </Center>
+          )}
+          {people.map((person) => (
+            <Table.Tr key={person.url}>
+              <Table.Td>
+                <a href={person.url}>{person.full_name}</a>
+              </Table.Td>
+              <Table.Td>{person.email}</Table.Td>
+              <Table.Td>{person.address}</Table.Td>
+              <Table.Td>{person.phone_number}</Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
+      {!isLoading && people.length > 0 && (
+        <Pagination
+          total={pageCount}
+          value={args.page || 1}
+          onChange={(page) => setArgs({ ...args, page })}
+          mt="md"
+          withEdges
+          withControls
+        />
       )}
     </Container>
   )

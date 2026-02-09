@@ -12,6 +12,12 @@ get:
       schema:
         type: integer
       required: false
+    - name: page_size
+      in: query
+      description: Number of items per page (pagination)
+      schema:
+        type: integer
+      required: false
   responses:
     "200":
       description: Successful response.

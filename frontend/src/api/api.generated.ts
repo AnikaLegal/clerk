@@ -182,6 +182,7 @@ const injectedRtkApi = api.injectEndpoints({
         params: {
           query: queryArg.query,
           page: queryArg.page,
+          page_size: queryArg.pageSize,
         },
       }),
     }),
@@ -681,6 +682,8 @@ export type GetPeopleApiArg = {
   query?: string;
   /** Page number (pagination) */
   page?: number;
+  /** Number of items per page (pagination) */
+  pageSize?: number;
 };
 export type CreatePersonApiResponse =
   /** status 201 Successful response. */ Person;

@@ -15,13 +15,7 @@ from conftest import schema_tester
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-# Person API list action not tested here because it is idiosyncratic (pagination and search functionality)
-# It is tested separately in specific_view_tests/test_person_views.py
-LIST_TEST_CASES = [
-    tc
-    for tc in GENERIC_API_TEST_CASES
-    if Action.LIST in tc.actions and tc.base_view_name != "person-api"
-]
+LIST_TEST_CASES = [tc for tc in GENERIC_API_TEST_CASES if Action.LIST in tc.actions]
 LIST_TEST_CASE_IDS = [tc.base_view_name for tc in LIST_TEST_CASES]
 
 

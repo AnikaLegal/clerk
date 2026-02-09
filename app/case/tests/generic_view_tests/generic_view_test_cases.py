@@ -41,7 +41,7 @@ GENERIC_API_TEST_CASES = [
         base_view_name="person-api",
         test_read_permissions=lambda user: user.is_paralegal_or_better,
         test_write_permissions=lambda user: user.is_coordinator_or_better,
-        actions=Action.ALL,
+        actions=[Action.RETRIEVE, Action.UPDATE, Action.CREATE, Action.DELETE],
     ),
     APIViewTestCase(
         factory=UserFactory,

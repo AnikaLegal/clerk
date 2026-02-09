@@ -34,34 +34,33 @@ def test_person_list_api(superuser_client: APIClient):
 @pytest.mark.django_db
 def test_person_list_api__with_page(superuser_client: APIClient):
     """Test list action pagination with page parameter."""
-    # Create 25 persons to test pagination, check PersonPaginator class for page_size (currently 20)
-    persons = [PersonFactory() for _ in range(25)]
+    PersonFactory.create_batch(5)
 
     url = reverse("person-api-list")
 
     # Get first page
-    response = superuser_client.get(url, {"page": 1})
+    response = superuser_client.get(url, {"page": 1, "page_size": 3})
     assert response.status_code == 200, response.json()
     data = response.json()
 
     assert data["current"] == 1
-    assert data["item_count"] == 25
+    assert data["item_count"] == 5
     assert data["page_count"] == 2
     assert data["next"] is not None
     assert data["prev"] is None
-    assert len(data["results"]) == 20
+    assert len(data["results"]) == 3
 
     # Get second page
-    response = superuser_client.get(url, {"page": 2})
+    response = superuser_client.get(url, {"page": 2, "page_size": 3})
     assert response.status_code == 200, response.json()
     data = response.json()
 
     assert data["current"] == 2
-    assert data["item_count"] == 25
+    assert data["item_count"] == 5
     assert data["page_count"] == 2
     assert data["next"] is None
     assert data["prev"] is not None
-    assert len(data["results"]) == 5
+    assert len(data["results"]) == 2
 
     schema_tester.validate_response(response=response)
 
@@ -148,34 +147,31 @@ def test_person_list_api__with_query(superuser_client: APIClient):
 def test_person_list_api__with_page_and_query(superuser_client: APIClient):
     """Test list action with both page and query parameters."""
     # Create persons with specific names for searching
-    matching_persons = [PersonFactory(full_name=f"Alice Smith {i}") for i in range(25)]
-    non_matching_persons = [
-        PersonFactory(full_name=f"Bob Johnson {i}") for i in range(5)
-    ]
-
+    PersonFactory.create_batch(3, full_name="Alice Smith")
+    PersonFactory.create_batch(3, full_name="Bob Johnson")
     url = reverse("person-api-list")
 
     # Get first page of search results
-    response = superuser_client.get(url, {"query": "Alice", "page": 1})
+    response = superuser_client.get(url, {"query": "Alice", "page": 1, "page_size": 2})
     assert response.status_code == 200, response.json()
     data = response.json()
 
     assert data["current"] == 1
-    assert data["item_count"] == 25
+    assert data["item_count"] == 3
     assert data["page_count"] == 2
     assert data["next"] is not None
-    assert len(data["results"]) == 20
+    assert len(data["results"]) == 2
 
     # Get second page of search results
-    response = superuser_client.get(url, {"query": "Alice", "page": 2})
+    response = superuser_client.get(url, {"query": "Alice", "page": 2, "page_size": 2})
     assert response.status_code == 200, response.json()
     data = response.json()
 
     assert data["current"] == 2
-    assert data["item_count"] == 25
+    assert data["item_count"] == 3
     assert data["page_count"] == 2
     assert data["prev"] is not None
-    assert len(data["results"]) == 5
+    assert len(data["results"]) == 1
 
     schema_tester.validate_response(response=response)
 

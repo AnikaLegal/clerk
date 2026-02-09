@@ -1,19 +1,23 @@
+from core.models import Issue, Person
+from django.db.models import Q, QuerySet
 from django.http import Http404
-from django.db.models import QuerySet, Q
 from django.urls import reverse
-from rest_framework.decorators import api_view, action
-from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.viewsets import ModelViewSet
 
-from core.models import Person, Issue
-from case.utils.pagination import ClerkPaginator
-from case.utils.react import render_react_page
 from case.serializers import (
-    PersonSerializer,
     IssueSerializer,
     PersonSearchRequestSerializer,
+    PersonSerializer,
 )
-from .auth import paralegal_or_better_required, CoordinatorOrBetterCanWritePermission
+from case.utils.pagination import ClerkPaginator
+from case.utils.react import render_react_page
+
+from .auth import (
+    CoordinatorOrBetterCanWritePermission,
+    coordinator_or_better_required,
+    paralegal_or_better_required,
+)
 
 
 @api_view(["GET"])
@@ -24,7 +28,7 @@ def person_list_page_view(request):
 
 
 @api_view(["GET"])
-@paralegal_or_better_required
+@coordinator_or_better_required
 def person_create_page_view(request):
     return render_react_page(request, "Create person", "person-create", {})
 
@@ -70,8 +74,8 @@ class PersonApiViewset(ModelViewSet):
     def search_queryset(self, queryset: QuerySet[Person]) -> QuerySet[Person]:
         serializer = PersonSearchRequestSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
-        query = serializer.validated_data.get("query", "")
 
+        query = serializer.validated_data.get("query")
         if query:
             q_filter = (
                 Q(full_name__icontains=query)
