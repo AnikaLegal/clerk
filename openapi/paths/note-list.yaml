@@ -1,0 +1,68 @@
+get:
+  operationId: getNotes
+  parameters:
+    - name: page
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: issue
+      description: Entity ID
+      in: query
+      schema:
+        type: string
+        format: uuid
+      required: false
+    - name: creator
+      description: Creator account ID
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: note_type
+      in: query
+      schema:
+        $ref: ../schemas/IssueNoteType.yaml
+      required: false
+    - name: reviewee
+      description: Reviewee account ID
+      in: query
+      schema:
+        type: integer
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              current:
+                type: number
+              next:
+                type: number
+                nullable: true
+              prev:
+                type: number
+                nullable: true
+              page_count:
+                type: number
+              item_count:
+                type: number
+              results:
+                type: array
+                items:
+                  $ref: ../schemas/IssueNote.yaml
+            required:
+              - current
+              - next
+              - prev
+              - page_count
+              - item_count
+              - results

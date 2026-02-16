@@ -1,5 +1,5 @@
 allOf:
-  - $ref: ./UserCreate.yaml
+  - $ref: ./UserBase.yaml
   - type: object
     properties:
       id:
@@ -10,16 +10,14 @@ allOf:
         type: boolean
       is_active:
         type: boolean
+      groups:
+        $ref: ./TextChoiceListField.yaml
       is_superuser:
         type: boolean
       full_name:
         type: string
       created_at:
         type: string
-      groups:
-        type: array
-        items:
-          type: string
       url:
         type: string
       is_admin_or_better:
@@ -48,10 +46,10 @@ allOf:
       - case_capacity
       - is_intern
       - is_active
+      - groups
       - is_superuser
       - full_name
       - created_at
-      - groups
       - url
       - is_admin_or_better
       - is_coordinator_or_better

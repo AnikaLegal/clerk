@@ -36,6 +36,9 @@ paths:
   /clerk/api/email/{id}/{email_id}/attachment/sharepoint/{sharepoint_id}/:
     $ref: paths/attachment-sharepoint-download.yaml
 
+  /clerk/api/note/:
+    $ref: paths/note-list.yaml
+
   /clerk/api/person/:
     $ref: paths/person-list.yaml
   /clerk/api/person/search/:
@@ -58,18 +61,14 @@ paths:
 
   /clerk/api/account/:
     $ref: paths/account-list.yaml
-  /clerk/api/account/potential:
-    $ref: paths/account-potential-list.yaml
   /clerk/api/account/{id}/:
     $ref: paths/account-detail.yaml
   /clerk/api/account/{id}/perms/:
     $ref: paths/account-perms.yaml
   /clerk/api/account/{id}/perms-resync/:
     $ref: paths/account-perms-resync.yaml
-  /clerk/api/account/{id}/perms-promote/:
-    $ref: paths/account-perms-promote.yaml
-  /clerk/api/account/{id}/perms-demote/:
-    $ref: paths/account-perms-demote.yaml
+  /clerk/api/account/potential:
+    $ref: paths/account-potential-list.yaml
 
   /clerk/api/template-email/:
     $ref: paths/template-email-list.yaml

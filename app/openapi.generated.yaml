@@ -641,6 +641,75 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/note/:
+    get:
+      operationId: getNotes
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: issue
+          description: Entity ID
+          in: query
+          schema:
+            type: string
+            format: uuid
+          required: false
+        - name: creator
+          description: Creator account ID
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: note_type
+          in: query
+          schema:
+            $ref: "#/components/schemas/IssueNoteType"
+          required: false
+        - name: reviewee
+          description: Reviewee account ID
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/IssueNote"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
   /clerk/api/person/:
     get:
       operationId: getPeople
@@ -1100,31 +1169,23 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/account/potential:
+  /clerk/api/account/{id}/:
     get:
-      operationId: getPotentialUsers
+      operationId: getUser
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    email:
-                      type: string
-                      format: email
-                    first_name:
-                      type: string
-                    last_name:
-                      type: string
-                  required:
-                    - email
-                    - first_name
-                    - last_name
-  /clerk/api/account/{id}/:
+                $ref: "#/components/schemas/User"
     patch:
       operationId: updateUser
       parameters:
@@ -1198,64 +1259,30 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/account/{id}/perms-promote/:
-    post:
-      operationId: promoteUserAccountPermissions
-      parameters:
-        - description: Entity ID
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+  /clerk/api/account/potential:
+    get:
+      operationId: getPotentialUsers
       responses:
-        "201":
+        "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  account:
-                    $ref: "#/components/schemas/User"
-                  permissions:
-                    $ref: "#/components/schemas/MicrosoftUserPermissions"
-                required:
-                  - account
-                  - permissions
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/account/{id}/perms-demote/:
-    post:
-      operationId: demoteUserAccountPermissions
-      parameters:
-        - description: Entity ID
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        "201":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  account:
-                    $ref: "#/components/schemas/User"
-                  permissions:
-                    $ref: "#/components/schemas/MicrosoftUserPermissions"
-                required:
-                  - account
-                  - permissions
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
+                type: array
+                items:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                  required:
+                    - email
+                    - first_name
+                    - last_name
   /clerk/api/template-email/:
     get:
       operationId: getEmailTemplates
@@ -2029,7 +2056,7 @@ components:
           type: string
       required:
         - topic
-    UserCreate:
+    UserBase:
       type: object
       properties:
         first_name:
@@ -2039,18 +2066,32 @@ components:
         email:
           type: string
           format: email
-        groups:
-          type: array
-          items:
-            type: string
       required:
         - first_name
         - last_name
         - email
-        - groups
+    TextChoiceListField:
+      type: object
+      properties:
+        display:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+        choices:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      required:
+        - display
+        - value
+        - choices
     User:
       allOf:
-        - $ref: "#/components/schemas/UserCreate"
+        - $ref: "#/components/schemas/UserBase"
         - type: object
           properties:
             id:
@@ -2061,16 +2102,14 @@ components:
               type: boolean
             is_active:
               type: boolean
+            groups:
+              $ref: "#/components/schemas/TextChoiceListField"
             is_superuser:
               type: boolean
             full_name:
               type: string
             created_at:
               type: string
-            groups:
-              type: array
-              items:
-                type: string
             url:
               type: string
             is_admin_or_better:
@@ -2099,10 +2138,10 @@ components:
             - case_capacity
             - is_intern
             - is_active
+            - groups
             - is_superuser
             - full_name
             - created_at
-            - groups
             - url
             - is_admin_or_better
             - is_coordinator_or_better
@@ -2134,25 +2173,6 @@ components:
           type: string
         value:
           type: string
-        choices:
-          type: array
-          items:
-            type: array
-            items:
-              type: string
-      required:
-        - display
-        - value
-        - choices
-    TextChoiceListField:
-      type: object
-      properties:
-        display:
-          type: string
-        value:
-          type: array
-          items:
-            type: string
         choices:
           type: array
           items:
@@ -2580,6 +2600,28 @@ components:
         - note_type
         - text
         - event
+    IssueNoteCreator:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+        url:
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - full_name
+        - url
     IssueNote:
       allOf:
         - $ref: "#/components/schemas/IssueNoteBase"
@@ -2588,7 +2630,7 @@ components:
             id:
               type: number
             creator:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/IssueNoteCreator"
             text_display:
               type: string
             created_at:
@@ -2846,6 +2888,18 @@ components:
           format: binary
       required:
         - file
+    IssueNoteType:
+      type: string
+      enum:
+        - CONFLICT_CHECK_FAILURE
+        - CONFLICT_CHECK_SUCCESS
+        - ELIGIBILITY_CHECK_FAILURE
+        - ELIGIBILITY_CHECK_SUCCESS
+        - EMAIL
+        - EVENT
+        - PARALEGAL
+        - PERFORMANCE
+        - REVIEW
     PersonCreate:
       allOf:
         - $ref: "#/components/schemas/PersonBase"
@@ -2914,6 +2968,17 @@ components:
               type: boolean
           required:
             - issue_id
+    UserCreate:
+      allOf:
+        - $ref: "#/components/schemas/UserBase"
+        - type: object
+          properties:
+            groups:
+              type: array
+              items:
+                type: string
+          required:
+            - groups
     MicrosoftUserPermissions:
       type: object
       properties:
