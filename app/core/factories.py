@@ -26,10 +26,12 @@ from core.models.client import (
 )
 from core.models.issue import CaseStage, CaseTopic, EmploymentType, ReferrerType
 from core.models.issue_date import DateType, HearingType
+from core.models.issue_event import EventType, IssueEvent
 from core.models.issue_note import NoteType
 from core.models.person import SupportContactPreferences
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from core.models.tenancy import LeaseType, RentalType
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from emails.models import Email, EmailAttachment, EmailTemplate
@@ -134,6 +136,54 @@ class IssueFactory(TimestampedModelFactory):
 
 
 @factory.django.mute_signals(post_save)
+class IssueEventFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueEvent
+
+    issue = factory.SubFactory(IssueFactory)
+    event_type = factory.Faker(
+        "random_element", elements=[x[0] for x in IssueEvent.EVENT_CHOICES]
+    )
+
+    prev_is_open = factory.LazyAttribute(
+        lambda o: fake.boolean() if o.event_type == EventType.OPEN else None
+    )
+    next_is_open = factory.LazyAttribute(
+        lambda o: not o.prev_is_open if o.event_type == EventType.OPEN else None
+    )
+
+    prev_stage = factory.LazyAttribute(
+        lambda o: (
+            fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+            if o.event_type == EventType.STAGE
+            else None
+        )
+    )
+    next_stage = factory.LazyAttribute(
+        lambda o: (
+            fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+            if o.event_type == EventType.STAGE
+            else None
+        )
+    )
+
+    prev_user = factory.Maybe(
+        factory.LazyAttribute(
+            lambda o: o.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+        ),
+        yes_declaration=factory.SubFactory(UserFactory),
+        no_declaration=None,
+    )
+    next_user = factory.Maybe(
+        factory.LazyAttribute(
+            lambda o: o.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+        ),
+        yes_declaration=factory.SubFactory(UserFactory),
+        no_declaration=None,
+    )
+
+
+@factory.django.mute_signals(post_save)
 class IssueNoteFactory(TimestampedModelFactory):
     class Meta:
         model = IssueNote
@@ -142,6 +192,28 @@ class IssueNoteFactory(TimestampedModelFactory):
     creator = factory.SubFactory(UserFactory)
     note_type = factory.Faker("random_element", elements=NoteType)
     text = factory.Faker("sentence")
+
+    content_object = factory.Maybe(
+        factory.LazyAttribute(lambda o: o.note_type == NoteType.EVENT),
+        yes_declaration=factory.SubFactory(
+            IssueEventFactory, issue=factory.SelfAttribute("..issue")
+        ),
+        no_declaration=None,
+    )
+    object_id = factory.Maybe(
+        factory.LazyAttribute(
+            lambda o: o.note_type == NoteType.EVENT and hasattr(o.content_object, "pk")
+        ),
+        yes_declaration=factory.LazyAttribute(lambda o: o.content_object.pk),
+        no_declaration=None,
+    )
+    content_type = factory.Maybe(
+        factory.LazyAttribute(lambda o: o.note_type == NoteType.EVENT),
+        yes_declaration=factory.LazyAttribute(
+            lambda o: ContentType.objects.get_for_model(IssueEvent)
+        ),
+        no_declaration=None,
+    )
 
 
 @factory.django.mute_signals(post_save)
