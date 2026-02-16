@@ -99,8 +99,19 @@ const AccountUserDetails = ({ result }: AccountUserDetailsProps) => {
         User details
       </Title>
       <TableForm
-        fields={FIELDS}
-        schema={SCHEMA}
+        fields={USER_DETAIL_FIELDS}
+        schema={USER_DETAIL_SCHEMA}
+        model={account}
+        setModel={setAccount}
+        modelName="account"
+        onUpdate={update}
+      />
+      <Title order={3} mt="lg">
+        Account details
+      </Title>
+      <TableForm
+        fields={ACCOUNT_DETAIL_FIELDS}
+        schema={ACCOUNT_DETAIL_SCHEMA}
         model={account}
         setModel={setAccount}
         modelName="account"
@@ -387,7 +398,7 @@ const LAWYER_TABLE_FIELDS = [
   'outcome',
 ]
 
-const FIELDS: FormField[] = [
+const USER_DETAIL_FIELDS: FormField[] = [
   {
     label: 'First name',
     schema: Yup.string().required('Required'),
@@ -404,7 +415,7 @@ const FIELDS: FormField[] = [
     label: 'Is intern?',
     name: 'is_intern',
     type: FIELD_TYPES.BOOL,
-    schema: Yup.string().required('Required'),
+    schema: Yup.boolean().required('Required'),
   },
   {
     label: 'Case capacity',
@@ -412,6 +423,10 @@ const FIELDS: FormField[] = [
     name: 'case_capacity',
     schema: Yup.number().integer().min(0),
   },
+]
+const USER_DETAIL_SCHEMA = getFormSchema(USER_DETAIL_FIELDS)
+
+const ACCOUNT_DETAIL_FIELDS: FormField[] = [
   {
     label: 'Groups',
     type: FIELD_TYPES.MULTI_CHOICE,
@@ -425,6 +440,6 @@ const FIELDS: FormField[] = [
     schema: Yup.boolean(),
   },
 ]
-const SCHEMA = getFormSchema(FIELDS)
+const ACCOUNT_DETAIL_SCHEMA = getFormSchema(ACCOUNT_DETAIL_FIELDS)
 
 mount(App)
