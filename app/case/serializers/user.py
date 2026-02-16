@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 
 from case.middleware import annotate_group_access
 
-from .fields import LocalDateField
+from .fields import LocalDateField, SlugRelatedTextChoiceField
 
 
 class PotentialUserSerializer(serializers.Serializer):
@@ -22,8 +22,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ("first_name", "last_name", "email", "groups", "url")
 
-    groups = serializers.ListField(
-        child=serializers.CharField(), required=True, write_only=True
+    groups = serializers.SlugRelatedField(
+        many=True, read_only=False, slug_field="name", queryset=Group.objects.all()
     )
     url = serializers.SerializerMethodField()
 
@@ -38,31 +38,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         validated_data["username"] = validated_data.get("email")
-
-        groups = validated_data.pop("groups", [])
-        user = super().create(validated_data)
-
-        # Validate and assign groups
-        group_set = set(groups)
-        groups_qs = Group.objects.filter(name__in=groups)
-
-        if len(groups) != groups_qs.count():
-            found_names = set(g.name for g in groups_qs)
-            unknown = group_set.difference(found_names)
-            raise ValidationError(
-                {"groups": "Unknown group(s): %s" % ", ".join(unknown)}
-            )
-
-        case_group_set = set(CaseGroups.values)
-        if not group_set.issubset(case_group_set):
-            invalid = group_set.difference(case_group_set)
-            raise ValidationError(
-                {"groups": "Invalid group(s): %s" % ", ".join(invalid)}
-            )
-
-        user.groups.set(groups_qs)
-
-        return user
+        return super().create(validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -93,12 +69,18 @@ class UserSerializer(serializers.ModelSerializer):
             "is_ms_account_set_up",
             "ms_account_created_at",
         )
-        read_only_fields = ("created_at", "url", "full_name", "groups", "is_superuser")
+        read_only_fields = ("created_at", "url", "full_name", "is_superuser")
+
+    groups = SlugRelatedTextChoiceField(
+        many=True,
+        read_only=False,
+        slug_field="name",
+        queryset=Group.objects.filter(name__in=CaseGroups.values),
+    )
 
     url = serializers.SerializerMethodField()
     created_at = LocalDateField(source="date_joined")
     full_name = serializers.SerializerMethodField()
-    groups = serializers.SerializerMethodField()
     is_admin_or_better = serializers.BooleanField(read_only=True)
     is_coordinator_or_better = serializers.BooleanField(read_only=True)
     is_lawyer_or_better = serializers.BooleanField(read_only=True)
@@ -122,9 +104,6 @@ class UserSerializer(serializers.ModelSerializer):
             obj.ms_account_created_at < fifteen_minutes_ago
         )
         return bool(is_set_up)
-
-    def get_groups(self, obj):
-        return [g.name for g in obj.groups.all()]
 
     def get_full_name(self, obj):
         return obj.get_full_name().title()

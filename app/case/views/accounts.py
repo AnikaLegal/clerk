@@ -1,9 +1,7 @@
 import logging
 from typing import Optional
 
-from accounts.models import CaseGroups, User
-from django.contrib.auth.models import Group
-from django.core.exceptions import PermissionDenied
+from accounts.models import User, CaseGroups
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
@@ -15,14 +13,13 @@ from microsoft.tasks import (
     set_up_new_user_task,
 )
 from rest_framework.decorators import action, api_view
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from case.serializers import (
     AccountSearchSerializer,
     AccountSortSerializer,
-    IssueNoteSerializer,
     IssueSerializer,
     PotentialUserSerializer,
     UserCreateSerializer,
@@ -33,17 +30,17 @@ from case.views.auth import (
     AdminOrBetterPermission,
     CoordinatorOrBetterPermission,
     coordinator_or_better_required,
-    paralegal_or_better_required,
 )
 
 logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
-@paralegal_or_better_required
+@coordinator_or_better_required
 def account_list_page_view(request):
     context = {
         "create_url": reverse("account-create"),
+        "group_values": CaseGroups.values,
     }
     return render_react_page(request, "Accounts", "accounts-list", context)
 
@@ -52,35 +49,13 @@ def account_list_page_view(request):
 @coordinator_or_better_required
 def account_detail_page_view(request, pk):
     try:
-        user = (
-            User.objects.prefetch_related(
-                "groups",
-                "issue_notes",
-                "issue_set__paralegal__groups",
-                "issue_set__lawyer__groups",
-                "issue_set__client",
-                "issue_set__tenancy__agent",
-                "issue_set__tenancy__landlord",
-                "lawyer_issues__paralegal__groups",
-                "lawyer_issues__lawyer__groups",
-                "lawyer_issues__client",
-                "lawyer_issues__tenancy__agent",
-                "lawyer_issues__tenancy__landlord",
-            )
-            .distinct()
-            .get(pk=pk)
-        )
+        user = User.objects.get(pk=pk)
     except User.DoesNotExist:
         raise Http404()
 
     name = user.get_full_name()
     context = {
-        "account": UserSerializer(user).data,
-        "issue_set": IssueSerializer(user.issue_set.all(), many=True).data,
-        "lawyer_issues": IssueSerializer(user.lawyer_issues.all(), many=True).data,
-        "performance_notes": IssueNoteSerializer(
-            user.issue_notes.prefetch_related("creator__groups").all(), many=True
-        ).data,
+        "account_id": pk,
     }
     return render_react_page(request, f"User {name}", "account-detail", context)
 
@@ -88,10 +63,15 @@ def account_detail_page_view(request, pk):
 @api_view(["GET"])
 @coordinator_or_better_required
 def account_create_page_view(request):
-    return render_react_page(request, "Invite paralegal", "account-create", {})
+    context = {
+        "group_values": CaseGroups.values,
+    }
+    return render_react_page(request, "Invite paralegal", "account-create", context)
 
 
-class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
+class AccountApiViewset(
+    GenericViewSet, UpdateModelMixin, ListModelMixin, RetrieveModelMixin
+):
     serializer_class = UserSerializer
     permission_classes = [CoordinatorOrBetterPermission]
 
@@ -172,67 +152,8 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
 
         reset_ms_access(user)
         perms_data = _load_ms_permissions(user)
-        return Response(
-            {"account": UserSerializer(user).data, "permissions": perms_data}
-        )
 
-    @action(
-        detail=True,
-        methods=["POST"],
-        url_path="perms-promote",
-        url_name="perms-promote",
-    )
-    def account_detail_perms_promote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
-
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        if is_paralegal:
-            group = Group.objects.get(name=CaseGroups.COORDINATOR)
-            user.groups.add(group)
-        else:
-            group = Group.objects.get(name=CaseGroups.PARALEGAL)
-            user.groups.add(group)
-            reset_ms_access(user)
-
-        perms_data = _load_ms_permissions(user)
-        return Response(
-            {"account": UserSerializer(user).data, "permissions": perms_data}
-        )
-
-    @action(
-        detail=True,
-        methods=["POST"],
-        url_path="perms-demote",
-        url_name="perms-demote",
-    )
-    def account_detail_perms_demote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
-
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        is_coordinator = user.groups.filter(name=CaseGroups.COORDINATOR).exists()
-        group_name = None
-        if is_coordinator:
-            group_name = CaseGroups.COORDINATOR
-        elif is_paralegal:
-            group_name = CaseGroups.PARALEGAL
-
-        if group_name:
-            group = Group.objects.get(name=group_name)
-            user.groups.remove(group)
-
-        perms_data = _load_ms_permissions(user)
+        # TODO: remove user data from response.
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
         )
