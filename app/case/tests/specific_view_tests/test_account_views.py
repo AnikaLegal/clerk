@@ -55,16 +55,16 @@ def test_get_account_permissions_view(
     url = reverse("account-api-perms", args=(user.pk,))
     mock_get_user_permissions.return_value = MicrosoftUserPermissions(
         has_full_access=False,
-        paralegal_perm_issues=[],
-        paralegal_perm_missing_issues=[],
+        issues_with_access=[],
+        issues_without_access=[],
     )
 
     response = superuser_client.get(url)
     assert response.status_code == 200
     assert response.json() == {
         "has_full_access": False,
-        "paralegal_perm_issues": [],
-        "paralegal_perm_missing_issues": [],
+        "issues_with_access": [],
+        "issues_without_access": [],
     }
 
 
@@ -78,8 +78,8 @@ def test_resync_account_permissions_view(
     url = reverse("account-api-perms-resync", args=(user.pk,))
     mock_get_user_permissions.return_value = MicrosoftUserPermissions(
         has_full_access=False,
-        paralegal_perm_issues=[],
-        paralegal_perm_missing_issues=[],
+        issues_with_access=[],
+        issues_without_access=[],
     )
     response = superuser_client.post(url)
     assert response.status_code == 200
@@ -88,6 +88,6 @@ def test_resync_account_permissions_view(
     assert resp_data["account"]["id"] == user.pk
     assert resp_data["permissions"] == {
         "has_full_access": False,
-        "paralegal_perm_issues": [],
-        "paralegal_perm_missing_issues": [],
+        "issues_with_access": [],
+        "issues_without_access": [],
     }

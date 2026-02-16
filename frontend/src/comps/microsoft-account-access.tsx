@@ -171,19 +171,19 @@ const SharepointAccessCell = ({ account }: SharepointAccessCellProps) => {
 
   return (
     <Group gap="0.25rem">
-      {data?.paralegal_perm_issues.map((i) => (
+      {data?.issues_with_access.map((i) => (
         <IssuePermissionBadge issue={i} color="green.6">
           Has access
         </IssuePermissionBadge>
       ))}
-      {data?.paralegal_perm_missing_issues
+      {data?.issues_without_access
         .filter((i) => i.actionstep_id)
         .map((i) => (
           <IssuePermissionBadge issue={i} color="green.9">
             Actionstep
           </IssuePermissionBadge>
         ))}
-      {data?.paralegal_perm_missing_issues
+      {data?.issues_without_access
         .filter((i) => !i.actionstep_id)
         .map((i) => (
           <IssuePermissionBadge issue={i} color="yellow.6">

@@ -1426,8 +1426,8 @@ export type UserCreate = UserBase & {
 };
 export type MicrosoftUserPermissions = {
   has_full_access: boolean;
-  paralegal_perm_issues: Issue[];
-  paralegal_perm_missing_issues: Issue[];
+  issues_with_access: Issue[];
+  issues_without_access: Issue[];
 };
 export type EmailTemplateCreate = {
   name: string;

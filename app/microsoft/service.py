@@ -21,14 +21,14 @@ EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 @dataclass
 class MicrosoftUserPermissions:
     has_full_access: bool
-    paralegal_perm_issues: list[Issue]
-    paralegal_perm_missing_issues: list[Issue]
+    issues_with_access: list[Issue]
+    issues_without_access: list[Issue]
 
 
 def get_user_permissions(user):
     has_full_access = False
-    paralegal_perm_issues = []
-    paralegal_perm_missing_issues = []
+    issues_with_access = []
+    issues_without_access = []
 
     api = MSGraphAPI()
     if api.user.get(user.email):
@@ -60,14 +60,14 @@ def get_user_permissions(user):
                             break
 
             if has_access:
-                paralegal_perm_issues.append(issue)
+                issues_with_access.append(issue)
             else:
-                paralegal_perm_missing_issues.append(issue)
+                issues_without_access.append(issue)
 
     return MicrosoftUserPermissions(
         has_full_access=has_full_access,
-        paralegal_perm_issues=paralegal_perm_issues,
-        paralegal_perm_missing_issues=paralegal_perm_missing_issues,
+        issues_with_access=issues_with_access,
+        issues_without_access=issues_without_access,
     )
 
 
