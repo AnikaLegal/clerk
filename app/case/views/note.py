@@ -3,7 +3,7 @@ from core.models import IssueNote
 from core.models.issue_note import NoteType
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, QuerySet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from case.serializers import (
@@ -22,12 +22,11 @@ class NotePaginator(ClerkPaginator):
     max_page_size = 100
 
 
-class NoteApiViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
+class NoteApiViewset(GenericViewSet, ListModelMixin):
     serializer_class = IssueNoteSerializer
     pagination_class = NotePaginator
     permission_classes = [
-        CoordinatorOrBetterPermission,
-        ParalegalOrBetterObjectPermission,
+        ParalegalOrBetterObjectPermission | CoordinatorOrBetterPermission
     ]
 
     def get_queryset(self):

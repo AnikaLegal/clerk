@@ -26,6 +26,7 @@ from core.models.client import (
 )
 from core.models.issue import CaseStage, CaseTopic, EmploymentType, ReferrerType
 from core.models.issue_date import DateType, HearingType
+from core.models.issue_note import NoteType
 from core.models.person import SupportContactPreferences
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from core.models.tenancy import LeaseType, RentalType
@@ -139,7 +140,7 @@ class IssueNoteFactory(TimestampedModelFactory):
 
     issue = factory.SubFactory(IssueFactory)
     creator = factory.SubFactory(UserFactory)
-    note_type = "PARALEGAL"
+    note_type = factory.Faker("random_element", elements=NoteType)
     text = factory.Faker("sentence")
 
 

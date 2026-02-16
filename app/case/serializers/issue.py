@@ -167,35 +167,6 @@ class IssueSerializer(serializers.ModelSerializer):
         return next_review.strftime("%d/%m/%y") if next_review else None
 
 
-class IssueNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IssueNote
-        fields = (
-            "id",
-            "creator",
-            "creator_id",
-            "note_type",
-            "text",
-            "text_display",
-            "created_at",
-            "issue_id",
-            "event",
-            "reviewee",
-        )
-
-    creator = UserSerializer(read_only=True)
-    creator_id = serializers.IntegerField(write_only=True)
-    text_display = serializers.CharField(source="get_text", read_only=True)
-    reviewee = serializers.SerializerMethodField()
-    issue_id = serializers.UUIDField(write_only=True)
-    event = serializers.DateTimeField(required=False)
-    created_at = LocalTimeField()
-
-    def get_reviewee(self, obj):
-        if obj.note_type == "PERFORMANCE":
-            return UserSerializer(obj.content_object).data
-
-
 class IssueSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
@@ -213,3 +184,69 @@ class IssueSearchSerializer(serializers.ModelSerializer):
 
     client = serializers.UUIDField(required=False)
     search = serializers.CharField(required=False)
+
+
+class CreatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "full_name",
+            "url",
+        )
+
+    url = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return obj.get_full_name().title()
+
+    def get_url(self, obj):
+        return reverse("account-detail", args=(obj.pk,))
+
+
+class IssueNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "id",
+            "creator",
+            "creator_id",
+            "note_type",
+            "text",
+            "text_display",
+            "created_at",
+            "issue_id",
+            "event",
+            "reviewee",
+        )
+
+    creator = CreatorSerializer(read_only=True)
+    creator_id = serializers.IntegerField(write_only=True)
+    text_display = serializers.CharField(source="get_text", read_only=True)
+    reviewee = serializers.SerializerMethodField()
+    issue_id = serializers.UUIDField(write_only=True)
+    event = serializers.DateTimeField(required=False)
+    created_at = LocalTimeField()
+
+    def get_reviewee(self, obj):
+        if obj.note_type == "PERFORMANCE":
+            return UserSerializer(obj.content_object).data
+
+
+class IssueNoteSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IssueNote
+        fields = (
+            "issue",
+            "creator",
+            "note_type",
+            "reviewee",
+        )
+        extra_kwargs = {f: {"required": False} for f in fields}
+
+    issue = serializers.UUIDField(required=False)
+    reviewee = serializers.CharField(required=False)

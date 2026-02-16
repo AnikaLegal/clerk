@@ -15,6 +15,7 @@ from .email import (
     EmailThreadSerializer,
 )
 from .issue import (
+    IssueNoteSearchSerializer,
     IssueNoteSerializer,
     IssueSearchSerializer,
     IssueSerializer,
@@ -43,6 +44,7 @@ __all__ = [
     "EmailSerializer",
     "EmailTemplateSerializer",
     "EmailThreadSerializer",
+    "IssueNoteSearchSerializer",
     "IssueNoteSerializer",
     "IssueSearchSerializer",
     "IssueSerializer",
