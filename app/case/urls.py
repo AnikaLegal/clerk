@@ -9,6 +9,7 @@ from .views import (
     date,
     document_templates,
     email_templates,
+    note,
     notification_templates,
     paralegal,
     person,
@@ -33,6 +34,7 @@ router.register("case", case.CaseApiViewset, basename="case-api")
 router.register("date", date.DateApiViewSet, basename="date-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
+router.register("note", note.NoteApiViewset, basename="note-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
