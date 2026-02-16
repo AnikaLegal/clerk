@@ -61,6 +61,10 @@ class DateApiViewSet(viewsets.ModelViewSet):
         if user.is_paralegal:
             # Paralegals can only see the dates for cases to which they are assigned.
             queryset = queryset.filter(issue__paralegal=user)
+        elif user.is_lawyer:
+            # Lawyers can only see the dates for cases to which they are
+            # assigned (they could be the lawyer or paralegal on the case).
+            queryset = queryset.filter(Q(issue__paralegal=user) | Q(issue__lawyer=user))
         elif not user.is_coordinator_or_better:
             # If you're not a paralegal or coordinator you can't see anything.
             queryset = queryset.none()

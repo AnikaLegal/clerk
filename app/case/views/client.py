@@ -79,6 +79,10 @@ class ClientApiViewset(
         if user.is_paralegal:
             # Paralegals can only see the clients from assigned cases
             queryset = queryset.filter(issue__paralegal=user)
+        elif user.is_lawyer:
+            # Lawyers can only see the clients from assigned cases (they could
+            # be the lawyer or paralegal on the case)
+            queryset = queryset.filter(Q(issue__paralegal=user) | Q(issue__lawyer=user))
         elif not user.is_coordinator_or_better:
             # If you're not a paralegal or coordinator+ you can't see nuthin.
             queryset = queryset.none()

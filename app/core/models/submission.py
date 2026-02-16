@@ -26,6 +26,6 @@ class Submission(TimestampedModel):
         Returns True if the user has object level permission to access this instance.
         """
         try:
-            return self.issue.paralegal_id == user.pk
+            return self.issue.check_permission(user)
         except ObjectDoesNotExist:
             return False

@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from enum import Enum
 
 import pytest
 from conftest import schema_tester
@@ -6,6 +7,12 @@ from core.factories import ClientFactory, IssueDateFactory, IssueFactory
 from core.models.issue_date import DateType, HearingType, IssueDate
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
+
+
+class AssignedAs(Enum):
+    NONE = 1
+    PARALEGAL = 2
+    LAWYER = 3
 
 
 @pytest.mark.django_db
@@ -292,20 +299,28 @@ def test_issue_date_delete_api(superuser_client: APIClient):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 201),
-        ("unassigned_coordinator", "coordinator_user", False, 201),
-        ("assigned_coordinator", "coordinator_user", True, 201),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 201),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 201),
+        ("lawyer_user", AssignedAs.LAWYER, 201),
+        ("coordinator_user", AssignedAs.NONE, 201),
+        ("coordinator_user", AssignedAs.PARALEGAL, 201),
+        ("coordinator_user", AssignedAs.LAWYER, 201),
+        ("admin_user", AssignedAs.NONE, 201),
+        ("admin_user", AssignedAs.PARALEGAL, 201),
+        ("admin_user", AssignedAs.LAWYER, 201),
     ],
 )
 def test_issue_date_api_create_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
@@ -315,8 +330,11 @@ def test_issue_date_api_create_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
 
     issue_date_stub = IssueDateFactory.stub()
@@ -335,22 +353,28 @@ def test_issue_date_api_create_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 403),
-        ("unassigned_coordinator", "coordinator_user", False, 403),
-        ("assigned_coordinator", "coordinator_user", True, 403),
-        ("unassigned_admin", "admin_user", False, 201),
-        ("assigned_admin", "admin_user", True, 201),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 403),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 403),
+        ("lawyer_user", AssignedAs.LAWYER, 403),
+        ("coordinator_user", AssignedAs.NONE, 403),
+        ("coordinator_user", AssignedAs.PARALEGAL, 403),
+        ("coordinator_user", AssignedAs.LAWYER, 403),
+        ("admin_user", AssignedAs.NONE, 201),
+        ("admin_user", AssignedAs.PARALEGAL, 201),
+        ("admin_user", AssignedAs.LAWYER, 201),
     ],
 )
 def test_issue_date_api_create_with_is_reviewed_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
@@ -361,8 +385,11 @@ def test_issue_date_api_create_with_is_reviewed_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
 
     issue_date_stub = IssueDateFactory.stub()
@@ -382,20 +409,28 @@ def test_issue_date_api_create_with_is_reviewed_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status, expected_count",
+    "user_name, assigned_as, expected_status, expected_count",
     [
-        ("unassigned_user", "unprivileged_user", False, 403, None),
-        ("assigned_user", "unprivileged_user", True, 403, None),
-        ("unassigned_paralegal", "paralegal_user", False, 200, 0),
-        ("assigned_paralegal", "paralegal_user", True, 200, 1),
-        ("unassigned_coordinator", "coordinator_user", False, 200, 1),
-        ("assigned_coordinator", "coordinator_user", True, 200, 1),
+        ("unprivileged_user", AssignedAs.NONE, 403, None),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403, None),
+        ("unprivileged_user", AssignedAs.LAWYER, 403, None),
+        ("paralegal_user", AssignedAs.NONE, 200, 0),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200, 1),
+        ("paralegal_user", AssignedAs.LAWYER, 200, 0),
+        ("lawyer_user", AssignedAs.NONE, 200, 0),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200, 1),
+        ("lawyer_user", AssignedAs.LAWYER, 200, 1),
+        ("coordinator_user", AssignedAs.NONE, 200, 1),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200, 1),
+        ("coordinator_user", AssignedAs.LAWYER, 200, 1),
+        ("admin_user", AssignedAs.NONE, 200, 1),
+        ("admin_user", AssignedAs.PARALEGAL, 200, 1),
+        ("admin_user", AssignedAs.LAWYER, 200, 1),
     ],
 )
 def test_issue_date_api_list_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     expected_count: int,
     user_client,
@@ -406,8 +441,11 @@ def test_issue_date_api_list_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     IssueDateFactory(issue=issue)
 
@@ -425,20 +463,28 @@ def test_issue_date_api_list_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 200),
-        ("unassigned_coordinator", "coordinator_user", False, 200),
-        ("assigned_coordinator", "coordinator_user", True, 200),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200),
+        ("lawyer_user", AssignedAs.LAWYER, 200),
+        ("coordinator_user", AssignedAs.NONE, 200),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200),
+        ("coordinator_user", AssignedAs.LAWYER, 200),
+        ("admin_user", AssignedAs.NONE, 200),
+        ("admin_user", AssignedAs.PARALEGAL, 200),
+        ("admin_user", AssignedAs.LAWYER, 200),
     ],
 )
 def test_issue_date_api_retrieve_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
@@ -448,8 +494,11 @@ def test_issue_date_api_retrieve_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     issue_date = IssueDateFactory(issue=issue)
 
@@ -461,20 +510,28 @@ def test_issue_date_api_retrieve_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 200),
-        ("unassigned_coordinator", "coordinator_user", False, 200),
-        ("assigned_coordinator", "coordinator_user", True, 200),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200),
+        ("lawyer_user", AssignedAs.LAWYER, 200),
+        ("coordinator_user", AssignedAs.NONE, 200),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200),
+        ("coordinator_user", AssignedAs.LAWYER, 200),
+        ("admin_user", AssignedAs.NONE, 200),
+        ("admin_user", AssignedAs.PARALEGAL, 200),
+        ("admin_user", AssignedAs.LAWYER, 200),
     ],
 )
 def test_issue_date_api_update_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
@@ -484,8 +541,11 @@ def test_issue_date_api_update_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     issue_date = IssueDateFactory(issue=issue, type=DateType.FILING_DEADLINE)
 
@@ -500,22 +560,28 @@ def test_issue_date_api_update_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 403),
-        ("unassigned_coordinator", "coordinator_user", False, 403),
-        ("assigned_coordinator", "coordinator_user", True, 403),
-        ("unassigned_admin", "admin_user", False, 200),
-        ("assigned_admin", "admin_user", True, 200),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 403),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 403),
+        ("lawyer_user", AssignedAs.LAWYER, 403),
+        ("coordinator_user", AssignedAs.NONE, 403),
+        ("coordinator_user", AssignedAs.PARALEGAL, 403),
+        ("coordinator_user", AssignedAs.LAWYER, 403),
+        ("admin_user", AssignedAs.NONE, 200),
+        ("admin_user", AssignedAs.PARALEGAL, 200),
+        ("admin_user", AssignedAs.LAWYER, 200),
     ],
 )
 def test_issue_date_api_update_with_is_reviewed_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
@@ -525,8 +591,11 @@ def test_issue_date_api_update_with_is_reviewed_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     issue_date = IssueDateFactory(issue=issue)
 
@@ -541,31 +610,42 @@ def test_issue_date_api_update_with_is_reviewed_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 204),
-        ("unassigned_coordinator", "coordinator_user", False, 204),
-        ("assigned_coordinator", "coordinator_user", True, 204),
+        ("unprivileged_user", AssignedAs.NONE, 403),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
+        ("unprivileged_user", AssignedAs.LAWYER, 403),
+        ("paralegal_user", AssignedAs.NONE, 403),
+        ("paralegal_user", AssignedAs.PARALEGAL, 204),
+        ("paralegal_user", AssignedAs.LAWYER, 403),
+        ("lawyer_user", AssignedAs.NONE, 403),
+        ("lawyer_user", AssignedAs.PARALEGAL, 204),
+        ("lawyer_user", AssignedAs.LAWYER, 204),
+        ("coordinator_user", AssignedAs.NONE, 204),
+        ("coordinator_user", AssignedAs.PARALEGAL, 204),
+        ("coordinator_user", AssignedAs.LAWYER, 204),
+        ("admin_user", AssignedAs.NONE, 204),
+        ("admin_user", AssignedAs.PARALEGAL, 204),
+        ("admin_user", AssignedAs.LAWYER, 204),
     ],
 )
 def test_issue_date_api_delete_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     user_client,
     request,
 ):
     """
-    Test update API perms for different users.
+    Test delete API perms for different users.
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     issue_date = IssueDateFactory(issue=issue)
 

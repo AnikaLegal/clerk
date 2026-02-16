@@ -47,4 +47,7 @@ class Tenancy(TimestampedModel):
         Returns True if the user has object level permission to access this
         instance.
         """
-        return self.issue_set.filter(Q(paralegal=user) | Q(lawyer=user)).exists()
+        for issue in self.issue_set.all():
+            if issue.check_permission(user):
+                return True
+        return False

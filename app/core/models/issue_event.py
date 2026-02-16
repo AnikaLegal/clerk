@@ -1,9 +1,6 @@
-from django.db import models
-from django.contrib.postgres.fields import ArrayField
-from django.contrib.contenttypes.fields import GenericRelation
-from django.db import transaction
-
 from accounts.models import User
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models, transaction
 
 from .issue import Issue
 from .issue_note import IssueNote, NoteType
@@ -140,8 +137,11 @@ class IssueEvent(TimestampedModel):
 
         texts = []
         if is_stage_changed:
-            text = f"Stage changed"
-            fmt_stage = lambda s: s.lower().replace("_", " ").capitalize() if s else s
+            text = "Stage changed"
+
+            def fmt_stage(s):
+                return s.lower().replace("_", " ").capitalize() if s else s
+
             if self.prev_stage:
                 prev_stage = fmt_stage(self.prev_stage)
                 text += f" from {prev_stage}"
