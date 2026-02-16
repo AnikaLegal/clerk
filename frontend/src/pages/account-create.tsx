@@ -10,6 +10,11 @@ import {
 import React from 'react'
 import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 
+interface DjangoContext {
+  group_values: string[]
+}
+const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
+
 const App = () => {
   const [createUser] = useCreateUserMutation()
 
@@ -69,6 +74,7 @@ const App = () => {
         Invite users
       </Title>
       <InviteForm
+        groups={CONTEXT.group_values}
         onSubmit={handleSubmit}
         onCancel={() => {
           /* Do nothing */

@@ -14,7 +14,6 @@ import {
 import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
 import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
 import { GroupLabels } from 'comps/group-label'
-import { GROUPS } from 'consts'
 import { getAPIErrorMessage, mount } from 'utils'
 import { UserPermission } from 'types'
 import { SelectFilter, TextInputFilter } from 'comps/filter'
@@ -23,6 +22,7 @@ import { showNotification } from 'comps/notification'
 interface DjangoContext {
   user: UserPermission
   create_url: string
+  group_values: string[]
 }
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
@@ -46,7 +46,7 @@ const App = () => {
         <Group wrap="nowrap" gap="sm" justify="space-between">
           <span>Accounts</span>
           {CONTEXT.user.is_admin_or_better && (
-            <Button component="a" href={CONTEXT.create_url} size="md">
+            <Button component="a" href={CONTEXT.create_url}>
               Invite users
             </Button>
           )}
@@ -64,7 +64,7 @@ const App = () => {
         <Grid.Col span={6}>
           <SelectFilter
             name="group"
-            data={Object.values(GROUPS).map((group) => ({
+            data={CONTEXT.group_values.map((group) => ({
               value: group,
               label: group,
             }))}
@@ -185,7 +185,10 @@ const UserDataRow = ({ user }: { user: User }) => {
       <Table.Td>{user.email}</Table.Td>
       <Table.Td>{user.created_at}</Table.Td>
       <Table.Td>
-        <GroupLabels groups={user.groups} isSuperUser={user.is_superuser} />
+        <GroupLabels
+          groups={user.groups.value}
+          isSuperUser={user.is_superuser}
+        />
       </Table.Td>
       <Table.Td>
         <Center>

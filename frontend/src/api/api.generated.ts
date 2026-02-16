@@ -176,6 +176,19 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
       }),
     }),
+    getNotes: build.query<GetNotesApiResponse, GetNotesApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/note/`,
+        params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
+          issue: queryArg.issue,
+          creator: queryArg.creator,
+          note_type: queryArg.noteType,
+          reviewee: queryArg.reviewee,
+        },
+      }),
+    }),
     getPeople: build.query<GetPeopleApiResponse, GetPeopleApiArg>({
       query: () => ({ url: `/clerk/api/person/` }),
     }),
@@ -306,11 +319,8 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.userCreate,
       }),
     }),
-    getPotentialUsers: build.query<
-      GetPotentialUsersApiResponse,
-      GetPotentialUsersApiArg
-    >({
-      query: () => ({ url: `/clerk/api/account/potential` }),
+    getUser: build.query<GetUserApiResponse, GetUserApiArg>({
+      query: (queryArg) => ({ url: `/clerk/api/account/${queryArg.id}/` }),
     }),
     updateUser: build.mutation<UpdateUserApiResponse, UpdateUserApiArg>({
       query: (queryArg) => ({
@@ -336,23 +346,11 @@ const injectedRtkApi = api.injectEndpoints({
         method: "POST",
       }),
     }),
-    promoteUserAccountPermissions: build.mutation<
-      PromoteUserAccountPermissionsApiResponse,
-      PromoteUserAccountPermissionsApiArg
+    getPotentialUsers: build.query<
+      GetPotentialUsersApiResponse,
+      GetPotentialUsersApiArg
     >({
-      query: (queryArg) => ({
-        url: `/clerk/api/account/${queryArg.id}/perms-promote/`,
-        method: "POST",
-      }),
-    }),
-    demoteUserAccountPermissions: build.mutation<
-      DemoteUserAccountPermissionsApiResponse,
-      DemoteUserAccountPermissionsApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/clerk/api/account/${queryArg.id}/perms-demote/`,
-        method: "POST",
-      }),
+      query: () => ({ url: `/clerk/api/account/potential` }),
     }),
     getEmailTemplates: build.query<
       GetEmailTemplatesApiResponse,
@@ -677,6 +675,25 @@ export type DownloadEmailAttachmentFromSharepointApiArg = {
   /** Sharepoint ID */
   sharepointId: string;
 };
+export type GetNotesApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: IssueNote[];
+};
+export type GetNotesApiArg = {
+  page?: number;
+  pageSize?: number;
+  /** Entity ID */
+  issue?: string;
+  /** Creator account ID */
+  creator?: number;
+  noteType?: IssueNoteType;
+  /** Reviewee account ID */
+  reviewee?: number;
+};
 export type GetPeopleApiResponse =
   /** status 200 Successful response. */ Person[];
 export type GetPeopleApiArg = void;
@@ -813,13 +830,11 @@ export type CreateUserApiResponse = /** status 201 Successful response. */ User;
 export type CreateUserApiArg = {
   userCreate: UserCreate;
 };
-export type GetPotentialUsersApiResponse =
-  /** status 200 Successful response. */ {
-    email: string;
-    first_name: string;
-    last_name: string;
-  }[];
-export type GetPotentialUsersApiArg = void;
+export type GetUserApiResponse = /** status 200 Successful response. */ User;
+export type GetUserApiArg = {
+  /** Entity ID */
+  id: number;
+};
 export type UpdateUserApiResponse = /** status 200 Successful response. */ User;
 export type UpdateUserApiArg = {
   /** Entity ID */
@@ -842,24 +857,13 @@ export type ResyncUserAccountPermissionsApiArg = {
   /** Entity ID */
   id: number;
 };
-export type PromoteUserAccountPermissionsApiResponse =
-  /** status 201 Successful response. */ {
-    account: User;
-    permissions: MicrosoftUserPermissions;
-  };
-export type PromoteUserAccountPermissionsApiArg = {
-  /** Entity ID */
-  id: number;
-};
-export type DemoteUserAccountPermissionsApiResponse =
-  /** status 201 Successful response. */ {
-    account: User;
-    permissions: MicrosoftUserPermissions;
-  };
-export type DemoteUserAccountPermissionsApiArg = {
-  /** Entity ID */
-  id: number;
-};
+export type GetPotentialUsersApiResponse =
+  /** status 200 Successful response. */ {
+    email: string;
+    first_name: string;
+    last_name: string;
+  }[];
+export type GetPotentialUsersApiArg = void;
 export type GetEmailTemplatesApiResponse =
   /** status 200 Successful response. */ EmailTemplate[];
 export type GetEmailTemplatesApiArg = {
@@ -1098,21 +1102,25 @@ export type Submission = {
 export type IssueBase = {
   topic: string;
 };
-export type UserCreate = {
+export type UserBase = {
   first_name: string;
   last_name: string;
   email: string;
-  groups: string[];
 };
-export type User = UserCreate & {
+export type TextChoiceListField = {
+  display: string;
+  value: string[];
+  choices: string[][];
+};
+export type User = UserBase & {
   id: number;
   case_capacity: number;
   is_intern: boolean;
   is_active: boolean;
+  groups: TextChoiceListField;
   is_superuser: boolean;
   full_name: string;
   created_at: string;
-  groups: string[];
   url: string;
   is_admin_or_better: boolean;
   is_coordinator_or_better: boolean;
@@ -1133,11 +1141,6 @@ export type ClientBase = {
 export type TextChoiceField = {
   display: string;
   value: string;
-  choices: string[][];
-};
-export type TextChoiceListField = {
-  display: string;
-  value: string[];
   choices: string[][];
 };
 export type Client = ClientBase & {
@@ -1279,9 +1282,17 @@ export type IssueNoteBase = {
   text: string;
   event: string | null;
 };
+export type IssueNoteCreator = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  full_name: string;
+  url: string;
+};
 export type IssueNote = IssueNoteBase & {
   id: number;
-  creator: User;
+  creator: IssueNoteCreator;
   text_display: string;
   created_at: string;
   reviewee: User | null;
@@ -1373,6 +1384,16 @@ export type EmailThread = {
 export type EmailAttachmentCreate = {
   file: Blob;
 };
+export type IssueNoteType =
+  | "CONFLICT_CHECK_FAILURE"
+  | "CONFLICT_CHECK_SUCCESS"
+  | "ELIGIBILITY_CHECK_FAILURE"
+  | "ELIGIBILITY_CHECK_SUCCESS"
+  | "EMAIL"
+  | "EVENT"
+  | "PARALEGAL"
+  | "PERFORMANCE"
+  | "REVIEW";
 export type PersonCreate = PersonBase & {
   support_contact_preferences: string;
 };
@@ -1399,6 +1420,9 @@ export type IssueDateCreate = IssueDateBase & {
   issue_id: string;
   notes?: string;
   is_reviewed?: boolean;
+};
+export type UserCreate = UserBase & {
+  groups: string[];
 };
 export type MicrosoftUserPermissions = {
   has_coordinator_perms: boolean;
@@ -1473,6 +1497,7 @@ export const {
   useDeleteEmailAttachmentMutation,
   useUploadEmailAttachmentToSharepointMutation,
   useDownloadEmailAttachmentFromSharepointMutation,
+  useGetNotesQuery,
   useGetPeopleQuery,
   useCreatePersonMutation,
   useSearchPeopleQuery,
@@ -1491,12 +1516,11 @@ export const {
   useUpdateClientMutation,
   useGetUsersQuery,
   useCreateUserMutation,
-  useGetPotentialUsersQuery,
+  useGetUserQuery,
   useUpdateUserMutation,
   useGetUserAccountPermissionsQuery,
   useResyncUserAccountPermissionsMutation,
-  usePromoteUserAccountPermissionsMutation,
-  useDemoteUserAccountPermissionsMutation,
+  useGetPotentialUsersQuery,
   useGetEmailTemplatesQuery,
   useCreateEmailTemplateMutation,
   useGetEmailTemplateQuery,

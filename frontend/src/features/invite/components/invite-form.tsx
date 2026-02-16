@@ -1,7 +1,6 @@
 import { Loader, MultiSelect, TagsInput } from '@mantine/core'
 import { useForm, UseFormInput } from '@mantine/form'
 import { useGetPotentialUsersQuery } from 'api'
-import { GROUPS } from 'consts'
 import { UsersCreate, UsersInvite, UsersInviteSchema } from 'features/invite'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React from 'react'
@@ -15,16 +14,18 @@ export interface InviteFormControlProps {
 }
 
 export interface InviteFormProps {
-  input?: UseFormInput<UsersInvite>
+  groups: string[]
   onSubmit: (form: InviteFormType, values: UsersCreate) => void
   onCancel: () => void
+  input?: UseFormInput<UsersInvite>
   controls?: React.ComponentType<InviteFormControlProps>
 }
 
 export const InviteForm = ({
-  input,
+  groups,
   onSubmit,
   onCancel,
+  input,
   controls,
 }: InviteFormProps) => {
   const potentialUserResult = useGetPotentialUsersQuery()
@@ -85,7 +86,7 @@ export const InviteForm = ({
         {...form.getInputProps('groups')}
         key={form.key('groups')}
         label="Groups"
-        data={Object.values(GROUPS)}
+        data={groups}
         searchable
         clearable
         size="md"

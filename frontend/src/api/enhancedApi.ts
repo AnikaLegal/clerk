@@ -8,6 +8,8 @@ const ENTITY_TYPES = [
   'EMAIL',
   'SERVICE',
   'POTENTIAL_USER',
+  'USER',
+  'USER_PERMISSIONS',
 ] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
@@ -92,11 +94,23 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteCaseDate: {
       invalidatesTags: [{ type: 'CASE_DATE' }],
     },
+    getUser: {
+      providesTags: [{ type: 'USER' }],
+    },
     getPotentialUsers: {
       providesTags: [{ type: 'POTENTIAL_USER' }],
     },
     createUser: {
-      invalidatesTags: [{ type: 'POTENTIAL_USER' }],
+      invalidatesTags: [{ type: 'USER' }, { type: 'POTENTIAL_USER' }],
+    },
+    updateUser: {
+      invalidatesTags: [{ type: 'USER' }],
+    },
+    getUserAccountPermissions: {
+      providesTags: [{ type: 'USER_PERMISSIONS' }],
+    },
+    resyncUserAccountPermissions: {
+      invalidatesTags: [{ type: 'USER' }, { type: 'USER_PERMISSIONS' }],
     },
   },
 })

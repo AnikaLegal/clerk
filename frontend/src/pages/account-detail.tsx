@@ -1,96 +1,103 @@
-import React, { useState } from 'react'
-import { Container, Header, Tab } from 'semantic-ui-react'
-import moment from 'moment'
-import * as Yup from 'yup'
-
-import { TimelineNote } from 'comps/timeline-item'
-import { TableForm } from 'comps/table-form'
-import { getFormSchema, FormField } from 'comps/auto-form'
+import {
+  Center,
+  Container,
+  Group,
+  Loader,
+  Pagination,
+  Tabs,
+  TabsPanelProps,
+  Text,
+  Title,
+} from '@mantine/core'
+import { IconExclamationCircle } from '@tabler/icons-react'
+import {
+  GetCasesApiArg,
+  GetNotesApiArg,
+  useGetCasesQuery,
+  useGetNotesQuery,
+  useGetUserQuery,
+  User,
+  UserCreate,
+  useUpdateUserMutation,
+} from 'api'
+import { MicrosoftAccountAccess } from 'comps/microsoft-account-access'
+import { FormField, getFormSchema } from 'comps/auto-form'
 import { CaseListTable } from 'comps/case-table'
-import { mount } from 'utils'
-import { AccountPermissions } from 'comps/account-permissions'
 import { ErrorBoundary } from 'comps/error-boundary'
 import { FIELD_TYPES } from 'comps/field-component'
-import { User, UserCreate, useUpdateUserMutation } from 'api'
+import { showNotification } from 'comps/notification'
+import { TableForm } from 'comps/table-form'
+import { TimelineNote } from 'comps/timeline-item'
+import React, { useEffect, useState } from 'react'
+import { getAPIErrorMessage, mount } from 'utils'
+import * as Yup from 'yup'
 
 interface DjangoContext {
-  account: User
-  issue_set: any[]
-  lawyer_issues: any[]
-  performance_notes: any[]
+  user: User
+  account_id: number
 }
 
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
-  const [account, setAccount] = useState(CONTEXT.account)
+  const result = useGetUserQuery({ id: CONTEXT.account_id })
+
+  if (result.isError) {
+    return (
+      <ErrorState error={result.error} title="Could not load account details" />
+    )
+  }
+  if (result.isLoading) {
+    return (
+      <Center>
+        <Loader size="lg" />
+      </Center>
+    )
+  }
+  return (
+    <Container size="xl">
+      <AccountDetailHeader result={result} />
+      <AccountUserDetails result={result} />
+      <AccountTabs result={result} />
+    </Container>
+  )
+}
+
+interface AccountDetailHeaderProps {
+  result: ReturnType<typeof useGetUserQuery>
+}
+
+const AccountDetailHeader = ({ result }: AccountDetailHeaderProps) => {
+  const isActive = result.data?.is_active
+  return (
+    <>
+      <Title order={1} c={isActive ? 'inherit' : 'dimmed'}>
+        {result.data?.full_name} {!isActive && ' (inactive)'}
+      </Title>
+      <Text c="dimmed">{result.data?.email}</Text>
+    </>
+  )
+}
+
+interface AccountUserDetailsProps {
+  result: ReturnType<typeof useGetUserQuery>
+}
+
+const AccountUserDetails = ({ result }: AccountUserDetailsProps) => {
+  const [account, setAccount] = useState<User>(result.data)
   const [updateUser] = useUpdateUserMutation()
+
   const update = (id: string, values: { [fieldName: string]: unknown }) =>
     updateUser({
       id: account.id,
       userCreate: values as UserCreate,
     }).unwrap()
 
-  let tabPanes = [
-    {
-      menuItem: 'Paralegal cases',
-      render: () => (
-        <Tab.Pane>
-          <CaseListTable
-            issues={CONTEXT.issue_set.sort(creationSort)}
-            fields={PARALEGAL_TABLE_FIELDS}
-          />
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: 'Lawyer cases',
-      render: () => (
-        <Tab.Pane>
-          <CaseListTable
-            issues={CONTEXT.lawyer_issues.sort(creationSort)}
-            fields={LAWYER_TABLE_FIELDS}
-          />
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: 'Performance notes',
-      render: () => (
-        <Tab.Pane>
-          {CONTEXT.performance_notes.length < 1 && 'No notes yet'}
-          {CONTEXT.performance_notes.map((note) => (
-            <TimelineNote note={note} key={note.id} />
-          ))}
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: 'Permissions',
-      render: () => (
-        <Tab.Pane>
-          <ErrorBoundary>
-            <AccountPermissions account={account} setAccount={setAccount} />
-          </ErrorBoundary>
-        </Tab.Pane>
-      ),
-    },
-  ]
-  // Prioritise lawyer issues if they exist
-  if (CONTEXT.lawyer_issues.length > 0) {
-    tabPanes = [tabPanes[1], tabPanes[0], tabPanes[2], tabPanes[3]]
-  }
-  if (CONTEXT.lawyer_issues.length === 0) {
-    // Don't show lawyer cases.
-    tabPanes = [tabPanes[0], tabPanes[2], tabPanes[3]]
-  }
   return (
-    <Container>
-      <Header as="h1" disabled={!account.is_active}>
-        {account.full_name} {!account.is_active && ' (inactive)'}
-        <Header.Subheader>{account.email}</Header.Subheader>
-      </Header>
-      <Header as="h3">User details</Header>
+    <>
+      <Title order={3} mt="lg">
+        User details
+      </Title>
       <TableForm
         fields={FIELDS}
         schema={SCHEMA}
@@ -99,15 +106,265 @@ const App = () => {
         modelName="account"
         onUpdate={update}
       />
-
-      <Tab style={{ marginTop: '2em' }} panes={tabPanes} />
-    </Container>
+    </>
   )
 }
 
-const creationSort = (a: any, b: any) =>
-  moment(b.created_at, 'DD/MM/YY').unix() -
-  moment(a.created_at, 'DD/MM/YY').unix()
+interface AccountTabsProps {
+  result: ReturnType<typeof useGetUserQuery>
+}
+
+const enum ACCOUNT_TABS {
+  PARALEGAL = 'paralegal',
+  LAWYER = 'lawyer',
+  NOTES = 'notes',
+  PERMISSIONS = 'permissions',
+}
+
+const AccountTabs = ({ result }: AccountTabsProps) => {
+  const [activeTab, setActiveTab] = useState<string | null>(null)
+
+  return (
+    <Tabs
+      variant="outline"
+      mt="xl"
+      onChange={setActiveTab}
+      defaultValue={ACCOUNT_TABS.PARALEGAL}
+      keepMounted={false}
+    >
+      <Tabs.List>
+        <Tabs.Tab value={ACCOUNT_TABS.PARALEGAL}>
+          <Text fw={activeTab === ACCOUNT_TABS.PARALEGAL ? 'bold' : 'normal'}>
+            Paralegal cases
+          </Text>
+        </Tabs.Tab>
+        <Tabs.Tab value={ACCOUNT_TABS.LAWYER}>
+          <Text fw={activeTab === ACCOUNT_TABS.LAWYER ? 'bold' : 'normal'}>
+            Lawyer cases
+          </Text>
+        </Tabs.Tab>
+        <Tabs.Tab value={ACCOUNT_TABS.NOTES}>
+          <Text fw={activeTab === ACCOUNT_TABS.NOTES ? 'bold' : 'normal'}>
+            Performance notes
+          </Text>
+        </Tabs.Tab>
+        <Tabs.Tab value={ACCOUNT_TABS.PERMISSIONS}>
+          <Text fw={activeTab === ACCOUNT_TABS.PERMISSIONS ? 'bold' : 'normal'}>
+            Microsoft account
+          </Text>
+        </Tabs.Tab>
+      </Tabs.List>
+      <ParalegalTabsPanel
+        account={result.data}
+        value={ACCOUNT_TABS.PARALEGAL}
+        p="sm"
+      />
+      <LawyerTabsPanel
+        account={result.data}
+        value={ACCOUNT_TABS.LAWYER}
+        p="sm"
+      />
+      <NotesTabsPanel account={result.data} value={ACCOUNT_TABS.NOTES} p="sm" />
+      <MicrosoftAccountAccessTabsPanel
+        account={result.data}
+        value={ACCOUNT_TABS.PERMISSIONS}
+        p="sm"
+      />
+    </Tabs>
+  )
+}
+
+interface AccountTabsPanelProps extends Omit<TabsPanelProps, 'children'> {
+  account: User
+}
+
+const ParalegalTabsPanel = ({ account, ...props }: AccountTabsPanelProps) => {
+  const [args, setArgs] = useState<GetCasesApiArg>({
+    paralegal: account.id.toString(),
+  })
+  const result = useGetCasesQuery(args)
+  const onPageChange = (page) => setArgs({ ...args, page })
+
+  return (
+    <TabPanelWithBorder {...props}>
+      <PaginatedCaseList
+        result={result}
+        fields={PARALEGAL_TABLE_FIELDS}
+        onPageChange={onPageChange}
+      />
+    </TabPanelWithBorder>
+  )
+}
+
+const LawyerTabsPanel = ({ account, ...props }: AccountTabsPanelProps) => {
+  const [args, setArgs] = useState<GetCasesApiArg>({
+    lawyer: account.id.toString(),
+  })
+  const result = useGetCasesQuery(args)
+  const onPageChange = (page) => setArgs({ ...args, page })
+
+  return (
+    <TabPanelWithBorder {...props}>
+      <PaginatedCaseList
+        result={result}
+        fields={LAWYER_TABLE_FIELDS}
+        onPageChange={onPageChange}
+      />
+    </TabPanelWithBorder>
+  )
+}
+
+const NotesTabsPanel = ({ account, ...props }: AccountTabsPanelProps) => {
+  const [args, setArgs] = useState<GetNotesApiArg>({
+    reviewee: account.id,
+    pageSize: 5,
+  })
+  const result = useGetNotesQuery(args)
+  const onPageChange = (page) => setArgs({ ...args, page })
+
+  return (
+    <TabPanelWithBorder {...props}>
+      <PaginatedNotesList result={result} onPageChange={onPageChange} />
+    </TabPanelWithBorder>
+  )
+}
+
+const MicrosoftAccountAccessTabsPanel = ({
+  account,
+  ...props
+}: AccountTabsPanelProps) => {
+  return (
+    <TabPanelWithBorder {...props}>
+      <ErrorBoundary>
+        <MicrosoftAccountAccess account={account} />
+      </ErrorBoundary>
+    </TabPanelWithBorder>
+  )
+}
+
+interface TabsPanelWithBorderProps extends TabsPanelProps {
+  children: React.ReactNode
+}
+
+const TabPanelWithBorder = ({
+  children,
+  ...props
+}: TabsPanelWithBorderProps) => {
+  const border =
+    'calc(0.0625rem * var(--mantine-scale)) solid var(--tab-border-color)'
+  return (
+    <Tabs.Panel
+      {...props}
+      style={{
+        borderLeft: border,
+        borderRight: border,
+        borderBottom: border,
+      }}
+    >
+      {children}
+    </Tabs.Panel>
+  )
+}
+
+interface ErrorStateProps {
+  title: string
+  error: any
+}
+
+const ErrorState = ({ error, title }: ErrorStateProps) => {
+  useEffect(() => {
+    const message = getAPIErrorMessage(error)
+    showNotification({ type: 'error', title: title, message: message })
+  }, [error])
+
+  return (
+    <Group justify="center" gap="xs" m="sm" c="red">
+      <IconExclamationCircle />
+      <Text>{title}</Text>
+    </Group>
+  )
+}
+
+interface PaginatedCaseListProps {
+  result: ReturnType<typeof useGetCasesQuery>
+  fields: string[]
+  onPageChange: (value: number) => void
+}
+
+export const PaginatedCaseList = ({
+  result,
+  fields,
+  onPageChange,
+}: PaginatedCaseListProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} title="Could not load cases" />
+  }
+
+  if (result.isLoading) {
+    return (
+      <Center>
+        <Loader size="lg" />
+      </Center>
+    )
+  }
+  return (
+    <>
+      <CaseListTable issues={result.data.results} fields={fields} />
+      {!result.isLoading && result.data && (
+        <Pagination
+          value={result.data.current}
+          total={result.data.page_count}
+          onChange={onPageChange}
+          mt="md"
+          withEdges
+          withControls
+        />
+      )}
+    </>
+  )
+}
+
+interface PaginatedNotesListProps {
+  result: ReturnType<typeof useGetNotesQuery>
+  onPageChange: (value: number) => void
+}
+
+export const PaginatedNotesList = ({
+  result,
+  onPageChange,
+}: PaginatedNotesListProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} title="Could not load notes" />
+  }
+
+  if (result.isLoading) {
+    return (
+      <Center>
+        <Loader size="lg" />
+      </Center>
+    )
+  }
+
+  return (
+    <>
+      {result.data.item_count == 0
+        ? 'No notes yet'
+        : result.data.results.map((note) => (
+            <TimelineNote note={note} key={note.id} />
+          ))}
+      {!result.isLoading && result.data && result.data.item_count > 0 && (
+        <Pagination
+          value={result.data.current}
+          total={result.data.page_count}
+          onChange={onPageChange}
+          mt="md"
+          withEdges
+          withControls
+        />
+      )}
+    </>
+  )
+}
 
 const PARALEGAL_TABLE_FIELDS = [
   'fileref',
@@ -154,6 +411,12 @@ const FIELDS: FormField[] = [
     type: FIELD_TYPES.TEXT,
     name: 'case_capacity',
     schema: Yup.number().integer().min(0),
+  },
+  {
+    label: 'Groups',
+    type: FIELD_TYPES.MULTI_CHOICE,
+    name: 'groups',
+    schema: Yup.array().of(Yup.string()),
   },
   {
     label: 'Is active?',

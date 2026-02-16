@@ -39,13 +39,6 @@ export const CASE_TYPES = {
   EVICTION_ARREARS: 'Eviction (Arrears)',
 } as const
 
-export const GROUPS = {
-  PARALEGAL: 'Paralegal',
-  ADMIN: 'Admin',
-  COORDINATOR: 'Coordinator',
-  LAWYER: 'Lawyer',
-} as const
-
 export const SERVICE_CATEGORIES: ServiceCategories = {
   DISCRETE: 'Discrete service',
   ONGOING: 'Ongoing service',

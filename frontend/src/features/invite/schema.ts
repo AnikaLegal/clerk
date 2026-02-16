@@ -1,7 +1,5 @@
 import * as Yup from 'yup'
 
-Yup.setLocale({ mixed: { required: 'This field is required.' } })
-
 export type UserInfo = {
   email: string
   first_name: string
@@ -18,7 +16,9 @@ export type UsersInvite = {
   groups: string[]
 }
 
+const required = 'This field is required.'
+
 export const UsersInviteSchema = Yup.object().shape({
-  users: Yup.array().of(Yup.string()).required(),
-  groups: Yup.array().of(Yup.string()).required(),
+  users: Yup.array().of(Yup.string()).min(1, required).required(required),
+  groups: Yup.array().of(Yup.string()).min(1, required).required(required),
 })

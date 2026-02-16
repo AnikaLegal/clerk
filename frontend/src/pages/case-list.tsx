@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import {
   Container,
-  Header,
   Input,
   Form,
   Pagination,
@@ -71,7 +70,7 @@ const App = () => {
         <Group wrap="nowrap" gap="sm" justify="space-between">
           <span>Cases</span>
           {CONTEXT.user.is_coordinator_or_better && (
-            <Button component="a" href={CONTEXT.create_url} size="md">
+            <Button component="a" href={CONTEXT.create_url}>
               Create a new case
             </Button>
           )}
