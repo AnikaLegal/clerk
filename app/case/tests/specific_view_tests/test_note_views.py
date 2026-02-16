@@ -1,13 +1,21 @@
+from enum import Enum
+
 import pytest
 from conftest import schema_tester
 from core.factories import IssueFactory, IssueNoteFactory
-from core.models.issue_note import NoteType, IssueNote
+from core.models.issue_note import IssueNote, NoteType
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 
-coordinator_note_types_only = (
-    list(set(IssueNote.COORDINATOR_NOTE_TYPES) - set(IssueNote.PARALEGAL_NOTE_TYPES)),
+class AssignedAs(Enum):
+    NONE = 1
+    PARALEGAL = 2
+    LAWYER = 3
+
+
+coordinator_note_types_only = list(
+    set(IssueNote.COORDINATOR_NOTE_TYPES) - set(IssueNote.PARALEGAL_NOTE_TYPES)
 )
 
 
@@ -74,28 +82,32 @@ def test_issue_note_list_api__search_filter(superuser_client: APIClient):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status, expected_count",
+    "user_name, assigned_as, expected_status, expected_count",
     [
-        ("unassigned_user", "unprivileged_user", False, 403, None),
-        ("assigned_user", "unprivileged_user", True, 403, None),
-        ("unassigned_paralegal", "paralegal_user", False, 200, 0),
-        ("assigned_paralegal", "paralegal_user", True, 200, 0),
-        ("unassigned_lawyer", "lawyer_user", False, 200, 0),
-        ("assigned_lawyer", "lawyer_user", True, 200, 0),
-        ("unassigned_coordinator", "coordinator_user", False, 200, 1),
-        ("assigned_coordinator", "coordinator_user", True, 200, 1),
-        ("unassigned_admin", "admin_user", False, 200, 1),
-        ("assigned_admin", "admin_user", True, 200, 1),
+        ("unprivileged_user", AssignedAs.NONE, 403, None),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403, None),
+        ("unprivileged_user", AssignedAs.LAWYER, 403, None),
+        ("paralegal_user", AssignedAs.NONE, 200, 0),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200, 0),
+        ("paralegal_user", AssignedAs.LAWYER, 200, 0),
+        ("lawyer_user", AssignedAs.NONE, 200, 0),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200, 0),
+        ("lawyer_user", AssignedAs.LAWYER, 200, 0),
+        ("coordinator_user", AssignedAs.NONE, 200, 1),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200, 1),
+        ("coordinator_user", AssignedAs.LAWYER, 200, 1),
+        ("admin_user", AssignedAs.NONE, 200, 1),
+        ("admin_user", AssignedAs.PARALEGAL, 200, 1),
+        ("admin_user", AssignedAs.LAWYER, 200, 1),
     ],
 )
 @pytest.mark.parametrize("note_type", coordinator_note_types_only)
 def test_issue_note_api_list_coordinator_note_types(
-    test_user: str,
+    note_type: NoteType,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     expected_count: int,
-    note_type: NoteType,
     user_client,
     request,
 ):
@@ -105,8 +117,11 @@ def test_issue_note_api_list_coordinator_note_types(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     IssueNoteFactory(issue=issue, note_type=note_type)
 
@@ -124,24 +139,28 @@ def test_issue_note_api_list_coordinator_note_types(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status, expected_count",
+    "user_name, assigned_as, expected_status, expected_count",
     [
-        ("unassigned_user", "unprivileged_user", False, 403, None),
-        ("assigned_user", "unprivileged_user", True, 403, None),
-        ("unassigned_paralegal", "paralegal_user", False, 200, 0),
-        ("assigned_paralegal", "paralegal_user", True, 200, 1),
-        ("unassigned_lawyer", "lawyer_user", False, 200, 0),
-        ("assigned_lawyer", "lawyer_user", True, 200, 1),
-        ("unassigned_coordinator", "coordinator_user", False, 200, 1),
-        ("assigned_coordinator", "coordinator_user", True, 200, 1),
-        ("unassigned_admin", "admin_user", False, 200, 1),
-        ("assigned_admin", "admin_user", True, 200, 1),
+        ("unprivileged_user", AssignedAs.NONE, 403, None),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403, None),
+        ("unprivileged_user", AssignedAs.LAWYER, 403, None),
+        ("paralegal_user", AssignedAs.NONE, 200, 0),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200, 1),
+        ("paralegal_user", AssignedAs.LAWYER, 200, 0),
+        ("lawyer_user", AssignedAs.NONE, 200, 0),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200, 1),
+        ("lawyer_user", AssignedAs.LAWYER, 200, 1),
+        ("coordinator_user", AssignedAs.NONE, 200, 1),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200, 1),
+        ("coordinator_user", AssignedAs.LAWYER, 200, 1),
+        ("admin_user", AssignedAs.NONE, 200, 1),
+        ("admin_user", AssignedAs.PARALEGAL, 200, 1),
+        ("admin_user", AssignedAs.LAWYER, 200, 1),
     ],
 )
 def test_issue_note_api_list_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     expected_count: int,
     user_client,
@@ -152,8 +171,11 @@ def test_issue_note_api_list_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     IssueNoteFactory(issue=issue, note_type=NoteType.PARALEGAL)
 
@@ -171,24 +193,28 @@ def test_issue_note_api_list_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status, expected_count",
+    "user_name, assigned_as, expected_status, expected_count",
     [
-        ("unassigned_user", "unprivileged_user", False, 403, None),
-        ("assigned_user", "unprivileged_user", True, 403, None),
-        ("unassigned_paralegal", "paralegal_user", False, 200, 1),
-        ("assigned_paralegal", "paralegal_user", True, 200, 1),
-        ("unassigned_lawyer", "lawyer_user", False, 200, 1),
-        ("assigned_lawyer", "lawyer_user", True, 200, 1),
-        ("unassigned_coordinator", "coordinator_user", False, 200, 1),
-        ("assigned_coordinator", "coordinator_user", True, 200, 1),
-        ("unassigned_admin", "admin_user", False, 200, 1),
-        ("assigned_admin", "admin_user", True, 200, 1),
+        ("unprivileged_user", AssignedAs.NONE, 403, None),
+        ("unprivileged_user", AssignedAs.PARALEGAL, 403, None),
+        ("unprivileged_user", AssignedAs.LAWYER, 403, None),
+        ("paralegal_user", AssignedAs.NONE, 200, 1),
+        ("paralegal_user", AssignedAs.PARALEGAL, 200, 1),
+        ("paralegal_user", AssignedAs.LAWYER, 200, 1),
+        ("lawyer_user", AssignedAs.NONE, 200, 1),
+        ("lawyer_user", AssignedAs.PARALEGAL, 200, 1),
+        ("lawyer_user", AssignedAs.LAWYER, 200, 1),
+        ("coordinator_user", AssignedAs.NONE, 200, 1),
+        ("coordinator_user", AssignedAs.PARALEGAL, 200, 1),
+        ("coordinator_user", AssignedAs.LAWYER, 200, 1),
+        ("admin_user", AssignedAs.NONE, 200, 1),
+        ("admin_user", AssignedAs.PARALEGAL, 200, 1),
+        ("admin_user", AssignedAs.LAWYER, 200, 1),
     ],
 )
 def test_issue_note_api_list_perms_as_creator(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: AssignedAs,
     expected_status: int,
     expected_count: int,
     user_client,
@@ -199,8 +225,11 @@ def test_issue_note_api_list_perms_as_creator(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if is_assigned:
+    if assigned_as == AssignedAs.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == AssignedAs.LAWYER:
+        issue.lawyer = user
         issue.save()
     IssueNoteFactory(issue=issue, note_type=NoteType.PARALEGAL, creator=user)
 

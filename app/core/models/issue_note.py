@@ -95,12 +95,7 @@ class IssueNote(TimestampedModel):
         super().save(*args, **kwargs)
 
     def check_permissions(self, user):
-        return (
-            user.is_coordinator_or_better
-            or self.creator == user
-            or self.issue.paralegal == user
-            or self.issue.lawyer == user
-        )
+        return self.creator == user or self.issue.check_permission(user)
 
     @staticmethod
     def annotate_with_eligibility_checks(queryset: QuerySet[Issue]) -> QuerySet[Issue]:

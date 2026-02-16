@@ -54,12 +54,15 @@ class NoteApiViewset(GenericViewSet, ListModelMixin):
         user = self.request.user
         queryset = self.search_queryset(queryset)
 
-        # Paralegals & lawyers can only view their own notes & the notes added to
-        # issues to which they are assigned.
-        if not user.is_coordinator_or_better:
+        if user.is_paralegal:
+            queryset = queryset.filter(Q(creator=user) | Q(issue__paralegal=user))
+        elif user.is_lawyer:
             queryset = queryset.filter(
-                Q(creator=user) | Q(issue__paralegal=user) | Q(issue__lawyer=user)
+                Q(creator=user) | Q(issue__lawyer=user) | Q(issue__paralegal=user)
             )
+        elif not user.is_coordinator_or_better:
+            queryset = queryset.none()
+
         return queryset
 
     def search_queryset(self, queryset: QuerySet[IssueNote]) -> QuerySet[IssueNote]:
