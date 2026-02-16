@@ -161,8 +161,12 @@ const SharepointAccessCell = ({ account }: SharepointAccessCellProps) => {
 
   const data = result.data
 
-  if (data?.has_coordinator_perms) {
-    return <Text>Full access</Text>
+  if (data?.has_full_access) {
+    return (
+      <Badge radius="sm" color="green.6">
+        Full access
+      </Badge>
+    )
   }
 
   return (

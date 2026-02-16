@@ -20,13 +20,13 @@ EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
 @dataclass
 class MicrosoftUserPermissions:
-    has_coordinator_perms: bool
+    has_full_access: bool
     paralegal_perm_issues: list[Issue]
     paralegal_perm_missing_issues: list[Issue]
 
 
 def get_user_permissions(user):
-    has_coordinator_perms = False
+    has_full_access = False
     paralegal_perm_issues = []
     paralegal_perm_missing_issues = []
 
@@ -35,10 +35,7 @@ def get_user_permissions(user):
         members = api.group.members()
         owners = api.group.owners()
 
-        # TODO: has_coordinator_perms is misnamed - it has nothing to do with
-        # coordinator perms, it's just whether the user is in the relevant
-        # group. We should rename it.
-        has_coordinator_perms = user.email in members or user.email in owners
+        has_full_access = user.email in members or user.email in owners
 
         queryset = (
             Issue.objects.select_related(
@@ -50,14 +47,17 @@ def get_user_permissions(user):
         )
         for issue in queryset:
             case_path = f"cases/{issue.id}"
-            has_access = False
 
-            for permission in api.folder.list_permissions(case_path):
-                if granted_to_v2 := permission.get("grantedToV2"):
-                    email = granted_to_v2.get("user", {}).get("email")
-                    if email and email == user.email:
-                        has_access = True
-                        break
+            # We don't need to check permissions explicitly for each folder for
+            # users with full access.
+            has_access = has_full_access
+            if not has_access:
+                for permission in api.folder.list_permissions(case_path):
+                    if granted_to_v2 := permission.get("grantedToV2"):
+                        email = granted_to_v2.get("user", {}).get("email")
+                        if email and email == user.email:
+                            has_access = True
+                            break
 
             if has_access:
                 paralegal_perm_issues.append(issue)
@@ -65,7 +65,7 @@ def get_user_permissions(user):
                 paralegal_perm_missing_issues.append(issue)
 
     return MicrosoftUserPermissions(
-        has_coordinator_perms=has_coordinator_perms,
+        has_full_access=has_full_access,
         paralegal_perm_issues=paralegal_perm_issues,
         paralegal_perm_missing_issues=paralegal_perm_missing_issues,
     )

@@ -1425,7 +1425,7 @@ export type UserCreate = UserBase & {
   groups: string[];
 };
 export type MicrosoftUserPermissions = {
-  has_coordinator_perms: boolean;
+  has_full_access: boolean;
   paralegal_perm_issues: Issue[];
   paralegal_perm_missing_issues: Issue[];
 };

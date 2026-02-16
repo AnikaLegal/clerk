@@ -104,7 +104,7 @@ const enhancedApi = generatedApi.enhanceEndpoints({
       invalidatesTags: [{ type: 'USER' }, { type: 'POTENTIAL_USER' }],
     },
     updateUser: {
-      invalidatesTags: [{ type: 'USER' }],
+      invalidatesTags: [{ type: 'USER' }, { type: 'USER_PERMISSIONS' }],
     },
     getUserAccountPermissions: {
       providesTags: [{ type: 'USER_PERMISSIONS' }],

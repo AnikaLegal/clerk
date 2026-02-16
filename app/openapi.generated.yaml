@@ -2982,7 +2982,7 @@ components:
     MicrosoftUserPermissions:
       type: object
       properties:
-        has_coordinator_perms:
+        has_full_access:
           type: boolean
         paralegal_perm_issues:
           type: array
@@ -2993,7 +2993,7 @@ components:
           items:
             $ref: "#/components/schemas/Issue"
       required:
-        - has_coordinator_perms
+        - has_full_access
         - paralegal_perm_issues
         - paralegal_perm_missing_issues
     EmailTemplateCreate:
