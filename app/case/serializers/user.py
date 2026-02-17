@@ -1,4 +1,4 @@
-from accounts.models import CaseGroups, User
+from accounts.models import User
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.urls import reverse
