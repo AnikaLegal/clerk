@@ -29,8 +29,8 @@ def test_generic_list_view_schema(
     """
     # Create an instance of the model
     Model = test_case.factory._meta.model
-    instance_count = Model.objects.count()
     instance = test_case.factory.create()
+    instance_count = Model.objects.count()
 
     # Try view a list of instances
     list_view_name = f"{test_case.base_view_name}-list"
@@ -39,13 +39,25 @@ def test_generic_list_view_schema(
 
     # Check results
     assert response.status_code == 200, response.json()
-    assert len(response.json()) == instance_count + 1
-    ids = [o["id"] for o in response.json()]
+
+    # Check is the response is paginated and test accordingly.
+    json_response = response.json()
+    if "results" in json_response:
+        # Paginated response
+        assert json_response["item_count"] == instance_count
+        results = json_response["results"]
+    else:
+        # Non-paginated response
+        assert len(json_response) == instance_count
+        results = json_response
+
+    ids = [o["id"] for o in results]
 
     if isinstance(instance.id, uuid.UUID):
         assert str(instance.id) in ids
     else:
         assert instance.id in ids
+
     schema_tester.validate_response(response=response)
 
 
