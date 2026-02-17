@@ -23,7 +23,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ("first_name", "last_name", "email", "groups", "url")
 
     groups = serializers.SlugRelatedField(
-        many=True, read_only=False, slug_field="name", queryset=Group.objects.all()
+        many=True,
+        read_only=False,
+        slug_field="name",
+        queryset=Group.objects.all(),
     )
     url = serializers.SerializerMethodField()
 
@@ -75,7 +78,7 @@ class UserSerializer(serializers.ModelSerializer):
         many=True,
         read_only=False,
         slug_field="name",
-        queryset=Group.objects.filter(name__in=CaseGroups.values),
+        queryset=Group.objects.all(),
     )
 
     url = serializers.SerializerMethodField()
