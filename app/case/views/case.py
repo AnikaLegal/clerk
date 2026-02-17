@@ -1,3 +1,4 @@
+from accounts.models import User
 from core.events.service import (
     on_service_create,
     on_service_delete,
@@ -331,6 +332,7 @@ class CaseApiViewset(
                 ServiceEvent.objects.filter(service__issue=issue)
                 .select_related("user")
                 .prefetch_related("user__groups"),
+                User.objects.filter(issuenote__issue=issue),
             ],
         )
 
