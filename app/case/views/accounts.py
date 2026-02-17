@@ -190,7 +190,7 @@ def _load_ms_permissions(user) -> Optional[dict]:
         return
 
     return {
-        "has_full_access": perms.has_full_access,
+        "access_level": perms.access_level,
         "issues_with_access": IssueSerializer(perms.issues_with_access, many=True).data,
         "issues_without_access": IssueSerializer(
             perms.issues_without_access, many=True

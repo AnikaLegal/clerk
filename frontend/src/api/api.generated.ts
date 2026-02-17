@@ -1425,7 +1425,7 @@ export type UserCreate = UserBase & {
   groups: string[];
 };
 export type MicrosoftUserPermissions = {
-  has_full_access: boolean;
+  access_level: "FULL_ACCESS" | "PARTIAL_ACCESS" | "NO_ACCESS";
   issues_with_access: Issue[];
   issues_without_access: Issue[];
 };

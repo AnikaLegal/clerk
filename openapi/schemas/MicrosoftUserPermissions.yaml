@@ -1,7 +1,11 @@
 type: object
 properties:
-  has_full_access:
-    type: boolean
+  access_level:
+    type: string
+    enum:
+      - FULL_ACCESS
+      - PARTIAL_ACCESS
+      - NO_ACCESS
   issues_with_access:
     type: array
     items:
@@ -11,6 +15,6 @@ properties:
     items:
       $ref: ./Issue.yaml
 required:
-  - has_full_access
+  - access_level
   - issues_with_access
   - issues_without_access

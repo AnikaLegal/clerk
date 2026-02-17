@@ -161,14 +161,20 @@ const SharepointAccessCell = ({ account }: SharepointAccessCellProps) => {
 
   const data = result.data
 
-  if (data?.has_full_access) {
+  if (data?.access_level === 'NO_ACCESS') {
+    return (
+      <Badge radius="sm" color="red.6">
+        No access
+      </Badge>
+    )
+  }
+  if (data?.access_level === 'FULL_ACCESS') {
     return (
       <Badge radius="sm" color="green.6">
         Full access
       </Badge>
     )
   }
-
   return (
     <Group gap="0.25rem">
       {data?.issues_with_access.map((i) => (

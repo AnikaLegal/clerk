@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from os.path import basename
-from typing import Tuple
+from typing import Literal, Tuple
 
 from accounts.models import User
 from core.models import DocumentTemplate, FileUpload, Issue
@@ -20,55 +20,57 @@ EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
 @dataclass
 class MicrosoftUserPermissions:
-    has_full_access: bool
+    access_level: Literal["FULL_ACCESS", "PARTIAL_ACCESS", "NO_ACCESS"]
     issues_with_access: list[Issue]
     issues_without_access: list[Issue]
 
 
 def get_user_permissions(user):
-    has_full_access = False
-    issues_with_access = []
-    issues_without_access = []
-
     api = MSGraphAPI()
-    if api.user.get(user.email):
-        members = api.group.members()
-        owners = api.group.owners()
-
-        has_full_access = user.email in members or user.email in owners
-
-        queryset = (
-            Issue.objects.select_related(
-                "client", "tenancy__agent", "tenancy__landlord"
-            )
-            .prefetch_related("paralegal__groups", "lawyer__groups")
-            .filter(Q(paralegal=user) | Q(lawyer=user))
-            .all()
-        )
-        for issue in queryset:
-            case_path = f"cases/{issue.id}"
-
-            # We don't need to check permissions explicitly for each folder for
-            # users with full access.
-            has_access = has_full_access
-            if not has_access:
-                for permission in api.folder.list_permissions(case_path):
-                    if granted_to_v2 := permission.get("grantedToV2"):
-                        email = granted_to_v2.get("user", {}).get("email")
-                        if email and email == user.email:
-                            has_access = True
-                            break
-
-            if has_access:
-                issues_with_access.append(issue)
-            else:
-                issues_without_access.append(issue)
-
-    return MicrosoftUserPermissions(
-        has_full_access=has_full_access,
-        issues_with_access=issues_with_access,
-        issues_without_access=issues_without_access,
+    user_perms = MicrosoftUserPermissions(
+        access_level="NO_ACCESS",
+        issues_with_access=[],
+        issues_without_access=[],
     )
+
+    def is_user_in_group(email):
+        return email in api.group.members() or email in api.group.owners()
+
+    user_exists = api.user.get(user.email) is not None
+    user_perms.access_level = (
+        "FULL_ACCESS"
+        if user_exists and is_user_in_group(user.email)
+        else "PARTIAL_ACCESS"
+        if user_exists
+        else "NO_ACCESS"
+    )
+
+    queryset = (
+        Issue.objects.select_related(
+            "client", "tenancy__agent", "tenancy__landlord", "support_worker"
+        )
+        .prefetch_related("paralegal__groups", "lawyer__groups")
+        .filter(Q(paralegal=user) | Q(lawyer=user))
+        .all()
+    )
+    for issue in queryset:
+        # We don't need to check permissions explicitly for each folder for
+        # users with full access.
+        has_access = user_perms.access_level == "FULL_ACCESS"
+        if user_exists and not has_access:
+            for permission in api.folder.list_permissions(f"cases/{issue.id}"):
+                if granted_to_v2 := permission.get("grantedToV2"):
+                    email = granted_to_v2.get("user", {}).get("email")
+                    if email and email == user.email:
+                        has_access = True
+                        break
+
+        if has_access:
+            user_perms.issues_with_access.append(issue)
+        else:
+            user_perms.issues_without_access.append(issue)
+
+    return user_perms
 
 
 def set_up_new_user(user):
