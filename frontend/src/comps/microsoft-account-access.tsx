@@ -112,7 +112,7 @@ const MicrosoftAccountCell = ({ account }: MicrosoftAccountCellProps) => {
           onClick={handleClick}
           disabled={!account.is_active || !account.is_ms_account_set_up}
         >
-          <Tooltip openDelay={750} label="Reset Microsoft access permissions">
+          <Tooltip openDelay={750} label="Reset access permissions">
             <IconRefresh
               className={result.isLoading ? styles.iconRotate : undefined}
             />
