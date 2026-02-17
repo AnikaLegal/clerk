@@ -36,14 +36,16 @@ def get_user_permissions(user):
     def is_user_in_group(email):
         return email in api.group.members() or email in api.group.owners()
 
-    user_exists = api.user.get(user.email) is not None
-    user_perms.access_level = (
-        "FULL_ACCESS"
-        if user_exists and is_user_in_group(user.email)
-        else "PARTIAL_ACCESS"
-        if user_exists
-        else "NO_ACCESS"
-    )
+    def get_access_level(user):
+        return (
+            "FULL_ACCESS"
+            if is_user_in_group(user.email)
+            else "PARTIAL_ACCESS"
+            if api.user.get(user.email)
+            else "NO_ACCESS"
+        )
+
+    user_perms.access_level = get_access_level(user)
 
     queryset = (
         Issue.objects.select_related(
@@ -54,10 +56,12 @@ def get_user_permissions(user):
         .all()
     )
     for issue in queryset:
-        # We don't need to check permissions explicitly for each folder for
-        # users with full access.
-        has_access = user_perms.access_level == "FULL_ACCESS"
-        if user_exists and not has_access:
+        if user_perms.access_level == "FULL_ACCESS":
+            has_access = True
+        elif user_perms.access_level == "NO_ACCESS":
+            has_access = False
+        else:
+            has_access = False
             for permission in api.folder.list_permissions(f"cases/{issue.id}"):
                 if granted_to_v2 := permission.get("grantedToV2"):
                     email = granted_to_v2.get("user", {}).get("email")
