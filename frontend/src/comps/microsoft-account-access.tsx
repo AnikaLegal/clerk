@@ -155,7 +155,7 @@ interface SharepointAccessCellProps {
 const SharepointAccessCell = ({ account }: SharepointAccessCellProps) => {
   const result = useGetUserAccountPermissionsQuery({ id: account.id })
 
-  if (result.isLoading) {
+  if (result.isFetching) {
     return <Loader size="sm" />
   }
 
