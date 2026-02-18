@@ -152,31 +152,31 @@ class IssueEventFactory(TimestampedModelFactory):
         lambda o: not o.prev_is_open if o.event_type == EventType.OPEN else None
     )
 
-    prev_stage = factory.LazyAttribute(
-        lambda o: (
-            fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
-            if o.event_type == EventType.STAGE
-            else None
-        )
-    )
-    next_stage = factory.LazyAttribute(
-        lambda o: (
-            fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
-            if o.event_type == EventType.STAGE
-            else None
-        )
-    )
+    @factory.lazy_attribute
+    def prev_stage(self):
+        if self.event_type == EventType.STAGE:
+            return fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+        return None
 
+    @factory.lazy_attribute
+    def next_stage(self):
+        if self.event_type == EventType.STAGE:
+            return fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+        return None
+
+    # NOTE: These would be simpler using @factory.lazy_attribute but I could not
+    # get it to work properly.
     prev_user = factory.Maybe(
         factory.LazyAttribute(
-            lambda o: o.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+            lambda self: self.event_type in [EventType.LAWYER, EventType.PARALEGAL]
         ),
         yes_declaration=factory.SubFactory(UserFactory),
         no_declaration=None,
     )
+
     next_user = factory.Maybe(
         factory.LazyAttribute(
-            lambda o: o.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+            lambda self: self.event_type in [EventType.LAWYER, EventType.PARALEGAL]
         ),
         yes_declaration=factory.SubFactory(UserFactory),
         no_declaration=None,
@@ -193,27 +193,34 @@ class IssueNoteFactory(TimestampedModelFactory):
     note_type = factory.Faker("random_element", elements=NoteType)
     text = factory.Faker("sentence")
 
+    # NOTE: This would be simpler using @factory.lazy_attribute but I could not
+    # get it to work properly.
     content_object = factory.Maybe(
-        factory.LazyAttribute(lambda o: o.note_type == NoteType.EVENT),
+        factory.LazyAttribute(lambda self: self.note_type == NoteType.EVENT),
         yes_declaration=factory.SubFactory(
             IssueEventFactory, issue=factory.SelfAttribute("..issue")
         ),
-        no_declaration=None,
-    )
-    object_id = factory.Maybe(
-        factory.LazyAttribute(
-            lambda o: o.note_type == NoteType.EVENT and hasattr(o.content_object, "pk")
+        no_declaration=factory.Maybe(
+            factory.LazyAttribute(lambda self: self.note_type == NoteType.PERFORMANCE),
+            yes_declaration=factory.SubFactory(UserFactory),
+            no_declaration=None,
         ),
-        yes_declaration=factory.LazyAttribute(lambda o: o.content_object.pk),
-        no_declaration=None,
     )
-    content_type = factory.Maybe(
-        factory.LazyAttribute(lambda o: o.note_type == NoteType.EVENT),
-        yes_declaration=factory.LazyAttribute(
-            lambda o: ContentType.objects.get_for_model(IssueEvent)
-        ),
-        no_declaration=None,
-    )
+
+    @factory.lazy_attribute
+    def object_id(self):
+        if self.note_type == NoteType.EVENT or self.note_type == NoteType.PERFORMANCE:
+            if hasattr(self.content_object, "pk"):
+                return self.content_object.pk
+        return None
+
+    @factory.lazy_attribute
+    def content_type(self):
+        if self.note_type == NoteType.EVENT:
+            return ContentType.objects.get_for_model(IssueEvent)
+        if self.note_type == NoteType.PERFORMANCE:
+            return ContentType.objects.get_for_model(User)
+        return None
 
 
 @factory.django.mute_signals(post_save)
