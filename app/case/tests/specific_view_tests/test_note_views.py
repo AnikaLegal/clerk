@@ -21,8 +21,8 @@ coordinator_note_types_only = list(
 
 @pytest.mark.django_db
 def test_issue_note_list_api(superuser_client: APIClient):
-    instance_1 = IssueNoteFactory(note_type=NoteType.PARALEGAL)
-    instance_2 = IssueNoteFactory(note_type=NoteType.PARALEGAL)
+    instance_1 = IssueNoteFactory()
+    instance_2 = IssueNoteFactory()
 
     url = reverse("note-api-list")
     response = superuser_client.get(url)
@@ -46,8 +46,8 @@ def test_issue_note_list_api(superuser_client: APIClient):
 
 @pytest.mark.django_db
 def test_issue_note_list_api__search_filter(superuser_client: APIClient):
-    instance_1 = IssueNoteFactory(note_type=NoteType.PARALEGAL)
-    instance_2 = IssueNoteFactory(note_type=NoteType.PARALEGAL)
+    instance_1 = IssueNoteFactory()
+    instance_2 = IssueNoteFactory()
     url = reverse("note-api-list")
 
     # Empty search parameter - ignored
