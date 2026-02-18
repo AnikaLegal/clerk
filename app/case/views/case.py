@@ -318,8 +318,7 @@ class CaseApiViewset(
             "content_object",
             [
                 IssueEvent.objects.filter(issue=issue).select_related(
-                    "prev_user",
-                    "next_user",
+                    "prev_user", "next_user"
                 ),
                 AuditEvent.objects.filter(
                     log_entry__content_type=ContentType.objects.get_for_model(
@@ -332,7 +331,6 @@ class CaseApiViewset(
                 ServiceEvent.objects.filter(service__issue=issue)
                 .select_related("user")
                 .prefetch_related("user__groups"),
-                User.objects.filter(issuenote__issue=issue),
             ],
         )
 
