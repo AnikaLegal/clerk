@@ -1,3 +1,4 @@
+# ruff: noqa
 from .base import *
 
 ENVIRONMENT = "test"
@@ -59,6 +60,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = None
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = None
 TWILIO_ACCOUNT_SID = None
 TWILIO_AUTH_TOKEN = None
+
+# The package that uses these expects string values.
+RECAPTCHA_PRIVATE_KEY = ""
+RECAPTCHA_PUBLIC_KEY = ""
 
 
 INSTALLED_APPS += ["zeal"]
