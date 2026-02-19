@@ -12,3 +12,5 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         for issue in Issue.objects.filter(fileref__in=kwargs["fileref"]):
             set_up_new_case(issue)
+            issue.is_sharepoint_set_up = True
+            issue.save()
