@@ -1,3 +1,4 @@
+# ruff: noqa
 from .base import *
 
 ENVIRONMENT = "test"
@@ -63,5 +64,11 @@ TWILIO_ACCOUNT_SID = None
 TWILIO_AUTH_TOKEN = None
 
 # The package that uses these expects string values.
-RECAPTCHA_PRIVATE_KEY = "test-private-key"
-RECAPTCHA_PUBLIC_KEY = "test-public-key"
+RECAPTCHA_PRIVATE_KEY = ""
+RECAPTCHA_PUBLIC_KEY = ""
+
+
+INSTALLED_APPS += ["zeal"]
+MIDDLEWARE += ["zeal.middleware.zeal_middleware"]
+ZEAL_RAISE = False
+ZEAL_SHOW_ALL_CALLERS = False
