@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from 'react'
 import {
-  Container,
-  Group,
-  Title,
-  Button,
-  Grid,
-  Table,
-  Center,
-  Loader,
-  Text,
   Anchor,
+  Button,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Pagination,
+  Table,
+  Text,
+  Title,
 } from '@mantine/core'
 import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
 import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
-import { GroupLabels } from 'comps/group-label'
-import { getAPIErrorMessage, mount } from 'utils'
-import { UserPermission } from 'types'
 import { SelectFilter, TextInputFilter } from 'comps/filter'
+import { GroupLabels } from 'comps/group-label'
 import { showNotification } from 'comps/notification'
+import React, { useEffect, useState } from 'react'
+import { UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   user: UserPermission
@@ -28,6 +29,7 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [args, setArgs] = useState<GetUsersApiArg>({
+    page: 1,
     sort: '-date_joined',
     isActive: true,
   })
@@ -37,6 +39,7 @@ const App = () => {
     setArgs((prevArgs) => ({
       ...prevArgs,
       [key]: value !== null ? value : undefined,
+      page: 1, // Reset to first page on filter change
     }))
   }
 
@@ -52,6 +55,12 @@ const App = () => {
           )}
         </Group>
       </Title>
+      {!result.isLoading && result.data && (
+        <Text c="dimmed">
+          Showing {result.data.results.length} of {result.data.item_count}{' '}
+          accounts
+        </Text>
+      )}
       <Grid mt="lg">
         <Grid.Col span={12}>
           <TextInputFilter
@@ -107,6 +116,16 @@ const App = () => {
           <TableBody result={result} dataRow={UserDataRow} />
         </Table.Tbody>
       </Table>
+      {!result.isLoading && result.data && (
+        <Pagination
+          total={result.data.page_count}
+          value={args.page || 1}
+          onChange={(page) => setArgs({ ...args, page })}
+          mt="md"
+          withEdges
+          withControls
+        />
+      )}
     </Container>
   )
 }
@@ -160,7 +179,7 @@ const TableBody = ({ result, dataRow }: TableBodyProps) => {
     return <LoadingState />
   }
 
-  const data: User[] = result.data || []
+  const data: User[] = result.data?.results || []
   if (data.length < 1) {
     return <EmptyState />
   }

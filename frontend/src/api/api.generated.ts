@@ -305,6 +305,8 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/account/`,
         params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
           name: queryArg.name,
           group: queryArg.group,
           is_active: queryArg.isActive,
@@ -809,8 +811,17 @@ export type UpdateClientApiArg = {
   /** Successful response. */
   clientCreate: ClientCreate;
 };
-export type GetUsersApiResponse = /** status 200 Successful response. */ User[];
+export type GetUsersApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: User[];
+};
 export type GetUsersApiArg = {
+  page?: number;
+  pageSize?: number;
   name?: string;
   group?: string;
   isActive?: boolean;

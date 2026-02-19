@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from accounts.models import User, CaseGroups
+from accounts.models import CaseGroups, User
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
@@ -25,6 +25,7 @@ from case.serializers import (
     UserCreateSerializer,
     UserSerializer,
 )
+from case.utils.pagination import ClerkPaginator
 from case.utils.react import render_react_page
 from case.views.auth import (
     AdminOrBetterPermission,
@@ -69,11 +70,16 @@ def account_create_page_view(request):
     return render_react_page(request, "Invite paralegal", "account-create", context)
 
 
+class AccountPaginator(ClerkPaginator):
+    page_size = 20
+
+
 class AccountApiViewset(
     GenericViewSet, UpdateModelMixin, ListModelMixin, RetrieveModelMixin
 ):
     serializer_class = UserSerializer
     permission_classes = [CoordinatorOrBetterPermission]
+    pagination_class = AccountPaginator
 
     def get_queryset(self):
         queryset = User.objects.prefetch_related("groups").all()
