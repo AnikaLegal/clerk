@@ -172,3 +172,118 @@ def test_resync_account_permissions_view(
         "issues_with_access": [],
         "issues_without_access": [],
     }
+
+
+@pytest.mark.django_db
+@patch("case.views.accounts.list_directory_users")
+def test_account_list_potential_users__returns_active_users(
+    mock_list_directory_users, superuser_client: APIClient
+):
+    """Test that potential users endpoint returns active users from Google Directory."""
+    mock_list_directory_users.return_value = [
+        {
+            "primaryEmail": "charlie.brown@example.com",
+            "name": {"givenName": "Charlie", "familyName": "Brown"},
+            "suspended": False,
+        },
+        {
+            "primaryEmail": "sally.brown@example.com",
+            "name": {"givenName": "Sally", "familyName": "Brown"},
+            "suspended": False,
+        },
+    ]
+
+    url = reverse("account-api-potential")
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+    assert len(data) == 2
+    emails = {user["email"] for user in data}
+    assert emails == {"charlie.brown@example.com", "sally.brown@example.com"}
+
+
+@pytest.mark.django_db
+@patch("case.views.accounts.list_directory_users")
+def test_account_list_potential_users__excludes_suspended_users(
+    mock_list_directory_users, superuser_client: APIClient
+):
+    """Test that suspended users are excluded from potential users list."""
+    mock_list_directory_users.return_value = [
+        {
+            "primaryEmail": "charlie.brown@example.com",
+            "name": {"givenName": "Charlie", "familyName": "Brown"},
+            "suspended": False,
+        },
+        {
+            "primaryEmail": "suspended.user@example.com",
+            "name": {"givenName": "Suspended", "familyName": "User"},
+            "suspended": True,
+        },
+    ]
+
+    url = reverse("account-api-potential")
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["email"] == "charlie.brown@example.com"
+
+
+@pytest.mark.django_db
+@patch("case.views.accounts.list_directory_users")
+def test_account_list_potential_users__excludes_existing_users(
+    mock_list_directory_users, superuser_client: APIClient
+):
+    """Test that users already in the system are excluded from potential users."""
+    UserFactory(email="charlie.brown@example.com")
+
+    mock_list_directory_users.return_value = [
+        {
+            "primaryEmail": "charlie.brown@example.com",
+            "name": {"givenName": "Charlie", "familyName": "Brown"},
+            "suspended": False,
+        },
+        {
+            "primaryEmail": "sally.brown@example.com",
+            "name": {"givenName": "Sally", "familyName": "Brown"},
+            "suspended": False,
+        },
+    ]
+
+    url = reverse("account-api-potential")
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["email"] == "sally.brown@example.com"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_client_name, expected_status",
+    [
+        ("user_client", 403),
+        ("paralegal_user_client", 403),
+        ("lawyer_user_client", 403),
+        ("coordinator_user_client", 403),
+        ("admin_user_client", 200),
+    ],
+)
+@patch("case.views.accounts.list_directory_users")
+def test_issue_date_api_list_perms(
+    mock_list_directory_users,
+    user_client_name: str,
+    expected_status: int,
+    request,
+):
+    """
+    Test list API perms for different users.
+    """
+    client = request.getfixturevalue(user_client_name)
+    url = reverse("account-api-potential")
+    response = client.get(url)
+
+    assert response.status_code == expected_status
