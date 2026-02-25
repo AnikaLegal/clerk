@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Checkbox,
   Container,
@@ -16,8 +16,10 @@ import { useSnackbar } from 'notistack'
 import * as Yup from 'yup'
 
 import {
+  GetPeopleApiArg,
   Issue,
   IssueUpdate,
+  Person,
   TenancyCreate,
   useGetCaseQuery,
   useGetPeopleQuery,
@@ -321,8 +323,27 @@ const PersonSearchCard: React.FC<PersonSearchCardProps> = ({
   onSelect,
   isLoading,
 }) => {
-  const { data, isFetching } = useGetPeopleQuery()
-  const people = data || []
+  const [data, setData] = useState<Person[]>([])
+  const [args, setArgs] = useState<GetPeopleApiArg>({
+    page: 1,
+    pageSize: 500,
+  })
+  const result = useGetPeopleQuery(args)
+
+  useEffect(() => {
+    if (result.data) {
+      setData((prev) => [...prev, ...result.data!.results])
+
+      // If there are more pages, fetch the next one
+      if (result.data.next !== null) {
+        setArgs((prev) => ({ ...prev, page: args.page! + 1 }))
+      }
+    }
+  }, [result.data])
+
+  const showLoading =
+    isLoading || result.isFetching || result.data?.next !== null
+
   return (
     <div className="ui card fluid">
       <div className="content">
@@ -336,9 +357,9 @@ const PersonSearchCard: React.FC<PersonSearchCardProps> = ({
           fluid
           search
           selection
-          loading={isFetching || isLoading}
+          loading={showLoading}
           placeholder="Select a person"
-          options={people.map((p) => ({
+          options={data.map((p) => ({
             key: p.id,
             text: p.email ? `${p.full_name} (${p.email})` : p.full_name,
             value: p.id,
