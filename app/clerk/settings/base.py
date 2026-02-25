@@ -354,7 +354,7 @@ EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_DOMAIN = "em7221.test-mail.anikalegal.org.au"
+EMAIL_DOMAIN = "test-mail.anikalegal.org.au"
 EMAIL_BUCKET_NAME = None  # Overwrite me
 
 # Marketing emails via MailChimp

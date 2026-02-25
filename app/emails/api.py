@@ -23,7 +23,7 @@ from sendgrid.helpers.mail import (
 
 BASE_URL = "https://api.sendgrid.com"
 HEADERS = {"Authorization": f"Bearer {settings.SENDGRID_API_KEY}"}
-DEV_EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.org.au"
+DEV_EMAIL_DOMAIN = "dev-mail.anikalegal.org.au"
 EMAIL_DOMAIN = settings.EMAIL_DOMAIN
 
 

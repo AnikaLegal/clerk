@@ -63,7 +63,7 @@ TWILIO_PHONE_NUMBER = "+61480016398"
 TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "em9037.mail.anikalegal.org.au"
+EMAIL_DOMAIN = "mail.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
