@@ -14,6 +14,7 @@ from django.contrib.auth.models import Group
 from openapi_tester import SchemaTester
 from rest_framework.test import APIClient
 from utils.signals import disable_signals, restore_signals
+from zeal import zeal_context
 
 schema_tester = SchemaTester(schema_file_path="/app/openapi.generated.yaml")
 
@@ -21,6 +22,12 @@ schema_tester = SchemaTester(schema_file_path="/app/openapi.generated.yaml")
 @pytest.fixture(autouse=True, scope="session")
 def set_faker_locale():
     with factory.Faker.override_default_locale("en_AU"):
+        yield
+
+
+@pytest.fixture(autouse=True, scope="function")
+def use_zeal():
+    with zeal_context():
         yield
 
 
