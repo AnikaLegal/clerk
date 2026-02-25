@@ -9,8 +9,7 @@ IS_PROD = True
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
-    "www.anikalegal.com",
-    "clerk.anikalegal.com",  # TODO: Remove
+    "anikalegal.org.au",
     "127.0.0.1",
     "localhost",
 ]
@@ -20,14 +19,14 @@ WEBMASTER_EMAIL = "webmaster@anikalegal.com"
 SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 INTAKE_NOEMAIL_EMAIL = "coordinators@anikalegal.com"
 
-SESSION_COOKIE_DOMAIN = ".anikalegal.com"
+SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
 SESSION_SAVE_EVERY_REQUEST = True
-CSRF_COOKIE_DOMAIN = ".anikalegal.com"
-CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.com"]
+CSRF_COOKIE_DOMAIN = ".anikalegal.org.au"
+CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.org.au"]
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
-    r"^(https?://)?(\w*-*\w*\.+)*anikalegal\.com$",
+    r"^(https?://)?(\w*-*\w*\.+)*anikalegal\.org\.au$",
     r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",
 )
 
@@ -64,7 +63,7 @@ TWILIO_PHONE_NUMBER = "+61480016398"
 TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "em9037.mail.anikalegal.com"
+EMAIL_DOMAIN = "em9037.mail.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
@@ -80,5 +79,5 @@ CASES_FOLDER_ID = "017MQILZDHEEIISZQLR5HZOMU4KKAUM34D"
 MS_REMOVE_OFFICE_LICENCES = True
 
 SLACK_EMAIL_ALERT_OVERRIDE = None
-CLERK_BASE_URL = "https://www.anikalegal.com"
+CLERK_BASE_URL = "https://anikalegal.org.au"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL

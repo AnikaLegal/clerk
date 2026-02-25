@@ -8,8 +8,7 @@ ENVIRONMENT = "staging"
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
-    "test.anikalegal.com",
-    "test-clerk.anikalegal.com",  # TODO: Remove
+    "test.anikalegal.org.au",
     "127.0.0.1",
     "localhost",
 ]
@@ -18,14 +17,14 @@ EMAIL_PREFIX = "TEST"
 WEBMASTER_EMAIL = "webmaster@anikalegal.com"
 SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 
-SESSION_COOKIE_DOMAIN = ".anikalegal.com"
+SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
 SESSION_SAVE_EVERY_REQUEST = True
-CSRF_COOKIE_DOMAIN = ".anikalegal.com"
-CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.com"]
+CSRF_COOKIE_DOMAIN = ".anikalegal.org.au"
+CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.org.au"]
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
-    r"^(https?://)?(\w*-*\w*\.+)*anikalegal\.com$",
+    r"^(https?://)?(\w*-*\w*\.+)*anikalegal\.org\.au$",
     r"^(https?://)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d{4})?$",
 )
 
@@ -55,7 +54,7 @@ MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "em7221.test-mail.anikalegal.com"
+EMAIL_DOMAIN = "em7221.test-mail.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
@@ -73,5 +72,5 @@ MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
 MS_GRAPH_DRIVE_ID = "b!zBUQNn3jdEO44jZXmI-2GO0Krjc71QFLkmFqmCjMqFZZhq6ZPsfjR6HYQBbAK0_E"
 CASES_FOLDER_ID = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
-CLERK_BASE_URL = "https://test.anikalegal.com"
+CLERK_BASE_URL = "https://test.anikalegal.org.au"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL

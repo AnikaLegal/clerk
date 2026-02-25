@@ -30,4 +30,4 @@ inv ngrok https://90c8-194-193-130-131.ngrok.io
 
 Then wait a minute or so for these settings to propagate. You can see these settings in the SendGrid web UI [here](https://app.sendgrid.com/settings/parse).
 
-Dev emails can be sent to the subdomain `em9463.dev-mail.anikalegal.com`. Check the case email tab in the Clerk web UI to get a test email.
+Dev emails can be sent to the subdomain `em9463.dev-mail.anikalegal.org.au`. Check the case email tab in the Clerk web UI to get a test email.

@@ -25,7 +25,7 @@ const INELIGIBLE_REASONS: { [key: string]: React.ReactElement } = {
         It looks like the person you're trying to refer is not receiving
         casework support from you. If you are supporting a friend or family,
         please ask them to apply for help from{' '}
-        <a href="https://intake.anikalegal.com">our intake form</a> directly.
+        <a href="https://intake.anikalegal.org.au">our intake form</a> directly.
       </Text.Body>
     </Splash.Content>
   ),
