@@ -1,5 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core'
 import { ModalsProvider } from '@mantine/modals'
+import { Notifications } from '@mantine/notifications'
 import { Error as ErrorType } from 'api'
 import { store } from 'api/store'
 import { ErrorBoundary } from 'comps/error-boundary'
@@ -12,15 +13,16 @@ import slackifyMarkdown from 'slackify-markdown'
 import styled from 'styled-components'
 import xss, { OnTagAttrHandler } from 'xss'
 
-import 'dayjs/locale/en-au'
 import { DatesProvider } from '@mantine/dates'
+import 'dayjs/locale/en-au'
 
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 import '@mantine/core/styles.css'
-import '@mantine/tiptap/styles.css'
 import '@mantine/dates/styles.css'
+import '@mantine/notifications/styles.css'
+import '@mantine/tiptap/styles.css'
 
 dayjs.extend(customParseFormat)
 
@@ -88,6 +90,7 @@ export const mount = (App: React.ComponentType) => {
             <ModalsProvider>
               <ErrorBoundary>
                 <FadeInOnLoad>
+                  <Notifications limit={3} />
                   <App />
                 </FadeInOnLoad>
               </ErrorBoundary>
@@ -154,27 +157,33 @@ export interface ErrorResult {
 
 // Read API error message for display in a notification.
 export const getAPIErrorMessage = (
-  err: ErrorResult,
-  baseMessage: string
+  error: ErrorResult,
+  baseMessage?: string
 ): string => {
-  if ('originalStatus' in err && err.originalStatus === 500) {
-    return `${baseMessage}: something went very wrong`
-  }
+  let message: string | null = null
 
-  if (!err.data) return baseMessage
-  const formattedMessages = []
-  for (let errorMessages of Object.values(err.data)) {
-    if (Array.isArray(errorMessages)) {
-      formattedMessages.push(errorMessages.join(', '))
-    } else {
-      formattedMessages.push(errorMessages)
+  if ('originalStatus' in error && error.originalStatus === 500) {
+    message = 'Something went very wrong'
+  } else if (error.data) {
+    const formattedMessages: string[] = []
+    for (const messages of Object.values(error.data)) {
+      if (Array.isArray(messages)) {
+        formattedMessages.push(messages.join(', '))
+      } else {
+        formattedMessages.push(messages)
+      }
+    }
+    if (formattedMessages.length > 0) {
+      message = formattedMessages.join(', ')
     }
   }
-  if (formattedMessages.length > 0) {
-    return `${baseMessage}: ${formattedMessages.join(', ')}`
-  } else {
-    return baseMessage
+  if (!message) {
+    message = 'An unknown error occurred'
   }
+  if (baseMessage) {
+    return `${baseMessage}: ${message}`
+  }
+  return message
 }
 
 interface FormErrors {
