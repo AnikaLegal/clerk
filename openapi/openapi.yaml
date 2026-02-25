@@ -38,8 +38,6 @@ paths:
 
   /clerk/api/person/:
     $ref: paths/person-list.yaml
-  /clerk/api/person/search/:
-    $ref: paths/person-search.yaml
   /clerk/api/person/{id}/:
     $ref: paths/person-detail.yaml
 
