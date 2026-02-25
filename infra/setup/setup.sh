@@ -1,16 +1,28 @@
-#!/bin/bash
-set -e
-HOST='13.55.250.149'
+#!/usr/bin/env bash
 
-echo -e "\n>>> Importing prod envars"
+set -o errexit
+prog=$(basename "$0")
+
+if [ -z "$1" ]; then
+    echo "Usage: $prog <HOST>"
+    exit 1
+fi  
+HOST=$1
+
+echo -e "\n>>> Importing envars"
 export $(grep -v '^#' env/prod.env | xargs)
+
 
 echo -e "\n>>> Setting up $HOST"
 
-echo -e "\n>>> Uploading infra files to $HOST"
+if ssh root@$HOST '[ -d /srv/infra/ ]'; then
+    echo -e "\n>>> Host $HOST is already set up. Exiting."
+    exit 1
+fi
+
+echo -e "\n>>> Copying infra files to $HOST"
 ssh root@$HOST mkdir -p /srv/
-ssh root@$HOST rm -rf /srv/infra/
-scp -r infra/ root@$HOST:/srv/infra/
+scp -r infra/ root@$HOST:/srv/infra
 
 echo -e "\n>>> Updating apt sources on $HOST"
 ssh root@$HOST apt-get update -qq
@@ -35,3 +47,4 @@ echo -e "\n>>> Hardening server on $HOST"
 ssh root@$HOST /srv/infra/security/setup.sh
 
 echo -e "\n>>> Finished setting up $HOST"
+exit 0
