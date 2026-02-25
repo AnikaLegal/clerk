@@ -12,7 +12,6 @@ HOST=$1
 echo -e "\n>>> Importing envars"
 export $(grep -v '^#' env/prod.env | xargs)
 
-
 echo -e "\n>>> Setting up $HOST"
 
 if ssh root@$HOST '[ -d /srv/infra/ ]'; then
