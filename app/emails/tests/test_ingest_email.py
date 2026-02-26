@@ -38,7 +38,7 @@ SUCCESS_TEST_CASES = [
             "to_address": "case.0e62ccc2@fake.anikalegal.org.au",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 2",
-            "text": "Elinor’s heart, which had undergone many changes in the course of this",
+            "text": "Elinor's heart, which had undergone many changes in the course of this",
         },
     },
     # Multiple recipients and cc addresses, different ordering of addresses.
@@ -56,7 +56,7 @@ SUCCESS_TEST_CASES = [
             "to_address": "case.0e62ccc2@fake.anikalegal.org.au",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 3",
-            "text": "Miss Bennet’s astonishment was soon lessened by the strong sisterly",
+            "text": "Miss Bennet's astonishment was soon lessened by the strong sisterly",
         },
     },
 ]
