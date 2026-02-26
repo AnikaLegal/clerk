@@ -1,8 +1,17 @@
+#!/usr/bin/env bash
+set -o errexit
+
 if ! command -v docker &> /dev/null
 then
+    echo -e "\n>>> Installing Docker"
+
+    # Prevent locale warnings during installation
+    export LC_ALL=C.UTF-8
+    export DEBIAN_FRONTEND=noninteractive
+
     # Add Docker's official GPG key:
-    apt update
-    apt install ca-certificates curl
+    apt-get update
+    apt-get install --yes ca-certificates curl
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     chmod a+r /etc/apt/keyrings/docker.asc
@@ -16,8 +25,7 @@ Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
-    apt update
-    apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt-get install --yes docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     echo -e "\n>>> Enabling Docker Swarm"
     docker swarm init

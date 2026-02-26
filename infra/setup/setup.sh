@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
 set -o errexit
+
 prog=$(basename "$0")
 
 if [ -z "$1" ]; then
@@ -9,22 +9,23 @@ if [ -z "$1" ]; then
 fi  
 HOST=$1
 
+echo -e "\n>>> Setting up $HOST"
+if ssh root@$HOST '[ -d /srv/infra/ ]'; then
+    read -p "Looks like host $HOST is already set up. Do you want to continue? (y/N) "
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 0
+    fi
+fi
+
 echo -e "\n>>> Importing envars"
 export $(grep -v '^#' env/prod.env | xargs)
 
-echo -e "\n>>> Setting up $HOST"
-
-if ssh root@$HOST '[ -d /srv/infra/ ]'; then
-    echo -e "\n>>> Host $HOST is already set up. Exiting."
-    exit 1
-fi
-
 echo -e "\n>>> Copying infra files to $HOST"
-ssh root@$HOST mkdir -p /srv/
-scp -r infra/ root@$HOST:/srv/infra
+ssh root@$HOST mkdir -p /srv/infra
+scp -r infra/setup/* root@$HOST:/srv/infra/
 
 echo -e "\n>>> Updating apt sources on $HOST"
-ssh root@$HOST apt-get update -qq
+ssh root@$HOST apt-get update -qq --yes
 
 echo -e "\n>>> Setting up NGINX on $HOST"
 ssh root@$HOST /srv/infra/nginx/setup.sh
