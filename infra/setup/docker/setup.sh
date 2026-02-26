@@ -25,7 +25,7 @@ Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
-    apt-get install --yes docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt install --yes docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     echo -e "\n>>> Enabling Docker Swarm"
     docker swarm init
