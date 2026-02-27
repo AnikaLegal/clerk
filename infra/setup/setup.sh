@@ -24,6 +24,10 @@ echo -e "\n>>> Copying infra files to $HOST"
 ssh root@$HOST mkdir -p /srv/infra
 scp -r infra/setup/* root@$HOST:/srv/infra/
 
+ssh root@$HOST localectl set-locale LANG=en_US.UTF-8
+unset LC_ALL
+unset LC_CTYPE
+
 echo -e "\n>>> Updating apt sources on $HOST"
 ssh root@$HOST apt-get update -qq --yes
 
