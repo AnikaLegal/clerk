@@ -27,7 +27,7 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
+AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 
 # Sentry

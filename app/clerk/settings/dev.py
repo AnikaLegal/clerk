@@ -14,7 +14,7 @@ ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
-AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
+AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
