@@ -30,13 +30,13 @@ docker context use remote
 echo -e "\n>>> Downloading clerk:staging Docker image on host $CLERK_HOST"
 docker pull anikalaw/clerk:staging
 
-echo -e "\n>>> Resetting clerk-test database on host $CLERK_HOST"
+echo -e "\n>>> Resetting clerk_staging database on host $CLERK_HOST"
 ssh root@$CLERK_HOST /bin/bash <<EOF
   set -o errexit
   set -o pipefail
-  psql -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'clerk-test';"
-  psql -c "DROP DATABASE IF EXISTS \"clerk-test\";"
-  sudo -Hiu postgres -- psql -U postgres -c "CREATE DATABASE \"clerk-test\" WITH OWNER = \"clerk\" ENCODING = 'UTF8';"
+  psql -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'clerk_staging';"
+  psql -c "DROP DATABASE IF EXISTS \"clerk_staging\";"
+  sudo -Hiu postgres -- psql -U postgres -c "CREATE DATABASE \"clerk_staging\" WITH OWNER = \"clerk_staging\" ENCODING = 'UTF8';"
 EOF
 
 echo -e "\n>>> Restoring staging environment on host $CLERK_HOST"

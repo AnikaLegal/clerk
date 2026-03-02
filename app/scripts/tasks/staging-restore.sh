@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 # NOTE: check before blowing the database away!
-if [[ $PGDATABASE != "clerk-test" ]]; then
+if [[ $PGDATABASE != "clerk_staging" ]]; then
     echo -e "\n>>> Error: unexpected PGDATABASE $PGDATABASE"
     exit 1
 fi
