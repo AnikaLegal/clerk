@@ -8,7 +8,7 @@ ENVIRONMENT = "staging"
 DEBUG = False
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
-    "test.anikalegal.org.au",
+    "staging.anikalegal.org.au",
     "127.0.0.1",
     "localhost",
 ]
@@ -54,7 +54,7 @@ MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "mail.test.anikalegal.org.au"
+EMAIL_DOMAIN = "mail.staging.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
@@ -72,5 +72,5 @@ MS_GRAPH_GROUP_ID = "4d0ce3f7-cec0-478b-aae8-1d981c2aede2"
 MS_GRAPH_DRIVE_ID = "b!zBUQNn3jdEO44jZXmI-2GO0Krjc71QFLkmFqmCjMqFZZhq6ZPsfjR6HYQBbAK0_E"
 CASES_FOLDER_ID = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
-CLERK_BASE_URL = "https://test.anikalegal.org.au"
+CLERK_BASE_URL = "https://staging.anikalegal.org.au"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
