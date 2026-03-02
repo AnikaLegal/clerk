@@ -10,14 +10,14 @@ SUCCESS_TEST_CASES = [
     {
         "received_data": {
             "from": "Example From <from@example.com>",
-            "to": "case.0e62ccc2@fake.anikalegal.org.au",
+            "to": "case.0e62ccc2@mail.fake.anikalegal.org.au",
             "subject": "Hello World 1",
             "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.org.au"],"from":"from@example.com"}',
+            "envelope": '{"to":["case.0e62ccc2@mail.fake.anikalegal.org.au"],"from":"from@example.com"}',
         },
         "expected_parsed": {
             "from_address": "from@example.com",
-            "to_address": "case.0e62ccc2@fake.anikalegal.org.au",
+            "to_address": "case.0e62ccc2@mail.fake.anikalegal.org.au",
             "cc_addresses": [],
             "subject": "Hello World 1",
             "text": "Mrs. Elton began to think she had been wrong in disclaiming so warmly.",
@@ -27,15 +27,15 @@ SUCCESS_TEST_CASES = [
     {
         "received_data": {
             "from": "From Example <from@example.com>",
-            "to": "case.0e62ccc2@fake.anikalegal.org.au, Example To <to@example.com>",
+            "to": "case.0e62ccc2@mail.fake.anikalegal.org.au, Example To <to@example.com>",
             "cc": "CC1 <cc_1@example.com>",
             "subject": "Hello World 2",
             "text": "Elinor's heart, which had undergone many changes in the course of this",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.org.au"],"from":"from@example.com"}',
+            "envelope": '{"to":["case.0e62ccc2@mail.fake.anikalegal.org.au"],"from":"from@example.com"}',
         },
         "expected_parsed": {
             "from_address": "from@example.com",
-            "to_address": "case.0e62ccc2@fake.anikalegal.org.au",
+            "to_address": "case.0e62ccc2@mail.fake.anikalegal.org.au",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 2",
             "text": "Elinor's heart, which had undergone many changes in the course of this",
@@ -45,15 +45,15 @@ SUCCESS_TEST_CASES = [
     {
         "received_data": {
             "from": "Example From <from@example.com>",
-            "to": "To Example <to@example.com>, case.0e62ccc2@fake.anikalegal.org.au",
+            "to": "To Example <to@example.com>, case.0e62ccc2@mail.fake.anikalegal.org.au",
             "cc": "CC1 <cc_1@example.com>",
             "subject": "Hello World 3",
             "text": "Miss Bennet's astonishment was soon lessened by the strong sisterly",
-            "envelope": '{"to":["case.0e62ccc2@fake.anikalegal.org.au"],"from":"from@example.com"}',
+            "envelope": '{"to":["case.0e62ccc2@mail.fake.anikalegal.org.au"],"from":"from@example.com"}',
         },
         "expected_parsed": {
             "from_address": "from@example.com",
-            "to_address": "case.0e62ccc2@fake.anikalegal.org.au",
+            "to_address": "case.0e62ccc2@mail.fake.anikalegal.org.au",
             "cc_addresses": ["cc_1@example.com", "to@example.com"],
             "subject": "Hello World 3",
             "text": "Miss Bennet's astonishment was soon lessened by the strong sisterly",
@@ -69,7 +69,7 @@ def test_ingest_email__with_success(settings, test_data):
         test_data["expected_parsed"],
         test_data["received_data"],
     )
-    settings.EMAIL_DOMAIN = "fake.anikalegal.org.au"
+    settings.EMAIL_DOMAIN = "mail.fake.anikalegal.org.au"
     issue = IssueFactory(id=uuid.UUID("0e62ccc2-b9ee-4a07-979a-da8a9d450404"))
     email = EmailFactory(
         state=EmailState.RECEIVED, received_data=received_data, issue=None

@@ -54,7 +54,7 @@ MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "test-mail.anikalegal.org.au"
+EMAIL_DOMAIN = "mail.test.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 

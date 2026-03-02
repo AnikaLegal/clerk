@@ -28,7 +28,7 @@ Q_CLUSTER = {
 }
 
 
-EMAIL_DOMAIN = "fake.anikalegal.org.au"
+EMAIL_DOMAIN = "mail.fake.anikalegal.org.au"
 SUBMISSION_EMAILS = ["test@example.com"]
 
 # Reminder emails via MailChimp

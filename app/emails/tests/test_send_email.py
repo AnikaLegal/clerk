@@ -7,9 +7,9 @@ from core.factories import IssueFactory
 
 @pytest.mark.django_db
 def test_build_email_address(settings):
-    settings.EMAIL_DOMAIN = "fake.anikalegal.org.au"
+    settings.EMAIL_DOMAIN = "mail.fake.anikalegal.org.au"
     issue_pk = "0e62ccc2-b9ee-4a07-979a-da8a9d450404"
     issue = IssueFactory(id=issue_pk)
     issue_addr = build_clerk_address(issue)
-    expected = "Anika Legal <case.0e62ccc2@fake.anikalegal.org.au>"
+    expected = "Anika Legal <case.0e62ccc2@mail.fake.anikalegal.org.au>"
     assert issue_addr == expected
