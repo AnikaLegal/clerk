@@ -13,10 +13,6 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-EMAIL_PREFIX = "TEST"
-WEBMASTER_EMAIL = "webmaster@anikalegal.com"
-SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
-
 SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
 SESSION_SAVE_EVERY_REQUEST = True
 CSRF_COOKIE_DOMAIN = ".anikalegal.org.au"

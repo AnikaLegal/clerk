@@ -3,7 +3,6 @@ from .base import *
 
 ENVIRONMENT = "test"
 DEBUG = False
-EMAIL_PREFIX = "TEST"
 SECRET_KEY = "test-secret-key"
 ALLOWED_HOSTS = ["*"]
 DATABASES["default"]["name"] = "test"
@@ -29,7 +28,6 @@ Q_CLUSTER = {
 
 
 EMAIL_DOMAIN = "mail.fake.anikalegal.org.au"
-SUBMISSION_EMAILS = ["test@example.com"]
 
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = ""

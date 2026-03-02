@@ -14,9 +14,6 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-EMAIL_PREFIX = None
-WEBMASTER_EMAIL = "webmaster@anikalegal.com"
-SUBMISSION_EMAILS = [WEBMASTER_EMAIL]
 INTAKE_NOEMAIL_EMAIL = "coordinators@anikalegal.com"
 
 SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
