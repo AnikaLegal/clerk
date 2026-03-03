@@ -17,12 +17,8 @@ if ssh root@$HOST '[ -d /srv/infra/ ]'; then
     fi
 fi
 
-echo -e "\n>>> Importing envars"
-export $(grep -v '^#' env/prod.env | xargs)
-
 echo -e "\n>>> Copying infra files to $HOST"
-ssh root@$HOST mkdir -p /srv/infra
-scp -r infra/setup/* root@$HOST:/srv/infra/
+rsync -av --delete --delete-before --filter='- /setup*.sh' infra/setup/ root@$HOST:/srv/infra
 
 ssh root@$HOST localectl set-locale LANG=en_US.UTF-8
 unset LC_ALL
@@ -35,11 +31,7 @@ echo -e "\n>>> Setting up NGINX on $HOST"
 ssh root@$HOST /srv/infra/nginx/setup.sh
 
 echo -e "\n>>> Setting up Postgres on $HOST"
-ssh root@$HOST \
-    PGDATABASE=$PGDATABASE \
-    PGUSER=$PGUSER \
-    PGPASSWORD=$PGPASSWORD \
-     /srv/infra/postgres/setup.sh
+ssh root@$HOST /srv/infra/postgres/setup.sh
 
 echo -e "\n>>> Setting up Docker on $HOST"
 ssh root@$HOST /srv/infra/docker/setup.sh
@@ -49,6 +41,12 @@ ssh root@$HOST /srv/infra/aws/setup.sh
 
 echo -e "\n>>> Hardening server on $HOST"
 ssh root@$HOST /srv/infra/security/setup.sh
+
+echo -e "\n>>> Setting up staging environment"
+bash infra/setup/setup-staging.sh $HOST
+
+echo -e "\n>>> Setting up production environment"
+bash infra/setup/setup-prod.sh $HOST
 
 echo -e "\n>>> Finished setting up $HOST"
 exit 0
