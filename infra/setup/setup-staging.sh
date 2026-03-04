@@ -23,6 +23,15 @@ echo -e "\n>>> Setting up staging environment on $HOST"
         PGUSER=$PGUSER \
         PGPASSWORD=$PGPASSWORD \
         /srv/infra/postgres/init.sh
+
+    # The following privilege adjustments allow the staging database to be
+    # dropped and recreated by PGUSER.
+
+    echo -e "\n>>> Changing ownership of database $PGDATABASE to $PGUSER"
+    ssh root@$HOST "sudo -Hiu postgres psql -tAc 'ALTER DATABASE $PGDATABASE OWNER TO $PGUSER;'" 
+
+    echo -e "\n>>> Allow $PGUSER to create databases"
+    ssh root@$HOST "sudo -Hiu postgres psql -tAc 'ALTER USER $PGUSER WITH CREATEDB;'"
 )
 
 echo -e "\n>>> Deploying Clerk for staging on host $HOST"
