@@ -35,12 +35,12 @@ echo -e "\n>>> Setting up staging environment on $HOST"
 )
 
 echo -e "\n>>> Deploying Clerk for staging on host $HOST"
+trap "{ docker context rm -f remote; }" EXIT
 docker context create remote --docker "host=ssh://root@${HOST}"
-export DOCKER_CONTEXT=remote
+docker context use remote
 
 ssh root@$HOST mkdir -p /var/log/clerk/staging/web
 ssh root@$HOST mkdir -p /var/log/clerk/staging/worker
-docker stack deploy --compose-file "docker/docker-compose.staging.yml" clerk_staging
-docker context rm -f remote
+docker stack deploy --detach=true --prune --compose-file "docker/docker-compose.staging.yml" clerk_staging
 
 exit 0

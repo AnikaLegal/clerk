@@ -26,12 +26,12 @@ echo -e "\n>>> Setting up production environment on $HOST"
 )
 
 echo -e "\n>>> Deploying Clerk for production on host $HOST"
+trap "{ docker context rm -f remote; }" EXIT
 docker context create remote --docker "host=ssh://root@${HOST}"
-export DOCKER_CONTEXT=remote
+docker context use remote
 
 ssh root@$HOST mkdir -p /var/log/clerk/prod/web
 ssh root@$HOST mkdir -p /var/log/clerk/prod/worker
-docker stack deploy --compose-file "docker/docker-compose.prod.yml" clerk_prod
-docker context rm -f remote
+docker stack deploy --detach=true --prune --compose-file "docker/docker-compose.prod.yml" clerk_prod
 
 exit 0
