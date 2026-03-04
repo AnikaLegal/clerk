@@ -2,6 +2,7 @@
 set -o errexit
 
 prog=$(basename "$0")
+base_dir="$(dirname -- $(dirname -- $(cd -- "$(dirname -- $0)" &> /dev/null && pwd)))"
 
 if [ -z "$1" ]; then
     echo "Usage: $prog <HOST>"
@@ -10,6 +11,7 @@ fi
 HOST=$1
 
 echo -e "\n>>> Setting up staging environment on $HOST"
+cd $base_dir
 
 # Run in subshell to avoid polluting the environment of the rest of the script
 # with the envars.

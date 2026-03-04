@@ -2,6 +2,7 @@
 set -o errexit
 
 prog=$(basename "$0")
+base_dir="$(dirname -- $(dirname -- $(cd -- "$(dirname -- $0)" &> /dev/null && pwd)))"
 
 if [ -z "$1" ]; then
     echo "Usage: $prog <HOST>"
@@ -10,6 +11,8 @@ fi
 HOST=$1
 
 echo -e "\n>>> Setting up $HOST"
+cd $base_dir
+
 if ssh root@$HOST '[ -d /srv/infra/ ]'; then
     read -p "Looks like host $HOST is already set up. Do you want to continue? (y/N) "
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
