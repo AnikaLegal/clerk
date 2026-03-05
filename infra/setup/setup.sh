@@ -21,7 +21,9 @@ if ssh root@$HOST '[ -d /srv/infra/ ]'; then
 fi
 
 echo -e "\n>>> Copying infra files to $HOST"
-rsync -av --delete --delete-before --filter='- /setup*.sh' infra/setup/ root@$HOST:/srv/infra
+# NOTE: don't copy top-level scripts as they are intended to be run from the
+# local machine only.
+rsync -av --delete --delete-before --filter='- /*.sh' infra/setup/ root@$HOST:/srv/infra
 
 ssh root@$HOST localectl set-locale LANG=en_US.UTF-8
 unset LC_ALL
