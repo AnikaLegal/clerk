@@ -51,7 +51,7 @@ unset LC_CTYPE
 
 (
     echo -e "\n>>> Restoring production database from backup to host $HOST"
-    export $(grep -v '^#' env/production.env | xargs)
+    export $(grep -v '^#' env/prod.env | xargs)
 
     if [ $HOST == $CLERK_HOST ]; then
         echo -e "Error: host $HOST is the same as the current production host. Exiting to avoid data loss." 2>&1
