@@ -55,8 +55,9 @@ jobs:
           username: anikalaw
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # If the tests passed and we're on master/develop, then push the image to DockerHub
-      # This image will be used for the next deployment.
+      # If the tests passed then push the image to DockerHub. This image will be
+      # used for the next deployment. NOTE: any branch can be used for the
+      # staging image, but only master can be used for the prod image.
       - name: Push container image
         if: success()
         run: docker push anikalaw/clerk:${TAG}
