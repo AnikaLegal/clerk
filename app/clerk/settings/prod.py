@@ -61,6 +61,7 @@ TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "mail.anikalegal.org.au"
+EMAIL_DOMAIN_LEGACY = "em9037.mail.anikalegal.com"
 EMAIL_BUCKET_NAME = "anika-emails"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True

@@ -355,6 +355,7 @@ EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_DOMAIN = "mail.staging.anikalegal.org.au"
+EMAIL_DOMAIN_LEGACY = None
 EMAIL_BUCKET_NAME = None  # Overwrite me
 
 # Marketing emails via MailChimp

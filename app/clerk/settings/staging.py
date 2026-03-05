@@ -51,6 +51,7 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "mail.staging.anikalegal.org.au"
+EMAIL_DOMAIN_LEGACY = "em7221.test-mail.anikalegal.com"
 EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 

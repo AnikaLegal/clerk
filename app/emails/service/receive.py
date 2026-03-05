@@ -167,7 +167,14 @@ def parse_received_data(email_data: dict) -> dict:
 
     # Try find the issue from to_addr.
     user, domain = to_addr.split("@")
-    if domain != settings.EMAIL_DOMAIN:
+
+    # Check that the email is sent to the correct domain.
+    # TODO: We have to accept emails from our the old mail domain for a while
+    # until all open cases from before the domain change are closed. Remove the
+    # legacy domain check when possible.
+    if domain != settings.EMAIL_DOMAIN and (
+        settings.EMAIL_DOMAIN_LEGACY is None or domain != settings.EMAIL_DOMAIN_LEGACY
+    ):
         raise Exception(f"Incorrect domain in 'to' address {to_addr}")
 
     user_parts = user.split(".")
