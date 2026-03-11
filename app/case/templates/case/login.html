@@ -1,25 +1,22 @@
-{% extends "case/_base.html" %} 
-{% block title %}Login{% endblock %} 
+{% extends 'case/_base.html' %}
+{% block title %}
+  Login
+{% endblock %}
 {% block content %}
-<div class="ui container center aligned login">
-    <h1 class="ui header">
-        Welcome to Clerk
-        <div class="sub header">
-            You can log in with your Anika email
-        </div>
-    </h1>
+  <div class="ui container center aligned login">
+    <h1 class="ui header">Welcome to Clerk<div class="sub header">You can log in with your Anika email</div></h1>
     <a href="{% url 'social:begin' 'google-oauth2' %}?{{ qs }}">
-        <button class="ui google plus button">
-            <i class="google icon"></i>
-            Log in
-        </button>
+      <button class="ui google plus button">
+        <i class="google icon"></i>
+        Log in
+      </button>
     </a>
     {% if messages %}
-    <div class="messages">
+      <div class="messages">
         {% for message in messages %}
-        <div class="ui compact message {{ message.tags }}">{{ message }}</div>
+          <div class="ui compact message {{ message.tags }}">{{ message }}</div>
         {% endfor %}
-    </div>
+      </div>
     {% endif %}
-</div>
+  </div>
 {% endblock %}
