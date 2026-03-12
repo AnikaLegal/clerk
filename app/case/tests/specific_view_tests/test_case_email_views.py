@@ -2,6 +2,7 @@
 TODO: Test permissions
 TODO: Test that emails actually get sent
 """
+
 import pytz
 from datetime import datetime
 from io import StringIO
@@ -66,7 +67,7 @@ def test_case_email_create_view(superuser_client: APIClient, superuser: User):
     assert email_data["issue"] == str(email.issue.pk)
     assert email_data["sender"]["id"] == superuser.pk
     assert email_data["state"] == "DRAFT"
-    assert email_data["from_address"].endswith("@fake.anikalegal.com")
+    assert email_data["from_address"].endswith("@mail.fake.anikalegal.org.au")
     schema_tester.validate_response(response=response)
 
 

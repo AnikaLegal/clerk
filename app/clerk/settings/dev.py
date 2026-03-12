@@ -10,15 +10,11 @@ DEBUG_TOOLBAR_CONFIG = {
 
 SECRET_KEY = "its-a-secret-key!"
 
-EMAIL_PREFIX = "DEV"
-MATT_EMAIL = "matt@anikalegal.com"
-SUBMISSION_EMAILS = [MATT_EMAIL]
-
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
-AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
+AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
@@ -31,7 +27,7 @@ MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
+EMAIL_DOMAIN = "mail.dev.anikalegal.org.au"
 EMAIL_BUCKET_NAME = "anika-emails-test"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 

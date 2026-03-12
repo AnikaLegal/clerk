@@ -19,7 +19,7 @@ class ClosedContact(TimestampedModel):
 
 class WebflowContact(TimestampedModel):
     """
-    A client contact form submission from anikalegal.com
+    A client contact form submission.
     """
 
     name = models.CharField(max_length=255)
