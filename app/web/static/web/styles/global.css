@@ -139,6 +139,7 @@ header {
   display: flex;
   justify-content: space-between;
   padding-top: var(--header-padding-top);
+  box-sizing: content-box;
 }
 
 header img {

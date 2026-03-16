@@ -10,7 +10,7 @@ import { SplashSwoosh } from './swoosh'
 
 const SplashOuterEl = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 80vh;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;

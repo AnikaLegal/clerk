@@ -12,7 +12,6 @@ export const LandingView = () => {
   return (
     <Splash.Container>
       <Splash.Content>
-        <LogoEl src={IMAGES.LOGO.TEXT.COLOR.SVG} />
         <Text.Header splash>Housing Health Check Referrals</Text.Header>
         <Text.Body splash>
           We’re here to help you with your client as they enter their new
@@ -49,11 +48,3 @@ export const LandingView = () => {
     </Splash.Container>
   )
 }
-
-const LogoEl = styled.img`
-  height: 122px;
-  margin-bottom: 39px;
-  @media (max-width: ${theme.screen.mobile}) {
-    display: none;
-  }
-`
