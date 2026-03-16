@@ -19,6 +19,20 @@ def render_react_page(
             }
         }
     )
+    return render_react_page_base(
+        request, title, react_page_name, react_context, public, status
+    )
+
+
+def render_react_page_base(
+    request,
+    title,
+    react_page_name,
+    react_context,
+    public=False,
+    status=None,
+    template_name="case/react_base.html",
+):
     sentry_context = {
         "dsn": settings.SENTRY_JS_DSN or "",
         "environment": settings.ENVIRONMENT or "",
@@ -32,7 +46,7 @@ def render_react_page(
     }
     return render(
         request=request,
-        template_name="case/react_base.html",
+        template_name=template_name,
         context=context,
         status=status,
     )
