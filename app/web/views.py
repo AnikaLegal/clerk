@@ -1,16 +1,16 @@
 import random
 
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.utils import timezone
-
-from .models import BlogListPage, DashboardItem
-from .forms import ContactForm, ContentFeedbackForm
-
 from core.models import Issue
 from core.models.issue import CaseTopic
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+
+from .forms import ContactForm, ContentFeedbackForm
+from .models import BlogListPage, DashboardItem
+from .utils import render_react_page
 
 
 @require_http_methods(["GET"])
@@ -96,6 +96,12 @@ def team_view(request):
         "web/about/team.html",
         {"members": TEAM_MEMBERS, "advisors": ADVISORS, "board": BOARD},
     )
+
+
+@require_http_methods(["GET"])
+def intake_view(request):
+    """Intake form"""
+    return render_react_page(request, "Client intake", "intake", {})
 
 
 def shuffle(l):
