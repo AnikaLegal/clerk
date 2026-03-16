@@ -13,6 +13,3 @@ __target__
 # Tests
 *pytest_cache*
 test_media/
-
-# frontend
-node_modules/
