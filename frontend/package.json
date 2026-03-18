@@ -58,6 +58,8 @@
   "devDependencies": {
     "@redocly/cli": "^2.2.2",
     "@rtk-query/codegen-openapi": "^2.0.0",
+    "@types/facebook-pixel": "^0.0.31",
+    "@types/gtag.js": "^0.0.20",
     "@types/linkifyjs": "~2.1.7",
     "@types/react": "~18.3.24",
     "@types/react-dom": "~18.3.7",
