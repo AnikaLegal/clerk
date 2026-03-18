@@ -108,7 +108,7 @@ urlpatterns = [
         template("web/subscribe.html"),
         name="subscribe",
     ),
-    path("intake/", views.intake_view, name="intake"),
+    path("intake/", include("intake.urls")),
     # Wagtail admin - excluded by robots.txt
     path("cms/admin/", include(wagtailadmin_urls)),
     path("cms/documents/", include(wagtaildocs_urls)),
