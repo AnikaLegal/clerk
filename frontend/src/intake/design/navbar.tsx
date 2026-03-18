@@ -15,10 +15,7 @@ interface Props {
 export const Navbar: React.FC<Props> = ({ current, steps, onBack }) => (
   <NavbarEl>
     <Icon.Back onClick={onBack} />
-    <div>
-      <img className="logo" src={IMAGES.LOGO.TEXT.COLOR.SVG} />
-      {steps && <StepProgress current={current} steps={steps} />}
-    </div>
+    <div>{steps && <StepProgress current={current} steps={steps} />}</div>
     <div />
   </NavbarEl>
 )
