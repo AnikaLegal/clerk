@@ -1,12 +1,12 @@
 # Clerk base image - all the stuff we don't want to bother rebuilding every few days
 FROM ubuntu:jammy
 
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-ENV DEBIAN_FRONTEND noninteractive
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONIOENCODING UTF-8
-ENV TIMEZONE Australia/Melbourne
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=UTF-8
+ENV TIMEZONE=Australia/Melbourne
 
 WORKDIR /app
 

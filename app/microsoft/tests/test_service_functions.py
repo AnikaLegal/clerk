@@ -120,7 +120,10 @@ def test_remove_user_from_case_C(mock_api):
     user = UserFactory(email="donald.duck@anikalegal.com")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
-        {"id": "666", "grantedToV2": {"user": {"email": "donald.duck@anikalegal.com"}}}
+        {
+            "id": "666",
+            "grantedToV2": {"user": {"email": "donald.duck@anikalegal.com"}},
+        }
     ]
 
     remove_user_from_case(user, issue)

@@ -13,5 +13,5 @@ export const LINKS = {
   },
   REPAIRS_INFO: '/services/rental-repairs/',
   BONDS_INFO: '/services/bond-recovery/',
-  BONDS_RESOURCES: 'https://www.anikalegal.com/blog/bonds-and-bond-recovery/',
+  BONDS_RESOURCES: 'https://anikalegal.org.au/blog/bonds-and-bond-recovery/',
 }

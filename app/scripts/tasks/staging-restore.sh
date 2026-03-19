@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 # NOTE: check before blowing the database away!
-if [[ $PGDATABASE != "clerk-test" ]]; then
+if [[ $PGDATABASE != "clerk_staging" ]]; then
     echo -e "\n>>> Error: unexpected PGDATABASE $PGDATABASE"
     exit 1
 fi
@@ -30,11 +30,11 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
         --if-exists
 
 echo -e "\nSync AWS S3 assets"
-aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-test/action-documents
-aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-test/documents
-aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-test/images
-aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-test/original_images
-aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-test
+aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-staging/action-documents
+aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-staging/documents
+aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-staging/images
+aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-staging/original_images
+aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-staging
 
 echo -e "\nRunning migrations"
 ./manage.py migrate

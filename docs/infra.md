@@ -12,9 +12,9 @@ The environment for this app is built using Docker, and the app runs in producti
 
 Deployment is done via a GitHub workflow [here](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy). A deployment involves SSHing into the target server and updating the Docker Swarm config. Deployment must be manually triggered from GitHub. There are two environments to deploy to, staging and production:
 
-- [staging backend](https://test-clerk.anikalegal.com/admin), which is deployed to by `develop` branch, used by the [staging frontend](https://test-intake.anikalegal.com)
+- [staging backend](https://staging.anikalegal.org.au/admin), which is deployed to by `develop` branch, used by the [staging frontend](https://intake-staging.anikalegal.org.au)
 
-- [production backend](https://clerk.anikalegal.com/admin), which is deployed to by `master` branch, used by the [production frontend](https://intake.anikalegal.com)
+- [production backend](https://anikalegal.org.au/admin), which is deployed to by `master` branch, used by the [production frontend](https://intake.anikalegal.org.au)
 
 When making a change or bugfix, you should:
 
@@ -31,9 +31,9 @@ There are two containers that run the application. A Django web server and a [Dj
 
 The application runs on Docker Swarm. The test and prod environments both run on a single AWS EC2 instance. That instance also contains the PostgreSQL database and a NGINX server which reverse proxies requests into the Docker containers.
 
-Production database backups are automated via GitHub Actions and stored in `s3://anika-database-backups`. Uploaded files are stored in `s3://anika-clerk` and `s3://anika-clerk-test`. Other than uploaded files and the contents of the PostgreSQL database, there is no important state on the EC2 instance or Docker images, which can be blown away and rebuilt at will. The only thing that will change is that EC2 instance IP address, which will need to be updated in CloudFlare.
+Production database backups are automated via GitHub Actions and stored in `s3://anika-database-backups`. Uploaded files are stored in `s3://anika-clerk` and `s3://anika-clerk-staging`. Other than uploaded files and the contents of the PostgreSQL database, there is no important state on the EC2 instance or Docker images, which can be blown away and rebuilt at will. The only thing that will change is that EC2 instance IP address, which will need to be updated in CloudFlare.
 
-DNS is handled by [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.com/dns), which also does SSL termination for us.
+DNS is handled by [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records), which also does SSL termination for us.
 
 Emails are sent using [SendGrid](https://app.sendgrid.com).
 
