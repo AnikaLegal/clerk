@@ -406,3 +406,41 @@ def test_case_update_view__allowed_to_close_case_with_deleted_unfinished_ongoing
 
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.CLOSED
+
+
+@pytest.mark.django_db
+def test_case_update_view__prevented_from_closing_case_with_unreviewed_critical_date(
+    superuser_client: APIClient,
+):
+    date = factories.IssueDateFactory(
+        issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
+        is_reviewed=False,
+    )
+
+    url = reverse("case-api-detail", args=(date.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+
+    assert response.status_code == 400
+    schema_tester.validate_response(response=response)
+
+    assert Issue.objects.count() == 1
+    assert Issue.objects.last().stage == CaseStage.UNSTARTED
+
+
+@pytest.mark.django_db
+def test_case_update_view__allowed_to_close_case_with_reviewed_critical_date(
+    superuser_client: APIClient,
+):
+    date = factories.IssueDateFactory(
+        issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
+        is_reviewed=True,
+    )
+
+    url = reverse("case-api-detail", args=(date.issue.pk,))
+    response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
+
+    assert response.status_code == 200
+    schema_tester.validate_response(response=response)
+
+    assert Issue.objects.count() == 1
+    assert Issue.objects.last().stage == CaseStage.CLOSED
