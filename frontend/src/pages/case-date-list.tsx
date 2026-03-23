@@ -107,7 +107,7 @@ const CaseDateHeader = ({ issue }: CaseDateHeaderProps) => {
       <Title order={2} mt="xl">
         <Group wrap="nowrap" gap="sm" justify="space-between">
           <span>Critical Dates</span>
-          <Button onClick={() => handler.open()}>
+          <Button onClick={() => handler.open()} disabled={!issue.is_open}>
             Create a new critical date
           </Button>
         </Group>
