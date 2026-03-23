@@ -69,6 +69,17 @@ class IssueDateSerializer(serializers.ModelSerializer):
             request = self.context.get("request", None)
             if not request or not request.user.is_admin_or_better:
                 raise exceptions.PermissionDenied()
+
+        # Prevent date creation if the related issue is closed.
+        issue_id = validated_data.get("issue_id")
+        if issue_id:
+            from core.models import Issue
+
+            if Issue.objects.filter(id=issue_id, is_open=False).exists():
+                raise serializers.ValidationError(
+                    "Cannot add a critical date to a closed case."
+                )
+
         return super().create(validated_data)
 
     def to_representation(self, instance):

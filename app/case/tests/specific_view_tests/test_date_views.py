@@ -68,6 +68,28 @@ def test_issue_date_create_api__restrict_date_prior_to_today(
 
 
 @pytest.mark.django_db
+def test_issue_date_create_api__restrict_if_related_issue_closed(
+    superuser_client: APIClient,
+):
+    issue_date_stub = IssueDateFactory.stub()
+    assert IssueDate.objects.count() == 0
+
+    issue = IssueFactory(is_open=False)
+    data = {
+        "issue_id": issue.pk,
+        "type": issue_date_stub.type,
+        "date": issue_date_stub.date.isoformat(),
+        "hearing_type": issue_date_stub.hearing_type,
+        "hearing_location": issue_date_stub.hearing_location,
+    }
+    url = reverse("date-api-list")
+    response = superuser_client.post(url, data=data, format="json")
+
+    assert response.status_code == 400, response.json()
+    assert IssueDate.objects.count() == 0
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "field_names, expected_status, expected_count",
     [
