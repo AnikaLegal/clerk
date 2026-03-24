@@ -37,7 +37,7 @@ aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk
 aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-staging/documents
 aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-staging/images
 aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-staging/original_images
-aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-staging
+aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-test
 
 echo -e "\nRunning migrations"
 ./manage.py migrate
