@@ -19,6 +19,9 @@ LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
     awk '{print $4}')
 echo -e "\nFound backup $LATEST_BACKUP"
 
+echo -e "\nResetting database"
+./manage.py reset_db --close-sessions --noinput
+
 aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
     pg_restore \
         --clean \
