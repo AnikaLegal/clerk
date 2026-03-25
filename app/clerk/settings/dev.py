@@ -33,7 +33,7 @@ INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-staging"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "d6b81121-9482-45d4-9acd-6fa42111d5b3"
