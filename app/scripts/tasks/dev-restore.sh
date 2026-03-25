@@ -9,7 +9,7 @@ export PGDATABASE=postgres
 export PGUSER=postgres
 export PGPASSWORD=password
 
-BACKUP_BUCKET_NAME="anika-database-backups-test"
+BACKUP_BUCKET_NAME="anika-database-backups-staging"
 S3_BUCKET="s3://${BACKUP_BUCKET_NAME}"
 
 echo -e "\nRestoring database from staging backups at ${S3_BUCKET}"
