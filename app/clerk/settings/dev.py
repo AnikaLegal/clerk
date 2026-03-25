@@ -28,7 +28,7 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "mail.dev.anikalegal.org.au"
-EMAIL_BUCKET_NAME = "anika-emails-test"
+EMAIL_BUCKET_NAME = "anika-emails-staging"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
