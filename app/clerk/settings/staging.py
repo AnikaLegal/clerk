@@ -57,7 +57,7 @@ INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-staging"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 

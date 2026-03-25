@@ -24,6 +24,8 @@ CALL_INTRO_AUDIO = "call-intro.wav"
 OPTION_REPAIRS_AUDIO = "option-repairs.wav"
 # Response when user selects bonds option.
 OPTION_BONDS_AUDIO = "option-bonds.wav"
+# Response when user selects evictions option.
+OPTION_EVICTIONS_AUDIO = "option-evictions.wav"
 # Response when user selects callback option.
 OPTION_CALLBACK_AUDIO = "option-callback.wav"
 # Response when user no option and the input times out.
@@ -32,6 +34,7 @@ CALL_TIMEOUT_AUDIO = "call-timeout.wav"
 TOPIC_MAPPING = {
     Choice.REPAIRS: CaseTopic.REPAIRS,
     Choice.BONDS: CaseTopic.BONDS,
+    Choice.EVICTIONS: CaseTopic.EVICTION_RETALIATORY,
     Choice.CALLBACK: CaseTopic.OTHER,
 }
 
@@ -86,6 +89,9 @@ def collect_view(request):
     elif choice == Choice.BONDS:
         audio_url = _get_audio_url(OPTION_BONDS_AUDIO)
         message_text = sms.BONDS_SMS_MESSAGE
+    elif choice == Choice.EVICTIONS:
+        audio_url = _get_audio_url(OPTION_EVICTIONS_AUDIO)
+        message_text = sms.EVICTIONS_SMS_MESSAGE
     elif choice == Choice.CALLBACK:
         audio_url = _get_audio_url(OPTION_CALLBACK_AUDIO)
         message_text = sms.CALLBACK_SMS_MESSAGE

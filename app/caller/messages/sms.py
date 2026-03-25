@@ -26,6 +26,18 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 """
 
 
+# The SMS message we send to people who are enquiring about evictions.
+EVICTIONS_SMS_MESSAGE = """
+Thank you for enquiring about Anika's retaliatory eviction service.
+
+To get help, please fill in this form: https://intake.anikalegal.org.au
+
+For more info on Anika's services, please visit https://anikalegal.org.au/services/
+
+If you have any other enquiries you can email us at contact@anikalegal.com
+"""
+
+
 # The SMS message we send to people who want a callback about another issue.
 CALLBACK_SMS_MESSAGE = """
 Thank you for contacting us about your enquiry, one of our staff will call you in the next 3 business days.
