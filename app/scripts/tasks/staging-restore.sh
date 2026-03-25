@@ -30,6 +30,7 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
         --port $PGPORT \
         --username $PGUSER \
         --no-owner \
+        --no-privileges \
         --if-exists
 
 echo -e "\nSync AWS S3 assets"

@@ -22,7 +22,7 @@ echo -e "\nFound backup $DUMP_NAME"
 
 ./manage.py reset_db --close-sessions --noinput
 ! aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - |
-    pg_restore -d $PGDATABASE --no-owner
+    pg_restore -d $PGDATABASE --no-owner --no-privileges
 
 . /app/scripts/tasks/dev-post-reset.sh
 
