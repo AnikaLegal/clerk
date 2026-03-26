@@ -26,9 +26,9 @@ echo -e "\nFound backup $DUMP_NAME"
 
 . /app/scripts/tasks/dev-post-reset.sh
 
-echo -e "\nSetting all Slack messages to send to test alerts channel"
+echo -e "\nSetting all Slack messages to send to staging alerts channel"
 SHELL_CMD="space=chr(32);\
-c=SlackChannel.objects.get(name=f'Test{space}Alerts');\
+c=SlackChannel.objects.get(name=f'Staging{space}Alerts');\
 SlackMessage.objects.all().update(channel=c);\
 SlackUser.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "${SHELL_CMD}"
