@@ -8,7 +8,11 @@ logger = logging.getLogger(__name__)
 
 SERVICE_ACCOUNT_INFO = {
     "client_email": settings.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    "private_key": settings.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+    # Docker compose seems to support escaped newlines, but Docker swarm (used
+    # in staging & production) doesn't, so we replace them with actual newlines.
+    "private_key": settings.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.replace("\\n", "\n")
+    if settings.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+    else None,
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
     "token_uri": "https://oauth2.googleapis.com/token",
 }
