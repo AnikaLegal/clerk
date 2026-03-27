@@ -10,15 +10,11 @@ DEBUG_TOOLBAR_CONFIG = {
 
 SECRET_KEY = "its-a-secret-key!"
 
-EMAIL_PREFIX = "DEV"
-MATT_EMAIL = "matt@anikalegal.com"
-SUBMISSION_EMAILS = [MATT_EMAIL]
-
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
-AWS_STORAGE_BUCKET_NAME = "anika-clerk-test"
+AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
@@ -31,13 +27,13 @@ MAILCHIMP_REPAIRS_WORKFLOW_ID = "3bd9c82043"
 MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
-EMAIL_DOMAIN = "em9463.dev-mail.anikalegal.com"
-EMAIL_BUCKET_NAME = "anika-emails-test"
+EMAIL_DOMAIN = "mail.dev.anikalegal.org.au"
+EMAIL_BUCKET_NAME = "anika-emails-staging"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-staging"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "d6b81121-9482-45d4-9acd-6fa42111d5b3"

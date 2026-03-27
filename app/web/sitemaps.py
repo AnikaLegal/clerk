@@ -17,6 +17,7 @@ from .models import (
 class StaticSitemap(sitemaps.Sitemap):
     priority = 0.5
     changefreq = "daily"
+    protocol = "https"
 
     def items(self):
         return [
@@ -43,6 +44,7 @@ class StaticSitemap(sitemaps.Sitemap):
 class WagtailSitemap(sitemaps.Sitemap):
     priority = 0.5
     changefreq = "daily"
+    protocol = "https"
     list_page = None
     details_page = None
 

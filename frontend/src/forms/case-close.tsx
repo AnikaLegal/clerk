@@ -40,12 +40,23 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
     id: issue.id,
     category: 'ONGOING',
   })
+  const datesResult = api.useGetCaseDatesQuery({
+    issueId: issue.id,
+    isReviewed: false,
+  })
+
   const isLoadingServices = servicesResult.isLoading
+  const isLoadingDates = datesResult.isLoading
 
   const findUnfinishedServices = (service: Service) =>
     service.finished_at === null
   const hasUnfinishedServices =
     servicesResult.data?.find(findUnfinishedServices) !== undefined
+
+  const hasUnreviewedDates =
+    datesResult.data !== undefined &&
+    datesResult.data.item_count !== undefined &&
+    datesResult.data.item_count > 0
 
   const onSubmit = (values, { setSubmitting, setErrors }) => {
     updateCase({
@@ -91,7 +102,11 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}
-            error={Object.keys(errors).length > 0 || hasUnfinishedServices}
+            error={
+              Object.keys(errors).length > 0 ||
+              hasUnfinishedServices ||
+              hasUnreviewedDates
+            }
           >
             <Dropdown
               fluid
@@ -141,10 +156,19 @@ export const CloseForm: React.FC<CaseDetailFormProps> = ({
                 <p>Cannot close case with unfinished ongoing services</p>
               </Message>
             )}
+            {!isLoadingDates && hasUnreviewedDates && (
+              <Message error>
+                <p>Cannot close case with unreviewed critical dates</p>
+              </Message>
+            )}
             <Button
-              loading={isSubmitting || isLoadingServices}
+              loading={isSubmitting || isLoadingServices || isLoadingDates}
               disabled={
-                isSubmitting || isLoadingServices || hasUnfinishedServices
+                isSubmitting ||
+                isLoadingServices ||
+                isLoadingDates ||
+                hasUnfinishedServices ||
+                hasUnreviewedDates
               }
               positive
               type="submit"

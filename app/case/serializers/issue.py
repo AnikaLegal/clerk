@@ -1,5 +1,5 @@
 from accounts.models import User
-from core.models import Client, Issue, IssueNote, Service, Tenancy
+from core.models import Client, Issue, IssueDate, IssueNote, Service, Tenancy
 from core.models.issue import CaseStage, EmploymentType, ReferrerType
 from core.models.service import ServiceCategory
 from django.db import transaction
@@ -131,6 +131,16 @@ class IssueSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Cannot close case with unfinished ongoing services"
                 )
+
+            query = Q(
+                issue_id=self.instance.id,
+                is_reviewed=False,
+            )
+            if IssueDate.objects.filter(query).exists():
+                raise serializers.ValidationError(
+                    "Cannot close case with unreviewed critical dates"
+                )
+
         return attrs
 
     def create(self, validated_data):

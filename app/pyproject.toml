@@ -62,6 +62,7 @@ dev = [
     "django-zeal>=2.0.4",
     "invoke>=2.2.0",
     "ipython",
+    "python-dotenv>=1.2.1",
     "setuptools",
     "watchdog[watchmedo]>=5.0.2",
 ]

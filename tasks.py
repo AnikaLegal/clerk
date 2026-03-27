@@ -1,8 +1,16 @@
-from invoke import task
+import os
+from pathlib import Path
+
+from invoke.tasks import task
 
 APP_NAME = "clerk"
-HOST = "13.55.250.149"
 COMPOSE = "docker compose -p clerk -f docker/docker-compose.local.yml"
+
+# NOTE: All tasks are intended to run from the project root, so we change the
+# working directory to the script's directory to ensure relative paths work
+# correctly.
+script_directory = Path(__file__).parent.absolute()
+os.chdir(script_directory)
 
 
 @task
@@ -64,9 +72,18 @@ def logs(c, service_name):
 
 
 @task
-def ssh(c):
-    """SSH into prod"""
-    cmd = f"ssh root@{HOST}"
+def ssh(c, env="prod"):
+    """SSH into prod server"""
+
+    from dotenv import dotenv_values
+
+    file = f"env/{env}.env"
+    values = dotenv_values(file)
+    if not values:
+        print(f"Failed to load {file} file")
+        return
+    host = values.get("CLERK_HOST")
+    cmd = f"ssh root@{host}"
     print(cmd)
     c.run(cmd, pty=True)
 
@@ -87,8 +104,6 @@ def docs(c, fileref):
 def own(c, user=None):
     """Assert file ownership of project"""
     if not user:
-        import os
-
         user = os.getenv("USER")
     c.run(f"sudo chown -R {user}: .", pty=True)
 

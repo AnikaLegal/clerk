@@ -3,7 +3,6 @@
 set -o errexit
 set -o pipefail
 
-HOST='13.55.250.149'
 TIME=$(date "+%s")
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
@@ -19,6 +18,12 @@ if [[ -z "$S3_BUCKET" ]]; then
     exit 1
 fi
 
+CLERK_HOST=$(grep "^CLERK_HOST=" env/${COMPOSE_SUFFIX}.env | cut -d '=' -f2-)
+if [[ -z "$CLERK_HOST" ]]; then
+    echo -e "\n>>> Error: CLERK_HOST not found in env/${COMPOSE_SUFFIX}.env"
+    exit 1
+fi
+
 DB_FILE="postgres_clerk_${COMPOSE_SUFFIX}_${TIME}.sql"
 DB_PATH="$S3_BUCKET/$DB_FILE"
 
@@ -30,26 +35,26 @@ mkdir ~/.ssh
 echo -e "$CLERK_PRIVATE_SSH_KEY" >~/.ssh/id_ed25519
 chmod 600 ~/.ssh/id_ed25519
 cat >> ~/.ssh/config <<END
-Host $HOST
+Host $CLERK_HOST
   StrictHostKeyChecking no
 END
 
 echo -e "\n>>> Setting up Docker context"
-docker context create remote --docker "host=ssh://root@${HOST}"
+docker context create remote --docker "host=ssh://root@${CLERK_HOST}"
 docker context use remote
 
 # Database backup
-echo -e "\n>>> Streaming database backup from host $HOST to $DB_PATH"
+echo -e "\n>>> Streaming database backup from host $CLERK_HOST to $DB_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
-    run --no-deps --rm web pg_dump --format=custom |
+    run --pull always --no-deps --rm web pg_dump --format=custom |
     aws s3 cp - $DB_PATH
 
 # Disaster recovery
-echo -e "\n>>> Streaming client info from host $HOST to $CLIENT_PATH"
+echo -e "\n>>> Streaming client info from host $CLERK_HOST to $CLIENT_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
-    run --no-deps --rm web python manage.py export_client_info |
+    run --pull always --no-deps --rm web python manage.py export_client_info |
     aws s3 cp - $CLIENT_PATH
 
 echo -e "\n>>> Finished backup"
