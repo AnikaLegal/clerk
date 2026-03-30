@@ -6,9 +6,14 @@ from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
+private_key = settings.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+if private_key:
+    private_key = private_key.replace("\\n", "\n")
+
+
 SERVICE_ACCOUNT_INFO = {
     "client_email": settings.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    "private_key": settings.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+    "private_key": private_key,
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
     "token_uri": "https://oauth2.googleapis.com/token",
 }
