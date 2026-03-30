@@ -1,24 +1,9 @@
-import {
-  Alert,
-  Button,
-  Group,
-  Loader,
-  Paper,
-  Select,
-  SelectProps,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core'
+import { Alert, Button, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import {
-  GetUsersApiArg,
-  useGetUsersQuery,
-  User,
-  useUpdateCaseMutation,
-} from 'api'
+import { useUpdateCaseMutation } from 'api'
 import { showNotification } from 'comps/notification'
-import React, { useEffect, useState } from 'react'
+import { UserSelect } from 'comps/user-select'
+import React from 'react'
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
 
@@ -149,44 +134,6 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
         </Stack>
       </form>
     </Paper>
-  )
-}
-
-interface UserSelectProps extends SelectProps {
-  params: GetUsersApiArg
-}
-
-const UserSelect = ({ params, ...props }: UserSelectProps) => {
-  const [data, setData] = useState<User[]>([])
-  const [args, setArgs] = useState<GetUsersApiArg>({
-    ...params,
-    page: 1,
-    pageSize: 100,
-  })
-  const result = useGetUsersQuery(args)
-
-  useEffect(() => {
-    if (result.data) {
-      setData((prev) => [...prev, ...result.data!.results])
-      // If there are more pages, fetch the next one
-      if (result.data.next !== null) {
-        setArgs((prev) => ({ ...prev, page: args.page! + 1 }))
-      }
-    }
-  }, [result.data])
-
-  const showLoading =
-    result.isLoading || result.isFetching || result.data?.next !== null
-
-  return (
-    <Select
-      {...props}
-      data={data.map((u) => ({
-        value: String(u.id),
-        label: u.email,
-      }))}
-      rightSection={showLoading && <Loader size="sm" />}
-    />
   )
 }
 
