@@ -43,7 +43,7 @@ const App = () => {
                 text: 'View user',
                 url: result.value.url,
               },
-              autoClose: 6000,
+              autoClose: 4000,
             })
           } else {
             const email = values.users[index].email
@@ -51,7 +51,7 @@ const App = () => {
               type: 'error',
               title: `Failed to create user ${email}`,
               message: getAPIErrorMessage(result.reason),
-              autoClose: 6000,
+              autoClose: 4000,
             })
             const requestErrors = getAPIFormErrors(result.reason)
             if (requestErrors) {
