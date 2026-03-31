@@ -2,7 +2,9 @@ import logging
 from typing import Optional
 
 from accounts.models import CaseGroups, User
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
+from django.db.models.functions import Concat
+from django.db.models import Value
 from django.http import Http404
 from django.urls import reverse
 from django_q.tasks import async_task
@@ -109,9 +111,9 @@ class AccountApiViewset(
         for key, value in search_query.items():
             if value is not None:
                 if key == "name":
-                    queryset = queryset.filter(
-                        Q(first_name__icontains=value) | Q(last_name__icontains=value)
-                    )
+                    queryset = queryset.annotate(
+                        full_name=Concat("first_name", Value(" "), "last_name")
+                    ).filter(full_name__icontains=value)
                 elif key == "group":
                     queryset = queryset.filter(groups__name=value)
                 else:
