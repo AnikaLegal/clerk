@@ -19,7 +19,7 @@ const SelectFilter = ({
       size="md"
       withCheckIcon={false}
       onChange={(value) => onFilterChange(name, value)}
-      rightSection={isLoading ? <Loader size="sm" /> : null}
+      rightSection={isLoading ? <Loader size="sm" /> : undefined}
       {...props}
     />
   )
