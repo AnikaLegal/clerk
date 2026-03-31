@@ -17,7 +17,6 @@ const SelectFilter = ({
     <Select
       clearable
       size="md"
-      withCheckIcon={false}
       onChange={(value) => onFilterChange(name, value)}
       rightSection={isLoading ? <Loader size="sm" /> : undefined}
       {...props}
