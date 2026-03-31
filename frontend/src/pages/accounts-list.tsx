@@ -61,12 +61,12 @@ const App = () => {
           accounts
         </Text>
       )}
-      <Grid mt="lg">
+      <Grid mt="md">
         <Grid.Col span={12}>
           <TextInputFilter
             name="name"
             label="Search"
-            placeholder="Search by name"
+            placeholder="Find users by name"
             onFilterChange={handleFilterChange}
           />
         </Grid.Col>
