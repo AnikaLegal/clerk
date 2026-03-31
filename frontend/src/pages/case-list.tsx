@@ -80,6 +80,7 @@ const App = () => {
       <Stack gap="md" mt="md">
         <TextInputFilter
           name="search"
+          label="Search"
           placeholder="Find cases with the name or email of paralegals and clients, or by using the file ref"
           onFilterChange={handleFilterChange}
         />
@@ -100,7 +101,7 @@ const App = () => {
             <Grid.Col span={6}>
               <SelectFilter
                 name="isOpen"
-                placeholder="Is case open?"
+                label="Case open / closed"
                 data={choiceToOptions(CONTEXT.choices.is_open)}
                 onFilterChange={handleFilterChange}
               />
@@ -108,7 +109,7 @@ const App = () => {
             <Grid.Col span={6}>
               <SelectFilter
                 name="stage"
-                placeholder="Case stage"
+                label="Case stage"
                 data={choiceToOptions(CONTEXT.choices.stage)}
                 onFilterChange={handleFilterChange}
               />
@@ -116,7 +117,7 @@ const App = () => {
             <Grid.Col span={6}>
               <SelectFilter
                 name="outcome"
-                placeholder="Case outcome"
+                label="Case outcome"
                 data={choiceToOptions(CONTEXT.choices.outcome)}
                 onFilterChange={handleFilterChange}
               />
@@ -124,31 +125,26 @@ const App = () => {
             <Grid.Col span={6}>
               <SelectFilter
                 name="topic"
-                placeholder="Case topic"
+                label="Case topic"
                 data={choiceToOptions(CONTEXT.choices.topic)}
                 onFilterChange={handleFilterChange}
               />
             </Grid.Col>
             <Grid.Col span={6}>
               <UserSelect
-                searchable
-                clearable
-                placeholder="Select a paralegal"
+                label="Paralegal"
                 onChange={(value) =>
                   setArgs({ ...args, paralegal: value || undefined, page: 1 })
                 }
-                params={{
+                filter={{
                   group: 'Paralegal',
                   sort: 'email',
                 }}
-                size="md"
               />
             </Grid.Col>
             <Grid.Col span={6}>
               <UserSelect
-                searchable
-                clearable
-                placeholder="Select a lawyer"
+                label="Lawyer"
                 onChange={(value) =>
                   setArgs({ ...args, lawyer: value || undefined, page: 1 })
                 }
@@ -156,7 +152,6 @@ const App = () => {
                   group: 'Lawyer',
                   sort: 'email',
                 }}
-                size="md"
               />
             </Grid.Col>
           </Grid>
