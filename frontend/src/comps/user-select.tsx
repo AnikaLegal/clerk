@@ -3,13 +3,13 @@ import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
 import React, { useEffect, useState } from 'react'
 
 interface UserSelectProps extends SelectProps {
-  params: GetUsersApiArg
+  filter: GetUsersApiArg
 }
 
-export const UserSelect = ({ params, ...props }: UserSelectProps) => {
+export const UserSelect = ({ filter, ...props }: UserSelectProps) => {
   const [data, setData] = useState<User[]>([])
   const [args, setArgs] = useState<GetUsersApiArg>({
-    ...params,
+    ...filter,
     page: 1,
     pageSize: 100,
   })
@@ -28,6 +28,9 @@ export const UserSelect = ({ params, ...props }: UserSelectProps) => {
   const showLoading = result.isLoading || result.data?.next !== null
   return (
     <Select
+      searchable
+      clearable
+      size="md"
       {...props}
       data={data.map((u) => ({
         value: String(u.id),

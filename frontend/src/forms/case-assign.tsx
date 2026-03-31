@@ -83,7 +83,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
             disabled={form.submitting}
             label="Paralegal"
             placeholder="Select a paralegal"
-            params={{
+            filter={{
               group: 'Paralegal',
               isActive: true,
               sort: 'email',
@@ -98,7 +98,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
             disabled={form.submitting}
             label="Lawyer"
             placeholder="Select a lawyer"
-            params={{
+            filter={{
               group: 'Lawyer',
               isActive: true,
               sort: 'email',
