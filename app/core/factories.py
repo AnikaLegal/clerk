@@ -1,5 +1,5 @@
 import io
-from datetime import timezone
+from datetime import timedelta, timezone
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -59,6 +59,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     date_joined = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2y", end_date="-1y"
+    )
+    ms_account_created_at = factory.LazyAttribute(
+        lambda x: x.date_joined + timedelta(minutes=20)
     )
     is_staff = False
     is_active = True

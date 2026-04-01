@@ -36,18 +36,14 @@ def test_case_list_view__with_no_access(user_client: APIClient, user: User):
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_no_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
+    paralegal_user_client: APIClient,
 ):
     """
     Paralegal users can fetch cases but no results because they're not assigned
     """
     factories.IssueFactory()  # There's an issue but the user can't see it
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = paralegal_user_client.get(url)
     assert response.status_code == 200
     assert response.json() == {
         "current": 1,
@@ -62,19 +58,17 @@ def test_case_list_view__as_paralegal_with_no_access(
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
+    paralegal_user_client: APIClient,
+    paralegal_user,
 ):
     """
     Paralegal users can fetch cases and see results when they're assigned
     """
-    issue_a = factories.IssueFactory(paralegal=user)
+    issue_a = factories.IssueFactory(paralegal=paralegal_user)
     factories.IssueFactory()  # There's an issue but the user can't see it
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
+
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = paralegal_user_client.get(url)
     assert response.status_code == 200
     resp_data = response.json()
 
@@ -91,19 +85,17 @@ def test_case_list_view__as_paralegal_with_access(
 
 @pytest.mark.django_db
 def test_case_list_view__as_coordinator(
-    user_client: APIClient,
-    user: User,
-    coordinator_group,
+    coordinator_user_client: APIClient,
+    coordinator_user,
 ):
     """
     Coordinator users can fetch cases and see results
     """
-    issue_a = factories.IssueFactory(paralegal=user)
+    issue_a = factories.IssueFactory(paralegal=coordinator_user)
     issue_b = factories.IssueFactory()
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
+
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = coordinator_user_client.get(url)
     assert response.status_code == 200
     resp_data = response.json()
 
@@ -286,6 +278,50 @@ def test_case_create_view__using_nested_relations(superuser_client: APIClient):
     assert issue.tenancy.address == tenancy_stub.address
     assert issue.tenancy.suburb == tenancy_stub.suburb
     assert issue.tenancy.postcode == tenancy_stub.postcode
+
+
+@pytest.mark.django_db
+def test_case_update_view__allowed_to_assign_paralegal_with_lawyer(
+    superuser_client: APIClient, paralegal_group, lawyer_group
+):
+    paralegal = factories.UserFactory()
+    paralegal.groups.set([paralegal_group])
+    annotate_group_access(paralegal)
+
+    lawyer = factories.UserFactory()
+    lawyer.groups.set([lawyer_group])
+    annotate_group_access(lawyer)
+
+    issue = factories.IssueFactory(paralegal=None, lawyer=None)
+    url = reverse("case-api-detail", args=(issue.pk,))
+    data = {
+        "lawyer_id": lawyer.pk,
+        "paralegal_id": paralegal.pk,
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 200, response.json()
+    schema_tester.validate_response(response=response)
+
+    data = response.json()
+    assert data["paralegal"]["id"] == paralegal.pk
+    assert data["lawyer"]["id"] == lawyer.pk
+
+
+@pytest.mark.django_db
+def test_case_update_view__prevented_from_assigning_paralegal_without_lawyer(
+    superuser_client: APIClient, paralegal_group
+):
+    paralegal = factories.UserFactory()
+    paralegal.groups.set([paralegal_group])
+    annotate_group_access(paralegal)
+
+    issue = factories.IssueFactory(paralegal=None, lawyer=None)
+    url = reverse("case-api-detail", args=(issue.pk,))
+    data = {
+        "paralegal_id": paralegal.pk,
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 400, response.json()
 
 
 # TODO: Test permissions
