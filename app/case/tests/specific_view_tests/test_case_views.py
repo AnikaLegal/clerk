@@ -280,6 +280,50 @@ def test_case_create_view__using_nested_relations(superuser_client: APIClient):
     assert issue.tenancy.postcode == tenancy_stub.postcode
 
 
+@pytest.mark.django_db
+def test_case_update_view__allowed_to_assign_paralegal_with_lawyer(
+    superuser_client: APIClient, paralegal_group, lawyer_group
+):
+    paralegal = factories.UserFactory()
+    paralegal.groups.set([paralegal_group])
+    annotate_group_access(paralegal)
+
+    lawyer = factories.UserFactory()
+    lawyer.groups.set([lawyer_group])
+    annotate_group_access(lawyer)
+
+    issue = factories.IssueFactory(paralegal=None, lawyer=None)
+    url = reverse("case-api-detail", args=(issue.pk,))
+    data = {
+        "lawyer_id": lawyer.pk,
+        "paralegal_id": paralegal.pk,
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 200, response.json()
+    schema_tester.validate_response(response=response)
+
+    data = response.json()
+    assert data["paralegal"]["id"] == paralegal.pk
+    assert data["lawyer"]["id"] == lawyer.pk
+
+
+@pytest.mark.django_db
+def test_case_update_view__prevented_from_assigning_paralegal_without_lawyer(
+    superuser_client: APIClient, paralegal_group
+):
+    paralegal = factories.UserFactory()
+    paralegal.groups.set([paralegal_group])
+    annotate_group_access(paralegal)
+
+    issue = factories.IssueFactory(paralegal=None, lawyer=None)
+    url = reverse("case-api-detail", args=(issue.pk,))
+    data = {
+        "paralegal_id": paralegal.pk,
+    }
+    response = superuser_client.patch(url, data=data, format="json")
+    assert response.status_code == 400, response.json()
+
+
 # TODO: Test permissions
 @pytest.mark.django_db
 def test_case_create_note_view(superuser_client: APIClient, superuser: User):
