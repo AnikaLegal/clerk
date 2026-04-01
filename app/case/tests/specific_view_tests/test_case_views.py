@@ -36,18 +36,14 @@ def test_case_list_view__with_no_access(user_client: APIClient, user: User):
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_no_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
+    paralegal_user_client: APIClient,
 ):
     """
     Paralegal users can fetch cases but no results because they're not assigned
     """
     factories.IssueFactory()  # There's an issue but the user can't see it
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = paralegal_user_client.get(url)
     assert response.status_code == 200
     assert response.json() == {
         "current": 1,
@@ -62,19 +58,17 @@ def test_case_list_view__as_paralegal_with_no_access(
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_access(
-    user_client: APIClient,
-    user: User,
-    paralegal_group,
+    paralegal_user_client: APIClient,
+    paralegal_user,
 ):
     """
     Paralegal users can fetch cases and see results when they're assigned
     """
-    issue_a = factories.IssueFactory(paralegal=user)
+    issue_a = factories.IssueFactory(paralegal=paralegal_user)
     factories.IssueFactory()  # There's an issue but the user can't see it
-    user.groups.set([paralegal_group])
-    annotate_group_access(user)
+
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = paralegal_user_client.get(url)
     assert response.status_code == 200
     resp_data = response.json()
 
@@ -91,19 +85,17 @@ def test_case_list_view__as_paralegal_with_access(
 
 @pytest.mark.django_db
 def test_case_list_view__as_coordinator(
-    user_client: APIClient,
-    user: User,
-    coordinator_group,
+    coordinator_user_client: APIClient,
+    coordinator_user,
 ):
     """
     Coordinator users can fetch cases and see results
     """
-    issue_a = factories.IssueFactory(paralegal=user)
+    issue_a = factories.IssueFactory(paralegal=coordinator_user)
     issue_b = factories.IssueFactory()
-    user.groups.set([coordinator_group])
-    annotate_group_access(user)
+
     url = reverse("case-api-list")
-    response = user_client.get(url)
+    response = coordinator_user_client.get(url)
     assert response.status_code == 200
     resp_data = response.json()
 
