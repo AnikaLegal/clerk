@@ -147,7 +147,6 @@ LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "case-list"
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
 ]
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
@@ -173,14 +172,6 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     "accounts.social_auth.confirm_user_setup",
 )
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
 
 
 # Google Service Account
