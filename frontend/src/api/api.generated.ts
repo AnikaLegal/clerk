@@ -351,7 +351,7 @@ const injectedRtkApi = api.injectEndpoints({
       GetPotentialUsersApiResponse,
       GetPotentialUsersApiArg
     >({
-      query: () => ({ url: `/clerk/api/account/potential` }),
+      query: () => ({ url: `/clerk/api/account/potential/` }),
     }),
     getEmailTemplates: build.query<
       GetEmailTemplatesApiResponse,
@@ -843,7 +843,8 @@ export type GetUsersApiArg = {
     | "last_name"
     | "-last_name";
 };
-export type CreateUserApiResponse = /** status 201 Successful response. */ User;
+export type CreateUserApiResponse =
+  /** status 201 Successful response. */ UserCreate;
 export type CreateUserApiArg = {
   userCreate: UserCreate;
 };
@@ -866,7 +867,7 @@ export type GetUserAccountPermissionsApiArg = {
   id: number;
 };
 export type ResyncUserAccountPermissionsApiResponse =
-  /** status 201 Successful response. */ {
+  /** status 200 Successful response. */ {
     account: User;
     permissions: MicrosoftUserPermissions;
   };
@@ -1123,6 +1124,7 @@ export type UserBase = {
   first_name: string;
   last_name: string;
   email: string;
+  url: string;
 };
 export type TextChoiceListField = {
   display: string;
@@ -1138,7 +1140,6 @@ export type User = UserBase & {
   is_superuser: boolean;
   full_name: string;
   created_at: string;
-  url: string;
   is_admin_or_better: boolean;
   is_coordinator_or_better: boolean;
   is_lawyer_or_better: boolean;

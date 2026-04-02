@@ -4,7 +4,7 @@ from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from case.middleware import annotate_group_access
 
@@ -79,8 +79,10 @@ class UserSerializer(serializers.ModelSerializer):
         read_only=False,
         slug_field="name",
         queryset=Group.objects.all(),
+        required=False,
     )
 
+    email = serializers.EmailField(required=False)
     url = serializers.SerializerMethodField()
     created_at = LocalDateField(source="date_joined")
     full_name = serializers.SerializerMethodField()
@@ -100,6 +102,16 @@ class UserSerializer(serializers.ModelSerializer):
             annotate_group_access(instance)
 
         return super().to_representation(instance)
+
+    def update(self, instance, validated_data):
+        # Only allow updating groups if the user is an admin.
+        if "groups" in validated_data:
+            if set(validated_data["groups"]) != set(instance.groups.all()):
+                request = self.context.get("request")
+                if not request or not request.user.is_admin_or_better:
+                    raise PermissionDenied()
+
+        return super().update(instance, validated_data)
 
     def get_is_ms_account_set_up(self, obj):
         fifteen_minutes_ago = timezone.now() - timezone.timedelta(minutes=15)

@@ -65,7 +65,7 @@ paths:
     $ref: paths/account-perms.yaml
   /clerk/api/account/{id}/perms-resync/:
     $ref: paths/account-perms-resync.yaml
-  /clerk/api/account/potential:
+  /clerk/api/account/potential/:
     $ref: paths/account-potential-list.yaml
 
   /clerk/api/template-email/:

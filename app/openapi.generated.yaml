@@ -1218,7 +1218,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserCreate"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -1295,7 +1295,7 @@ paths:
           schema:
             type: integer
       responses:
-        "201":
+        "200":
           description: Successful response.
           content:
             application/json:
@@ -1313,7 +1313,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/account/potential:
+  /clerk/api/account/potential/:
     get:
       operationId: getPotentialUsers
       responses:
@@ -2120,10 +2120,13 @@ components:
         email:
           type: string
           format: email
+        url:
+          type: string
       required:
         - first_name
         - last_name
         - email
+        - url
     TextChoiceListField:
       type: object
       properties:
@@ -2164,8 +2167,6 @@ components:
               type: string
             created_at:
               type: string
-            url:
-              type: string
             is_admin_or_better:
               type: boolean
             is_coordinator_or_better:
@@ -2196,7 +2197,6 @@ components:
             - is_superuser
             - full_name
             - created_at
-            - url
             - is_admin_or_better
             - is_coordinator_or_better
             - is_lawyer_or_better

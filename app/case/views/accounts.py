@@ -83,6 +83,11 @@ class AccountApiViewset(
     permission_classes = [CoordinatorOrBetterPermission]
     pagination_class = AccountPaginator
 
+    def get_permissions(self):
+        if self.action in ["create"]:
+            return [AdminOrBetterPermission()]
+        return super().get_permissions()
+
     def get_queryset(self):
         queryset = User.objects.prefetch_related("groups").all()
 

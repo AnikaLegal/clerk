@@ -87,7 +87,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../schemas/User.yaml
+            $ref: ../schemas/UserCreate.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":
