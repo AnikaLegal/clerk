@@ -251,6 +251,7 @@ DJANGO_VITE = {
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 WAGTAILDOCS_DOCUMENT_MODEL = "web.CustomDocument"
+WAGTAILUSERS_PASSWORD_REQUIRED = False  # Allow blank passwords for social auth users
 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
