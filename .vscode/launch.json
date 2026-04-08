@@ -16,6 +16,13 @@
       "connect": {
         "port": 8123,
       }
+    },
+    {
+      "type": "editor-browser",
+      "request": "launch",
+      "name": "Launch in integrated browser",
+      "url": "http://localhost:8000/clerk",
+      "webRoot": "${workspaceFolder}/frontend/src"
     }
   ]
 }
