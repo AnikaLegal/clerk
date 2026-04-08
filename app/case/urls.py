@@ -23,7 +23,7 @@ INT_EMAIL_PK = "(?P<email_pk>[0-9]+)"
 INT_ATTACHMENT_PK = "(?P<attachment_pk>[0-9]+)"
 INT_PERSON_PK = "(?P<person_pk>[0-9]+)"
 UUID_PK = "(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})"
-SLUG = "(?P<slug>[\-\w]+)"
+SLUG = "(?P<slug>[-\w]+)"
 
 router = DefaultRouter()
 router.register(

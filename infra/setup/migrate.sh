@@ -31,7 +31,7 @@ unset LC_CTYPE
     export AWS_ACCESS_KEY_ID="AKIAUZ6OTSVMUXQAJLGM"
     export AWS_SECRET_ACCESS_KEY="$backup_user_secret_access_key"
 
-    S3_BUCKET="s3://anika-database-backups-test"
+    S3_BUCKET="s3://anika-database-backups-staging"
     DUMP_NAME=$(aws s3 ls ${S3_BUCKET} |
         sort |
         grep postgres_clerk |

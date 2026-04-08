@@ -120,6 +120,11 @@ class IssueSerializer(serializers.ModelSerializer):
         return fields
 
     def validate(self, attrs):
+        if attrs.get("paralegal_id") is not None and attrs.get("lawyer_id") is None:
+            raise serializers.ValidationError(
+                {"lawyer_id": "A lawyer must be assigned if a paralegal is assigned"}
+            )
+
         if attrs.get("stage") == CaseStage.CLOSED and self.instance:
             query = Q(
                 issue_id=self.instance.id,

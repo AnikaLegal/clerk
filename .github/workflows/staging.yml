@@ -47,4 +47,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_BACKUP_USER_SECRET_ACCESS_KEY }}
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
         COMPOSE_SUFFIX: staging
-        S3_BUCKET: s3://anika-database-backups-test
+        S3_BUCKET: s3://anika-database-backups-staging
