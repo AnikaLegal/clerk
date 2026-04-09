@@ -508,7 +508,7 @@ export type GetCasesApiResponse = /** status 200 Successful response. */ {
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: Issue[];
+  results: IssueRead[];
 };
 export type GetCasesApiArg = {
   page?: number;
@@ -523,21 +523,21 @@ export type GetCasesApiArg = {
   client?: string;
 };
 export type CreateCaseApiResponse =
-  /** status 201 Successful response. */ Issue;
+  /** status 201 Successful response. */ IssueRead;
 export type CreateCaseApiArg = {
   issueCreate: IssueCreate;
 };
 export type GetCaseApiResponse = /** status 200 Successful response. */ {
-  issue: Issue;
+  issue: IssueRead;
   tenancy: Tenancy;
-  notes: IssueNote[];
+  notes: IssueNoteRead[];
 };
 export type GetCaseApiArg = {
   /** Entity ID */
   id: string;
 };
 export type UpdateCaseApiResponse =
-  /** status 200 Successful response. */ Issue;
+  /** status 200 Successful response. */ IssueRead;
 export type UpdateCaseApiArg = {
   /** Entity ID */
   id: string;
@@ -545,7 +545,7 @@ export type UpdateCaseApiArg = {
   issueUpdate: IssueUpdate;
 };
 export type CreateCaseNoteApiResponse =
-  /** status 201 Successful response. */ IssueNote;
+  /** status 201 Successful response. */ IssueNoteRead;
 export type CreateCaseNoteApiArg = {
   /** Entity ID */
   id: string;
@@ -603,20 +603,21 @@ export type DeleteCaseServiceApiArg = {
   serviceId: number;
 };
 export type GetEmailThreadsApiResponse =
-  /** status 200 Successful response. */ EmailThread[];
+  /** status 200 Successful response. */ EmailThreadRead[];
 export type GetEmailThreadsApiArg = {
   /** Case ID */
   id: string;
   slug?: string;
 };
 export type CreateEmailApiResponse =
-  /** status 201 Successful response. */ Email;
+  /** status 201 Successful response. */ EmailRead;
 export type CreateEmailApiArg = {
   /** Case ID */
   id: string;
   emailCreate: EmailCreate;
 };
-export type GetEmailApiResponse = /** status 200 Successful response. */ Email;
+export type GetEmailApiResponse =
+  /** status 200 Successful response. */ EmailRead;
 export type GetEmailApiArg = {
   /** Case ID */
   id: string;
@@ -624,7 +625,7 @@ export type GetEmailApiArg = {
   emailId: number;
 };
 export type UpdateEmailApiResponse =
-  /** status 200 Successful response. */ Email;
+  /** status 200 Successful response. */ EmailRead;
 export type UpdateEmailApiArg = {
   /** Case ID */
   id: string;
@@ -682,7 +683,7 @@ export type GetNotesApiResponse = /** status 200 Successful response. */ {
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: IssueNote[];
+  results: IssueNoteRead[];
 };
 export type GetNotesApiArg = {
   page?: number;
@@ -740,7 +741,7 @@ export type GetCaseDatesApiResponse = /** status 200 Successful response. */ {
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: IssueDate[];
+  results: IssueDateRead[];
 };
 export type GetCaseDatesApiArg = {
   page?: number;
@@ -752,19 +753,19 @@ export type GetCaseDatesApiArg = {
   isReviewed?: boolean;
 };
 export type CreateCaseDateApiResponse =
-  /** status 201 Successful response. */ IssueDate;
+  /** status 201 Successful response. */ IssueDateRead;
 export type CreateCaseDateApiArg = {
   /** Successful response. */
   issueDateCreate: IssueDateCreate;
 };
 export type GetCaseDateApiResponse =
-  /** status 200 Successful response. */ IssueDate;
+  /** status 200 Successful response. */ IssueDateRead;
 export type GetCaseDateApiArg = {
   /** Date ID */
   id: number;
 };
 export type UpdateCaseDateApiResponse =
-  /** status 200 Successful response. */ IssueDate;
+  /** status 200 Successful response. */ IssueDateRead;
 export type UpdateCaseDateApiArg = {
   /** Date ID */
   id: number;
@@ -823,7 +824,7 @@ export type GetUsersApiResponse = /** status 200 Successful response. */ {
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: User[];
+  results: UserRead[];
 };
 export type GetUsersApiArg = {
   page?: number;
@@ -844,16 +845,18 @@ export type GetUsersApiArg = {
     | "-last_name";
 };
 export type CreateUserApiResponse =
-  /** status 201 Successful response. */ UserCreate;
+  /** status 201 Successful response. */ UserCreateRead;
 export type CreateUserApiArg = {
   userCreate: UserCreate;
 };
-export type GetUserApiResponse = /** status 200 Successful response. */ User;
+export type GetUserApiResponse =
+  /** status 200 Successful response. */ UserRead;
 export type GetUserApiArg = {
   /** Entity ID */
   id: number;
 };
-export type UpdateUserApiResponse = /** status 200 Successful response. */ User;
+export type UpdateUserApiResponse =
+  /** status 200 Successful response. */ UserRead;
 export type UpdateUserApiArg = {
   /** Entity ID */
   id: number;
@@ -861,15 +864,15 @@ export type UpdateUserApiArg = {
   userCreate: UserCreate;
 };
 export type GetUserAccountPermissionsApiResponse =
-  /** status 200 Successful response. */ MicrosoftUserPermissions;
+  /** status 200 Successful response. */ MicrosoftUserPermissionsRead;
 export type GetUserAccountPermissionsApiArg = {
   /** Entity ID */
   id: number;
 };
 export type ResyncUserAccountPermissionsApiResponse =
   /** status 200 Successful response. */ {
-    account: User;
-    permissions: MicrosoftUserPermissions;
+    account: UserRead;
+    permissions: MicrosoftUserPermissionsRead;
   };
 export type ResyncUserAccountPermissionsApiArg = {
   /** Entity ID */
@@ -1124,6 +1127,11 @@ export type UserBase = {
   first_name: string;
   last_name: string;
   email: string;
+};
+export type UserBaseRead = {
+  first_name: string;
+  last_name: string;
+  email: string;
   url: string;
 };
 export type TextChoiceListField = {
@@ -1132,6 +1140,26 @@ export type TextChoiceListField = {
   choices: string[][];
 };
 export type User = UserBase & {
+  id: number;
+  case_capacity: number;
+  is_intern: boolean;
+  is_active: boolean;
+  groups: TextChoiceListField;
+  is_superuser: boolean;
+  full_name: string;
+  created_at: string;
+  is_admin_or_better: boolean;
+  is_coordinator_or_better: boolean;
+  is_lawyer_or_better: boolean;
+  is_paralegal_or_better: boolean;
+  is_admin: boolean;
+  is_coordinator: boolean;
+  is_lawyer: boolean;
+  is_paralegal: boolean;
+  is_ms_account_set_up: boolean;
+  ms_account_created_at: string | null;
+};
+export type UserRead = UserBaseRead & {
   id: number;
   case_capacity: number;
   is_intern: boolean;
@@ -1242,6 +1270,39 @@ export type Issue = IssueBase & {
   next_review: string | null;
   submission_id: string | null;
 };
+export type IssueRead = IssueBase & {
+  id: string;
+  topic_display: string;
+  stage: string;
+  stage_display: string;
+  outcome: string | null;
+  outcome_display: string | null;
+  outcome_notes: string;
+  fileref: string;
+  provided_legal_services: boolean;
+  is_open: boolean;
+  is_sharepoint_set_up: boolean;
+  paralegal: UserRead | null;
+  lawyer: UserRead | null;
+  client: Client;
+  employment_status: TextChoiceListField;
+  weekly_income: number | null;
+  referrer: string;
+  referrer_type: TextChoiceField;
+  tenancy: Tenancy;
+  weekly_rent: number | null;
+  support_worker: Person | null;
+  actionstep_id: number | null;
+  created_at: string;
+  url: string;
+  answers: {
+    [key: string]: string;
+  } | null;
+  is_conflict_check: boolean | null;
+  is_eligibility_check: boolean | null;
+  next_review: string | null;
+  submission_id: string | null;
+};
 export type Error = {
   detail?: string | object | (string | object | any)[];
   non_field_errors?: string[];
@@ -1314,6 +1375,13 @@ export type IssueNote = IssueNoteBase & {
   text_display: string;
   created_at: string;
   reviewee: User | null;
+};
+export type IssueNoteRead = IssueNoteBase & {
+  id: number;
+  creator: IssueNoteCreator;
+  text_display: string;
+  created_at: string;
+  reviewee: UserRead | null;
 };
 export type IssueUpdate = {
   topic?: string;
@@ -1392,8 +1460,25 @@ export type Email = EmailCreate & {
   edit_url: string;
   attachments: EmailAttachment[];
 };
+export type EmailRead = EmailCreate & {
+  id: number;
+  created_at: string;
+  processed_at: string | null;
+  sender: UserRead;
+  state: string;
+  reply_url: string;
+  edit_url: string;
+  attachments: EmailAttachment[];
+};
 export type EmailThread = {
   emails: Email[];
+  subject: string;
+  slug: string;
+  most_recent: string;
+  url: string;
+};
+export type EmailThreadRead = {
+  emails: EmailRead[];
   subject: string;
   slug: string;
   most_recent: string;
@@ -1434,6 +1519,12 @@ export type IssueDate = IssueDateBase & {
   notes: string;
   is_reviewed: boolean;
 };
+export type IssueDateRead = IssueDateBase & {
+  id: number;
+  issue: IssueRead;
+  notes: string;
+  is_reviewed: boolean;
+};
 export type IssueDateCreate = IssueDateBase & {
   issue_id: string;
   notes?: string;
@@ -1442,10 +1533,18 @@ export type IssueDateCreate = IssueDateBase & {
 export type UserCreate = UserBase & {
   groups: string[];
 };
+export type UserCreateRead = UserBaseRead & {
+  groups: string[];
+};
 export type MicrosoftUserPermissions = {
   access_level: "FULL_ACCESS" | "PARTIAL_ACCESS" | "NO_ACCESS";
   issues_with_access: Issue[];
   issues_without_access: Issue[];
+};
+export type MicrosoftUserPermissionsRead = {
+  access_level: "FULL_ACCESS" | "PARTIAL_ACCESS" | "NO_ACCESS";
+  issues_with_access: IssueRead[];
+  issues_without_access: IssueRead[];
 };
 export type EmailTemplateCreate = {
   name: string;
