@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "npx eslint .",
     "schema": "npx @redocly/cli bundle ../openapi/openapi.yaml --output ../app/openapi.generated.yaml && npx prettier --write ../app/openapi.generated.yaml && npx @rtk-query/codegen-openapi openapi-config.json",
     "build": "vite build --config vite.config.ts",
     "dev": "vite serve --config vite.config.ts",
@@ -56,6 +57,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@redocly/cli": "^2.2.2",
     "@rtk-query/codegen-openapi": "^2.0.0",
     "@types/linkifyjs": "~2.1.7",
@@ -64,13 +66,15 @@
     "@types/react-transition-group": "~4.4.12",
     "@types/showdown": "~2.0.6",
     "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^10.2.0",
     "glob": "^11.0.3",
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.6.2",
     "type-fest": "^5.0.1",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4",
     "yaml": "^2.8.1"
