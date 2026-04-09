@@ -32,7 +32,7 @@ def list_directory_users(order_by="email"):
 
     service = build("admin", "directory_v1", credentials=credentials)
     # TODO: can we add caching here?
-    request = service.users().list(domain="anikalegal.com", orderBy=order_by)
+    request = service.users().list(domain="anikalegal.org.au", orderBy=order_by)
 
     users = []
     while request is not None:
