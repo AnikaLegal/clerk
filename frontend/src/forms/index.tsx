@@ -1,4 +1,3 @@
-import { AccountForm } from './account'
 import { AssignForm } from './case-assign'
 import { CloseForm } from './case-close'
 import { ConflictForm } from './case-conflict-check'
@@ -15,7 +14,6 @@ import { EmailTemplateForm } from './email-template'
 import { TenancyForm } from './tenancy'
 
 export {
-  AccountForm,
   AssignForm,
   CloseForm,
   ConflictForm,
