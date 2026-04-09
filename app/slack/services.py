@@ -52,7 +52,7 @@ def send_slack_direct_message(markdown_text: str, user_id: str):
 
 
 NON_STANDARD_SLACK_EMAILS = {
-    "matt@anikalegal.com": "mattdsegal@gmail.com",
+    "matt@anikalegal.org.au": "mattdsegal@gmail.com",
 }
 
 

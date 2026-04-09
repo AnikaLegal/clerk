@@ -102,10 +102,13 @@ def test_remove_user_from_case_A(mock_api):
 @pytest.mark.django_db
 def test_remove_user_from_case_B(mock_api):
     """Check service function when there are permissions on the case folder that don't belong to our user."""
-    user = UserFactory(email="donald.duck@anikalegal.com")
+    user = UserFactory(email="donald.duck@anikalegal.org.au")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
-        {"id": "666", "grantedToV2": {"user": {"email": "bugs.bunny@anikalegal.com"}}}
+        {
+            "id": "666",
+            "grantedToV2": {"user": {"email": "bugs.bunny@anikalegal.org.au"}},
+        }
     ]
 
     remove_user_from_case(user, issue)
@@ -117,12 +120,12 @@ def test_remove_user_from_case_B(mock_api):
 @pytest.mark.django_db
 def test_remove_user_from_case_C(mock_api):
     """Check service function when there are permissions on the case folder belonging to our user."""
-    user = UserFactory(email="donald.duck@anikalegal.com")
+    user = UserFactory(email="donald.duck@anikalegal.org.au")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
         {
             "id": "666",
-            "grantedToV2": {"user": {"email": "donald.duck@anikalegal.com"}},
+            "grantedToV2": {"user": {"email": "donald.duck@anikalegal.org.au"}},
         }
     ]
 
