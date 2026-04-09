@@ -34,10 +34,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return reverse("account-detail", args=(obj.pk,))
 
     def validate_email(self, value: str):
-        if not value.endswith("@anikalegal.org.au"):
-            raise ValidationError(
-                "Can only invite users with an anikalegal.org.au email"
-            )
+        if not value.endswith("@anikalegal.com"):
+            raise ValidationError("Can only invite users with an anikalegal.com email")
         return value
 
     @transaction.atomic

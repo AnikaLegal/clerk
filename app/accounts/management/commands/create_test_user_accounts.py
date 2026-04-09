@@ -14,7 +14,7 @@ USER_ACCOUNTS = {
     "test-lawyer": [CaseGroups.LAWYER],
     "test-coordinator": [CaseGroups.COORDINATOR],
 }
-DOMAIN = "anikalegal.org.au"
+DOMAIN = "anikalegal.com"
 
 
 class Command(BaseCommand):

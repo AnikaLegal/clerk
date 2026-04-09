@@ -16,7 +16,7 @@ class Command(BaseCommand):
             print("Processing page", slug)
             dt = datetime.strptime(published_date, "%d %B %Y")
             first, last = name.split(" ")
-            email = f"{first}.{last}@anikalegal.org.au".lower()
+            email = f"{first}.{last}@anikalegal.com".lower()
             user, _ = User.objects.get_or_create(
                 first_name=first,
                 last_name=last,

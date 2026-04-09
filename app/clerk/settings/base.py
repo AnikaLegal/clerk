@@ -9,7 +9,7 @@ IS_PROD = False
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEFAULT_FROM_EMAIL = "noreply@anikalegal.org.au"
+DEFAULT_FROM_EMAIL = "noreply@anikalegal.com"
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -156,7 +156,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.profile",
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.org.au"]
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.com"]
 
 # See https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
 SOCIAL_AUTH_PIPELINE = (
@@ -331,7 +331,7 @@ class SlackMessage:
 
 SLACK_MESSAGE = SlackMessage
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
-SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.org.au"  # Set to None in prod only
+SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.com"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
 INTAKE_NOEMAIL_EMAIL = None

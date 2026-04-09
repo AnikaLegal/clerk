@@ -67,7 +67,7 @@ class Command(BaseCommand):
         users = User.objects.exclude(
             Q(groups__name__in=[CaseGroups.ADMIN])
             | Q(is_superuser=True)
-            | Q(email="coordinators@anikalegal.org.au")
+            | Q(email="coordinators@anikalegal.com")
         ).distinct()
 
         for t in tenancies.iterator():

@@ -20,7 +20,7 @@ def test_webflow_form_create(mock_slack, client):
         "_id": "b" * 24,
         "data": {
             "Name": "sorry alex I need to do this quite a few times",
-            "Email": "test@example.com",
+            "Email": "matt99@anikalegal.com",
             "Phone Number": "1111111",
             "Referral": "Google Maps",
             "Field 4": "true",
@@ -31,7 +31,7 @@ def test_webflow_form_create(mock_slack, client):
     assert resp.json() == {"message": "We got the form. :)"}
     contact = WebflowContact.objects.last()
     assert contact.name == "sorry alex I need to do this quite a few times"
-    assert contact.email == "test@example.com"
+    assert contact.email == "matt99@anikalegal.com"
     assert contact.phone == "1111111"
     assert contact.referral == "Google Maps"
 

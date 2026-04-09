@@ -55,7 +55,7 @@ inv reset
 Create a user for local development and testing using your Anika email address:
 
 ```bash
-inv superuser your.name@anikalegal.org.au
+inv superuser your.name@anikalegal.com
 ```
 
 Finally you can bring up the web server:

@@ -20,14 +20,14 @@ def test_account_api_create(
     data = {
         "first_name": "Charlie",
         "last_name": "Brown",
-        "email": "charlie.brown@anikalegal.org.au",
+        "email": "charlie.brown@anikalegal.com",
         "groups": ["Paralegal"],
     }
     response = superuser_client.post(url, data, format="json")
     assert response.status_code == 201, response.json()
-    assert response.json()["email"] == "charlie.brown@anikalegal.org.au"
+    assert response.json()["email"] == "charlie.brown@anikalegal.com"
     assert User.objects.count() == 2
-    user = User.objects.get(email="charlie.brown@anikalegal.org.au")
+    user = User.objects.get(email="charlie.brown@anikalegal.com")
     mock_invite_user_if_not_exists.assert_called_with(user)
     assert list(user.groups.values_list("name", flat=True)) == ["Paralegal"]
     assert user.ms_account_created_at is not None
@@ -334,7 +334,7 @@ def test_account_api_create_permissions(
     data = {
         "first_name": "Charlie",
         "last_name": "Brown",
-        "email": "charlie.brown@anikalegal.org.au",
+        "email": "charlie.brown@anikalegal.com",
         "groups": ["Paralegal"],
     }
     response = client.post(url, data, format="json")
