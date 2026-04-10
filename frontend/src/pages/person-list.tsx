@@ -57,7 +57,7 @@ const App = () => {
           <span>Parties</span>
         </Title>
         {CONTEXT.user.is_coordinator_or_better && (
-          <Button component="a" href={CONTEXT.create_url} size="md">
+          <Button component="a" href={CONTEXT.create_url}>
             Add a party
           </Button>
         )}
