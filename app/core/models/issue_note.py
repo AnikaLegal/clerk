@@ -94,6 +94,9 @@ class IssueNote(TimestampedModel):
 
         super().save(*args, **kwargs)
 
+    def check_permissions(self, user):
+        return self.creator == user or self.issue.check_permission(user)
+
     @staticmethod
     def annotate_with_eligibility_checks(queryset: QuerySet[Issue]) -> QuerySet[Issue]:
         is_conflict_check = Q(note_type=NoteType.CONFLICT_CHECK_FAILURE) | Q(

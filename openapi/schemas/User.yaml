@@ -1,5 +1,5 @@
 allOf:
-  - $ref: ./UserCreate.yaml
+  - $ref: ./UserBase.yaml
   - type: object
     properties:
       id:
@@ -10,27 +10,27 @@ allOf:
         type: boolean
       is_active:
         type: boolean
+      groups:
+        $ref: ./TextChoiceListField.yaml
       is_superuser:
         type: boolean
       full_name:
         type: string
       created_at:
         type: string
-      groups:
-        type: array
-        items:
-          type: string
-      url:
-        type: string
       is_admin_or_better:
         type: boolean
       is_coordinator_or_better:
+        type: boolean
+      is_lawyer_or_better:
         type: boolean
       is_paralegal_or_better:
         type: boolean
       is_admin:
         type: boolean
       is_coordinator:
+        type: boolean
+      is_lawyer:
         type: boolean
       is_paralegal:
         type: boolean
@@ -44,16 +44,17 @@ allOf:
       - case_capacity
       - is_intern
       - is_active
+      - groups
       - is_superuser
       - full_name
       - created_at
-      - groups
-      - url
       - is_admin_or_better
       - is_coordinator_or_better
+      - is_lawyer_or_better
       - is_paralegal_or_better
       - is_admin
       - is_coordinator
+      - is_lawyer
       - is_paralegal
       - is_ms_account_set_up
       - ms_account_created_at

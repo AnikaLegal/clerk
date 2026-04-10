@@ -2,19 +2,13 @@ import {
   Center,
   Container,
   Grid,
-  Loader,
   Pagination,
-  Select,
-  SelectProps,
   Table,
   Text,
-  TextInput,
-  TextInputProps,
   Title,
 } from '@mantine/core'
-import { useDebouncedCallback } from '@mantine/hooks'
-import { IconSearch } from '@tabler/icons-react'
 import api, { GetCaseDatesApiArg, IssueDate } from 'api'
+import { SelectFilter, TextInputFilter } from 'comps/filter'
 import { CASE_DATE_TYPES } from 'consts'
 import {
   DateActionIconGroup,
@@ -42,7 +36,7 @@ const App = () => {
   })
   const result = api.useGetCaseDatesQuery(args)
 
-  const handleFilterChange = (key: keyof GetCaseDatesApiArg, value: any) => {
+  const handleFilterChange = (key, value) => {
     setArgs((prevArgs) => ({
       ...prevArgs,
       [key]: value !== null ? value : undefined,
@@ -123,62 +117,6 @@ const App = () => {
         />
       )}
     </Container>
-  )
-}
-
-interface TextInputFilterProps extends TextInputProps {
-  name: keyof GetCaseDatesApiArg
-  onFilterChange: (key: keyof GetCaseDatesApiArg, value: any) => void
-  isLoading?: boolean
-}
-
-const TextInputFilter = ({
-  name,
-  onFilterChange,
-  isLoading = false,
-  ...props
-}: TextInputFilterProps) => {
-  const debouncedFilterChange = useDebouncedCallback(
-    (key: keyof GetCaseDatesApiArg, value: any) => {
-      onFilterChange(key, value)
-    },
-    300 // Adjust the debounce delay as needed
-  )
-
-  return (
-    <TextInput
-      size="md"
-      value={props.value}
-      onChange={(event) =>
-        debouncedFilterChange(name, event.currentTarget.value)
-      }
-      rightSection={isLoading ? <Loader size="sm" /> : <IconSearch size={16} />}
-      {...props}
-    />
-  )
-}
-
-interface SelectFilterProps extends SelectProps {
-  name: keyof GetCaseDatesApiArg
-  onFilterChange: (key: keyof GetCaseDatesApiArg, value: any) => void
-  isLoading?: boolean
-}
-
-const SelectFilter = ({
-  name,
-  onFilterChange,
-  isLoading = false,
-  ...props
-}: SelectFilterProps) => {
-  return (
-    <Select
-      clearable
-      size="md"
-      withCheckIcon={false}
-      onChange={(value) => onFilterChange(name, value)}
-      rightSection={isLoading ? <Loader size="sm" /> : null}
-      {...props}
-    />
   )
 }
 

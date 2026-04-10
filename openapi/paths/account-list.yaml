@@ -1,6 +1,16 @@
 get:
   operationId: getUsers
   parameters:
+    - name: page
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
     - name: name
       in: query
       schema:
@@ -38,10 +48,31 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: ../schemas/User.yaml
-
+            type: object
+            properties:
+              current:
+                type: number
+              next:
+                type: number
+                nullable: true
+              prev:
+                type: number
+                nullable: true
+              page_count:
+                type: number
+              item_count:
+                type: number
+              results:
+                type: array
+                items:
+                  $ref: ../schemas/User.yaml
+            required:
+              - current
+              - next
+              - prev
+              - page_count
+              - item_count
+              - results
 post:
   operationId: createUser
   requestBody:
@@ -56,7 +87,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../schemas/User.yaml
+            $ref: ../schemas/UserCreate.yaml
     "400":
       $ref: ../responses/BadRequest.yaml
     "403":

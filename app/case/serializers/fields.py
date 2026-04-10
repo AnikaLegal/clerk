@@ -1,5 +1,6 @@
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.relations import MANY_RELATION_KWARGS
 
 
 class BooleanYesNoDisplayField(serializers.BooleanField):
@@ -55,6 +56,37 @@ class TextChoiceListField(serializers.ListField):
             "value": [v for v in value if v],
             "choices": self.text_choice_cls.choices,
         }
+
+
+class SlugRelatedTextChoiceField(serializers.SlugRelatedField):
+    class CustomManyRelatedField(serializers.ManyRelatedField):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._choices_list = None
+
+        @property
+        def choices_list(self):
+            if self._choices_list is None:
+                self._choices_list = [list(pair) for pair in self.choices.items()]
+            return self._choices_list
+
+        def to_representation(self, iterable):  # pyright: ignore [reportIncompatibleMethodOverride]
+            iterable = super().to_representation(iterable)
+            # NOTE: the display and value are the same as they are the value of
+            # the related field.
+            return {
+                "display": " | ".join(iterable),
+                "value": iterable,
+                "choices": self.choices_list,
+            }
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        list_kwargs = {"child_relation": cls(*args, **kwargs)}
+        for key in kwargs:
+            if key in MANY_RELATION_KWARGS:
+                list_kwargs[key] = kwargs[key]
+        return cls.CustomManyRelatedField(**list_kwargs)
 
 
 class DateField(serializers.ReadOnlyField):

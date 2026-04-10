@@ -1,125 +1,224 @@
-import React, { useState } from 'react'
 import {
+  Anchor,
   Button,
+  Center,
   Container,
-  Header,
+  Grid,
+  Group,
+  Loader,
+  Pagination,
   Table,
-  Icon,
-  Input,
-  Dropdown,
-} from 'semantic-ui-react'
-
-import { mount, debounce, useEffectLazy } from 'utils'
-import { FadeTransition } from 'comps/transitions'
+  Text,
+  Title,
+} from '@mantine/core'
+import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
+import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
+import { SelectFilter, TextInputFilter } from 'comps/filter'
 import { GroupLabels } from 'comps/group-label'
-import api, { User } from 'api'
+import { showNotification } from 'comps/notification'
+import React, { useEffect, useState } from 'react'
+import { UserPermission } from 'types'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
-  users: User[]
+  user: UserPermission
   create_url: string
+  group_values: string[]
 }
-
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-const GROUP_OPTIONS = [
-  { key: '', value: '', text: 'All groups' },
-  { key: 'Paralegal', value: 'Paralegal', text: 'Paralegal' },
-  { key: 'Coordinator', value: 'Coordinator', text: 'Coordinator' },
-  { key: 'Lawyer', value: 'Lawyer', text: 'Lawyer' },
-  { key: 'Admin', value: 'Admin', text: 'Admin' },
-]
-
-const debouncer = debounce(300)
-
 const App = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [users, setUsers] = useState<User[]>(CONTEXT.users)
-  const [name, setName] = useState<string>('')
-  const [group, setGroups] = useState<string>('')
-  const [getUsers] = api.useLazyGetUsersQuery()
-
-  const search = debouncer(() => {
-    setIsLoading(true)
-    getUsers({ name, group })
-      .unwrap()
-      .then((users) => {
-        setUsers(users)
-        setIsLoading(false)
-      })
-      .catch(() => setIsLoading(false))
+  const [args, setArgs] = useState<GetUsersApiArg>({
+    page: 1,
+    sort: '-date_joined',
+    isActive: true,
   })
-  useEffectLazy(() => search(), [name, group])
+  const result = useGetUsersQuery(args)
+
+  const handleFilterChange = (key, value) => {
+    setArgs((prevArgs) => ({
+      ...prevArgs,
+      [key]: value !== null ? value : undefined,
+      page: 1, // Reset to first page on filter change
+    }))
+  }
+
   return (
-    <Container>
-      <Header as="h1">Accounts</Header>
-      <a href={CONTEXT.create_url}>
-        <Button primary>Invite a paralegal</Button>
-      </a>
-      <div
-        style={{
-          margin: '1rem 0',
-          display: 'grid',
-          gap: '1rem',
-          gridTemplateColumns: '1fr 1fr',
-        }}
+    <Container size="xl">
+      <Title order={1}>
+        <Group wrap="nowrap" gap="sm" justify="space-between">
+          <span>Accounts</span>
+          {CONTEXT.user.is_admin_or_better && (
+            <Button component="a" href={CONTEXT.create_url}>
+              Invite users
+            </Button>
+          )}
+        </Group>
+      </Title>
+      {!result.isLoading && result.data && (
+        <Text c="dimmed">
+          Showing {result.data.results.length} of {result.data.item_count}{' '}
+          accounts
+        </Text>
+      )}
+      <Grid mt="md">
+        <Grid.Col span={12}>
+          <TextInputFilter
+            name="name"
+            label="Search"
+            placeholder="Find users by name"
+            onFilterChange={handleFilterChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <SelectFilter
+            name="group"
+            data={CONTEXT.group_values.map((group) => ({
+              value: group,
+              label: group,
+            }))}
+            label="Group"
+            value={args.group || ''}
+            onFilterChange={handleFilterChange}
+          />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <SelectFilter
+            name="isActive"
+            data={[
+              { value: 'true', label: 'Yes' },
+              { value: 'false', label: 'No' },
+            ]}
+            label="Active?"
+            value={args.isActive?.toString() || ''}
+            onFilterChange={handleFilterChange}
+          />
+        </Grid.Col>
+      </Grid>
+      <Table
+        withColumnBorders
+        withTableBorder
+        verticalSpacing="xs"
+        fz="md"
+        mt="lg"
       >
-        <Input
-          icon="search"
-          placeholder="Search names..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>Org</Table.Th>
+            <Table.Th>Email</Table.Th>
+            <Table.Th>Created</Table.Th>
+            <Table.Th>Groups</Table.Th>
+            <Table.Th>Active?</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          <TableBody result={result} dataRow={UserDataRow} />
+        </Table.Tbody>
+      </Table>
+      {!result.isLoading && result.data && (
+        <Pagination
+          total={result.data.page_count}
+          value={args.page || 1}
+          onChange={(page) => setArgs({ ...args, page })}
+          mt="md"
+          withEdges
+          withControls
         />
-        <Dropdown
-          fluid
-          selection
-          placeholder="Filter groups"
-          options={GROUP_OPTIONS}
-          onChange={(e, { value }) => setGroups(String(value))}
-          value={group}
-        />
-      </div>
-      <FadeTransition in={!isLoading}>
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Org</Table.HeaderCell>
-              <Table.HeaderCell>Email</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-              <Table.HeaderCell>Permissions</Table.HeaderCell>
-              <Table.HeaderCell>Active?</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {users.length < 1 && (
-              <Table.Row>
-                <td>No users found</td>
-              </Table.Row>
-            )}
-            {users.map((u) => (
-              <Table.Row key={u.url}>
-                <Table.Cell>
-                  <a href={u.url}>{u.full_name}</a>
-                </Table.Cell>
-                <Table.Cell>{u.is_intern ? 'Intern' : 'Staff'}</Table.Cell>
-                <Table.Cell>{u.email}</Table.Cell>
-                <Table.Cell>{u.created_at}</Table.Cell>
-                <Table.Cell>
-                  <GroupLabels groups={u.groups} isSuperUser={u.is_superuser} />
-                </Table.Cell>
-                <Table.Cell>
-                  {u.is_active ? (
-                    <Icon name="check" color="green" />
-                  ) : (
-                    <Icon name="times" color="grey" />
-                  )}
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </FadeTransition>
+      )}
     </Container>
+  )
+}
+
+const ErrorState = ({ error }: { error: any }) => {
+  useEffect(() => {
+    const message = getAPIErrorMessage(error)
+    showNotification({ type: 'error', title: 'Error loading users', message })
+  }, [error])
+
+  return (
+    <Table.Tr>
+      <td colSpan={99}>
+        <Group justify="center" gap="xs" m="sm" c="red">
+          <IconExclamationCircle />
+          <Text>Could not load users</Text>
+        </Group>
+      </td>
+    </Table.Tr>
+  )
+}
+
+const LoadingState = () => (
+  <Table.Tr>
+    <td colSpan={99}>
+      <Center m="sm">
+        <Loader />
+      </Center>
+    </td>
+  </Table.Tr>
+)
+
+const EmptyState = () => (
+  <Table.Tr>
+    <td colSpan={99}>
+      <Center m="sm">No users found</Center>
+    </td>
+  </Table.Tr>
+)
+
+interface TableBodyProps {
+  result: ReturnType<typeof useGetUsersQuery>
+  dataRow: React.ComponentType<{ user: User }>
+}
+
+const TableBody = ({ result, dataRow }: TableBodyProps) => {
+  if (result.isError) {
+    return <ErrorState error={result.error} />
+  }
+  if (result.isLoading) {
+    return <LoadingState />
+  }
+
+  const data: User[] = result.data?.results || []
+  if (data.length < 1) {
+    return <EmptyState />
+  }
+
+  const DataRow = dataRow
+  return (
+    <>
+      {data.map((user) => (
+        <DataRow key={user.id} user={user} />
+      ))}
+    </>
+  )
+}
+
+const UserDataRow = ({ user }: { user: User }) => {
+  return (
+    <Table.Tr>
+      <Table.Td>
+        <Anchor href={user.url}>{user.full_name}</Anchor>
+      </Table.Td>
+      <Table.Td>{user.is_intern ? 'Intern' : 'Staff'}</Table.Td>
+      <Table.Td>{user.email}</Table.Td>
+      <Table.Td>{user.created_at}</Table.Td>
+      <Table.Td>
+        <GroupLabels
+          groups={user.groups.value}
+          isSuperUser={user.is_superuser}
+        />
+      </Table.Td>
+      <Table.Td>
+        <Center>
+          {user.is_active ? (
+            <IconCheck color="var(--mantine-color-green-6)" stroke={3} />
+          ) : (
+            <IconX color="var(--mantine-color-yellow-6)" stroke={3} />
+          )}
+        </Center>
+      </Table.Td>
+    </Table.Tr>
   )
 }
 

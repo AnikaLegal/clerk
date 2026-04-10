@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "caller.apps.CallerConfig",
     "emails.apps.EmailsConfig",
+    "google.apps.GoogleConfig",
     "microsoft.apps.MicrosoftConfig",
     "notify.apps.NotifyConfig",
     "intake.apps.IntakeConfig",
@@ -146,7 +147,6 @@ LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "case-list"
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
 ]
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
@@ -172,14 +172,13 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     "accounts.social_auth.confirm_user_setup",
 )
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
+
+
+# Google Service Account
+GOOGLE_SERVICE_ACCOUNT_EMAIL = os.environ.get("GOOGLE_SERVICE_ACCOUNT_EMAIL")
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY = os.environ.get(
+    "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"
+)
 
 
 # Google Recaptcha
@@ -243,6 +242,7 @@ DJANGO_VITE = {
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 WAGTAILDOCS_DOCUMENT_MODEL = "web.CustomDocument"
+WAGTAILUSERS_PASSWORD_REQUIRED = False  # Allow blank passwords for social auth users
 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False

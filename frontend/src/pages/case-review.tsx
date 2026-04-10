@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { Container, Header, Dropdown, Segment, Button } from 'semantic-ui-react'
-
+import { Alert, Button, Container, Text, Title } from '@mantine/core'
+import { useToggle } from '@mantine/hooks'
+import { Issue } from 'api'
 import { CaseListTable } from 'comps/case-table'
+import { UserSelect } from 'comps/user-select'
+import React, { useState } from 'react'
 import { mount } from 'utils'
-import { Issue, useGetUsersQuery } from 'api'
 
 interface DjangoContext {
   issues: Issue[]
@@ -26,34 +27,29 @@ const TABLE_FIELDS = [
 const App = () => {
   const issues = CONTEXT.issues
   const [lawyer, setLawyer] = useState<number | null>(null)
-  const lawyerResults = useGetUsersQuery({ group: 'Lawyer' })
-  const filteredIssues = issues.filter(
+  const issuesByLawyer = issues.filter(
     (i) => !lawyer || i.lawyer?.id === lawyer
   )
   return (
-    <Container>
+    <Container size="xl">
       <MissingChecksAlert issues={issues} />
-      <Header as="h1">
+      <Title order={1} mt="xl">
         Case Review Queue
-        <Header.Subheader>
+        <Text c="dimmed">
           All open and assigned cases, sorted by next review date.
-        </Header.Subheader>
-      </Header>
-      <Dropdown
-        fluid
-        selection
-        clearable
-        value={lawyer}
-        loading={lawyerResults.isFetching}
-        placeholder="Select a lawyer"
-        options={lawyerResults.data?.map((u) => ({
-          key: u.id,
-          value: u.id,
-          text: u.email,
-        }))}
-        onChange={(e, { value }) => setLawyer(value as number)}
+        </Text>
+      </Title>
+      <UserSelect
+        label="Lawyer"
+        placeholder="Only show the cases supervised by the selected lawyer"
+        onChange={(value) => setLawyer(Number(value) || null)}
+        filter={{
+          group: 'Lawyer',
+          sort: 'email',
+        }}
+        mt="md"
       />
-      <CaseListTable issues={filteredIssues} fields={TABLE_FIELDS} />
+      <CaseListTable issues={issuesByLawyer} fields={TABLE_FIELDS} />
     </Container>
   )
 }
@@ -72,38 +68,57 @@ interface MissingChecksAlertProps {
   issues: Issue[]
 }
 
-const MissingChecksAlert: React.FC<MissingChecksAlertProps> = ({ issues }) => {
-  const [showMissing, setShowMissing] = useState<boolean>(false)
-  const alertIssues = issues
+const MissingChecksAlert = ({ issues }: MissingChecksAlertProps) => {
+  const [hideAlert, setHideAlert] = useState(false)
+  const [showMissing, toggleMissing] = useToggle()
+
+  const issuesWithMissingChecks = issues
     .filter((i) => i.stage !== 'UNSTARTED')
     .filter((i) => i.paralegal)
     .filter((i) => !(i.is_conflict_check && i.is_eligibility_check))
+  const hasMissingChecks = issuesWithMissingChecks.length > 0
+
+  if (hideAlert) return null
 
   return (
-    <Segment
-      inverted
-      color="red"
-      tertiary
-      padded
-      style={{ marginBottom: '3rem' }}
+    <Alert
+      autoContrast
+      withCloseButton
+      variant="filled"
+      color={hasMissingChecks ? 'red' : 'green'}
+      p="lg"
+      onClose={() => setHideAlert(true)}
     >
-      <Header as="h2">
+      <Title order={2}>
         Checks Missing
-        <Header.Subheader>
-          {alertIssues.length} active cases are missing a conflict or
-          eligibility check.
-        </Header.Subheader>
-      </Header>
-      <Button color="red" onClick={() => setShowMissing(!showMissing)}>
-        {showMissing ? 'Hide' : 'View'}
-      </Button>
-      {showMissing && (
-        <CaseListTable
-          issues={alertIssues}
-          fields={CHECKS_MISSING_TABLE_FIELDS}
-        />
+        <Text>
+          {issuesWithMissingChecks.length > 1
+            ? `${issuesWithMissingChecks.length} active cases are`
+            : issuesWithMissingChecks.length == 1
+              ? 'One active case is'
+              : 'No active cases are'}{' '}
+          missing a conflict or eligibility check.
+        </Text>
+      </Title>
+      {hasMissingChecks && (
+        <>
+          <Button
+            variant="filled"
+            color="red.8"
+            onClick={() => toggleMissing()}
+            mt="md"
+          >
+            {showMissing ? 'Hide' : 'View'}
+          </Button>
+          {showMissing && (
+            <CaseListTable
+              issues={issuesWithMissingChecks}
+              fields={CHECKS_MISSING_TABLE_FIELDS}
+            />
+          )}
+        </>
       )}
-    </Segment>
+    </Alert>
   )
 }
 

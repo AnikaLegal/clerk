@@ -3,10 +3,13 @@ import { generatedApi } from './api.generated'
 const ENTITY_TYPES = [
   'CASE',
   'CASE_DATE',
+  'CLIENT',
+  'DOCUMENT_TEMPLATE',
   'EMAIL',
   'SERVICE',
-  'DOCUMENT_TEMPLATE',
-  'CLIENT',
+  'POTENTIAL_USER',
+  'USER',
+  'USER_PERMISSIONS',
 ] as const
 
 const enhancedApi = generatedApi.enhanceEndpoints({
@@ -90,6 +93,24 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteCaseDate: {
       invalidatesTags: [{ type: 'CASE_DATE' }],
+    },
+    getUser: {
+      providesTags: [{ type: 'USER' }],
+    },
+    getPotentialUsers: {
+      providesTags: [{ type: 'POTENTIAL_USER' }],
+    },
+    createUser: {
+      invalidatesTags: [{ type: 'USER' }, { type: 'POTENTIAL_USER' }],
+    },
+    updateUser: {
+      invalidatesTags: [{ type: 'USER' }, { type: 'USER_PERMISSIONS' }],
+    },
+    getUserAccountPermissions: {
+      providesTags: [{ type: 'USER_PERMISSIONS' }],
+    },
+    resyncUserAccountPermissions: {
+      invalidatesTags: [{ type: 'USER' }, { type: 'USER_PERMISSIONS' }],
     },
   },
 })
