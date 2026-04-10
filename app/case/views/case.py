@@ -1,3 +1,4 @@
+from accounts.models import User
 from core.events.service import (
     on_service_create,
     on_service_delete,
@@ -249,6 +250,10 @@ class CaseApiViewset(
             if user.is_paralegal:
                 # Paralegals can only see assigned cases
                 queryset = queryset.filter(paralegal=user)
+            elif user.is_lawyer:
+                # Lawyers can only see assigned cases (they could be the lawyer
+                # or paralegal on the case)
+                queryset = queryset.filter(Q(paralegal=user) | Q(lawyer=user))
             elif not user.is_coordinator_or_better:
                 # If you're not a paralegal or coordinator you can't see nuthin.
                 queryset = queryset.none()
@@ -313,8 +318,7 @@ class CaseApiViewset(
             "content_object",
             [
                 IssueEvent.objects.filter(issue=issue).select_related(
-                    "prev_user",
-                    "next_user",
+                    "prev_user", "next_user"
                 ),
                 AuditEvent.objects.filter(
                     log_entry__content_type=ContentType.objects.get_for_model(

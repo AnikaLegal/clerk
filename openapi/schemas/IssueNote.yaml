@@ -5,7 +5,7 @@ allOf:
       id:
         type: number
       creator:
-        $ref: ./User.yaml
+        $ref: ./IssueNoteCreator.yaml
       text_display:
         type: string
       created_at:

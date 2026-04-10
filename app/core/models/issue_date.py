@@ -49,7 +49,7 @@ class IssueDate(TimestampedModel):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return self.issue.paralegal_id == user.pk
+        return self.issue.check_permission(user)
 
     @staticmethod
     def audit_event_ignore_fields() -> set:

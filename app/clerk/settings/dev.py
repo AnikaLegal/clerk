@@ -18,6 +18,11 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
+# Authentication
+AUTHENTICATION_BACKENDS += [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = "9749f1f08c"
 MAILCHIMP_COVID_WORKFLOW_ID = "fb4daa69fe"

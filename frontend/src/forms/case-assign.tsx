@@ -1,137 +1,140 @@
-import React, { useState, useEffect } from 'react'
-import { Formik } from 'formik'
-import {
-  Header,
-  Form,
-  Button,
-  Message,
-  Segment,
-  Dropdown,
-} from 'semantic-ui-react'
-import { useSnackbar } from 'notistack'
-
+import { Alert, Button, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { useForm } from '@mantine/form'
+import { useUpdateCaseMutation } from 'api'
+import { showNotification } from 'comps/notification'
+import { UserSelect } from 'comps/user-select'
+import React from 'react'
 import { CaseDetailFormProps } from 'types'
 import { getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { useUpdateCaseMutation, useGetUsersQuery } from 'api'
+
+interface AssignFormValues {
+  paralegal_id: string | null
+  lawyer_id: string | null
+}
 
 export const AssignForm: React.FC<CaseDetailFormProps> = ({
   issue,
   onCancel,
 }) => {
   const [updateCase] = useUpdateCaseMutation()
-  const { enqueueSnackbar } = useSnackbar()
-  const [isSuccess, setSuccess] = useState(false)
-  const paralegalResults = useGetUsersQuery({ group: 'Paralegal', isActive: true, sort: "email" })
-  const lawyerResults = useGetUsersQuery({ group: 'Lawyer', isActive: true, sort: "email" })
-  const isLoading = paralegalResults.isFetching || lawyerResults.isFetching
+  const form = useForm<AssignFormValues>({
+    mode: 'uncontrolled',
+    initialValues: {
+      paralegal_id: issue.paralegal ? String(issue.paralegal.id) : null,
+      lawyer_id: issue.lawyer ? String(issue.lawyer.id) : null,
+    },
+    validate: {
+      lawyer_id: (value, values) => {
+        if (value == null && values.paralegal_id !== null) {
+          return 'A lawyer must be selected if a paralegal is assigned'
+        }
+        return null
+      },
+    },
+  })
 
-  const lawyers = lawyerResults.data ?? []
-  const paralegals = paralegalResults.data ?? []
-
-  const onSubmit = (values, { setSubmitting, setErrors }) => {
+  const handleSubmit = (
+    values: AssignFormValues,
+    event: React.FormEvent<HTMLFormElement> | undefined
+  ) => {
+    event?.stopPropagation()
+    form.setSubmitting(true)
     updateCase({
       id: issue.id,
       issueUpdate: {
-        paralegal_id: values.paralegal,
-        lawyer_id: values.lawyer,
-      } as any,
+        paralegal_id: values.paralegal_id ? Number(values.paralegal_id) : null,
+        lawyer_id: values.lawyer_id ? Number(values.lawyer_id) : null,
+      },
     })
       .unwrap()
       .then(() => {
-        setSubmitting(false)
-        setSuccess(true)
-        enqueueSnackbar('Assignment success', { variant: 'success' })
-      })
-      .catch((err) => {
-        enqueueSnackbar(getAPIErrorMessage(err, 'Assignment failed'), {
-          variant: 'error',
+        showNotification({
+          type: 'success',
+          message: 'Assignment success',
         })
-        const requestErrors = getAPIFormErrors(err)
+      })
+      .catch((e) => {
+        showNotification({
+          type: 'error',
+          title: 'Assignment failed',
+          message: getAPIErrorMessage(e),
+        })
+        const requestErrors = getAPIFormErrors(e)
         if (requestErrors) {
-          setErrors(requestErrors)
+          form.setErrors(requestErrors)
         }
-        setSubmitting(false)
+      })
+      .finally(() => {
+        form.setSubmitting(false)
       })
   }
 
   return (
-    <Segment>
-      <Header>Assign a paralegal to this case.</Header>
-      <Formik
-        initialValues={{
-          paralegal: issue.paralegal ? issue.paralegal.id : null,
-          lawyer: issue.lawyer ? issue.lawyer.id : null,
-        }}
-        validate={({ paralegal, lawyer }) => {
-          const errors: any = {}
-          if (paralegal && !lawyer)
-            errors.lawyer =
-              'A lawyer must be selected if a paralegal is assigned'
-          return errors
-        }}
-        onSubmit={onSubmit}
-      >
-        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
-          <Form
-            onSubmit={handleSubmit}
-            success={isSuccess}
-            error={Object.keys(errors).length > 0}
-          >
-            <Dropdown
-              clearable
-              fluid
-              selection
-              search
-              value={values.paralegal}
-              style={{ margin: '1em 0' }}
-              loading={isSubmitting || isLoading}
-              placeholder="Select a paralegal"
-              options={paralegals.map((u) => ({
-                key: u.id,
-                value: u.id,
-                text: u.email,
-              }))}
-              onChange={(e, { value }) =>
-                setFieldValue('paralegal', value, false)
-              }
-            />
-            <Dropdown
-              clearable
-              fluid
-              selection
-              search
-              value={values.lawyer}
-              style={{ margin: '1em 0' }}
-              loading={isSubmitting || isLoading}
-              placeholder="Select a lawyer"
-              options={lawyers.map((u) => ({
-                key: u.id,
-                value: u.id,
-                text: u.email,
-              }))}
-              onChange={(e, { value }) => setFieldValue('lawyer', value, false)}
-            />
-            {Object.entries(errors).map(([k, v]) => (
-              <Message error key={k}>
-                <div className="header">{k}</div>
-                <p>{v}</p>
-              </Message>
+    <Paper withBorder shadow="sm" p="md">
+      <Title order={3}>Assign a paralegal to this case</Title>
+      <Text mt="md">Select the case paralegal and supervising lawyer.</Text>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack mt="lg" gap="md">
+          <UserSelect
+            {...form.getInputProps('paralegal_id')}
+            key={form.key('paralegal_id')}
+            clearable
+            searchable
+            disabled={form.submitting}
+            label="Paralegal"
+            placeholder="Select a paralegal"
+            filter={{
+              group: 'Paralegal',
+              isActive: true,
+              sort: 'email',
+            }}
+            size="md"
+          />
+          <UserSelect
+            {...form.getInputProps('lawyer_id')}
+            key={form.key('lawyer_id')}
+            clearable
+            searchable
+            disabled={form.submitting}
+            label="Lawyer"
+            placeholder="Select a lawyer"
+            filter={{
+              group: 'Lawyer',
+              isActive: true,
+              sort: 'email',
+            }}
+            size="md"
+          />
+          {Object.entries(form.errors)
+            .filter(([k]) => k === 'non_field_errors')
+            .map(([k, v]) => (
+              <Alert color="red" key={k}>
+                {v}
+              </Alert>
             ))}
+          <Group mt="sm">
             <Button
-              loading={isSubmitting}
-              disabled={isSubmitting}
-              positive
+              loading={form.submitting}
+              disabled={form.submitting}
+              color="green"
               type="submit"
+              size="md"
             >
               Update
             </Button>
-            <Button disabled={isSubmitting} onClick={onCancel}>
+            <Button
+              variant="default"
+              disabled={form.submitting}
+              onClick={onCancel}
+              size="md"
+            >
               Close
             </Button>
-            <Message success>Case assignment successful</Message>
-          </Form>
-        )}
-      </Formik>
-    </Segment>
+          </Group>
+        </Stack>
+      </form>
+    </Paper>
   )
 }
+
+export default AssignForm
