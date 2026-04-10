@@ -147,8 +147,20 @@ def test_person_list_api__with_query(superuser_client: APIClient):
 def test_person_list_api__with_page_and_query(superuser_client: APIClient):
     """Test list action with both page and query parameters."""
     # Create persons with specific names for searching
-    PersonFactory.create_batch(3, full_name="Alice Smith")
-    PersonFactory.create_batch(3, full_name="Bob Johnson")
+    PersonFactory.create_batch(
+        3,
+        full_name="Alice Smith",
+        email="alice@example.com",
+        address="123 Main St",
+        phone_number="555-0001",
+    )
+    PersonFactory.create_batch(
+        3,
+        full_name="Bob Johnson",
+        email="bob@example.com",
+        address="456 Oak Ave",
+        phone_number="555-0002",
+    )
     url = reverse("person-api-list")
 
     # Get first page of search results
