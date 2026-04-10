@@ -103,7 +103,7 @@ class ParalegalOrBetterObjectPermission(permissions.IsAuthenticated):
         custom `check_permission` method, which takes an annotated user.
         """
         if hasattr(obj, "check_permission"):
-            # Otherwise you need object permisisons.
+            # Otherwise you need object permissions.
             return obj.check_permission(request.user)
         else:
             # If there are no object level permissions, assume object level access.

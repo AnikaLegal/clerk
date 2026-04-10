@@ -52,12 +52,12 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "mail.staging.anikalegal.org.au"
 EMAIL_DOMAIN_LEGACY = "em7221.test-mail.anikalegal.com"
-EMAIL_BUCKET_NAME = "anika-emails-test"
+EMAIL_BUCKET_NAME = "anika-emails-staging"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-staging"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 

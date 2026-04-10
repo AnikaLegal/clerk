@@ -1,6 +1,6 @@
 import pytest
-from conftest import schema_tester
-from core.factories import SubmissionFactory, IssueFactory
+from conftest import CaseRole, schema_tester
+from core.factories import IssueFactory, SubmissionFactory
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
@@ -30,20 +30,28 @@ def test_submission_retrieve_api__unprocessed_not_accessible(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 403),
-        ("assigned_paralegal", "paralegal_user", True, 200),
-        ("unassigned_coordinator", "coordinator_user", False, 200),
-        ("assigned_coordinator", "coordinator_user", True, 200),
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 403),
+        ("paralegal_user", CaseRole.PARALEGAL, 200),
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
+        ("lawyer_user", CaseRole.PARALEGAL, 200),
+        ("lawyer_user", CaseRole.LAWYER, 200),
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
     ],
 )
 def test_submission_api_retrieve_perms(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: CaseRole,
     expected_status: int,
     user_client,
     request,
@@ -55,8 +63,11 @@ def test_submission_api_retrieve_perms(
     submission = SubmissionFactory(is_processed=True)
     issue = IssueFactory(submission=submission)
 
-    if is_assigned:
+    if assigned_as == CaseRole.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
         issue.save()
 
     url = reverse("submission-api-detail", args=(submission.pk,))
@@ -66,20 +77,28 @@ def test_submission_api_retrieve_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "test_user, user_name, is_assigned, expected_status",
+    "user_name, assigned_as, expected_status",
     [
-        ("unassigned_user", "unprivileged_user", False, 403),
-        ("assigned_user", "unprivileged_user", True, 403),
-        ("unassigned_paralegal", "paralegal_user", False, 404),
-        ("assigned_paralegal", "paralegal_user", True, 404),
-        ("unassigned_coordinator", "coordinator_user", False, 404),
-        ("assigned_coordinator", "coordinator_user", True, 404),
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 404),
+        ("paralegal_user", CaseRole.PARALEGAL, 404),
+        ("paralegal_user", CaseRole.LAWYER, 404),
+        ("lawyer_user", CaseRole.NONE, 404),
+        ("lawyer_user", CaseRole.PARALEGAL, 404),
+        ("lawyer_user", CaseRole.LAWYER, 404),
+        ("coordinator_user", CaseRole.NONE, 404),
+        ("coordinator_user", CaseRole.PARALEGAL, 404),
+        ("coordinator_user", CaseRole.LAWYER, 404),
+        ("admin_user", CaseRole.NONE, 404),
+        ("admin_user", CaseRole.PARALEGAL, 404),
+        ("admin_user", CaseRole.LAWYER, 404),
     ],
 )
 def test_submission_api_retrieve_perms__unprocessed(
-    test_user: str,
     user_name: str,
-    is_assigned: bool,
+    assigned_as: CaseRole,
     expected_status: int,
     user_client,
     request,
@@ -91,8 +110,11 @@ def test_submission_api_retrieve_perms__unprocessed(
     submission = SubmissionFactory(is_processed=False)
     issue = IssueFactory(submission=submission)
 
-    if is_assigned:
+    if assigned_as == CaseRole.PARALEGAL:
         issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
         issue.save()
 
     url = reverse("submission-api-detail", args=(submission.pk,))

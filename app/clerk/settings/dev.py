@@ -18,6 +18,11 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
+# Authentication
+AUTHENTICATION_BACKENDS += [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = "9749f1f08c"
 MAILCHIMP_COVID_WORKFLOW_ID = "fb4daa69fe"
@@ -28,12 +33,12 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 
 # Transactional emails via SendGrid
 EMAIL_DOMAIN = "mail.dev.anikalegal.org.au"
-EMAIL_BUCKET_NAME = "anika-emails-test"
+EMAIL_BUCKET_NAME = "anika-emails-staging"
 INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"
-TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-test"
+TWILIO_AUDIO_BUCKET_NAME = "anika-twilio-audio-staging"
 
 # MS Graph Integration
 MS_GRAPH_GROUP_ID = "d6b81121-9482-45d4-9acd-6fa42111d5b3"

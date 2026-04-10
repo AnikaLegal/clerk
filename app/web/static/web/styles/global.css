@@ -439,8 +439,3 @@ Optional call to action section thar sits just above the footer.
 .grecaptcha-badge {
   visibility: hidden;
 }
-
-.grecaptcha-branding {
-  font-size: 11px;
-  color: #adb5bd;
-}

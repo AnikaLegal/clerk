@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from accounts.models import User
@@ -185,9 +186,10 @@ class Client(TimestampedModel):
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
 
-    def get_age(self) -> int:
+    def get_age(self) -> int | None:
         if self.date_of_birth:
             return int((timezone.now() - self.date_of_birth).days / 365.25)
+        return None
 
     def __str__(self) -> str:
         name = self.get_full_name()
@@ -195,6 +197,10 @@ class Client(TimestampedModel):
 
     def check_permission(self, user: User) -> bool:
         """
-        Returns True if the user has object level permission to access this instance.
+        Returns True if the user has object level permission to access this
+        instance.
         """
-        return self.issue_set.filter(paralegal=user).exists()
+        for issue in self.issue_set.all():
+            if issue.check_permission(user):
+                return True
+        return False

@@ -116,9 +116,12 @@ class Email(models.Model):
 
     def check_permission(self, user: User) -> bool:
         """
-        Returns True if the user has object level permission to access this instance.
+        Returns True if the user has object level permission to access this
+        instance.
         """
-        return self.issue.paralegal_id == user.pk
+        return self.issue is not None and (
+            self.issue.paralegal == user or self.issue.lawyer == user
+        )
 
 
 class EmailTemplate(TimestampedModel):
@@ -161,4 +164,8 @@ class EmailAttachment(models.Model):
         """
         Returns True if the user has object level permission to access this instance.
         """
-        return self.email.issue.paralegal_id == user.pk
+        return (
+            self.email is not None
+            and self.email.issue is not None
+            and (self.email.issue.paralegal == user or self.email.issue.lawyer == user)
+        )

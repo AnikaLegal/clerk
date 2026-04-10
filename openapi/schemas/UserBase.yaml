@@ -1,0 +1,17 @@
+type: object
+properties:
+  first_name:
+    type: string
+  last_name:
+    type: string
+  email:
+    type: string
+    format: email
+  url:
+    type: string
+    readOnly: true
+required:
+  - first_name
+  - last_name
+  - email
+  - url

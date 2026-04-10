@@ -19,6 +19,9 @@ LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
     awk '{print $4}')
 echo -e "\nFound backup $LATEST_BACKUP"
 
+echo -e "\nResetting database"
+./manage.py reset_db --close-sessions --noinput
+
 aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
     pg_restore \
         --clean \
@@ -27,6 +30,7 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
         --port $PGPORT \
         --username $PGUSER \
         --no-owner \
+        --no-privileges \
         --if-exists
 
 echo -e "\nSync AWS S3 assets"
@@ -39,9 +43,9 @@ aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-st
 echo -e "\nRunning migrations"
 ./manage.py migrate
 
-echo -e "\nSetting all Slack messages to send to test alerts channel"
+echo -e "\nSetting all Slack messages to send to staging alerts channel"
 SHELL_CMD="space=chr(32);\
-c=SlackChannel.objects.get(name=f'Test{space}Alerts');\
+c=SlackChannel.objects.get(name=f'Staging{space}Alerts');\
 SlackMessage.objects.all().update(channel=c);\
 SlackUser.objects.all().delete()"
 ./manage.py shell_plus --quiet-load -c "$SHELL_CMD"

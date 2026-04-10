@@ -1,11 +1,12 @@
 import logging
 from dataclasses import dataclass
 from os.path import basename
-from typing import Tuple
+from typing import Literal, Tuple
 
 from accounts.models import User
 from core.models import DocumentTemplate, FileUpload, Issue
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from emails.models import Email, EmailAttachment
 from microsoft.endpoints import MSGraphAPI
@@ -19,45 +20,61 @@ EMAIL_ATTACHMENT_FOLDER_NAME = "email-attachments"
 
 @dataclass
 class MicrosoftUserPermissions:
-    has_coordinator_perms: bool
-    paralegal_perm_issues: list[Issue]
-    paralegal_perm_missing_issues: list[Issue]
+    access_level: Literal["FULL_ACCESS", "PARTIAL_ACCESS", "NO_ACCESS"]
+    issues_with_access: list[Issue]
+    issues_without_access: list[Issue]
 
 
 def get_user_permissions(user):
-    has_coordinator_perms = False
-    paralegal_perm_issues = []
-    paralegal_perm_missing_issues = []
-
     api = MSGraphAPI()
-    if api.user.get(user.email):
-        members = api.group.members()
-        owners = api.group.owners()
-        has_coordinator_perms = user.email in members or user.email in owners
+    user_perms = MicrosoftUserPermissions(
+        access_level="NO_ACCESS",
+        issues_with_access=[],
+        issues_without_access=[],
+    )
 
-        # NOTE: when we add lawyer permissions, we will need to check those here
-        # too.
-        for issue in Issue.objects.filter(paralegal=user):
-            case_path = f"cases/{issue.id}"
+    def is_user_in_group(email):
+        return email in api.group.members() or email in api.group.owners()
+
+    def get_access_level(user):
+        return (
+            "FULL_ACCESS"
+            if is_user_in_group(user.email)
+            else "PARTIAL_ACCESS"
+            if api.user.get(user.email)
+            else "NO_ACCESS"
+        )
+
+    user_perms.access_level = get_access_level(user)
+
+    queryset = (
+        Issue.objects.select_related(
+            "client", "tenancy__agent", "tenancy__landlord", "support_worker"
+        )
+        .prefetch_related("paralegal__groups", "lawyer__groups")
+        .filter(Q(paralegal=user) | Q(lawyer=user))
+        .all()
+    )
+    for issue in queryset:
+        if user_perms.access_level == "FULL_ACCESS":
+            has_access = True
+        elif user_perms.access_level == "NO_ACCESS":
             has_access = False
-
-            for permission in api.folder.list_permissions(case_path):
+        else:
+            has_access = False
+            for permission in api.folder.list_permissions(f"cases/{issue.id}"):
                 if granted_to_v2 := permission.get("grantedToV2"):
                     email = granted_to_v2.get("user", {}).get("email")
                     if email and email == user.email:
                         has_access = True
                         break
 
-            if has_access:
-                paralegal_perm_issues.append(issue)
-            else:
-                paralegal_perm_missing_issues.append(issue)
+        if has_access:
+            user_perms.issues_with_access.append(issue)
+        else:
+            user_perms.issues_without_access.append(issue)
 
-    return MicrosoftUserPermissions(
-        has_coordinator_perms=has_coordinator_perms,
-        paralegal_perm_issues=paralegal_perm_issues,
-        paralegal_perm_missing_issues=paralegal_perm_missing_issues,
-    )
+    return user_perms
 
 
 def set_up_new_user(user):
@@ -263,7 +280,7 @@ def get_case_folder_info(issue):
     return list_files, folder_url
 
 
-def set_up_coordinator(user):
+def add_group_member(user):
     """
     Add User as Group member.
     """
@@ -273,7 +290,7 @@ def set_up_coordinator(user):
         api.group.add_user(user.email)
 
 
-def tear_down_coordinator(user):
+def remove_group_member(user):
     """
     Remove User as Group member.
     """

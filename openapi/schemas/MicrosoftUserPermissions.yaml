@@ -1,16 +1,20 @@
 type: object
 properties:
-  has_coordinator_perms:
-    type: boolean
-  paralegal_perm_issues:
+  access_level:
+    type: string
+    enum:
+      - FULL_ACCESS
+      - PARTIAL_ACCESS
+      - NO_ACCESS
+  issues_with_access:
     type: array
     items:
       $ref: ./Issue.yaml
-  paralegal_perm_missing_issues:
+  issues_without_access:
     type: array
     items:
       $ref: ./Issue.yaml
 required:
-  - has_coordinator_perms
-  - paralegal_perm_issues
-  - paralegal_perm_missing_issues
+  - access_level
+  - issues_with_access
+  - issues_without_access

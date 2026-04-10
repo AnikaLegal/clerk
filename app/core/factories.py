@@ -1,5 +1,5 @@
 import io
-from datetime import timezone
+from datetime import timedelta, timezone
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -26,9 +26,12 @@ from core.models.client import (
 )
 from core.models.issue import CaseStage, CaseTopic, EmploymentType, ReferrerType
 from core.models.issue_date import DateType, HearingType
+from core.models.issue_event import EventType, IssueEvent
+from core.models.issue_note import NoteType
 from core.models.person import SupportContactPreferences
 from core.models.service import DiscreteServiceType, OngoingServiceType, ServiceCategory
 from core.models.tenancy import LeaseType, RentalType
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save
 from emails.models import Email, EmailAttachment, EmailTemplate
@@ -56,6 +59,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     date_joined = factory.Faker(
         "date_time_between", tzinfo=timezone.utc, start_date="-2y", end_date="-1y"
+    )
+    ms_account_created_at = factory.LazyAttribute(
+        lambda x: x.date_joined + timedelta(minutes=20)
     )
     is_staff = False
     is_active = True
@@ -133,14 +139,91 @@ class IssueFactory(TimestampedModelFactory):
 
 
 @factory.django.mute_signals(post_save)
+class IssueEventFactory(TimestampedModelFactory):
+    class Meta:
+        model = IssueEvent
+
+    issue = factory.SubFactory(IssueFactory)
+    event_type = factory.Faker(
+        "random_element", elements=[x[0] for x in IssueEvent.EVENT_CHOICES]
+    )
+
+    prev_is_open = factory.LazyAttribute(
+        lambda o: fake.boolean() if o.event_type == EventType.OPEN else None
+    )
+    next_is_open = factory.LazyAttribute(
+        lambda o: not o.prev_is_open if o.event_type == EventType.OPEN else None
+    )
+
+    @factory.lazy_attribute
+    def prev_stage(self):
+        if self.event_type == EventType.STAGE:
+            return fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+        return None
+
+    @factory.lazy_attribute
+    def next_stage(self):
+        if self.event_type == EventType.STAGE:
+            return fake.random_element(elements=[x[0] for x in CaseStage.CHOICES])
+        return None
+
+    # NOTE: These would be simpler using @factory.lazy_attribute but I could not
+    # get it to work properly.
+    prev_user = factory.Maybe(
+        factory.LazyAttribute(
+            lambda self: self.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+        ),
+        yes_declaration=factory.SubFactory(UserFactory),
+        no_declaration=None,
+    )
+
+    next_user = factory.Maybe(
+        factory.LazyAttribute(
+            lambda self: self.event_type in [EventType.LAWYER, EventType.PARALEGAL]
+        ),
+        yes_declaration=factory.SubFactory(UserFactory),
+        no_declaration=None,
+    )
+
+
+@factory.django.mute_signals(post_save)
 class IssueNoteFactory(TimestampedModelFactory):
     class Meta:
         model = IssueNote
 
     issue = factory.SubFactory(IssueFactory)
     creator = factory.SubFactory(UserFactory)
-    note_type = "PARALEGAL"
+    note_type = factory.Faker("random_element", elements=NoteType)
     text = factory.Faker("sentence")
+
+    # NOTE: This would be simpler using @factory.lazy_attribute but I could not
+    # get it to work properly.
+    content_object = factory.Maybe(
+        factory.LazyAttribute(lambda self: self.note_type == NoteType.EVENT),
+        yes_declaration=factory.SubFactory(
+            IssueEventFactory, issue=factory.SelfAttribute("..issue")
+        ),
+        no_declaration=factory.Maybe(
+            factory.LazyAttribute(lambda self: self.note_type == NoteType.PERFORMANCE),
+            yes_declaration=factory.SubFactory(UserFactory),
+            no_declaration=None,
+        ),
+    )
+
+    @factory.lazy_attribute
+    def object_id(self):
+        if self.note_type == NoteType.EVENT or self.note_type == NoteType.PERFORMANCE:
+            if hasattr(self.content_object, "pk"):
+                return self.content_object.pk
+        return None
+
+    @factory.lazy_attribute
+    def content_type(self):
+        if self.note_type == NoteType.EVENT:
+            return ContentType.objects.get_for_model(IssueEvent)
+        if self.note_type == NoteType.PERFORMANCE:
+            return ContentType.objects.get_for_model(User)
+        return None
 
 
 @factory.django.mute_signals(post_save)

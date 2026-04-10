@@ -1,46 +1,49 @@
 import logging
 from typing import Optional
 
+from accounts.models import CaseGroups, User
+from django.db.models import QuerySet
+from django.db.models.functions import Concat
+from django.db.models import Value
 from django.http import Http404
-from django.contrib.auth.models import Group
-from django.db.models import QuerySet, Q
-from rest_framework.decorators import api_view, action
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import UpdateModelMixin, ListModelMixin
 from django.urls import reverse
 from django_q.tasks import async_task
-from django.core.exceptions import PermissionDenied
-
-from accounts.models import User, CaseGroups
-from case.utils.react import render_react_page
-from accounts.models import User
-from case.views.auth import (
-    paralegal_or_better_required,
-    coordinator_or_better_required,
-    CoordinatorOrBetterPermission,
+from google.service import list_directory_users
+from microsoft.service import get_user_permissions
+from microsoft.tasks import (
+    reset_ms_access,
+    set_up_new_user_task,
 )
+from rest_framework.decorators import action, api_view
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
 from case.serializers import (
     AccountSearchSerializer,
     AccountSortSerializer,
-    UserSerializer,
-    UserCreateSerializer,
     IssueSerializer,
-    IssueNoteSerializer,
+    PotentialUserSerializer,
+    UserCreateSerializer,
+    UserSerializer,
 )
-from microsoft.service import get_user_permissions
-from microsoft.tasks import refresh_ms_permissions, set_up_new_user_task
+from case.utils.pagination import ClerkPaginator
+from case.utils.react import render_react_page
+from case.views.auth import (
+    AdminOrBetterPermission,
+    CoordinatorOrBetterPermission,
+    coordinator_or_better_required,
+)
 
 logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
-@paralegal_or_better_required
+@coordinator_or_better_required
 def account_list_page_view(request):
-    users = User.objects.prefetch_related("groups").order_by("-date_joined").all()
     context = {
-        "users": UserSerializer(users, many=True).data,
         "create_url": reverse("account-create"),
+        "group_values": CaseGroups.values,
     }
     return render_react_page(request, "Accounts", "accounts-list", context)
 
@@ -49,35 +52,13 @@ def account_list_page_view(request):
 @coordinator_or_better_required
 def account_detail_page_view(request, pk):
     try:
-        user = (
-            User.objects.prefetch_related(
-                "groups",
-                "issue_notes",
-                "issue_set__paralegal__groups",
-                "issue_set__lawyer__groups",
-                "issue_set__client",
-                "issue_set__tenancy__agent",
-                "issue_set__tenancy__landlord",
-                "lawyer_issues__paralegal__groups",
-                "lawyer_issues__lawyer__groups",
-                "lawyer_issues__client",
-                "lawyer_issues__tenancy__agent",
-                "lawyer_issues__tenancy__landlord",
-            )
-            .distinct()
-            .get(pk=pk)
-        )
+        user = User.objects.get(pk=pk)
     except User.DoesNotExist:
         raise Http404()
 
     name = user.get_full_name()
     context = {
-        "account": UserSerializer(user).data,
-        "issue_set": IssueSerializer(user.issue_set.all(), many=True).data,
-        "lawyer_issues": IssueSerializer(user.lawyer_issues.all(), many=True).data,
-        "performance_notes": IssueNoteSerializer(
-            user.issue_notes.prefetch_related("creator__groups").all(), many=True
-        ).data,
+        "account_id": pk,
     }
     return render_react_page(request, f"User {name}", "account-detail", context)
 
@@ -85,12 +66,27 @@ def account_detail_page_view(request, pk):
 @api_view(["GET"])
 @coordinator_or_better_required
 def account_create_page_view(request):
-    return render_react_page(request, "Invite paralegal", "account-create", {})
+    context = {
+        "group_values": CaseGroups.values,
+    }
+    return render_react_page(request, "Invite paralegal", "account-create", context)
 
 
-class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
+class AccountPaginator(ClerkPaginator):
+    page_size = 20
+
+
+class AccountApiViewset(
+    GenericViewSet, UpdateModelMixin, ListModelMixin, RetrieveModelMixin
+):
     serializer_class = UserSerializer
     permission_classes = [CoordinatorOrBetterPermission]
+    pagination_class = AccountPaginator
+
+    def get_permissions(self):
+        if self.action in ["create"]:
+            return [AdminOrBetterPermission()]
+        return super().get_permissions()
 
     def get_queryset(self):
         queryset = User.objects.prefetch_related("groups").all()
@@ -102,9 +98,7 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def sort_queryset(self, queryset: QuerySet[User]) -> QuerySet[User]:
-        serializer = AccountSortSerializer(
-            data=self.request.query_params, partial=True
-        )
+        serializer = AccountSortSerializer(data=self.request.query_params, partial=True)
         serializer.is_valid(raise_exception=True)
         sort = serializer.validated_data.get("sort", ["-date_joined"])
         return queryset.order_by(*sort)
@@ -122,9 +116,9 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         for key, value in search_query.items():
             if value is not None:
                 if key == "name":
-                    queryset = queryset.filter(
-                        Q(first_name__icontains=value) | Q(last_name__icontains=value)
-                    )
+                    queryset = queryset.annotate(
+                        full_name=Concat("first_name", Value(" "), "last_name")
+                    ).filter(full_name__icontains=value)
                 elif key == "group":
                     queryset = queryset.filter(groups__name=value)
                 else:
@@ -134,13 +128,10 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Invite a paralegal to join the platform"""
+        """Create a new user account and set up their Microsoft access asynchronously."""
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data["email"]
-        user = User.objects.filter(email=email).last()
-        if not user:
-            user = serializer.save()
+        user = serializer.save()
 
         async_task(set_up_new_user_task, user.pk)
         return Response(serializer.data, status=201)
@@ -172,72 +163,36 @@ class AccountApiViewset(GenericViewSet, UpdateModelMixin, ListModelMixin):
         except User.DoesNotExist:
             raise Http404()
 
-        refresh_ms_permissions(user)
+        reset_ms_access(user)
         perms_data = _load_ms_permissions(user)
+
+        # TODO: remove user data from response.
         return Response(
             {"account": UserSerializer(user).data, "permissions": perms_data}
         )
 
     @action(
-        detail=True,
-        methods=["POST"],
-        url_path="perms-promote",
-        url_name="perms-promote",
+        detail=False,
+        methods=["GET"],
+        url_path="potential",
+        url_name="potential",
+        permission_classes=[AdminOrBetterPermission],
     )
-    def account_detail_perms_promote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
+    def account_list_potential_users(self, request):
+        # Fetch active users from Google Directory.
+        active_users = [
+            user for user in list_directory_users() if user.get("suspended") is False
+        ]
 
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
+        # Exclude users that are already in the system.
+        existing_emails = set(self.get_queryset().values_list("email", flat=True))
+        potential_users = [
+            user for user in active_users if user["primaryEmail"] not in existing_emails
+        ]
+        potential_users.sort(key=lambda u: u["primaryEmail"])
 
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        if is_paralegal:
-            group = Group.objects.get(name=CaseGroups.COORDINATOR)
-            user.groups.add(group)
-        else:
-            group = Group.objects.get(name=CaseGroups.PARALEGAL)
-            user.groups.add(group)
-            refresh_ms_permissions(user)
-
-        perms_data = _load_ms_permissions(user)
-        return Response(
-            {"account": UserSerializer(user).data, "permissions": perms_data}
-        )
-
-    @action(
-        detail=True,
-        methods=["POST"],
-        url_path="perms-demote",
-        url_name="perms-demote",
-    )
-    def account_detail_perms_demote_view(self, request, pk):
-        if not request.user.is_admin_or_better:
-            raise PermissionDenied
-
-        try:
-            user = User.objects.prefetch_related("groups").get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404()
-
-        is_paralegal = user.groups.filter(name=CaseGroups.PARALEGAL).exists()
-        is_coordinator = user.groups.filter(name=CaseGroups.COORDINATOR).exists()
-        group_name = None
-        if is_coordinator:
-            group_name = CaseGroups.COORDINATOR
-        elif is_paralegal:
-            group_name = CaseGroups.PARALEGAL
-
-        if group_name:
-            group = Group.objects.get(name=group_name)
-            user.groups.remove(group)
-
-        perms_data = _load_ms_permissions(user)
-        return Response(
-            {"account": UserSerializer(user).data, "permissions": perms_data}
-        )
+        serializer = PotentialUserSerializer(potential_users, many=True)
+        return Response(serializer.data)
 
 
 def _load_ms_permissions(user) -> Optional[dict]:
@@ -248,11 +203,9 @@ def _load_ms_permissions(user) -> Optional[dict]:
         return
 
     return {
-        "has_coordinator_perms": perms.has_coordinator_perms,
-        "paralegal_perm_issues": IssueSerializer(
-            perms.paralegal_perm_issues, many=True
-        ).data,
-        "paralegal_perm_missing_issues": IssueSerializer(
-            perms.paralegal_perm_missing_issues, many=True
+        "access_level": perms.access_level,
+        "issues_with_access": IssueSerializer(perms.issues_with_access, many=True).data,
+        "issues_without_access": IssueSerializer(
+            perms.issues_without_access, many=True
         ).data,
     }

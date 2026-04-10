@@ -47,14 +47,14 @@ docker context use remote
 echo -e "\n>>> Streaming database backup from host $CLERK_HOST to $DB_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
-    run --no-deps --rm web pg_dump --format=custom |
+    run --pull always --no-deps --rm web pg_dump --format=custom |
     aws s3 cp - $DB_PATH
 
 # Disaster recovery
 echo -e "\n>>> Streaming client info from host $CLERK_HOST to $CLIENT_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
-    run --no-deps --rm web python manage.py export_client_info |
+    run --pull always --no-deps --rm web python manage.py export_client_info |
     aws s3 cp - $CLIENT_PATH
 
 echo -e "\n>>> Finished backup"

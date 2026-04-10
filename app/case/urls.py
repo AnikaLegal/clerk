@@ -9,6 +9,7 @@ from .views import (
     date,
     document_templates,
     email_templates,
+    note,
     notification_templates,
     paralegal,
     person,
@@ -23,7 +24,7 @@ INT_EMAIL_PK = "(?P<email_pk>[0-9]+)"
 INT_ATTACHMENT_PK = "(?P<attachment_pk>[0-9]+)"
 INT_PERSON_PK = "(?P<person_pk>[0-9]+)"
 UUID_PK = "(?P<pk>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})"
-SLUG = "(?P<slug>[\-\w]+)"
+SLUG = "(?P<slug>[-\w]+)"
 
 router = DefaultRouter()
 router.register(
@@ -33,6 +34,7 @@ router.register("case", case.CaseApiViewset, basename="case-api")
 router.register("date", date.DateApiViewSet, basename="date-api")
 router.register("person", person.PersonApiViewset, basename="person-api")
 router.register("tenancy", tenancy.TenancyApiViewset, basename="tenancy-api")
+router.register("note", note.NoteApiViewset, basename="note-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
