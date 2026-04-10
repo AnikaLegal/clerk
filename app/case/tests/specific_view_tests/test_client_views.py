@@ -1,16 +1,8 @@
-from enum import Enum
-
 import pytest
-from conftest import schema_tester
+from conftest import CaseRole, schema_tester
 from core.factories import ClientFactory, IssueFactory
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-
-
-class AssignedAs(Enum):
-    NONE = 1
-    PARALEGAL = 2
-    LAWYER = 3
 
 
 @pytest.mark.django_db
@@ -115,28 +107,25 @@ def test_client_update_api(superuser_client: APIClient):
     schema_tester.validate_response(response=response)
 
 
-#
-# TODO: test results
-#
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "user_name, assigned_as, expected_status, expected_count",
     [
-        ("unprivileged_user", AssignedAs.NONE, 403, None),
-        ("unprivileged_user", AssignedAs.PARALEGAL, 403, None),
-        ("unprivileged_user", AssignedAs.LAWYER, 403, None),
-        ("paralegal_user", AssignedAs.NONE, 200, 0),
-        ("paralegal_user", AssignedAs.PARALEGAL, 200, 1),
-        ("paralegal_user", AssignedAs.LAWYER, 200, 0),
-        ("lawyer_user", AssignedAs.NONE, 200, 0),
-        ("lawyer_user", AssignedAs.PARALEGAL, 200, 1),
-        ("lawyer_user", AssignedAs.LAWYER, 200, 1),
-        ("coordinator_user", AssignedAs.NONE, 200, 1),
-        ("coordinator_user", AssignedAs.PARALEGAL, 200, 1),
-        ("coordinator_user", AssignedAs.LAWYER, 200, 1),
-        ("admin_user", AssignedAs.NONE, 200, 1),
-        ("admin_user", AssignedAs.PARALEGAL, 200, 1),
-        ("admin_user", AssignedAs.LAWYER, 200, 1),
+        ("unprivileged_user", CaseRole.NONE, 403, None),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403, None),
+        ("unprivileged_user", CaseRole.LAWYER, 403, None),
+        ("paralegal_user", CaseRole.NONE, 200, 0),
+        ("paralegal_user", CaseRole.PARALEGAL, 200, 1),
+        ("paralegal_user", CaseRole.LAWYER, 200, 0),
+        ("lawyer_user", CaseRole.NONE, 200, 0),
+        ("lawyer_user", CaseRole.PARALEGAL, 200, 1),
+        ("lawyer_user", CaseRole.LAWYER, 200, 1),
+        ("coordinator_user", CaseRole.NONE, 200, 1),
+        ("coordinator_user", CaseRole.PARALEGAL, 200, 1),
+        ("coordinator_user", CaseRole.LAWYER, 200, 1),
+        ("admin_user", CaseRole.NONE, 200, 1),
+        ("admin_user", CaseRole.PARALEGAL, 200, 1),
+        ("admin_user", CaseRole.LAWYER, 200, 1),
     ],
 )
 def test_client_api_list_perms(
@@ -152,10 +141,10 @@ def test_client_api_list_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if assigned_as == AssignedAs.PARALEGAL:
+    if assigned_as == CaseRole.PARALEGAL:
         issue.paralegal = user
         issue.save()
-    elif assigned_as == AssignedAs.LAWYER:
+    elif assigned_as == CaseRole.LAWYER:
         issue.lawyer = user
         issue.save()
 
@@ -175,21 +164,21 @@ def test_client_api_list_perms(
 @pytest.mark.parametrize(
     "user_name, assigned_as, expected_status",
     [
-        ("unprivileged_user", AssignedAs.NONE, 403),
-        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
-        ("unprivileged_user", AssignedAs.LAWYER, 403),
-        ("paralegal_user", AssignedAs.NONE, 403),
-        ("paralegal_user", AssignedAs.PARALEGAL, 200),
-        ("paralegal_user", AssignedAs.LAWYER, 403),
-        ("lawyer_user", AssignedAs.NONE, 403),
-        ("lawyer_user", AssignedAs.PARALEGAL, 200),
-        ("lawyer_user", AssignedAs.LAWYER, 200),
-        ("coordinator_user", AssignedAs.NONE, 200),
-        ("coordinator_user", AssignedAs.PARALEGAL, 200),
-        ("coordinator_user", AssignedAs.LAWYER, 200),
-        ("admin_user", AssignedAs.NONE, 200),
-        ("admin_user", AssignedAs.PARALEGAL, 200),
-        ("admin_user", AssignedAs.LAWYER, 200),
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 403),
+        ("paralegal_user", CaseRole.PARALEGAL, 200),
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
+        ("lawyer_user", CaseRole.PARALEGAL, 200),
+        ("lawyer_user", CaseRole.LAWYER, 200),
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
     ],
 )
 def test_client_api_retrieve_perms(
@@ -204,10 +193,10 @@ def test_client_api_retrieve_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if assigned_as == AssignedAs.PARALEGAL:
+    if assigned_as == CaseRole.PARALEGAL:
         issue.paralegal = user
         issue.save()
-    elif assigned_as == AssignedAs.LAWYER:
+    elif assigned_as == CaseRole.LAWYER:
         issue.lawyer = user
         issue.save()
 
@@ -221,21 +210,21 @@ def test_client_api_retrieve_perms(
 @pytest.mark.parametrize(
     "user_name, assigned_as, expected_status",
     [
-        ("unprivileged_user", AssignedAs.NONE, 403),
-        ("unprivileged_user", AssignedAs.PARALEGAL, 403),
-        ("unprivileged_user", AssignedAs.LAWYER, 403),
-        ("paralegal_user", AssignedAs.NONE, 403),
-        ("paralegal_user", AssignedAs.PARALEGAL, 200),
-        ("paralegal_user", AssignedAs.LAWYER, 403),
-        ("lawyer_user", AssignedAs.NONE, 403),
-        ("lawyer_user", AssignedAs.PARALEGAL, 200),
-        ("lawyer_user", AssignedAs.LAWYER, 200),
-        ("coordinator_user", AssignedAs.NONE, 200),
-        ("coordinator_user", AssignedAs.PARALEGAL, 200),
-        ("coordinator_user", AssignedAs.LAWYER, 200),
-        ("admin_user", AssignedAs.NONE, 200),
-        ("admin_user", AssignedAs.PARALEGAL, 200),
-        ("admin_user", AssignedAs.LAWYER, 200),
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 403),
+        ("paralegal_user", CaseRole.PARALEGAL, 200),
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
+        ("lawyer_user", CaseRole.PARALEGAL, 200),
+        ("lawyer_user", CaseRole.LAWYER, 200),
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
     ],
 )
 def test_client_api_update_perms(
@@ -250,10 +239,10 @@ def test_client_api_update_perms(
     """
     user = request.getfixturevalue(user_name)
     issue = IssueFactory()
-    if assigned_as == AssignedAs.PARALEGAL:
+    if assigned_as == CaseRole.PARALEGAL:
         issue.paralegal = user
         issue.save()
-    elif assigned_as == AssignedAs.LAWYER:
+    elif assigned_as == CaseRole.LAWYER:
         issue.lawyer = user
         issue.save()
 

@@ -3,6 +3,7 @@ Pytest configuration
 """
 
 import os
+from enum import Enum
 
 import debugpy
 import factory
@@ -17,6 +18,12 @@ from utils.signals import disable_signals, restore_signals
 from zeal import zeal_context
 
 schema_tester = SchemaTester(schema_file_path="/app/openapi.generated.yaml")
+
+
+class CaseRole(Enum):
+    NONE = 1
+    PARALEGAL = 2
+    LAWYER = 3
 
 
 @pytest.fixture(autouse=True, scope="session")
