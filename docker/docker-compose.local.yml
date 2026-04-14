@@ -24,6 +24,7 @@ services:
       - worker
       - frontend
       - clerk_db
+      - web_css
     env_file:
       - ../env/dev.env
     environment:
@@ -41,6 +42,14 @@ services:
       - clerk_db
     env_file:
       - ../env/dev.env
+  # Tailwind/DaisyUI watcher for Django web app styles.
+  web_css:
+    image: node:lts
+    working_dir: /app/web
+    command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run css:watch"
+    volumes:
+      - ../app/web:/app/web
+      - web-node-modules:/app/web/node_modules
   frontend:
     image: clerk-frontend:local
     command: npm run dev
@@ -63,3 +72,4 @@ services:
 volumes:
   clerk-postgres-data:
   config_local:
+  web-node-modules:

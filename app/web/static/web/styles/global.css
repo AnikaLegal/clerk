@@ -108,6 +108,12 @@ body {
   color: var(--dark-0);
 }
 
+/* Override style from DaisyUI as we rely on img display being inline in some
+ * places. TODO: fix those places and remove this. */
+img {
+  display: inline;
+}
+
 a {
   text-decoration: none;
 }
@@ -129,6 +135,7 @@ a {
 }
 
 header {
+  box-sizing: content-box;
   position: relative;
   z-index: 1;
   max-width: 1240px;

@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@plugin "daisyui" {
+  themes: anika --default;
+  prefix: "d-";
+}
+@plugin "daisyui/theme" {
+  name: "anika";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-primary: #428eef;
+  --color-secondary: #c3dafa;
+  --radius-selector: 2rem;
+  --radius-field: 2rem;
+  --radius-box: 2rem;
+}
