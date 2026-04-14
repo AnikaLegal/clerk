@@ -108,14 +108,22 @@ body {
   color: var(--dark-0);
 }
 
-/* Override style from DaisyUI as we rely on img display being inline in some
- * places. TODO: fix those places and remove this. */
+a {
+  text-decoration: none;
+}
+
+/* Override styles from DaisyUI as we rely on these in some places.
+ * TODO: fix those places and remove these overrides?
+ */
 img {
   display: inline;
 }
 
-a {
-  text-decoration: none;
+ol,
+ul {
+  list-style: revert;
+  margin: revert;
+  padding: revert;
 }
 
 /* Page header */
