@@ -164,6 +164,141 @@
   }
 }
 @layer utilities {
+  .d-btn {
+    :where(&) {
+      @layer daisyui.l1.l2.l3 {
+        width: unset;
+      }
+    }
+    .prose :where(a&:not(.d-btn-link)):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+      text-decoration-line: none;
+    }
+    @layer daisyui.l1.l2.l3 {
+      display: inline-flex;
+      flex-shrink: 0;
+      cursor: pointer;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: calc(0.25rem * 1.5);
+      text-align: center;
+      vertical-align: middle;
+      outline-offset: 2px;
+      webkit-user-select: none;
+      user-select: none;
+      padding-inline: var(--d-btn-p);
+      color: var(--d-btn-fg);
+      --tw-prose-links: var(--d-btn-fg);
+      height: var(--d-size);
+      font-size: var(--d-fontsize, 0.875rem);
+      font-weight: 600;
+      outline-color: var(--d-btn-color, var(--color-base-content));
+      transition-property: color, background-color, border-color, box-shadow;
+      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      transition-duration: 0.2s;
+      border-start-start-radius: var(--d-join-ss, var(--radius-field));
+      border-start-end-radius: var(--d-join-se, var(--radius-field));
+      border-end-start-radius: var(--d-join-es, var(--radius-field));
+      border-end-end-radius: var(--d-join-ee, var(--radius-field));
+      background-color: var(--d-btn-bg);
+      background-size: auto, calc(var(--noise) * 100%);
+      background-image: none, var(--d-btn-noise);
+      border-width: var(--border);
+      border-style: solid;
+      border-color: var(--d-btn-border);
+      text-shadow: 0 0.5px oklch(100% 0 0 / calc(var(--depth) * 0.15));
+      touch-action: manipulation;
+      box-shadow: 0 0.5px 0 0.5px oklch(100% 0 0 / calc(var(--depth) * 6%)) inset, var(--d-btn-shadow);
+      --d-size: calc(var(--size-field, 0.25rem) * 10);
+      --d-btn-bg: var(--d-btn-color, var(--color-base-200));
+      --d-btn-fg: var(--color-base-content);
+      --d-btn-p: 1rem;
+      --d-btn-border: var(--d-btn-bg);
+      @supports (color: color-mix(in lab, red, red)) {
+        --d-btn-border: color-mix(in oklab, var(--d-btn-bg), #000 calc(var(--depth) * 5%));
+      }
+      --d-btn-shadow: 0 3px 2px -2px var(--d-btn-bg),
+      0 4px 3px -2px var(--d-btn-bg);
+      @supports (color: color-mix(in lab, red, red)) {
+        --d-btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--d-btn-bg) calc(var(--depth) * 30%), #0000),
+      0 4px 3px -2px color-mix(in oklab, var(--d-btn-bg) calc(var(--depth) * 30%), #0000);
+      }
+      --d-btn-noise: var(--d-fx-noise);
+      @media (hover: hover) {
+        &:hover {
+          --d-btn-bg: var(--d-btn-color, var(--color-base-200));
+          @supports (color: color-mix(in lab, red, red)) {
+            --d-btn-bg: color-mix(in oklab, var(--d-btn-color, var(--color-base-200)), #000 7%);
+          }
+        }
+      }
+      &:focus-visible, &:has(:focus-visible) {
+        outline-width: 2px;
+        outline-style: solid;
+        isolation: isolate;
+      }
+      &:active:not(.d-btn-active) {
+        translate: 0 0.5px;
+        --d-btn-bg: var(--d-btn-color, var(--color-base-200));
+        @supports (color: color-mix(in lab, red, red)) {
+          --d-btn-bg: color-mix(in oklab, var(--d-btn-color, var(--color-base-200)), #000 5%);
+        }
+        --d-btn-border: var(--d-btn-color, var(--color-base-200));
+        @supports (color: color-mix(in lab, red, red)) {
+          --d-btn-border: color-mix(in oklab, var(--d-btn-color, var(--color-base-200)), #000 7%);
+        }
+        --d-btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);
+      }
+      &:is(input[type="checkbox"], input[type="radio"]) {
+        appearance: none;
+        &[aria-label]::after {
+          --tw-content: attr(aria-label);
+          content: var(--tw-content);
+        }
+      }
+      &:where(input:checked:not(.d-filter .d-btn)) {
+        --d-btn-color: var(--color-primary);
+        --d-btn-fg: var(--color-primary-content);
+        isolation: isolate;
+      }
+    }
+    &:disabled {
+      @layer daisyui.l1.l2 {
+        &:not(.d-btn-link, .d-btn-ghost) {
+          background-color: var(--color-base-content);
+          @supports (color: color-mix(in lab, red, red)) {
+            background-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+          }
+          box-shadow: none;
+        }
+        pointer-events: none;
+        --d-btn-border: #0000;
+        --d-btn-noise: none;
+        --d-btn-fg: var(--color-base-content);
+        @supports (color: color-mix(in lab, red, red)) {
+          --d-btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+        }
+      }
+    }
+    &[disabled] {
+      @layer daisyui.l1.l2 {
+        &:not(.d-btn-link, .d-btn-ghost) {
+          background-color: var(--color-base-content);
+          @supports (color: color-mix(in lab, red, red)) {
+            background-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+          }
+          box-shadow: none;
+        }
+        pointer-events: none;
+        --d-btn-border: #0000;
+        --d-btn-noise: none;
+        --d-btn-fg: var(--color-base-content);
+        @supports (color: color-mix(in lab, red, red)) {
+          --d-btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+        }
+      }
+    }
+  }
   .fixed {
     position: fixed;
   }
@@ -212,12 +347,6 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
-  .items-center {
-    align-items: center;
-  }
-  .justify-between {
-    justify-content: space-between;
-  }
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
@@ -236,6 +365,65 @@
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .d-btn-outline {
+    @layer daisyui.l1 {
+      &:not( .d-btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.d-filter .d-btn), :disabled, [disabled], .d-btn-disabled ) {
+        --d-btn-shadow: "";
+        --d-btn-bg: #0000;
+        --d-btn-fg: var(--d-btn-color);
+        --d-btn-border: var(--d-btn-color);
+        --d-btn-noise: none;
+      }
+      @media (hover: none) {
+        &:not(.d-btn-active, :active, :focus-visible, input:checked:not(.d-filter .d-btn)):hover {
+          --d-btn-shadow: "";
+          --d-btn-bg: #0000;
+          --d-btn-fg: var(--d-btn-color);
+          --d-btn-border: var(--d-btn-color);
+          --d-btn-noise: none;
+        }
+      }
+    }
+  }
+  .d-btn-primary {
+    @layer daisyui.l1.l2.l3 {
+      --d-btn-color: var(--color-primary);
+      --d-btn-fg: var(--color-primary-content);
+    }
+  }
+}
+@layer base {
+  :root:has(input.d-theme-controller[value=light]:checked),[data-theme=light] {
+    color-scheme: light;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(98% 0 0);
+    --color-base-300: oklch(95% 0 0);
+    --color-base-content: oklch(21% 0.006 285.885);
+    --color-primary: oklch(45% 0.24 277.023);
+    --color-primary-content: oklch(93% 0.034 272.788);
+    --color-secondary: oklch(65% 0.241 354.308);
+    --color-secondary-content: oklch(94% 0.028 342.258);
+    --color-accent: oklch(77% 0.152 181.912);
+    --color-accent-content: oklch(38% 0.063 188.416);
+    --color-neutral: oklch(14% 0.005 285.823);
+    --color-neutral-content: oklch(92% 0.004 286.32);
+    --color-info: oklch(74% 0.16 232.661);
+    --color-info-content: oklch(29% 0.066 243.157);
+    --color-success: oklch(76% 0.177 163.223);
+    --color-success-content: oklch(37% 0.077 168.94);
+    --color-warning: oklch(82% 0.189 84.429);
+    --color-warning-content: oklch(41% 0.112 45.904);
+    --color-error: oklch(71% 0.194 13.428);
+    --color-error-content: oklch(27% 0.105 12.094);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
   }
 }
 @layer base {
@@ -353,11 +541,34 @@
 @layer base {
   :where(:root),:root:has(input.theme-controller[value=anika]:checked),[data-theme="anika"] {
     color-scheme: light;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(98% 0 0);
+    --color-base-300: oklch(95% 0 0);
+    --color-base-content: oklch(21% 0.006 285.885);
     --color-primary: #428eef;
+    --color-primary-content: oklch(93% 0.034 272.788);
     --color-secondary: #c3dafa;
+    --color-secondary-content: oklch(94% 0.028 342.258);
+    --color-accent: oklch(77% 0.152 181.912);
+    --color-accent-content: oklch(38% 0.063 188.416);
+    --color-neutral: oklch(14% 0.005 285.823);
+    --color-neutral-content: oklch(92% 0.004 286.32);
+    --color-info: oklch(74% 0.16 232.661);
+    --color-info-content: oklch(29% 0.066 243.157);
+    --color-success: oklch(76% 0.177 163.223);
+    --color-success-content: oklch(37% 0.077 168.94);
+    --color-warning: oklch(82% 0.189 84.429);
+    --color-warning-content: oklch(41% 0.112 45.904);
+    --color-error: oklch(71% 0.194 13.428);
+    --color-error-content: oklch(27% 0.105 12.094);
     --radius-selector: 2rem;
     --radius-field: 2rem;
     --radius-box: 2rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
   }
 }
 @property --tw-rotate-x {
