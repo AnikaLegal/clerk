@@ -79,7 +79,7 @@ p.header {
 }
 
 /* Buttons */
-button {
+button:not(.d-btn) {
   color: var(--white);
   background: var(--blue);
   font-weight: bold;
@@ -96,14 +96,14 @@ button {
   box-shadow: 0px 4px 4px rgba(67, 143, 239, 0.18);
 }
 @media (max-width: 600px) {
-  button {
+  button:not(.d-btn) {
     margin: 0 auto;
     width: 270px;
     max-width: 100%;
     padding: 14px 30px;
   }
 }
-button.inverted {
+button:not(.d-btn).inverted {
   color: var(--blue);
   background: var(--white);
   border: 1px solid var(--blue);

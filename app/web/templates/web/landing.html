@@ -1,210 +1,228 @@
-{% extends "web/_base.html" %} 
+{% extends 'web/_base.html' %}
 {% load static %}
 {% load wagtail_clerk %}
-{% block supertitle %}Anika Legal{% endblock %} 
-{% block content %}
-
-{% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/landing.css' %}">
+{% block supertitle %}
+  Anika Legal
 {% endblock %}
+{% block content %}
+  {% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/landing.css' %}" />
+  {% endblock %}
 
-<div class="landing-hero small">
+  <div class="landing-hero small">
     {% include 'web/snippets/_landing_hero_preview.svg' %}
     <div class="img"></div>
     <div class="container wide">
-        {% include 'web/snippets/_landing_hero_text.html' %}
+      {% include 'web/snippets/_landing_hero_text.html' %}
+      <div class="buttons flex flex-wrap gap-4 justify-center">
+        <a class="grow" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
+        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-soft d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
     </div>
-</div>
-<div class="landing-hero large">
+  </div>
+
+  <div class="landing-hero large">
     {% include 'web/snippets/_landing_hero_preview.svg' %}
-    <img
-        src="{% static 'web/img/landing-hero-1920.jpg' %}"
-        alt="Girl at home on laptop, wearing headphones."
-        srcset="
+    <img src="{% static 'web/img/landing-hero-1920.jpg' %}" alt="Girl at home on laptop, wearing headphones." srcset="
             {% static 'web/img/landing-hero-2560.jpg' %} 2560w,
             {% static 'web/img/landing-hero-1920.jpg' %} 1920w,
             {% static 'web/img/landing-hero-1080.jpg' %} 1080w
-        "
-        sizes="
+        " sizes="
             (min-width: 1080w) 1080px,
             (min-width: 1920w) 1920px,
             2560px
-        "
-     >
+        " />
     <div class="container wide">
-        {% include 'web/snippets/_landing_hero_text.html' %}
-        <a href="https://intake.anikalegal.org.au/">
-            <button>Get free help</button>
-        </a>
+      {% include 'web/snippets/_landing_hero_text.html' %}
+      <div class="buttons flex gap-4">
+        <a class="grow" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
+        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-soft d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
     </div>
-</div>
-<div class="landing-brag large">
-    <div class="inner">
-        {% include 'web/snippets/_landing_brag_text.html' %}
-    </div>
-</div>
-<div class="landing-brag small">
-    <div class="container">
-        <a href="https://intake.anikalegal.org.au/">
-            <button>Get free help</button>
-        </a>
-        {% include 'web/snippets/_landing_brag_text.html' %}
-    </div>
-</div>
+  </div>
 
-
-<div class="segment gold round-large top-right bottom-left">
+  <div class="problem segment round-large top-right bottom-left">
     <div class="container wide">
-        <h2>How it works</h2>
-        <div class="divider"></div>
-        <div class="card-grid">
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}">
-                <p class="header">1. Questionnaire</p>
-                <p class="compact">It takes less than 10 minutes</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}">
-                <p class="header">2. We’ll call you</p>
-                <p class="compact">A paralegal assigned to your case will call you to discuss your situation</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
-                <p class="header">3. Legal advice</p>
-                <p class="compact">You’ll get an email outlining your rights and options</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}">
-                <p class="header">4. Resolution</p>
-                <p class="compact">We’ll work with you to reach a resolution that best fits you and your needs</p>
-            </div>
+      <h2>What problem are you facing?</h2>
+      <div class="divider"></div>
+      <div class="card-grid">
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/eviction.png' %}" />
+          <p class="header">Eviction Notice</p>
+          <p class="compact min-h-25">Received a notice to vacate and worried about losing your home? We can help you understand your options.</p>
+          <a href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
         </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/repairs.png' %}" />
+          <p class="header">Urgent Repairs</p>
+          <p class="compact min-h-25">Need something in your rental property fixed? Let's look at what you can do next.</p>
+          <a href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/bond.png' %}" />
+          <p class="header">Rental Bond Problems</p>
+          <p class="compact min-h-25">Having trouble getting your bond back? We can help you work through it.</p>
+          <a href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+        </div>
+      </div>
     </div>
-</div>
-<div class="container wide">
-    <div class="story right">
-        <div class="blue-ball">
-            <img
-                style="object-position: 50% 20%;max-height: 465px;"
-                class="round not-responsive top-left bottom-left bottom-right"
-                src="{% static 'web/img/photos/louise.jpg' %}"
-            >
+  </div>
+
+  <div class="segment gold round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>Can Anika Legal help you?</h2>
+      <div class="divider"></div>
+      <div class="flex flex-col items-center">
+        <div class="text-left">
+          <p>We support Victorian renters who may not have access to traditional legal services. You may be eligible if you:</p>
+          <ul>
+            <li>Are on a low or middle income</li>
+            <li>Need help recovering your bond, seeking urgent repairs, or have received a Notice to Vacate</li>
+          </ul>
         </div>
-        <div class="content">
-            <h2>Louise’s story</h2>
-            <p class="light">For 9 months, Louise pleaded with her landlord to get urgent repairs carried out at her home in preparation for the birth of her baby.</p>
-            <p class="light">“I felt like I was on the edge of having a heart attack. At times I wanted to give up, it was all just getting too hard”.</p>
-            <a href="{% clerk_slugurl 'louise-rental-repairs' %}">
-                <button>Read more</button>
-            </a>
-        </div>
+      </div>
     </div>
-</div>
-<div class="segment gold round-large top-right bottom-left">
+  </div>
+
+  <div class="segment round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>Getting Legal Help Is Simple</h2>
+      <div class="divider"></div>
+      <div class="card-grid">
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}" />
+          <p class="header">1. Tell us about your rental problem</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
+          <p class="header">2. Our legal team reviews your case</p>
+        </div>
+        <div class="card">
+          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+          <p class="header">3. We work with you to resolve the issue</p>
+        </div>
+      </div>
+      <div class="mt-12">
+        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment gold round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>You're Not Alone</h2>
+      <div class="divider"></div>
+      <div class="mb-12">
+        <p>
+          We've helped <span class="text-primary">{{ issues_serviced }} renters</span> stay in safe, secure homes.
+        </p>
+      </div>
+      <div class="card-grid">
+        <div class="card basis-1/2">
+          <img class="icon" src="{% static 'web/img/icons/star.svg' %}" />
+          <p class="header">100% free legal support</p>
+        </div>
+        <div class="card basis-1/2">
+          <img class="icon" src="{% static 'web/img/icons/valet.svg' %}" />
+          <p class="header">Community-based service</p>
+        </div>
+        <div class="card basis-1/2">
+          <img class="icon" src="{% static 'web/img/icons/crowd.svg' %}" />
+          <p class="header">90+ volunteers</p>
+        </div>
+        <div class="card basis-1/2">
+          <img class="icon" src="{% static 'web/img/icons/dial.svg' %}" />
+          <p class="header">Australia's first fully remote community legal centre</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>Empowering renters to thrive in safe homes</h2>
+      <p>Everyone deserves a place to call home</p>
+      <div class="divider"></div>
+      <div class="mb-4 flex flex-col items-center">
+        <div class="md:max-w-2/3 lg:max-w-2/3">
+          <p>Anika Legal provides free legal help to renters while using casework data to advocate for stronger renter protections and housing policy reform.</p>
+          <p>Because better systems mean fewer people end up in crisis.</p>
+        </div>
+      </div>
+      <a href="{% url 'about' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+    </div>
+  </div>
+
+  <div class="segment round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>FAQ</h2>
+      <div class="divider"></div>
+      <div class="flex flex-col gap-1">
+        <div class="d-collapse d-collapse-plus border border-base-300 rounded-sm">
+          <input type="radio" name="faq-accordion" />
+          <div class="d-collapse-title font-semibold">Can you help with my rental situation?</div>
+          <div class="d-collapse-content text-sm text-left">If you're renting in Victoria and dealing with something like eviction, urgent repairs, a bond issue or a rent increase, we may be able to help. We focus on supporting renters who are experiencing financial stress or have difficulty accessing legal services. The best way to find out is to check your eligibility. It only takes a few minutes.</div>
+        </div>
+        <div class="d-collapse d-collapse-plus border border-base-300 rounded-sm">
+          <input type="radio" name="faq-accordion" />
+          <div class="d-collapse-title font-semibold">Is the service really free?</div>
+          <div class="d-collapse-content text-sm text-left">Yes, our legal support is completely free. We're a community legal centre, which means we're here to help people who might not otherwise be able to access legal advice. There are no hidden fees or charges.</div>
+        </div>
+        <div class="d-collapse d-collapse-plus border border-base-300 rounded-sm">
+          <input type="radio" name="faq-accordion" />
+          <div class="d-collapse-title font-semibold">How do I know if I'm eligible?</div>
+          <div class="d-collapse-content text-sm text-left">
+            <p>You may be eligible if you're a Victorian renter living in a private rental or social housing and:</p>
+            <ul>
+              <li>Are on a low or middle income</li>
+              <li>Need help recovering your bond, seeking urgent repairs, or have received a Notice to Vacate</li>
+              <li>Live with disability or mental health challenges</li>
+              <li>Are experiencing family violence</li>
+              <li>Find it hard to access legal help elsewhere</li>
+            </ul>
+            <p>If you're unsure, that's okay. You can still check your eligibility and we'll guide you through it.</p>
+          </div>
+        </div>
+        <div class="d-collapse d-collapse-plus border border-base-300 rounded-sm">
+          <input type="radio" name="faq-accordion" />
+          <div class="d-collapse-title font-semibold">What happens after I submit my case?</div>
+          <div class="d-collapse-content text-sm text-left">Once you submit your details, our legal team will review your situation. We'll then get in touch with you to talk through your options and next steps. We know these situations can feel stressful, so we aim to respond as quickly as we can.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
     <div class="container">
-        <h2>Why use Anika?</h2>
-        <div class="divider"></div>
-        <div class="card-grid tight">
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/star.svg' %}">
-                <p class="header">100% free</p>
-                <p class="compact">We’re not-for-profit so we’ll never charge you a cent.</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/valet.svg' %}">
-                <p class="header">Personal support</p>
-                <p class="compact">You’ll have a paralegal dedicated to your case, giving you ongoing legal support specific to your circumstances, every step <br class="desktop-break">of the way.</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/fast.svg' %}">
-                <p class="header">Fast</p>
-                <p class="compact">We’ll get back to you promptly.</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/law.svg' %}">
-                <p class="header">Law you can understand</p>
-                <p class="compact">No long documents & confusing legal jargon. Just what you need to know, in plain English, explained by a real human being.</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/house.svg' %}">
-                <p class="header">Tenancy experts</p>
-               <p class="compact">We focus exclusively on residential tenancy matters.</p>
-            </div>
-            <div class="card">
-                <img class="icon" src="{% static 'web/img/icons/dial.svg' %}">
-                <p class="header">Online assistance</p>
-                <p class="compact">All assistance is online or over the phone, so you can take control of your living situation from the comfort of your couch.</p>
-            </div>
-        </div>
+      <h2>Our partners</h2>
+      <p>Working Together To Support Renters Across Victoria</p>
+      <div class="divider"></div>
+      <div class="partner-logos">
+        <img src="{% static 'web/img/partners/federation-vic.png' %}" width="200" />
+        <img src="{% static 'web/img/partners/victorian-legal-services-board-commissioner.jpg' %}" width="280" />
+        <img src="{% static 'web/img/partners/minter-ellison.png' %}" width="200" />
+        <img src="{% static 'web/img/partners/maurice-blackburn.svg' %}" width="180" />
+        <img src="{% static 'web/img/partners/deakin.png' %}" width="140" />
+        <img src="{% static 'web/img/partners/rmit.png' %}" width="200" />
+        <img src="{% static 'web/img/partners/leo-cussen.png' %}" width="200" />
+        <img src="{% static 'web/img/partners/tenants-vic.png' %}" width="200" />
+      </div>
     </div>
-</div>
-<div class="segment">
+  </div>
+
+  {% comment '' %}
+  <div id="contact-us" class="segment" style="padding: 0">
     <div class="container">
-        <h2>Our partners</h2>
-        <div class="divider"></div>
-        <div class="partner-logos">
-            <img src="{% static 'web/img/partners/federation-vic.png' %}" width="200">
-            <img src="{% static 'web/img/partners/victorian-legal-services-board-commissioner.jpg' %}" width="280">
-            <img src="{% static 'web/img/partners/minter-ellison.png' %}" width="200">
-            <img src="{% static 'web/img/partners/maurice-blackburn.svg' %}" width="180">
-            <img src="{% static 'web/img/partners/deakin.png' %}" width="140">
-            <img src="{% static 'web/img/partners/rmit.png' %}" width="200">
-            <img src="{% static 'web/img/partners/leo-cussen.png' %}" width="200">
-            <img src="{% static 'web/img/partners/tenants-vic.png' %}" width="200">
+      <div id="contact">
+        <div class="text">
+          <h2>Contact us</h2>
+          <p class="light">If you want to learn more about how Anika can help you, fill in your details, and we'll give you a call.</p>
         </div>
+        {% include 'web/htmx/_contact_form.html' %}
+      </div>
     </div>
-</div>
-<div class="segment gold round-large top-right">
-    <div class="container">
-        <h2>What our clients say</h2>
-        <div class="divider"></div>
-        <div class="testamonial-list">
-            {% for t in testimonials %}
-                <div class="testamonial {% if forloop.first %}active{% endif %}">
-                    <div class="quote">“</div>
-                    <p class="light compact">{{ t.testimonial }}</p>
-                </div>
-            {% endfor %}
-        </div>
-        <div class="client-list">
-            {% for t in testimonials %}
-                <div class="client {% if forloop.first %}active{% endif %}">
-                    <img src="{% static t.image %}">
-                    <div class="details">
-                        <p class="compact header">{{ t.name }}</p>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-<script>
-    // Make the carousel work
-    const clients = document.getElementsByClassName("client")
-    const testamonials = document.getElementsByClassName("testamonial")
-    let clientIdx = 0 // Start on client 0
-    Array.prototype.slice.call(clients).map((client, idx) => {
-        client.addEventListener('click', () => {
-            clients[clientIdx].classList.remove("active")
-            testamonials[clientIdx].classList.remove("active")
-            clientIdx = idx
-            clients[clientIdx].classList.add("active")
-            testamonials[clientIdx].classList.add("active")
-        })
-    })           
-</script>
-<div id="contact-us" class="segment" style="padding: 0">
-    <div class="container">
-        <div id="contact">
-            <div class="text">
-                <h2>Contact us</h2>
-                <p class="light">
-                    If you want to learn more about how Anika can help you, fill in your details, and we’ll give you a call. 
-                </p>
-            </div>
-            {% include 'web/htmx/_contact_form.html' %}
-        </div>
-    </div>
-</div>
-{% include 'web/snippets/_footer_cta.html' with cta="Ready to solve your rental problems?" %}
+  </div>
+  {% endcomment %}
+
+  {% include 'web/snippets/_footer_cta.html' with cta='Ready to solve your rental problems?' %}
 {% endblock %}

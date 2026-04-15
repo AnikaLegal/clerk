@@ -7,8 +7,8 @@ Landing page only styles.
   /* Desktop size responsive vars */
   --hero-curve-height: 280px;
   --hero-padding-top: 98px;
-  --hero-padding-bottom: 400px;
-  --brag-height: 400px;
+  --hero-padding-bottom: 140px;
+  --brag-height: 200px;
   --hero-small-image-height: 600px;
 }
 
@@ -16,7 +16,6 @@ Landing page only styles.
 @media (max-height: 800px) {
   :root {
     --hero-padding-top: 40px;
-    --hero-padding-bottom: 350px;
   }
 }
 
@@ -25,7 +24,6 @@ Landing page only styles.
   :root {
     --hero-curve-height: 100px;
     --hero-padding-top: 40px;
-    --hero-padding-bottom: 350px;
   }
 }
 
@@ -34,7 +32,6 @@ Landing page only styles.
     --brag-height: 200px;
     --hero-curve-height: 50px;
     --hero-padding-top: 40px;
-    --hero-padding-bottom: 140px;
   }
 }
 
@@ -44,7 +41,6 @@ Landing page only styles.
     --hero-curve-height: 46px;
     /* FIXME: CHRISTMAS */
     --hero-padding-top: -72px;
-
     --hero-padding-bottom: 0;
     --hero-small-image-height: 275px;
   }
@@ -115,6 +111,7 @@ Landing page only styles.
   height: calc(var(--hero-curve-height) + 2px);
   border-radius: 0 25% 0 0/ 0 100% 0 0;
 }
+
 .landing-hero.small .container {
   margin-top: -15px;
 }
@@ -134,41 +131,18 @@ Landing page only styles.
   max-width: 473px;
   line-height: 1.8;
 }
-.landing-brag.small,
-.landing-brag.large .inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
+.landing-hero.large .buttons {
+  max-width: 473px;
 }
 
-.landing-brag.large {
-  height: var(--brag-height);
-  margin-top: calc(-1 * var(--hero-curve-height));
-  position: relative;
-}
-.landing-brag.large .inner {
-  position: absolute;
-  height: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  padding: 0 var(--container-padding);
-  box-sizing: border-box;
-}
-.landing-brag .brag-number {
-  color: var(--blue);
-}
-.landing-brag.small {
-  padding: 20px 0 70px 0;
-}
-.landing-brag.small button {
-  margin: 30px auto 70px auto;
-}
 .landing-hero.small,
 .landing-brag.small {
   display: none;
+}
+
+.problem {
+  margin-top: calc(-1 * var(--hero-curve-height));
+  position: relative;
 }
 
 @media (max-width: 1300px) {
