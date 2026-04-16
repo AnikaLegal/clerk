@@ -646,6 +646,7 @@ Assumed to be in a wide container.
   content: "";
   position: absolute;
   display: none;
+  box-sizing: content-box;
 }
 .checkbox input:checked ~ .checkmark:after {
   display: block;
