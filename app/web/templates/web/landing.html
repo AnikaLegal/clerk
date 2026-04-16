@@ -14,10 +14,7 @@
     <div class="img"></div>
     <div class="container wide">
       {% include 'web/snippets/_landing_hero_text.html' %}
-      <div class="buttons flex flex-wrap gap-4 justify-center">
-        <a class="grow" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
-        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-soft d-btn-primary d-btn-wide">Get free help</button></a>
-      </div>
+      {% include 'web/snippets/_landing_hero_buttons.html' %}
     </div>
   </div>
 
@@ -34,10 +31,7 @@
         " />
     <div class="container wide">
       {% include 'web/snippets/_landing_hero_text.html' %}
-      <div class="buttons flex gap-4">
-        <a class="grow" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
-        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-soft d-btn-primary d-btn-wide">Get free help</button></a>
-      </div>
+      {% include 'web/snippets/_landing_hero_buttons.html' %}
     </div>
   </div>
 
@@ -50,19 +44,19 @@
           <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/eviction.png' %}" />
           <p class="header">Eviction Notice</p>
           <p class="compact min-h-25">Received a notice to vacate and worried about losing your home? We can help you understand your options.</p>
-          <a href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+          <a href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
         </div>
         <div class="card">
           <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/repairs.png' %}" />
           <p class="header">Urgent Repairs</p>
           <p class="compact min-h-25">Need something in your rental property fixed? Let's look at what you can do next.</p>
-          <a href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+          <a href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
         </div>
         <div class="card">
           <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/bond.png' %}" />
           <p class="header">Rental Bond Problems</p>
           <p class="compact min-h-25">Having trouble getting your bond back? We can help you work through it.</p>
-          <a href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+          <a href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
         </div>
       </div>
     </div>
@@ -103,7 +97,7 @@
         </div>
       </div>
       <div class="mt-12">
-        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
       </div>
     </div>
   </div>
@@ -149,7 +143,7 @@
           <p>Because better systems mean fewer people end up in crisis.</p>
         </div>
       </div>
-      <a href="{% url 'about' %}"><button class="d-btn d-btn-primary d-btn-wide mt-4">Learn more</button></a>
+      <a href="{% url 'about' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
     </div>
   </div>
 
