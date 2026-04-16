@@ -3,14 +3,12 @@
 @layer theme, base, components, utilities;
 @layer theme {
   :root, :host {
-    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-sans: "Nunito Sans", sans-serif;
+    --font-serif: "Abhaya Libre", serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-slate-700: oklch(37.2% 0.044 257.287);
     --spacing: 0.25rem;
-    --container-xs: 20rem;
-    --container-sm: 24rem;
     --text-sm: 0.875rem;
     --text-sm--line-height: calc(1.25 / 0.875);
     --font-weight-semibold: 600;
@@ -532,6 +530,9 @@
       max-width: 96rem;
     }
   }
+  .mt-2 {
+    margin-top: calc(var(--spacing) * 2);
+  }
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
   }
@@ -592,6 +593,9 @@
   .gap-4 {
     gap: calc(var(--spacing) * 4);
   }
+  .self-end {
+    align-self: flex-end;
+  }
   .rounded-sm {
     border-radius: var(--radius-sm);
   }
@@ -599,8 +603,8 @@
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
-  .border-base-300 {
-    border-color: var(--color-base-300);
+  .bg-base-100 {
+    background-color: var(--color-base-100);
   }
   .text-left {
     text-align: left;
@@ -613,8 +617,14 @@
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
   }
+  .text-\(--dark-4\) {
+    color: var(--dark-4);
+  }
   .text-primary {
     color: var(--color-primary);
+  }
+  .text-slate-700 {
+    color: var(--color-slate-700);
   }
   .italic {
     font-style: italic;
@@ -683,6 +693,16 @@
     @layer daisyui.l1.l2.l3 {
       --d-btn-color: var(--color-primary);
       --d-btn-fg: var(--color-primary-content);
+    }
+  }
+  .sm\:max-w-3\/4 {
+    @media (width >= 40rem) {
+      max-width: calc(3 / 4 * 100%);
+    }
+  }
+  .sm\:max-w-3\/5 {
+    @media (width >= 40rem) {
+      max-width: calc(3 / 5 * 100%);
     }
   }
   .md\:max-w-2\/3 {

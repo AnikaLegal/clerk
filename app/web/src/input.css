@@ -6,6 +6,10 @@
     light;
   prefix: "d-";
 }
+@theme {
+  --font-serif: "Abhaya Libre", serif;
+  --font-sans: "Nunito Sans", sans-serif;
+}
 @plugin "daisyui/theme" {
   name: "anika";
   default: true;
