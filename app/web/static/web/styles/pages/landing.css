@@ -173,6 +173,9 @@ Landing page only styles.
   .desktop-break {
     display: none;
   }
+  .problem {
+    margin-top: 40px;
+  }
 }
 
 /* Louise's story */
