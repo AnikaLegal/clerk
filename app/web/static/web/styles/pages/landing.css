@@ -140,7 +140,7 @@ Landing page only styles.
   display: none;
 }
 
-.problem {
+.problems {
   margin-top: calc(-1 * var(--hero-curve-height));
   position: relative;
 }
@@ -173,7 +173,7 @@ Landing page only styles.
   .desktop-break {
     display: none;
   }
-  .problem {
+  .problems {
     margin-top: 40px;
   }
 }
