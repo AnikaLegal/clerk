@@ -39,24 +39,42 @@
     <div class="container wide">
       <h2>What problem are you facing?</h2>
       <div class="divider"></div>
-      <div class="card-grid">
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/eviction.png' %}" />
-          <p class="header">Eviction Notice</p>
-          <p class="compact min-h-25">Received a notice to vacate and worried about losing your home? We can help you understand your options.</p>
-          <a href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
+      <div class="flex flex-wrap justify-center gap-8">
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img class="" src="{% static 'web/img/problem/eviction.png' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">Eviction Notice</div>
+            <p>Received a notice to vacate and worried about losing your home? We can help you understand your options.</p>
+            <div class="d-card-actions justify-end w-full">
+              <a class="grow-1" href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+            </div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/repairs.png' %}" />
-          <p class="header">Urgent Repairs</p>
-          <p class="compact min-h-25">Need something in your rental property fixed? Let's look at what you can do next.</p>
-          <a href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img class="" src="{% static 'web/img/problem/repairs.png' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">Urgent Repairs</div>
+            <p>Need something in your rental property fixed? Let's look at what you can do next.</p>
+            <div class="d-card-actions justify-end w-full">
+              <a class="grow-1" href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+            </div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/problem/bond.png' %}" />
-          <p class="header">Rental Bond Problems</p>
-          <p class="compact min-h-25">Having trouble getting your bond back? We can help you work through it.</p>
-          <a href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft mt-4">Learn more</button></a>
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img class="" src="{% static 'web/img/problem/bond.png' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">Rental Bond Problems</div>
+            <p>Having trouble getting your bond back? We can help you work through it.</p>
+            <div class="d-card-actions justify-end w-full">
+              <a class="grow-1" href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
