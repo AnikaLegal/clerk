@@ -42,7 +42,7 @@
       <div class="flex flex-wrap justify-center gap-8">
         <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
           <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
-            <img class="" src="{% static 'web/img/problem/eviction.png' %}" />
+            <img src="{% static 'web/img/problem/eviction.png' %}" />
           </figure>
           <div class="d-card-body items-center">
             <div class="d-card-title">Eviction Notice</div>
@@ -54,7 +54,7 @@
         </div>
         <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
           <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
-            <img class="" src="{% static 'web/img/problem/repairs.png' %}" />
+            <img src="{% static 'web/img/problem/repairs.png' %}" />
           </figure>
           <div class="d-card-body items-center">
             <div class="d-card-title">Urgent Repairs</div>
@@ -66,7 +66,7 @@
         </div>
         <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
           <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
-            <img class="" src="{% static 'web/img/problem/bond.png' %}" />
+            <img src="{% static 'web/img/problem/bond.png' %}" />
           </figure>
           <div class="d-card-body items-center">
             <div class="d-card-title">Rental Bond Problems</div>
@@ -106,22 +106,34 @@
     <div class="container wide">
       <h2>Getting Legal Help Is Simple</h2>
       <div class="divider"></div>
-      <div class="card-grid">
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}" />
-          <p class="header">1. Tell us about your rental problem</p>
+      <div class="flex flex-wrap justify-center gap-8">
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img src="{% static 'web/img/how-it-works/intake.jpg' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">1. Tell us about your rental problem</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
-          <p class="header">2. Our legal team reviews your case</p>
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">2. Our legal team reviews your case</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
-          <p class="header">3. We work with you to resolve the issue</p>
+        <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+            <img src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+          </figure>
+          <div class="d-card-body items-center">
+            <div class="d-card-title">3. We work with you to resolve the issue</div>
+          </div>
         </div>
       </div>
       <div class="mt-12">
-        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
+        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
       </div>
     </div>
   </div>
