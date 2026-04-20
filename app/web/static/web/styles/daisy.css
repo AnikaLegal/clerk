@@ -651,9 +651,6 @@
   .grow {
     flex-grow: 1;
   }
-  .grow-1 {
-    flex-grow: 1;
-  }
   .basis-1\/2 {
     flex-basis: calc(1 / 2 * 100%);
   }
@@ -806,6 +803,16 @@
   .md\:max-w-2\/3 {
     @media (width >= 48rem) {
       max-width: calc(2 / 3 * 100%);
+    }
+  }
+  .md\:max-w-3\/4 {
+    @media (width >= 48rem) {
+      max-width: calc(3 / 4 * 100%);
+    }
+  }
+  .lg\:max-w-1\/2 {
+    @media (width >= 64rem) {
+      max-width: calc(1 / 2 * 100%);
     }
   }
   .lg\:max-w-2\/3 {

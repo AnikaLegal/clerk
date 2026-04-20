@@ -48,7 +48,7 @@
             <div class="d-card-title">Eviction Notice</div>
             <p>Received a notice to vacate and worried about losing your home? We can help you understand your options.</p>
             <div class="d-card-actions justify-end w-full">
-              <a class="grow-1" href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+              <a class="grow" href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
             <div class="d-card-title">Urgent Repairs</div>
             <p>Need something in your rental property fixed? Let's look at what you can do next.</p>
             <div class="d-card-actions justify-end w-full">
-              <a class="grow-1" href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+              <a class="grow" href="{% url 'repairs' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@
             <div class="d-card-title">Rental Bond Problems</div>
             <p>Having trouble getting your bond back? We can help you work through it.</p>
             <div class="d-card-actions justify-end w-full">
-              <a class="grow-1" href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+              <a class="grow" href="{% url 'bonds' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
             </div>
           </div>
         </div>
@@ -83,14 +83,20 @@
   <div class="segment gold round-large top-right bottom-left">
     <div class="container wide">
       <h2>Can Anika Legal help you?</h2>
-      <div class="divider"></div>
       <div class="flex flex-col items-center">
-        <div class="text-left">
-          <p>We support Victorian renters who may not have access to traditional legal services. You may be eligible if you:</p>
+        <p class="lg:max-w-1/2 md:max-w-2/3">We support Victorian renters who may not have access to traditional legal services</p>
+      </div>
+      <div class="divider"></div>
+      <div class="flex flex-col items-center gap-8">
+        <div class="text-left lg:max-w-2/3 md:max-w-3/4">
+          <p>You may be eligible if you:</p>
           <ul>
             <li>Are on a low or middle income</li>
             <li>Need help recovering your bond, seeking urgent repairs, or have received a Notice to Vacate</li>
           </ul>
+        </div>
+        <div>
+          <a href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
         </div>
       </div>
     </div>
