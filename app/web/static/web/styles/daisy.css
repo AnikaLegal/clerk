@@ -8,6 +8,7 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-slate-700: oklch(37.2% 0.044 257.287);
+    --color-white: #fff;
     --spacing: 0.25rem;
     --text-sm: 0.875rem;
     --text-sm--line-height: calc(1.25 / 0.875);
@@ -636,14 +637,23 @@
   .table {
     display: table;
   }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
+  }
   .d-btn-wide {
     @layer daisyui.l1.l2 {
       width: 100%;
       max-width: calc(0.25rem * 64);
     }
   }
+  .w-10 {
+    width: calc(var(--spacing) * 10);
+  }
   .w-full {
     width: 100%;
+  }
+  .min-w-10 {
+    min-width: calc(var(--spacing) * 10);
   }
   .min-w-\[350px\] {
     min-width: 350px;
@@ -662,6 +672,9 @@
   }
   .flex-col {
     flex-direction: column;
+  }
+  .flex-row {
+    flex-direction: row;
   }
   .flex-wrap {
     flex-wrap: wrap;
@@ -683,6 +696,9 @@
   }
   .gap-8 {
     gap: calc(var(--spacing) * 8);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
   }
   .rounded-sm {
     border-radius: var(--radius-sm);
@@ -706,6 +722,9 @@
   .bg-base-100 {
     background-color: var(--color-base-100);
   }
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
   .text-left {
     text-align: left;
   }
@@ -725,6 +744,9 @@
   }
   .text-slate-700 {
     color: var(--color-slate-700);
+  }
+  .text-white {
+    color: var(--color-white);
   }
   .italic {
     font-style: italic;
