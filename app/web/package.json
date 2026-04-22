@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "DaisyUI styling for Clerk web app",
   "scripts": {
-    "css:build": "npx @tailwindcss/cli -i src/input.css -o static/web/styles/daisy.css",
-    "css:watch": "npx @tailwindcss/cli -i src/input.css -o static/web/styles/daisy.css --watch=always"
+    "build": "npx @tailwindcss/cli -i src/input.css -o static/web/styles/daisy.css",
+    "watch": "npx @tailwindcss/cli -i src/input.css -o static/web/styles/daisy.css --watch=always"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",

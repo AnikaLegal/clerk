@@ -46,7 +46,7 @@ services:
   web_css:
     image: node:lts
     working_dir: /app/web
-    command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run css:watch"
+    command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run watch"
     volumes:
       - ../app/web:/app/web
       - web-node-modules:/app/web/node_modules
