@@ -1,3 +1,15 @@
+# Build web CSS assets
+FROM node:lts-slim AS css-builder
+WORKDIR /web
+COPY app/web/package.json .
+COPY app/web/package-lock.json .
+RUN echo "Installing Node modules." && \
+    npm install --silent
+ADD app/web /web
+RUN echo "Building CSS" && \ 
+    mkdir /dist && \
+    npx @tailwindcss/cli -i src/input.css -o /dist/daisyui.css
+
 # Use Clerk base image
 FROM anikalaw/clerkbase:latest
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
@@ -15,7 +27,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
 
 # Copy frontend build assets (for production only)
 COPY --from=clerk-frontend:local /frontend/dist/ /dist/
+COPY --from=css-builder /dist/daisyui.css /dist/web/static/web/styles/daisyui.css
 
 # Collect static files
 RUN ./manage.py collectstatic --noinput
-

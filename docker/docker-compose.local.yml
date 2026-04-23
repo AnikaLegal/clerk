@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
-      - clerk-postgres-data:/var/lib/postgresql
+      - clerk_postgres_data:/var/lib/postgresql
     ports:
       - 25432:5432
   # Django webserver.
@@ -20,11 +20,12 @@ services:
       - ../app:/app
       - /app/.venv/ # Exclude
       - config_local:/root/.config
+      - dist_local:/dist
     links:
-      - worker
-      - frontend
       - clerk_db
-      - web_css
+      - worker
+      - css
+      - frontend
     env_file:
       - ../env/dev.env
     environment:
@@ -43,13 +44,14 @@ services:
     env_file:
       - ../env/dev.env
   # Tailwind/DaisyUI watcher for Django web app styles.
-  web_css:
-    image: node:lts
+  css:
+    image: node:lts-slim
     working_dir: /app/web
     command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run watch"
     volumes:
       - ../app/web:/app/web
-      - web-node-modules:/app/web/node_modules
+      - web_node_modules:/app/web/node_modules
+      - dist_local:/dist
   frontend:
     image: clerk-frontend:local
     command: npm run dev
@@ -70,6 +72,7 @@ services:
     env_file:
       - ../env/test.env
 volumes:
-  clerk-postgres-data:
+  clerk_postgres_data:
+  web_node_modules:
   config_local:
-  web-node-modules:
+  dist_local:
