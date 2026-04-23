@@ -8,7 +8,7 @@ RUN echo "Installing Node modules." && \
 ADD app/web /web
 RUN echo "Building CSS" && \ 
     mkdir /dist && \
-    npx @tailwindcss/cli -i src/input.css -o /dist/daisyui.css
+    npx @tailwindcss/cli --input src/input.css --output /dist/daisyui.css --minify
 
 # Use Clerk base image
 FROM anikalaw/clerkbase:latest
