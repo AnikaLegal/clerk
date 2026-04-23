@@ -27,7 +27,7 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
 
 # Copy frontend build assets (for production only)
 COPY --from=clerk-frontend:local /frontend/dist/ /dist/
-COPY --from=css-builder /dist/daisyui.css /dist/web/static/web/styles/daisyui.css
+COPY --from=css-builder /dist/daisyui.css /dist/web/styles/daisyui.css
 
 # Collect static files
 RUN ./manage.py collectstatic --noinput
