@@ -45,7 +45,7 @@ Screen sizes to consider (https://screensiz.es/):
   /* Static content urls */
   --url-footer-cta-img: url("/static/web/img/footer-cta-phones.png");
   --url-chevron-down-svg: url("/static/web/img/chevron-down.svg");
-  --url-landing-hero-phone-img: url("/static/web/img/landing-hero-1080.png");
+  --url-landing-hero-phone-img: url("/static/web/img/landing-hero-1080.webp");
 
   /* Responsive variables */
   --container-padding: 135px;
