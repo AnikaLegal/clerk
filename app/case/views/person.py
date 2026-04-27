@@ -1,4 +1,4 @@
-from core.models import Issue, Person
+from core.models import Issue, Person, Tenancy
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
@@ -65,8 +65,17 @@ class PersonApiViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        user = self.request.user
 
         if self.action == "list":
+            if user.is_paralegal:
+                # Filter queryset to only include those who are landlords or agents in Tenancies related to Issues where the paralegal is the current user
+                related_tenancies = Tenancy.objects.filter(issue__paralegal=user)
+                queryset = queryset.filter(
+                    Q(id__in=related_tenancies.values_list("landlord_id", flat=True))
+                    | Q(id__in=related_tenancies.values_list("agent_id", flat=True))
+                )
+
             queryset = self.search_queryset(queryset)
 
         return queryset
