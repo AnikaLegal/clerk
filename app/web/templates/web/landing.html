@@ -255,6 +255,46 @@
     </div>
   </div>
 
+  <div class="segment gold round-large top-right bottom-left">
+    <div class="container">
+      <h2>What our clients say</h2>
+      <div class="divider"></div>
+      <div class="testamonial-list">
+        {% for t in testimonials %}
+          <div class="testamonial {% if forloop.first %}active{% endif %}">
+            <div class="quote">“</div>
+            <p class="light compact">{{ t.testimonial }}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="client-list">
+        {% for t in testimonials %}
+          <div class="client {% if forloop.first %}active{% endif %}">
+            <img src="{% static t.image %}" />
+            <div class="details">
+              <p class="compact header">{{ t.name }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script>
+    // Make the carousel work
+    const clients = document.getElementsByClassName('client')
+    const testamonials = document.getElementsByClassName('testamonial')
+    let clientIdx = 0 // Start on client 0
+    Array.prototype.slice.call(clients).map((client, idx) => {
+      client.addEventListener('click', () => {
+        clients[clientIdx].classList.remove('active')
+        testamonials[clientIdx].classList.remove('active')
+        clientIdx = idx
+        clients[clientIdx].classList.add('active')
+        testamonials[clientIdx].classList.add('active')
+      })
+    })
+  </script>
+
   <div id="contact-us" class="segment" style="padding: 0">
     <div class="container">
       <div id="contact">
