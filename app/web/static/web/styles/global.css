@@ -110,6 +110,10 @@ body {
 
 a {
   text-decoration: none;
+  /* Override styles from DaisyUI as we rely on these in some places.
+   * TODO: fix those places and remove these overrides?
+   */
+  color: revert;
 }
 
 /* Override styles from DaisyUI as we rely on these in some places.
