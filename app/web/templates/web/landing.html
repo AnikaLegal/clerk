@@ -7,6 +7,8 @@
 {% block content %}
   {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/landing.css' %}" />
+    <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+    <script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js"></script>
   {% endblock %}
 
   <div class="landing-hero small">
@@ -94,7 +96,7 @@
               <li>Need help recovering your bond, seeking urgent repairs, or have received a Notice to Vacate.</li>
             </ul>
           </div>
-          <div>
+          <div class="grow w-full">
             <a href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check Your Eligibility</button></a>
           </div>
         </div>
@@ -136,7 +138,7 @@
         </div>
       </div>
       <div class="mt-12">
-        <a class="grow" href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+        <a href="https://intake.anikalegal.org.au/"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
       </div>
     </div>
   </div>
@@ -238,24 +240,96 @@
   </div>
 
   <div class="segment">
-    <div class="container">
+    <div class="container wide">
       <h2>Our partners</h2>
       <p>Working Together To Support Renters Across Victoria</p>
       <div class="divider"></div>
-      <div class="partner-logos">
-        <img src="{% static 'web/img/partners/federation-vic.png' %}" width="200" />
-        <img src="{% static 'web/img/partners/victorian-legal-services-board-commissioner.jpg' %}" width="280" />
-        <img src="{% static 'web/img/partners/minter-ellison.png' %}" width="200" />
-        <img src="{% static 'web/img/partners/maurice-blackburn.svg' %}" width="180" />
-        <img src="{% static 'web/img/partners/deakin.png' %}" width="140" />
-        <img src="{% static 'web/img/partners/rmit.png' %}" width="200" />
-        <img src="{% static 'web/img/partners/leo-cussen.png' %}" width="200" />
-        <img src="{% static 'web/img/partners/tenants-vic.png' %}" width="200" />
+      <div class="embla md:max-w-4/5 mx-auto">
+        <div class="embla_viewport">
+          <div class="embla_container">
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/federation-vic.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/victorian-legal-services-board-commissioner.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/minter-ellison.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/maurice-blackburn.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/deakin.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/rmit.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/leo-cussen.png' %}" />
+              </div>
+            </div>
+            <div class="embla_slide">
+              <div class="embla_slide_inner">
+                <img src="{% static 'web/img/partners/tenants-vic.png' %}" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="embla_buttons justify-end mt-4 hidden lg:flex">
+          <div class="embla_prev_next_buttons flex gap-1">
+            <button id="embla_prev_button-partners" class="d-btn d-btn-circle embla_button" type="button">
+              <svg class="embla_button_svg w-[35%] h-[35%]" viewBox="0 0 532 532">
+                <path fill="currentColor" d="M355.66 11.354c13.793-13.805 36.208-13.805 50.001 0 13.785 13.804 13.785 36.238 0 50.034L201.22 266l204.442 204.61c13.785 13.805 13.785 36.239 0 50.044-13.793 13.796-36.208 13.796-50.002 0a5994246.277 5994246.277 0 0 0-229.332-229.454 35.065 35.065 0 0 1-10.326-25.126c0-9.2 3.393-18.26 10.326-25.2C172.192 194.973 332.731 34.31 355.66 11.354Z"></path>
+              </svg>
+            </button>
+            <button id="embla_next_button-partners" class="d-btn d-btn-circle embla_button" type="button">
+              <svg class="embla_button_svg w-[35%] h-[35%]" viewBox="0 0 532 532">
+                <path fill="currentColor" d="M176.34 520.646c-13.793 13.805-36.208 13.805-50.001 0-13.785-13.804-13.785-36.238 0-50.034L330.78 266 126.34 61.391c-13.785-13.805-13.785-36.239 0-50.044 13.793-13.796 36.208-13.796 50.002 0 22.928 22.947 206.395 206.507 229.332 229.454a35.065 35.065 0 0 1 10.326 25.126c0 9.2-3.393 18.26-10.326 25.2-45.865 45.901-206.404 206.564-229.332 229.52Z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="segment gold round-large top-right bottom-left">
+  <script type="text/javascript">
+    const wrapperNode = document.querySelector('.embla')
+    const viewportNode = wrapperNode.querySelector('.embla_viewport')
+    const prevButtonNode = wrapperNode.querySelector('#embla_prev_button-partners')
+    const nextButtonNode = wrapperNode.querySelector('#embla_next_button-partners')
+    
+    const autoplayOptions = { active: true, delay: 3000, playOnInit: true, stopOnInteraction: false, stopOnFocusIn: true, stopOnMouseEnter: true }
+    const emblaAutoplay = EmblaCarouselAutoplay(autoplayOptions)
+    const emblaApi = EmblaCarousel(viewportNode, { loop: true }, [emblaAutoplay])
+    
+    prevButtonNode.addEventListener('click', () => emblaApi.scrollPrev(), false)
+    nextButtonNode.addEventListener('click', () => emblaApi.scrollNext(), false)
+    
+    const hoverTarget = document.querySelector('.embla_prev_next_buttons')
+    hoverTarget.addEventListener('mouseenter', () => {
+      if (emblaAutoplay) emblaAutoplay.stop()
+    })
+    hoverTarget.addEventListener('mouseleave', () => {
+      if (emblaAutoplay) emblaAutoplay.play()
+    })
+  </script>
+
+  <div class="segment gold round-large top-right bottom-left mt-8">
     <div class="container">
       <h2>What our clients say</h2>
       <div class="divider"></div>
