@@ -240,11 +240,11 @@
   </div>
 
   <div class="segment">
-    <div class="container wide">
+    <div class="container">
       <h2>Our partners</h2>
       <p>Working Together To Support Renters Across Victoria</p>
       <div class="divider"></div>
-      <div class="embla">
+      <div class="embla lg:max-w-4/5 mx-auto">
         <div class="embla_viewport">
           <div class="embla_container">
             <div class="embla_slide">
@@ -289,7 +289,7 @@
             </div>
           </div>
         </div>
-        <div class="embla_buttons justify-end mt-4 hidden lg:flex">
+        <div class="embla_buttons justify-end mt-4 hidden xl:flex">
           <div class="embla_prev_next_buttons flex gap-1">
             <button id="embla_prev_button-partners" class="d-btn d-btn-circle embla_button" type="button">
               <svg class="embla_button_svg w-[35%] h-[35%]" viewBox="0 0 532 532">
@@ -315,7 +315,7 @@
     
     const autoplayOptions = { active: true, delay: 3000, playOnInit: true, stopOnInteraction: false, stopOnFocusIn: true, stopOnMouseEnter: true }
     const emblaAutoplay = EmblaCarouselAutoplay(autoplayOptions)
-    const emblaApi = EmblaCarousel(viewportNode, { loop: true }, [emblaAutoplay])
+    const emblaApi = EmblaCarousel(viewportNode, { loop: true, align: 'start' }, [emblaAutoplay])
     
     prevButtonNode.addEventListener('click', () => emblaApi.scrollPrev(), false)
     nextButtonNode.addEventListener('click', () => emblaApi.scrollNext(), false)
