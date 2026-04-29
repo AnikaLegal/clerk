@@ -13,7 +13,7 @@ Landing page only styles.
 }
 
 .embla {
-  --slide-size: 50%;
+  --slide-size: 100%;
   --slide-spacing: 10px;
   height: 240px;
 }
@@ -47,9 +47,15 @@ Landing page only styles.
   background-color: var(--gold-light);
 }
 
-@media (width <= 40rem) {
+@media (width >= 40rem) {
   .embla {
     --slide-size: 80%;
+  }
+}
+
+@media (width >= 48rem) {
+  .embla {
+    --slide-size: 50%;
   }
 }
 
