@@ -39,9 +39,9 @@ docker context create remote --docker "host=ssh://root@${CLERK_HOST}"
 docker context use remote
 
 echo -e "\n>>> Deploying $PROJECT_NAME to Docker Swarm cluster on host $CLERK_HOST"
-docker stack deploy --compose-file "docker/docker-compose.${COMPOSE_SUFFIX}.yml" --prune $PROJECT_NAME
+docker stack deploy --compose-file "docker/docker-compose.${COMPOSE_SUFFIX}.yml" $PROJECT_NAME
 
 echo -e "\n>>> Removing unused Docker objects (containers, images, volumes, networks, build cache)"
-docker system prune --volumes --force
+docker system prune --all --volumes --force
 
 echo -e "\n>>> Deployment finished for $PROJECT_NAME"
