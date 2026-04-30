@@ -15,6 +15,17 @@ class ResourcePage(Page):
     parent_page_types = ["web.ResourceListPage"]
     subpage_types = []
 
+    def get_template(self, request, *args, **kwargs):
+        from django.template.loader import get_template
+        from django.template.exceptions import TemplateDoesNotExist
+
+        slug_template = f"web/resources/{self.slug}.html"
+        try:
+            get_template(slug_template)
+            return slug_template
+        except TemplateDoesNotExist:
+            return self.template
+
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
