@@ -366,9 +366,9 @@ TEAM_MEMBERS = [
     },
     {
         "image": "web/img/photos/team/dale.png",
-        "name": "Dale Walker",
+        "name": "Dale Clough",
         "title": "Head of Partnerships & Fundraising",
-        "linkedin": "https://www.linkedin.com/in/dale-walker/",
+        "linkedin": "https://www.linkedin.com/in/dale-clough/",
         "brags": [
             """Dale leads our Partnerships & Fundraising function, ensuring that
             Anika can continue to grow sustainably.""",
