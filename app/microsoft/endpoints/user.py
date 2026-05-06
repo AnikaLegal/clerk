@@ -46,7 +46,7 @@ class UserEndpoint(BaseEndpoint):
 
     def assign_license(self, userPrincipalName):
         """
-        Assign Office 365 E1 license to User.
+        Assign Office 365 license to User.
         """
         data = {
             # Do not remove fields or POST request might fail.
@@ -57,7 +57,7 @@ class UserEndpoint(BaseEndpoint):
 
     def remove_license(self, userPrincipalName):
         """
-        Removes Office 365 E1 license from User.
+        Removes Office 365 license from User.
         """
         data = {
             # Do not remove fields or POST request might fail.
