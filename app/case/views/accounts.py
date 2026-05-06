@@ -69,7 +69,7 @@ def account_create_page_view(request):
     context = {
         "group_values": CaseGroups.values,
     }
-    return render_react_page(request, "Invite paralegal", "account-create", context)
+    return render_react_page(request, "Invite users", "account-create", context)
 
 
 class AccountPaginator(ClerkPaginator):
