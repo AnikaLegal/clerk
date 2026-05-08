@@ -3,13 +3,15 @@ from unittest.mock import patch
 import pytest
 from core.factories import DocumentTemplateFactory, IssueFactory, UserFactory
 from microsoft.service import (
+    add_group_member,
+    add_office_licence,
     add_user_to_case,
     get_case_folder_info,
+    remove_group_member,
+    remove_office_licence,
     remove_user_from_case,
-    add_group_member,
     set_up_new_case,
     set_up_new_user,
-    remove_group_member,
 )
 from microsoft.storage import MSGraphStorage
 
@@ -24,12 +26,10 @@ def mock_api():
 
 
 @pytest.mark.django_db
-def test_set_up_new_user_A(mock_api):
-    """Check service function does not create MS account or assign license for existing user."""
+def test_ms_service__set_up_existing_user(mock_api):
+    """Check service function does not create MS account or assign license for existing user"""
     user = UserFactory()
-    mock_api.user.get.return_value = {
-        f"Microsoft Account already exists for {user.email}"
-    }
+    mock_api.user.get.return_value = {"userPrincipalName": user.email}
 
     set_up_new_user(user)
 
@@ -39,25 +39,42 @@ def test_set_up_new_user_A(mock_api):
 
 
 @pytest.mark.django_db
-def test_set_up_new_user_B(mock_api):
-    """Check service function creates MS account and assigns license for new user."""
+def test_ms_service__set_up_new_user(mock_api):
+    """Check service function creates MS account and assigns license for new user"""
     user = UserFactory()
     mock_api.user.get.return_value = None
     mock_api.user.create.return_value = user, "open sesame"
 
-    password = set_up_new_user(user)
+    set_up_new_user(user)
 
     mock_api.user.get.assert_called_once_with(user.email)
     mock_api.user.create.assert_called_once_with(
         user.first_name, user.last_name, user.email
     )
-    mock_api.user.assign_license.assert_called_once_with(user.email)
-    assert password == "open sesame"
+    mock_api.user.assign_license.assert_not_called()
 
 
 @pytest.mark.django_db
-def test_set_up_new_case(mock_api):
-    """Check service function creates new case folder and places it inside parent folder."""
+def test_ms_service__set_up_new_user_with_paralegal_role(mock_api, paralegal_group):
+    """Check service function creates MS account and assigns license for new user with paralegal role"""
+    user = UserFactory()
+    user.groups.add(paralegal_group)
+
+    mock_api.user.get.return_value = None
+    mock_api.user.create.return_value = user, "open sesame"
+
+    set_up_new_user(user)
+
+    mock_api.user.get.assert_called_once_with(user.email)
+    mock_api.user.create.assert_called_once_with(
+        user.first_name, user.last_name, user.email
+    )
+    mock_api.user.assign_license.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_ms_service__set_up_new_case(mock_api):
+    """Check service function creates new case folder and places it inside parent folder"""
     issue = IssueFactory()
 
     with patch.object(MSGraphStorage, "_get_file_info", return_value={}):
@@ -74,8 +91,66 @@ def test_set_up_new_case(mock_api):
 
 
 @pytest.mark.django_db
-def test_add_user_to_case(mock_api):
-    """Check service function gives user write permissions to existing case folder."""
+def test_ms_service__assign_office_licence(mock_api):
+    """Check service function assigns licence to user with MS account"""
+    user = UserFactory()
+    mock_api.user.get.return_value = {"userPrincipalName": user.email}
+
+    add_office_licence(user)
+
+    mock_api.user.get.assert_called_once_with(user.email)
+    mock_api.user.assign_license.assert_called_once_with(user.email)
+
+
+@pytest.mark.django_db
+def test_ms_service__assign_office_licence_to_nonexistent_user(mock_api):
+    """Check service function does not assign licence to non-existent user"""
+    user = UserFactory()
+    mock_api.user.get.return_value = None
+
+    add_office_licence(user)
+
+    mock_api.user.get.assert_called_once_with(user.email)
+    mock_api.user.assign_license.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_ms_service__remove_office_licence(mock_api, settings):
+    """Check service function removes licence from user with MS account"""
+
+    # This fudge is required to get past the check in the service function that
+    # prevents licence removal if the setting is not enabled. This is to prevent
+    # accidental licence removals in development & staging but we don't need it
+    # here as the API calls are mocked.
+    settings.MS_REMOVE_OFFICE_LICENCES = True
+
+    user = UserFactory()
+    mock_api.user.get_license.return_value = {"value": ["license_id"]}
+
+    remove_office_licence(user)
+
+    mock_api.user.get_license.assert_called_once_with(user.email)
+    mock_api.user.remove_license.assert_called_once_with(user.email)
+
+
+@pytest.mark.django_db
+def test_ms_service__remove_nonexistent_office_licence(mock_api, settings):
+    """Check service function does not remove licence from user without MS account"""
+
+    settings.MS_REMOVE_OFFICE_LICENCES = True
+
+    user = UserFactory()
+    mock_api.user.get_license.return_value = None
+
+    remove_office_licence(user)
+
+    mock_api.user.get_license.assert_called_once_with(user.email)
+    mock_api.user.remove_license.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_ms_service__add_user_to_case(mock_api):
+    """Check service function gives user write permissions to existing case folder"""
     user = UserFactory()
     issue = IssueFactory()
 
@@ -87,8 +162,8 @@ def test_add_user_to_case(mock_api):
 
 
 @pytest.mark.django_db
-def test_remove_user_from_case_A(mock_api):
-    """Check service function when there are no permissions on the case folder."""
+def test_ms_service__remove_unprivileged_user_from_case(mock_api):
+    """Check service function when there are no permissions on the case folder"""
     user = UserFactory()
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = []
@@ -100,8 +175,8 @@ def test_remove_user_from_case_A(mock_api):
 
 
 @pytest.mark.django_db
-def test_remove_user_from_case_B(mock_api):
-    """Check service function when there are permissions on the case folder that don't belong to our user."""
+def test_ms_service__remove_different_user_from_case(mock_api):
+    """Check service function when there are permissions on the case folder that don't belong to our user"""
     user = UserFactory(email="donald.duck@anikalegal.com")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
@@ -115,8 +190,8 @@ def test_remove_user_from_case_B(mock_api):
 
 
 @pytest.mark.django_db
-def test_remove_user_from_case_C(mock_api):
-    """Check service function when there are permissions on the case folder belonging to our user."""
+def test_ms_service__remove_user_from_case(mock_api):
+    """Check service function when there are permissions on the case folder belonging to our user"""
     user = UserFactory(email="donald.duck@anikalegal.com")
     issue = IssueFactory()
     mock_api.folder.list_permissions.return_value = [
@@ -135,8 +210,8 @@ def test_remove_user_from_case_C(mock_api):
 
 
 @pytest.mark.django_db
-def test_get_case_folder_info_A(mock_api):
-    """Check service function when the case folder doesn't exist."""
+def test_ms_service__get_nonexistent_case_folder_info(mock_api):
+    """Check service function when the case folder doesn't exist"""
     issue = IssueFactory()
     mock_api.folder.get_children.return_value = []
     mock_api.folder.get.return_value = None
@@ -150,8 +225,8 @@ def test_get_case_folder_info_A(mock_api):
 
 
 @pytest.mark.django_db
-def test_get_case_folder_info_B(mock_api):
-    """Check service function when there is a proper case folder."""
+def test_ms_service__get_case_folder_info(mock_api):
+    """Check service function when there is a proper case folder"""
     issue = IssueFactory()
     mock_api.folder.get_children.return_value = [
         {
@@ -181,8 +256,8 @@ def test_get_case_folder_info_B(mock_api):
 
 
 @pytest.mark.django_db
-def test_set_up_coordinator_A(mock_api):
-    """Check service function doesn't add User who is already a Group member."""
+def test_ms_service__set_up_coordinator_that_already_is_member(mock_api):
+    """Check service function doesn't add User who is already a Group member"""
     user = UserFactory()
     mock_api.group.members.return_value = [user.email]
 
@@ -193,8 +268,8 @@ def test_set_up_coordinator_A(mock_api):
 
 
 @pytest.mark.django_db
-def test_set_up_coordinator_B(mock_api):
-    """Check service function adds User who is not already a Group member."""
+def test_ms_service__set_up_coordinator(mock_api):
+    """Check service function adds User who is not already a Group member"""
     user = UserFactory()
     mock_api.group.members.return_value = []
 
@@ -205,8 +280,8 @@ def test_set_up_coordinator_B(mock_api):
 
 
 @pytest.mark.django_db
-def test_tear_down_coordinator_A(mock_api):
-    """Check service function removes User who is already a Group member."""
+def test_ms_service__tear_down_coordinator(mock_api):
+    """Check service function removes User who is already a Group member"""
     user = UserFactory()
     mock_api.group.members.return_value = [user.email]
     mock_api.user.get.return_value = {"id": user.id}
@@ -219,8 +294,8 @@ def test_tear_down_coordinator_A(mock_api):
 
 
 @pytest.mark.django_db
-def test_tear_down_coordinator_B(mock_api):
-    """Check service function doesn't remove User who is not already a Group member."""
+def test_ms_service__tear_down_coordinator_that_is_not_member(mock_api):
+    """Check service function doesn't remove User who is not already a Group member"""
     user = UserFactory()
     mock_api.group.members.return_value = []
 

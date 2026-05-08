@@ -51,6 +51,7 @@ dependencies = [
     "google-api-python-client>=2.188.0",
     "google-auth-httplib2>=0.3.0",
     "google-auth-oauthlib>=1.2.4",
+    "django-fernet-encrypted-fields>=0.4.0",
 ]
 
 [dependency-groups]

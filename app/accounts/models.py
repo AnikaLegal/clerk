@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from auditlog.registry import auditlog
+from encrypted_fields.fields import EncryptedCharField
 
 
 class CaseGroups(models.TextChoices):
@@ -47,6 +48,9 @@ class User(AbstractUser):
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)
     ms_account_created_at = models.DateTimeField(blank=True, null=True)
+    ms_account_initial_password = EncryptedCharField(
+        max_length=255, blank=True, null=True
+    )
     university = models.ForeignKey(
         University, blank=True, null=True, on_delete=models.PROTECT
     )

@@ -263,6 +263,7 @@ dependencies = [
     { name = "django-auditlog" },
     { name = "django-cleanup" },
     { name = "django-cors-headers" },
+    { name = "django-fernet-encrypted-fields" },
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-recaptcha" },
@@ -324,6 +325,7 @@ requires-dist = [
     { name = "django-auditlog", specifier = ">=3.2.1" },
     { name = "django-cleanup" },
     { name = "django-cors-headers" },
+    { name = "django-fernet-encrypted-fields", specifier = ">=0.4.0" },
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-recaptcha", specifier = ">=4.1.0" },
@@ -548,6 +550,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8a/f1/318684c9466968bf9a9c221663128206e460c1a67f595055be4b284cde8a/django-extensions-3.2.3.tar.gz", hash = "sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a", size = 277216, upload-time = "2023-06-05T17:09:01.447Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/7e/ba12b9660642663f5273141018d2bec0a1cae1711f4f6d1093920e157946/django_extensions-3.2.3-py3-none-any.whl", hash = "sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401", size = 229868, upload-time = "2023-06-05T17:08:58.197Z" },
+]
+
+[[package]]
+name = "django-fernet-encrypted-fields"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/d7/df0426ebf5b1784d064825ec8e5940e634991452066cfacc7fe0138f091a/django_fernet_encrypted_fields-0.4.0.tar.gz", hash = "sha256:836c927a260a834a35c4caecf82a97a5e411408cbecb44e25caddd02d8cdd86e", size = 5505, upload-time = "2026-04-14T01:25:15.216Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/75/c6de2333c26d0052d2175bf21dc3f5c45e878090946a75fb0c827da6e40a/django_fernet_encrypted_fields-0.4.0-py3-none-any.whl", hash = "sha256:b3e4049882b8c7216d868b7aa7533e466a48c1307b5d4b1b8dc4cb5946d87eec", size = 5681, upload-time = "2026-04-14T01:25:13.309Z" },
 ]
 
 [[package]]

@@ -22,7 +22,9 @@ def handle_user_added_to_case(sender, user, issue, **kwargs):
         mgr.user_added_to_case(user, issue)
     except Exception:
         logger.exception(
-            "Failure handling user event: user %s added to case %s", user, issue
+            "Failure handling user event: User<%s> added to Issue<%s>",
+            user.pk,
+            issue.pk,
         )
 
 
@@ -33,7 +35,9 @@ def handle_user_removed_from_case(sender, user, issue, **kwargs):
         mgr.user_removed_from_case(user, issue)
     except Exception:
         logger.exception(
-            "Failure handling user event: user %s removed from case %s", user, issue
+            "Failure handling user event: User<%s> removed from Issue<%s>",
+            user.pk,
+            issue.pk,
         )
 
 
@@ -43,7 +47,7 @@ def handle_user_activated(sender, user, **kwargs):
     try:
         mgr.user_activated(user)
     except Exception:
-        logger.exception("Failure handling user event: user %s activated", user)
+        logger.exception("Failure handling user event: User<%s> activated", user.pk)
 
 
 @receiver(events.user_deactivated)
@@ -52,26 +56,13 @@ def handle_user_deactivated(sender, user, **kwargs):
     try:
         mgr.user_deactivated(user)
     except Exception:
-        logger.exception("Failure handling user event: user %s deactivated", user)
+        logger.exception("Failure handling user event: User<%s> deactivated", user.pk)
 
 
-@receiver(events.user_added_to_group)
-def handle_user_added_to_group(sender, user, group, **kwargs):
+@receiver(events.user_role_changed)
+def handle_user_role_changed(sender, user, **kwargs):
     mgr = get_user_event_manager()
     try:
-        mgr.user_added_to_group(user, group)
+        mgr.user_role_changed(user)
     except Exception:
-        logger.exception(
-            "Failure handling user event: user %s added to group %s", user, group
-        )
-
-
-@receiver(events.user_removed_from_group)
-def handle_user_removed_from_group(sender, user, group, **kwargs):
-    mgr = get_user_event_manager()
-    try:
-        mgr.user_removed_from_group(user, group)
-    except Exception:
-        logger.exception(
-            "Failure handling user event: user %s removed from group %s", user, group
-        )
+        logger.exception("Failure handling user event: User<%s> role changed", user.pk)

@@ -1,11 +1,13 @@
 from auditlog.models import LogEntry
 from auditlog.receivers import post_log
-from django.contrib.auth.models import Group
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
+from django_q.tasks import async_task
+from microsoft import events as ms_events
 
 from accounts import events
 from accounts.models import User
+from accounts.tasks import welcome_user_task
 
 
 @receiver(post_log, sender=User)
@@ -40,22 +42,14 @@ def m2m_changed_user_groups(sender, instance, action, **kwargs):
     if pk_set is None:
         return
 
-    # Clear cached role to ensure it is recalculated based on current groups.
-    user.clear_role()
+    if action in ("post_add", "post_remove"):
+        # Clear cached role to ensure it is recalculated based on current groups.
+        user.clear_role()
+        events.user_role_changed.send(sender=User, user=user)
 
-    # Emit appropriate events based on the action.
-    queryset = Group.objects.filter(pk__in=pk_set)
-    if action == "post_add":
-        for group in queryset:
-            events.user_added_to_group.send(
-                sender=User,
-                user=user,
-                group=group,
-            )
-    elif action == "post_remove":
-        for group in queryset:
-            events.user_removed_from_group.send(
-                sender=User,
-                user=user,
-                group=group,
-            )
+
+# We have to wait until the MS account is created before sending the welcome
+# email, as the email contains the initial MS password.
+@receiver(ms_events.ms_account_created, sender=User)
+def ms_account_created_user(sender, user, **kwargs):
+    async_task(welcome_user_task, user.pk)

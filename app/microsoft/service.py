@@ -1,3 +1,4 @@
+from PIL.IptcImagePlugin import i
 import logging
 from dataclasses import dataclass
 from os.path import basename
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from emails.models import Email, EmailAttachment
+from microsoft import events
 from microsoft.endpoints import MSGraphAPI
 
 logger = logging.getLogger(__name__)
@@ -83,12 +85,19 @@ def set_up_new_user(user):
     """
     api = MSGraphAPI()
     ms_account = api.user.get(user.email)
-
     if not ms_account:
+        logger.info("Creating Microsoft account for User<%s>", user.pk)
+
         _, password = api.user.create(user.first_name, user.last_name, user.email)
-        api.user.assign_license(user.email)
-        User.objects.filter(pk=user.pk).update(ms_account_created_at=timezone.now())
-        return password
+        User.objects.filter(pk=user.pk).update(
+            ms_account_created_at=timezone.now(), ms_account_initial_password=password
+        )
+
+        # Send a ms_account_created signal so that other services can react to the new account.
+        events.ms_account_created.send(
+            sender=User,
+            user=user,
+        )
 
 
 def add_office_licence(user):
@@ -98,7 +107,9 @@ def add_office_licence(user):
     api = MSGraphAPI()
     ms_account = api.user.get(user.email)
     if ms_account:
-        api.user.assign_license(user.email)
+        logger.info("Assigning Microsoft license for User<%s>", user.pk)
+        return api.user.assign_license(user.email)
+    return None
 
 
 def remove_office_licence(user):
@@ -106,12 +117,13 @@ def remove_office_licence(user):
     Removes MS account from a user.
     """
     api = MSGraphAPI()
-    ms_license = api.user.get_license(user.email)
-    has_license = ms_license is not None and ms_license.get("value")
-    if has_license and settings.MS_REMOVE_OFFICE_LICENCES:
-        api.user.remove_license(user.email)
-    elif has_license:
-        logger.info("Did not remove Office 365 licence for %s", user.email)
+    license = api.user.get_license(user.email)
+    if license is not None and license.get("value"):
+        logger.info("Removing Microsoft license for User<%s>", user.pk)
+        if settings.MS_REMOVE_OFFICE_LICENCES:
+            api.user.remove_license(user.email)
+        else:
+            logger.info("Licence removal is disabled in settings, skipping")
 
 
 def set_up_new_case(issue: Issue):
@@ -232,6 +244,8 @@ def add_user_to_case(user, issue):
     """
     Give User write permissions for a specific case (folder).
     """
+    logger.info("Adding User<%s> to case folder for Issue<%s>", user.pk, issue.pk)
+
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
     api.folder.create_permissions(case_path, "write", [user.email])
@@ -241,6 +255,8 @@ def remove_user_from_case(user, issue):
     """
     Delete the permissions that a User has for a specific case (folder).
     """
+    logger.info("Removing User<%s> from case folder for Issue<%s>", user.pk, issue.pk)
+
     api = MSGraphAPI()
     case_path = f"cases/{issue.id}"
 
@@ -284,6 +300,8 @@ def add_group_member(user):
     """
     Add User as Group member.
     """
+    logger.info("Adding User<%s> to Microsoft group", user.pk)
+
     api = MSGraphAPI()
     members = api.group.members()
     if user.email not in members:
@@ -294,6 +312,8 @@ def remove_group_member(user):
     """
     Remove User as Group member.
     """
+    logger.info("Removing User<%s> from Microsoft group", user.pk)
+
     api = MSGraphAPI()
     members = api.group.members()
     if user.email in members:

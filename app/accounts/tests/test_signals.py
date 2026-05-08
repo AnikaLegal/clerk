@@ -3,10 +3,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 from core.factories import IssueFactory, UserFactory
 from django.contrib.auth.models import Group
+from microsoft import events as ms_events
 from utils.signals import DisableSignals
 
 from accounts import registry
-from accounts.models import CaseGroups
+from accounts.models import CaseGroups, User
+from accounts.signals import ms_account_created_user
 
 # Fixtures
 
@@ -89,20 +91,21 @@ def test_delete_active_user(mock_user_event_mgr):
 @pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_add_group(mock_user_event_mgr, group_name, user):
     group = Group.objects.get(name=group_name)
-
     user.groups.add(group)
-    mock_user_event_mgr.user_added_to_group.assert_called_once_with(user, group)
+
+    mock_user_event_mgr.user_role_changed.assert_called_once_with(user)
 
 
 @pytest.mark.enable_signals
 @pytest.mark.django_db
 @pytest.mark.parametrize("group_name", CaseGroups.values)
 def test_remove_group(mock_user_event_mgr, group_name, user):
-    group = Group.objects.get(name=group_name)
-    user.groups.add(group)
-
+    with DisableSignals():
+        group = Group.objects.get(name=group_name)
+        user.groups.add(group)
     user.groups.remove(group)
-    mock_user_event_mgr.user_removed_from_group.assert_called_once_with(user, group)
+
+    mock_user_event_mgr.user_role_changed.assert_called_once_with(user)
 
 
 @pytest.mark.enable_signals
@@ -175,3 +178,15 @@ def test_remove_lawyer_from_case(mock_user_event_mgr, lawyer_user):
     mock_user_event_mgr.user_removed_from_case.assert_called_once_with(
         lawyer_user, issue
     )
+
+
+@pytest.mark.django_db
+def test_ms_signal__welcome_email_on_ms_account_created_signal_received():
+    """Test that when ms_account_created signal is received, welcome email is sent"""
+    user = UserFactory()
+    ms_events.ms_account_created.connect(ms_account_created_user, sender=User)
+
+    with patch("accounts.tasks.send_email") as mock_send_email:
+        ms_events.ms_account_created.send(sender=User, user=user)
+        mock_send_email.assert_called_once()
+        assert mock_send_email.call_args[1]["to_addr"] == user.email
