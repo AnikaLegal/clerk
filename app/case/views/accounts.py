@@ -7,12 +7,10 @@ from django.db.models.functions import Concat
 from django.db.models import Value
 from django.http import Http404
 from django.urls import reverse
-from django_q.tasks import async_task
 from google.service import list_directory_users
 from microsoft.service import get_user_permissions
 from microsoft.tasks import (
     reset_ms_access,
-    set_up_new_user_task,
 )
 from rest_framework.decorators import action, api_view
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -69,7 +67,7 @@ def account_create_page_view(request):
     context = {
         "group_values": CaseGroups.values,
     }
-    return render_react_page(request, "Invite paralegal", "account-create", context)
+    return render_react_page(request, "Invite users", "account-create", context)
 
 
 class AccountPaginator(ClerkPaginator):
@@ -131,9 +129,7 @@ class AccountApiViewset(
         """Create a new user account and set up their Microsoft access asynchronously."""
         serializer = UserCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
-        async_task(set_up_new_user_task, user.pk)
+        serializer.save()
         return Response(serializer.data, status=201)
 
     @action(

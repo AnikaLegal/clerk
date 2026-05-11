@@ -124,6 +124,11 @@ SILENCED_SYSTEM_CHECKS = [
     "django_vite.W001",  # Cannot read Vite manifest file for app default at /static/manifest.json
 ]
 
+# Encrypted fields.
+# Does not need to be secret, but must be set to a fixed value in all
+# environments to avoid breaking encryption.
+SALT_KEY = "Ucy8Us3DsAN6xvxOdPvSIQ"
+
 # Auditing
 AUDITLOG_STORE_JSON_CHANGES = True
 
