@@ -9,8 +9,6 @@ from .models import (
     JobPage,
     NewsListPage,
     NewsPage,
-    VolunteerListPage,
-    VolunteerPage,
 )
 
 
@@ -80,16 +78,10 @@ class NewsSitemap(WagtailSitemap):
     details_page = NewsPage
 
 
-class VolunteerSitemap(WagtailSitemap):
-    list_page = VolunteerListPage
-    details_page = VolunteerPage
-
-
 SITEMAPS = {
     "static": StaticSitemap,
     "blog": BlogSitemap,
     "resources": ResourceSitemap,
     "jobs": JobSitemap,
     "news": NewsSitemap,
-    "volunteers": VolunteerSitemap,
 }

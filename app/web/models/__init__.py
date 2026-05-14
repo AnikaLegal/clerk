@@ -9,7 +9,6 @@ from .report import Report
 from .resources import ResourceListPage, ResourcePage
 from .root import RootPage
 from .settings import LinkSettings
-from .volunteers import VolunteerListPage, VolunteerPage
 from .web_redirect import WebRedirect
 
 __all__ = [
@@ -30,7 +29,5 @@ __all__ = [
     "ResourceListPage",
     "ResourcePage",
     "RootPage",
-    "VolunteerListPage",
-    "VolunteerPage",
     "WebRedirect",
 ]
