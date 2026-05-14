@@ -49,9 +49,9 @@ class WagtailSitemap(sitemaps.Sitemap):
     def items(self):
         items = []
         if self.list_page:
-            items += list(self.list_page.objects.all())
+            items += list(self.list_page.objects.filter(live=True).specific())
         if self.details_page:
-            items += list(self.details_page.objects.all())
+            items += list(self.details_page.objects.filter(live=True).specific())
 
         return items
 
