@@ -5,11 +5,9 @@ import django.db.models.deletion
 import wagtail.blocks
 import wagtail.fields
 import wagtail.images.blocks
-import web.models.volunteers
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("wagtailcore", "0062_comment_models_and_pagesubscription"),
         ("wagtailimages", "0023_add_choose_permissions"),
@@ -57,9 +55,7 @@ class Migration(migrations.Migration):
                         [
                             (
                                 "heading",
-                                wagtail.blocks.CharBlock(
-                                    form_classname="full title"
-                                ),
+                                wagtail.blocks.CharBlock(form_classname="full title"),
                             ),
                             (
                                 "paragraph",

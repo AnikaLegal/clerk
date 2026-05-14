@@ -1,3 +1,5 @@
+import os
+
 from auditlog.models import LogEntry
 from auditlog.receivers import post_log
 from django.db.models.signals import m2m_changed
@@ -12,6 +14,13 @@ from accounts.tasks import welcome_user_task
 
 @receiver(post_log, sender=User)
 def post_log_user(sender, instance, action, changes, **kwargs):
+    # Skip this is a specific environment variable is set, to avoid triggering
+    # events during local account creation.
+    # TODO: remove when we implement auto-provisioning and can remove most of
+    # the MS account creation / update related code.
+    if os.getenv("CLERK_SKIP_USER_EVENTS"):
+        return
+
     user: User = instance
     if action == LogEntry.Action.CREATE:
         if user.is_active:

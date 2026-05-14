@@ -9,8 +9,6 @@ from .models import (
     JobPage,
     NewsListPage,
     NewsPage,
-    VolunteerListPage,
-    VolunteerPage,
 )
 
 
@@ -51,9 +49,9 @@ class WagtailSitemap(sitemaps.Sitemap):
     def items(self):
         items = []
         if self.list_page:
-            items += list(self.list_page.objects.all())
+            items += list(self.list_page.objects.filter(live=True).specific())
         if self.details_page:
-            items += list(self.details_page.objects.all())
+            items += list(self.details_page.objects.filter(live=True).specific())
 
         return items
 
@@ -80,16 +78,10 @@ class NewsSitemap(WagtailSitemap):
     details_page = NewsPage
 
 
-class VolunteerSitemap(WagtailSitemap):
-    list_page = VolunteerListPage
-    details_page = VolunteerPage
-
-
 SITEMAPS = {
     "static": StaticSitemap,
     "blog": BlogSitemap,
     "resources": ResourceSitemap,
     "jobs": JobSitemap,
     "news": NewsSitemap,
-    "volunteers": VolunteerSitemap,
 }

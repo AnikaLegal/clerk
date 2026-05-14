@@ -428,6 +428,32 @@ TEAM_MEMBERS = [
             renters.""",
         ],
     },
+    {
+        "image": "web/img/photos/team/kawshi.png",
+        "name": "Kawshalya Manisegaran",
+        "title": "Lawyer",
+        "linkedin": "https://www.linkedin.com/in/kmanisegaran/",
+        "brags": [
+            """Kawshi is a a member of our casework team, and is responsible for
+            supporting our paralegals and delivering legal services directly to
+            clients.""",
+            """Kawshi is generously seconded to us from Barry Nilsson where she
+            works as National Pro Bono Manager & Senior Associate.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/tom.png",
+        "name": "Tom Fletcher",
+        "title": "Lawyer",
+        "linkedin": "https://www.linkedin.com/in/tom-fletcher-9586971b3/",
+        "brags": [
+            """Tom is a a member of our casework team, and is responsible for
+            supporting our paralegals and delivering legal services directly to
+            clients.""",
+            """Tom is generously seconded to us from Hall & Wilcox where he
+            works as an Associate in the Pro Bono & Community team.""",
+        ],
+    },
 ]
 
 TESTIMONIALS = [
