@@ -434,7 +434,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "https://www.linkedin.com/in/kmanisegaran/",
         "brags": [
-            """Kawshi is a a member of our casework team, and is responsible for
+            """Kawshi is a member of our casework team, and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
             """Kawshi is generously seconded to us from Barry Nilsson where she
@@ -447,7 +447,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "https://www.linkedin.com/in/tom-fletcher-9586971b3/",
         "brags": [
-            """Tom is a a member of our casework team, and is responsible for
+            """Tom is a member of our casework team, and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
             """Tom is generously seconded to us from Hall & Wilcox where he
