@@ -118,7 +118,7 @@ BOARD = [
             supporting economic sustainability in vulnerable Asia Pacific
             communities.""",
             """Kim retired from legal practice in June 2025 after 34
-            years at Maurice Blackburn Lawyers, where she served on the firm’s
+            years at Maurice Blackburn Lawyers, where she served on the firm's
             Board for six years. She has also served on advisory boards at RMIT
             Law School and the Law Institute of Victoria.""",
         ],
@@ -140,7 +140,7 @@ BOARD = [
             with Legal Aid Commissions and community legal centres nationwide to
             secure over $10 million in funding for access to justice
             initiatives. His extensive history of leadership and expertise in
-            digital transformation supports Anika Legal’s mission to scale
+            digital transformation supports Anika Legal's mission to scale
             innovative, tech-driven legal solutions for access to justice."""
         ],
     },
@@ -156,7 +156,7 @@ BOARD = [
             Legal Services Board and Commissioner, she brings deep expertise in
             shaping legal policy and practice, alongside executive leadership
             experience at Tenants Victoria and Southside Justice. Her wealth of
-            experience strengthens Anika Legal’s mission to create a fairer
+            experience strengthens Anika Legal's mission to create a fairer
             housing system for renters.""",
         ],
     },
@@ -356,7 +356,7 @@ TEAM_MEMBERS = [
         "title": "Head of Operations",
         "linkedin": "https://www.linkedin.com/in/jacqui-siebel-a4984337/",
         "brags": [
-            """Jacqui leads Anika’s operations portfolio, keeping the engine of
+            """Jacqui leads Anika's operations portfolio, keeping the engine of
             our legal practice running.""",
             """Jacqui was previously a Project, Data & Engagement Lead at
             Justice Connect and has considerable community legal sector
@@ -434,7 +434,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "https://www.linkedin.com/in/kmanisegaran/",
         "brags": [
-            """Kawshi is a member of our casework team, and is responsible for
+            """Kawshi is a member of our casework team and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
             """Kawshi is generously seconded to us from Barry Nilsson where she
@@ -447,7 +447,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "https://www.linkedin.com/in/tom-fletcher-9586971b3/",
         "brags": [
-            """Tom is a member of our casework team, and is responsible for
+            """Tom is a member of our casework team and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
             """Tom is generously seconded to us from Hall & Wilcox where he
@@ -477,25 +477,25 @@ TESTIMONIALS = [
         "name": "Hieu",
         "testimonial": """[Anika] was really quick with everything, like the
         follow-up, and also tried their best to help out. I feel like I at least
-        had someone else on my side who helped me work things out.. If it wasn’t
-        for Anika I don’t think I would have pursued the negotiations on my own.
+        had someone else on my side who helped me work things out.. If it wasn't
+        for Anika I don't think I would have pursued the negotiations on my own.
         Now [my rent] is actually reduced.""",
         "image": "web/img/testimonials/hieu.jpg",
     },
     {
         "name": "Erica",
-        "testimonial": """I would give Anika a 10! I didn’t have any issues at
+        "testimonial": """I would give Anika a 10! I didn't have any issues at
         all and I thought the service went super well. It was exactly what I
         needed. Having the law on your side makes you feel way more comfortable
         with dealing with these things, especially because in the past I have
-        been told that I am just a young renter who doesn’t have any rights. I
-        didn’t realise that as a renter I actually had some power!""",
+        been told that I am just a young renter who doesn't have any rights. I
+        didn't realise that as a renter I actually had some power!""",
         "image": "web/img/testimonials/erica.jpg",
     },
     {
         "name": "Louise",
-        "testimonial": """Anika was exactly the service I needed - I couldn’t
-        have asked for anything better. I was so used to everyone else that I’d
+        "testimonial": """Anika was exactly the service I needed - I couldn't
+        have asked for anything better. I was so used to everyone else that I'd
         dealt with letting me down - agents, landlords, even law firms. Sam (the
         Anika law student) was just that one solid person I could completely
         count on when I needed him. The empathy that everyone at Anika showed
