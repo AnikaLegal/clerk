@@ -69,27 +69,23 @@ class PersonApiViewset(ModelViewSet):
 
         if self.action == "list":
             if user.is_paralegal:
-                queryset = self._filter_by_issue_role(queryset, user, "paralegal")
+                query = (
+                    Q(landlord_tenancy__issue__paralegal=user)
+                    | Q(agent_tenancy__issue__paralegal=user)
+                    | Q(support_worker_issue__paralegal=user)
+                )
+                queryset = queryset.filter(query).distinct()
             elif user.is_lawyer:
-                queryset = self._filter_by_issue_role(queryset, user, "lawyer")
+                query = (
+                    Q(landlord_tenancy__issue__lawyer=user)
+                    | Q(agent_tenancy__issue__lawyer=user)
+                    | Q(support_worker_issue__lawyer=user)
+                )
+                queryset = queryset.filter(query).distinct()
 
             queryset = self.search_queryset(queryset)
 
         return queryset
-
-    def _filter_by_issue_role(
-        self, queryset: QuerySet[Person], user, role: str
-    ) -> QuerySet[Person]:
-        paths = [
-            "support_worker_issue",
-            "agent_tenancy__issue",
-            "landlord_tenancy__issue",
-        ]
-        role_filter = Q()
-        for path in paths:
-            role_filter |= Q(**{f"{path}__{role}": user})
-
-        return queryset.filter(role_filter).distinct()
 
     def search_queryset(self, queryset: QuerySet[Person]) -> QuerySet[Person]:
         serializer = PersonSearchRequestSerializer(data=self.request.query_params)
