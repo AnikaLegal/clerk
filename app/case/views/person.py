@@ -1,4 +1,4 @@
-from core.models import Issue, Person
+from core.models import Issue, Person, Tenancy
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
@@ -65,8 +65,24 @@ class PersonApiViewset(ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        user = self.request.user
 
         if self.action == "list":
+            if user.is_paralegal:
+                query = (
+                    Q(landlord_tenancy__issue__paralegal=user)
+                    | Q(agent_tenancy__issue__paralegal=user)
+                    | Q(support_worker_issue__paralegal=user)
+                )
+                queryset = queryset.filter(query).distinct()
+            elif user.is_lawyer:
+                query = (
+                    Q(landlord_tenancy__issue__lawyer=user)
+                    | Q(agent_tenancy__issue__lawyer=user)
+                    | Q(support_worker_issue__lawyer=user)
+                )
+                queryset = queryset.filter(query).distinct()
+
             queryset = self.search_queryset(queryset)
 
         return queryset

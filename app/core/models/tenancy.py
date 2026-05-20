@@ -36,10 +36,20 @@ class Tenancy(TimestampedModel):
         max_length=32, choices=RentalType.choices, blank=True, default=""
     )
     landlord = models.ForeignKey(
-        Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        Person,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        related_query_name="landlord_tenancy",
     )
     agent = models.ForeignKey(
-        Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        Person,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        related_query_name="agent_tenancy",
     )
 
     def check_permission(self, user: User) -> bool:
