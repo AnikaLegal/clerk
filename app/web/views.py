@@ -146,7 +146,7 @@ BOARD = [
     },
     {
         "image": "web/img/photos/board/agata.png",
-        "name": "Agata Weirzbowski",
+        "name": "Agata Wierzbowski",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/agata-wierzbowski-9964b0125/",
         "brags": [
