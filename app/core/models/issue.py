@@ -179,7 +179,12 @@ class Issue(TimestampedModel):
     )
     # Person managing clients case from a 3rd party institution (eg. Launch Housing)
     support_worker = models.ForeignKey(
-        Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        Person,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        related_query_name="support_worker_issue",
     )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
