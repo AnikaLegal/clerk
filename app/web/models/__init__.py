@@ -3,6 +3,7 @@ from .blog import BlogListPage, BlogPage
 from .dashboard import DashboardItem
 from .document import CustomDocument, DocumentLog
 from .feedback import ContentFeedback
+from .impact import Impact, ImpactImage
 from .jobs import JobListPage, JobPage
 from .news import ExternalNews, NewsListPage, NewsPage
 from .report import Report
@@ -20,6 +21,8 @@ __all__ = [
     "DashboardItem",
     "DocumentLog",
     "ExternalNews",
+    "Impact",
+    "ImpactImage",
     "JobListPage",
     "JobPage",
     "LinkSettings",

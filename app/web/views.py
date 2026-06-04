@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .models import BlogListPage, DashboardItem
+from .models import BlogListPage, DashboardItem, Impact
 from .forms import ContactForm, ContentFeedbackForm
 
 
@@ -26,7 +26,8 @@ def landing_view(request):
 
 @require_http_methods(["GET"])
 def impact_view(request):
-    return render(request, "web/about/impact.html", {})
+    impact = Impact.objects.filter(live=True).prefetch_related("images").last()
+    return render(request, "web/about/impact.html", {"impact": impact})
 
 
 @require_http_methods(["GET"])

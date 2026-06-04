@@ -92,7 +92,7 @@ p.header {
 }
 
 /* Buttons */
-button:not(.d-btn) {
+button:not(.d-btn, .gbtn) {
   color: var(--white);
   background: var(--blue);
   font-weight: bold;
@@ -109,14 +109,14 @@ button:not(.d-btn) {
   box-shadow: 0px 4px 4px rgba(67, 143, 239, 0.18);
 }
 @media (max-width: 600px) {
-  button:not(.d-btn) {
+  button:not(.d-btn, .gbtn) {
     margin: 0 auto;
     width: 270px;
     max-width: 100%;
     padding: 14px 30px;
   }
 }
-button:not(.d-btn).inverted {
+button:not(.d-btn, .gbtn).inverted {
   color: var(--blue);
   background: var(--white);
   border: 1px solid var(--blue);

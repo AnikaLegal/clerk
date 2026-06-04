@@ -33,6 +33,7 @@ dependencies = [
     "openapi-spec-validator",
     "pillow",
     "psycopg2-binary",
+    "pypdfium2",
     "pygments",
     "pytest-django",
     "pytest-factoryboy",

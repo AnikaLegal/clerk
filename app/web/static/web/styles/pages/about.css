@@ -3,6 +3,141 @@
   padding-bottom: 100px;
 }
 
+/* Impact carousel
+ */
+.impact-embla {
+  --slide-size: 100%;
+  --slide-spacing: 1rem;
+  user-select: none;
+}
+
+.impact-embla__viewport {
+  overflow: hidden;
+  background: var(--color-slate-100);
+  padding: 1rem;
+  border-radius: var(--radius-box);
+}
+
+.impact-embla__container {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+  margin-left: calc(var(--slide-spacing) * -1);
+}
+
+.impact-embla__slide {
+  flex: 0 0 var(--slide-size);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
+}
+
+.impact-embla__slide-inner {
+  overflow: hidden;
+  max-height: 650px;
+}
+
+.impact-embla__img {
+  width: 100%;
+  height: 100%;
+  max-height: 650px;
+  display: block;
+  object-fit: contain;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.impact-embla__img:hover {
+  opacity: 0.9;
+}
+
+.impact-embla__controls {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+
+.impact-embla__prev-next {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.impact-embla__btn {
+  width: 2rem;
+  min-height: 2rem;
+  height: 2rem;
+}
+
+.impact-embla__btn-svg {
+  width: 35%;
+  height: 35%;
+}
+
+.impact-embla__counter {
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.impact-embla__scrollbar {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  height: 0.25rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.impact-embla__scrollbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: #000;
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.impact-embla__scrollbar::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+.impact-embla__scrollbar::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 9999px;
+  background: #000;
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.impact-embla__scrollbar::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+@media (width >= 64rem) {
+  .impact-embla {
+    --slide-size: 50%;
+  }
+}
+
+/* Lightbox
+*/
+.glightbox-clean .gslide-description {
+  background: transparent;
+  color: var(--color-neutral-200);
+  text-align: center;
+}
+
 /* General flexbox stuff.
  */
 .box {
@@ -28,7 +163,7 @@
   justify-content: center;
   gap: 30px;
 }
- #vision {
+#vision {
   .box {
     gap: 30px;
   }
@@ -51,7 +186,7 @@
     font-size: medium;
     text-align: left;
   }
- }
+}
 @media (max-width: 1300px) {
   .brag {
     padding-top: 30px;
