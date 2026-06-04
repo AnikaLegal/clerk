@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
+    "wagtail_link_block",
     "wagtail_localize",
     "wagtail_localize.locales",
     "modelcluster",
@@ -114,6 +115,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
+                "web.context_processors.intake_url",
             ],
         },
     }

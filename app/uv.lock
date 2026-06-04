@@ -264,10 +264,12 @@ dependencies = [
     { name = "django-cleanup" },
     { name = "django-cors-headers" },
     { name = "django-fernet-encrypted-fields" },
+    { name = "django-modelcluster" },
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-recaptcha" },
     { name = "django-storages" },
+    { name = "django-taggit" },
     { name = "django-vite" },
     { name = "djangorestframework" },
     { name = "drf-openapi-tester" },
@@ -296,6 +298,7 @@ dependencies = [
     { name = "twilio" },
     { name = "tzdata" },
     { name = "wagtail" },
+    { name = "wagtail-link-block" },
     { name = "wagtail-localize" },
     { name = "whitenoise" },
 ]
@@ -326,10 +329,12 @@ requires-dist = [
     { name = "django-cleanup" },
     { name = "django-cors-headers" },
     { name = "django-fernet-encrypted-fields", specifier = ">=0.4.0" },
+    { name = "django-modelcluster" },
     { name = "django-override-storage" },
     { name = "django-q2" },
     { name = "django-recaptcha", specifier = ">=4.1.0" },
     { name = "django-storages" },
+    { name = "django-taggit" },
     { name = "django-vite", specifier = ">=3.1.0" },
     { name = "djangorestframework" },
     { name = "drf-openapi-tester" },
@@ -358,6 +363,7 @@ requires-dist = [
     { name = "twilio" },
     { name = "tzdata" },
     { name = "wagtail", specifier = ">=7.2.0" },
+    { name = "wagtail-link-block", specifier = ">=1.2" },
     { name = "wagtail-localize" },
     { name = "whitenoise" },
 ]
@@ -2083,6 +2089,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/83/1a/79dc8e4cb9ea51f26096e5ce7c8f1619c9534edffe2c7d27b1791e20f2be/wagtail-7.2.tar.gz", hash = "sha256:8a39df908bd64ab029e08bf191f475f54cc914f84aa41e9ae79b41bf41d55ec3", size = 6757172, upload-time = "2025-11-05T12:27:52.195Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2d/da/55b302face51c505ebeb1df349c90455058362d53ed5c29114647a8fdbba/wagtail-7.2-py3-none-any.whl", hash = "sha256:2c0d41545976b57266e84df3f03e7dd812e6a4d0a8d61d5b76863fe021613973", size = 9229326, upload-time = "2025-11-05T12:27:46.459Z" },
+]
+
+[[package]]
+name = "wagtail-link-block"
+version = "1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "wagtail" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/24/ee086c313b36cc10b088331ba0eb64d838d349d5fba50235dc08d4a1f35d/wagtail_link_block-1.2.tar.gz", hash = "sha256:f0ae53801f46cd90cb9f176ea3af4ae96e0dbb029b6942e1af8561e432219ecd", size = 8243, upload-time = "2026-03-26T14:06:36.675Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/f6/12922f4e2d4ea33431e4e328f18257a17d913aa067868fb21c8b7fbf4d49/wagtail_link_block-1.2-py3-none-any.whl", hash = "sha256:1079c0d9839d50be8ae34936c43f024b3f02390623f70dd60cd2a2f74680ab11", size = 8792, upload-time = "2026-03-26T14:06:35.263Z" },
 ]
 
 [[package]]

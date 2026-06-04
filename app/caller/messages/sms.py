@@ -3,11 +3,13 @@
 INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
 
 
+from django.conf import settings
+
 # The SMS message we send to people who are enquiring about repairs.
-REPAIRS_SMS_MESSAGE = """
+REPAIRS_SMS_MESSAGE = f"""
 Thank you for enquiring about Anika's rental repairs service.
 
-To get help, please fill in this form: https://intake.anikalegal.org.au
+To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 
@@ -15,10 +17,10 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 """
 
 # The SMS message we send to people who are enquiring about bonds.
-BONDS_SMS_MESSAGE = """
+BONDS_SMS_MESSAGE = f"""
 Thank you for enquiring about Anika's bonds service.
 
-To get help, please fill in this form: https://intake.anikalegal.org.au
+To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 
@@ -27,10 +29,10 @@ If you have any other enquiries you can email us at contact@anikalegal.com
 
 
 # The SMS message we send to people who are enquiring about evictions.
-EVICTIONS_SMS_MESSAGE = """
+EVICTIONS_SMS_MESSAGE = f"""
 Thank you for enquiring about Anika's retaliatory eviction service.
 
-To get help, please fill in this form: https://intake.anikalegal.org.au
+To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 

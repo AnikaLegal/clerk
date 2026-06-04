@@ -1,0 +1,22 @@
+{
+  "name": "clerk-web",
+  "version": "1.0.0",
+  "description": "DaisyUI styling for Clerk web app",
+  "scripts": {
+    "build:css": "mkdir -p /dist/web/styles && npx @tailwindcss/cli -i src/input.css -o /dist/web/styles/daisyui.css --minify",
+    "watch:css": "mkdir -p /dist/web/styles && npx @tailwindcss/cli -i src/input.css -o /dist/web/styles/daisyui.css --watch=always",
+    "build:js": "mkdir -p /dist/web/scripts && cp ./node_modules/htmx.org/dist/htmx.min.js /dist/web/scripts/htmx.min.js && cp ./node_modules/embla-carousel/embla-carousel.umd.js /dist/web/scripts/embla-carousel.umd.js && cp ./node_modules/embla-carousel-autoplay/embla-carousel-autoplay.umd.js /dist/web/scripts/embla-carousel-autoplay.umd.js",
+    "build": "npm run build:css && npm run build:js",
+    "watch": "npm run build:js && npm run watch:css"
+  },
+  "dependencies": {
+    "embla-carousel": "^8.6.0",
+    "embla-carousel-autoplay": "^8.6.0",
+    "htmx.org": "^2.0.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "daisyui": "^5.5.19",
+    "tailwindcss": "^4.2.2"
+  }
+}

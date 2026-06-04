@@ -47,6 +47,8 @@ urlpatterns = [
     re_path(r"^case/(?P<path>.*)", RedirectView.as_view(url="/clerk/%(path)s")),
     path("accounts/", include("accounts.urls")),
     path("email/", include(email_urls)),
+    # How it works
+    path("how-it-works/", template("web/how-it-works.html"), name="how-it-works"),
     # About
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
@@ -54,23 +56,18 @@ urlpatterns = [
     path("about/impact/", views.impact_view, name="impact"),
     # Services
     path(
-        "services/",
-        template("web/services/services.html"),
-        name="services",
-    ),
-    path(
         "services/rental-repairs/",
-        template("web/services/repairs.html"),
+        views.repairs_view,
         name="repairs",
     ),
     path(
         "services/bond-recovery/",
-        template("web/services/bonds.html"),
+        views.bonds_view,
         name="bonds",
     ),
     path(
         "services/eviction-support/",
-        template("web/services/evictions.html"),
+        views.evictions_view,
         name="evictions",
     ),
     path(
@@ -93,11 +90,6 @@ urlpatterns = [
         "partners/universities/",
         template("web/partners/universities.html"),
         name="university-partners",
-    ),
-    path(
-        "partners/community-organisations/",
-        template("web/partners/community-organisations.html"),
-        name="community-partners",
     ),
     path(
         "partners/law-students/",

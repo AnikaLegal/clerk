@@ -39,9 +39,6 @@ allOf:
         $ref: ./Client.yaml
       employment_status:
         $ref: ./TextChoiceListField.yaml
-      weekly_income:
-        type: number
-        nullable: true
       referrer:
         type: string
       referrer_type:
@@ -50,6 +47,9 @@ allOf:
         $ref: ./Tenancy.yaml
       weekly_rent:
         type: integer
+        nullable: true
+      annual_income_range:
+        $ref: ./TextChoiceField.yaml
         nullable: true
       support_worker:
         nullable: true
@@ -96,7 +96,6 @@ allOf:
       - lawyer
       - client
       - employment_status
-      - weekly_income
       - referrer
       - referrer_type
       - tenancy

@@ -104,6 +104,10 @@ properties:
       weekly_income:
         type: integer
         nullable: true
+      annual_income_range:
+        allOf:
+          - $ref: ./ChoiceDisplay.yaml
+        nullable: true
       employment_status:
         type: array
         items:

@@ -79,3 +79,4 @@ MS_REMOVE_OFFICE_LICENCES = True
 SLACK_EMAIL_ALERT_OVERRIDE = None
 CLERK_BASE_URL = "https://anikalegal.org.au"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
+INTAKE_URL = "https://intake.anikalegal.org.au"

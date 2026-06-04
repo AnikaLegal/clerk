@@ -1780,6 +1780,10 @@ components:
             weekly_income:
               type: integer
               nullable: true
+            annual_income_range:
+              allOf:
+                - $ref: "#/components/schemas/ChoiceDisplay"
+              nullable: true
             employment_status:
               type: array
               items:
@@ -2433,9 +2437,6 @@ components:
               $ref: "#/components/schemas/Client"
             employment_status:
               $ref: "#/components/schemas/TextChoiceListField"
-            weekly_income:
-              type: number
-              nullable: true
             referrer:
               type: string
             referrer_type:
@@ -2444,6 +2445,9 @@ components:
               $ref: "#/components/schemas/Tenancy"
             weekly_rent:
               type: integer
+              nullable: true
+            annual_income_range:
+              $ref: "#/components/schemas/TextChoiceField"
               nullable: true
             support_worker:
               nullable: true
@@ -2489,7 +2493,6 @@ components:
             - lawyer
             - client
             - employment_status
-            - weekly_income
             - referrer
             - referrer_type
             - tenancy
@@ -2613,8 +2616,8 @@ components:
               nullable: true
             employment_status:
               type: string
-            weekly_income:
-              type: number
+            annual_income_range:
+              type: string
               nullable: true
             referrer:
               type: string
@@ -2728,8 +2731,8 @@ components:
           nullable: true
         employment_status:
           type: string
-        weekly_income:
-          type: number
+        annual_income_range:
+          type: string
           nullable: true
         referrer:
           type: string

@@ -23,7 +23,6 @@ class StaticSitemap(sitemaps.Sitemap):
             "reports",
             "team",
             "impact",
-            "services",
             "repairs",
             "bonds",
             "evictions",
@@ -31,7 +30,6 @@ class StaticSitemap(sitemaps.Sitemap):
             "philanthropy-partners",
             "corporate-partners",
             "university-partners",
-            "community-partners",
             "law-student-partners",
         ]
 
