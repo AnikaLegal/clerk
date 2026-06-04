@@ -1,6 +1,8 @@
+from core.models.issue import CaseTopic, EmploymentType, IncomeRange, ReferrerType
 from rest_framework import serializers
-from core.models.issue import CaseTopic, EmploymentType, ReferrerType
+
 from case.serializers.fields import ChoiceDisplayField
+
 from .fields import StringOrListField
 from .person import PersonSerializer
 
@@ -10,6 +12,9 @@ class IssueSerializer(serializers.Serializer):
         allow_null=True, child=ChoiceDisplayField(choices=CaseTopic.CHOICES)
     )
     weekly_income = serializers.IntegerField(allow_null=True)
+    annual_income_range = ChoiceDisplayField(
+        allow_null=True, choices=IncomeRange.choices
+    )
     employment_status = StringOrListField(
         allow_null=True, child=ChoiceDisplayField(choices=EmploymentType.choices)
     )
@@ -21,9 +26,10 @@ class IssueSerializer(serializers.Serializer):
     def to_representation(self, instance):  # pyright: ignore [reportIncompatibleMethodOverride]
         instance = {
             "issues": instance.get("ISSUES"),
-            "weekly_income": instance.get("WEEKLY_HOUSEHOLD_INCOME")
+            "weekly_income": instance.get("WEEKLY_HOUSEHOLD_INCOME")  # NB legacy value
             or instance.get("WEEKLY_INCOME_MULTI")  # NB legacy value
             or instance.get("WEEKLY_INCOME"),  # NB legacy value
+            "annual_income_range": instance.get("ANNUAL_INCOME_RANGE"),
             "employment_status": instance.get("WORK_OR_STUDY_CIRCUMSTANCES"),
             "referrer": instance.get("SOCIAL_REFERRER")
             or instance.get("COMMUNITY_ORGANISATION_REFERRER")

@@ -22,7 +22,6 @@ URLS_TO_TEST_BY_NAME = [
     ("reports", 200),
     ("team", 200),
     ("impact", 200),
-    ("services", 200),
     ("repairs", 200),
     ("bonds", 200),
     ("evictions", 200),
@@ -31,7 +30,6 @@ URLS_TO_TEST_BY_NAME = [
     ("philanthropy-partners", 200),
     ("corporate-partners", 200),
     ("university-partners", 200),
-    ("community-partners", 200),
     ("law-student-partners", 200),
     ("django.contrib.sitemaps.views.sitemap", 200),
 ]

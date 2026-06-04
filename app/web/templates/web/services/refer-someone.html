@@ -17,12 +17,12 @@
         <div class="content">
           <h1>Refer someone to Anika</h1>
           <p style="max-width: 530px">
-            Anika provides free legal advice and ongoing casework to vulnerable renters who need <strong>repairs</strong> performed in their rental or need assistance in getting their <strong>bond</strong> returned.
+            Anika provides free legal advice and ongoing casework to vulnerable renters who need <strong>repairs</strong> performed in their rental, are facing <strong>retaliatory eviction</strong>, or need assistance in getting their <strong>bond</strong> returned.
           </p>
           <p style="max-width: 530px">
             You can refer someone to Anika Legal's services by helping them fill out this 10 minute questionnaire, or sending an email to <strong>referrals@anikalegal.com</strong>.
           </p>
-          <a href="https://intake.anikalegal.org.au/"><button>Refer someone</button></a>
+          <a href="{{ INTAKE_URL }}"><button>Refer someone</button></a>
         </div>
         <img class="round top-left bottom-left" src="{% static 'web/img/photos/refer-hero.jpg' %}" />
       </div>
@@ -44,6 +44,12 @@
           <h2>Bond recovery</h2>
           <p>We can help Victorian renters negotiate the bond amount that is returned at the end of their tenancy.</p>
           <a href="{% url 'bonds' %}"><button>Learn more</button></a>
+        </div>
+        <div class="card">
+          <img class="icon" src="{% static 'web/img/icons/document.svg' %}" />
+          <h2>Retaliatory evictions</h2>
+          <p>We can help Victorian renters who have received a notice to vacate because they stood up for their rental rights, as long as a possession order hasn't been issued yet.</p>
+          <a href="{% url 'evictions' %}"><button>Learn more</button></a>
         </div>
       </div>
     </div>
@@ -82,7 +88,7 @@
           <img class="icon" src="{% static 'web/img/icons/questionnaire.svg' %}" />
           <h2>Intake questionnaire</h2>
           <p>The best way to refer a client is to help them complete our 10-minute questionnaire.</p>
-          <a href="https://intake.anikalegal.org.au"><button>Start</button></a>
+          <a href="{{ INTAKE_URL }}"><button>Start</button></a>
         </div>
         <div class="card">
           <img class="icon" src="{% static 'web/img/icons/email.svg' %}" />

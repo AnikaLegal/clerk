@@ -1,0 +1,40 @@
+{% load static %}
+
+<div class="segment round-large top-right bottom-left">
+  <div class="container wide">
+    <h2>Getting legal help is simple</h2>
+    <div class="divider"></div>
+    <div class="flex flex-wrap justify-center gap-8 md:gap-12">
+      <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px] max-h-[350px] sm:max-h-none">
+        <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+          <img src="{% static 'web/img/how-it-works/intake.jpg' %}" />
+        </figure>
+        <div class="d-card-body items-center flex-row gap-4">
+          <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center">1</div>
+          <div class="d-card-title text-left">Tell us about your rental problem</div>
+        </div>
+      </div>
+      <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px] max-h-[350px] sm:max-h-none">
+        <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+          <img src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
+        </figure>
+        <div class="d-card-body items-center flex-row gap-4">
+          <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center">2</div>
+          <div class="d-card-title text-left">Our legal team reviews your case</div>
+        </div>
+      </div>
+      <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px] max-h-[350px] sm:max-h-none">
+        <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none">
+          <img src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+        </figure>
+        <div class="d-card-body items-center flex-row gap-4">
+          <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center">3</div>
+          <div class="d-card-title text-left">We work with you to resolve the issue</div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-12">
+      <a href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+    </div>
+  </div>
+</div>

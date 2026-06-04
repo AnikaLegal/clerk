@@ -4,6 +4,12 @@
 {% block title %}
   Impact
 {% endblock %}
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/glightbox.min.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/about.css' %}" />
+  <script src="{% static 'web/scripts/embla-carousel.umd.js' %}"></script>
+  <script src="{% static 'web/scripts/glightbox.min.js' %}"></script>
+{% endblock %}
 {% block social_meta %}
   {% include 'web/snippets/_social_meta.html' with title='Impact' description='Our vision is a world where everyone can access justice' %}
 {% endblock %}
@@ -18,28 +24,20 @@
       <a href="{% static 'web/docs/Anika-Legal-Annual-Report-2023-2024.pdf' %}"><button>See our latest Annual Report</button></a>
     </div>
   </div>
-  <div class="segment gold round-large top-right bottom-left">
-    <div class="container">
-      <h2>Our impact FY23-24</h2>
-      <div class="divider"></div>
-      <div style="display: flex; flex-wrap: wrap; gap: 1rem">
-        <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 1rem;">
-          <img src="{% static 'web/img/impact/impact-fy-23-24-1.png' %}" style="max-width: 100%; border-radius: 22px;
-                box-shadow: 0px 4px 41px #ebb90042;" />
-          <img src="{% static 'web/img/impact/impact-fy-23-24-2.png' %}" style="max-width: 100%; border-radius: 22px;
-                box-shadow: 0px 4px 41px #ebb90042;" />
-        </div>
-        <div style="flex: 1; min-width: 250px;">
-          <img src="{% static 'web/img/impact/impact-fy-23-24-3.png' %}" style="max-width: 100%; min-height: 100%; border-radius: 22px;
-                box-shadow: 0px 4px 41px #ebb90042;" />
-        </div>
-        <div style="flex: 1; min-width: 250px;">
-          <img src="{% static 'web/img/impact/impact-fy-23-24-4.png' %}" style="max-width: 100%; min-height: 100%; border-radius: 22px;
-                box-shadow: 0px 4px 41px #ebb90042;" />
+
+  {% if impact %}
+    <div class="segment">
+      <div class="container">
+        <h2>{{ impact.title }}</h2>
+        <div class="divider"></div>
+        <div class="flex justify-center items-center">
+          <div class="max-w-3xl">
+            {% include 'web/snippets/_impact_carousel.html' %}
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
   <div class="segment">
     <div class="container wide">
       <div class="story right">

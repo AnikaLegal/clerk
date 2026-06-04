@@ -13,7 +13,7 @@ Test case #1
 """
 REPAIRS_ANSWERS = {
     "ISSUES": "REPAIRS",
-    "WEEKLY_HOUSEHOLD_INCOME": 1000,
+    "ANNUAL_INCOME_RANGE": "UNDER_90K",
     "WEEKLY_RENT": 500,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
     "LEGAL_CENTRE_REFERRER": "Justice Connect",
@@ -36,7 +36,7 @@ REPAIRS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
-    "weekly_income": 1000,
+    "annual_income_range": "UNDER_90K",
     "weekly_rent": 500,
     "employment_status": ["STUDENT", "WORKING_PART_TIME", "PARENT"],
     "referrer_type": "LEGAL_CENTRE",
@@ -58,7 +58,7 @@ Test case #2
 """
 EVICTIONS_ANSWERS = {
     "ISSUES": "EVICTION_ARREARS",
-    "WEEKLY_HOUSEHOLD_INCOME": 2000,
+    "ANNUAL_INCOME_RANGE": "FROM_90K_TO_114K",
     "WEEKLY_RENT": 500,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["WORKING_FULL_TIME"],
     "REFERRER_TYPE": "WORD_OF_MOUTH",
@@ -107,7 +107,7 @@ EVICTIONS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
-    "weekly_income": 2000,
+    "annual_income_range": "FROM_90K_TO_114K",
     "weekly_rent": 500,
     "employment_status": ["WORKING_FULL_TIME"],
     "referrer_type": "WORD_OF_MOUTH",
@@ -155,7 +155,7 @@ Test case #3
 """
 BONDS_ANSWERS = {
     "ISSUES": "BONDS",
-    "WEEKLY_HOUSEHOLD_INCOME": 1337,
+    "ANNUAL_INCOME_RANGE": "UNDER_90K",
     "WEEKLY_RENT": None,
     "WORK_OR_STUDY_CIRCUMSTANCES": ["LOOKING_FOR_WORK", "STUDENT"],
     "COMMUNITY_ORGANISATION_REFERRER": "Jewish Care",
@@ -219,7 +219,7 @@ BONDS_ISSUE = {
     "outcome": None,
     "outcome_notes": "",
     "provided_legal_services": False,
-    "weekly_income": 1337,
+    "annual_income_range": "UNDER_90K",
     "weekly_rent": None,
     "employment_status": ["LOOKING_FOR_WORK", "STUDENT"],
     "referrer_type": "COMMUNITY_ORGANISATION",

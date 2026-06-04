@@ -1,0 +1,154 @@
+{% load static %}
+{% load testimonials %}
+
+{% testimonial_list as testimonial_list %}
+
+<div class="segment">
+  <div class="container">
+    <h2>What our clients say</h2>
+    <div class="divider"></div>
+    <div class="testimonial-list">
+      {% for t in testimonial_list %}
+        <div class="testimonial {% if forloop.first %}active{% endif %}">
+          <div class="quote">“</div>
+          <p class="light compact">{{ t.testimonial }}</p>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="client-list">
+      {% for t in testimonial_list %}
+        <div class="client {% if forloop.first %}active{% endif %}">
+          <img src="{% static t.image %}" />
+          <div class="details">
+            <p class="compact header">{{ t.name }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+  // Make the carousel work
+  const clients = document.getElementsByClassName('client')
+  const testimonials = document.getElementsByClassName('testimonial')
+  let clientIdx = 0 // Start on client 0
+  Array.prototype.slice.call(clients).map((client, idx) => {
+    client.addEventListener('click', () => {
+      clients[clientIdx].classList.remove('active')
+      testimonials[clientIdx].classList.remove('active')
+      clientIdx = idx
+      clients[clientIdx].classList.add('active')
+      testimonials[clientIdx].classList.add('active')
+    })
+  })
+</script>
+
+<style>
+  .testimonial-list {
+    background-color: var(--white);
+    box-shadow: 0px 4px 30px rgba(0, 55, 123, 0.2);
+    padding: 75px 65px 65px 65px;
+    border-radius: 22px;
+    text-align: left;
+    margin-bottom: 55px;
+  }
+  
+  .testimonial-list .testimonial {
+    align-items: flex-start;
+    display: flex;
+    visibility: hidden;
+    transition: opacity 2s ease-in;
+    transition: height 2s ease-in;
+    opacity: 0;
+    height: 0;
+  }
+  .testimonial-list .testimonial.active {
+    opacity: 1;
+    visibility: visible;
+    height: unset;
+  }
+  .testimonial-list .testimonial .quote {
+    font-family: var(--font-serif);
+    font-size: 110px;
+    line-height: 60px;
+    color: var(--blue);
+    padding: 0 12px 0 12px;
+  }
+  @media (max-width: 1300px) {
+    .testimonial-list {
+      padding: 40px 30px;
+    }
+    .testimonial-list .testimonial {
+      flex-direction: column;
+    }
+    .testimonial-list .testimonial .quote {
+      margin-bottom: -35px;
+      padding: 0;
+    }
+  }
+  
+  .client-list {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    text-align: left;
+  }
+  .client-list .client {
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+  }
+  .client-list .client img {
+    width: 92px;
+    height: 92px;
+    background-color: var(--dark-6);
+    border-radius: 100%;
+    object-fit: cover;
+  }
+  .client-list .client .details {
+    display: none;
+  }
+  .client-list .client.active .details {
+    display: block;
+    padding: 3px 0 0 0;
+  }
+  .client-list .client .details .name {
+    font-weight: bold;
+    color: var(--dark-1);
+    font-size: 25px;
+  }
+  .client-list .client.active:before {
+    content: '';
+    background-color: var(--white);
+    border-radius: 5px;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    transform: rotate(45deg);
+    left: 19px;
+    top: -82px;
+  }
+  @media (max-width: 600px) {
+    .client-list .client img {
+      width: 70px;
+      height: 70px;
+    }
+    .client-list .client {
+      display: none;
+    }
+    .client-list .client.active {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+    .client-list .client.active .details {
+      padding: 14px 0 0 0;
+    }
+    .client-list .client.active:before {
+      left: calc(50% - 27px);
+    }
+  }
+</style>

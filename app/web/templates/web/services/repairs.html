@@ -1,94 +1,142 @@
-{% extends "web/_base.html" %} 
+{% extends 'web/_base.html' %}
 {% load static %}
-{% block title %}Rental Repairs{% endblock %} 
+{% load wagtail_clerk %}
+{% load cases %}
+
+{% block title %}
+  Rental Repairs
+{% endblock %}
 {% block social_meta %}
-{% include 'web/snippets/_social_meta.html' with title="Rental Repairs" description="Need something in your rental property fixed? We’re here to help." %}            
+  {% include 'web/snippets/_social_meta.html' with title='Rental Repairs' description='Need something in your rental property fixed? We’re here to help.' %}
 {% endblock %}
 {% block content %}
-<div class="segment">
+  <div class="segment">
     <div class="container wide">
-        <div class="story left">
-            <div class="content">
-                <h1>Need something repaired by your agent?</h1>
-                <p>
-                    So, you’re renting and there’s an issue in your home.
-                </p>
-                <p>
-                    This time it’s a leaking tap, shower, or maybe the heater won’t turn on?  You’ve raised the issue with your agent and landlord, and you’re waiting… and waiting. In an ideal situation, they’ll fix it as soon as possible, but this isn’t always the case!
-                </p>
-                <p>
-                    Need something in your rental property fixed? We’re here to help.
-                </p>
-                <a href="https://intake.anikalegal.org.au/">
-                    <button>Get free help</button>
-                </a>
-            </div>
-            <img class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/repairs-hero.jpg' %}">
+      <div class="story left">
+        <div class="content">
+          <h1>Need Repairs Fixed?</h1>
+          <p>If something in your rental property needs fixing and your landlord isn't responding, we're here to help.</p>
+          <p>We offer free, confidential and online legal help to renters across Victoria and help you understand what to do next.</p>
+          <div class="max-w-[473px] flex flex-wrap gap-4 justify-center sm:justify-start mt-8">
+            <a class="min-w-64 sm:min-w-42" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check your eligibility</button></a>
+            <a class="min-w-64 sm:min-w-42" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
+          </div>
         </div>
+        <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/repairs-hero.jpg' %}" />
+      </div>
     </div>
-</div>
-<div class="panel left round top-right bottom-right">
-    <img class="round bottom-right" src="{% static 'web/img/services/coffee.jpg' %}">
+  </div>
+
+  <div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
     <div class="content">
-        <h2>What does it involve?</h2>
-        <p>
-        Start your case with us and you’ll receive free legal assistance and advice that is:
-        </p>
-        <ul>
-            <li>Specific to your circumstances</li> 
-            <li>Online and easy to understand</li>
-        </ul>
-        <p>
-            Whether it’s sending a letter to your landlord, talking to them on your behalf, or helping to prepare for VCAT, we’ll do everything we can to get your home repaired!
-        </p>
+      <h2>Does this sound like you?</h2>
+      <div class="divider"></div>
+      <ul class="mb-4">
+        <li>Your landlord isn't responding to repair requests</li>
+        <li>Something in your home feels unsafe or broken</li>
+        <li>You have issues like mould, leaks or no heating</li>
+        <li>You've reported a problem but nothing has been fixed</li>
+        <li>You're not sure what your rights are</li>
+      </ul>
+      <!-- prettier-ignore -->
+      <p>
+        If any of this sounds familiar, it's worth checking in. We've helped over {% cases_serviced_count 100 %} renters in Victoria in your situation take action.
+      </p>
+      <div class="flex justify-center mt-12">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
     </div>
-</div>
-<div class="panel right round top-left bottom-left">
+  </div>
+
+  <div class="panel right round top-left bottom-left">
     <div class="content">
-        <h2>Am I eligible?</h2>
-        <p>
-            You are eligible for this service if you’re a renter living in Victoria who cannot afford to pay for a private lawyer.
-        </p>
-        <p>
-            Still not sure if you're eligible? Submit your case, and we’ll let you know.
-        </p>
+      <h2>Understanding your options</h2>
+      <div class="divider"></div>
+      <p>If you're dealing with repairs that aren't being fixed, it's a good idea to seek advice. Depending on your situation, you may be able to follow up formally, arrange urgent repairs, or take further steps if your landlord isn't responding.</p>
+      <p>We help you understand what's considered urgent, explain your rights in plain language, and work through your options so you feel more confident about what to do next.</p>
     </div>
-    <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/services/mum.jpg' %}">
-</div>
-<div class="segment" style="padding-bottom: 0;">
+    <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/services/mum.jpg' %}" />
+  </div>
+
+  {% include 'web/snippets/_how_we_help_segment.html' %}
+
+  {% include 'web/snippets/eligibility/_repairs_panel.html' %}
+
+  <div class="segment">
     <div class="container wide">
-        <h2>Here’s the step-by-step breakdown</h2>
-        <div class="divider"></div>
-        <div class="card-grid tight">
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}">
-                <p class="header">
-                    1. Complete our questionnaire
-                </p>
-                <p class="compact">It is <a href="https://intake.anikalegal.org.au/">fully online</a>  and takes less than 10 minutes</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}">
-                <p class="header">2. We’ll call you</p>
-                <p class="compact">One of our friendly team will call you to discuss your situation</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}">
-                <p class="header">3. Receive your personalised legal advice</p>
-                <p class="compact"> You’ll get an email outlining your rights and options</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/agreement.jpg' %}">
-                <p class="header">4. Ask your landlord to perform repairs</p>
-                <p class="compact">We’ll send a letter formally asking your landlord to repair your home. If they don’t respond we can give them a call too!</p>
-            </div>
-            <div class="card">
-                <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}">
-                <p class="header">5. Reach a resolution</p>
-                <p class="compact">Whether it’s following up your landlord on your behalf or helping you prepare your case for VCAT, we’ll work with you to reach a resolution that best fits you and your needs</p>
-            </div>
+      <h2>FAQ</h2>
+      <div class="divider"></div>
+      <div class="flex d-join d-join-vertical bg-base-100 mx-auto md:max-w-4/5 text-left text-(--dark-4) [--radius-field:0.5rem]">
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What are urgent and non-urgent repairs?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>Urgent repairs usually include issues that make your home unsafe or difficult to live in, like serious leaks, broken heating, or electrical problems. Non-urgent repairs are any other issues that require fixing so that you can comfortably use your home. If you're unsure, we help you understand your situation.</div>
+          </div>
         </div>
+
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What if my landlord ignores my repair requests?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>If your landlord isn't responding, there may be steps you can take to escalate the issue. We help you understand your options and what to do next.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Can I arrange repairs myself?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>In some situations, you may be able to organise urgent repairs yourself, but there are rules around this. We help you understand what applies to you.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">How quickly should repairs be fixed?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>Urgent repairs should be addressed immediately. Non-urgent repairs must be fixed within 14 days. If there are delays, it's worth getting advice early.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Do I need proof of the issue?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>No, that's okay. You don't need to have everything ready right now. We help you work through what you have in relation to your situation.</div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-{% include 'web/snippets/_footer_cta.html' with cta="Ready to get your home repaired?" %}
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>We also help with other rental issues</h2>
+      <div class="divider"></div>
+      <div class="flex flex-wrap justify-center gap-12">
+        {% include 'web/snippets/services/_evictions_card.html' %}
+        {% include 'web/snippets/services/_bonds_card.html' %}
+      </div>
+    </div>
+  </div>
+
+  {% include 'web/snippets/_testimonials_segment.html' %}
+
+  {% include 'web/snippets/_blog_section.html' %}
+
+  <div id="contact-us" class="segment" style="padding: 0">
+    <div class="container">
+      <div id="contact">
+        <div class="text">
+          <h2>Contact us</h2>
+          <p class="light">If you want to learn more about how Anika can help you, fill in your details, and we'll give you a call.</p>
+        </div>
+        {% include 'web/htmx/_contact_form.html' %}
+      </div>
+    </div>
+  </div>
+
+  {% include 'web/snippets/_footer_cta.html' with cta='Ready to get your home repaired?' %}
 {% endblock %}

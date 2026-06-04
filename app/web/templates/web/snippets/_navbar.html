@@ -1,0 +1,160 @@
+{% load static %}
+{% load wagtail_clerk %}
+<header>
+  <!-- Secondary nav: smaller font, sits above primary nav -->
+  <div class="flex justify-end items-end min-h-0 py-1 px-0 pt-0">
+    <div>
+      <!-- Desktop secondary links -->
+      <nav class="hidden lg:flex items-center text-xs [--radius-box:0.5rem] [--radius-field:0.5rem]">
+        <div class="d-dropdown d-dropdown-hover">
+          <div tabindex="0" role="button" class="px-3 py-1 cursor-pointer">About</div>
+          <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
+            <li>
+              <a href="{% url 'about' %}">Anika</a>
+            </li>
+            <li>
+              <a href="{% url 'impact' %}">Impact</a>
+            </li>
+            <li>
+              <a href="{% url 'team' %}">Team</a>
+            </li>
+            <li>
+              <a href="{% clerk_slugurl 'news' %}">News</a>
+            </li>
+            <li>
+              <a href="{% url 'reports' %}">Reports</a>
+            </li>
+          </ul>
+        </div>
+        <div class="d-dropdown d-dropdown-hover">
+          <div tabindex="0" role="button" class="px-3 py-1 cursor-pointer">Get Involved</div>
+          <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-56 p-2 shadow">
+            <li>
+              <a href="{% url 'law-student-partners' %}">Law students</a>
+            </li>
+            <li>
+              <a href="{% url 'philanthropy-partners' %}">Philanthropic supporters</a>
+            </li>
+            <li>
+              <a href="{% url 'corporate-partners' %}">Corporate supporters</a>
+            </li>
+            <li>
+              <a href="{% url 'university-partners' %}">Universities</a>
+            </li>
+            <li>
+              <a href="{% clerk_slugurl 'jobs' %}">Join the team</a>
+            </li>
+            <li>
+              <a href="{% url 'subscribe' %}">Join our mailing list</a>
+            </li>
+          </ul>
+        </div>
+        <a href="{% url 'refer' %}" class="px-3 py-1">Refer</a>
+        <a href="{{ settings.web.LinkSettings.donate_url }}" class="px-3 ps-[0.1rem] py-1">Donate</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center py-2 px-0 mb-2">
+    <!-- Logo -->
+    <div class="flex flex-wrap items-center gap-4 h-[63px] overflow-hidden">
+      <a href="{% url 'landing' %}"><img class="h-full" src="{% static 'web/brand/logo-color.svg' %}" alt="Anika Legal" /></a>
+      <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile"><img class="h-full" src="{% static 'web/brand/acnc-charity.png' %}" alt="ACNC Charity" /></a>
+      <a href="https://www.fclc.org.au/"><img class="h-full" src="{% static 'web/img/partners/federation-vic.png' %}" alt="Federation VIC" /></a>
+    </div>
+    <div class="hidden lg:flex items-center">
+      <!-- Primary nav -->
+      <nav class="flex items-center text-sm [--radius-box:0.5rem] [--radius-field:0.5rem]">
+        <div class="d-dropdown d-dropdown-hover">
+          <div tabindex="0" role="button" class="px-4 py-2 cursor-pointer font-semibold">Your Situation</div>
+          <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-60 p-2 shadow">
+            <li>
+              <a href="{% url 'evictions' %}">I'm getting evicted</a>
+            </li>
+            <li>
+              <a href="{% url 'bonds' %}">I want to recover my bond</a>
+            </li>
+            <li>
+              <a href="{% url 'repairs' %}">I need something repaired</a>
+            </li>
+          </ul>
+        </div>
+        <a href="{% url 'how-it-works' %}" class="px-4 py-2 font-semibold">How It Works</a>
+        <a href="{% clerk_slugurl 'blog' %}" class="px-4 py-2 font-semibold">Resources</a>
+      </nav>
+      <a href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-sm hidden lg:inline-flex">Get free help</button></a>
+    </div>
+
+    <!-- Mobile menu: checkbox toggle (no JS required) -->
+    <input type="checkbox" id="mobile-menu-toggle" class="peer sr-only lg:hidden" />
+
+    <!-- Hamburger button — hidden when overlay is open -->
+    <label for="mobile-menu-toggle" class="d-btn d-btn-ghost ml-auto lg:hidden cursor-pointer peer-checked:hidden"><img src="{% static 'web/img/hamburger.svg' %}" /></label>
+
+    <!-- Full-screen overlay — shown when checkbox is checked -->
+    <div class="hidden peer-checked:flex fixed inset-0 z-50 bg-white flex-col overflow-y-auto">
+      <!-- Overlay header: logo + close button -->
+      <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+        <div class="flex flex-wrap items-center gap-4 overflow-hidden h-10">
+          <a href="{% url 'landing' %}"><img class="h-10" src="{% static 'web/brand/logo-color.svg' %}" alt="Anika Legal" /></a>
+          <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile"><img class="h-10" src="{% static 'web/brand/acnc-charity.png' %}" alt="ACNC Charity" /></a>
+          <a href="https://www.fclc.org.au/"><img class="h-10" src="{% static 'web/img/partners/federation-vic.png' %}" alt="Federation VIC" /></a>
+        </div>
+        <label for="mobile-menu-toggle" class="d-btn d-btn-ghost cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </label>
+      </div>
+
+      <!-- All menu items, fully expanded -->
+      <nav class="flex flex-col px-6 py-6 gap-6 text-base">
+        <!-- Your Situation -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Your Situation</div>
+          <div class="flex flex-col gap-3 pl-3">
+            <a href="{% url 'evictions' %}">I'm getting evicted</a>
+            <a href="{% url 'bonds' %}">I want to recover my bond</a>
+            <a href="{% url 'repairs' %}">I need something repaired</a>
+          </div>
+        </div>
+
+        <a href="{% url 'how-it-works' %}">How It Works</a>
+        <a href="{% clerk_slugurl 'blog' %}">Resources</a>
+
+        <div class="border-t border-gray-200"></div>
+
+        <!-- About -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">About</div>
+          <div class="flex flex-col gap-3 pl-3">
+            <a href="{% url 'about' %}">Anika</a>
+            <a href="{% url 'impact' %}">Impact</a>
+            <a href="{% url 'team' %}">Team</a>
+            <a href="{% clerk_slugurl 'news' %}">News</a>
+            <a href="{% url 'reports' %}">Reports</a>
+          </div>
+        </div>
+
+        <!-- Get Involved -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Get Involved</div>
+          <div class="flex flex-col gap-3 pl-3">
+            <a href="{% url 'law-student-partners' %}">Law students</a>
+            <a href="{% url 'philanthropy-partners' %}">Philanthropic supporters</a>
+            <a href="{% url 'corporate-partners' %}">Corporate supporters</a>
+            <a href="{% url 'university-partners' %}">Universities</a>
+            <a href="{% clerk_slugurl 'jobs' %}">Join the team</a>
+            <a href="{% url 'subscribe' %}">Join our mailing list</a>
+          </div>
+        </div>
+
+        <a href="{% url 'refer' %}">Refer</a>
+        <a href="{{ settings.web.LinkSettings.donate_url }}">Donate</a>
+        <div class="flex justify-center">
+          <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>

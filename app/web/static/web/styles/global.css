@@ -30,9 +30,7 @@ Screen sizes to consider (https://screensiz.es/):
   --grey-2: #d9dbe1;
   --white: #fff;
   /* Sizes */
-  --header-height: 63px;
-  --header-padding-top: 60px;
-
+  --header-height: 93px;
   --header-offset-top: 60px;
   --header-height-total: calc(var(--header-height) + var(--header-offset-top));
   --container-max-width: 1240px;
@@ -45,7 +43,7 @@ Screen sizes to consider (https://screensiz.es/):
   /* Static content urls */
   --url-footer-cta-img: url("/static/web/img/footer-cta-phones.png");
   --url-chevron-down-svg: url("/static/web/img/chevron-down.svg");
-  --url-landing-hero-phone-img: url("/static/web/img/landing-hero-1080.jpg");
+  --url-landing-hero-phone-img: url("/static/web/img/landing-hero-1080.webp");
 
   /* Responsive variables */
   --container-padding: 135px;
@@ -80,7 +78,6 @@ Screen sizes to consider (https://screensiz.es/):
 @media (max-width: 600px) {
   :root {
     --header-height: 46px;
-    --header-padding-top: 30px;
     --hero-external-radius: 124px;
     --header-font-size: 26px;
     --header-line-height: 32px;
@@ -108,8 +105,20 @@ body {
   color: var(--dark-0);
 }
 
-a {
+/* Links 
+ * Apply global styling to links not in the header or footer, or that don't contain buttons.
+ */
+a:not(header a):not(footer a):not(:has(button)) {
+  color: var(--blue);
   text-decoration: none;
+}
+
+a:hover:not(header a):not(:has(button)) {
+  text-decoration: underline;
+}
+
+a:visited:not(header a):not(footer a):not(:has(button)) {
+  color: revert;
 }
 
 /* Page header */
@@ -129,182 +138,41 @@ a {
 }
 
 header {
+  box-sizing: content-box;
   position: relative;
   z-index: 1;
   max-width: 1240px;
   width: calc(100vw - 2 * var(--container-wide-padding));
   height: var(--header-height);
-  left: 50%;
-  transform: translateX(-50%);
+  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
-  padding-top: var(--header-padding-top);
+  flex-direction: column;
+  padding-top: 30px;
 }
 
-header img {
-  height: var(--header-height);
+header a {
+  color: var(--dark-0);
 }
 
-header nav.large {
-  display: flex;
-  align-items: center;
-  gap: calc(33px - 24px);
+header ul {
+  list-style: none;
+  padding-left: calc(var(--spacing) * 2);
+  margin-bottom: 0;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  letter-spacing: var(--tracking-normal);
 }
 
-header nav.small,
-header nav.small .menu {
-  display: none;
-}
-
-header nav.small img {
-  height: 20px;
-}
-
-header nav.small .menu.active {
-  display: unset;
-  position: absolute;
-  background-color: var(--white);
-  box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
-  border-radius: 3px;
-  left: calc(-1 * var(--container-wide-padding) - 1px);
-  right: calc(-1 * var(--container-wide-padding));
-  width: calc(100vw + 1px);
-  box-sizing: border-box;
-  padding: 16px 16px 44px 16px;
-  top: var(--header-height-total);
-}
-
-header nav.small .menu.active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  top: calc(-1 * (var(--header-height-total) + var(--header-offset-top)));
-  bottom: 100%;
-  background: var(--white);
-  z-index: -1;
-}
-
-@media (max-width: 1300px) {
-  header nav.small {
-    display: flex;
-    align-items: center;
-  }
-
-  header nav.large {
-    display: none;
-  }
-}
-
-header nav a,
-header nav .dropdown {
-  text-decoration: none;
-  font-size: 16px;
-  font-family: var(--font-sans-alt-1);
-  font-weight: 700;
-  color: var(--dark-1);
-  text-decoration: none;
-}
-
-header nav .dropdown {
-  position: relative;
-  padding: 12px;
-  display: block;
-}
-
-header nav .dropdown .title {
-  position: relative;
-  padding-right: 19px;
-  cursor: pointer;
-}
-
-header nav .dropdown .title:after {
+header nav .d-dropdown > :first-child::after {
   position: absolute;
   background: var(--url-chevron-down-svg) no-repeat;
   background-size: contain;
   width: 12px;
   height: 6px;
   content: "";
-  top: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   right: 0;
-}
-
-header nav.small .dropdown .options {
-  display: none;
-}
-
-header nav.small .dropdown {
-  margin-bottom: 4px;
-}
-
-header nav.small .dropdown.active > .options {
-  display: flex;
-  flex-direction: column;
-  padding: 0 12px 0 18px;
-  gap: 1rem;
-}
-
-header nav.large .dropdown .options {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  left: 0;
-  margin-top: 12px;
-  display: none;
-  border-radius: 0 0 0 12px;
-}
-
-header nav .dropdown .options a {
-  font-weight: 500;
-}
-
-header nav.small .dropdown .options a {
-  margin: 18px 0 0 0;
-}
-
-header nav.large .dropdown:hover {
-  background-color: var(--gold-light);
-  box-shadow: 0px 4px 41px rgba(0, 55, 123, 0.15);
-  border-radius: 0 12px 0 0;
-}
-
-header nav.large .dropdown:hover > .options,
-header nav.large .dropdown:focus-within > .options,
-header nav.large .dropdown .options:hover {
-  visibility: visible;
-  opacity: 1;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  background: var(--gold-light);
-  padding: 12px 12px 16px 12px;
-  gap: 1rem;
-}
-
-header nav .dropdown .options a {
-  clear: both;
-  width: 100%;
-  cursor: pointer;
-}
-
-header nav .dropdown .options a:hover {
-  text-decoration: underline;
-}
-
-header nav a button#donate {
-  font-size: 16px;
-  background: var(--blue-mid);
-  padding: 8px 36px 7px 36px;
-}
-
-header nav.small a button#donate {
-  margin: 38px 0 0 0;
-  width: unset;
-}
-
-header nav a:visited {
-  color: var(--dark);
 }
 
 /* Page footer */
@@ -318,7 +186,7 @@ footer {
 
 footer .inner {
   display: grid;
-  grid-template-columns: repeat(4, 25%);
+  grid-template-columns: repeat(4, 1fr);
   grid-gap: 30px;
   width: calc(100vw - 2 * 165px);
   justify-content: center;
@@ -331,7 +199,20 @@ footer .inner {
   }
 
   footer .inner {
-    grid-template-columns: 270px;
+    width: calc(100vw - 2 * 60px);
+  }
+}
+
+@media (max-width: 900px) {
+  footer .inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  footer .inner {
+    grid-template-columns: 1fr;
+    width: calc(100vw - 2 * 30px);
   }
 }
 
@@ -341,7 +222,6 @@ footer h3 {
   line-height: 30px;
   font-weight: 600;
   margin-bottom: 24px;
-  margin-top: 0;
 }
 
 footer p {
@@ -363,12 +243,6 @@ footer a:visited {
 footer .column {
   display: flex;
   flex-direction: column;
-}
-
-#social-media {
-  width: 146;
-  display: grid;
-  grid-template-columns: repeat(4, 24px 16px);
 }
 
 footer p.icon {

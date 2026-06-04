@@ -4,13 +4,9 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import timezone
 
-from .models import BlogListPage, DashboardItem
+from .models import BlogListPage, DashboardItem, Impact
 from .forms import ContactForm, ContentFeedbackForm
-
-from core.models import Issue
-from core.models.issue import CaseTopic
 
 
 @require_http_methods(["GET"])
@@ -21,32 +17,44 @@ def robots_view(request):
 
 @require_http_methods(["GET"])
 def landing_view(request):
-    form = ContactForm()
-    issues_serviced = Issue.objects.filter(provided_legal_services=True).count()
-    context = {
-        "form": form,
-        "testimonials": TESTIMONIALS,
-        "issues_serviced": issues_serviced,
-    }
-    return render(request, "web/landing.html", context)
+    return render(
+        request,
+        "web/landing.html",
+        {"blog_posts": _get_blog_posts()},
+    )
 
 
 @require_http_methods(["GET"])
 def impact_view(request):
-    start_time = timezone.now() - timezone.timedelta(days=365)
-    issues_serviced = Issue.objects.filter(
-        created_at__gte=start_time, provided_legal_services=True
-    )
-    repairs_count = issues_serviced.filter(topic=CaseTopic.REPAIRS).count()
-    evictions_count = issues_serviced.filter(topic=CaseTopic.EVICTION_ARREARS).count()
-    bonds_count = issues_serviced.filter(topic=CaseTopic.BONDS).count()
-    context = {
-        "repairs_advice_count": repairs_count,
-        "evictions_advice_count": evictions_count,
-        "bonds_advice_count": bonds_count,
-    }
+    impact = Impact.objects.filter(live=True).prefetch_related("images").last()
+    return render(request, "web/about/impact.html", {"impact": impact})
 
-    return render(request, "web/about/impact.html", context)
+
+@require_http_methods(["GET"])
+def evictions_view(request):
+    return render(
+        request,
+        "web/services/evictions.html",
+        {"blog_posts": _get_blog_posts("evictions")},
+    )
+
+
+@require_http_methods(["GET"])
+def bonds_view(request):
+    return render(
+        request,
+        "web/services/bonds.html",
+        {"blog_posts": _get_blog_posts("bonds")},
+    )
+
+
+@require_http_methods(["GET"])
+def repairs_view(request):
+    return render(
+        request,
+        "web/services/repairs.html",
+        {"blog_posts": _get_blog_posts("repairs")},
+    )
 
 
 @login_required
@@ -102,6 +110,17 @@ def shuffle(l):
     l2 = l.copy()
     random.shuffle(l2)
     return l2
+
+
+def _get_blog_posts(tag_slug=None, limit=3):
+    blog_list_page = BlogListPage.objects.first()
+    if blog_list_page:
+        blog_posts = blog_list_page.get_children().live().public()
+        if tag_slug:
+            blog_posts = blog_posts.filter(blogpage__tagged_items__tag__slug=tag_slug)
+        return blog_posts.order_by("-first_published_at")[:limit]
+
+    return []
 
 
 BOARD = [
@@ -453,62 +472,5 @@ TEAM_MEMBERS = [
             """Tom is generously seconded to us from Hall & Wilcox where he
             works as an Associate in the Pro Bono & Community team.""",
         ],
-    },
-]
-
-TESTIMONIALS = [
-    {
-        "name": "Gabrielle",
-        "testimonial": """After months of getting nowhere with my landlord I was
-        beginning to think I was overreacting to a number of faults in my house,
-        namely heating that didn't work. Contacting Anika to get some advice and
-        legal support was super easy and super fast. I was able to have a chat
-        on the phone to a staff member, voice my concerns and ask questions,
-        which was followed up by timely legal advice. Suffice to say, my heating
-        ended up getting fixed the following week without going to VCAT, and I
-        was able to maintain a relationship with my agent and landlord which was
-        something I was anxious about. It is amazing to have free support for
-        tenants who have very little idea about their rights. Anika has filled a
-        very large gap in the system and I couldn't recommend them enough.
-        Thanks again to the team!""",
-        "image": "web/img/testimonials/gabrielle.jpg",
-    },
-    {
-        "name": "Hieu",
-        "testimonial": """[Anika] was really quick with everything, like the
-        follow-up, and also tried their best to help out. I feel like I at least
-        had someone else on my side who helped me work things out.. If it wasn't
-        for Anika I don't think I would have pursued the negotiations on my own.
-        Now [my rent] is actually reduced.""",
-        "image": "web/img/testimonials/hieu.jpg",
-    },
-    {
-        "name": "Erica",
-        "testimonial": """I would give Anika a 10! I didn't have any issues at
-        all and I thought the service went super well. It was exactly what I
-        needed. Having the law on your side makes you feel way more comfortable
-        with dealing with these things, especially because in the past I have
-        been told that I am just a young renter who doesn't have any rights. I
-        didn't realise that as a renter I actually had some power!""",
-        "image": "web/img/testimonials/erica.jpg",
-    },
-    {
-        "name": "Louise",
-        "testimonial": """Anika was exactly the service I needed - I couldn't
-        have asked for anything better. I was so used to everyone else that I'd
-        dealt with letting me down - agents, landlords, even law firms. Sam (the
-        Anika law student) was just that one solid person I could completely
-        count on when I needed him. The empathy that everyone at Anika showed
-        for our situation was amazing, and with Sam taking over, everything just
-        became so much easier for me.""",
-        "image": "web/img/testimonials/louise.jpg",
-    },
-    {
-        "name": "Mary",
-        "testimonial": """Big thank you to Anika Legal and the team. Without
-        their legal advice I would not have been able to get my repairs done. I
-        am very thankful, the communication and help received was
-        incredible.""",
-        "image": "web/img/testimonials/mary.jpg",
     },
 ]

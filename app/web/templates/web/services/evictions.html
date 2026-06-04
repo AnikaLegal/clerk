@@ -1,5 +1,8 @@
 {% extends 'web/_base.html' %}
 {% load static %}
+{% load wagtail_clerk %}
+{% load cases %}
+
 {% block title %}
   Evictions Support
 {% endblock %}
@@ -11,10 +14,13 @@
     <div class="container wide">
       <div class="story left">
         <div class="content">
-          <h1>Getting evicted? Know your rights before you panic!</h1>
-          <p>Is your landlord trying to evict you because you exercised your rights? Perhaps you asked for repairs, or complained about a rent increase. We are here to help.</p>
-          <p>Received a retaliatory notice to vacate? There's no time to waste. Get free, ongoing legal support.</p>
-          <a href="https://intake.anikalegal.org.au/"><button>Get free help</button></a>
+          <h1>Worried About Being Evicted?</h1>
+          <p>If you've received a notice to vacate or feel like you might lose your home, we're here to help.</p>
+          <p>We offer free, confidential and online legal help to renters across Victoria and help you understand what to do next.</p>
+          <div class="max-w-[473px] flex flex-wrap gap-4 justify-center sm:justify-start mt-8">
+            <a class="min-w-64 sm:min-w-42" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check your eligibility</button></a>
+            <a class="min-w-64 sm:min-w-42" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
+          </div>
         </div>
         <img style="object-position: 100% 50%;" class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/evictions-hero.jpg' %}" />
       </div>
@@ -23,57 +29,108 @@
   <div class="panel left round top-right bottom-right">
     <img class="round bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
     <div class="content">
-      <h2>What does it involve?</h2>
-      <p>Start your case with us and you'll receive free legal assistance and advice that is:</p>
-      <ul>
-        <li>Specific to your circumstances</li>
-        <li>Online and easy to understand</li>
+      <h2>Does this sound like you?</h2>
+      <div class="divider"></div>
+      <ul class="mb-4">
+        <li>You've received a notice to vacate</li>
+        <li>You're not sure if the notice is valid</li>
+        <li>You feel pressure to move out</li>
+        <li>You're not sure what to do next</li>
       </ul>
-      <p>Whether it's buying you some time in your home to find a new place, or preparing you to challenge the eviction at VCAT, we've got you covered.</p>
+      <!-- prettier-ignore -->
+      <p>
+        If any of this sounds familiar, it's worth checking in. We've helped over {% cases_serviced_count 100 %} renters in Victoria in your situation take action.
+      </p>
+      <div class="flex justify-center">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
     </div>
   </div>
+
   <div class="panel right round top-left bottom-left">
     <div class="content">
-      <h2>Am I eligible?</h2>
-      <p>You are eligible for this service if you're a renter living in Victoria who is being evicted because you stood up for your rental rights.</p>
-      <p>Still not sure if you're eligible? Submit your case, and we'll let you know.</p>
+      <h2>Understanding your options</h2>
+      <div class="divider"></div>
+      <p>If you're facing eviction, it's a good idea to get legal advice early. Depending on your situation, you may be able to stay in your home longer, challenge the notice, negotiate with your landlord, or get more time to move.</p>
+      <p>We help you understand your notice, explain your rights in plain language, and work through your options so you feel more confident about what to do next.</p>
     </div>
     <img style="object-position: 100% 50%;" class="round bottom-left" src="{% static 'web/img/services/mum.jpg' %}" />
   </div>
-  <div class="segment" style="padding-bottom: 0;">
+
+  {% include 'web/snippets/_how_we_help_segment.html' %}
+
+  {% include 'web/snippets/eligibility/_evictions_panel.html' %}
+
+  <div class="segment">
     <div class="container wide">
-      <h2>Here's the step-by-step breakdown</h2>
+      <h2>FAQ</h2>
       <div class="divider"></div>
-      <div class="card-grid tight">
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/intake.jpg' %}" />
-          <p class="header">1. Complete our questionnaire</p>
-          <p class="compact">
-            It is <a href="https://intake.anikalegal.org.au/">fully online</a> and takes less than 10 minutes
-          </p>
+      <div class="flex d-join d-join-vertical bg-base-100 mx-auto md:max-w-4/5 text-left text-(--dark-4) [--radius-field:0.5rem]">
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Can I be evicted straight away?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>There's a strict legal process your landlord needs to follow. Your landlord must give you the minimum notice period required by the law. If you don't move out by the time your notice expires, the landlord must apply to VCAT to evict you. You can't be forced to leave the Property without a VCAT order and a warrant for possession from Police.</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
-          <p class="header">2. We'll call you</p>
-          <p class="compact">One of our friendly team will call you to discuss your situation</p>
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What is a notice to vacate?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>It's a formal document from your landlord asking you to leave. You can only be given a notice for particular reasons under the law, and the notice itself needs to meet certain requirements to be valid.</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
-          <p class="header">3. Receive your personalised legal advice</p>
-          <p class="compact">You'll get an email outlining your rights and options</p>
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What if I don't think it's fair?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>You might be able to challenge it, depending on your situation. We help you understand your options.</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/agreement.jpg' %}" />
-          <p class="header">4. We may negotiate with your landlord</p>
-          <p class="compact">We can contact your Rental Provider or Agent to try and negotiate a resolution or ask that they give you more time while you look for your next rental</p>
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">How quickly should I act?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>It's best to get legal advice before taking action. The sooner you get support, the more options you may have.</div>
+          </div>
         </div>
-        <div class="card">
-          <img class="round-small top-right bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}" />
-          <p class="header">5. Reach a resolution at VCAT</p>
-          <p class="compact">We'll help you prepare for your VCAT hearing, whether it's to stop the eviction process, or ask for one more month in your rental to look for your next accommodation</p>
+        <div class="d-collapse d-collapse-plus d-join-item border border-base-300">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What if I don't understand the notice I received?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>That's okay - you don't need to figure it out on your own. We help you make sense of it.</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>We also help with other rental issues</h2>
+      <div class="divider"></div>
+      <div class="flex flex-wrap justify-center gap-12">
+        {% include 'web/snippets/services/_repairs_card.html' %}
+        {% include 'web/snippets/services/_bonds_card.html' %}
+      </div>
+    </div>
+  </div>
+
+  {% include 'web/snippets/_testimonials_segment.html' %}
+
+  {% include 'web/snippets/_blog_section.html' %}
+
+  <div id="contact-us" class="segment" style="padding: 0">
+    <div class="container">
+      <div id="contact">
+        <div class="text">
+          <h2>Contact us</h2>
+          <p class="light">If you want to learn more about how Anika can help you, fill in your details, and we'll give you a call.</p>
+        </div>
+        {% include 'web/htmx/_contact_form.html' %}
+      </div>
+    </div>
+  </div>
+
   {% include 'web/snippets/_footer_cta.html' with cta='Received a Notice to Vacate your home?' %}
 {% endblock %}

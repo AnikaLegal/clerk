@@ -1019,6 +1019,7 @@ export type SubmissionAnswers = {
   issue?: {
     issues?: ChoiceDisplay[] | null;
     weekly_income?: number | null;
+    annual_income_range?: ChoiceDisplay | null;
     employment_status?: ChoiceDisplay[] | null;
     referrer?: string | null;
     referrer_type?: ChoiceDisplay | null;
@@ -1253,11 +1254,11 @@ export type Issue = IssueBase & {
   lawyer: User | null;
   client: Client;
   employment_status: TextChoiceListField;
-  weekly_income: number | null;
   referrer: string;
   referrer_type: TextChoiceField;
   tenancy: Tenancy;
   weekly_rent: number | null;
+  annual_income_range?: TextChoiceField;
   support_worker: Person | null;
   actionstep_id: number | null;
   created_at: string;
@@ -1286,11 +1287,11 @@ export type IssueRead = IssueBase & {
   lawyer: UserRead | null;
   client: Client;
   employment_status: TextChoiceListField;
-  weekly_income: number | null;
   referrer: string;
   referrer_type: TextChoiceField;
   tenancy: Tenancy;
   weekly_rent: number | null;
+  annual_income_range?: TextChoiceField;
   support_worker: Person | null;
   actionstep_id: number | null;
   created_at: string;
@@ -1351,7 +1352,7 @@ export type IssueCreate = IssueBase & {
   lawyer_id?: number | null;
   support_worker_id?: number | null;
   employment_status?: string;
-  weekly_income?: number | null;
+  annual_income_range?: string | null;
   referrer?: string;
   referrer_type?: string;
   weekly_rent?: number | null;
@@ -1394,7 +1395,7 @@ export type IssueUpdate = {
   support_worker_id?: number | null;
   weekly_rent?: number | null;
   employment_status?: string;
-  weekly_income?: number | null;
+  annual_income_range?: string | null;
   referrer?: string;
   referrer_type?: string;
 };

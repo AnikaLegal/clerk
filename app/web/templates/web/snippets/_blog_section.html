@@ -1,0 +1,41 @@
+{% load static %}
+{% load wagtailcore_tags %}
+{% load wagtailimages_tags %}
+{% load wagtail_clerk %}
+
+{% if blog_posts %}
+  <div class="segment">
+    <div class="container wide">
+      <h2>Latest articles</h2>
+      <p>Stay informed with our latest articles, reports and news</p>
+      <div class="divider"></div>
+      <div class="flex flex-wrap justify-center gap-12">
+        {% for post in blog_posts %}
+          <a href="{% pageurl post.specific %}" class="flex-1 max-w-[400px] !no-underline">
+            <div class="d-card basis-1/3 min-w-[350px] lg:max-w-[350px]">
+              <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none max-h-[250px] sm:max-h-none">
+                {% if post.specific.main_image %}
+                  {# prettier-ignore #}
+                  {% image post.specific.main_image fill-400x250 class='round-small top-right bottom-left' %}
+                {% else %}
+                  <div class="bg-base-300 w-full h-[250px] flex items-center justify-center round-small top-right bottom-left">
+                    <img src="{% static 'web/brand/logo-icon-color.png' %}" class="h-[100px]" />
+                  </div>
+                {% endif %}
+              </figure>
+              <div class="d-card-body items-center">
+                <div class="d-card-title text-base-content">{{ post.title }}</div>
+                {% if post.specific.search_description %}
+                  <p>{{ post.specific.search_description }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      <div class="mt-4">
+        <a href="{% clerk_slugurl 'blog' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">View all articles</button></a>
+      </div>
+    </div>
+  </div>
+{% endif %}

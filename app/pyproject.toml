@@ -14,6 +14,8 @@ dependencies = [
     "boto3",
     "django-cleanup",
     "django-cors-headers",
+    "django-modelcluster",
+    "django-taggit",
     "django-override-storage",
     "django-q2",
     "django-storages",
@@ -31,6 +33,7 @@ dependencies = [
     "openapi-spec-validator",
     "pillow",
     "psycopg2-binary",
+    "pypdfium2",
     "pygments",
     "pytest-django",
     "pytest-factoryboy",
@@ -52,6 +55,7 @@ dependencies = [
     "google-auth-httplib2>=0.3.0",
     "google-auth-oauthlib>=1.2.4",
     "django-fernet-encrypted-fields>=0.4.0",
+    "wagtail-link-block>=1.2",
 ]
 
 [dependency-groups]
