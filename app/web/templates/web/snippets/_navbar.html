@@ -5,9 +5,12 @@
   <div class="flex justify-end items-end min-h-0 py-1 px-0 pt-0">
     <div>
       <!-- Desktop secondary links -->
-      <nav class="hidden lg:flex items-center text-xs [--radius-box:0.5rem] [--radius-field:0.5rem]">
+      <nav class="hidden lg:flex items-center gap-3 text-xs [--radius-box:0.5rem] [--radius-field:0.5rem]">
         <div class="d-dropdown d-dropdown-hover">
-          <div tabindex="0" role="button" class="px-3 py-1 cursor-pointer">About</div>
+          <div tabindex="0" role="button" class="group flex items-center py-1 cursor-pointer gap-1">
+            <span>About</span>
+            <img src="{% static 'web/img/chevron-down.svg' %}" alt="Chevron Down" width="10" height="5" class="group-hover:-rotate-180 transition-transform duration-200" />
+          </div>
           <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-48 p-2 shadow">
             <li>
               <a href="{% url 'about' %}">Anika</a>
@@ -27,7 +30,10 @@
           </ul>
         </div>
         <div class="d-dropdown d-dropdown-hover">
-          <div tabindex="0" role="button" class="px-3 py-1 cursor-pointer">Get Involved</div>
+          <div tabindex="0" role="button" class="group flex items-center py-1 cursor-pointer gap-1">
+            <span>Get Involved</span>
+            <img src="{% static 'web/img/chevron-down.svg' %}" alt="Chevron Down" width="10" height="5" class="group-hover:-rotate-180 transition-transform duration-200" />
+          </div>
           <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-56 p-2 shadow">
             <li>
               <a href="{% url 'law-student-partners' %}">Law students</a>
@@ -49,8 +55,8 @@
             </li>
           </ul>
         </div>
-        <a href="{% url 'refer' %}" class="px-3 py-1">Refer</a>
-        <a href="{{ settings.web.LinkSettings.donate_url }}" class="px-3 ps-[0.1rem] py-1">Donate</a>
+        <a href="{% url 'refer' %}" class="py-1">Refer</a>
+        <a href="{{ settings.web.LinkSettings.donate_url }}" class="py-1">Donate</a>
       </nav>
     </div>
   </div>
@@ -62,28 +68,30 @@
       <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile"><img class="h-full" src="{% static 'web/brand/acnc-charity.png' %}" alt="ACNC Charity" /></a>
       <a href="https://www.fclc.org.au/"><img class="h-full" src="{% static 'web/img/partners/federation-vic.png' %}" alt="Federation VIC" /></a>
     </div>
-    <div class="hidden lg:flex items-center">
+    <nav class="hidden lg:flex items-center gap-5 text-sm">
       <!-- Primary nav -->
-      <nav class="flex items-center text-sm [--radius-box:0.5rem] [--radius-field:0.5rem]">
-        <div class="d-dropdown d-dropdown-hover">
-          <div tabindex="0" role="button" class="px-4 py-2 cursor-pointer font-semibold">Your Situation</div>
-          <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-60 p-2 shadow">
-            <li>
-              <a href="{% url 'evictions' %}">I'm getting evicted</a>
-            </li>
-            <li>
-              <a href="{% url 'bonds' %}">I want to recover my bond</a>
-            </li>
-            <li>
-              <a href="{% url 'repairs' %}">I need something repaired</a>
-            </li>
-          </ul>
+      <div class="d-dropdown d-dropdown-hover [--radius-box:0.5rem] [--radius-field:0.5rem]">
+        <div tabindex="0" role="button" class="group flex items-center py-1 cursor-pointer gap-1">
+          <span class="font-semibold">Your Situation</span>
+          <img src="{% static 'web/img/chevron-down.svg' %}" alt="Chevron Down" width="10" height="5" class="group-hover:-rotate-180 transition-transform duration-200" />
         </div>
-        <a href="{% url 'how-it-works' %}" class="px-4 py-2 font-semibold">How It Works</a>
-        <a href="{% clerk_slugurl 'blog' %}" class="px-4 py-2 font-semibold">Resources</a>
-      </nav>
+
+        <ul tabindex="0" class="d-dropdown-content d-menu bg-base-100 rounded-box z-10 w-60 p-2 shadow">
+          <li>
+            <a href="{% url 'evictions' %}">I'm getting evicted</a>
+          </li>
+          <li>
+            <a href="{% url 'bonds' %}">I want to recover my bond</a>
+          </li>
+          <li>
+            <a href="{% url 'repairs' %}">I need something repaired</a>
+          </li>
+        </ul>
+      </div>
+      <a href="{% url 'how-it-works' %}" class="py-2 font-semibold">How It Works</a>
+      <a href="{% clerk_slugurl 'blog' %}" class="py-2 font-semibold">Resources</a>
       <a href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-sm hidden lg:inline-flex">Get free help</button></a>
-    </div>
+    </nav>
 
     <!-- Mobile menu: checkbox toggle (no JS required) -->
     <input type="checkbox" id="mobile-menu-toggle" class="peer sr-only lg:hidden" />
