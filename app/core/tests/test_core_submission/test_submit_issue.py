@@ -321,6 +321,6 @@ def test_process_submission(
     else:
         assert getattr(issue, k) == v, k
 
-    for upload in FileUpload.objects.all():
+    for upload in FileUpload.objects.select_related("issue").all():
         assert str(upload.id) in expected_uploads
         assert upload.issue == issue
