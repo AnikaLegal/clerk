@@ -71,3 +71,4 @@ CASES_FOLDER_ID = "012MW3H5PFZKSKCYCV4ZH25IDR5GUXGAJC"
 
 CLERK_BASE_URL = "https://staging.anikalegal.org.au"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
+INTAKE_URL = "https://intake-staging.anikalegal.org.au"

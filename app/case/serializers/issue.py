@@ -1,6 +1,6 @@
 from accounts.models import User
 from core.models import Client, Issue, IssueDate, IssueNote, Service, Tenancy
-from core.models.issue import CaseStage, EmploymentType, ReferrerType
+from core.models.issue import CaseStage, EmploymentType, ReferrerType, IncomeRange
 from core.models.service import ServiceCategory
 from django.db import transaction
 from django.db.models import Q
@@ -44,7 +44,7 @@ class IssueSerializer(serializers.ModelSerializer):
             "tenancy",
             "tenancy_id",
             "employment_status",
-            "weekly_income",
+            "annual_income_range",
             "weekly_rent",
             "referrer_type",
             "referrer",
@@ -99,6 +99,7 @@ class IssueSerializer(serializers.ModelSerializer):
     created_at = LocalDateField()
     employment_status = TextChoiceListField(EmploymentType, required=False)
     referrer_type = TextChoiceField(ReferrerType, required=False)
+    annual_income_range = TextChoiceField(IncomeRange, required=False)
 
     # Submission-related fields.
     submission_id = serializers.UUIDField(read_only=True)

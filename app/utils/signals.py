@@ -2,6 +2,14 @@
 Utils for disabling and re-enabling signals.
 https://www.cameronmaske.com/muting-django-signals-with-a-pytest-fixture/
 """
+
+from accounts.events import (
+    user_activated,
+    user_added_to_case,
+    user_deactivated,
+    user_removed_from_case,
+    user_role_changed,
+)
 from django.db.models.signals import (
     m2m_changed,
     post_delete,
@@ -9,8 +17,21 @@ from django.db.models.signals import (
     pre_delete,
     pre_save,
 )
+from microsoft.events import ms_account_created
 
-SIGNALS = [pre_save, post_save, pre_delete, post_delete, m2m_changed]
+SIGNALS = [
+    pre_save,
+    post_save,
+    pre_delete,
+    post_delete,
+    m2m_changed,
+    user_activated,
+    user_deactivated,
+    user_added_to_case,
+    user_removed_from_case,
+    user_role_changed,
+    ms_account_created,
+]
 RESTORE = {}
 
 

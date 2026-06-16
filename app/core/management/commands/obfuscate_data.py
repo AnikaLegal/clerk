@@ -61,12 +61,13 @@ class Command(BaseCommand):
         log_entries = LogEntry.objects.all()
         submissions = Submission.objects.all()
 
-        # Obfuscate any user that isn't an admin or superuser. We want to keep
-        # the accounts unchanged for users in those groups so they can be used
-        # for testing. Also keep the coordinators account.
+        # Obfuscate any user that isn't staff, an admin, a superuser or the
+        # specific coordinator's account. We want to keep the accounts unchanged
+        # for users in those groups so they can be used for testing.
         users = User.objects.exclude(
             Q(groups__name__in=[CaseGroups.ADMIN])
             | Q(is_superuser=True)
+            | Q(is_staff=True)
             | Q(email="coordinators@anikalegal.org.au")
         ).distinct()
 

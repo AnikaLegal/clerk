@@ -1,0 +1,79 @@
+{% if impact and impact.images.exists %}
+  {% load static %}
+
+  {% with images=impact.images.all %}
+    <div class="impact-embla" id="impact-carousel">
+      <div class="impact-embla__viewport">
+        <div class="impact-embla__container">
+          {% for img in images %}
+            <div class="impact-embla__slide">
+              <div class="impact-embla__slide-inner">
+                <a href="{{ img.image.url }}" class="glightbox" data-gallery="impact-report" data-description="{{ forloop.counter }} of {{ images|length }}"><img src="{{ img.image.url }}" alt="{{ impact.title }} - page {{ forloop.counter }} of {{ images|length }}" class="impact-embla__img" /></a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="impact-embla__controls">
+        <div class="impact-embla__prev-next">
+          <button class="impact-embla__btn d-btn d-btn-circle" id="impact-carousel-prev" type="button" aria-label="Previous slide">
+            <svg class="impact-embla__btn-svg" viewBox="0 0 532 532">
+              <path fill="currentColor" d="M355.66 11.354c13.793-13.805 36.208-13.805 50.001 0 13.785 13.804 13.785 36.238 0 50.034L201.22 266l204.442 204.61c13.785 13.805 13.785 36.239 0 50.044-13.793 13.796-36.208 13.796-50.002 0a5994246.277 5994246.277 0 0 0-229.332-229.454 35.065 35.065 0 0 1-10.326-25.126c0-9.2 3.393-18.26 10.326-25.2C172.192 194.973 332.731 34.31 355.66 11.354Z" />
+            </svg>
+          </button>
+          <button class="impact-embla__btn d-btn d-btn-circle" id="impact-carousel-next" type="button" aria-label="Next slide">
+            <svg class="impact-embla__btn-svg" viewBox="0 0 532 532">
+              <path fill="currentColor" d="M176.34 520.646c-13.793 13.805-36.208 13.805-50.001 0-13.785-13.804-13.785-36.238 0-50.034L330.78 266 126.34 61.391c-13.785-13.805-13.785-36.239 0-50.044 13.793-13.796 36.208-13.796 50.002 0 22.928 22.947 206.395 206.507 229.332 229.454a35.065 35.065 0 0 1 10.326 25.126c0 9.2-3.393 18.26-10.326 25.2-45.865 45.901-206.404 206.564-229.332 229.52Z" />
+            </svg>
+          </button>
+        </div>
+        <span class="impact-embla__counter" id="impact-carousel-counter"></span>
+      </div>
+      <input class="impact-embla__scrollbar" id="impact-carousel-scrollbar" type="range" min="0" max="100" step="0.01" value="0" aria-label="Carousel position" />
+    </div>
+
+    <script type="text/javascript">
+      ;(function () {
+        const carousel = document.getElementById('impact-carousel')
+        const viewport = carousel.querySelector('.impact-embla__viewport')
+        const prevBtn = document.getElementById('impact-carousel-prev')
+        const nextBtn = document.getElementById('impact-carousel-next')
+        const counter = document.getElementById('impact-carousel-counter')
+        const scrollbar = document.getElementById('impact-carousel-scrollbar')
+      
+        const emblaApi = EmblaCarousel(viewport, { loop: true, align: 'start' })
+        GLightbox({ selector: '.glightbox', touchNavigation: true, loop: true })
+      
+        prevBtn.addEventListener('click', () => emblaApi.scrollPrev())
+        nextBtn.addEventListener('click', () => emblaApi.scrollNext())
+      
+        let isDragging = false
+        scrollbar.addEventListener('pointerdown', () => {
+          isDragging = true
+        })
+        scrollbar.addEventListener('pointerup', () => {
+          isDragging = false
+        })
+      
+        function updateScrollbar() {
+          if (isDragging) return
+          const selected = emblaApi.selectedScrollSnap()
+          const total = emblaApi.scrollSnapList().length
+          counter.textContent = selected + 1 + ' / ' + total
+          scrollbar.value = total <= 1 ? '0' : String((selected / (total - 1)) * 100)
+        }
+      
+        scrollbar.addEventListener('input', () => {
+          const total = emblaApi.scrollSnapList().length
+          const idx = Math.round((Number(scrollbar.value) / 100) * (total - 1))
+          counter.textContent = idx + 1 + ' / ' + total
+          emblaApi.scrollTo(idx, true)
+        })
+      
+        emblaApi.on('select', updateScrollbar)
+        emblaApi.on('init', updateScrollbar)
+        updateScrollbar()
+      })()
+    </script>
+  {% endwith %}
+{% endif %}

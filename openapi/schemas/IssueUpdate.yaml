@@ -25,8 +25,8 @@ properties:
     nullable: true
   employment_status:
     type: string
-  weekly_income:
-    type: number
+  annual_income_range:
+    type: string
     nullable: true
   referrer:
     type: string

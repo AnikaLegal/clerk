@@ -3,8 +3,7 @@ TODO: Test permissions
 TODO: Test that emails actually get sent
 """
 
-import pytz
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 from unittest.mock import patch, Mock
 
@@ -179,7 +178,7 @@ def test_case_email_download_attachment_from_sharepoint_view(
 
 
 def dt(day):
-    return datetime(2022, 1, day, tzinfo=pytz.UTC)
+    return datetime(2022, 1, day, tzinfo=timezone.utc)
 
 
 THREADED_EMAILS = [

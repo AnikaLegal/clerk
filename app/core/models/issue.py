@@ -137,6 +137,16 @@ class EmploymentType(models.TextChoices):
     UNEMPLOYED = "UNEMPLOYED", "Currently unemployed (DO NOT USE)"
 
 
+class IncomeRange(models.TextChoices):
+    UNDER_40K = "UNDER_40K", "Under $40,000"
+    FROM_40K_TO_64K = "FROM_40K_TO_64K", "$40,000 - $64,000"
+    FROM_65K_TO_89K = "FROM_65K_TO_89K", "$65,000 - $89,000"
+    FROM_90K_TO_114K = "FROM_90K_TO_114K", "$90,000 - $114,000"
+    FROM_115K_TO_139K = "FROM_115K_TO_139K", "$115,000 - $139,000"
+    FROM_140K_TO_155K = "FROM_140K_TO_155K", "$140,000 - $155,000"
+    OVER_155K = "OVER_155K", "Over $155,000"
+
+
 class Issue(TimestampedModel):
     """
     A client's specific issue.
@@ -179,7 +189,12 @@ class Issue(TimestampedModel):
     )
     # Person managing clients case from a 3rd party institution (eg. Launch Housing)
     support_worker = models.ForeignKey(
-        Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        Person,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        related_query_name="support_worker_issue",
     )
     # Tracks whether the case has been closed by paralegals.
     is_open = models.BooleanField(default=True)
@@ -208,7 +223,10 @@ class Issue(TimestampedModel):
         default=list,
         blank=True,
     )
-    weekly_income = models.IntegerField(null=True, blank=True)
+    weekly_income = models.IntegerField(null=True, blank=True)  # Legacy - Do not use.
+    annual_income_range = models.CharField(
+        max_length=32, blank=True, default="", choices=IncomeRange.choices
+    )
 
     # Referrer info: how did the client find us?
     referrer_type = models.CharField(

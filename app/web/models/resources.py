@@ -1,8 +1,10 @@
 from wagtail import blocks
-from wagtail.models import Page
-from wagtail.fields import StreamField
 from wagtail.admin.panels import FieldPanel
-from .mixins import NotFoundMixin
+from wagtail.fields import StreamField
+from wagtail.models import Page
+
+from web.blocks import AccordionBlock, AttributedQuoteBlock, LinkButtonBlock
+from web.models.mixins import NotFoundMixin
 
 
 class ResourceListPage(NotFoundMixin, Page):
@@ -15,12 +17,26 @@ class ResourcePage(Page):
     parent_page_types = ["web.ResourceListPage"]
     subpage_types = []
 
+    def get_template(self, request, *args, **kwargs):
+        from django.template.exceptions import TemplateDoesNotExist
+        from django.template.loader import get_template
+
+        slug_template = f"web/resources/{self.slug}.html"
+        try:
+            get_template(slug_template)
+            return slug_template
+        except TemplateDoesNotExist:
+            return self.template
+
     body = StreamField(
         [
             ("heading", blocks.CharBlock(form_classname="full title")),
             ("paragraph", blocks.RichTextBlock()),
+            ("attributed_quote", AttributedQuoteBlock()),
+            ("accordion", AccordionBlock()),
+            ("link_button", LinkButtonBlock()),
         ],
-        use_json_field=True
+        use_json_field=True,
     )
     content_panels = Page.content_panels + [
         FieldPanel("body"),

@@ -24,7 +24,13 @@ from core.models.client import (
     EligibilityCircumstanceType,
     RequiresInterpreter,
 )
-from core.models.issue import CaseStage, CaseTopic, EmploymentType, ReferrerType
+from core.models.issue import (
+    CaseStage,
+    CaseTopic,
+    EmploymentType,
+    IncomeRange,
+    ReferrerType,
+)
 from core.models.issue_date import DateType, HearingType
 from core.models.issue_event import EventType, IssueEvent
 from core.models.issue_note import NoteType
@@ -480,7 +486,9 @@ class SubmissionFactory(TimestampedModelFactory):
             "ISSUES": fake.random_element(
                 elements=[x[0] for x in CaseTopic.ACTIVE_CHOICES]
             ),
-            "WEEKLY_HOUSEHOLD_INCOME": fake.random_int(),
+            "ANNUAL_INCOME_RANGE": fake.random_element(
+                elements=[x[0] for x in IncomeRange.choices]
+            ),
             "WORK_OR_STUDY_CIRCUMSTANCES": fake.random_element(
                 elements=[x[0] for x in EmploymentType.choices]
             ),

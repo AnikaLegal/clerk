@@ -1,11 +1,17 @@
 from django.db import models
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from modelcluster.contrib.taggit import ClusterTaggableManager
+from modelcluster.fields import ParentalKey
+from taggit.models import TaggedItemBase
 from wagtail import blocks
 from wagtail.models import Page
+from wagtail.models.pages import PagePermissionTester
 from wagtail.fields import StreamField
 from wagtail.admin.panels import (
     FieldPanel,
     MultiFieldPanel,
+    ObjectList,
+    TabbedInterface,
 )
 from wagtail.images.blocks import ImageChooserBlock
 from django.utils import translation
@@ -19,8 +25,15 @@ class BlogListPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
+        blogs = (
+            self.get_children()
+            .live()
+            .public()
+            .select_related("locale", "content_type")
+            .order_by("-first_published_at")
+        )
+
         search = request.GET.get("search")
-        blogs = self.get_children().live().public().order_by("-first_published_at")
         if search:
             blogs = blogs.autocomplete(search)
 
@@ -38,6 +51,14 @@ class BlogListPage(Page):
         return context
 
 
+class BlogPageTag(TaggedItemBase):
+    content_object = ParentalKey(
+        "BlogPage",
+        related_name="tagged_items",
+        on_delete=models.CASCADE,
+    )
+
+
 class BlogPage(Page):
     template = "web/blog/blog-details.html"
     parent_page_types = ["web.BlogListPage"]
@@ -52,6 +73,7 @@ class BlogPage(Page):
         ],
         use_json_field=True,
     )
+    tags = ClusterTaggableManager(through="web.BlogPageTag", blank=True)
     main_image = models.ForeignKey(
         "wagtailimages.Image",
         related_name="+",
@@ -72,6 +94,17 @@ class BlogPage(Page):
         FieldPanel("owner", heading="Author"),
         FieldPanel("body"),
     ]
+    tag_panels = [
+        FieldPanel("tags"),
+    ]
+
+    edit_handler = TabbedInterface(
+        [
+            ObjectList(content_panels, heading="Content"),
+            ObjectList(tag_panels, heading="Tags"),
+            ObjectList(promote_panels, heading="Promote"),
+        ]
+    )
 
     def serve(self, request, *args, **kwargs):
         """Ensure links are translated as well."""
@@ -88,3 +121,14 @@ class BlogPage(Page):
         context = super().get_context(request, *args, **kwargs)
         context["feedback_form"] = ContentFeedbackForm()
         return context
+
+    # Fix django-zeal warning when displaying blog detail page with translated content:
+    #  N+1 detected on wagtailcore.Page.locale at /app/web/models/blog.py:114 in serve
+    def get_translations(self, inclusive=False):
+        translations = super().get_translations()
+        return translations.select_related("locale")
+
+    # Fix django-zeal warning when displaying Wagtail admin detail page:
+    #  N+1 detected on web.BlogPage.content_type at /app/case/middleware.py:15
+    def permissions_for_user(self, user):
+        return PagePermissionTester(user, self)

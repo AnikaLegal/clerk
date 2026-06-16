@@ -6,4 +6,4 @@ class AccountsConfig(AppConfig):
 
     def ready(self):
         import accounts.signals
-        import accounts.handlers
+        import accounts.handlers  # noqa: F401

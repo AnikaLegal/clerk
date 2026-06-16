@@ -12,7 +12,7 @@ h2 {
   font-family: var(--font-serif);
   font-size: var(--header-font-size);
   line-height: var(--header-line-height);
-  margin: 0 0 1rem 0;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 1300px) {
@@ -23,16 +23,29 @@ h2 {
 
 /* Paragraph / normal sized text */
 p {
-  margin: 0 0 1rem 0;
+  margin-bottom: 1rem;
   font-size: var(--body-font-size);
   line-height: var(--body-line-height);
   letter-spacing: 0.05em;
   color: var(--dark-4);
 }
-li {
-  letter-spacing: 0.05em;
+
+ol,
+ul {
+  padding-left: 25px;
+  margin-bottom: 1rem;
+  font-size: var(--body-font-size);
   line-height: var(--body-line-height);
+  letter-spacing: 0.05em;
+  color: var(--dark-4);
 }
+ol {
+  list-style-type: decimal;
+}
+ul {
+  list-style-type: disc;
+}
+
 p.light,
 li.light {
   color: var(--dark-6);
@@ -79,7 +92,7 @@ p.header {
 }
 
 /* Buttons */
-button {
+button:not(.d-btn, .gbtn) {
   color: var(--white);
   background: var(--blue);
   font-weight: bold;
@@ -96,14 +109,14 @@ button {
   box-shadow: 0px 4px 4px rgba(67, 143, 239, 0.18);
 }
 @media (max-width: 600px) {
-  button {
+  button:not(.d-btn, .gbtn) {
     margin: 0 auto;
     width: 270px;
     max-width: 100%;
     padding: 14px 30px;
   }
 }
-button.inverted {
+button:not(.d-btn, .gbtn).inverted {
   color: var(--blue);
   background: var(--white);
   border: 1px solid var(--blue);
@@ -255,6 +268,8 @@ Each image/icon can have some descriptive test below it.
 .card-grid .card img.icon {
   width: unset;
   height: 70px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .card-grid .card img.headshot {
   max-height: unset;
@@ -309,6 +324,8 @@ Each image/icon can have some descriptive test below it.
     width: 50px;
     height: 50px;
     object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -349,6 +366,7 @@ Each image/icon can have some descriptive test below it.
   line-height: 1.2;
 }
 .card-grid .card.profile .content ul {
+  list-style-type: disc;
   padding-left: 18px;
   margin: 0;
 }
@@ -381,6 +399,7 @@ A story has a big image on one side, and some content on the other.
 .story img {
   width: 594px;
   object-fit: cover;
+  max-width: none;
 }
 .story.right img {
   margin-right: 75px;
@@ -401,6 +420,10 @@ A story has a big image on one side, and some content on the other.
 }
 .story.center img {
   width: 100%;
+}
+.story .content ul {
+  list-style-type: disc;
+  padding-left: 25px;
 }
 
 @media (max-width: 1300px) {
@@ -457,6 +480,7 @@ Very similar to a story.
   padding-right: 100px;
   align-self: center;
   min-width: 342px;
+  box-sizing: content-box;
 }
 @media (max-width: 600px) {
   .hero-story {
@@ -512,15 +536,13 @@ Assumed to be in a wide container.
   color: var(--dark-0);
   font-weight: 600;
   line-height: 1;
+  text-align: center;
 }
 .panel ul {
+  list-style-type: disc;
   padding-left: 25px;
 }
-.panel p,
-.panel li {
-  color: var(--dark-0);
-}
-.panel img {
+.panel > img {
   object-fit: cover;
   width: min(900px, calc(100% - var(--content-width)));
 }
@@ -528,11 +550,12 @@ Assumed to be in a wide container.
   align-self: center;
   box-sizing: border-box;
   width: var(--content-width);
-  padding: 80px 100px 80px 100px;
+  padding: 50px 60px;
+  color: var(--dark-4);
 }
 @media (max-width: 1300px) {
   .panel .content {
-    padding: 75px 75px 75px 75px;
+    padding: 25px 30px;
   }
 }
 @media (max-width: 600px) {
@@ -564,8 +587,8 @@ Assumed to be in a wide container.
   .panel.left {
     flex-direction: column-reverse;
   }
-  .panel.right img,
-  .panel.left img {
+  .panel.right > img,
+  .panel.left > img {
     max-height: 300px;
     width: 100%;
   }
@@ -646,6 +669,7 @@ Assumed to be in a wide container.
   content: "";
   position: absolute;
   display: none;
+  box-sizing: content-box;
 }
 .checkbox input:checked ~ .checkmark:after {
   display: block;
@@ -935,6 +959,41 @@ before the final footer.
   transform: translateY(24px);
 }
 
+/* Wagtail link-button block */
+.article .block-link_button {
+  display: flex;
+  justify-content: center;
+  margin-block: 3rem;
+}
+
+/* Wagtail accordion block */
+.article .block-accordion {
+  margin-block: 3rem;
+}
+.article .block-accordion .d-join {
+  --radius-field: 0.5rem;
+  color: var(--dark-4);
+  text-align: left;
+  background-color: var(--color-base-100);
+}
+.article .block-accordion .d-collapse {
+  border-width: 1px;
+  border-color: var(--color-base-300);
+}
+.article .block-accordion .d-collapse-title {
+  font-weight: var(--font-weight-semibold);
+}
+.article .block-accordion .d-collapse-title {
+  font-weight: var(--font-weight-semibold);
+}
+.article .block-accordion .d-collapse-content p,
+.article .block-accordion .d-collapse-content ul,
+.article .block-accordion .d-collapse-content ol {
+  font-size: var(--text-sm);
+  color: var(--text-slate-700);
+  letter-spacing: normal;
+}
+
 @media (max-width: 1300px) {
   .article {
     --body-font-size: 16px;
@@ -953,7 +1012,7 @@ before the final footer.
   }
 }
 
-.partner-logos {
+.ally-logos {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -962,15 +1021,48 @@ before the final footer.
   margin: 0 auto;
 }
 
-.partner-logos img {
+.ally-logos img {
   object-fit: contain;
   max-width: 100%;
 }
 @media (max-width: 600px) {
-  .partner-logos {
+  .ally-logos {
     gap: 5rem;
     flex-direction: column;
     align-items: center;
+  }
+}
+
+.supporter-list {
+  list-style: none;
+  text-align: left;
+  column-count: 2;
+  column-gap: 2.5rem;
+}
+
+.supporter-list li {
+  position: relative;
+  padding: 0.5rem 0 0.7rem 1.4rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+.supporter-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--blue);
+  opacity: 0.9;
+}
+
+@media (max-width: 800px) {
+  .supporter-list {
+    column-count: 1;
   }
 }
 

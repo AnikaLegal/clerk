@@ -10,5 +10,4 @@ class RootPage(NotFoundMixin, Page):
         "web.ResourceListPage",
         "web.JobListPage",
         "web.NewsListPage",
-        "web.VolunteerListPage",
     ]

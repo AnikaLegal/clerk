@@ -1,19 +1,23 @@
 import json
 import logging
+from email.utils import getaddresses
 
-from core.models import Issue, IssueNote
-from core.models.issue_note import NoteType
+from core.models.issue import CaseStage, Issue
+from core.models.issue_note import IssueNote, NoteType
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from emails.models import (
+    DuplicateEmailDataError,
     Email,
     EmailAttachment,
     EmailState,
-    DuplicateEmailDataError,
 )
 from utils.sentry import sentry_task
+from .send import build_clerk_address
+
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +54,7 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
 
     logger.info("Saving inbound email data")
     try:
-        email = Email.objects.create(received_data=data, state=EmailState.SAVING)
+        email = Email.objects.create(received_data=data, state=EmailState.SAVING)  # ty:ignore[unresolved-attribute]
     except DuplicateEmailDataError as e:
         # We need to figure out if we are still saving the email and attachments
         # so we can respond appropriately back to SendGrid. Note that we
@@ -58,7 +62,7 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
         # save is still in progress so we can get SendGrid to resend in case
         # something goes wrong before we finish.
         is_saved = (
-            Email.objects.filter(received_data_hash=e.hash)
+            Email.objects.filter(received_data_hash=e.hash)  # ty:ignore[unresolved-attribute]
             .exclude(state=EmailState.SAVING)
             .exists()
         )
@@ -70,7 +74,7 @@ def save_inbound_email(data: MultiValueDict, files: MultiValueDict) -> bool:
     with transaction.atomic():
         try:
             for file in files.values():
-                EmailAttachment.objects.create(
+                EmailAttachment.objects.create(  # ty:ignore[unresolved-attribute]
                     email=email, file=file, content_type=file.content_type
                 )
             email.state = EmailState.RECEIVED
@@ -90,7 +94,7 @@ def ingest_email_task(email_pk: int):
     """
     Ingests a received email and attempts to associate it with a case.
     """
-    email = Email.objects.get(pk=email_pk)
+    email = Email.objects.get(pk=email_pk)  # ty:ignore[unresolved-attribute]
     for rule, msg in EMAIL_RECEIVE_RULES:
         if not rule(email):
             logger.error(f"Cannot ingest Email[{email_pk}]: {msg}")
@@ -114,7 +118,7 @@ def ingest_email_task(email_pk: int):
             email.processed_at = timezone.now()
             email.save()
 
-            IssueNote.objects.create(
+            IssueNote.objects.create(  # ty:ignore[unresolved-attribute]
                 note_type=NoteType.EMAIL,
                 content_object=email,
                 issue=email.issue,
@@ -142,51 +146,86 @@ def parse_received_data(email_data: dict) -> dict:
     parsed_data = {}
     # Find who the email is to.
     envelope = json.loads(email_data["envelope"])
-    to_addrs = envelope["to"]
-    if len(to_addrs) != 1:
-        if len(to_addrs) == 0:
-            raise Exception("No 'to' address found")
-        raise Exception(f"Multiple 'to' addresses found: {to_addrs}")
+    to_addrs = [addr for _, addr in getaddresses(envelope["to"])]
+    if not to_addrs:
+        raise Exception("No 'to' addresses found")
 
-    to_addr = clean_email_addr(to_addrs[0])
-    parsed_data["to_address"] = to_addr
+    local_to_addrs = [addr for addr in to_addrs if is_inbound_email_domain(addr)]
+    if not local_to_addrs:
+        raise Exception(f"No local 'to' addresses found: {to_addrs}")
+
+    issues = get_issues_from_addresses(local_to_addrs)
+    if issues.count() == 0:
+        raise Exception(f"No issues found for 'to' addresses: {local_to_addrs}")
+    elif issues.count() == 1:
+        issue = issues.first()
+    else:
+        # The email has been sent to multiple local addresses associated with
+        # different issues. Select the latest open issue otherwise just the
+        # latest issue. Also emit a warning.
+        # NOTE: We could remove this if we separated the saving of received data
+        # from our ESP from the creation of the email record. We could then
+        # create an email record for each local "to" address and associate it
+        # with the relevant issue.
+        issue = issues.exclude(stage=CaseStage.CLOSED).order_by("-created_at").first()
+        if not issue:
+            issue = issues.order_by("-created_at").first()
+
+        logger.warning(
+            "Multiple issues found for 'to' addresses %s, selecting Issue pk=%s, stage=%s, created_at=%s",
+            local_to_addrs,
+            issue.pk,
+            issue.stage,
+            issue.created_at,
+        )
+
+    # NOTE: We use the "canonical" clerk email address as the "to" address because:
+    # - It's easier to determine from the issue when there are multiple local
+    #   "to" addresses.
+    # - It uses the correct domain for emails sent to the legacy domain which we
+    #   have to continue accepting for now.
+    parsed_data["to_address"] = build_clerk_address(issue, True)
     parsed_data["from_address"] = envelope["from"]
 
-    cc_addrs = []
-    cc_addr_strs = email_data.get("cc", "").split(",")
-    to_addr_strs = email_data["to"].split(",")
-    for addr_str in cc_addr_strs + to_addr_strs:
-        addr_cleaned = clean_email_addr(addr_str)
-        if addr_cleaned and addr_cleaned != parsed_data["to_address"]:
-            cc_addrs.append(addr_cleaned)
+    cc_addr_strs = email_data.get("cc", "")
+    to_addr_strs = email_data["to"]
 
-    parsed_data["cc_addresses"] = cc_addrs
+    parsed_addrs = getaddresses([cc_addr_strs] + [to_addr_strs])
+    cc_addrs = [
+        email
+        for _, email in parsed_addrs
+        if email != ""
+        and email not in local_to_addrs
+        and email != parsed_data["to_address"]
+    ]
+
+    parsed_data["cc_addresses"] = list(dict.fromkeys(cc_addrs))
     parsed_data["text"] = email_data.get("text", "")
     parsed_data["subject"] = email_data["subject"]
     parsed_data["html"] = email_data.get("html", "")
-
-    # Try find the issue from to_addr.
-    user, domain = to_addr.split("@")
-
-    # Check that the email is sent to the correct domain.
-    # TODO: We have to accept emails from our the old mail domain for a while
-    # until all open cases from before the domain change are closed. Remove the
-    # legacy domain check when possible.
-    if domain != settings.EMAIL_DOMAIN and (
-        settings.EMAIL_DOMAIN_LEGACY is None or domain != settings.EMAIL_DOMAIN_LEGACY
-    ):
-        raise Exception(f"Incorrect domain in 'to' address {to_addr}")
-
-    user_parts = user.split(".")
-    issue_prefix = user_parts[-1]
-    parsed_data["issue"] = Issue.objects.get(id__startswith=issue_prefix)
+    parsed_data["issue"] = issue
 
     return parsed_data
 
 
-def clean_email_addr(email_addr):
-    email_addr = email_addr.strip()
-    if "<" in email_addr:
-        return email_addr.split("<")[1].rstrip(">")
-    else:
-        return email_addr.strip()
+def get_issues_from_addresses(addresses: list[str]) -> QuerySet[Issue]:
+    query = Q()
+    for address in addresses:
+        user, _ = address.split("@")
+        user_parts = user.split(".")
+        issue_prefix = user_parts[-1]
+        query |= Q(id__startswith=issue_prefix)
+
+    return Issue.objects.filter(query)  # ty:ignore[unresolved-attribute]
+
+
+def is_inbound_email_domain(email_addr: str) -> bool:
+    _, domain = email_addr.split("@")
+
+    # TODO: We have to accept emails from our the old mail domain for a while
+    # until all open cases from before the domain change are closed. Remove the
+    # legacy domain check when possible.
+    return domain == settings.EMAIL_DOMAIN or (
+        settings.EMAIL_DOMAIN_LEGACY is not None
+        and domain == settings.EMAIL_DOMAIN_LEGACY
+    )

@@ -1,0 +1,27 @@
+{% load static %}
+{% load wagtail_clerk %}
+
+<div class="panel left round top-right bottom-right">
+  <img class="round bottom-right" src="{% static 'web/img/services/services-hero.jpg' %}" />
+  <div class="content">
+    <h2>You may be eligible for free legal help</h2>
+    <div class="divider"></div>
+    <p>We support Victorian renters who may not have access to traditional legal services.</p>
+    <div class="flex flex-col items-center gap-8">
+      <div class="text-left">
+        <p>You may be eligible if:</p>
+        <ul>
+          {% block eligibility_list %}
+
+          {% endblock %}
+        </ul>
+        <p>
+          If you're not sure, that's okay; you can read more about our <a href="{% clerk_slugurl 'eligibility-criteria' %}">eligibility criteria</a> or submit an intake form and we will let you know.
+        </p>
+      </div>
+      <div class="flex justify-center w-full">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+      </div>
+    </div>
+  </div>
+</div>

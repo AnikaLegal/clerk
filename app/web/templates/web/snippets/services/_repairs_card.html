@@ -1,0 +1,6 @@
+{% load static %}
+
+{% url 'repairs' as repairs_url %}
+{% static 'web/img/problem/repairs.webp' as image_url %}
+
+{% include 'web/snippets/services/_base_card.html' with image=image_url title='Rental Repairs' description="Need something in your rental property fixed? Let's look at what you can do next." url=repairs_url %}

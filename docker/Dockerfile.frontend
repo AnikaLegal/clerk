@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:lts-slim
 
 WORKDIR /frontend
 
@@ -6,7 +6,7 @@ WORKDIR /frontend
 COPY frontend/package.json .
 COPY frontend/package-lock.json .
 RUN echo "Installing Node modules." && \
-    npm install --silent
+    npm ci --silent
 
 # Mount the codebase
 ADD frontend /frontend

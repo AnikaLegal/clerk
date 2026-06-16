@@ -2,10 +2,10 @@
 {% load static %}
 {% load wagtail_clerk %}
 {% block title %}
-  Philanthropic Partners
+  Philanthropic Supporters
 {% endblock %}
 {% block social_meta %}
-  {% include 'web/snippets/_social_meta.html' with title='Philanthropic Partners' description='Create effective, sustainable impact with us' %}
+  {% include 'web/snippets/_social_meta.html' with title='Philanthropic Supporters' description='Create effective, sustainable impact with us' %}
 {% endblock %}
 {% block content %}
   <div class="hero-gold">
@@ -26,7 +26,7 @@
 
   <div class="segment">
     <div class="container">
-      <h2>Why partner with Anika?</h2>
+      <h2>Why support Anika?</h2>
       <div class="divider"></div>
       <div class="card-grid tight">
         <div class="card">
@@ -39,12 +39,12 @@
         <div class="card">
           <img class="icon" src="{% static 'web/img/icons/star.svg' %}" />
           <p class="header">Promotion of your philanthropic efforts</p>
-          <p class="compact">We offer philanthropic partners exposure to Anika’s extensive corporate, media and community networks</p>
+          <p class="compact">We offer philanthropic supporters exposure to Anika's extensive corporate, media and community networks</p>
         </div>
         <div class="card">
           <img class="icon" src="{% static 'web/img/icons/email.svg' %}" />
-          <p class="header">We’ll keep you informed</p>
-          <p class="compact">We’ll update you on your impact and key developments. As a charity registered with the ACNC we are also accountable through transparent reporting and leadership practices</p>
+          <p class="header">We'll keep you informed</p>
+          <p class="compact">We'll update you on your impact and key developments. As a charity registered with the ACNC we are also accountable through transparent reporting and leadership practices</p>
         </div>
       </div>
     </div>
@@ -52,27 +52,26 @@
 
   <div class="segment gold round-large top-left bottom-right">
     <div class="container wide">
-      <h2>Meet our philanthropic partners</h2>
-      <p class="light">We gratefully acknowledge the following philanthropic partners and people who have made Anika Legal’s impact possible</p>
+      <h2>Meet our philanthropic supporters</h2>
+      <p class="light">We gratefully acknowledge the following philanthropic supporters who make Anika Legal's impact possible</p>
       <div class="divider"></div>
-      <div class="partner-logos">
-        <img src="{% static 'web/img/partners/victorian-legal-services-board-commissioner.jpg' %}" width="280" />
-        <img src="{% static 'web/img/partners/sunshine.jpg' %}" width="160" />
-        <img src="{% static 'web/img/partners/victoria-law-foundation.svg' %}" width="200" />
-        <img src="{% static 'web/img/partners/the-funding-network.png' %}" width="120" />
-        <img src="{% static 'web/img/partners/city-of-melbourne.svg' %}" width="120" />
-        <div style="width:150px;display:flex;justify-content: center; align-items: center">
-          <h2 style="font-size: 32px;line-height:1.2">The Diana Browne Trust</h2>
-        </div>
-        <img src="{% static 'web/img/partners/smorgon-families-foundation.png' %}" width="360" />
-        <div style="width:150px;display:flex;justify-content: center; align-items: center">
-          <h2 style="font-size: 32px;line-height:1.2">Shelley Hua Foundation</h2>
-        </div>
-        <img src="{% static 'web/img/partners/streetsmart.png' %}" width="200" />
-        <div style="width:150px;display:flex;justify-content: center; align-items: center">
-          <h2 style="font-size: 32px;line-height:1.2">Marcia & Henry Pinskier</h2>
-        </div>
-        <img src="{% static 'web/img/partners/10x10.png' %}" width="140" />
+      <div class="flex justify-center">
+        <ul class="supporter-list">
+          <li>ANZ Community Foundation</li>
+          <li>Australian Communities Foundation</li>
+          <li>Collier Charitable Fund</li>
+          <li>Equity Trustees</li>
+          <li>Jack &amp; Robert Smorgon Families Foundation</li>
+          <li>Perpetual</li>
+          <li>Shelley Hua Foundation</li>
+          <li>Sisters of Charity</li>
+          <li>The Sidney Myer Fund</li>
+          <li>Spencer Gibson</li>
+          <li>Sunshine Foundation</li>
+          <li>Victorian Legal Services Board + Commissioner</li>
+          <li>The W.C.F. Thomas Charitable Trust</li>
+          <li>William Buckland Foundation</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -81,22 +80,24 @@
     <div class="container wide">
       <div class="story left">
         <div class="content">
-          <h2>Here’s how we can work together</h2>
-          <p class="light">Our most impactful partnerships strengthen and evolve over multiple years, enabling us to grow and proactively respond to social need.</p>
-          <a href="mailto:partnerships@anikalegal.org.au"><button>Get in touch</button></a>
+          <h2>Here's how we can work together</h2>
+          <p class="light">Our most impactful supporters grow with us over multiple years, enabling us to expand and proactively respond to social need.</p>
+          <a href="mailto:partnerships@anikalegal.com"><button>Get in touch</button></a>
         </div>
         <img style="object-position: 50% 20%;max-height: 465px;" class="round not-responsive top-left bottom-right top-right" src="{% static 'web/img/photos/boardroom.jpg' %}" />
       </div>
       <div class="story right" style="margin-top:2.5rem">
         <img style="object-position: 50% 20%;max-height: 465px;" class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/photos/tenant.jpg' %}" />
         <div class="content">
-          <p class="light">Here are a handful of ways you can partner with us:</p>
+          <p class="light">Here are a handful of ways you can support us:</p>
           <ul>
             <li class="light">Fund projects and operations</li>
             <li class="light">Assist us in achieving greater brand awareness</li>
             <li class="light">Contribute in-kind support to build our capacity and reduce our expenses</li>
           </ul>
-          <p class="light">If you’d like to explore how you may be able to make a transformational philanthropic contribution, please get in touch with our Head of Philanthropy.</p>
+          <p class="light">
+            If you'd like to explore how you may be able to make a transformational philanthropic contribution, please <a href="mailto:partnerships@anikalegal.com">get in touch</a>.
+          </p>
         </div>
       </div>
     </div>

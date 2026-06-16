@@ -1,0 +1,6 @@
+{% load wagtail_clerk %}
+
+<div class="max-w-[473px] flex flex-wrap gap-4 justify-center sm:justify-start mt-8">
+  <a class="min-w-64 sm:min-w-42" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check your eligibility</button></a>
+  <a class="min-w-64 sm:min-w-42" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
+</div>

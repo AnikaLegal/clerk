@@ -15,6 +15,7 @@ export const StructuredAnswersClientCard = ({
   if (
     !answers.client &&
     !answers.issue?.weekly_income &&
+    !answers.issue?.annual_income_range &&
     !answers.issue?.employment_status
   ) {
     return null
@@ -71,6 +72,10 @@ export const StructuredAnswersClientCard = ({
     ],
     [
       { label: 'Weekly income', value: answers.issue?.weekly_income },
+      {
+        label: 'Annual income range',
+        value: answers.issue?.annual_income_range?.label,
+      },
       {
         label: 'Employment status',
         value: answers.issue?.employment_status

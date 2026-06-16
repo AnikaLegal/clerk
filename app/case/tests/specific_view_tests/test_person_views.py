@@ -1,6 +1,7 @@
 import pytest
+from accounts.models import User
 from conftest import schema_tester
-from core.factories import PersonFactory
+from core.factories import IssueFactory, PersonFactory, TenancyFactory, UserFactory
 from core.models import Person
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
@@ -262,5 +263,69 @@ def test_person_update_api(superuser_client: APIClient):
     assert data["email"] == "updated@example.com"
     assert data["address"] == "999 Updated St"
     assert data["phone_number"] == "555-9999"
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_person_list_api__paralegal_returns_only_related_people(
+    paralegal_user_client: APIClient, paralegal_user: User
+):
+    """Paralegal list action should only return people linked to issues they work on."""
+    landlord = PersonFactory()
+    agent = PersonFactory()
+    support_worker = PersonFactory()
+    unrelated_person = PersonFactory()
+
+    tenancy = TenancyFactory(landlord=landlord, agent=agent)
+    IssueFactory(
+        paralegal=paralegal_user, tenancy=tenancy, support_worker=support_worker
+    )
+    IssueFactory(
+        paralegal=UserFactory(),
+        tenancy=TenancyFactory(),
+        support_worker=PersonFactory(),
+    )
+
+    url = reverse("person-api-list")
+    response = paralegal_user_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+
+    assert data["item_count"] == 3
+    result_ids = {x["id"] for x in data["results"]}
+    assert result_ids == {landlord.pk, agent.pk, support_worker.pk}
+    assert unrelated_person.pk not in result_ids
+
+    schema_tester.validate_response(response=response)
+
+
+@pytest.mark.django_db
+def test_person_list_api__lawyer_returns_only_related_people(
+    lawyer_user_client: APIClient, lawyer_user: User
+):
+    """Lawyer list action should only return people linked to issues they work on."""
+    landlord = PersonFactory()
+    agent = PersonFactory()
+    support_worker = PersonFactory()
+    unrelated_person = PersonFactory()
+
+    tenancy = TenancyFactory(landlord=landlord, agent=agent)
+    IssueFactory(lawyer=lawyer_user, tenancy=tenancy, support_worker=support_worker)
+    IssueFactory(
+        lawyer=UserFactory(), tenancy=TenancyFactory(), support_worker=PersonFactory()
+    )
+
+    url = reverse("person-api-list")
+    response = lawyer_user_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    data = response.json()
+
+    assert data["item_count"] == 3
+    result_ids = {x["id"] for x in data["results"]}
+    assert result_ids == {landlord.pk, agent.pk, support_worker.pk}
+    assert unrelated_person.pk not in result_ids
 
     schema_tester.validate_response(response=response)

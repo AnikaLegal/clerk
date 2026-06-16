@@ -37,6 +37,7 @@ echo -e "\nSync AWS S3 assets"
 aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-staging/action-documents
 aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-staging/documents
 aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-staging/images
+aws s3 sync --acl public-read s3://anika-clerk/impact_images s3://anika-clerk-staging/impact_images
 aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-staging/original_images
 aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-staging
 

@@ -9,6 +9,8 @@ from web.models import (
     BlogPage,
     CustomDocument,
     DocumentLog,
+    Impact,
+    ImpactImage,
     Report,
     RootPage,
 )
@@ -28,9 +30,12 @@ class BlogListPageFactory(factory.django.DjangoModelFactory[BlogListPage]):
     def _create(cls, model_class, *args, **kwargs):
         # Get the root page to add child to
         root_page = RootPage.objects.get()
+
         instance = model_class(*args, **kwargs)
         root_page.add_child(instance=instance)
-        instance.save_revision().publish()
+        instance.live = True
+        instance.save()
+
         return instance
 
 
@@ -51,7 +56,8 @@ class BlogPageFactory(factory.django.DjangoModelFactory[BlogPage]):
 
         instance = model_class(*args, **kwargs)
         parent.add_child(instance=instance)
-        instance.save_revision().publish()
+        instance.live = True
+        instance.save()
 
         return instance
 
@@ -87,6 +93,26 @@ class DocumentLogFactory(factory.django.DjangoModelFactory[DocumentLog]):
     )
 
 
+class ImpactFactory(factory.django.DjangoModelFactory[Impact]):
+    class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
+        model = Impact
+
+    title = factory.Faker("sentence")
+    pdf = factory.SubFactory(DocumentFactory)
+    page_range_start = 1
+    page_range_end = factory.LazyAttribute(lambda obj: obj.page_range_start + 1)
+    live = True
+
+
+class ImpactImageFactory(factory.django.DjangoModelFactory[ImpactImage]):
+    class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
+        model = ImpactImage
+
+    impact = factory.SubFactory(ImpactFactory)
+    page_number = factory.Sequence(lambda n: n + 1)
+    image = factory.django.ImageField(width=100, height=100)
+
+
 class ReportFactory(factory.django.DjangoModelFactory[Report]):
     class Meta:  # pyright: ignore[reportIncompatibleVariableOverride]
         model = Report
@@ -103,9 +129,11 @@ class ReportFactory(factory.django.DjangoModelFactory[Report]):
         lambda obj: DocumentFactory() if obj.is_document else None
     )
     accessible_document = factory.LazyAttribute(
-        lambda obj: DocumentFactory()
-        if obj.is_document and fake.boolean(chance_of_getting_true=50)
-        else None
+        lambda obj: (
+            DocumentFactory()
+            if obj.is_document and fake.boolean(chance_of_getting_true=50)
+            else None
+        )
     )
     blog_page = factory.LazyAttribute(
         lambda obj: None if obj.is_document else BlogPageFactory()

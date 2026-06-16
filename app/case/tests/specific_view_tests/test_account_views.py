@@ -10,9 +10,7 @@ from conftest import schema_tester
 
 
 @pytest.mark.django_db
-@patch("microsoft.tasks._invite_user_if_not_exists")
 def test_account_api_create(
-    mock_invite_user_if_not_exists,
     superuser_client: APIClient,
 ):
     assert User.objects.count() == 1
@@ -28,9 +26,7 @@ def test_account_api_create(
     assert response.json()["email"] == "charlie.brown@anikalegal.org.au"
     assert User.objects.count() == 2
     user = User.objects.get(email="charlie.brown@anikalegal.org.au")
-    mock_invite_user_if_not_exists.assert_called_with(user)
     assert list(user.groups.values_list("name", flat=True)) == ["Paralegal"]
-    assert user.ms_account_created_at is not None
 
     schema_tester.validate_response(response=response)
 
@@ -319,9 +315,7 @@ def test_account_api_list_potential_users__excludes_existing_users(
         ("admin_user_client", 201),
     ],
 )
-@patch("microsoft.tasks._invite_user_if_not_exists")
 def test_account_api_create_permissions(
-    mock_invite_user_if_not_exists,
     user_client_name: str,
     expected_status: int,
     request,

@@ -14,6 +14,8 @@ dependencies = [
     "boto3",
     "django-cleanup",
     "django-cors-headers",
+    "django-modelcluster",
+    "django-taggit",
     "django-override-storage",
     "django-q2",
     "django-storages",
@@ -31,6 +33,7 @@ dependencies = [
     "openapi-spec-validator",
     "pillow",
     "psycopg2-binary",
+    "pypdfium2",
     "pygments",
     "pytest-django",
     "pytest-factoryboy",
@@ -41,8 +44,8 @@ dependencies = [
     "social-auth-app-django",
     "twilio",
     "tzdata",
-    "wagtail-localize",
-    "wagtail>=7.2.0",
+    "wagtail-localize==1.13.1",
+    "wagtail==7.4.1",
     "whitenoise",
     "django-vite>=3.1.0",
     "django-auditlog>=3.2.1",
@@ -51,6 +54,8 @@ dependencies = [
     "google-api-python-client>=2.188.0",
     "google-auth-httplib2>=0.3.0",
     "google-auth-oauthlib>=1.2.4",
+    "django-fernet-encrypted-fields>=0.4.0",
+    "wagtail-link-block>=1.2",
 ]
 
 [dependency-groups]

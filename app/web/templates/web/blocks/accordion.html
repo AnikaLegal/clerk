@@ -1,0 +1,11 @@
+<div class="flex d-join d-join-vertical">
+  {% for item in self.items %}
+    <div class="d-collapse d-collapse-plus d-join-item">
+      <input type="checkbox" />
+      <div class="d-collapse-title">{{ item.title }}</div>
+      <div class="d-collapse-content">
+        <div>{{ item.content }}</div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

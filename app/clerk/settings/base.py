@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
+    "wagtail_link_block",
     "wagtail_localize",
     "wagtail_localize.locales",
     "modelcluster",
@@ -114,6 +115,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
+                "web.context_processors.intake_url",
             ],
         },
     }
@@ -123,6 +125,11 @@ SILENCED_SYSTEM_CHECKS = [
     "wagtailadmin.W004",  # The AWS_S3_FILE_OVERWRITE setting is set to True
     "django_vite.W001",  # Cannot read Vite manifest file for app default at /static/manifest.json
 ]
+
+# Encrypted fields.
+# Does not need to be secret, but must be set to a fixed value in all
+# environments to avoid breaking encryption.
+SALT_KEY = "Ucy8Us3DsAN6xvxOdPvSIQ"
 
 # Auditing
 AUDITLOG_STORE_JSON_CHANGES = True
@@ -147,6 +154,7 @@ LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "case-list"
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
@@ -299,23 +307,19 @@ LOGGING = {
     "loggers": {
         "django": {
             "level": "INFO",
-            "handlers": ["console", "file"],
-            "propagate": False,
+            "propagate": True,
         },
         "django.server": {
             "level": "INFO",
-            "handlers": ["console", "file"],
-            "propagate": False,
+            "propagate": True,
         },
         "django-q": {
             "level": "INFO",
-            "handlers": ["console", "file"],
-            "propagate": False,
+            "propagate": True,
         },
         "django.db.backends": {
             "level": "ERROR",
-            "handlers": ["console", "file"],
-            "propagate": False,
+            "propagate": True,
         },
     },
 }

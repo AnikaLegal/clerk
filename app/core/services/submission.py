@@ -106,7 +106,7 @@ def process_issue(submission, answers, client, tenancy):
         # Client data
         client=client,
         employment_status=get_as_list(answers, "WORK_OR_STUDY_CIRCUMSTANCES"),
-        weekly_income=answers.get("WEEKLY_HOUSEHOLD_INCOME"),
+        annual_income_range=get_as_string(answers, "ANNUAL_INCOME_RANGE"),
         referrer_type=get_as_string(answers, "REFERRER_TYPE"),
         referrer=referrer,
         # Tanancy data

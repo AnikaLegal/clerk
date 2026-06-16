@@ -5,6 +5,7 @@ set -o errexit
 echo -e "\nRunning migrations"
 ./manage.py migrate
 
+export CLERK_SKIP_USER_EVENTS=true
 export DJANGO_SUPERUSER_PASSWORD="admin"
 echo -e "\nCreating new superuser 'admin' with password: $DJANGO_SUPERUSER_PASSWORD"
 ./manage.py createsuperuser \

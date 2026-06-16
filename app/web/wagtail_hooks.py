@@ -8,7 +8,14 @@ from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet
 
 from .forms import DocumentLogForm
-from .models import Banner, DashboardItem, DocumentLog, ExternalNews, Report
+from .models import (
+    Banner,
+    DashboardItem,
+    DocumentLog,
+    ExternalNews,
+    Impact,
+    Report,
+)
 
 
 def global_admin_css():
@@ -135,3 +142,17 @@ class ReportAdmin(SnippetViewSet):
 
 
 register_snippet(ReportAdmin)
+
+
+class ImpactAdmin(SnippetViewSet):
+    model = Impact
+    menu_label = "Impact"
+    icon = "image"
+    menu_order = 204
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    list_display = ("title",)
+    search_fields = ("title",)
+
+
+register_snippet(ImpactAdmin)

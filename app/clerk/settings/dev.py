@@ -18,11 +18,6 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
-# Authentication
-AUTHENTICATION_BACKENDS += [
-    "django.contrib.auth.backends.ModelBackend",
-]
-
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = "9749f1f08c"
 MAILCHIMP_COVID_WORKFLOW_ID = "fb4daa69fe"
@@ -48,6 +43,7 @@ CASES_FOLDER_ID = "014GE5DG2XPLXZF3NLYNGK4IDSYOAG5ICE"
 
 CLERK_BASE_URL = "http://localhost:8000"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
+INTAKE_URL = "https://localhost:3001"
 
 DJANGO_VITE["default"]["dev_mode"] = True
 

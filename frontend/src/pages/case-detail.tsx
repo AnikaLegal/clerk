@@ -428,10 +428,10 @@ const CurrentCircumstancesCard = ({ initialIssue, updateCase }) => {
       name: 'employment_status',
     },
     {
-      label: 'Weekly income',
-      name: 'weekly_income',
-      schema: Yup.number().integer().min(0).nullable(),
-      type: FIELD_TYPES.NUMBER,
+      label: 'Annual income',
+      name: 'annual_income_range',
+      type: FIELD_TYPES.SINGLE_CHOICE,
+      schema: Yup.string().nullable(),
     },
   ]
 

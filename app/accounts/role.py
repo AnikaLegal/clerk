@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from accounts.models import CaseGroups
+from django.db.models import prefetch_related_objects
 
 if TYPE_CHECKING:
     from accounts.models import User
@@ -48,7 +49,7 @@ class UserRole:
     is_paralegal_or_better = False
 
     _user: User | None = None
-    _groups: set[str] = set()
+    _group_names: set[str] = set()
 
     def __init__(self, user: User):
         self._user = user
@@ -72,13 +73,20 @@ class UserRole:
         setattr(user, "is_paralegal_or_better", role.is_paralegal_or_better)
 
     def reset(self):
-        self._groups = set()
+        self._group_names = set()
         self._set_no_role()
 
         if self._user:
+            # Prefetch the user's groups if they haven't been already.
+            if (
+                not hasattr(self._user, "_prefetched_objects_cache")
+                or "groups" not in self._user._prefetched_objects_cache
+            ):
+                prefetch_related_objects([self._user], "groups")
+
             # NOTE: Use all() to make sure we hit the "groups" prefetch_related
-            # cache if it is specified.
-            self._groups = set(x.name for x in self._user.groups.all())
+            # cache.
+            self._group_names = set(x.name for x in self._user.groups.all())
 
             # NOTE: the order of the tests is important.
             if self._user.is_superuser:
@@ -94,19 +102,19 @@ class UserRole:
 
     @property
     def is_in_admin_group(self) -> bool:
-        return CaseGroups.ADMIN in self._groups
+        return CaseGroups.ADMIN in self._group_names
 
     @property
     def is_in_coordinator_group(self) -> bool:
-        return CaseGroups.COORDINATOR in self._groups
+        return CaseGroups.COORDINATOR in self._group_names
 
     @property
     def is_in_lawyer_group(self) -> bool:
-        return CaseGroups.LAWYER in self._groups
+        return CaseGroups.LAWYER in self._group_names
 
     @property
     def is_in_paralegal_group(self) -> bool:
-        return CaseGroups.PARALEGAL in self._groups
+        return CaseGroups.PARALEGAL in self._group_names
 
     def _set_superuser_role(self):
         self.is_admin = False

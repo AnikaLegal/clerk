@@ -1,0 +1,283 @@
+{% extends 'web/_base.html' %}
+{% load static %}
+{% load wagtail_clerk %}
+{% load cases %}
+
+{% block title %}
+  How It Works
+{% endblock %}
+{% block social_meta %}
+  {% include 'web/snippets/_social_meta.html' with title='How It Works' description='Getting legal help can feel overwhelming. We keep the process simple, clear, and supportive so you know what happens next.' %}
+{% endblock %}
+
+{% block content %}
+  {# HEADER #}
+  <div class="segment">
+    <div class="container wide">
+      <div class="story left">
+        <div class="content">
+          <h1>How It Works</h1>
+          <p>Getting legal help can feel overwhelming, especially when you're already dealing with stress around your housing.</p>
+          <p>We keep the process simple, clear, and supportive so you understand what happens next and how we can help.</p>
+          <div class="mt-8 max-w-[473px] flex gap-4 justify-center sm:justify-start flex-wrap sm:flex-nowrap">
+            <a class="d-btn-wide" href="{% clerk_slugurl 'eligibility-criteria' %}"><button class="d-btn d-btn-primary d-btn-wide">Check your eligibility</button></a>
+            <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Get free help</button></a>
+          </div>
+        </div>
+        <img class="round not-responsive top-left top-right bottom-left" src="{% static 'web/img/services/services-hero.jpg' %}" />
+      </div>
+    </div>
+  </div>
+
+  {# INTRODUCTION #}
+  <div class="panel right round top-left bottom-left">
+    <div class="content">
+      <h2>Getting help is simpler than you think</h2>
+      <div class="divider"></div>
+      <p>You don't need to know exactly what your rights are before reaching out, and you don't need to have everything figured out.</p>
+      <p>Whether you're dealing with an eviction, rental repairs or bond issues, our team of volunteer paralegals and lawyers help you understand your options and the steps you can take next.</p>
+      <p>We offer free, confidential, online legal help to renters across Victoria.</p>
+    </div>
+    <img class="round bottom-left" src="{% static 'web/img/how-it-works/casework.jpg' %}" />
+  </div>
+
+  {# URGENT CTA — Facing eviction #}
+  <div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/services/evictions-hero.jpg' %}" />
+    <div class="content">
+      <h2>Facing eviction? We can help</h2>
+      <div class="divider"></div>
+      <p>Some rental issues are more pressing than others. If you're facing eviction, it's a good idea to get legal advice early. Depending on your situation, you may be able to stay in your home longer, challenge the notice, negotiate with your landlord, or get more time to move.</p>
+      <p>We help you understand your notice, explain your rights in plain language, and work through your options so you feel more confident about what to do next.</p>
+      <div class="flex justify-center">
+        <a class="d-btn-wide" href="{% url 'evictions' %}"><button class="d-btn d-btn-primary d-btn-wide d-btn-soft">Learn more</button></a>
+      </div>
+    </div>
+  </div>
+
+  {# WHAT HAPPENS NEXT — Steps #}
+  <div class="segment round-large top-right bottom-left">
+    <div class="container wide">
+      <h2>What happens after you contact us?</h2>
+      <div class="divider"></div>
+      <div class="flex flex-wrap justify-center gap-8 md:gap-12">
+        <div class="d-card basis-2/5 min-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none max-h-[250px] sm:max-h-none">
+            <img src="{% static 'web/img/how-it-works/intake.jpg' %}" />
+          </figure>
+          <div class="d-card-body">
+            <div class="flex items-center gap-4 mb-2">
+              <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</div>
+              <div class="d-card-title text-left">Tell us what's going on</div>
+            </div>
+            <div class="text-left">
+              <p>
+                Start by completing our <a href="{{ INTAKE_URL }}">online intake form</a>. We'll ask a few questions about your rental situation so we can understand how to help.
+              </p>
+              <p>The form takes around 10 minutes to complete.</p>
+              <p>You don't need to have every document or detail ready before getting started.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-card basis-2/5 min-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none max-h-[250px] sm:max-h-none">
+            <img src="{% static 'web/img/how-it-works/call-you.jpg' %}" />
+          </figure>
+          <div class="d-card-body">
+            <div class="flex items-center gap-4 mb-2">
+              <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</div>
+              <div class="d-card-title text-left">We review your situation</div>
+            </div>
+            <div class="text-left">
+              <p>Once we receive your form, our team reviews your information.</p>
+              <p>We look at the type of rental issue you're experiencing, whether we're the right service to help, and how urgent your situation may be.</p>
+              <p>If we need more information, we may contact you to better understand your situation.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-card basis-2/5 min-w-[350px]">
+          <figure class="rounded-tl-none rounded-tr-(--radius-box) rounded-bl-(--radius-box) rounded-br-none max-h-[250px] sm:max-h-none">
+            <img src="{% static 'web/img/how-it-works/legal-advice.jpg' %}" />
+          </figure>
+          <div class="d-card-body">
+            <div class="flex items-center gap-4 mb-2">
+              <div class="w-10 h-10 min-w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">3</div>
+              <div class="d-card-title text-left">We contact you about next steps</div>
+            </div>
+            <div class="text-left">
+              <p>If we're able to assist, one of our trained volunteer paralegals, supervised by a lawyer, will get in touch to explain your options and discuss what support may be available.</p>
+              <p>Depending on your situation, we can help you to understand your rights, review notices or documents, communicate with your landlord or agent, and understand available pathways and support options.</p>
+              <p>Every situation is different, and we work through each matter individually.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 flex justify-center">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get Free Help</button></a>
+      </div>
+    </div>
+  </div>
+
+  {# DOES THIS SOUND LIKE YOU? #}
+  <div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/services/bonds-hero.jpg' %}" />
+    <div class="content">
+      <h2>We help Victorian renters</h2>
+      <div class="divider"></div>
+      <p>We provide free legal help to renters across Victoria with issues like:</p>
+      <ul class="mb-4">
+        <li>Eviction notices</li>
+        <li>Rental repairs</li>
+        <li>Bond disputes</li>
+      </ul>
+      <!-- prettier-ignore -->
+      <p>
+        We've helped over {% cases_serviced_count 100 %} renters in situations like yours. If something doesn't feel right, it's worth getting in touch.
+      </p>
+      <div class="mt-12 flex justify-center">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get Free Help</button></a>
+      </div>
+    </div>
+  </div>
+
+  {# WHAT YOU DO — AND DON'T — NEED BEFORE CONTACTING US #}
+  <div class="panel right round top-left bottom-left">
+    <div class="content">
+      <h2>You don't need to have everything ready</h2>
+      <div class="divider"></div>
+      <p>A lot of renters delay getting help because they're unsure whether their situation is serious enough, whether they're eligible, or whether they have all the paperwork ready.</p>
+      <p>That's okay.</p>
+      <p>You don't need to understand the legal process before contacting us, and you don't need to know exactly what type of notice or issue you're dealing with.</p>
+      <p>If you're unsure, we can help you work through it.</p>
+      <div class="mt-12 flex justify-center">
+        <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get Free Help</button></a>
+      </div>
+    </div>
+    <img class="round bottom-left" src="{% static 'web/img/how-it-works/resolution.jpg' %}" />
+  </div>
+
+  {# CAN WE HELP YOU? — Eligibility #}
+
+  <div>
+    {% include 'web/snippets/eligibility/_landing_panel.html' %}
+  </div>
+
+  {# YOU'RE NOT ALONE #}
+  <div class="panel right round top-left bottom-left">
+    <div class="content">
+      <h2>You're not alone</h2>
+      <!-- prettier-ignore -->
+      <p class="text-center">We've helped <span class="text-primary">{% cases_serviced_count %} renters</span> stay in safe, secure homes.</p>
+      <div class="divider"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
+        <div class="flex flex-row items-center gap-4">
+          <img class="icon h-12" src="{% static 'web/img/icons/star.svg' %}" />
+          <div class="font-semibold mt-4">100% free legal support</div>
+        </div>
+        <div class="flex flex-row items-center gap-4">
+          <img class="icon h-12" src="{% static 'web/img/icons/valet.svg' %}" />
+          <div class="font-semibold mt-4">Community-based service</div>
+        </div>
+        <div class="flex flex-row items-center gap-4">
+          <img class="icon h-12" src="{% static 'web/img/icons/crowd.svg' %}" />
+          <div class="font-semibold mt-4">90+ volunteers</div>
+        </div>
+        <div class="flex flex-row items-center gap-4">
+          <img class="icon h-12" src="{% static 'web/img/icons/email.svg' %}" />
+          <div class="font-semibold mt-4">Australia's first fully remote community legal centre</div>
+        </div>
+      </div>
+    </div>
+    <img class="round bottom-left" src="{% static 'web/img/services/coffee.jpg' %}" />
+  </div>
+
+  {# FAQ #}
+  <div class="segment">
+    <div class="container wide">
+      <h2>FAQ</h2>
+      <div class="divider"></div>
+      <div class="flex d-join d-join-vertical bg-base-100 mx-auto md:max-w-4/5 text-left text-(--dark-4) [--radius-field:0.5rem]">
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">How long does it take to hear back?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>Response times can vary depending on demand and the urgency of your situation.</div>
+            <div class="mt-2">We usually acknowledge new requests within 2 business days. Sometimes matters are assigned quickly, while at other times there may be a wait depending on demand and the urgency of the situation.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Do I need any documents before contacting you?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>No, that's okay. You don't need to have everything ready before reaching out. We can help you work through what you have.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Is the service really free?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>
+              Yes. We provide free legal help to eligible renters across Victoria. <a href="{% clerk_slugurl 'eligibility-criteria' %}">Check your eligibility here.</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Will I speak with a real person?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>Yes. Every request is reviewed individually by our team. If we're able to assist, your matter will be managed by one of our trained volunteer paralegals, supervised by a lawyer, who will work with you to understand your situation and explain your options.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">What if I'm not sure whether my issue qualifies?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>That's okay. If something doesn't feel right with your rental situation, it's still worth getting in touch.</div>
+          </div>
+        </div>
+
+        <div class="d-collapse d-collapse-plus border border-base-300 d-join-item">
+          <input type="checkbox" />
+          <div class="d-collapse-title font-semibold">Will you represent me at VCAT?</div>
+          <div class="d-collapse-content text-slate-700 text-sm">
+            <div>We help renters understand tribunal processes and prepare for mediation or hearings, including matters that progress to RDRV or VCAT. We support renters to represent themselves at VCAT.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# NOT QUITE YOUR SITUATION? — Service cards #}
+  <div class="segment">
+    <div class="container wide">
+      <h2>Explore common rental issues</h2>
+      <div class="divider"></div>
+      <div class="flex flex-wrap justify-center gap-8">
+        {% include 'web/snippets/services/_evictions_card.html' %}
+        {% include 'web/snippets/services/_repairs_card.html' %}
+        {% include 'web/snippets/services/_bonds_card.html' %}
+      </div>
+    </div>
+  </div>
+
+  {# CONTACT US #}
+  <div id="contact-us" class="segment" style="padding: 0">
+    <div class="container">
+      <div id="contact">
+        <div class="text">
+          <h2>Contact us</h2>
+          <p class="light">If you want to learn more about how Anika can help you, fill in your details, and we'll give you a call.</p>
+        </div>
+        {% include 'web/htmx/_contact_form.html' %}
+      </div>
+    </div>
+  </div>
+
+  {% include 'web/snippets/_footer_cta.html' with cta='Ready to get started?' %}
+{% endblock %}
