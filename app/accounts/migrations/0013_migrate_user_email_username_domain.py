@@ -22,7 +22,7 @@ def _change_user_email_and_username_domain(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("accounts", "0011_alter_social_auth_usersocialauth_extra_data"),
+        ("accounts", "0012_user_ms_account_initial_password"),
     ]
 
     operations = [
