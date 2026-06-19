@@ -21,7 +21,6 @@ dependencies = [
     "django-storages",
     "django",
     "djangorestframework",
-    "drf-openapi-tester",
     "faker",
     "flake8",
     "freezegun",
@@ -56,6 +55,7 @@ dependencies = [
     "google-auth-oauthlib>=1.2.4",
     "django-fernet-encrypted-fields>=0.4.0",
     "wagtail-link-block>=1.2",
+    "django-contract-tester>=1.8.2",
 ]
 
 [dependency-groups]

@@ -13,7 +13,7 @@ from case.middleware import annotate_group_access
 from core import factories
 from django.contrib.auth.models import Group
 from openapi_tester import SchemaTester
-from rest_framework.test import APIClient
+from openapi_tester.clients import OpenAPIClient
 from utils.signals import disable_signals, restore_signals
 from zeal import zeal_context
 
@@ -143,37 +143,37 @@ def admin_group():
 
 
 @pytest.fixture
-def user_client(unprivileged_user) -> APIClient:
+def user_client(unprivileged_user) -> OpenAPIClient:
     return _login_user(unprivileged_user)
 
 
 @pytest.fixture
-def paralegal_user_client(paralegal_user) -> APIClient:
+def paralegal_user_client(paralegal_user) -> OpenAPIClient:
     return _login_user(paralegal_user)
 
 
 @pytest.fixture
-def lawyer_user_client(lawyer_user) -> APIClient:
+def lawyer_user_client(lawyer_user) -> OpenAPIClient:
     return _login_user(lawyer_user)
 
 
 @pytest.fixture
-def coordinator_user_client(coordinator_user) -> APIClient:
+def coordinator_user_client(coordinator_user) -> OpenAPIClient:
     return _login_user(coordinator_user)
 
 
 @pytest.fixture
-def admin_user_client(admin_user) -> APIClient:
+def admin_user_client(admin_user) -> OpenAPIClient:
     return _login_user(admin_user)
 
 
 @pytest.fixture
-def superuser_client(superuser: User) -> APIClient:
+def superuser_client(superuser: User) -> OpenAPIClient:
     return _login_user(superuser)
 
 
-def _login_user(user: User) -> APIClient:
-    client = APIClient()
-    client.login(username=user.username, password="password")
+def _login_user(user: User) -> OpenAPIClient:
+    client = OpenAPIClient(schema_tester=schema_tester)
+    client.force_login(user=user)
     client.force_authenticate(user=user)
     return client

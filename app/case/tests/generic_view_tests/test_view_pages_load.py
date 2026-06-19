@@ -7,10 +7,19 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pytest
+from core import factories
 from django.urls import reverse
 from factory.django import DjangoModelFactory
+from rest_framework.test import APIClient
 
-from core import factories
+
+# Override the global fixture to use the regular Django test client instead of
+# the OpenAPIClient, as we're testing html page loads, not json API endpoints.
+@pytest.fixture
+def superuser_client(superuser):
+    client = APIClient()
+    client.force_login(user=superuser)
+    return client
 
 
 @dataclass

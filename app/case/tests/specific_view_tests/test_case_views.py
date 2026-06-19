@@ -3,18 +3,16 @@ from unittest.mock import patch
 import pytest
 from accounts.models import User
 from case.middleware import annotate_group_access
-from conftest import schema_tester
 from core import factories
 from core.models import Issue, IssueNote
 from core.models.issue import CaseStage
 from core.models.service import ServiceCategory
 from django.utils import timezone
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_case_list_view__with_no_access(user_client: APIClient, user: User):
+def test_case_list_view__with_no_access(user_client, user: User):
     """
     Logged in, but otherwise unauthorized, users can fetch cases but no results
     """
@@ -31,12 +29,11 @@ def test_case_list_view__with_no_access(user_client: APIClient, user: User):
         "prev": None,
         "results": [],
     }
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_no_access(
-    paralegal_user_client: APIClient,
+    paralegal_user_client,
 ):
     """
     Paralegal users can fetch cases but no results because they're not assigned
@@ -53,12 +50,11 @@ def test_case_list_view__as_paralegal_with_no_access(
         "prev": None,
         "results": [],
     }
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 def test_case_list_view__as_paralegal_with_access(
-    paralegal_user_client: APIClient,
+    paralegal_user_client,
     paralegal_user,
 ):
     """
@@ -80,12 +76,11 @@ def test_case_list_view__as_paralegal_with_access(
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 def test_case_list_view__as_coordinator(
-    coordinator_user_client: APIClient,
+    coordinator_user_client,
     coordinator_user,
 ):
     """
@@ -107,11 +102,10 @@ def test_case_list_view__as_coordinator(
     results = resp_data["results"]
     assert len(results) == 2
     assert set(r["id"] for r in results) == {str(issue_a.pk), str(issue_b.pk)}
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_list_view__search(superuser_client: APIClient):
+def test_case_list_view__search(superuser_client):
     issue_a = factories.IssueFactory(fileref="A12345")
     factories.IssueFactory(fileref="B54321")
     url = reverse("case-api-list")
@@ -132,23 +126,21 @@ def test_case_list_view__search(superuser_client: APIClient):
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
-    schema_tester.validate_response(response=response)
 
 
 # TODO: Test permissions and who can see which notes
 @pytest.mark.django_db
-def test_case_get_view(superuser_client: APIClient):
+def test_case_get_view(superuser_client):
     issue = factories.IssueFactory()
     factories.IssueNoteFactory(issue=issue)
     url = reverse("case-api-detail", args=(issue.pk,))
     response = superuser_client.get(url)
     assert response.status_code == 200
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 def test_case_get_view__as_paralegal(
-    user_client: APIClient,
+    user_client,
     user: User,
     paralegal_group,
 ):
@@ -180,24 +172,22 @@ def test_case_get_view__as_paralegal(
     notes = resp_data["notes"]
     assert len(notes) == 1
     assert notes[0]["id"] == issue_note_a.pk
-    schema_tester.validate_response(response=response)
 
 
 # TODO: Test permissions
 @pytest.mark.django_db
-def test_case_update_view(superuser_client: APIClient):
+def test_case_update_view(superuser_client):
     issue = factories.IssueFactory(is_open=True)
     url = reverse("case-api-detail", args=(issue.pk,))
-    response = superuser_client.patch(url, data={"is_open": False}, format="json")
+    response = superuser_client.patch(url, data={"is_open": False})
     assert response.status_code == 200
-    schema_tester.validate_response(response=response)
     issue.refresh_from_db()
     assert not issue.is_open
 
 
 @pytest.mark.django_db
 def test_case_create_view_permissions(
-    user_client: APIClient,
+    user_client,
     user: User,
     paralegal_group,
     coordinator_group,
@@ -217,18 +207,18 @@ def test_case_create_view_permissions(
     # Paralegal user.
     user.groups.set([paralegal_group])
     annotate_group_access(user)
-    response = user_client.post(url, data=data, format="json")
+    response = user_client.post(url, data=data)
     assert response.status_code == 403
 
     # Coordinator user.
     user.groups.set([coordinator_group])
     annotate_group_access(user)
-    response = user_client.post(url, data=data, format="json")
+    response = user_client.post(url, data=data)
     assert response.status_code == 201
 
 
 @pytest.mark.django_db
-def test_case_create_view__using_id_relations(superuser_client: APIClient):
+def test_case_create_view__using_id_relations(superuser_client):
     client = factories.ClientFactory()
     tenancy = factories.TenancyFactory()
     data = {
@@ -237,9 +227,8 @@ def test_case_create_view__using_id_relations(superuser_client: APIClient):
         "tenancy_id": tenancy.pk,
     }
     url = reverse("case-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 201
-    schema_tester.validate_response(response=response)
 
     issue = Issue.objects.get()
     assert issue.topic == "REPAIRS"
@@ -248,7 +237,7 @@ def test_case_create_view__using_id_relations(superuser_client: APIClient):
 
 
 @pytest.mark.django_db
-def test_case_create_view__using_nested_relations(superuser_client: APIClient):
+def test_case_create_view__using_nested_relations(superuser_client):
     issue_stub = factories.IssueFactory.stub()
     client_stub = factories.ClientFactory.stub()
     tenancy_stub = factories.TenancyFactory.stub()
@@ -266,9 +255,8 @@ def test_case_create_view__using_nested_relations(superuser_client: APIClient):
         },
     }
     url = reverse("case-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 201
-    schema_tester.validate_response(response=response)
 
     issue = Issue.objects.get()
     assert issue.topic == issue_stub.topic
@@ -282,7 +270,7 @@ def test_case_create_view__using_nested_relations(superuser_client: APIClient):
 
 @pytest.mark.django_db
 def test_case_update_view__allowed_to_assign_paralegal_with_lawyer(
-    superuser_client: APIClient, paralegal_group, lawyer_group
+    superuser_client, paralegal_group, lawyer_group
 ):
     paralegal = factories.UserFactory()
     paralegal.groups.set([paralegal_group])
@@ -298,9 +286,8 @@ def test_case_update_view__allowed_to_assign_paralegal_with_lawyer(
         "lawyer_id": lawyer.pk,
         "paralegal_id": paralegal.pk,
     }
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
     assert response.status_code == 200, response.json()
-    schema_tester.validate_response(response=response)
 
     data = response.json()
     assert data["paralegal"]["id"] == paralegal.pk
@@ -309,7 +296,7 @@ def test_case_update_view__allowed_to_assign_paralegal_with_lawyer(
 
 @pytest.mark.django_db
 def test_case_update_view__prevented_from_assigning_paralegal_without_lawyer(
-    superuser_client: APIClient, paralegal_group
+    superuser_client, paralegal_group
 ):
     paralegal = factories.UserFactory()
     paralegal.groups.set([paralegal_group])
@@ -320,13 +307,13 @@ def test_case_update_view__prevented_from_assigning_paralegal_without_lawyer(
     data = {
         "paralegal_id": paralegal.pk,
     }
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
     assert response.status_code == 400, response.json()
 
 
 # TODO: Test permissions
 @pytest.mark.django_db
-def test_case_create_note_view(superuser_client: APIClient, superuser: User):
+def test_case_create_note_view(superuser_client, superuser: User):
     issue = factories.IssueFactory()
     url = reverse("case-api-note", args=(issue.pk,))
     assert IssueNote.objects.count() == 0
@@ -334,9 +321,8 @@ def test_case_create_note_view(superuser_client: APIClient, superuser: User):
         "note_type": "PARALEGAL",
         "text": "Lorem ipsum dolor",
     }
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 201, response.json()
-    schema_tester.validate_response(response=response)
 
     note = IssueNote.objects.get()
     assert note.creator == superuser
@@ -348,9 +334,7 @@ def test_case_create_note_view(superuser_client: APIClient, superuser: User):
 # TODO: Test permissions
 @pytest.mark.django_db
 @patch("case.views.case.get_case_folder_info")
-def test_case_get_documents_view(
-    mock_get_case_folder_info, superuser_client: APIClient
-):
+def test_case_get_documents_view(mock_get_case_folder_info, superuser_client):
     issue = factories.IssueFactory()
     url = reverse("case-api-docs", args=(issue.pk,))
     sharepoint_url = "https://example.com"
@@ -364,14 +348,13 @@ def test_case_get_documents_view(
         }
     ]
     mock_get_case_folder_info.return_value = docs, sharepoint_url
-    response = superuser_client.get(url)
+    superuser_client.get(url)
     mock_get_case_folder_info.assert_called_once_with(issue)
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 def test_case_update_view__prevented_from_closing_case_with_unfinished_ongoing_service(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     service = factories.ServiceFactory(
         issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
@@ -383,15 +366,13 @@ def test_case_update_view__prevented_from_closing_case_with_unfinished_ongoing_s
     response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
 
     assert response.status_code == 400
-    schema_tester.validate_response(response=response)
-
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.UNSTARTED
 
 
 @pytest.mark.django_db
 def test_case_update_view__allowed_to_close_case_with_finished_ongoing_service(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     service = factories.ServiceFactory(
         issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
@@ -403,15 +384,13 @@ def test_case_update_view__allowed_to_close_case_with_finished_ongoing_service(
     response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
 
     assert response.status_code == 200
-    schema_tester.validate_response(response=response)
-
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.CLOSED
 
 
 @pytest.mark.django_db
 def test_case_update_view__allowed_to_close_case_with_deleted_unfinished_ongoing_service(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     """
     Normally we probably wouldn't bother to test this but services are
@@ -439,14 +418,13 @@ def test_case_update_view__allowed_to_close_case_with_deleted_unfinished_ongoing
     url = reverse("case-api-detail", args=(service.issue.pk,))
     response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
     assert response.status_code == 200
-
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.CLOSED
 
 
 @pytest.mark.django_db
 def test_case_update_view__prevented_from_closing_case_with_unreviewed_critical_date(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     date = factories.IssueDateFactory(
         issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
@@ -457,15 +435,13 @@ def test_case_update_view__prevented_from_closing_case_with_unreviewed_critical_
     response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
 
     assert response.status_code == 400
-    schema_tester.validate_response(response=response)
-
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.UNSTARTED
 
 
 @pytest.mark.django_db
 def test_case_update_view__allowed_to_close_case_with_reviewed_critical_date(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     date = factories.IssueDateFactory(
         issue=factories.IssueFactory(stage=CaseStage.UNSTARTED),
@@ -476,7 +452,5 @@ def test_case_update_view__allowed_to_close_case_with_reviewed_critical_date(
     response = superuser_client.patch(url, data={"stage": CaseStage.CLOSED})
 
     assert response.status_code == 200
-    schema_tester.validate_response(response=response)
-
     assert Issue.objects.count() == 1
     assert Issue.objects.last().stage == CaseStage.CLOSED

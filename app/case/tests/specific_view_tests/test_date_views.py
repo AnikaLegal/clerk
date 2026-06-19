@@ -1,15 +1,14 @@
 from datetime import date, timedelta
 
 import pytest
-from conftest import CaseRole, schema_tester
+from conftest import CaseRole
 from core.factories import ClientFactory, IssueDateFactory, IssueFactory
 from core.models.issue_date import DateType, HearingType, IssueDate
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_issue_date_create_api(superuser_client: APIClient):
+def test_issue_date_create_api(superuser_client):
     issue_date_stub = IssueDateFactory.stub()
     assert IssueDate.objects.count() == 0
 
@@ -20,11 +19,13 @@ def test_issue_date_create_api(superuser_client: APIClient):
         "date": issue_date_stub.date.isoformat(),
         "notes": issue_date_stub.notes,
         "is_reviewed": issue_date_stub.is_reviewed,
-        "hearing_type": issue_date_stub.hearing_type,
-        "hearing_location": issue_date_stub.hearing_location,
     }
+    if issue_date_stub.type == DateType.HEARING_LISTED:
+        data["hearing_type"] = issue_date_stub.hearing_type
+        data["hearing_location"] = issue_date_stub.hearing_location
+
     url = reverse("date-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
 
     assert response.status_code == 201, response.json()
     data = response.json()
@@ -40,12 +41,10 @@ def test_issue_date_create_api(superuser_client: APIClient):
     assert issue_date.notes == data["notes"] == issue_date_stub.notes
     assert issue_date.is_reviewed == data["is_reviewed"] == issue_date_stub.is_reviewed
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 def test_issue_date_create_api__restrict_date_prior_to_today(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     yesterday = date.today() - timedelta(days=1)
 
@@ -61,7 +60,7 @@ def test_issue_date_create_api__restrict_date_prior_to_today(
         "hearing_location": issue_date_stub.hearing_location,
     }
     url = reverse("date-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
 
     assert response.status_code == 400, response.json()
     assert IssueDate.objects.count() == 0
@@ -69,7 +68,7 @@ def test_issue_date_create_api__restrict_date_prior_to_today(
 
 @pytest.mark.django_db
 def test_issue_date_create_api__restrict_if_related_issue_closed(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     issue_date_stub = IssueDateFactory.stub()
     assert IssueDate.objects.count() == 0
@@ -83,7 +82,7 @@ def test_issue_date_create_api__restrict_if_related_issue_closed(
         "hearing_location": issue_date_stub.hearing_location,
     }
     url = reverse("date-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
 
     assert response.status_code == 400, response.json()
     assert IssueDate.objects.count() == 0
@@ -103,7 +102,7 @@ def test_issue_date_create_hearing_listed(
     field_names,
     expected_status,
     expected_count,
-    superuser_client: APIClient,
+    superuser_client,
 ):
     """
     Dates for hearings must include the hearing type and location.
@@ -121,13 +120,13 @@ def test_issue_date_create_hearing_listed(
         data.update({field_name: getattr(issue_date_stub, field_name)})
 
     url = reverse("date-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == expected_status, response.json()
     assert IssueDate.objects.count() == expected_count
 
 
 @pytest.mark.django_db
-def test_issue_date_list_api(superuser_client: APIClient):
+def test_issue_date_list_api(superuser_client):
     instance_1 = IssueDateFactory()
     instance_2 = IssueDateFactory()
 
@@ -147,11 +146,9 @@ def test_issue_date_list_api(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {instance_1.pk, instance_2.pk}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_issue_date_list_api__q_filter(superuser_client: APIClient):
+def test_issue_date_list_api__q_filter(superuser_client):
     client = ClientFactory()
     issue_1 = IssueFactory(client=client)
     issue_2 = IssueFactory(client=client)
@@ -184,7 +181,6 @@ def test_issue_date_list_api__q_filter(superuser_client: APIClient):
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == instance_1.pk
-    schema_tester.validate_response(response=response)
 
     # Two search results.
     response = superuser_client.get(url, {"q": client.last_name})
@@ -195,11 +191,9 @@ def test_issue_date_list_api__q_filter(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {instance_1.pk, instance_2.pk}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_issue_date_retrieve_api(superuser_client: APIClient):
+def test_issue_date_retrieve_api(superuser_client):
     instance = IssueDateFactory()
     url = reverse("date-api-detail", args=(instance.pk,))
     response = superuser_client.get(url)
@@ -208,18 +202,16 @@ def test_issue_date_retrieve_api(superuser_client: APIClient):
     data = response.json()
     assert data["id"] == instance.pk
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_issue_date_update_api(superuser_client: APIClient):
+def test_issue_date_update_api(superuser_client):
     today = date.today()
     tomorrow = today + timedelta(days=1)
 
     instance = IssueDateFactory(type=DateType.FILING_DEADLINE, date=today.isoformat())
     url = reverse("date-api-detail", args=(instance.pk,))
     data = {"type": DateType.NTV_TERMINATION, "date": tomorrow.isoformat()}
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
 
     assert response.status_code == 200, response.json()
 
@@ -231,12 +223,10 @@ def test_issue_date_update_api(superuser_client: APIClient):
     assert data["type"] == instance.type
     assert data["date"] == instance.date.strftime("%d/%m/%Y")
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 def test_issue_date_update_api__restrict_date_prior_to_today(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     today = date.today()
     yesterday = today - timedelta(days=1)
@@ -244,7 +234,7 @@ def test_issue_date_update_api__restrict_date_prior_to_today(
     instance = IssueDateFactory(type=DateType.FILING_DEADLINE, date=today.isoformat())
     url = reverse("date-api-detail", args=(instance.pk,))
     data = {"date": yesterday.isoformat()}
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
 
     assert response.status_code == 400, response.json()
 
@@ -254,7 +244,7 @@ def test_issue_date_update_api__restrict_date_prior_to_today(
 
 @pytest.mark.django_db
 def test_issue_date_update_api__allow_updates_to_other_fields_for_unchanged_dates_prior_to_today(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     yesterday = date.today() - timedelta(days=1)
     instance = IssueDateFactory(
@@ -262,7 +252,7 @@ def test_issue_date_update_api__allow_updates_to_other_fields_for_unchanged_date
     )
     url = reverse("date-api-detail", args=(instance.pk,))
     data = {"type": DateType.OTHER, "date": yesterday.isoformat()}
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
 
     assert response.status_code == 200, response.json()
 
@@ -283,7 +273,7 @@ def test_issue_date_update_api__allow_updates_to_other_fields_for_unchanged_date
 def test_issue_date_update_hearing_listed(
     data,
     expected_status,
-    superuser_client: APIClient,
+    superuser_client,
 ):
     """
     Dates for hearings must include the hearing type and location.
@@ -293,13 +283,13 @@ def test_issue_date_update_hearing_listed(
 
     url = reverse("date-api-detail", args=(instance.pk,))
     data.update({"type": DateType.HEARING_LISTED})
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
 
     assert response.status_code == expected_status, response.json()
 
 
 @pytest.mark.django_db
-def test_issue_date_delete_api(superuser_client: APIClient):
+def test_issue_date_delete_api(superuser_client):
     issue_date = IssueDateFactory()
     assert IssueDate.objects.count() == 1
 
@@ -308,8 +298,6 @@ def test_issue_date_delete_api(superuser_client: APIClient):
 
     assert response.status_code == 204
     assert IssueDate.objects.count() == 0
-
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
@@ -357,11 +345,12 @@ def test_issue_date_api_create_perms(
         "issue_id": issue.pk,
         "type": issue_date_stub.type,
         "date": issue_date_stub.date.isoformat(),
-        "hearing_type": issue_date_stub.hearing_type,
-        "hearing_location": issue_date_stub.hearing_location,
     }
+    if issue_date_stub.type == DateType.HEARING_LISTED:
+        data["hearing_type"] = issue_date_stub.hearing_type
+        data["hearing_location"] = issue_date_stub.hearing_location
     url = reverse("date-api-list")
-    response = user_client.post(url, data=data, format="json")
+    response = user_client.post(url, data=data)
 
     assert response.status_code == expected_status
 
@@ -413,11 +402,13 @@ def test_issue_date_api_create_with_is_reviewed_perms(
         "type": issue_date_stub.type,
         "date": issue_date_stub.date.isoformat(),
         "is_reviewed": issue_date_stub.is_reviewed,
-        "hearing_type": issue_date_stub.hearing_type,
-        "hearing_location": issue_date_stub.hearing_location,
     }
+    if issue_date_stub.type == DateType.HEARING_LISTED:
+        data["hearing_type"] = issue_date_stub.hearing_type
+        data["hearing_location"] = issue_date_stub.hearing_location
+
     url = reverse("date-api-list")
-    response = user_client.post(url, data=data, format="json")
+    response = user_client.post(url, data=data)
 
     assert response.status_code == expected_status
 
@@ -568,7 +559,7 @@ def test_issue_date_api_update_perms(
         "type": DateType.OTHER,
     }
     url = reverse("date-api-detail", args=(issue_date.pk,))
-    response = user_client.patch(url, data=data, format="json")
+    response = user_client.patch(url, data=data)
 
     assert response.status_code == expected_status
 
@@ -618,7 +609,7 @@ def test_issue_date_api_update_with_is_reviewed_perms(
         "is_reviewed": not issue_date.is_reviewed,
     }
     url = reverse("date-api-detail", args=(issue_date.pk,))
-    response = user_client.patch(url, data=data, format="json")
+    response = user_client.patch(url, data=data)
 
     assert response.status_code == expected_status
 

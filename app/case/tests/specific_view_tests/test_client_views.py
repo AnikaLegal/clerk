@@ -1,12 +1,11 @@
 import pytest
-from conftest import CaseRole, schema_tester
+from conftest import CaseRole
 from core.factories import ClientFactory, IssueFactory
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_client_list_api(superuser_client: APIClient):
+def test_client_list_api(superuser_client):
     instance_1 = ClientFactory()
     instance_2 = ClientFactory()
 
@@ -26,11 +25,9 @@ def test_client_list_api(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {str(instance_1.pk), str(instance_2.pk)}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_client_list_api__q_filter(superuser_client: APIClient):
+def test_client_list_api__q_filter(superuser_client):
     instance_1 = ClientFactory(first_name="Charlie", last_name="Brown")
     instance_2 = ClientFactory(first_name="Sally", last_name="Brown")
     url = reverse("client-api-list")
@@ -55,7 +52,6 @@ def test_client_list_api__q_filter(superuser_client: APIClient):
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(instance_1.pk)
-    schema_tester.validate_response(response=response)
 
     # Two search results.
     response = superuser_client.get(url, {"q": "Brown"})
@@ -66,11 +62,9 @@ def test_client_list_api__q_filter(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {str(instance_1.pk), str(instance_2.pk)}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_client_retrieve_api(superuser_client: APIClient):
+def test_client_retrieve_api(superuser_client):
     instance = ClientFactory()
     url = reverse("client-api-detail", args=(instance.pk,))
     response = superuser_client.get(url)
@@ -79,11 +73,9 @@ def test_client_retrieve_api(superuser_client: APIClient):
     data = response.json()
     assert data["id"] == str(instance.pk)
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_client_update_api(superuser_client: APIClient):
+def test_client_update_api(superuser_client):
     instance = ClientFactory()
     url = reverse("client-api-detail", args=(instance.pk,))
     data = {
@@ -91,7 +83,7 @@ def test_client_update_api(superuser_client: APIClient):
         "last_name": "Brown",
         "email": "charlie.brown@example.com",
     }
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
     assert response.status_code == 200, response.json()
 
     instance.refresh_from_db()
@@ -103,8 +95,6 @@ def test_client_update_api(superuser_client: APIClient):
     assert data["first_name"] == instance.first_name
     assert data["last_name"] == instance.last_name
     assert data["email"] == instance.email
-
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
@@ -250,6 +240,6 @@ def test_client_api_update_perms(
         "last_name": "Brown",
     }
     url = reverse("client-api-detail", args=(issue.client.pk,))
-    response = user_client.patch(url, data=data, format="json")
+    response = user_client.patch(url, data=data)
 
     assert response.status_code == expected_status

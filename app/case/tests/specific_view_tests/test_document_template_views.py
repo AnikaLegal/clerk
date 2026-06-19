@@ -1,8 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-
 import pytest
-from conftest import schema_tester
 from core.factories import DocumentTemplateFactory
 from core.models.document_template import DocumentTemplate
 from core.models.issue import CaseTopic
@@ -10,11 +8,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from microsoft.storage import MSGraphStorage
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_document_template_list_api_view(superuser_client: APIClient):
+def test_document_template_list_api_view(superuser_client):
     template = DocumentTemplateFactory(
         topic=CaseTopic.REPAIRS,
         file=SimpleUploadedFile(
@@ -54,11 +51,19 @@ def test_document_template_list_api_view(superuser_client: APIClient):
     assert json[0]["modified_at"] == timezone.localtime(now).strftime("%d/%m/%Y")
     assert json[0]["topic"] == template.topic
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_document_template_create_api_view(superuser_client: APIClient):
+def test_document_template_create_api_view(superuser):
+    # Manually test the response schema here due to bug in the openapi tester
+    # where it doesn't use the correct content-type.
+    # TODO: Remove when the openapi tester bug is fixed.
+    from conftest import schema_tester
+    from openapi_tester.response_handler_factory import ResponseHandlerFactory
+    from rest_framework.test import APIClient
+
+    superuser_client = APIClient()
+    superuser_client.force_login(user=superuser)
+
     file_a = SimpleUploadedFile(
         name="file_a.txt",
         content=b"file a content",
@@ -82,19 +87,24 @@ def test_document_template_create_api_view(superuser_client: APIClient):
         mock_save.side_effect = _save_return_value
 
         data = {"topic": "REPAIRS", "files": [file_a, file_b]}
-        response = superuser_client.post(reverse("template-doc-api-list"), data=data)
+        response = superuser_client.post(
+            reverse("template-doc-api-list"), data=data, format="multipart"
+        )
 
     assert response.status_code == 201, response.json()
-    schema_tester.validate_response(response=response)
 
     assert (
         DocumentTemplate.objects.filter(topic="REPAIRS", file__isnull=False).count()
         == 2
     )
 
+    schema_tester.validate_response(
+        response_handler=ResponseHandlerFactory.create(response=response)
+    )
+
 
 @pytest.mark.django_db
-def test_document_template_destroy_api_view(superuser_client: APIClient):
+def test_document_template_destroy_api_view(superuser_client):
     template = DocumentTemplateFactory(
         topic=CaseTopic.BONDS,
         file=SimpleUploadedFile(
@@ -109,13 +119,12 @@ def test_document_template_destroy_api_view(superuser_client: APIClient):
         reverse("template-doc-api-detail", args=(template.pk,))
     )
     assert response.status_code == 204, response.json()
-    schema_tester.validate_response(response=response)
 
     assert DocumentTemplate.objects.count() == 0
 
 
 @pytest.mark.django_db
-def test_document_template_rename_api_view(superuser_client: APIClient):
+def test_document_template_rename_api_view(superuser_client):
     template = DocumentTemplateFactory(
         topic=CaseTopic.BONDS,
         file=SimpleUploadedFile(
@@ -142,13 +151,12 @@ def test_document_template_rename_api_view(superuser_client: APIClient):
         response = superuser_client.patch(url, data={"name": new_name})
 
     assert response.status_code == 204, response.json()
-    schema_tester.validate_response(response=response)
 
     # The name property is an annotation so it won't be reset if we call
     # template.refresh_from_db() here as we might normally do, so we just get
     # the object instead.
     template = DocumentTemplate.objects.get(pk=template.pk)
-    assert template.name == new_name  # type: ignore
+    assert template.name == new_name
     assert template.file.name.endswith(new_name)
 
 
@@ -184,23 +192,32 @@ def test_document_template_api_list_perms(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "user_client_name, expected_status",
+    "user_fixture_name, expected_status",
     [
-        ("user_client", 403),
-        ("paralegal_user_client", 403),
-        ("coordinator_user_client", 403),
-        ("admin_user_client", 201),
+        ("user", 403),
+        ("paralegal_user", 403),
+        ("coordinator_user", 403),
+        ("admin_user", 201),
     ],
 )
 def test_document_template_api_create_perms(
-    user_client_name: str,
+    user_fixture_name: str,
     expected_status: int,
     request,
 ):
     """
     Test create API perms for different users.
     """
-    client = request.getfixturevalue(user_client_name)
+    # Manually test the response schema here due to bug in the openapi tester
+    # where it doesn't use the correct content-type.
+    # TODO: Remove when the openapi tester bug is fixed.
+    from conftest import schema_tester
+    from openapi_tester.response_handler_factory import ResponseHandlerFactory
+    from rest_framework.test import APIClient
+
+    user = request.getfixturevalue(user_fixture_name)
+    client = APIClient()
+    client.force_login(user=user)
 
     def _save_return_value(name, content):
         return name
@@ -221,6 +238,10 @@ def test_document_template_api_create_perms(
         response = client.post(url, data=data)
 
     assert response.status_code == expected_status
+
+    schema_tester.validate_response(
+        response_handler=ResponseHandlerFactory.create(response=response)
+    )
 
 
 @pytest.mark.django_db
