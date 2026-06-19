@@ -8,7 +8,6 @@ from emails.utils.size import (
     get_email_payload_size,
 )
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from .fields import LocalDateField, LocalTimeField
 from .user import UserSerializer
@@ -46,9 +45,9 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
     sharepoint_state = serializers.CharField(read_only=True)
     content_type = serializers.CharField(read_only=True)
 
-    def create(self, validated_data):
-        file = validated_data["file"]
-        email = validated_data.get("email")
+    def validate(self, attrs):
+        file = attrs["file"]
+        email = attrs.get("email")
 
         # SendGrid limits the total size of the message and all attachments, so
         # validate the cumulative size of the existing attachments plus this new
@@ -62,18 +61,17 @@ class EmailAttachmentSerializer(serializers.ModelSerializer):
                 # the raw space left for this file is the encoded headroom
                 # scaled back down by that ratio.
                 remaining = max(0, (MAX_EMAIL_SIZE_BYTES - used) * 3 // 4)
-                raise ValidationError(
+                raise serializers.ValidationError(
                     {
                         "file": f"File too large. {format_size(remaining)} of "
                         "attachment space left on this email."
                     }
                 )
+        return attrs
 
-        data = {
-            **validated_data,
-            "content_type": file.content_type,
-        }
-        return super().create(data)
+    def create(self, validated_data):
+        validated_data["content_type"] = validated_data["file"].content_type
+        return super().create(validated_data)
 
 
 class EmailSerializer(serializers.ModelSerializer):
@@ -114,7 +112,7 @@ class EmailSerializer(serializers.ModelSerializer):
                 self.instance.attachments.all(),
             )
             if size > MAX_EMAIL_SIZE_BYTES:
-                raise ValidationError(
+                raise serializers.ValidationError(
                     f"Email too large to send ({format_size(size)} when encoded for delivery, "
                     f"over the {format_size(MAX_EMAIL_SIZE_BYTES)} limit). Remove or shrink "
                     "an attachment and try again."
