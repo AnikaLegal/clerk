@@ -82,10 +82,14 @@ export const FormErrors: React.FC<FormErrorsProps> = ({
 }) => (
   <>
     {Object.entries(errors)
-      .filter(([k, v]) => touched[k])
+      // Non-field errors are form-level (e.g. DRF non_field_errors) and have
+      // no corresponding field, so they won't be touched — always show them.
+      .filter(([k, v]) => k === 'non_field_errors' || touched[k])
       .map(([k, v]) => (
         <div key={k} className="ui error message">
-          <div className="header">{labels ? labels[k] : k}</div>
+          {k !== 'non_field_errors' && (
+            <div className="header">{labels ? labels[k] : k}</div>
+          )}
           <p>{typeof v === 'object' ? Object.values(v) : v}</p>
         </div>
       ))}
