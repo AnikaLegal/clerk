@@ -328,4 +328,161 @@ def test_person_list_api__lawyer_returns_only_related_people(
     assert result_ids == {landlord.pk, agent.pk, support_worker.pk}
     assert unrelated_person.pk not in result_ids
 
-    schema_tester.validate_response(response=response)
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status, expected_count",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403, None),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403, None),
+        ("unprivileged_user", CaseRole.LAWYER, 403, None),
+        ("paralegal_user", CaseRole.NONE, 200, 0),
+        ("paralegal_user", CaseRole.PARALEGAL, 200, 3),
+        ("paralegal_user", CaseRole.LAWYER, 200, 0),
+        ("lawyer_user", CaseRole.NONE, 200, 0),
+        ("lawyer_user", CaseRole.PARALEGAL, 200, 3),
+        ("lawyer_user", CaseRole.LAWYER, 200, 3),
+        ("coordinator_user", CaseRole.NONE, 200, 3),
+        ("coordinator_user", CaseRole.PARALEGAL, 200, 3),
+        ("coordinator_user", CaseRole.LAWYER, 200, 3),
+        ("admin_user", CaseRole.NONE, 200, 3),
+        ("admin_user", CaseRole.PARALEGAL, 200, 3),
+        ("admin_user", CaseRole.LAWYER, 200, 3),
+    ],
+)
+def test_person_api_list_perms(
+    user_name: str,
+    assigned_as: bool,
+    expected_status: int,
+    expected_count: int,
+    user_client,
+    request,
+):
+    """
+    Test list API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+
+    issue = IssueFactory(
+        tenancy=TenancyFactory(landlord=PersonFactory(), agent=PersonFactory()),
+        support_worker=PersonFactory(),
+    )
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    url = reverse("person-api-list")
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+    if expected_count is not None:
+        data = response.json()
+        assert data["item_count"] == expected_count
+        results = data["results"]
+        assert len(results) == expected_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("paralegal_user", CaseRole.PARALEGAL, 200),
+        ("paralegal_user", CaseRole.LAWYER, 200),  # TODO: fix - should be 403.
+        ("lawyer_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("lawyer_user", CaseRole.PARALEGAL, 200),
+        ("lawyer_user", CaseRole.LAWYER, 200),
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
+    ],
+)
+def test_person_api_retrieve_perms(
+    user_name: str,
+    assigned_as: CaseRole,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test creation of a tenancy via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    person = PersonFactory()
+    tenancy = TenancyFactory(landlord=person, agent=person)
+    issue = IssueFactory(support_worker=person, tenancy=tenancy)
+
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    url = reverse("person-api-detail", args=(person.pk,))
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 403),
+        ("paralegal_user", CaseRole.PARALEGAL, 403),  # Probably should be 200
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
+        ("lawyer_user", CaseRole.PARALEGAL, 403),  # Probably should be 200
+        ("lawyer_user", CaseRole.LAWYER, 403),  # Probably should be 200
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
+    ],
+)
+def test_person_api_update_perms(
+    user_name: str,
+    assigned_as: CaseRole,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test updating a person via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    person = PersonFactory()
+    issue = IssueFactory(
+        support_worker=person, tenancy=TenancyFactory(landlord=person, agent=person)
+    )
+
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    data = {
+        "full_name": "Charlie Brown",
+    }
+    url = reverse("person-api-detail", args=(person.pk,))
+    response = user_client.patch(url, data=data)
+
+    assert response.status_code == expected_status

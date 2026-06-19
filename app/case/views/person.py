@@ -76,12 +76,19 @@ class PersonApiViewset(ModelViewSet):
                 )
                 queryset = queryset.filter(query).distinct()
             elif user.is_lawyer:
+                # Lawyers can see people from cases where they assigned as the
+                # lawyer or paralegal, so we need to check both.
                 query = (
-                    Q(landlord_tenancy__issue__lawyer=user)
+                    Q(landlord_tenancy__issue__paralegal=user)
+                    | Q(agent_tenancy__issue__paralegal=user)
+                    | Q(support_worker_issue__paralegal=user)
+                    | Q(landlord_tenancy__issue__lawyer=user)
                     | Q(agent_tenancy__issue__lawyer=user)
                     | Q(support_worker_issue__lawyer=user)
                 )
                 queryset = queryset.filter(query).distinct()
+            elif not user.is_coordinator_or_better:
+                queryset = queryset.none()
 
             queryset = self.search_queryset(queryset)
 
