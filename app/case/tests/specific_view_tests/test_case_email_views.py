@@ -117,8 +117,59 @@ def test_case_email_add_attachment_view(superuser_client: APIClient):
 
 
 @pytest.mark.django_db
+@patch("case.serializers.email.MAX_EMAIL_SIZE_BYTES", 10)
+def test_case_email_add_attachment_too_large_view(superuser_client: APIClient):
+    """Uploading an attachment that pushes the email over the size limit is rejected."""
+    email = EmailFactory(state=EmailState.DRAFT)
+    url = reverse("email-api-attachment-create", args=(email.issue.pk, email.pk))
+    uploaded_file = InMemoryUploadedFile(
+        StringIO("Hello World!"),
+        name="hello-world.txt",
+        content_type="text/plain",
+        field_name="file",
+        size=12,
+        charset="utf-8",
+    )
+    response = superuser_client.post(url, data={"file": uploaded_file})
+    assert response.status_code == 400, response.json()
+    assert "file" in response.json()
+    assert EmailAttachment.objects.count() == 0
+
+
+@pytest.mark.django_db
+@patch("case.serializers.email.MAX_EMAIL_SIZE_BYTES", 5)
+def test_case_email_send_too_large_view(superuser_client: APIClient):
+    """Marking an oversized email ready to send is rejected and it stays a draft."""
+    email = EmailFactory(state=EmailState.DRAFT, text="Hello there")
+    url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
+    response = superuser_client.patch(
+        url,
+        data={"state": EmailState.READY_TO_SEND, "html": "<p>Hi</p>"},
+        format="json",
+    )
+    assert response.status_code == 400, response.json()
+    email.refresh_from_db()
+    assert email.state == EmailState.DRAFT
+
+
+@pytest.mark.django_db
+def test_case_email_send_within_limit_view(superuser_client: APIClient):
+    """A normal-sized email can still be marked ready to send."""
+    email = EmailFactory(state=EmailState.DRAFT, text="Hello there")
+    url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
+    response = superuser_client.patch(
+        url,
+        data={"state": EmailState.READY_TO_SEND, "html": "<p>Hi</p>"},
+        format="json",
+    )
+    assert response.status_code == 200, response.json()
+    email.refresh_from_db()
+    assert email.state == EmailState.READY_TO_SEND
+
+
+@pytest.mark.django_db
 def test_case_email_delete_attachment_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT")
+    email = EmailFactory(state=EmailState.DRAFT)
     f = get_dummy_file("image.png")
     attachment = EmailAttachmentFactory(email=email, file=f)
     assert EmailAttachment.objects.count() == 1
@@ -136,7 +187,7 @@ def test_case_email_delete_attachment_view(superuser_client: APIClient):
 def test_case_email_upload_attachment_to_sharepoint_view(
     mock_save_email_attachment, superuser_client: APIClient
 ):
-    email = EmailFactory(state="DRAFT")
+    email = EmailFactory(state=EmailState.DRAFT)
     f = get_dummy_file("image.png")
     attachment = EmailAttachmentFactory(email=email, file=f)
     url = reverse(
@@ -162,7 +213,7 @@ def test_case_email_download_attachment_from_sharepoint_view(
     mock_microsoft_api.return_value = mock_api
     sharepoint_id = "ABCD-1234"
 
-    email = EmailFactory(state="DRAFT")
+    email = EmailFactory(state=EmailState.DRAFT)
     url = reverse(
         "email-api-attachment-sharepoint-download",
         args=(email.issue.pk, email.pk, sharepoint_id),

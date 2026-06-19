@@ -1,36 +1,35 @@
-import React from 'react'
-import { Formik } from 'formik'
 import {
-  Container,
-  Header,
-  Tab,
-  Form,
-  Button,
-  Input,
-  Dropdown,
-  Checkbox,
-  Icon,
-  List,
-  Label,
-} from 'semantic-ui-react'
-import * as Yup from 'yup'
-import styled from 'styled-components'
-import { useSnackbar } from 'notistack'
-
-import { FormErrors } from 'comps/auto-form'
-import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
-import { MarkdownEditor } from 'comps/markdown-editor'
-import {
-  useUpdateEmailMutation,
-  useDeleteEmailMutation,
-  useCreateEmailAttachmentMutation,
-  useDownloadEmailAttachmentFromSharepointMutation,
-  useDeleteEmailAttachmentMutation,
-  useGetCaseQuery,
-  useGetCaseDocumentsQuery,
-  useGetEmailQuery,
   EmailAttachment,
+  useCreateEmailAttachmentMutation,
+  useDeleteEmailAttachmentMutation,
+  useDeleteEmailMutation,
+  useDownloadEmailAttachmentFromSharepointMutation,
+  useGetCaseDocumentsQuery,
+  useGetCaseQuery,
+  useGetEmailQuery,
+  useUpdateEmailMutation,
 } from 'api'
+import { FormErrors } from 'comps/auto-form'
+import { MarkdownEditor } from 'comps/markdown-editor'
+import { Formik } from 'formik'
+import { useSnackbar } from 'notistack'
+import React from 'react'
+import {
+  Button,
+  Checkbox,
+  Container,
+  Dropdown,
+  Form,
+  Header,
+  Icon,
+  Input,
+  Label,
+  List,
+  Tab,
+} from 'semantic-ui-react'
+import styled from 'styled-components'
+import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import * as Yup from 'yup'
 
 interface DjangoContext {
   case_pk: string
@@ -39,6 +38,7 @@ interface DjangoContext {
   email_preview_url: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { case_pk, email_pk, case_email_url, email_preview_url } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
@@ -361,25 +361,23 @@ const FileUploadAttachForm = () => {
   const { enqueueSnackbar } = useSnackbar()
   return (
     <Formik
-      initialValues={{ file: null }}
+      initialValues={{ file: undefined }}
       validationSchema={Yup.object().shape({
-        file: Yup.mixed()
-          .test('file-required', 'Please select a file', (file) =>
-            Boolean(file)
-          )
-          .test(
-            'file-size',
-            'File size must be no greater than 30MB',
-            (file) => (file ? file.size / 1024 / 1024 <= 30 : true)
-          ),
+        file: Yup.mixed().test(
+          'file-required',
+          'Please select a file',
+          (file) => Boolean(file)
+        ),
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {
+        if (!values.file) return
         setSubmitting(true)
         const form = new FormData()
         form.append('file', values.file)
         createAttachment({
           id: case_pk,
           emailId: email_pk,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           emailAttachmentCreate: form as any,
         })
           .unwrap()
@@ -454,22 +452,11 @@ const SharepointAttachForm = () => {
     <Formik
       initialValues={{ sharepointId: '' }}
       validationSchema={Yup.object().shape({
-        sharepointId: Yup.string()
-          .test('file-required', 'Please select a document', (sharepointId) =>
-            Boolean(sharepointId)
-          )
-          .test(
-            'file-size',
-            'File size must be no greater than 30MB',
-            (sharepointId) => {
-              const doc = sharePointDocs.find((d) => d.id === sharepointId)
-              if (!doc) {
-                return true
-              } else {
-                return doc.size / 1024 / 1024 <= 30
-              }
-            }
-          ),
+        sharepointId: Yup.string().test(
+          'file-required',
+          'Please select a document',
+          (sharepointId) => Boolean(sharepointId)
+        ),
       })}
       onSubmit={(values, { setSubmitting, setErrors }) => {
         setSubmitting(true)

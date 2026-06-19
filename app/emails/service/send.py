@@ -1,7 +1,10 @@
 import os
 import logging
+from urllib.error import URLError
+
 from django.conf import settings
 from django.utils import timezone
+from python_http_client.exceptions import HTTPError
 
 from core.models import IssueNote, Issue
 from core.models.issue_note import NoteType
@@ -42,15 +45,28 @@ def send_email_task(email_pk: int):
             attachments.append((file_name, file_bytes, att.content_type))
 
     logger.info("Sending email to %s from %s", email.to_address, from_addr)
-    message_id = send_email(
-        from_addr,
-        email.to_address,
-        email.cc_addresses,
-        email.subject,
-        email.text,
-        attachments,
-        html=email.html,
-    )
+    try:
+        message_id = send_email(
+            from_addr,
+            email.to_address,
+            email.cc_addresses,
+            email.subject,
+            email.text,
+            attachments,
+            html=email.html,
+        )
+    except (HTTPError, URLError):
+        # SendGrid rejected the message. An oversized email (over 30MB once
+        # base64 encoded) usually surfaces as an HTTPError (413), but the load
+        # balancer may instead sever the connection mid-upload, which raises a
+        # URLError ("EOF occurred in violation of protocol") with no response.
+        # Either way, mark it as failed so it isn't left stuck in READY_TO_SEND;
+        # this fires the post_save signal that alerts the case team via Slack.
+        # Re-raise so @sentry_task still captures the error.
+        logger.exception("SendGrid rejected Email<%s>", email_pk)
+        email.state = EmailState.DELIVERY_FAILURE
+        email.save()
+        raise
     Email.objects.filter(pk=email_pk).update(
         state=EmailState.SENT,
         processed_at=timezone.now(),
