@@ -129,8 +129,6 @@ export const FormikServiceFields = () => {
 }
 
 export const FormikDiscreteServiceFields = () => {
-  const { values } = useFormikContext<ServiceCreate>()
-
   return (
     <>
       <DropdownField
@@ -158,8 +156,6 @@ export const FormikDiscreteServiceFields = () => {
 }
 
 export const FormikOngoingServiceFields = () => {
-  const { values } = useFormikContext<ServiceCreate>()
-
   return (
     <>
       <DropdownField

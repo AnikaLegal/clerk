@@ -114,7 +114,7 @@ const App = () => {
     updateEmail({
       id: case_pk,
       emailId: email_pk,
-      emailCreate: requestData,
+      emailUpdate: requestData,
     })
       .unwrap()
       .then((email) => {

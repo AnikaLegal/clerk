@@ -64,7 +64,7 @@ const DateActionIconGroup = ({ date, user }: DateActionIconGroupProps) => {
   const handleReviewed = () => {
     updateCaseDate({
       id: date.id,
-      issueDateCreate: {
+      issueDateUpdate: {
         ...initialValues,
         is_reviewed: !date.is_reviewed,
       },
@@ -87,7 +87,7 @@ const DateActionIconGroup = ({ date, user }: DateActionIconGroupProps) => {
     form.setSubmitting(true)
     updateCaseDate({
       id: date.id,
-      issueDateCreate: values,
+      issueDateUpdate: values,
     })
       .unwrap()
       .then(() => {

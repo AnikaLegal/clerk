@@ -192,7 +192,7 @@ interface FormErrors {
 
 // Read API errors for display in a form.
 export const getAPIFormErrors = (err: ErrorResult): FormErrors | null => {
-  let statusNumber = null
+  let statusNumber: number | null = null
   if (err && 'status' in err && typeof err.status === 'number') {
     statusNumber = err.status
   }
