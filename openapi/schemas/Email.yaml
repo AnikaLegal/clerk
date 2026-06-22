@@ -4,6 +4,11 @@ allOf:
     properties:
       id:
         type: number
+      issue:
+        type: string
+        format: uuid
+      from_address:
+        type: string
       created_at:
         type: string
       processed_at:
@@ -24,6 +29,8 @@ allOf:
           $ref: ./EmailAttachment.yaml
     required:
       - id
+      - issue
+      - from_address
       - created_at
       - processed_at
       - sender

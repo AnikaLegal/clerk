@@ -1,8 +1,5 @@
 type: object
 properties:
-  id:
-    type: string
-    format: uuid
   first_name:
     type: string
   last_name:
@@ -46,36 +43,16 @@ properties:
   contact_notes:
     type: string
   contact_restriction:
-    $ref: ./TextChoiceField.yaml
+    type: string
   requires_interpreter:
-    $ref: ./TextChoiceField.yaml
+    type: string
   is_aboriginal_or_torres_strait_islander:
-    $ref: ./TextChoiceField.yaml
+    type: string
   call_times:
-    $ref: ./TextChoiceListField.yaml
+    type: array
+    items:
+      type: string
   eligibility_circumstances:
-    $ref: ./TextChoiceListField.yaml
-required:
-  - id
-  - first_name
-  - last_name
-  - email
-  - date_of_birth
-  - preferred_name
-  - phone_number
-  - gender
-  - pronouns
-  - centrelink_support
-  - eligibility_notes
-  - primary_language_non_english
-  - primary_language
-  - number_of_dependents
-  - notes
-  - url
-  - age
-  - full_name
-  - contact_restriction
-  - requires_interpreter
-  - is_aboriginal_or_torres_strait_islander
-  - call_times
-  - eligibility_circumstances
+    type: array
+    items:
+      type: string

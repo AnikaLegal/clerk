@@ -4,10 +4,14 @@ properties:
     $ref: ./IssueDateType.yaml
   date:
     type: string
+  issue_id:
+    type: string
+    format: uuid
   hearing_type:
     $ref: ./IssueDateHearingType.yaml
   hearing_location:
     type: string
-required:
-  - type
-  - date
+  notes:
+    type: string
+  is_reviewed:
+    type: boolean

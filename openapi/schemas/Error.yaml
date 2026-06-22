@@ -1,17 +1,25 @@
-description: The schema for an error response
 type: object
+description: >
+  Standard Django REST Framework error format. 
+  It maps field names to lists of validation errors, or returns generic messages.
 properties:
-  detail:
-    oneOf:
-      - type: string
-      - type: object
-      - type: array
-        items:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
   non_field_errors:
     type: array
+    description: Global errors not tied to a specific request field.
     items:
       type: string
+      example: "The provided credentials are not valid."
+  detail:
+    type: string
+    description: Format used for generic system/parsing exceptions instead of validation errors.
+    example: "Malformed request payload."
+additionalProperties:
+  type: array
+  description: Field-specific validation errors dynamically keyed by field name.
+  items:
+    type: string
+  example:
+    email:
+      - "This field is required."
+    password:
+      - "Ensure this value has at least 8 characters."

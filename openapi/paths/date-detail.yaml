@@ -14,6 +14,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/IssueDate.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateCaseDate
   parameters:
@@ -25,11 +29,11 @@ patch:
         type: number
   requestBody:
     required: true
-    description: Successful response.
+    description: Request body for updating a case date.
     content:
       application/json:
         schema:
-          $ref: ../schemas/IssueDateCreate.yaml
+          $ref: ../schemas/IssueDateUpdate.yaml
   responses:
     "200":
       description: Successful response.

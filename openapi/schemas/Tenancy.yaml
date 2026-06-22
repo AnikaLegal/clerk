@@ -1,31 +1,40 @@
-allOf:
-  - $ref: ./TenancyBase.yaml
-  - type: object
-    properties:
-      id:
-        type: integer
-      started:
-        type: string
-        nullable: true
-      url:
-        type: string
-      is_on_lease:
-        $ref: ./TextChoiceField.yaml
-      rental_circumstances:
-        $ref: ./TextChoiceField.yaml
-      landlord:
-        allOf:
-          - $ref: ./Person.yaml
-        nullable: true
-      agent:
-        allOf:
-          - $ref: ./Person.yaml
-        nullable: true
-    required:
-      - id
-      - started
-      - url
-      - is_on_lease
-      - rental_circumstances
-      - landlord
-      - agent
+type: object
+properties:
+  id:
+    type: integer
+  address:
+    type: string
+  suburb:
+    type: string
+    nullable: true
+  postcode:
+    type: string
+    nullable: true
+  started:
+    type: string
+    nullable: true
+  url:
+    type: string
+  is_on_lease:
+    $ref: ./TextChoiceField.yaml
+  rental_circumstances:
+    $ref: ./TextChoiceField.yaml
+  landlord:
+    allOf:
+      - $ref: ./Person.yaml
+    nullable: true
+  agent:
+    allOf:
+      - $ref: ./Person.yaml
+    nullable: true
+required:
+  - id
+  - address
+  - suburb
+  - postcode
+  - started
+  - url
+  - is_on_lease
+  - rental_circumstances
+  - landlord
+  - agent

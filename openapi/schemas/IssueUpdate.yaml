@@ -4,6 +4,8 @@ properties:
     type: string
   stage:
     type: string
+  is_open:
+    type: boolean
   outcome:
     type: string
     nullable: true

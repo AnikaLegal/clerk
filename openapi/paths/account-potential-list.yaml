@@ -21,3 +21,7 @@ get:
                 - email
                 - first_name
                 - last_name
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

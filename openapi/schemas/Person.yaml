@@ -4,11 +4,20 @@ allOf:
     properties:
       id:
         type: integer
+      email:
+        type: string
+      address:
+        type: string
+      phone_number:
+        type: string
       url:
         type: string
       support_contact_preferences:
         $ref: ./TextChoiceField.yaml
     required:
       - id
+      - email
+      - address
+      - phone_number
       - url
       - support_contact_preferences

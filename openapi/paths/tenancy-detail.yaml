@@ -14,7 +14,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Tenancy.yaml
-
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateTenancy
   parameters:
@@ -26,11 +29,11 @@ patch:
         type: integer
   requestBody:
     required: true
-    description: Successful response.
+    description: Request body for updating a tenancy.
     content:
       application/json:
         schema:
-          $ref: ../schemas/TenancyCreate.yaml
+          $ref: ../schemas/TenancyUpdate.yaml
   responses:
     "200":
       description: Successful response.

@@ -22,6 +22,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Submission"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /clerk/api/case/:
     get:
       operationId: getCases
@@ -157,6 +163,10 @@ paths:
                   - issue
                   - tenancy
                   - notes
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateCase
       parameters:
@@ -274,6 +284,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Service"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createCaseService
       parameters:
@@ -326,6 +340,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Service"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateCaseService
       parameters:
@@ -344,11 +362,11 @@ paths:
             type: number
       requestBody:
         required: true
-        description: Successful response.
+        description: Request body for updating a case service.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ServiceCreate"
+              $ref: "#/components/schemas/ServiceUpdate"
       responses:
         "200":
           description: Successful response.
@@ -482,7 +500,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EmailCreate"
+              $ref: "#/components/schemas/EmailUpdate"
       responses:
         "200":
           description: Successful response.
@@ -710,6 +728,10 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/person/:
     get:
       operationId: getPeople
@@ -762,6 +784,10 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createPerson
       requestBody:
@@ -798,7 +824,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Person"
-    put:
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    patch:
       operationId: updatePerson
       parameters:
         - description: Entity ID
@@ -908,6 +938,10 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createCaseDate
       requestBody:
@@ -945,6 +979,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IssueDate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateCaseDate
       parameters:
@@ -956,11 +994,11 @@ paths:
             type: number
       requestBody:
         required: true
-        description: Successful response.
+        description: Request body for updating a case date.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/IssueDateCreate"
+              $ref: "#/components/schemas/IssueDateUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1005,6 +1043,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tenancy"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateTenancy
       parameters:
@@ -1016,11 +1058,11 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: Successful response.
+        description: Request body for updating a tenancy.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TenancyCreate"
+              $ref: "#/components/schemas/TenancyUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1082,6 +1124,10 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/client/{id}/:
     get:
       operationId: getClient
@@ -1100,6 +1146,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Client"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateClient
       parameters:
@@ -1116,7 +1166,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ClientCreate"
+              $ref: "#/components/schemas/ClientUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1204,6 +1254,10 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createUser
       requestBody:
@@ -1240,6 +1294,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateUser
       parameters:
@@ -1255,7 +1313,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserCreate"
+              $ref: "#/components/schemas/UserUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1337,6 +1395,10 @@ paths:
                     - email
                     - first_name
                     - last_name
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
   /clerk/api/template-email/:
     get:
       operationId: getEmailTemplates
@@ -1360,6 +1422,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createEmailTemplate
       requestBody:
@@ -1396,6 +1462,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateEmailTemplate
       parameters:
@@ -1462,6 +1532,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createNotificationTemplate
       requestBody:
@@ -1498,6 +1572,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     patch:
       operationId: updateNotificationTemplate
       parameters:
@@ -1564,6 +1642,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DocumentTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
     post:
       operationId: createDocumentTemplate
       requestBody:
@@ -2107,6 +2189,31 @@ components:
         - answers_raw
         - answers
         - created_at
+    Error:
+      type: object
+      description: |
+        Standard Django REST Framework error format.  It maps field names to lists of validation errors, or returns generic messages.
+      properties:
+        non_field_errors:
+          type: array
+          description: Global errors not tied to a specific request field.
+          items:
+            type: string
+            example: The provided credentials are not valid.
+        detail:
+          type: string
+          description: Format used for generic system/parsing exceptions instead of validation errors.
+          example: Malformed request payload.
+      additionalProperties:
+        type: array
+        description: Field-specific validation errors dynamically keyed by field name.
+        items:
+          type: string
+        example:
+          email:
+            - This field is required.
+          password:
+            - Ensure this value has at least 8 characters.
     IssueBase:
       type: object
       properties:
@@ -2114,24 +2221,6 @@ components:
           type: string
       required:
         - topic
-    UserBase:
-      type: object
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        url:
-          type: string
-          readOnly: true
-      required:
-        - first_name
-        - last_name
-        - email
-        - url
     TextChoiceListField:
       type: object
       properties:
@@ -2152,79 +2241,78 @@ components:
         - value
         - choices
     User:
-      allOf:
-        - $ref: "#/components/schemas/UserBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-            case_capacity:
-              type: integer
-            is_intern:
-              type: boolean
-            is_active:
-              type: boolean
-            groups:
-              $ref: "#/components/schemas/TextChoiceListField"
-            is_superuser:
-              type: boolean
-            full_name:
-              type: string
-            created_at:
-              type: string
-            is_admin_or_better:
-              type: boolean
-            is_coordinator_or_better:
-              type: boolean
-            is_lawyer_or_better:
-              type: boolean
-            is_paralegal_or_better:
-              type: boolean
-            is_admin:
-              type: boolean
-            is_coordinator:
-              type: boolean
-            is_lawyer:
-              type: boolean
-            is_paralegal:
-              type: boolean
-            is_ms_account_set_up:
-              type: boolean
-            ms_account_created_at:
-              type: string
-              nullable: true
-          required:
-            - id
-            - case_capacity
-            - is_intern
-            - is_active
-            - groups
-            - is_superuser
-            - full_name
-            - created_at
-            - is_admin_or_better
-            - is_coordinator_or_better
-            - is_lawyer_or_better
-            - is_paralegal_or_better
-            - is_admin
-            - is_coordinator
-            - is_lawyer
-            - is_paralegal
-            - is_ms_account_set_up
-            - ms_account_created_at
-    ClientBase:
       type: object
       properties:
+        id:
+          type: integer
         first_name:
           type: string
         last_name:
           type: string
         email:
           type: string
+          format: email
+        url:
+          type: string
+          readOnly: true
+        case_capacity:
+          type: integer
+        is_intern:
+          type: boolean
+        is_active:
+          type: boolean
+        groups:
+          $ref: "#/components/schemas/TextChoiceListField"
+        is_superuser:
+          type: boolean
+        full_name:
+          type: string
+        created_at:
+          type: string
+        is_admin_or_better:
+          type: boolean
+        is_coordinator_or_better:
+          type: boolean
+        is_lawyer_or_better:
+          type: boolean
+        is_paralegal_or_better:
+          type: boolean
+        is_admin:
+          type: boolean
+        is_coordinator:
+          type: boolean
+        is_lawyer:
+          type: boolean
+        is_paralegal:
+          type: boolean
+        is_ms_account_set_up:
+          type: boolean
+        ms_account_created_at:
+          type: string
+          nullable: true
       required:
         - first_name
         - last_name
         - email
+        - url
+        - id
+        - case_capacity
+        - is_intern
+        - is_active
+        - groups
+        - is_superuser
+        - full_name
+        - created_at
+        - is_admin_or_better
+        - is_coordinator_or_better
+        - is_lawyer_or_better
+        - is_paralegal_or_better
+        - is_admin
+        - is_coordinator
+        - is_lawyer
+        - is_paralegal
+        - is_ms_account_set_up
+        - ms_account_created_at
     TextChoiceField:
       type: object
       properties:
@@ -2243,83 +2331,123 @@ components:
         - value
         - choices
     Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+        preferred_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        pronouns:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        number_of_dependents:
+          type: number
+          nullable: true
+        notes:
+          type: string
+        url:
+          type: string
+        age:
+          type: integer
+          nullable: true
+        full_name:
+          type: string
+        contact_notes:
+          type: string
+        contact_restriction:
+          $ref: "#/components/schemas/TextChoiceField"
+        requires_interpreter:
+          $ref: "#/components/schemas/TextChoiceField"
+        is_aboriginal_or_torres_strait_islander:
+          $ref: "#/components/schemas/TextChoiceField"
+        call_times:
+          $ref: "#/components/schemas/TextChoiceListField"
+        eligibility_circumstances:
+          $ref: "#/components/schemas/TextChoiceListField"
+      required:
+        - id
+        - first_name
+        - last_name
+        - email
+        - date_of_birth
+        - preferred_name
+        - phone_number
+        - gender
+        - pronouns
+        - centrelink_support
+        - eligibility_notes
+        - primary_language_non_english
+        - primary_language
+        - number_of_dependents
+        - notes
+        - url
+        - age
+        - full_name
+        - contact_restriction
+        - requires_interpreter
+        - is_aboriginal_or_torres_strait_islander
+        - call_times
+        - eligibility_circumstances
+    PersonBase:
+      type: object
+      properties:
+        full_name:
+          type: string
+      required:
+        - full_name
+    Person:
       allOf:
-        - $ref: "#/components/schemas/ClientBase"
+        - $ref: "#/components/schemas/PersonBase"
         - type: object
           properties:
             id:
+              type: integer
+            email:
               type: string
-              format: uuid
-            date_of_birth:
+            address:
               type: string
-              nullable: true
-            preferred_name:
-              type: string
-              nullable: true
             phone_number:
-              type: string
-            gender:
-              type: string
-              nullable: true
-            pronouns:
-              type: string
-              nullable: true
-            centrelink_support:
-              type: boolean
-            eligibility_notes:
-              type: string
-            primary_language_non_english:
-              type: boolean
-            primary_language:
-              type: string
-            number_of_dependents:
-              type: number
-              nullable: true
-            notes:
               type: string
             url:
               type: string
-            age:
-              type: integer
-              nullable: true
-            full_name:
-              type: string
-            contact_notes:
-              type: string
-            contact_restriction:
+            support_contact_preferences:
               $ref: "#/components/schemas/TextChoiceField"
-            requires_interpreter:
-              $ref: "#/components/schemas/TextChoiceField"
-            is_aboriginal_or_torres_strait_islander:
-              $ref: "#/components/schemas/TextChoiceField"
-            call_times:
-              $ref: "#/components/schemas/TextChoiceListField"
-            eligibility_circumstances:
-              $ref: "#/components/schemas/TextChoiceListField"
           required:
             - id
-            - date_of_birth
-            - preferred_name
+            - email
+            - address
             - phone_number
-            - gender
-            - pronouns
-            - centrelink_support
-            - eligibility_notes
-            - primary_language_non_english
-            - primary_language
-            - number_of_dependents
-            - notes
             - url
-            - age
-            - full_name
-            - contact_restriction
-            - requires_interpreter
-            - is_aboriginal_or_torres_strait_islander
-            - call_times
-            - eligibility_circumstances
-    TenancyBase:
+            - support_contact_preferences
+    Tenancy:
       type: object
       properties:
+        id:
+          type: integer
         address:
           type: string
         suburb:
@@ -2328,73 +2456,34 @@ components:
         postcode:
           type: string
           nullable: true
+        started:
+          type: string
+          nullable: true
+        url:
+          type: string
+        is_on_lease:
+          $ref: "#/components/schemas/TextChoiceField"
+        rental_circumstances:
+          $ref: "#/components/schemas/TextChoiceField"
+        landlord:
+          allOf:
+            - $ref: "#/components/schemas/Person"
+          nullable: true
+        agent:
+          allOf:
+            - $ref: "#/components/schemas/Person"
+          nullable: true
       required:
+        - id
         - address
         - suburb
         - postcode
-    PersonBase:
-      type: object
-      properties:
-        full_name:
-          type: string
-        email:
-          type: string
-        address:
-          type: string
-        phone_number:
-          type: string
-      required:
-        - full_name
-        - email
-        - address
-        - phone_number
-    Person:
-      allOf:
-        - $ref: "#/components/schemas/PersonBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-            url:
-              type: string
-            support_contact_preferences:
-              $ref: "#/components/schemas/TextChoiceField"
-          required:
-            - id
-            - url
-            - support_contact_preferences
-    Tenancy:
-      allOf:
-        - $ref: "#/components/schemas/TenancyBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-            started:
-              type: string
-              nullable: true
-            url:
-              type: string
-            is_on_lease:
-              $ref: "#/components/schemas/TextChoiceField"
-            rental_circumstances:
-              $ref: "#/components/schemas/TextChoiceField"
-            landlord:
-              allOf:
-                - $ref: "#/components/schemas/Person"
-              nullable: true
-            agent:
-              allOf:
-                - $ref: "#/components/schemas/Person"
-              nullable: true
-          required:
-            - id
-            - started
-            - url
-            - is_on_lease
-            - rental_circumstances
-            - landlord
-            - agent
+        - started
+        - url
+        - is_on_lease
+        - rental_circumstances
+        - landlord
+        - agent
     Issue:
       allOf:
         - $ref: "#/components/schemas/IssueBase"
@@ -2508,78 +2597,96 @@ components:
             - next_review
             - submission_id
     ClientCreate:
-      allOf:
-        - $ref: "#/components/schemas/ClientBase"
-        - type: object
-          properties:
-            date_of_birth:
-              type: string
-              nullable: true
-            preferred_name:
-              type: string
-              nullable: true
-            phone_number:
-              type: string
-            gender:
-              type: string
-              nullable: true
-            pronouns:
-              type: string
-              nullable: true
-            centrelink_support:
-              type: boolean
-            eligibility_notes:
-              type: string
-            primary_language_non_english:
-              type: boolean
-            primary_language:
-              type: string
-            number_of_dependents:
-              type: number
-              nullable: true
-            notes:
-              type: string
-            url:
-              type: string
-            age:
-              type: integer
-              nullable: true
-            full_name:
-              type: string
-            contact_notes:
-              type: string
-            contact_restriction:
-              type: string
-            requires_interpreter:
-              type: string
-            is_aboriginal_or_torres_strait_islander:
-              type: string
-            call_times:
-              type: array
-              items:
-                type: string
-            eligibility_circumstances:
-              type: array
-              items:
-                type: string
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+        preferred_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        pronouns:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        number_of_dependents:
+          type: number
+          nullable: true
+        notes:
+          type: string
+        url:
+          type: string
+        age:
+          type: integer
+          nullable: true
+        full_name:
+          type: string
+        contact_notes:
+          type: string
+        contact_restriction:
+          type: string
+        requires_interpreter:
+          type: string
+        is_aboriginal_or_torres_strait_islander:
+          type: string
+        call_times:
+          type: array
+          items:
+            type: string
+        eligibility_circumstances:
+          type: array
+          items:
+            type: string
+      required:
+        - first_name
+        - last_name
+        - email
     TenancyCreate:
-      allOf:
-        - $ref: "#/components/schemas/TenancyBase"
-        - type: object
-          properties:
-            started:
-              type: string
-              nullable: true
-            is_on_lease:
-              type: string
-            rental_circumstances:
-              type: string
-            landlord_id:
-              type: number
-              nullable: true
-            agent_id:
-              type: number
-              nullable: true
+      type: object
+      properties:
+        address:
+          type: string
+        suburb:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        started:
+          type: string
+          nullable: true
+        is_on_lease:
+          type: string
+        rental_circumstances:
+          type: string
+        landlord_id:
+          type: number
+          nullable: true
+        agent_id:
+          type: number
+          nullable: true
+      required:
+        - address
+        - suburb
+        - postcode
     IssueCreate:
       allOf:
         - $ref: "#/components/schemas/IssueBase"
@@ -2626,38 +2733,6 @@ components:
             weekly_rent:
               type: integer
               nullable: true
-    Error:
-      description: The schema for an error response
-      type: object
-      properties:
-        detail:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
-              items:
-                oneOf:
-                  - type: string
-                  - type: object
-                  - type: array
-        non_field_errors:
-          type: array
-          items:
-            type: string
-    IssueNoteBase:
-      type: object
-      properties:
-        note_type:
-          type: string
-        text:
-          type: string
-        event:
-          type: string
-          nullable: true
-      required:
-        - note_type
-        - text
-        - event
     IssueNoteCreator:
       type: object
       properties:
@@ -2681,28 +2756,36 @@ components:
         - full_name
         - url
     IssueNote:
-      allOf:
-        - $ref: "#/components/schemas/IssueNoteBase"
-        - type: object
-          properties:
-            id:
-              type: number
-            creator:
-              $ref: "#/components/schemas/IssueNoteCreator"
-            text_display:
-              type: string
-            created_at:
-              type: string
-            reviewee:
-              nullable: true
-              allOf:
-                - $ref: "#/components/schemas/User"
-          required:
-            - id
-            - creator
-            - text_display
-            - created_at
-            - reviewee
+      type: object
+      properties:
+        id:
+          type: number
+        note_type:
+          type: string
+        text:
+          type: string
+        event:
+          type: string
+          nullable: true
+        creator:
+          $ref: "#/components/schemas/IssueNoteCreator"
+        text_display:
+          type: string
+        created_at:
+          type: string
+        reviewee:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/User"
+      required:
+        - id
+        - note_type
+        - text
+        - event
+        - creator
+        - text_display
+        - created_at
+        - reviewee
     IssueUpdate:
       type: object
       properties:
@@ -2710,6 +2793,8 @@ components:
           type: string
         stage:
           type: string
+        is_open:
+          type: boolean
         outcome:
           type: string
           nullable: true
@@ -2739,18 +2824,18 @@ components:
         referrer_type:
           type: string
     IssueNoteCreate:
-      allOf:
-        - $ref: "#/components/schemas/IssueNoteBase"
-        - type: object
-          properties:
-            creator_id:
-              type: number
-            issue_id:
-              type: string
-              format: uuid
-          required:
-            - creator_id
-            - issue_id
+      type: object
+      properties:
+        note_type:
+          type: string
+        text:
+          type: string
+        event:
+          type: string
+          nullable: true
+      required:
+        - note_type
+        - text
     SharepointDocument:
       type: object
       properties:
@@ -2789,7 +2874,41 @@ components:
         - LEGAL_SUPPORT
         - REPRESENTATION_COURT_TRIBUNAL
         - REPRESENTATION_OTHER
-    ServiceBase:
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        issue_id:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/ServiceCategory"
+        type:
+          oneOf:
+            - $ref: "#/components/schemas/ServiceTypeDiscrete"
+            - $ref: "#/components/schemas/ServiceTypeOngoing"
+        started_at:
+          type: string
+        finished_at:
+          type: string
+          nullable: true
+        count:
+          type: number
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+      required:
+        - id
+        - issue_id
+        - category
+        - type
+        - started_at
+        - finished_at
+        - count
+        - notes
+    ServiceCreate:
       type: object
       properties:
         category:
@@ -2816,32 +2935,30 @@ components:
         - finished_at
         - count
         - notes
-    Service:
-      allOf:
-        - $ref: "#/components/schemas/ServiceBase"
-        - type: object
-          properties:
-            id:
-              type: integer
-            issue_id:
-              type: string
-              format: uuid
-          required:
-            - id
-            - issue_id
-    ServiceCreate:
-      allOf:
-        - $ref: "#/components/schemas/ServiceBase"
-        - type: object
+    ServiceUpdate:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/ServiceCategory"
+        type:
+          oneOf:
+            - $ref: "#/components/schemas/ServiceTypeDiscrete"
+            - $ref: "#/components/schemas/ServiceTypeOngoing"
+        started_at:
+          type: string
+        finished_at:
+          type: string
+          nullable: true
+        count:
+          type: number
+          nullable: true
+        notes:
+          type: string
+          nullable: true
     EmailCreate:
       type: object
       properties:
-        issue:
-          type: string
-          format: uuid
         to_address:
-          type: string
-        from_address:
           type: string
         cc_addresses:
           type: array
@@ -2853,10 +2970,10 @@ components:
           type: string
         html:
           type: string
+        state:
+          type: string
       required:
-        - issue
         - to_address
-        - from_address
         - cc_addresses
         - subject
         - text
@@ -2890,6 +3007,11 @@ components:
           properties:
             id:
               type: number
+            issue:
+              type: string
+              format: uuid
+            from_address:
+              type: string
             created_at:
               type: string
             processed_at:
@@ -2910,6 +3032,8 @@ components:
                 $ref: "#/components/schemas/EmailAttachment"
           required:
             - id
+            - issue
+            - from_address
             - created_at
             - processed_at
             - sender
@@ -2938,6 +3062,23 @@ components:
         - slug
         - most_recent
         - url
+    EmailUpdate:
+      type: object
+      properties:
+        to_address:
+          type: string
+        cc_addresses:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        text:
+          type: string
+        html:
+          type: string
+        state:
+          type: string
     EmailAttachmentCreate:
       type: object
       properties:
@@ -2963,10 +3104,14 @@ components:
         - $ref: "#/components/schemas/PersonBase"
         - type: object
           properties:
+            email:
+              type: string
+            address:
+              type: string
+            phone_number:
+              type: string
             support_contact_preferences:
               type: string
-          required:
-            - support_contact_preferences
     IssueDateType:
       type: string
       enum:
@@ -2980,9 +3125,11 @@ components:
       enum:
         - IN_PERSON
         - VIRTUAL
-    IssueDateBase:
+    IssueDate:
       type: object
       properties:
+        id:
+          type: number
         type:
           $ref: "#/components/schemas/IssueDateType"
         date:
@@ -2991,52 +3138,182 @@ components:
           $ref: "#/components/schemas/IssueDateHearingType"
         hearing_location:
           type: string
+        issue:
+          $ref: "#/components/schemas/Issue"
+        notes:
+          type: string
+        is_reviewed:
+          type: boolean
+      required:
+        - id
+        - type
+        - date
+        - issue
+        - notes
+        - is_reviewed
+    IssueDateCreate:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/IssueDateType"
+        date:
+          type: string
+        issue_id:
+          type: string
+          format: uuid
+        hearing_type:
+          $ref: "#/components/schemas/IssueDateHearingType"
+        hearing_location:
+          type: string
+        notes:
+          type: string
+        is_reviewed:
+          type: boolean
       required:
         - type
         - date
-    IssueDate:
-      allOf:
-        - $ref: "#/components/schemas/IssueDateBase"
-        - type: object
-          properties:
-            id:
-              type: number
-            issue:
-              $ref: "#/components/schemas/Issue"
-            notes:
-              type: string
-            is_reviewed:
-              type: boolean
-          required:
-            - id
-            - issue
-            - notes
-            - is_reviewed
-    IssueDateCreate:
-      allOf:
-        - $ref: "#/components/schemas/IssueDateBase"
-        - type: object
-          properties:
-            issue_id:
-              type: string
-              format: uuid
-            notes:
-              type: string
-            is_reviewed:
-              type: boolean
-          required:
-            - issue_id
+        - issue_id
+    IssueDateUpdate:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/IssueDateType"
+        date:
+          type: string
+        issue_id:
+          type: string
+          format: uuid
+        hearing_type:
+          $ref: "#/components/schemas/IssueDateHearingType"
+        hearing_location:
+          type: string
+        notes:
+          type: string
+        is_reviewed:
+          type: boolean
+    TenancyUpdate:
+      type: object
+      properties:
+        address:
+          type: string
+        suburb:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        started:
+          type: string
+          nullable: true
+        is_on_lease:
+          type: string
+        rental_circumstances:
+          type: string
+        landlord_id:
+          type: number
+          nullable: true
+        agent_id:
+          type: number
+          nullable: true
+    ClientUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        date_of_birth:
+          type: string
+          nullable: true
+        preferred_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        pronouns:
+          type: string
+          nullable: true
+        centrelink_support:
+          type: boolean
+        eligibility_notes:
+          type: string
+        primary_language_non_english:
+          type: boolean
+        primary_language:
+          type: string
+        number_of_dependents:
+          type: number
+          nullable: true
+        notes:
+          type: string
+        url:
+          type: string
+        age:
+          type: integer
+          nullable: true
+        full_name:
+          type: string
+        contact_notes:
+          type: string
+        contact_restriction:
+          type: string
+        requires_interpreter:
+          type: string
+        is_aboriginal_or_torres_strait_islander:
+          type: string
+        call_times:
+          type: array
+          items:
+            type: string
+        eligibility_circumstances:
+          type: array
+          items:
+            type: string
     UserCreate:
-      allOf:
-        - $ref: "#/components/schemas/UserBase"
-        - type: object
-          properties:
-            groups:
-              type: array
-              items:
-                type: string
-          required:
-            - groups
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        url:
+          type: string
+          readOnly: true
+        groups:
+          type: array
+          items:
+            type: string
+      required:
+        - first_name
+        - last_name
+        - email
+        - url
+        - groups
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        url:
+          type: string
+          readOnly: true
+        groups:
+          type: array
+          items:
+            type: string
     MicrosoftUserPermissions:
       type: object
       properties:
@@ -3198,6 +3475,12 @@ components:
             $ref: "#/components/schemas/Error"
     PermissionDenied:
       description: Permission Denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: The requested resource was not found
       content:
         application/json:
           schema:

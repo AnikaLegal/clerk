@@ -1,22 +1,30 @@
-allOf:
-  - $ref: ./IssueNoteBase.yaml
-  - type: object
-    properties:
-      id:
-        type: number
-      creator:
-        $ref: ./IssueNoteCreator.yaml
-      text_display:
-        type: string
-      created_at:
-        type: string
-      reviewee:
-        nullable: true
-        allOf:
-          - $ref: ./User.yaml
-    required:
-      - id
-      - creator
-      - text_display
-      - created_at
-      - reviewee
+type: object
+properties:
+  id:
+    type: number
+  note_type:
+    type: string
+  text:
+    type: string
+  event:
+    type: string
+    nullable: true
+  creator:
+    $ref: ./IssueNoteCreator.yaml
+  text_display:
+    type: string
+  created_at:
+    type: string
+  reviewee:
+    nullable: true
+    allOf:
+      - $ref: ./User.yaml
+required:
+  - id
+  - note_type
+  - text
+  - event
+  - creator
+  - text_display
+  - created_at
+  - reviewee
