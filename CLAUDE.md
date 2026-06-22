@@ -25,7 +25,7 @@ inv -l                  # List all tasks
 
 App URLs (via `inv dev`): website `http://localhost:8000`, Clerk CMS `/clerk`, Django admin `/admin`.
 
-First-time setup (Docker, transcrypt, `inv build -f` / `inv build`, `inv reset`, `inv superuser you@anikalegal.com`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
+First-time setup (Docker, transcrypt, `inv build -f` / `inv build`, `inv reset`, `inv superuser you@anikalegal.org.au`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
 
 ## API contract workflow (important)
 
