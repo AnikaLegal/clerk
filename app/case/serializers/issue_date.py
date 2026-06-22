@@ -64,9 +64,10 @@ class IssueDateSerializer(serializers.ModelSerializer):
         # Prevent date creation if the related issue is closed.
         from core.models import Issue
 
-        if self.instance is None and Issue.objects.filter(
-            id=value, is_open=False
-        ).exists():
+        if (
+            self.instance is None
+            and Issue.objects.filter(id=value, is_open=False).exists()
+        ):
             raise serializers.ValidationError(
                 "Cannot add a critical date to a closed case."
             )
