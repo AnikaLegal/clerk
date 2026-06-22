@@ -5,27 +5,24 @@ TODO: Test that emails actually get sent
 
 from datetime import datetime, timezone
 from io import StringIO
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse
-from django.core.files.uploadedfile import InMemoryUploadedFile
-
 from accounts.models import User
+from case.views.case_email import EmailThread, get_email_threads
 from core.factories import (
-    IssueFactory,
-    EmailFactory,
     EmailAttachmentFactory,
+    EmailFactory,
+    IssueFactory,
     get_dummy_file,
 )
-from emails.models import EmailState, Email, EmailAttachment
-from case.views.case_email import get_email_threads, EmailThread
-from conftest import schema_tester
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from emails.models import Email, EmailAttachment, EmailState
+from rest_framework.reverse import reverse
 
 
 @pytest.mark.django_db
-def test_case_email_list_view(superuser_client: APIClient):
+def test_case_email_list_view(superuser_client):
     issue = IssueFactory()
     for state, subject, created_at in THREADED_EMAILS:
         EmailFactory(issue=issue, state=state, subject=subject, created_at=created_at)
@@ -35,22 +32,20 @@ def test_case_email_list_view(superuser_client: APIClient):
     assert response.status_code == 200, response.json()
     threads = response.json()
     assert len(threads) == 3
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_get_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT")
+def test_case_email_get_view(superuser_client):
+    email = EmailFactory(state=EmailState.DRAFT)
     url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
     response = superuser_client.get(url)
     assert response.status_code == 200, response.json()
     email_data = response.json()
     assert email_data["id"] == email.pk
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_create_view(superuser_client: APIClient, superuser: User):
+def test_case_email_create_view(superuser_client, superuser: User):
     email = EmailFactory()
     url = reverse("email-api-create", args=(email.issue.pk,))
     data = {
@@ -60,43 +55,38 @@ def test_case_email_create_view(superuser_client: APIClient, superuser: User):
         "text": "Hi there!",
         "html": "<p>Hi there!</p>",
     }
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 201, response.json()
     email_data = response.json()
     assert email_data["issue"] == str(email.issue.pk)
     assert email_data["sender"]["id"] == superuser.pk
     assert email_data["state"] == "DRAFT"
     assert email_data["from_address"].endswith("@mail.fake.anikalegal.org.au")
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_update_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT", subject="Hello World")
+def test_case_email_update_view(superuser_client):
+    email = EmailFactory(state=EmailState.DRAFT, subject="Hello World")
     url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
-    response = superuser_client.patch(
-        url, data={"subject": "Goodbye All!"}, format="json"
-    )
+    response = superuser_client.patch(url, data={"subject": "Goodbye All!"})
     assert response.status_code == 200, response.json()
     email_data = response.json()
     assert email_data["subject"] == "Goodbye All!"
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_delete_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT")
+def test_case_email_delete_view(superuser_client):
+    email = EmailFactory(state=EmailState.DRAFT)
     assert Email.objects.count() == 1
     url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
     response = superuser_client.delete(url)
     assert response.status_code == 204
     assert Email.objects.count() == 0
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_add_attachment_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT")
+def test_case_email_add_attachment_view(superuser_client):
+    email = EmailFactory(state=EmailState.DRAFT)
     url = reverse("email-api-attachment-create", args=(email.issue.pk, email.pk))
     uploaded_file = InMemoryUploadedFile(
         StringIO("Hello World!"),
@@ -107,18 +97,70 @@ def test_case_email_add_attachment_view(superuser_client: APIClient):
         charset="utf-8",
     )
     data = {"file": uploaded_file}
-    response = superuser_client.post(url, data=data)
+    response = superuser_client.post(
+        url, data=data, format="multipart", content_type=None
+    )
     assert response.status_code == 201, response.json()
     attach_data = response.json()
     assert attach_data["email"] == email.pk
+
     attachment = EmailAttachment.objects.get(pk=attach_data["id"])
+    assert attachment.email == email
     assert attachment.file.read() == b"Hello World!"
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_email_delete_attachment_view(superuser_client: APIClient):
-    email = EmailFactory(state="DRAFT")
+@patch("case.serializers.email.MAX_EMAIL_SIZE_BYTES", 10)
+def test_case_email_add_attachment_too_large_view(superuser_client):
+    """Uploading an attachment that pushes the email over the size limit is rejected."""
+    email = EmailFactory(state=EmailState.DRAFT)
+    url = reverse("email-api-attachment-create", args=(email.issue.pk, email.pk))
+    uploaded_file = InMemoryUploadedFile(
+        StringIO("Hello World!"),
+        name="hello-world.txt",
+        content_type="text/plain",
+        field_name="file",
+        size=12,
+        charset="utf-8",
+    )
+    response = superuser_client.post(
+        url, data={"file": uploaded_file}, format="multipart", content_type=None
+    )
+    assert response.status_code == 400, response.json()
+    assert any(error["attr"] == "file" for error in response.json()["errors"])
+    assert EmailAttachment.objects.count() == 0
+
+
+@pytest.mark.django_db
+@patch("case.serializers.email.MAX_EMAIL_SIZE_BYTES", 5)
+def test_case_email_send_too_large_view(superuser_client):
+    """Marking an oversized email ready to send is rejected and it stays a draft."""
+    email = EmailFactory(state=EmailState.DRAFT, text="Hello there")
+    url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
+    response = superuser_client.patch(
+        url, data={"state": EmailState.READY_TO_SEND, "html": "<p>Hi</p>"}
+    )
+    assert response.status_code == 400, response.json()
+    email.refresh_from_db()
+    assert email.state == EmailState.DRAFT
+
+
+@pytest.mark.django_db
+def test_case_email_send_within_limit_view(superuser_client):
+    """A normal-sized email can still be marked ready to send."""
+    email = EmailFactory(state=EmailState.DRAFT, text="Hello there")
+    url = reverse("email-api-email-detail", args=(email.issue.pk, email.pk))
+    response = superuser_client.patch(
+        url, data={"state": EmailState.READY_TO_SEND, "html": "<p>Hi</p>"}
+    )
+    assert response.status_code == 200, response.json()
+    email.refresh_from_db()
+    assert email.state == EmailState.READY_TO_SEND
+
+
+@pytest.mark.django_db
+def test_case_email_delete_attachment_view(superuser_client):
+    email = EmailFactory(state=EmailState.DRAFT)
     f = get_dummy_file("image.png")
     attachment = EmailAttachmentFactory(email=email, file=f)
     assert EmailAttachment.objects.count() == 1
@@ -128,15 +170,14 @@ def test_case_email_delete_attachment_view(superuser_client: APIClient):
     response = superuser_client.delete(url)
     assert response.status_code == 204
     assert EmailAttachment.objects.count() == 0
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 @patch("case.views.case_email.save_email_attachment")
 def test_case_email_upload_attachment_to_sharepoint_view(
-    mock_save_email_attachment, superuser_client: APIClient
+    mock_save_email_attachment, superuser_client
 ):
-    email = EmailFactory(state="DRAFT")
+    email = EmailFactory(state=EmailState.DRAFT)
     f = get_dummy_file("image.png")
     attachment = EmailAttachmentFactory(email=email, file=f)
     url = reverse(
@@ -145,13 +186,12 @@ def test_case_email_upload_attachment_to_sharepoint_view(
     )
     response = superuser_client.post(url)
     mock_save_email_attachment.assert_called_once_with(email, attachment)
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
 @patch("case.views.case_email.MSGraphAPI")
 def test_case_email_download_attachment_from_sharepoint_view(
-    mock_microsoft_api, superuser_client: APIClient
+    mock_microsoft_api, superuser_client
 ):
     mock_api = Mock()
     mock_api.folder.download_file.return_value = (
@@ -162,7 +202,7 @@ def test_case_email_download_attachment_from_sharepoint_view(
     mock_microsoft_api.return_value = mock_api
     sharepoint_id = "ABCD-1234"
 
-    email = EmailFactory(state="DRAFT")
+    email = EmailFactory(state=EmailState.DRAFT)
     url = reverse(
         "email-api-attachment-sharepoint-download",
         args=(email.issue.pk, email.pk, sharepoint_id),
@@ -174,7 +214,6 @@ def test_case_email_download_attachment_from_sharepoint_view(
     mock_api.folder.download_file.assert_called_once_with(sharepoint_id)
     attachment = EmailAttachment.objects.get()
     assert attachment.file.read() == b"Hello World!"
-    schema_tester.validate_response(response=response)
 
 
 def dt(day):

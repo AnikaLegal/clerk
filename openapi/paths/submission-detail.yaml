@@ -15,3 +15,9 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Submission.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+    "404":
+      $ref: ../responses/NotFound.yaml

@@ -1,14 +1,13 @@
 import pytest
 from accounts.models import User
-from conftest import schema_tester
+from conftest import CaseRole
 from core.factories import IssueFactory, PersonFactory, TenancyFactory, UserFactory
 from core.models import Person
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_person_list_api(superuser_client: APIClient):
+def test_person_list_api(superuser_client):
     """Test basic list retrieval without any parameters."""
     instance_1 = PersonFactory()
     instance_2 = PersonFactory()
@@ -29,11 +28,9 @@ def test_person_list_api(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {instance_1.pk, instance_2.pk}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_list_api__with_page(superuser_client: APIClient):
+def test_person_list_api__with_page(superuser_client):
     """Test list action pagination with page parameter."""
     PersonFactory.create_batch(5)
 
@@ -63,11 +60,9 @@ def test_person_list_api__with_page(superuser_client: APIClient):
     assert data["prev"] is not None
     assert len(data["results"]) == 2
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_list_api__with_query(superuser_client: APIClient):
+def test_person_list_api__with_query(superuser_client):
     """Test list action with query parameter for searching."""
     person_1 = PersonFactory(
         full_name="John Smith",
@@ -141,11 +136,9 @@ def test_person_list_api__with_query(superuser_client: APIClient):
     assert data["item_count"] == 3
     assert len(data["results"]) == 3
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_list_api__with_page_and_query(superuser_client: APIClient):
+def test_person_list_api__with_page_and_query(superuser_client):
     """Test list action with both page and query parameters."""
     # Create persons with specific names for searching
     PersonFactory.create_batch(
@@ -186,11 +179,9 @@ def test_person_list_api__with_page_and_query(superuser_client: APIClient):
     assert data["prev"] is not None
     assert len(data["results"]) == 1
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_retrieve_api(superuser_client: APIClient):
+def test_person_retrieve_api(superuser_client):
     """Test retrieving a specific person."""
     instance = PersonFactory()
     url = reverse("person-api-detail", args=(instance.pk,))
@@ -204,11 +195,9 @@ def test_person_retrieve_api(superuser_client: APIClient):
     assert data["address"] == instance.address
     assert data["phone_number"] == instance.phone_number
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_create_api(superuser_client: APIClient):
+def test_person_create_api(superuser_client):
     """Test creating a new person with POST request."""
     person_stub = PersonFactory.stub()
     assert Person.objects.count() == 0
@@ -221,7 +210,7 @@ def test_person_create_api(superuser_client: APIClient):
         "support_contact_preferences": "",
     }
     url = reverse("person-api-list")
-    response = superuser_client.post(url, data=data, format="json")
+    response = superuser_client.post(url, data=data)
 
     assert response.status_code == 201, response.json()
     data = response.json()
@@ -232,12 +221,10 @@ def test_person_create_api(superuser_client: APIClient):
     assert person.address == data["address"] == person_stub.address
     assert person.phone_number == data["phone_number"] == person_stub.phone_number
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_person_update_api(superuser_client: APIClient):
-    """Test updating an existing person with PUT request."""
+def test_person_update_api(superuser_client):
+    """Test updating an existing person."""
     instance = PersonFactory()
     url = reverse("person-api-detail", args=(instance.pk,))
 
@@ -248,7 +235,7 @@ def test_person_update_api(superuser_client: APIClient):
         "phone_number": "555-9999",
         "support_contact_preferences": "",
     }
-    response = superuser_client.put(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
 
     assert response.status_code == 200, response.json()
 
@@ -264,12 +251,10 @@ def test_person_update_api(superuser_client: APIClient):
     assert data["address"] == "999 Updated St"
     assert data["phone_number"] == "555-9999"
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 def test_person_list_api__paralegal_returns_only_related_people(
-    paralegal_user_client: APIClient, paralegal_user: User
+    paralegal_user_client, paralegal_user: User
 ):
     """Paralegal list action should only return people linked to issues they work on."""
     landlord = PersonFactory()
@@ -298,12 +283,10 @@ def test_person_list_api__paralegal_returns_only_related_people(
     assert result_ids == {landlord.pk, agent.pk, support_worker.pk}
     assert unrelated_person.pk not in result_ids
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 def test_person_list_api__lawyer_returns_only_related_people(
-    lawyer_user_client: APIClient, lawyer_user: User
+    lawyer_user_client, lawyer_user: User
 ):
     """Lawyer list action should only return people linked to issues they work on."""
     landlord = PersonFactory()
@@ -328,4 +311,161 @@ def test_person_list_api__lawyer_returns_only_related_people(
     assert result_ids == {landlord.pk, agent.pk, support_worker.pk}
     assert unrelated_person.pk not in result_ids
 
-    schema_tester.validate_response(response=response)
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status, expected_count",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403, None),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403, None),
+        ("unprivileged_user", CaseRole.LAWYER, 403, None),
+        ("paralegal_user", CaseRole.NONE, 200, 0),
+        ("paralegal_user", CaseRole.PARALEGAL, 200, 3),
+        ("paralegal_user", CaseRole.LAWYER, 200, 0),
+        ("lawyer_user", CaseRole.NONE, 200, 0),
+        ("lawyer_user", CaseRole.PARALEGAL, 200, 3),
+        ("lawyer_user", CaseRole.LAWYER, 200, 3),
+        ("coordinator_user", CaseRole.NONE, 200, 3),
+        ("coordinator_user", CaseRole.PARALEGAL, 200, 3),
+        ("coordinator_user", CaseRole.LAWYER, 200, 3),
+        ("admin_user", CaseRole.NONE, 200, 3),
+        ("admin_user", CaseRole.PARALEGAL, 200, 3),
+        ("admin_user", CaseRole.LAWYER, 200, 3),
+    ],
+)
+def test_person_api_list_perms(
+    user_name: str,
+    assigned_as: bool,
+    expected_status: int,
+    expected_count: int,
+    user_client,
+    request,
+):
+    """
+    Test list API perms for different users.
+    """
+    user = request.getfixturevalue(user_name)
+
+    issue = IssueFactory(
+        tenancy=TenancyFactory(landlord=PersonFactory(), agent=PersonFactory()),
+        support_worker=PersonFactory(),
+    )
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    url = reverse("person-api-list")
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+    if expected_count is not None:
+        data = response.json()
+        assert data["item_count"] == expected_count
+        results = data["results"]
+        assert len(results) == expected_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("paralegal_user", CaseRole.PARALEGAL, 200),
+        ("paralegal_user", CaseRole.LAWYER, 200),  # TODO: fix - should be 403.
+        ("lawyer_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("lawyer_user", CaseRole.PARALEGAL, 200),
+        ("lawyer_user", CaseRole.LAWYER, 200),
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
+    ],
+)
+def test_person_api_retrieve_perms(
+    user_name: str,
+    assigned_as: CaseRole,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test creation of a tenancy via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    person = PersonFactory()
+    tenancy = TenancyFactory(landlord=person, agent=person)
+    issue = IssueFactory(support_worker=person, tenancy=tenancy)
+
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    url = reverse("person-api-detail", args=(person.pk,))
+    response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, assigned_as, expected_status",
+    [
+        ("unprivileged_user", CaseRole.NONE, 403),
+        ("unprivileged_user", CaseRole.PARALEGAL, 403),
+        ("unprivileged_user", CaseRole.LAWYER, 403),
+        ("paralegal_user", CaseRole.NONE, 403),
+        ("paralegal_user", CaseRole.PARALEGAL, 403),  # Probably should be 200
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
+        ("lawyer_user", CaseRole.PARALEGAL, 403),  # Probably should be 200
+        ("lawyer_user", CaseRole.LAWYER, 403),  # Probably should be 200
+        ("coordinator_user", CaseRole.NONE, 200),
+        ("coordinator_user", CaseRole.PARALEGAL, 200),
+        ("coordinator_user", CaseRole.LAWYER, 200),
+        ("admin_user", CaseRole.NONE, 200),
+        ("admin_user", CaseRole.PARALEGAL, 200),
+        ("admin_user", CaseRole.LAWYER, 200),
+    ],
+)
+def test_person_api_update_perms(
+    user_name: str,
+    assigned_as: CaseRole,
+    expected_status: int,
+    user_client,
+    request,
+):
+    """
+    Test updating a person via the API as different users.
+    """
+    user = request.getfixturevalue(user_name)
+    person = PersonFactory()
+    issue = IssueFactory(
+        support_worker=person, tenancy=TenancyFactory(landlord=person, agent=person)
+    )
+
+    if assigned_as == CaseRole.PARALEGAL:
+        issue.paralegal = user
+        issue.save()
+    elif assigned_as == CaseRole.LAWYER:
+        issue.lawyer = user
+        issue.save()
+
+    data = {
+        "full_name": "Charlie Brown",
+    }
+    url = reverse("person-api-detail", args=(person.pk,))
+    response = user_client.patch(url, data=data)
+
+    assert response.status_code == expected_status

@@ -1,13 +1,21 @@
-allOf:
-  - $ref: ./IssueDateBase.yaml
-  - type: object
-    properties:
-      issue_id:
-        type: string
-        format: uuid
-      notes:
-        type: string
-      is_reviewed:
-        type: boolean
-    required:
-      - issue_id
+type: object
+properties:
+  type:
+    $ref: ./IssueDateType.yaml
+  date:
+    type: string
+  issue_id:
+    type: string
+    format: uuid
+  hearing_type:
+    $ref: ./IssueDateHearingType.yaml
+  hearing_location:
+    type: string
+  notes:
+    type: string
+  is_reviewed:
+    type: boolean
+required:
+  - type
+  - date
+  - issue_id

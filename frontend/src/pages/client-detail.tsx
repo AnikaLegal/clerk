@@ -7,23 +7,24 @@ import { getFormSchema } from 'comps/auto-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { CaseListTable } from 'comps/case-table'
 import { mount } from 'utils'
-import { Client, ClientCreate, useUpdateClientMutation } from 'api'
+import { Client, ClientUpdate, Issue, useUpdateClientMutation } from 'api'
 
 interface DjangoContext {
   client: Client
-  issues: any[]
+  issues: Issue[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { client: initialClient, issues } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [client, setClient] = useState<Client>(initialClient)
   const [updateClient] = useUpdateClientMutation()
-  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+  const update = (id: string | number, values: ClientUpdate) =>
     updateClient({
       id: client.id,
-      clientCreate: values as ClientCreate,
+      clientUpdate: values,
     }).unwrap()
 
   return (

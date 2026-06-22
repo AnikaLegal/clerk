@@ -1,17 +1,43 @@
-description: The schema for an error response
 type: object
+description: >
+  Standardized error envelope produced by drf-standardized-errors. Every 4xx/5xx
+  response shares this shape: a `type` describing the error category and a list of
+  one or more individual `errors`.
 properties:
-  detail:
-    oneOf:
-      - type: string
-      - type: object
-      - type: array
-        items:
-          oneOf:
-            - type: string
-            - type: object
-            - type: array
-  non_field_errors:
+  type:
+    type: string
+    description: The category of error that occurred.
+    enum:
+      - validation_error
+      - client_error
+      - server_error
+    example: validation_error
+  errors:
     type: array
+    description: The individual errors that make up this response.
     items:
-      type: string
+      type: object
+      properties:
+        code:
+          type: string
+          description: A machine-readable code identifying the error.
+          example: required
+        detail:
+          type: string
+          description: A human-readable description of the error.
+          example: This field is required.
+        attr:
+          type: string
+          nullable: true
+          description: >
+            The name of the field that raised the error, or null for errors not
+            tied to a specific field. Non-field validation errors use
+            "non_field_errors".
+          example: email
+      required:
+        - code
+        - detail
+        - attr
+required:
+  - type
+  - errors

@@ -2,7 +2,6 @@ import pytest
 from accounts.models import User
 from case.middleware import annotate_group_access
 from case.serializers import ServiceSerializer
-from conftest import schema_tester
 from core.factories import IssueFactory, ServiceFactory
 from core.models.service import (
     DiscreteServiceType,
@@ -11,11 +10,10 @@ from core.models.service import (
     ServiceCategory,
 )
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
-def test_case_service_list_api(superuser_client: APIClient):
+def test_case_service_list_api(superuser_client):
     service = ServiceFactory()
     ServiceFactory(issue=service.issue)
 
@@ -26,11 +24,9 @@ def test_case_service_list_api(superuser_client: APIClient):
     data = response.json()
     assert len(data) == 2
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_case_service_create_api(superuser_client: APIClient, superuser: User):
+def test_case_service_create_api(superuser_client, superuser: User):
     # Instantiate with build so that it returns an unsaved instance. We just
     # want the data so we can test creating it ourselves.
     service = ServiceFactory.build(issue=IssueFactory())
@@ -39,22 +35,23 @@ def test_case_service_create_api(superuser_client: APIClient, superuser: User):
 
     url = reverse("case-api-service-list", args=(service.issue.pk,))
     request_data = ServiceSerializer(service).data
+    request_data.pop("id", None)
+    request_data.pop("issue_id", None)
 
-    response = superuser_client.post(url, data=request_data, format="json")
+    response = superuser_client.post(url, data=request_data)
     assert response.status_code == 201, response.json()
     response_data = ServiceSerializer(response.json()).data
 
     # Compare response and request data.
     assert response_data["id"] is not None
-    for field_name in filter(lambda f: f != "id", ServiceSerializer.Meta.fields):
+    for field_name in request_data.keys():
         assert request_data[field_name] == response_data[field_name]
+    assert response_data["issue_id"] == str(service.issue.pk)
     assert Service.objects.count() == 1
-
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
-def test_case_service_get_api(superuser_client: APIClient):
+def test_case_service_get_api(superuser_client):
     service = ServiceFactory()
 
     url = reverse("case-api-service-detail", args=(service.issue.pk, service.pk))
@@ -64,11 +61,9 @@ def test_case_service_get_api(superuser_client: APIClient):
     data = response.json()
     assert data["id"] == service.pk
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_case_service_update_api(superuser_client: APIClient):
+def test_case_service_update_api(superuser_client):
     service = ServiceFactory(
         category=ServiceCategory.DISCRETE,
         type=DiscreteServiceType.LEGAL_TASK,
@@ -83,7 +78,6 @@ def test_case_service_update_api(superuser_client: APIClient):
             "type": OngoingServiceType.LEGAL_SUPPORT,
             "notes": "ongoing legal support service",
         },
-        format="json",
     )
 
     assert response.status_code == 200, response.json()
@@ -92,11 +86,9 @@ def test_case_service_update_api(superuser_client: APIClient):
     assert data["type"] == OngoingServiceType.LEGAL_SUPPORT
     assert data["notes"] == "ongoing legal support service"
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_case_service_delete_api(superuser_client: APIClient):
+def test_case_service_delete_api(superuser_client):
     service = ServiceFactory()
     assert Service.objects.count() == 1
 
@@ -108,11 +100,9 @@ def test_case_service_delete_api(superuser_client: APIClient):
     # get the correct count.
     assert Service.objects.exclude(is_deleted=True).count() == 0
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_case_list_api__filter(superuser_client: APIClient):
+def test_case_list_api__filter(superuser_client):
     issue = IssueFactory()
     service_a = ServiceFactory(issue=issue, category=ServiceCategory.DISCRETE)
 
@@ -152,7 +142,7 @@ def test_case_service_api_perms__as_user_without_access(
     test_user: str,
     group_name: str | None,
     expected_status: int,
-    user_client: APIClient,
+    user_client,
     user: User,
     request,
 ):
@@ -173,7 +163,10 @@ def test_case_service_api_perms__as_user_without_access(
 
     url = reverse("case-api-service-list", args=(service.issue.pk,))
     request_data = ServiceSerializer(service).data
-    response = user_client.post(url, data=request_data, format="json")
+    request_data.pop("id", None)
+    request_data.pop("issue_id", None)
+
+    response = user_client.post(url, data=request_data)
     assert response.status_code == expected_status
 
     # Need to create a service to use in the following tests.
@@ -191,7 +184,7 @@ def test_case_service_api_perms__as_user_without_access(
 
     # 4. Update.
     url = reverse("case-api-service-detail", args=(service.issue.pk, service.pk))
-    response = user_client.patch(url, data={"notes": "UPDATE TEST"}, format="json")
+    response = user_client.patch(url, data={"notes": "UPDATE TEST"})
     assert response.status_code == expected_status
 
     # 3. Delete.
@@ -213,7 +206,7 @@ def test_case_service_api_perms__as_user_with_access(
     test_user: str,
     group_name: str,
     is_assigned: bool,
-    user_client: APIClient,
+    user_client,
     user: User,
     request,
 ):
@@ -237,7 +230,10 @@ def test_case_service_api_perms__as_user_with_access(
 
     url = reverse("case-api-service-list", args=(service.issue.pk,))
     request_data = ServiceSerializer(service).data
-    response = user_client.post(url, data=request_data, format="json")
+    request_data.pop("id", None)
+    request_data.pop("issue_id", None)
+
+    response = user_client.post(url, data=request_data)
     assert response.status_code == 201
     data = response.json()
     service_id = data["id"]
@@ -254,7 +250,7 @@ def test_case_service_api_perms__as_user_with_access(
 
     # 4. Update.
     url = reverse("case-api-service-detail", args=(service.issue.pk, service_id))
-    response = user_client.patch(url, data={"notes": "UPDATE TEST"}, format="json")
+    response = user_client.patch(url, data={"notes": "UPDATE TEST"})
     assert response.status_code == 200
 
     # 3. Delete.

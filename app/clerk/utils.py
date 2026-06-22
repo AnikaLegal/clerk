@@ -1,13 +1,17 @@
 from case.utils import render_react_page
 from django.core import exceptions as django_exceptions
 from django.http import Http404
+from drf_standardized_errors.handler import exception_handler
 from rest_framework import exceptions as drf_exceptions
-from rest_framework.views import exception_handler
 
 
 def custom_exception_handler(exception, context):
     """
     Custom DRF exception handler.
+
+    Renders React 403/404 pages for non-API ``/clerk/`` routes, otherwise
+    delegates to drf-standardized-errors so API responses share a single,
+    predictable error envelope.
     """
     request = context.get("request")
     if (

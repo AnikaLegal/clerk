@@ -69,14 +69,7 @@ export const ConflictForm: React.FC<CaseDetailFormProps> = ({
         }}
         onSubmit={submitNote}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}

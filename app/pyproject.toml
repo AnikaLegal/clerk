@@ -21,7 +21,6 @@ dependencies = [
     "django-storages",
     "django",
     "djangorestframework",
-    "drf-openapi-tester",
     "faker",
     "flake8",
     "freezegun",
@@ -56,6 +55,8 @@ dependencies = [
     "google-auth-oauthlib>=1.2.4",
     "django-fernet-encrypted-fields>=0.4.0",
     "wagtail-link-block>=1.2",
+    "django-contract-tester>=1.8.2",
+    "drf-standardized-errors>=0.14.1",
 ]
 
 [dependency-groups]
@@ -82,3 +83,6 @@ override-dependencies = ["django>=5"]
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::django.utils.deprecation.RemovedInDjango60Warning"]
 addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"
+
+[tool.django-contract-tester.validation]
+request_for_non_successful_responses = true

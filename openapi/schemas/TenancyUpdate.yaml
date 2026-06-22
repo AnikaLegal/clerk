@@ -21,7 +21,3 @@ properties:
   agent_id:
     type: number
     nullable: true
-required:
-  - address
-  - suburb
-  - postcode

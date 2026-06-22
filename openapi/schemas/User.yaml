@@ -1,60 +1,72 @@
-allOf:
-  - $ref: ./UserBase.yaml
-  - type: object
-    properties:
-      id:
-        type: integer
-      case_capacity:
-        type: integer
-      is_intern:
-        type: boolean
-      is_active:
-        type: boolean
-      groups:
-        $ref: ./TextChoiceListField.yaml
-      is_superuser:
-        type: boolean
-      full_name:
-        type: string
-      created_at:
-        type: string
-      is_admin_or_better:
-        type: boolean
-      is_coordinator_or_better:
-        type: boolean
-      is_lawyer_or_better:
-        type: boolean
-      is_paralegal_or_better:
-        type: boolean
-      is_admin:
-        type: boolean
-      is_coordinator:
-        type: boolean
-      is_lawyer:
-        type: boolean
-      is_paralegal:
-        type: boolean
-      is_ms_account_set_up:
-        type: boolean
-      ms_account_created_at:
-        type: string
-        nullable: true
-    required:
-      - id
-      - case_capacity
-      - is_intern
-      - is_active
-      - groups
-      - is_superuser
-      - full_name
-      - created_at
-      - is_admin_or_better
-      - is_coordinator_or_better
-      - is_lawyer_or_better
-      - is_paralegal_or_better
-      - is_admin
-      - is_coordinator
-      - is_lawyer
-      - is_paralegal
-      - is_ms_account_set_up
-      - ms_account_created_at
+type: object
+properties:
+  id:
+    type: integer
+  first_name:
+    type: string
+  last_name:
+    type: string
+  email:
+    type: string
+    format: email
+  url:
+    type: string
+    readOnly: true
+  case_capacity:
+    type: integer
+  is_intern:
+    type: boolean
+  is_active:
+    type: boolean
+  groups:
+    $ref: ./TextChoiceListField.yaml
+  is_superuser:
+    type: boolean
+  full_name:
+    type: string
+  created_at:
+    type: string
+  is_admin_or_better:
+    type: boolean
+  is_coordinator_or_better:
+    type: boolean
+  is_lawyer_or_better:
+    type: boolean
+  is_paralegal_or_better:
+    type: boolean
+  is_admin:
+    type: boolean
+  is_coordinator:
+    type: boolean
+  is_lawyer:
+    type: boolean
+  is_paralegal:
+    type: boolean
+  is_ms_account_set_up:
+    type: boolean
+  ms_account_created_at:
+    type: string
+    nullable: true
+required:
+  - first_name
+  - last_name
+  - email
+  - url
+  - id
+  - case_capacity
+  - is_intern
+  - is_active
+  - groups
+  - is_superuser
+  - full_name
+  - created_at
+  - is_admin_or_better
+  - is_coordinator_or_better
+  - is_lawyer_or_better
+  - is_paralegal_or_better
+  - is_admin
+  - is_coordinator
+  - is_lawyer
+  - is_paralegal
+  - is_ms_account_set_up
+  - ms_account_created_at

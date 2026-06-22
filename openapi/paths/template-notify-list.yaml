@@ -20,7 +20,10 @@ get:
             type: array
             items:
               $ref: ../schemas/NotificationTemplate.yaml
-
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 post:
   operationId: createNotificationTemplate
   requestBody:

@@ -1,10 +1,9 @@
 from enum import Enum
 
 import pytest
-from conftest import CaseRole, schema_tester
+from conftest import CaseRole
 from core.factories import IssueFactory, TenancyFactory
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 class AssignedAs(Enum):
@@ -14,7 +13,7 @@ class AssignedAs(Enum):
 
 
 @pytest.mark.django_db
-def test_tenancy_retrieve_api(superuser_client: APIClient):
+def test_tenancy_retrieve_api(superuser_client):
     instance = TenancyFactory()
     url = reverse("tenancy-api-detail", args=(instance.pk,))
     response = superuser_client.get(url)
@@ -23,11 +22,9 @@ def test_tenancy_retrieve_api(superuser_client: APIClient):
     data = response.json()
     assert data["id"] == instance.pk
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_tenancy_update_api(superuser_client: APIClient):
+def test_tenancy_update_api(superuser_client):
     instance = TenancyFactory(
         address="123 Fake St",
         suburb="Noburg",
@@ -39,7 +36,7 @@ def test_tenancy_update_api(superuser_client: APIClient):
         "suburb": "Yesburg",
         "postcode": "4321",
     }
-    response = superuser_client.patch(url, data=data, format="json")
+    response = superuser_client.patch(url, data=data)
     assert response.status_code == 200, response.json()
 
     instance.refresh_from_db()
@@ -51,8 +48,6 @@ def test_tenancy_update_api(superuser_client: APIClient):
     assert data["address"] == instance.address
     assert data["suburb"] == instance.suburb
     assert data["postcode"] == instance.postcode
-
-    schema_tester.validate_response(response=response)
 
 
 @pytest.mark.django_db
@@ -145,6 +140,6 @@ def test_tenancy_api_update_perms(
         "address": "123 Fake St",
     }
     url = reverse("tenancy-api-detail", args=(issue.tenancy.pk,))
-    response = user_client.patch(url, data=data, format="json")
+    response = user_client.patch(url, data=data)
 
     assert response.status_code == expected_status

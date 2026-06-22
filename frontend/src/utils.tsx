@@ -164,18 +164,8 @@ export const getAPIErrorMessage = (
 
   if ('originalStatus' in error && error.originalStatus === 500) {
     message = 'Something went very wrong'
-  } else if (error.data) {
-    const formattedMessages: string[] = []
-    for (const messages of Object.values(error.data)) {
-      if (Array.isArray(messages)) {
-        formattedMessages.push(messages.join(', '))
-      } else {
-        formattedMessages.push(messages)
-      }
-    }
-    if (formattedMessages.length > 0) {
-      message = formattedMessages.join(', ')
-    }
+  } else if (error.data?.errors?.length) {
+    message = error.data.errors.map((e) => e.detail).join(', ')
   }
   if (!message) {
     message = 'An unknown error occurred'
@@ -186,38 +176,26 @@ export const getAPIErrorMessage = (
   return message
 }
 
-interface FormErrors {
+export interface FormErrors {
   [key: string]: string
 }
 
-// Read API errors for display in a form.
+// Read API errors for display in a form. Maps each error's `attr` (the field
+// name, or null for non-field errors) back to a field key so forms can surface
+// errors against the right input. Multiple errors for the same field are joined.
 export const getAPIFormErrors = (err: ErrorResult): FormErrors | null => {
-  let statusNumber = null
+  let statusNumber: number | null = null
   if (err && 'status' in err && typeof err.status === 'number') {
     statusNumber = err.status
   }
-  let requestErrors: { [key: string]: string } | null = null
-  if (statusNumber == 400 && 'data' in err) {
-    requestErrors = Object.entries(err.data).reduce(
-      (obj, [k, v]) => ({ ...obj, [k]: parseError(v) }),
-      {}
-    ) as { [key: string]: string }
+  if (statusNumber !== 400 || !err.data?.errors?.length) {
+    return null
   }
-  return requestErrors
-}
-
-const parseError = (error: any) => {
-  const isArray = Array.isArray(error)
-  const isObject = typeof error === 'object'
-  if (isArray) {
-    return error.map((e) => String(e)).join(', ')
-  } else if (isObject) {
-    return Object.entries(error)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(', ')
-  } else {
-    return String(error)
-  }
+  return err.data.errors.reduce<FormErrors>((obj, { attr, detail }) => {
+    const key = attr ?? 'non_field_errors'
+    obj[key] = obj[key] ? `${obj[key]}, ${detail}` : detail
+    return obj
+  }, {})
 }
 
 export const choiceToMap = (choices: string[][]): Map<string, string> => {

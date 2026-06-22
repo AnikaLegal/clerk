@@ -15,6 +15,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Client.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateClient
   parameters:
@@ -31,7 +35,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/ClientCreate.yaml
+          $ref: ../schemas/ClientUpdate.yaml
   responses:
     "200":
       description: Successful response.

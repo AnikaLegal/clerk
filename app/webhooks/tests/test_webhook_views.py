@@ -45,7 +45,8 @@ def test_webflow_form_create_fails(client):
     data = {"msg": "This aint right"}
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 400
-    assert resp.json() == ["Invalid request format."]
+    assert resp.json()["type"] == "validation_error"
+    assert resp.json()["errors"][0]["detail"] == "Invalid request format."
     assert WebflowContact.objects.count() == 0
 
 
@@ -76,5 +77,6 @@ def test_jotforms_form_create_fail(client):
     data = {"this": "ain't it chief"}
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 400
-    assert resp.json() == ["Invalid request format."]
+    assert resp.json()["type"] == "validation_error"
+    assert resp.json()["errors"][0]["detail"] == "Invalid request format."
     assert JotformSubmission.objects.count() == 0

@@ -3,7 +3,7 @@ import { Container, Header, Table } from 'semantic-ui-react'
 
 import { mount } from 'utils'
 import { CaseListTable } from 'comps/case-table'
-import { Tenancy, TenancyCreate, useUpdateTenancyMutation } from 'api'
+import { Issue, Tenancy, TenancyUpdate, useUpdateTenancyMutation } from 'api'
 import { TableForm } from 'comps/table-form'
 import { FIELD_TYPES } from 'comps/field-component'
 import { getFormSchema } from 'comps/auto-form'
@@ -11,19 +11,20 @@ import * as Yup from 'yup'
 
 interface DjangoContext {
   tenancy: Tenancy
-  issues: any[]
+  issues: Issue[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { tenancy: initialTenancy, issues } = (window as any)
   .REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [tenancy, setTenancy] = useState<Tenancy>(initialTenancy)
   const [updateTenancy] = useUpdateTenancyMutation()
-  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+  const update = (id: string | number, values: TenancyUpdate) =>
     updateTenancy({
       id: tenancy.id,
-      tenancyCreate: values as TenancyCreate,
+      tenancyUpdate: values,
     }).unwrap()
 
   return (
@@ -68,7 +69,6 @@ const App = () => {
     </Container>
   )
 }
-
 
 const TABLE_FIELDS = [
   'fileref',

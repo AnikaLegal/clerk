@@ -28,6 +28,10 @@ get:
               - issue
               - tenancy
               - notes
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateCase
   parameters:

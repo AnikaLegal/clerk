@@ -1,9 +1,7 @@
-// Form framework
+import { FormikErrors, FormikProps, FormikTouched } from 'formik'
 import React from 'react'
 import { Button, Form } from 'semantic-ui-react'
-
 import * as Yup from 'yup'
-import { FormikProps } from 'formik'
 import {
   FIELD_COMPONENTS,
   FIELD_TYPES,
@@ -43,6 +41,7 @@ export const getFormSchema = (formFields: FormField[]) =>
   )
 
 type Model = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [fieldName: string]: any
 }
 
@@ -70,9 +69,13 @@ export const getModelInitialValues = (formFields: FormField[], model: Model) =>
   }, {})
 
 interface FormErrorsProps {
-  errors: any
-  touched: any
-  labels?: any
+  errors: FormikErrors<{
+    [fieldName: string]: unknown
+  }>
+  touched: FormikTouched<{
+    [fieldName: string]: unknown
+  }>
+  labels?: object
 }
 
 export const FormErrors: React.FC<FormErrorsProps> = ({
@@ -82,10 +85,14 @@ export const FormErrors: React.FC<FormErrorsProps> = ({
 }) => (
   <>
     {Object.entries(errors)
-      .filter(([k, v]) => touched[k])
+      // Non-field errors are form-level (e.g. DRF non_field_errors) and have
+      // no corresponding field, so they won't be touched — always show them.
+      .filter(([k]) => k === 'non_field_errors' || touched[k])
       .map(([k, v]) => (
         <div key={k} className="ui error message">
-          <div className="header">{labels ? labels[k] : k}</div>
+          {k !== 'non_field_errors' && (
+            <div className="header">{labels ? labels[k] : k}</div>
+          )}
           <p>{typeof v === 'object' ? Object.values(v) : v}</p>
         </div>
       ))}

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     # APIs
     "rest_framework",
+    "drf_standardized_errors",
     "corsheaders",
     # Social auth
     "social_django",

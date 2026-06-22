@@ -1,9 +1,8 @@
 from enum import Enum
 import pytest
-from conftest import CaseRole, schema_tester
+from conftest import CaseRole
 from core.factories import IssueFactory, SubmissionFactory
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
 class AssignedAs(Enum):
@@ -13,7 +12,7 @@ class AssignedAs(Enum):
 
 
 @pytest.mark.django_db
-def test_submission_retrieve_api(superuser_client: APIClient):
+def test_submission_retrieve_api(superuser_client):
     submission = SubmissionFactory(is_processed=True)
     url = reverse("submission-api-detail", args=(submission.pk,))
     response = superuser_client.get(url)
@@ -22,13 +21,9 @@ def test_submission_retrieve_api(superuser_client: APIClient):
     data = response.json()
     assert data["id"] == str(submission.pk)
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_submission_retrieve_api__unprocessed_not_accessible(
-    superuser_client: APIClient,
-):
+def test_submission_retrieve_api__unprocessed_not_accessible(superuser_client):
     submission = SubmissionFactory(is_processed=False)
     url = reverse("submission-api-detail", args=(submission.pk,))
     response = superuser_client.get(url)
