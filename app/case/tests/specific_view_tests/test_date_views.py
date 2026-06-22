@@ -56,9 +56,10 @@ def test_issue_date_create_api__restrict_date_prior_to_today(
         "issue_id": issue.pk,
         "type": issue_date_stub.type,
         "date": yesterday.isoformat(),
-        "hearing_type": issue_date_stub.hearing_type,
-        "hearing_location": issue_date_stub.hearing_location,
     }
+    if issue_date_stub.type == DateType.HEARING_LISTED:
+        data["hearing_type"] = issue_date_stub.hearing_type
+        data["hearing_location"] = issue_date_stub.hearing_location
     url = reverse("date-api-list")
     response = superuser_client.post(url, data=data)
 
@@ -78,9 +79,10 @@ def test_issue_date_create_api__restrict_if_related_issue_closed(
         "issue_id": issue.pk,
         "type": issue_date_stub.type,
         "date": issue_date_stub.date.isoformat(),
-        "hearing_type": issue_date_stub.hearing_type,
-        "hearing_location": issue_date_stub.hearing_location,
     }
+    if issue_date_stub.type == DateType.HEARING_LISTED:
+        data["hearing_type"] = issue_date_stub.hearing_type
+        data["hearing_location"] = issue_date_stub.hearing_location
     url = reverse("date-api-list")
     response = superuser_client.post(url, data=data)
 
