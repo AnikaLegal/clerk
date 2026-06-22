@@ -2192,28 +2192,43 @@ components:
     Error:
       type: object
       description: |
-        Standard Django REST Framework error format.  It maps field names to lists of validation errors, or returns generic messages.
+        Standardized error envelope produced by drf-standardized-errors. Every 4xx/5xx response shares this shape: a `type` describing the error category and a list of one or more individual `errors`.
       properties:
-        non_field_errors:
+        type:
+          type: string
+          description: The category of error that occurred.
+          enum:
+            - validation_error
+            - client_error
+            - server_error
+          example: validation_error
+        errors:
           type: array
-          description: Global errors not tied to a specific request field.
+          description: The individual errors that make up this response.
           items:
-            type: string
-            example: The provided credentials are not valid.
-        detail:
-          type: string
-          description: Format used for generic system/parsing exceptions instead of validation errors.
-          example: Malformed request payload.
-      additionalProperties:
-        type: array
-        description: Field-specific validation errors dynamically keyed by field name.
-        items:
-          type: string
-        example:
-          email:
-            - This field is required.
-          password:
-            - Ensure this value has at least 8 characters.
+            type: object
+            properties:
+              code:
+                type: string
+                description: A machine-readable code identifying the error.
+                example: required
+              detail:
+                type: string
+                description: A human-readable description of the error.
+                example: This field is required.
+              attr:
+                type: string
+                nullable: true
+                description: |
+                  The name of the field that raised the error, or null for errors not tied to a specific field. Non-field validation errors use "non_field_errors".
+                example: email
+            required:
+              - code
+              - detail
+              - attr
+      required:
+        - type
+        - errors
     IssueBase:
       type: object
       properties:

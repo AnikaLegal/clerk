@@ -56,6 +56,7 @@ dependencies = [
     "django-fernet-encrypted-fields>=0.4.0",
     "wagtail-link-block>=1.2",
     "django-contract-tester>=1.8.2",
+    "drf-standardized-errors>=0.14.1",
 ]
 
 [dependency-groups]

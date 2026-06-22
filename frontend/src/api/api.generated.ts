@@ -1122,11 +1122,18 @@ export type Submission = {
   created_at: string;
 };
 export type Error = {
-  /** Global errors not tied to a specific request field. */
-  non_field_errors?: string[];
-  /** Format used for generic system/parsing exceptions instead of validation errors. */
-  detail?: string;
-  [key: string]: string[];
+  /** The category of error that occurred. */
+  type: "validation_error" | "client_error" | "server_error";
+  /** The individual errors that make up this response. */
+  errors: {
+    /** A machine-readable code identifying the error. */
+    code: string;
+    /** A human-readable description of the error. */
+    detail: string;
+    /** The name of the field that raised the error, or null for errors not tied to a specific field. Non-field validation errors use "non_field_errors".
+     */
+    attr: string | null;
+  }[];
 };
 export type IssueBase = {
   topic: string;

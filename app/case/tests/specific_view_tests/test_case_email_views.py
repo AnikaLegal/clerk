@@ -127,7 +127,7 @@ def test_case_email_add_attachment_too_large_view(superuser_client):
         url, data={"file": uploaded_file}, format="multipart", content_type=None
     )
     assert response.status_code == 400, response.json()
-    assert "file" in response.json()
+    assert any(error["attr"] == "file" for error in response.json()["errors"])
     assert EmailAttachment.objects.count() == 0
 
 
