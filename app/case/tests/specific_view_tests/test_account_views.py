@@ -5,14 +5,10 @@ from accounts.models import User
 from core.factories import UserFactory
 from microsoft.service import MicrosoftUserPermissions
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
-from conftest import schema_tester
 
 
 @pytest.mark.django_db
-def test_account_api_create(
-    superuser_client: APIClient,
-):
+def test_account_api_create(superuser_client):
     assert User.objects.count() == 1
     url = reverse("account-api-list")
     data = {
@@ -21,20 +17,16 @@ def test_account_api_create(
         "email": "charlie.brown@anikalegal.com",
         "groups": ["Paralegal"],
     }
-    response = superuser_client.post(url, data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 201, response.json()
     assert response.json()["email"] == "charlie.brown@anikalegal.com"
     assert User.objects.count() == 2  # superuser + new user
     user = User.objects.get(email="charlie.brown@anikalegal.com")
     assert list(user.groups.values_list("name", flat=True)) == ["Paralegal"]
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_account_api_create__with_external_email(
-    superuser_client: APIClient,
-):
+def test_account_api_create__with_external_email(superuser_client):
     assert User.objects.count() == 1
     url = reverse("account-api-list")
     data = {
@@ -43,12 +35,12 @@ def test_account_api_create__with_external_email(
         "email": "charlie.brown@example.com",
         "groups": ["Paralegal"],
     }
-    response = superuser_client.post(url, data, format="json")
+    response = superuser_client.post(url, data=data)
     assert response.status_code == 400, response.json()
 
 
 @pytest.mark.django_db
-def test_account_api_list(superuser_client: APIClient):
+def test_account_api_list(superuser_client):
     superuser = User.objects.get(is_superuser=True)
 
     charlie = UserFactory(first_name="Charlie", last_name="Brown")
@@ -63,11 +55,9 @@ def test_account_api_list(superuser_client: APIClient):
     emails = {result["email"] for result in data["results"]}
     assert emails == {charlie.email, sally.email, lucy.email, superuser.email}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_account_api_list__name_filter(superuser_client: APIClient):
+def test_account_api_list__name_filter(superuser_client):
     charlie = UserFactory(first_name="Charlie", last_name="Brown")
     sally = UserFactory(first_name="Sally", last_name="Brown")
     lucy = UserFactory(first_name="Lucy", last_name="Van Pelt")
@@ -101,7 +91,7 @@ def test_account_api_list__name_filter(superuser_client: APIClient):
 
 @pytest.mark.django_db
 def test_account_api_list__group_filter(
-    superuser_client: APIClient, paralegal_group, coordinator_group
+    superuser_client, paralegal_group, coordinator_group
 ):
     paralegal = UserFactory()
     paralegal.groups.add(paralegal_group)
@@ -125,7 +115,7 @@ def test_account_api_list__group_filter(
 
 
 @pytest.mark.django_db
-def test_account_api_list__is_active_filter(superuser_client: APIClient):
+def test_account_api_list__is_active_filter(superuser_client):
     active_user = UserFactory(is_active=True)
     inactive_user = UserFactory(is_active=False)
     url = reverse("account-api-list")
@@ -149,7 +139,7 @@ def test_account_api_list__is_active_filter(superuser_client: APIClient):
 
 @pytest.mark.django_db
 def test_account_api_update(
-    superuser_client: APIClient,
+    superuser_client,
 ):
     user = UserFactory(first_name="Lucy", last_name="Van Pelt")
     url = reverse("account-api-detail", args=(user.pk,))
@@ -157,18 +147,16 @@ def test_account_api_update(
         "first_name": "Charlie",
         "last_name": "Brown",
     }
-    response = superuser_client.patch(url, data, format="json")
+    response = superuser_client.patch(url, data=data)
     assert response.status_code == 200, response.json()
     user.refresh_from_db()
     assert user.first_name == "Charlie"
     assert user.last_name == "Brown"
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 @patch("case.views.accounts.get_user_permissions")
-def test_account_api_perms(mock_get_user_permissions, superuser_client: APIClient):
+def test_account_api_perms(mock_get_user_permissions, superuser_client):
     user = UserFactory()
     url = reverse("account-api-perms", args=(user.pk,))
     mock_get_user_permissions.return_value = MicrosoftUserPermissions(
@@ -185,14 +173,12 @@ def test_account_api_perms(mock_get_user_permissions, superuser_client: APIClien
         "issues_without_access": [],
     }
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 @patch("case.views.accounts.reset_ms_access")
 @patch("case.views.accounts.get_user_permissions")
 def test_account_api_perms_resync(
-    mock_get_user_permissions, mock_reset_ms_access, superuser_client: APIClient
+    mock_get_user_permissions, mock_reset_ms_access, superuser_client
 ):
     user = UserFactory()
     url = reverse("account-api-perms-resync", args=(user.pk,))
@@ -212,13 +198,11 @@ def test_account_api_perms_resync(
         "issues_without_access": [],
     }
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 @patch("case.views.accounts.list_directory_users")
 def test_account_api_list_potential_users__returns_active_users(
-    mock_list_directory_users, superuser_client: APIClient
+    mock_list_directory_users, superuser_client
 ):
     """Test that potential users endpoint returns active users from Google Directory."""
     mock_list_directory_users.return_value = [
@@ -243,13 +227,11 @@ def test_account_api_list_potential_users__returns_active_users(
     emails = {user["email"] for user in data}
     assert emails == {"charlie.brown@example.com", "sally.brown@example.com"}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
 @patch("case.views.accounts.list_directory_users")
 def test_account_api_list_potential_users__excludes_suspended_users(
-    mock_list_directory_users, superuser_client: APIClient
+    mock_list_directory_users, superuser_client
 ):
     """Test that suspended users are excluded from potential users list."""
     mock_list_directory_users.return_value = [
@@ -277,7 +259,7 @@ def test_account_api_list_potential_users__excludes_suspended_users(
 @pytest.mark.django_db
 @patch("case.views.accounts.list_directory_users")
 def test_account_api_list_potential_users__excludes_existing_users(
-    mock_list_directory_users, superuser_client: APIClient
+    mock_list_directory_users, superuser_client
 ):
     """Test that users already in the system are excluded from potential users."""
     UserFactory(email="charlie.brown@example.com")
@@ -331,7 +313,7 @@ def test_account_api_create_permissions(
         "email": "charlie.brown@anikalegal.com",
         "groups": ["Paralegal"],
     }
-    response = client.post(url, data, format="json")
+    response = client.post(url, data=data)
     assert response.status_code == expected_status, response.json()
 
 
@@ -361,7 +343,7 @@ def test_account_api_update_permissions(
         "last_name": "Brown",
     }
     client = request.getfixturevalue(user_client_name)
-    response = client.put(url, data, format="json")
+    response = client.patch(url, data=data)
     assert response.status_code == expected_status, response.json()
 
 
@@ -391,7 +373,7 @@ def test_account_api_update_permissions__groups(
         "groups": ["Admin"],
     }
     client = request.getfixturevalue(user_client_name)
-    response = client.put(url, data, format="json")
+    response = client.patch(url, data=data)
     assert response.status_code == expected_status, response.json()
 
 

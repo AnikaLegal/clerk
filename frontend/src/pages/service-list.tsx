@@ -32,6 +32,7 @@ interface DjangoContext {
   urls: CaseTabUrls
   user: UserPermission
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -73,7 +74,8 @@ interface ServiceTableProps {
 export const DiscreteServices = ({ issue, canChange }: ServiceProps) => {
   const initialValues: ServiceCreate = {
     category: 'DISCRETE',
-    // @ts-expect-error
+    // @ts-expect-error "type" is required by the API but we don't want to
+    // require it when creating a new service as it is selected by the user.
     type: '',
     count: 1,
     started_at: '',
@@ -170,7 +172,8 @@ export const DiscreteServicesTable = ({
 export const OngoingServices = ({ issue, canChange }: ServiceProps) => {
   const initialValues: ServiceCreate = {
     category: 'ONGOING',
-    // @ts-expect-error
+    // @ts-expect-error "type" is required by the API but we don't want to
+    // require it when creating a new service as it is selected by the user.
     type: '',
     started_at: '',
     finished_at: '',
@@ -348,7 +351,7 @@ export const EditServiceIcon = ({
     updateService({
       id: issue.id,
       serviceId: service.id,
-      serviceCreate: values,
+      serviceUpdate: values,
     })
       .unwrap()
       .then(() => {

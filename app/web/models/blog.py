@@ -5,6 +5,7 @@ from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
 from wagtail import blocks
 from wagtail.models import Page
+from wagtail.models.pages import PagePermissionTester
 from wagtail.fields import StreamField
 from wagtail.admin.panels import (
     FieldPanel,
@@ -24,7 +25,13 @@ class BlogListPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        blogs = self.get_children().live().public().order_by("-first_published_at")
+        blogs = (
+            self.get_children()
+            .live()
+            .public()
+            .select_related("locale", "content_type")
+            .order_by("-first_published_at")
+        )
 
         search = request.GET.get("search")
         if search:
@@ -114,3 +121,14 @@ class BlogPage(Page):
         context = super().get_context(request, *args, **kwargs)
         context["feedback_form"] = ContentFeedbackForm()
         return context
+
+    # Fix django-zeal warning when displaying blog detail page with translated content:
+    #  N+1 detected on wagtailcore.Page.locale at /app/web/models/blog.py:114 in serve
+    def get_translations(self, inclusive=False):
+        translations = super().get_translations()
+        return translations.select_related("locale")
+
+    # Fix django-zeal warning when displaying Wagtail admin detail page:
+    #  N+1 detected on web.BlogPage.content_type at /app/case/middleware.py:15
+    def permissions_for_user(self, user):
+        return PagePermissionTester(user, self)

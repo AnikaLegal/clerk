@@ -45,42 +45,33 @@ class IssueDateSerializer(serializers.ModelSerializer):
                     )
         return super().validate(attrs)
 
-    def update(self, instance, validated_data):
+    def validate_date(self, value):
+        # On update, only reject a past date if it is being changed.
+        if self.instance is not None and value == self.instance.date:
+            return value
+        if value < date.today():
+            raise serializers.ValidationError("Date cannot be prior to today.")
+        return value
+
+    def validate_is_reviewed(self, value):
+        # The is_reviewed field is only editable by admins.
+        request = self.context.get("request", None)
+        if not request or not request.user.is_admin_or_better:
+            raise exceptions.PermissionDenied()
+        return value
+
+    def validate_issue_id(self, value):
+        # Prevent date creation if the related issue is closed.
+        from core.models import Issue
+
         if (
-            "date" in validated_data
-            and validated_data["date"] < date.today()
-            and validated_data["date"] != instance.date
+            self.instance is None
+            and Issue.objects.filter(id=value, is_open=False).exists()
         ):
             raise serializers.ValidationError(
-                {"date": "Date cannot be prior to today."}
+                "Cannot add a critical date to a closed case."
             )
-        if "is_reviewed" in validated_data:
-            request = self.context.get("request", None)
-            if not request or not request.user.is_admin_or_better:
-                raise exceptions.PermissionDenied()
-        return super().update(instance, validated_data)
-
-    def create(self, validated_data):
-        if "date" in validated_data and validated_data["date"] < date.today():
-            raise serializers.ValidationError(
-                {"date": "Date cannot be prior to today."}
-            )
-        if "is_reviewed" in validated_data:
-            request = self.context.get("request", None)
-            if not request or not request.user.is_admin_or_better:
-                raise exceptions.PermissionDenied()
-
-        # Prevent date creation if the related issue is closed.
-        issue_id = validated_data.get("issue_id")
-        if issue_id:
-            from core.models import Issue
-
-            if Issue.objects.filter(id=issue_id, is_open=False).exists():
-                raise serializers.ValidationError(
-                    "Cannot add a critical date to a closed case."
-                )
-
-        return super().create(validated_data)
+        return value
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

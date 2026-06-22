@@ -13,6 +13,7 @@ import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
 interface DjangoContext {
   group_values: string[]
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -85,7 +86,7 @@ const App = () => {
   )
 }
 
-const InviteFormControls = ({ form, onCancel }: InviteFormControlProps) => {
+const InviteFormControls = ({ form }: InviteFormControlProps) => {
   return (
     <Group mt="lg">
       <Button

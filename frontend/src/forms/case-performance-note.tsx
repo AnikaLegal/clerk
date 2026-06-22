@@ -55,18 +55,11 @@ export const PerformanceForm: React.FC<CaseDetailFormProps> = ({
       <Formik
         initialValues={{ text: '', note_type: 'PERFORMANCE' }}
         validate={({ text }) =>
-          text ? null : { 'File note text': 'File note cannot be empty' }
+          text ? {} : { 'File note text': 'File note cannot be empty' }
         }
         onSubmit={submitNote}
       >
-        {({
-          values,
-          errors,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          setFieldValue,
-        }) => (
+        {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
             onSubmit={handleSubmit}
             success={isSuccess}

@@ -14,9 +14,3 @@ properties:
     type: string
   state:
     type: string
-required:
-  - to_address
-  - cc_addresses
-  - subject
-  - text
-  - html

@@ -52,7 +52,8 @@ def test_job_urls(client):
     root_page = RootPage.objects.get()
     job_list_page = JobListPage(title="Jobs", slug="jobs")
     root_page.add_child(instance=job_list_page)
-    job_list_page.save_revision().publish()
+    job_list_page.live = True
+    job_list_page.save()
 
     # Job list page works
     response = client.get("/jobs/")
@@ -66,7 +67,8 @@ def test_job_urls(client):
         closing_date=date(2020, 1, 1),
     )
     job_list_page.add_child(instance=job_page)
-    job_page.save_revision().publish()
+    job_page.live = True
+    job_page.save()
 
     response = client.get("/jobs/job-post/")
     assert response.status_code == 200
@@ -91,12 +93,14 @@ def test_resource_urls(client):
     root_page = RootPage.objects.get()
     resource_list_page = ResourceListPage(title="Resources", slug="resources")
     root_page.add_child(instance=resource_list_page)
-    resource_list_page.save_revision().publish()
+    resource_list_page.live = True
+    resource_list_page.save()
 
-    # Blog page works
+    # Resource page works
     resource_page = ResourcePage(title="A Resource", slug="a-resource")
     resource_list_page.add_child(instance=resource_page)
-    resource_page.save_revision().publish()
+    resource_page.live = True
+    resource_page.save()
 
     response = client.get("/resources/a-resource/")
     assert response.status_code == 200

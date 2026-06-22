@@ -2,7 +2,11 @@ allOf:
   - $ref: ./PersonBase.yaml
   - type: object
     properties:
+      email:
+        type: string
+      address:
+        type: string
+      phone_number:
+        type: string
       support_contact_preferences:
         type: string
-    required:
-      - support_contact_preferences

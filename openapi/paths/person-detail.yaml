@@ -14,8 +14,11 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Person.yaml
-
-put:
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+patch:
   operationId: updatePerson
   parameters:
     - description: Entity ID
@@ -42,7 +45,6 @@ put:
       $ref: ../responses/BadRequest.yaml
     "403":
       $ref: ../responses/PermissionDenied.yaml
-
 delete:
   operationId: deletePerson
   parameters:

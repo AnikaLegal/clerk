@@ -30,9 +30,12 @@ class BlogListPageFactory(factory.django.DjangoModelFactory[BlogListPage]):
     def _create(cls, model_class, *args, **kwargs):
         # Get the root page to add child to
         root_page = RootPage.objects.get()
+
         instance = model_class(*args, **kwargs)
         root_page.add_child(instance=instance)
-        instance.save_revision().publish()
+        instance.live = True
+        instance.save()
+
         return instance
 
 
@@ -53,7 +56,8 @@ class BlogPageFactory(factory.django.DjangoModelFactory[BlogPage]):
 
         instance = model_class(*args, **kwargs)
         parent.add_child(instance=instance)
-        instance.save_revision().publish()
+        instance.live = True
+        instance.save()
 
         return instance
 

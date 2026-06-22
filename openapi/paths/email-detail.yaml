@@ -21,7 +21,6 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Email.yaml
-
 patch:
   operationId: updateEmail
   parameters:
@@ -44,7 +43,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/EmailCreate.yaml
+          $ref: ../schemas/EmailUpdate.yaml
   responses:
     "200":
       description: Successful response.
@@ -56,7 +55,6 @@ patch:
       $ref: ../responses/BadRequest.yaml
     "403":
       $ref: ../responses/PermissionDenied.yaml
-
 delete:
   operationId: deleteEmail
   parameters:

@@ -1,4 +1,4 @@
-import { Badge, Table } from '@mantine/core'
+import { Table } from '@mantine/core'
 import { IssueDate } from 'api'
 import { CASE_DATE_HEARING_TYPES } from 'consts'
 import React from 'react'

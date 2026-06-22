@@ -91,7 +91,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/case/${queryArg.id}/services/${queryArg.serviceId}/`,
         method: "PATCH",
-        body: queryArg.serviceCreate,
+        body: queryArg.serviceUpdate,
       }),
     }),
     deleteCaseService: build.mutation<
@@ -130,7 +130,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/email/${queryArg.id}/${queryArg.emailId}/`,
         method: "PATCH",
-        body: queryArg.emailCreate,
+        body: queryArg.emailUpdate,
       }),
     }),
     deleteEmail: build.mutation<DeleteEmailApiResponse, DeleteEmailApiArg>({
@@ -212,7 +212,7 @@ const injectedRtkApi = api.injectEndpoints({
     updatePerson: build.mutation<UpdatePersonApiResponse, UpdatePersonApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/person/${queryArg.id}/`,
-        method: "PUT",
+        method: "PATCH",
         body: queryArg.personCreate,
       }),
     }),
@@ -255,7 +255,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/date/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.issueDateCreate,
+        body: queryArg.issueDateUpdate,
       }),
     }),
     deleteCaseDate: build.mutation<
@@ -277,7 +277,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/tenancy/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.tenancyCreate,
+        body: queryArg.tenancyUpdate,
       }),
     }),
     getClients: build.query<GetClientsApiResponse, GetClientsApiArg>({
@@ -297,7 +297,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/client/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.clientCreate,
+        body: queryArg.clientUpdate,
       }),
     }),
     getUsers: build.query<GetUsersApiResponse, GetUsersApiArg>({
@@ -327,7 +327,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/account/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.userCreate,
+        body: queryArg.userUpdate,
       }),
     }),
     getUserAccountPermissions: build.query<
@@ -592,8 +592,8 @@ export type UpdateCaseServiceApiArg = {
   id: string;
   /** Service ID */
   serviceId: number;
-  /** Successful response. */
-  serviceCreate: ServiceCreate;
+  /** Request body for updating a case service. */
+  serviceUpdate: ServiceUpdate;
 };
 export type DeleteCaseServiceApiResponse = unknown;
 export type DeleteCaseServiceApiArg = {
@@ -632,7 +632,7 @@ export type UpdateEmailApiArg = {
   /** Email ID */
   emailId: number;
   /** Successful response. */
-  emailCreate: EmailCreate;
+  emailUpdate: EmailUpdate;
 };
 export type DeleteEmailApiResponse = unknown;
 export type DeleteEmailApiArg = {
@@ -769,8 +769,8 @@ export type UpdateCaseDateApiResponse =
 export type UpdateCaseDateApiArg = {
   /** Date ID */
   id: number;
-  /** Successful response. */
-  issueDateCreate: IssueDateCreate;
+  /** Request body for updating a case date. */
+  issueDateUpdate: IssueDateUpdate;
 };
 export type DeleteCaseDateApiResponse = unknown;
 export type DeleteCaseDateApiArg = {
@@ -788,8 +788,8 @@ export type UpdateTenancyApiResponse =
 export type UpdateTenancyApiArg = {
   /** Entity ID */
   id: number;
-  /** Successful response. */
-  tenancyCreate: TenancyCreate;
+  /** Request body for updating a tenancy. */
+  tenancyUpdate: TenancyUpdate;
 };
 export type GetClientsApiResponse = /** status 200 Successful response. */ {
   current: number;
@@ -816,7 +816,7 @@ export type UpdateClientApiArg = {
   /** Entity ID */
   id: string;
   /** Successful response. */
-  clientCreate: ClientCreate;
+  clientUpdate: ClientUpdate;
 };
 export type GetUsersApiResponse = /** status 200 Successful response. */ {
   current: number;
@@ -861,7 +861,7 @@ export type UpdateUserApiArg = {
   /** Entity ID */
   id: number;
   /** Successful response. */
-  userCreate: UserCreate;
+  userUpdate: UserUpdate;
 };
 export type GetUserAccountPermissionsApiResponse =
   /** status 200 Successful response. */ MicrosoftUserPermissionsRead;
@@ -1121,77 +1121,85 @@ export type Submission = {
   answers: SubmissionAnswers | null;
   created_at: string;
 };
+export type Error = {
+  /** The category of error that occurred. */
+  type: "validation_error" | "client_error" | "server_error";
+  /** The individual errors that make up this response. */
+  errors: {
+    /** A machine-readable code identifying the error. */
+    code: string;
+    /** A human-readable description of the error. */
+    detail: string;
+    /** The name of the field that raised the error, or null for errors not tied to a specific field. Non-field validation errors use "non_field_errors".
+     */
+    attr: string | null;
+  }[];
+};
 export type IssueBase = {
   topic: string;
-};
-export type UserBase = {
-  first_name: string;
-  last_name: string;
-  email: string;
-};
-export type UserBaseRead = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  url: string;
 };
 export type TextChoiceListField = {
   display: string;
   value: string[];
   choices: string[][];
 };
-export type User = UserBase & {
+export type User = {
   id: number;
-  case_capacity: number;
-  is_intern: boolean;
-  is_active: boolean;
-  groups: TextChoiceListField;
-  is_superuser: boolean;
-  full_name: string;
-  created_at: string;
-  is_admin_or_better: boolean;
-  is_coordinator_or_better: boolean;
-  is_lawyer_or_better: boolean;
-  is_paralegal_or_better: boolean;
-  is_admin: boolean;
-  is_coordinator: boolean;
-  is_lawyer: boolean;
-  is_paralegal: boolean;
-  is_ms_account_set_up: boolean;
-  ms_account_created_at: string | null;
-};
-export type UserRead = UserBaseRead & {
-  id: number;
-  case_capacity: number;
-  is_intern: boolean;
-  is_active: boolean;
-  groups: TextChoiceListField;
-  is_superuser: boolean;
-  full_name: string;
-  created_at: string;
-  is_admin_or_better: boolean;
-  is_coordinator_or_better: boolean;
-  is_lawyer_or_better: boolean;
-  is_paralegal_or_better: boolean;
-  is_admin: boolean;
-  is_coordinator: boolean;
-  is_lawyer: boolean;
-  is_paralegal: boolean;
-  is_ms_account_set_up: boolean;
-  ms_account_created_at: string | null;
-};
-export type ClientBase = {
   first_name: string;
   last_name: string;
   email: string;
+  case_capacity: number;
+  is_intern: boolean;
+  is_active: boolean;
+  groups: TextChoiceListField;
+  is_superuser: boolean;
+  full_name: string;
+  created_at: string;
+  is_admin_or_better: boolean;
+  is_coordinator_or_better: boolean;
+  is_lawyer_or_better: boolean;
+  is_paralegal_or_better: boolean;
+  is_admin: boolean;
+  is_coordinator: boolean;
+  is_lawyer: boolean;
+  is_paralegal: boolean;
+  is_ms_account_set_up: boolean;
+  ms_account_created_at: string | null;
+};
+export type UserRead = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  url: string;
+  case_capacity: number;
+  is_intern: boolean;
+  is_active: boolean;
+  groups: TextChoiceListField;
+  is_superuser: boolean;
+  full_name: string;
+  created_at: string;
+  is_admin_or_better: boolean;
+  is_coordinator_or_better: boolean;
+  is_lawyer_or_better: boolean;
+  is_paralegal_or_better: boolean;
+  is_admin: boolean;
+  is_coordinator: boolean;
+  is_lawyer: boolean;
+  is_paralegal: boolean;
+  is_ms_account_set_up: boolean;
+  ms_account_created_at: string | null;
 };
 export type TextChoiceField = {
   display: string;
   value: string;
   choices: string[][];
 };
-export type Client = ClientBase & {
+export type Client = {
   id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
   date_of_birth: string | null;
   preferred_name: string | null;
   phone_number: string;
@@ -1213,24 +1221,22 @@ export type Client = ClientBase & {
   call_times: TextChoiceListField;
   eligibility_circumstances: TextChoiceListField;
 };
-export type TenancyBase = {
-  address: string;
-  suburb: string | null;
-  postcode: string | null;
-};
 export type PersonBase = {
   full_name: string;
-  email: string;
-  address: string;
-  phone_number: string;
 };
 export type Person = PersonBase & {
   id: number;
+  email: string;
+  address: string;
+  phone_number: string;
   url: string;
   support_contact_preferences: TextChoiceField;
 };
-export type Tenancy = TenancyBase & {
+export type Tenancy = {
   id: number;
+  address: string;
+  suburb: string | null;
+  postcode: string | null;
   started: string | null;
   url: string;
   is_on_lease: TextChoiceField;
@@ -1304,11 +1310,10 @@ export type IssueRead = IssueBase & {
   next_review: string | null;
   submission_id: string | null;
 };
-export type Error = {
-  detail?: string | object | (string | object | any)[];
-  non_field_errors?: string[];
-};
-export type ClientCreate = ClientBase & {
+export type ClientCreate = {
+  first_name: string;
+  last_name: string;
+  email: string;
   date_of_birth?: string | null;
   preferred_name?: string | null;
   phone_number?: string;
@@ -1330,7 +1335,10 @@ export type ClientCreate = ClientBase & {
   call_times?: string[];
   eligibility_circumstances?: string[];
 };
-export type TenancyCreate = TenancyBase & {
+export type TenancyCreate = {
+  address: string;
+  suburb: string | null;
+  postcode: string | null;
   started?: string | null;
   is_on_lease?: string;
   rental_circumstances?: string;
@@ -1357,11 +1365,6 @@ export type IssueCreate = IssueBase & {
   referrer_type?: string;
   weekly_rent?: number | null;
 };
-export type IssueNoteBase = {
-  note_type: string;
-  text: string;
-  event: string | null;
-};
 export type IssueNoteCreator = {
   id: number;
   first_name: string;
@@ -1370,15 +1373,21 @@ export type IssueNoteCreator = {
   full_name: string;
   url: string;
 };
-export type IssueNote = IssueNoteBase & {
+export type IssueNote = {
   id: number;
+  note_type: string;
+  text: string;
+  event: string | null;
   creator: IssueNoteCreator;
   text_display: string;
   created_at: string;
   reviewee: User | null;
 };
-export type IssueNoteRead = IssueNoteBase & {
+export type IssueNoteRead = {
   id: number;
+  note_type: string;
+  text: string;
+  event: string | null;
   creator: IssueNoteCreator;
   text_display: string;
   created_at: string;
@@ -1387,6 +1396,7 @@ export type IssueNoteRead = IssueNoteBase & {
 export type IssueUpdate = {
   topic?: string;
   stage?: string;
+  is_open?: boolean;
   outcome?: string | null;
   outcome_notes?: string;
   provided_legal_services?: boolean;
@@ -1399,9 +1409,10 @@ export type IssueUpdate = {
   referrer?: string;
   referrer_type?: string;
 };
-export type IssueNoteCreate = IssueNoteBase & {
-  creator_id: number;
-  issue_id: string;
+export type IssueNoteCreate = {
+  note_type: string;
+  text: string;
+  event?: string | null;
 };
 export type SharepointDocument = {
   name: string;
@@ -1421,7 +1432,9 @@ export type ServiceTypeOngoing =
   | "LEGAL_SUPPORT"
   | "REPRESENTATION_COURT_TRIBUNAL"
   | "REPRESENTATION_OTHER";
-export type ServiceBase = {
+export type Service = {
+  id: number;
+  issue_id: string;
   category: ServiceCategory;
   type: ServiceTypeDiscrete | ServiceTypeOngoing;
   started_at: string;
@@ -1429,19 +1442,29 @@ export type ServiceBase = {
   count: number | null;
   notes: string | null;
 };
-export type Service = ServiceBase & {
-  id: number;
-  issue_id: string;
+export type ServiceCreate = {
+  category: ServiceCategory;
+  type: ServiceTypeDiscrete | ServiceTypeOngoing;
+  started_at: string;
+  finished_at: string | null;
+  count: number | null;
+  notes: string | null;
 };
-export type ServiceCreate = ServiceBase & object;
+export type ServiceUpdate = {
+  category?: ServiceCategory;
+  type?: ServiceTypeDiscrete | ServiceTypeOngoing;
+  started_at?: string;
+  finished_at?: string | null;
+  count?: number | null;
+  notes?: string | null;
+};
 export type EmailCreate = {
-  issue: string;
   to_address: string;
-  from_address: string;
   cc_addresses: string[];
   subject: string;
   text: string;
   html: string;
+  state?: string;
 };
 export type EmailAttachment = {
   id: number;
@@ -1453,6 +1476,8 @@ export type EmailAttachment = {
 };
 export type Email = EmailCreate & {
   id: number;
+  issue: string;
+  from_address: string;
   created_at: string;
   processed_at: string | null;
   sender: User;
@@ -1463,6 +1488,8 @@ export type Email = EmailCreate & {
 };
 export type EmailRead = EmailCreate & {
   id: number;
+  issue: string;
+  from_address: string;
   created_at: string;
   processed_at: string | null;
   sender: UserRead;
@@ -1485,6 +1512,14 @@ export type EmailThreadRead = {
   most_recent: string;
   url: string;
 };
+export type EmailUpdate = {
+  to_address?: string;
+  cc_addresses?: string[];
+  subject?: string;
+  text?: string;
+  html?: string;
+  state?: string;
+};
 export type EmailAttachmentCreate = {
   file: Blob;
 };
@@ -1499,7 +1534,10 @@ export type IssueNoteType =
   | "PERFORMANCE"
   | "REVIEW";
 export type PersonCreate = PersonBase & {
-  support_contact_preferences: string;
+  email?: string;
+  address?: string;
+  phone_number?: string;
+  support_contact_preferences?: string;
 };
 export type IssueDateType =
   | "FILING_DEADLINE"
@@ -1508,34 +1546,104 @@ export type IssueDateType =
   | "NTV_TERMINATION"
   | "OTHER";
 export type IssueDateHearingType = "IN_PERSON" | "VIRTUAL";
-export type IssueDateBase = {
+export type IssueDate = {
+  id: number;
   type: IssueDateType;
   date: string;
   hearing_type?: IssueDateHearingType;
   hearing_location?: string;
-};
-export type IssueDate = IssueDateBase & {
-  id: number;
   issue: Issue;
   notes: string;
   is_reviewed: boolean;
 };
-export type IssueDateRead = IssueDateBase & {
+export type IssueDateRead = {
   id: number;
+  type: IssueDateType;
+  date: string;
+  hearing_type?: IssueDateHearingType;
+  hearing_location?: string;
   issue: IssueRead;
   notes: string;
   is_reviewed: boolean;
 };
-export type IssueDateCreate = IssueDateBase & {
+export type IssueDateCreate = {
+  type: IssueDateType;
+  date: string;
   issue_id: string;
+  hearing_type?: IssueDateHearingType;
+  hearing_location?: string;
   notes?: string;
   is_reviewed?: boolean;
 };
-export type UserCreate = UserBase & {
+export type IssueDateUpdate = {
+  type?: IssueDateType;
+  date?: string;
+  issue_id?: string;
+  hearing_type?: IssueDateHearingType;
+  hearing_location?: string;
+  notes?: string;
+  is_reviewed?: boolean;
+};
+export type TenancyUpdate = {
+  address?: string;
+  suburb?: string | null;
+  postcode?: string | null;
+  started?: string | null;
+  is_on_lease?: string;
+  rental_circumstances?: string;
+  landlord_id?: number | null;
+  agent_id?: number | null;
+};
+export type ClientUpdate = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  date_of_birth?: string | null;
+  preferred_name?: string | null;
+  phone_number?: string;
+  gender?: string | null;
+  pronouns?: string | null;
+  centrelink_support?: boolean;
+  eligibility_notes?: string;
+  primary_language_non_english?: boolean;
+  primary_language?: string;
+  number_of_dependents?: number | null;
+  notes?: string;
+  url?: string;
+  age?: number | null;
+  full_name?: string;
+  contact_notes?: string;
+  contact_restriction?: string;
+  requires_interpreter?: string;
+  is_aboriginal_or_torres_strait_islander?: string;
+  call_times?: string[];
+  eligibility_circumstances?: string[];
+};
+export type UserCreate = {
+  first_name: string;
+  last_name: string;
+  email: string;
   groups: string[];
 };
-export type UserCreateRead = UserBaseRead & {
+export type UserCreateRead = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  url: string;
   groups: string[];
+};
+export type UserUpdate = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  groups?: string[];
+};
+export type UserUpdateRead = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  url?: string;
+  groups?: string[];
 };
 export type MicrosoftUserPermissions = {
   access_level: "FULL_ACCESS" | "PARTIAL_ACCESS" | "NO_ACCESS";

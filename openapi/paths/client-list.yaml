@@ -47,3 +47,7 @@ get:
               - page_count
               - item_count
               - results
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

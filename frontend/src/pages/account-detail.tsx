@@ -17,7 +17,7 @@ import {
   useGetNotesQuery,
   useGetUserQuery,
   User,
-  UserCreate,
+  UserUpdate,
   useUpdateUserMutation,
 } from 'api'
 import { MicrosoftAccountAccess } from 'comps/microsoft-account-access'
@@ -37,6 +37,7 @@ interface DjangoContext {
   account_id: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -87,10 +88,10 @@ const AccountUserDetails = ({ result }: AccountUserDetailsProps) => {
   const [account, setAccount] = useState<User>(result.data)
   const [updateUser] = useUpdateUserMutation()
 
-  const update = (id: string, values: { [fieldName: string]: unknown }) =>
+  const update = (id: string | number, values: UserUpdate) =>
     updateUser({
       id: account.id,
-      userCreate: values as UserCreate,
+      userUpdate: values,
     }).unwrap()
 
   return (
@@ -279,6 +280,7 @@ const TabPanelWithBorder = ({
 
 interface ErrorStateProps {
   title: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any
 }
 

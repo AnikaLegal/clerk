@@ -14,7 +14,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/EmailTemplate.yaml
-
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateEmailTemplate
   parameters:
@@ -42,7 +45,6 @@ patch:
       $ref: ../responses/BadRequest.yaml
     "403":
       $ref: ../responses/PermissionDenied.yaml
-
 delete:
   operationId: deleteEmailTemplate
   parameters:

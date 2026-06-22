@@ -20,7 +20,7 @@ import {
   Issue,
   IssueUpdate,
   Person,
-  TenancyCreate,
+  TenancyUpdate,
   useGetCaseQuery,
   useGetPeopleQuery,
   useUpdateCaseMutation,
@@ -56,6 +56,7 @@ const {
   case_pk,
   urls,
   user: permissions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -93,8 +94,8 @@ const App = () => {
     .filter((note) => note.note_type !== 'EMAIL')
     .filter((note) => showSystemNotes || note.note_type !== 'EVENT')
 
-  const updateTenancy = (tenancyCreate: TenancyCreate) => {
-    _updateTenancy({ id: tenancy.id, tenancyCreate })
+  const updateTenancy = (tenancyUpdate: TenancyUpdate) => {
+    _updateTenancy({ id: tenancy.id, tenancyUpdate })
       .unwrap()
       .then(() => {
         enqueueSnackbar('Updated tenancy', { variant: 'success' })
@@ -121,28 +122,28 @@ const App = () => {
 
   const onRemoveLandlord = () => {
     if (confirm('Remove the landlord for this case?')) {
-      updateTenancy({ landlord_id: null } as any)
+      updateTenancy({ landlord_id: null })
     }
   }
   const onRemoveAgent = () => {
     if (confirm('Remove the agent for this case?')) {
-      updateTenancy({ agent_id: null } as any)
+      updateTenancy({ agent_id: null })
     }
   }
   const onRemoveSupportWorker = () => {
     if (confirm('Remove the support worker for this case?')) {
-      updateCase({ support_worker_id: null } as any)
+      updateCase({ support_worker_id: null })
     }
   }
 
   const onAddAgent = (agentId) => {
-    updateTenancy({ agent_id: agentId } as any)
+    updateTenancy({ agent_id: agentId })
   }
   const onAddLandlord = (landlordId) => {
-    updateTenancy({ landlord_id: landlordId } as any)
+    updateTenancy({ landlord_id: landlordId })
   }
   const onAddSupportWorker = (supportWorkerId) => {
-    updateCase({ support_worker_id: supportWorkerId } as any)
+    updateCase({ support_worker_id: supportWorkerId })
   }
 
   return (

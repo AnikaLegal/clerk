@@ -12,7 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import { IconCheck, IconExclamationCircle, IconX } from '@tabler/icons-react'
-import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
+import { GetUsersApiArg, useGetUsersQuery, UserRead } from 'api'
 import { SelectFilter, TextInputFilter } from 'comps/filter'
 import { GroupLabels } from 'comps/group-label'
 import { showNotification } from 'comps/notification'
@@ -25,6 +25,7 @@ interface DjangoContext {
   create_url: string
   group_values: string[]
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
@@ -130,6 +131,7 @@ const App = () => {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ErrorState = ({ error }: { error: any }) => {
   useEffect(() => {
     const message = getAPIErrorMessage(error)
@@ -168,7 +170,7 @@ const EmptyState = () => (
 
 interface TableBodyProps {
   result: ReturnType<typeof useGetUsersQuery>
-  dataRow: React.ComponentType<{ user: User }>
+  dataRow: React.ComponentType<{ user: UserRead }>
 }
 
 const TableBody = ({ result, dataRow }: TableBodyProps) => {
@@ -179,7 +181,7 @@ const TableBody = ({ result, dataRow }: TableBodyProps) => {
     return <LoadingState />
   }
 
-  const data: User[] = result.data?.results || []
+  const data: UserRead[] = result.data?.results || []
   if (data.length < 1) {
     return <EmptyState />
   }
@@ -194,7 +196,7 @@ const TableBody = ({ result, dataRow }: TableBodyProps) => {
   )
 }
 
-const UserDataRow = ({ user }: { user: User }) => {
+const UserDataRow = ({ user }: { user: UserRead }) => {
   return (
     <Table.Tr>
       <Table.Td>

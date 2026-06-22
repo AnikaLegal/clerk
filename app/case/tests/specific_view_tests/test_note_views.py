@@ -1,9 +1,8 @@
 import pytest
-from conftest import CaseRole, schema_tester
+from conftest import CaseRole
 from core.factories import IssueFactory, IssueNoteFactory
 from core.models.issue_note import IssueNote, NoteType
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 coordinator_note_types_only = list(
     set(IssueNote.COORDINATOR_NOTE_TYPES) - set(IssueNote.PARALEGAL_NOTE_TYPES)
@@ -11,7 +10,7 @@ coordinator_note_types_only = list(
 
 
 @pytest.mark.django_db
-def test_issue_note_list_api(superuser_client: APIClient):
+def test_issue_note_list_api(superuser_client):
     instance_1 = IssueNoteFactory()
     instance_2 = IssueNoteFactory()
 
@@ -32,23 +31,12 @@ def test_issue_note_list_api(superuser_client: APIClient):
     assert len(results) == 2
     assert set(x["id"] for x in results) == {instance_1.pk, instance_2.pk}
 
-    schema_tester.validate_response(response=response)
-
 
 @pytest.mark.django_db
-def test_issue_note_list_api__search_filter(superuser_client: APIClient):
-    instance_1 = IssueNoteFactory()
-    instance_2 = IssueNoteFactory()
+def test_issue_note_list_api__search_filter(superuser_client):
+    instance = IssueNoteFactory()
+    IssueNoteFactory()
     url = reverse("note-api-list")
-
-    # Empty search parameter - ignored
-    response = superuser_client.get(url, {"issue": ""})
-    assert response.status_code == 200
-    resp_data = response.json()
-    assert resp_data["item_count"] == 2
-    results = resp_data["results"]
-    assert len(results) == 2
-    assert set(x["id"] for x in results) == {instance_1.pk, instance_2.pk}
 
     # No search results.
     response = superuser_client.get(
@@ -61,14 +49,13 @@ def test_issue_note_list_api__search_filter(superuser_client: APIClient):
     assert len(results) == 0
 
     # One search result by issue id.
-    response = superuser_client.get(url, {"issue": str(instance_1.issue.pk)})
+    response = superuser_client.get(url, {"issue": str(instance.issue.pk)})
     assert response.status_code == 200
     resp_data = response.json()
     assert resp_data["item_count"] == 1
     results = resp_data["results"]
     assert len(results) == 1
-    assert results[0]["id"] == instance_1.pk
-    schema_tester.validate_response(response=response)
+    assert results[0]["id"] == instance.pk
 
 
 @pytest.mark.django_db

@@ -21,6 +21,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/Service.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateCaseService
   parameters:
@@ -39,11 +43,11 @@ patch:
         type: number
   requestBody:
     required: true
-    description: Successful response.
+    description: Request body for updating a case service.
     content:
       application/json:
         schema:
-          $ref: ../schemas/ServiceCreate.yaml
+          $ref: ../schemas/ServiceUpdate.yaml
   responses:
     "200":
       description: Successful response.

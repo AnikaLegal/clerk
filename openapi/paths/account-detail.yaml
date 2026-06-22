@@ -14,6 +14,10 @@ get:
         application/json:
           schema:
             $ref: ../schemas/User.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
 patch:
   operationId: updateUser
   parameters:
@@ -29,7 +33,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/UserCreate.yaml
+          $ref: ../schemas/UserUpdate.yaml
   responses:
     "200":
       description: Successful response.
