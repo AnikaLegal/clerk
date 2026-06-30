@@ -28,3 +28,4 @@ jobs:
         CLERK_PRIVATE_SSH_KEY: ${{ secrets.CLERK_PRIVATE_SSH_KEY }}
         COMPOSE_SUFFIX: prod
         S3_BUCKET: s3://anika-database-backups
+        BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}

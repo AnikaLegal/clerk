@@ -18,10 +18,12 @@ RUN echo "Updating apt sources" && \
 # iputils-ping: for pinging things.
 # postgresql-client: for talking to PostgreSQL database.
 # postgresql-common: PostgreSQL database-cluster manager.
+# gnupg: for decrypting encrypted database backups during restore.
 RUN echo "Installing generic stuff" && \
     apt-get -qq install \
     curl \
     wget \
     iputils-ping \
     postgresql-client \
-    postgresql-common
+    postgresql-common \
+    gnupg

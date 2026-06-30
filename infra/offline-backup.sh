@@ -11,8 +11,8 @@ OPTIONS
   -d, --decrypt <FILE>  Decrypt the supplied offline backup file.
   -h, --help            Show this help.
   
-When no options are supplied the latest backup file will be downloaded from AWS
-to the current directory and encrypted."
+When no options are supplied the latest (already encrypted) backup files will be
+downloaded from AWS to the current directory."
 
 # Pass command line args.
 decrypt_file=""
@@ -36,10 +36,11 @@ done
 
 if [ -n "$decrypt_file" ]; then
     # Read required secret. Passphrase in Anika BitWarden.
-    read -r -s -p $'Enter Clerk offline backup passphrase:\n' passphrase
+    read -r -s -p $'Enter Clerk backup passphrase:\n' passphrase
 
     echo "Decrypting backup file $decrypt_file"
-    output="${decrypt_file%.data}"
+    # Strip the encrypted-file suffix.
+    output="${decrypt_file%.gpg}"
     gpg --no-symkey-cache --output "${output}" --pinentry-mode=loopback \
         --passphrase "${passphrase}" --decrypt "$decrypt_file"
 else
@@ -48,8 +49,8 @@ else
     export AWS_ACCESS_KEY_ID="AKIAUZ6OTSVMUXQAJLGM"
     export AWS_SECRET_ACCESS_KEY
 
-    # Read required secret. Passphrase in Anika BitWarden.
-    read -r -s -p $'Enter Clerk offline backup passphrase:\n' passphrase
+    # Prod backups are already GPG-encrypted at rest, so just download them as-is.
+    # Decrypt later with: ${prog} -d <FILE>
 
     # Get the db backup from the AWS prod backup bucket.
     echo "Finding latest database backup..."
@@ -61,14 +62,8 @@ else
             awk '{{print $4}}'
     )
 
-    echo "Encrypting database backup file $db_backup_file"
-    ! aws s3 cp ${s3_bucket}/${db_backup_file} - |
-        gpg --no-symkey-cache \
-            --output "${db_backup_file}.data" \
-            --pinentry-mode=loopback \
-            --passphrase "${passphrase}" \
-            --symmetric \
-            --cipher-algo AES256 -
+    echo "Downloading database backup file $db_backup_file"
+    aws s3 cp ${s3_bucket}/${db_backup_file} "${db_backup_file}"
 
     # Get the client info backup from the AWS prod backup bucket.
     echo "Finding latest client info backup..."
@@ -80,13 +75,7 @@ else
             awk '{{print $4}}'
     )
 
-    echo "Encrypting client info backup file $client_info_file"
-    ! aws s3 cp ${s3_bucket}/${client_info_file} - |
-        gpg --no-symkey-cache \
-            --output "${client_info_file}.data" \
-            --pinentry-mode=loopback \
-            --passphrase "${passphrase}" \
-            --symmetric \
-            --cipher-algo AES256 -
+    echo "Downloading client info backup file $client_info_file"
+    aws s3 cp ${s3_bucket}/${client_info_file} "${client_info_file}"
 fi
 exit 0
