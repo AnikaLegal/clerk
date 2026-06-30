@@ -14,6 +14,8 @@ fi
 HOST=$1
 
 read -r -s -p $'Enter AWS backup user secret access key:\n' backup_user_secret_access_key
+# Prod backups are GPG-encrypted at rest. Passphrase in Anika BitWarden.
+read -r -s -p $'Enter Clerk backup passphrase:\n' backup_passphrase
 cd $base_dir
 
 unset LC_ALL
@@ -67,11 +69,12 @@ unset LC_CTYPE
         grep postgres_clerk |
         tail -n 1 |
         awk '{{print $4}}')
-
     echo -e "\n>>> Found backup: $DUMP_NAME"
 
     echo -e "\n>>> Restoring backup $DUMP_NAME to host $HOST"
     aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - |
+        gpg --decrypt --quiet --no-symkey-cache \
+            --pinentry-mode=loopback  --passphrase "$backup_passphrase" |
         ssh root@$HOST \
         PGDATABASE=clerk_prod \
         PGUSER=$PGUSER \

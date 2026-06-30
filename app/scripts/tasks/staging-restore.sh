@@ -9,8 +9,12 @@ if [[ $PGDATABASE != "clerk_staging" ]]; then
     echo -e "\n>>> Error: unexpected PGDATABASE $PGDATABASE"
     exit 1
 fi
-
+if [[ -z "$BACKUP_PASSPHRASE" ]]; then
+    echo -e "\n>>> Error: BACKUP_PASSPHRASE is required"
+    exit 1
+fi
 echo -e "\nRestoring database from backup"
+
 S3_BUCKET="s3://anika-database-backups"
 LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
     sort |
@@ -22,7 +26,10 @@ echo -e "\nFound backup $LATEST_BACKUP"
 echo -e "\nResetting database"
 ./manage.py reset_db --close-sessions --noinput
 
+echo -e "\nDecrypting and restoring backup"
 aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
+    gpg --decrypt --quiet --no-symkey-cache \
+        --pinentry-mode=loopback --passphrase "$BACKUP_PASSPHRASE" |
     pg_restore \
         --clean \
         --dbname $PGDATABASE \
@@ -33,7 +40,7 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
         --no-privileges \
         --if-exists
 
-echo -e "\nSync AWS S3 assets"
+echo -e "\nSyncing AWS S3 assets"
 aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-staging/action-documents
 aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-staging/documents
 aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-staging/images
