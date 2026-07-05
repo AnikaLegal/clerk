@@ -246,20 +246,6 @@ BOARD = [
             Victorian Government, and as a ministerial media advisor."""
         ],
     },
-    {
-        "image": "web/img/photos/team/noel.png",
-        "name": "Noel Lim",
-        "title": "Board Member & CEO",
-        "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
-        "brags": [
-            """Noel is the Chief Executive Officer and co-founder of Anika
-            Legal, and has led the founding team to become an organisation of 62
-            volunteers, and to receive successive AFR Client Choice Awards for
-            Startup of the Year (2019, 2020). Noel was a finalist for the
-            Victorian Young Australian of the Year (2023) and NFP Emerging
-            Leader award (2023).""",
-        ],
-    },
 ]
 
 
@@ -359,14 +345,31 @@ ADVISORS = [
 
 TEAM_MEMBERS = [
     {
+        "image": "web/img/photos/team/dale.png",
+        "name": "Dale Clough",
+        "title": "Chief Executive Officer",
+        "linkedin": "https://www.linkedin.com/in/dale-clough/",
+        "brags": [
+            """Dale drives the direction of our organisation and ensures that
+            each portfolio is successfully managed.""",
+            """Dale has a Masters of Business Administration and brings over a
+            decade of experience in leading large, highly engaged teams across
+            the private and not-for-profit sectors.""",
+        ],
+    },
+    {
         "image": "web/img/photos/team/noel.png",
         "name": "Noel Lim",
-        "title": "Chief Executive Officer",
+        "title": "Co-Founder",
         "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
         "brags": [
-            """Noel drives the direction of our organisation and ensures that
-            each portfolio is successfully managed.""",
-            """Noel is the full-time CEO and co-founder of Anika Legal.""",
+            """Noel co-founded Anika Legal with the belief that providing
+            lawyers and law students with an opportunity to contribute to access
+            to justice can help close the justice gap for Victoria's
+            renters.""",
+            """Noel was named Victorian of the Year in 2025, is a Westpac Social
+            Change Fellow and is now growing Anika's strategic partnerships to
+            further our mission.""",
         ],
     },
     {
@@ -384,28 +387,12 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/dale.png",
-        "name": "Dale Clough",
-        "title": "Head of Partnerships & Fundraising",
-        "linkedin": "https://www.linkedin.com/in/dale-clough/",
-        "brags": [
-            """Dale leads our Partnerships & Fundraising function, ensuring that
-            Anika can continue to grow sustainably.""",
-            """Dale has over eight years of experience in leading large, highly
-            engaged teams and managing strategic partnerships across the private
-            and not-for-profit sectors. Dale has a Masters of Business
-            Administration, and a strong understanding of the donor development
-            cycle and solicitation process, as well as how to use data to
-            increase fundraising effectiveness.""",
-        ],
-    },
-    {
         "image": "web/img/photos/team/emily.png",
         "name": "Emily Southwell",
         "title": "Principal Lawyer",
         "linkedin": "https://www.linkedin.com/in/emily-southwell-95459213a/",
         "brags": [
-            """Emily is our Principal lawyer, and is responsible for developing
+            """Emily is our Principal lawyer and is responsible for developing
             and delivering the legal service we provide.""",
             """Emily brings a wealth of diverse experiences to Anika Legal. She
             has previously worked as a Coroner's Solicitor at the Coroner's
@@ -435,7 +422,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "",
         "brags": [
-            """Sharon's journey at Anika is a story of growth, passion, and
+            """Sharon's journey at Anika is a story of growth, passion and
             making a real difference in the legal world. Starting out as a
             volunteer paralegal through a Deakin University internship, Sharon
             quickly rose through the ranks, becoming a paralegal lead. After she
