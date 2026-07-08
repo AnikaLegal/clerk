@@ -363,13 +363,14 @@ TEAM_MEMBERS = [
         "title": "Co-Founder",
         "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
         "brags": [
-            """Noel co-founded Anika Legal with the belief that providing
-            lawyers and law students with an opportunity to contribute to access
-            to justice can help close the justice gap for Victoria's
-            renters.""",
-            """Noel was named Victorian of the Year in 2025, is a Westpac Social
-            Change Fellow and is now growing Anika's strategic partnerships to
-            further our mission.""",
+            """Noel co-founded Anika Legal with the belief that the untapped
+            energy of law students and lawyers could help close the justice gap
+            for Victoria's renters. After leading Anika as Founding CEO, he now
+            focuses on strategic partnerships and systems change for a fairer
+            housing system.""",
+            """Noel was named Victorian of the Year in 2025 and is a Westpac
+            Social Change Fellow. He is also a founding member of the Access to
+            Justice & Technology Network.""",
         ],
     },
     {
