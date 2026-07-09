@@ -16,6 +16,9 @@ STORAGES = {
     },
 }
 
+# Render intake form pages without requiring a built Vite manifest.
+DJANGO_VITE["intake"]["dev_mode"] = True
+
 # Django-q cluster should run synchronously
 Q_CLUSTER = {
     "name": "clerk",

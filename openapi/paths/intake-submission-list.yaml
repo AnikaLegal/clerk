@@ -1,0 +1,16 @@
+post:
+  operationId: createIntakeSubmission
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IntakeSubmissionCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IntakeSubmission.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml

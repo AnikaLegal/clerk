@@ -4,6 +4,150 @@ info:
   description: API that the Django backend will provide.
   version: 0.1.0
 paths:
+  /api/submission/:
+    post:
+      operationId: createIntakeSubmission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntakeSubmissionCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntakeSubmission"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/submission/{id}/:
+    get:
+      operationId: getIntakeSubmission
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntakeSubmission"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateIntakeSubmission
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntakeSubmissionCreate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntakeSubmission"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/submission/{id}/submit/:
+    post:
+      operationId: submitIntakeSubmission
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/upload/:
+    post:
+      operationId: createIntakeUpload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                issue:
+                  type: string
+                  format: uuid
+              required:
+                - file
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntakeFileUpload"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/webhooks/intake-noemail/:
+    post:
+      operationId: createIntakeNoEmailContact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                phone_number:
+                  type: string
+                  minLength: 6
+              required:
+                - name
+                - phone_number
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /clerk/api/submission/{id}/:
     get:
       operationId: getSubmission
@@ -1704,6 +1848,84 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
+    IntakeSubmissionCreate:
+      type: object
+      properties:
+        answers:
+          type: object
+          additionalProperties: true
+      required:
+        - answers
+    IntakeSubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        answers:
+          type: object
+          additionalProperties: true
+          description: |
+            Intake form answers keyed by UPPER_SNAKE_CASE question name. The effective schema is owned by the survey definition in intake/src/ and consumed by core.services.submission.process_submission.
+      required:
+        - id
+        - answers
+    Error:
+      type: object
+      description: |
+        Standardized error envelope produced by drf-standardized-errors. Every 4xx/5xx response shares this shape: a `type` describing the error category and a list of one or more individual `errors`.
+      properties:
+        type:
+          type: string
+          description: The category of error that occurred.
+          enum:
+            - validation_error
+            - client_error
+            - server_error
+          example: validation_error
+        errors:
+          type: array
+          description: The individual errors that make up this response.
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: A machine-readable code identifying the error.
+                example: required
+              detail:
+                type: string
+                description: A human-readable description of the error.
+                example: This field is required.
+              attr:
+                type: string
+                nullable: true
+                description: |
+                  The name of the field that raised the error, or null for errors not tied to a specific field. Non-field validation errors use "non_field_errors".
+                example: email
+            required:
+              - code
+              - detail
+              - attr
+      required:
+        - type
+        - errors
+    IntakeFileUpload:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file:
+          type: string
+        issue:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+        - id
+        - file
+        - issue
     BooleanYesNo:
       type: object
       properties:
@@ -2189,46 +2411,6 @@ components:
         - answers_raw
         - answers
         - created_at
-    Error:
-      type: object
-      description: |
-        Standardized error envelope produced by drf-standardized-errors. Every 4xx/5xx response shares this shape: a `type` describing the error category and a list of one or more individual `errors`.
-      properties:
-        type:
-          type: string
-          description: The category of error that occurred.
-          enum:
-            - validation_error
-            - client_error
-            - server_error
-          example: validation_error
-        errors:
-          type: array
-          description: The individual errors that make up this response.
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-                description: A machine-readable code identifying the error.
-                example: required
-              detail:
-                type: string
-                description: A human-readable description of the error.
-                example: This field is required.
-              attr:
-                type: string
-                nullable: true
-                description: |
-                  The name of the field that raised the error, or null for errors not tied to a specific field. Non-field validation errors use "non_field_errors".
-                example: email
-            required:
-              - code
-              - detail
-              - attr
-      required:
-        - type
-        - errors
     IssueBase:
       type: object
       properties:

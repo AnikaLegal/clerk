@@ -24,8 +24,11 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     echo "Installing python executable & dependencies..." && \
     uv sync --frozen
 
-# Copy frontend build assets (for production only)
+# Copy frontend build assets (for production only). The intake build lives
+# in its own subdirectory so its manifest.json and assets don't collide with
+# the frontend build's.
 COPY --from=clerk-frontend:local /frontend/dist/ /dist/
+COPY --from=clerk-intake:local /intake/dist/ /dist/intake/
 COPY --from=web-builder /dist/web/ /dist/web/
 
 # Collect static files

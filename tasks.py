@@ -15,12 +15,13 @@ os.chdir(script_directory)
 
 @task
 def schema(c):
-    """Regenerate OpenAPI schema and JavaScript API client"""
+    """Regenerate OpenAPI schema and JavaScript API clients"""
     c.run("cd frontend && npm run schema")
+    c.run("cd intake && npm run schema")
 
 
 @task
-def build(c, base=False, frontend=False, no_cache=False):
+def build(c, base=False, frontend=False, intake=False, no_cache=False):
     """Build Docker environment locally"""
 
     file = "Dockerfile"
@@ -34,6 +35,9 @@ def build(c, base=False, frontend=False, no_cache=False):
     elif frontend:
         file = "Dockerfile.frontend"
         tag = f"{APP_NAME}-frontend:local"
+    elif intake:
+        file = "Dockerfile.intake"
+        tag = f"{APP_NAME}-intake:local"
 
     if no_cache:
         args += " --no-cache"
@@ -138,9 +142,13 @@ def clean(c, volumes=False, images=False):
 
 
 @task
-def bash(c, frontend=False):
+def bash(c, frontend=False, intake=False):
     """Get a bash shell in a Docker container"""
-    s = "frontend" if frontend else "web"
+    s = "web"
+    if frontend:
+        s = "frontend"
+    if intake:
+        s = "intake"
     run(c, "bash", service=s)
 
 

@@ -1,0 +1,26 @@
+post:
+  operationId: createIntakeNoEmailContact
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              minLength: 2
+            phone_number:
+              type: string
+              minLength: 6
+          required:
+            - name
+            - phone_number
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: object
+    "400":
+      $ref: ../responses/BadRequest.yaml

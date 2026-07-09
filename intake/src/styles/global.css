@@ -1,0 +1,105 @@
+/* Minimal chrome around the SurveyJS form; the survey itself uses the
+   default SurveyJS theme. */
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  color: #333;
+}
+
+.intake-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+}
+
+.intake-header-logo {
+  height: 40px;
+}
+
+.intake-header-close {
+  font-size: 32px;
+  line-height: 1;
+  color: #666;
+  text-decoration: none;
+}
+
+.intake-splash {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.intake-splash-logo {
+  height: 90px;
+  margin-bottom: 32px;
+}
+
+.intake-splash h1 {
+  font-size: 28px;
+  line-height: 1.3;
+}
+
+.intake-splash p,
+.intake-splash li {
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.intake-button-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.intake-button {
+  display: inline-block;
+  padding: 12px 28px;
+  border: 2px solid #438fef;
+  border-radius: 28px;
+  color: #438fef;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.intake-button-primary {
+  background: #438fef;
+  color: #fff;
+}
+
+.intake-noemail-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 420px;
+  margin-top: 24px;
+}
+
+.intake-noemail-form input[type='text'],
+.intake-noemail-form input[type='tel'] {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.intake-checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 15px;
+}
+
+.intake-error {
+  color: #d72207;
+  margin: 0;
+}

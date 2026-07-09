@@ -46,6 +46,7 @@ WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
 INTAKE_URL = "https://localhost:3001"
 
 DJANGO_VITE["default"]["dev_mode"] = True
+DJANGO_VITE["intake"]["dev_mode"] = True
 
 INSTALLED_APPS += ["zeal"]
 MIDDLEWARE += ["zeal.middleware.zeal_middleware"]

@@ -1,0 +1,31 @@
+{% load static django_vite analytics %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{ title }} | Anika Legal</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}">
+  {% vite_hmr_client app="intake" %}
+  {% vite_react_refresh app="intake" %}
+  {% vite_asset 'main.tsx' app="intake" %}
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.REACT_CONTEXT = JSON.parse('{{ react_context|escapejs }}')
+    window.SENTRY_CONTEXT = JSON.parse('{{ sentry_context|escapejs }}')
+  </script>
+  {% analytics %}
+  <script>
+    // No-op fallbacks so form funnel events never crash when analytics IDs
+    // are absent (dev has neither, staging has Google Analytics only).
+    if (typeof window.gtag === 'undefined') {
+      window.gtag = function () { console.log('gtag', arguments) }
+    }
+    if (typeof window.fbq === 'undefined') {
+      window.fbq = function () { console.log('fbq', arguments) }
+    }
+  </script>
+</body>
+</html>

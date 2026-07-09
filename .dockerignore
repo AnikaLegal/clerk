@@ -5,3 +5,5 @@ docs/
 env/
 frontend/node_modules/
 infra/
+intake/node_modules/
+intake/dist/

@@ -1,10 +1,11 @@
 # CLAUDE.md
 
-Clerk is **Anika Legal's case management system & public website**. It's a monorepo with three coupled parts joined by an OpenAPI contract:
+Clerk is **Anika Legal's case management system & public website**. It's a monorepo with four coupled parts joined by an OpenAPI contract:
 
 - `app/` — Django + Wagtail backend (Django REST Framework API, CMS, public site, admin)
 - `frontend/` — React 18 + TypeScript + Vite SPA (the "Clerk" CMS UI)
-- `openapi/` — the hand-authored OpenAPI spec that is the **source of truth** for the API; it generates both the backend schema and the frontend API client
+- `intake/` — React 18 + TypeScript + Vite SPA (the public client intake form, built on SurveyJS; served at `/intake/` by the thin `app/intake` Django app)
+- `openapi/` — the hand-authored OpenAPI spec that is the **source of truth** for the API; it generates the backend schema and both frontend API clients
 
 Everything runs in Docker, orchestrated through `inv` (pyinvoke) tasks defined in `tasks.py`. Run `inv` commands from the project root.
 
@@ -32,8 +33,8 @@ First-time setup (Docker, transcrypt, `inv build -f` / `inv build`, `inv reset`,
 The API is **contract-first**. To change an endpoint or schema:
 
 1. Edit the source spec under [openapi/](openapi/) (`paths/`, `schemas/`, `responses/`).
-2. Run `inv schema` (or `cd frontend && npm run schema`). This bundles the spec into `app/openapi.generated.yaml` and regenerates the RTK Query client at `frontend/src/api/api.generated.ts`.
-3. **Never hand-edit the generated files** — `app/openapi.generated.yaml` and `frontend/src/api/api.generated.ts` are build artifacts.
+2. Run `inv schema`. This bundles the spec into `app/openapi.generated.yaml`, regenerates the RTK Query client at `frontend/src/api/api.generated.ts` (intake endpoints are filtered out via `frontend/openapi-config.js`), and regenerates the intake types at `intake/src/api/types.generated.ts`.
+3. **Never hand-edit the generated files** — `app/openapi.generated.yaml`, `frontend/src/api/api.generated.ts` and `intake/src/api/types.generated.ts` are build artifacts.
 
 Backend responses are validated against the contract in tests (`django-contract-tester`), so the spec and the DRF serializers/views must stay in sync.
 
@@ -51,6 +52,12 @@ Backend responses are validated against the contract in tests (`django-contract-
 - **Mid-migration: prefer Mantine.** New components use `@mantine/core`; new forms use `@mantine/form` + `yup` (`mantine-form-yup-resolver`). `semantic-ui-react`, `styled-components`, and `formik` are **legacy** — don't add new code with them; migrate toward Mantine when touching that code.
 - Structure: `src/pages/`, `src/features/`, `src/forms/`, `src/comps/`.
 - Commands: `npm run dev`, `npm run build`, `npm run lint` (eslint), `npm run format` (prettier). The frontend also runs as a service under `inv dev`.
+
+## Intake form (`intake/`)
+
+- The public client intake form: a SurveyJS (survey-core + survey-react-ui) SPA served by the `app/intake` Django app at `/intake/` (dev Vite server on port 5174, image `clerk-intake:local`, built via `inv build --intake`).
+- The question list in `src/questions/` is the source of truth; question names are the UPPER_SNAKE_CASE answer keys that `core/services/submission.py` processes - do not rename them. Flow logic (eligibility exits, saves, analytics) hooks into SurveyJS events in `src/views/FormPage.tsx` + `src/form/`.
+- Commands: `npm run dev`, `npm run build`, `npm run test` (vitest - flow parity/serialization tests), `npm run lint`, `npm run format`.
 
 ## Conventions & guardrails
 

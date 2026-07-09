@@ -244,7 +244,14 @@ STORAGES = {
 DJANGO_VITE = {
     "default": {
         "dev_mode": False,
-    }
+    },
+    # The public intake form's separate Vite build. Its assets live under
+    # static/intake/ so they don't collide with the default app's build.
+    "intake": {
+        "dev_mode": False,
+        "dev_server_port": 5174,
+        "static_url_prefix": "intake",
+    },
 }
 
 # Wagtail

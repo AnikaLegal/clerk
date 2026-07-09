@@ -18,7 +18,7 @@ This Django project has several apps:
 - clerk: Project settings
 - core: Core domain models and functionality
 - emails: Sending and receiving emails
-- intake: User intake forms (Housing health check only)
+- intake: Serves the public client intake form (a SurveyJS app, see intake/)
 - microsoft: Microsoft integration (Sharepoint)
 - office: Alternative communications when the office is closed
 - slack: Slack integration

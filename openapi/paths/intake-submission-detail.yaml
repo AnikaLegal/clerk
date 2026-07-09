@@ -1,0 +1,49 @@
+get:
+  operationId: getIntakeSubmission
+  parameters:
+    - name: id
+      description: Submission ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IntakeSubmission.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+    "404":
+      $ref: ../responses/NotFound.yaml
+patch:
+  operationId: updateIntakeSubmission
+  parameters:
+    - name: id
+      description: Submission ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/IntakeSubmissionCreate.yaml
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IntakeSubmission.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+    "404":
+      $ref: ../responses/NotFound.yaml

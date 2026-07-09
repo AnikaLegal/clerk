@@ -42,7 +42,9 @@ Next, build the Docker environment that we'll be using:
 ```bash
 # Build frontend container
 inv build -f
-# Build Django container
+# Build intake form container
+inv build -i
+# Build Django container (requires the frontend and intake images)
 inv build
 ```
 

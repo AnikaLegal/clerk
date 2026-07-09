@@ -5,6 +5,18 @@ info:
   version: 0.1.0
 
 paths:
+  # Public intake form API (anonymous access, used by intake/).
+  /api/submission/:
+    $ref: paths/intake-submission-list.yaml
+  /api/submission/{id}/:
+    $ref: paths/intake-submission-detail.yaml
+  /api/submission/{id}/submit/:
+    $ref: paths/intake-submission-submit.yaml
+  /api/upload/:
+    $ref: paths/intake-upload-list.yaml
+  /api/webhooks/intake-noemail/:
+    $ref: paths/intake-noemail.yaml
+
   /clerk/api/submission/{id}/:
     $ref: paths/submission-detail.yaml
 

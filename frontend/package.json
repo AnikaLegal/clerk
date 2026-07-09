@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "npx eslint .",
-    "schema": "npx @redocly/cli bundle ../openapi/openapi.yaml --output ../app/openapi.generated.yaml && npx prettier --write ../app/openapi.generated.yaml && npx @rtk-query/codegen-openapi openapi-config.json",
+    "schema": "npx @redocly/cli bundle ../openapi/openapi.yaml --output ../app/openapi.generated.yaml && npx prettier --write ../app/openapi.generated.yaml && npx @rtk-query/codegen-openapi openapi-config.js",
     "build": "vite build --config vite.config.ts",
     "dev": "vite serve --config vite.config.ts",
     "format": "prettier --write ."

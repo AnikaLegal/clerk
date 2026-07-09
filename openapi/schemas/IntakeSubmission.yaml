@@ -1,0 +1,15 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  answers:
+    type: object
+    additionalProperties: true
+    description: >
+      Intake form answers keyed by UPPER_SNAKE_CASE question name. The
+      effective schema is owned by the survey definition in intake/src/
+      and consumed by core.services.submission.process_submission.
+required:
+  - id
+  - answers

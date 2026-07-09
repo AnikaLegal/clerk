@@ -1,0 +1,18 @@
+FROM node:lts-slim
+
+WORKDIR /intake
+
+# Install Node modules, build intake form for prod.
+COPY intake/package.json .
+COPY intake/package-lock.json .
+RUN echo "Installing Node modules." && \
+    npm ci --silent
+
+# Mount the codebase
+ADD intake /intake
+
+RUN echo "Testing intake" && \
+    npm run test
+
+RUN echo "Building intake" && \
+    npm run build

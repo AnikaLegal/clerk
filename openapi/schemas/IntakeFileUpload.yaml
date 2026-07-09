@@ -1,0 +1,15 @@
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  file:
+    type: string
+  issue:
+    type: string
+    format: uuid
+    nullable: true
+required:
+  - id
+  - file
+  - issue

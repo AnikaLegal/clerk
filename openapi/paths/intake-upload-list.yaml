@@ -1,0 +1,25 @@
+post:
+  operationId: createIntakeUpload
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+            issue:
+              type: string
+              format: uuid
+          required:
+            - file
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/IntakeFileUpload.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml

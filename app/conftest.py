@@ -143,6 +143,15 @@ def admin_group():
 
 
 @pytest.fixture
+def anon_client() -> OpenAPIClient:
+    """
+    Anonymous client for the public intake API, with responses validated
+    against the OpenAPI schema.
+    """
+    return OpenAPIClient(schema_tester=schema_tester)
+
+
+@pytest.fixture
 def user_client(unprivileged_user) -> OpenAPIClient:
     return _login_user(unprivileged_user)
 

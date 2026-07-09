@@ -1,0 +1,7 @@
+type: object
+properties:
+  answers:
+    type: object
+    additionalProperties: true
+required:
+  - answers

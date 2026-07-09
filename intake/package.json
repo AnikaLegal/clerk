@@ -1,0 +1,36 @@
+{
+  "name": "intake",
+  "version": "1.0.0",
+  "description": "Anika Legal public client intake form",
+  "private": true,
+  "scripts": {
+    "lint": "npx eslint .",
+    "schema": "npx openapi-typescript ../app/openapi.generated.yaml -o src/api/types.generated.ts && npx prettier --write src/api/types.generated.ts",
+    "build": "vite build --config vite.config.ts",
+    "dev": "vite serve --config vite.config.ts",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@sentry/browser": "^10.15.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.9.3",
+    "survey-core": "^2.3.5",
+    "survey-react-ui": "^2.3.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "~18.3.24",
+    "@types/react-dom": "~18.3.7",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^10.2.0",
+    "openapi-typescript": "^7.9.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1",
+    "vite": "^7.1.7",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
+  }
+}
