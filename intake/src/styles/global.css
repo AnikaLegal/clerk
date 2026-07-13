@@ -26,6 +26,16 @@ header .h-\[63px\] img {
   width: auto;
 }
 
+/* Align the SurveyJS accent (radios, checkboxes, progress bar, focus rings)
+   to the Anika blue so it matches the daisyUI buttons. SurveyJS reads these
+   variables with a green fallback (#19b394); defining them here - they inherit
+   into the survey - swaps the accent to the theme's primary colour. */
+.intake-form {
+  --sjs-primary-backcolor: var(--color-primary);
+  --sjs-primary-backcolor-light: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --sjs-primary-forecolor: var(--color-primary-content);
+}
+
 /* SurveyJS renders its Previous / Next / Confirm buttons as <input> elements.
    The website's components.css styles `form input` as a text field, and being
    unlayered it beats daisyUI's cascade-layered button rules, so the daisyUI
