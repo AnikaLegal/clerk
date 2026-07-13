@@ -56,6 +56,16 @@ const setUpForm = (): FormState => {
     })
   }
 
+  // A returning or resuming visitor (with stored progress) skips the start
+  // page and picks up where they left off; a brand-new visitor stays on the
+  // start page until they press Start. Leaving the start page must happen
+  // before restoring a position, as currentPage only tracks real pages once
+  // the survey is running. This runs before onStarted is wired up in the
+  // effect below, so restoring here does not fire the startIntake event.
+  if (visited.size > 0 || stored.currentPage) {
+    survey.start()
+  }
+
   // Restore position: the stored current page, or (after a resume, or when
   // the stored page is no longer visible) the first visible page that still
   // has an unanswered question the user hasn't passed.
@@ -146,6 +156,13 @@ export const FormPage = () => {
       window.scrollTo(0, 0)
     }
 
+    // Fired when the user presses Start on the start page. A restored session
+    // leaves the start page in setUpForm (before this handler is attached), so
+    // this only fires for a genuine fresh start.
+    const onStarted = () => {
+      events.onStartIntake()
+    }
+
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
       _,
       options
@@ -166,10 +183,12 @@ export const FormPage = () => {
         })
     }
 
+    survey.onStarted.add(onStarted)
     survey.onCurrentPageChanging.add(onPageChanging)
     survey.onCurrentPageChanged.add(onPageChanged)
     survey.onComplete.add(onComplete)
     return () => {
+      survey.onStarted.remove(onStarted)
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)

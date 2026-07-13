@@ -32,7 +32,7 @@ export const ResumePage = () => {
           visited: Object.keys(submission.answers),
           currentPage: null,
         })
-        navigate(ROUTES.FORM, { replace: true })
+        navigate(ROUTES.LANDING, { replace: true })
       })
       .catch((error) => {
         // 403 (already submitted) or 404 - start from scratch.

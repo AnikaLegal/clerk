@@ -1,11 +1,33 @@
 import { Model } from 'survey-core'
 
+import { LINKS } from '../consts'
 import { PAGES, QUESTIONS_BY_NAME } from '../questions'
 import { IntakeQuestion } from './types'
 import './functions'
 
 // Mirrors the old form's allowed upload extensions.
 export const ACCEPTED_UPLOAD_TYPES = '.png,.jpg,.jpeg,.pdf,.docx'
+
+// Content for the survey's start page (firstPageIsStartPage): the welcome /
+// intro screen shown before the questions begin, replacing the old standalone
+// landing splash page. Its built-in Start button begins the survey.
+const WELCOME_HTML = `
+  <h2>Welcome to the Anika Legal intake form!</h2>
+  <p>We're here to help you with your rental problem. In order for us to help
+  you, we need to ask you a series of simple questions to see whether you're
+  eligible. This questionnaire takes approximately 10 minutes to complete.</p>
+  <p>Before starting the intake form, please have the information ready about:</p>
+  <ul>
+    <li>Your rental property</li>
+    <li>Your rental provider</li>
+    <li>Your agent, if applicable</li>
+    <li>Your income</li>
+  </ul>
+  <p>You can have a look at our
+  <a href="${LINKS.COLLECTIONS_STATEMENT}">collection statement</a> if you have
+  any questions about why we need your information, and what we do with it. You
+  can also <a href="${LINKS.SERVICES}">learn more about our services</a>.</p>
+`
 
 const toElement = (q: IntakeQuestion): Record<string, unknown> => {
   const base = {
@@ -89,11 +111,25 @@ export const buildSurveyModel = (): Model => {
     // visibleIf skips a whole branch's pages via the built-in Next/Previous
     // buttons; element-level visibleIf hides individual questions within a
     // visible page. Together they replace the old form's askCondition loop.
-    pages: PAGES.map((page) => ({
-      name: page.name,
-      visibleIf: page.visibleIf,
-      elements: page.questions.map((name) => toElement(QUESTIONS_BY_NAME[name])),
-    })),
+    // The leading WELCOME page is the start page (firstPageIsStartPage below):
+    // it holds the intro and its Start button begins the survey. It carries no
+    // value, is excluded from the progress bar, and never appears in the
+    // question flow (survey.currentPage skips it).
+    pages: [
+      {
+        name: 'WELCOME',
+        elements: [{ type: 'html', name: 'WELCOME_INTRO', html: WELCOME_HTML }],
+      },
+      ...PAGES.map((page) => ({
+        name: page.name,
+        visibleIf: page.visibleIf,
+        elements: page.questions.map((name) =>
+          toElement(QUESTIONS_BY_NAME[name])
+        ),
+      })),
+    ],
+    firstPageIsStartPage: true,
+    startSurveyText: "Let's get started",
     showQuestionNumbers: 'off',
     showProgressBar: true,
     progressBarType: 'pages',

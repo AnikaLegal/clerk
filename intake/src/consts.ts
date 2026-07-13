@@ -1,11 +1,12 @@
 // Client side routes. All paths are relative to the router basename
 // (/intake/), which Django serves via a catch-all URL pattern.
 export const ROUTES = {
-  // Splash pages
+  // The form itself lives at the root: it opens on a SurveyJS start page
+  // (the welcome/intro screen) and the survey takes over from there.
   LANDING: '/',
+  // Other splash pages
   SUBMITTED: '/submitted/',
   NO_EMAIL: '/no-email/',
-  ABANDON: '/abandon/',
   // Eligibility exit pages
   GEOGRAPHY: '/geography/',
   LEGAL_SCOPE_COMPENSATION: '/legal-scope-compensation/',
@@ -16,8 +17,6 @@ export const ROUTES = {
   INELIGIBLE_ALREADY_REMOVED: '/ineligible/already-removed/',
   INELIGIBLE_VCAT_HEARING: '/ineligible/vcat-hearing/',
   BONDS_RECOVERY: '/bonds-recovery/',
-  // The form itself
-  FORM: '/form/',
   RESUME: '/resume/',
 } as const
 
