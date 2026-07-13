@@ -1,32 +1,29 @@
-/* Minimal chrome around the SurveyJS form; the survey itself uses the
-   default SurveyJS theme. */
+/* Styles for the intake splash pages and no-email form. The page chrome
+   (header/footer) and body font come from the public website stylesheets
+   loaded alongside this one; the survey itself uses the default SurveyJS
+   theme. */
 
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial, sans-serif;
-  color: #333;
+/* The website's components.css styles bare <form> elements as a centering
+   flex column (form { display: flex; flex-direction: column; align-items:
+   center }). That rule bleeds onto SurveyJS's own <form>, whose child then
+   shrink-wraps to min-content and collapses the survey to ~1px wide. Reset
+   the survey form back to block so SurveyJS controls its own layout. Scoped
+   to .intake-form so the no-email splash form keeps its intended flex layout. */
+.intake-form form {
+  display: block;
+  align-items: normal;
 }
 
-.intake-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  border-bottom: 1px solid #e8e8e8;
-  background: #fff;
-}
-
-.intake-header-logo {
-  height: 40px;
-}
-
-.intake-header-close {
-  font-size: 32px;
-  line-height: 1;
-  color: #666;
-  text-decoration: none;
+/* The website's navbar sizes the logo + charity badges purely through flex
+   layout (a h-[63px] row with no explicit image height). Loading the SPA's
+   stylesheet alongside disrupts that context, so the square badge images fall
+   back to their natural size (~650px) and shove the nav off the row. Pin the
+   logo-row images to the row height, matching how they render on the site.
+   Scoped to the h-[63px] desktop logo container so the mobile menu is
+   untouched. */
+header .h-\[63px\] img {
+  height: 63px;
+  width: auto;
 }
 
 .intake-splash {

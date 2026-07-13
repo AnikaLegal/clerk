@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom'
 
 import { events } from '../analytics'
-import logoUrl from '../assets/logo-color.svg'
 import { LINKS, ROUTES } from '../consts'
 
 export const LandingPage = () => (
   <div className="intake-splash">
-    <img src={logoUrl} alt="Anika Legal" className="intake-splash-logo" />
     <h1>Welcome to the Anika Legal intake form!</h1>
     <p>
       We're here to help you with your rental problem. In order for us to help

@@ -4,7 +4,6 @@ import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 
 import { events } from '../analytics'
-import { Header } from '../comps/Header'
 import { ROUTES } from '../consts'
 import { getExitRoute } from '../form/exits'
 import { buildSurveyModel } from '../form/model'
@@ -179,7 +178,6 @@ export const FormPage = () => {
 
   return (
     <div className="intake-form">
-      <Header />
       <Survey model={survey} />
     </div>
   )

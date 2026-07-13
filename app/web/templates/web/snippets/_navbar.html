@@ -90,7 +90,9 @@
       </div>
       <a href="{% url 'how-it-works' %}" class="py-2 font-semibold">How It Works</a>
       <a href="{% clerk_slugurl 'blog' %}" class="py-2 font-semibold">Resources</a>
-      <a href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-sm hidden lg:inline-flex">Get free help</button></a>
+      {% if not hide_intake_cta %}
+        <a href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-sm hidden lg:inline-flex">Get free help</button></a>
+      {% endif %}
     </nav>
 
     <!-- Mobile menu: checkbox toggle (no JS required) -->
@@ -159,9 +161,11 @@
 
         <a href="{% url 'refer' %}">Refer</a>
         <a href="{{ settings.web.LinkSettings.donate_url }}">Donate</a>
-        <div class="flex justify-center">
-          <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
-        </div>
+        {% if not hide_intake_cta %}
+          <div class="flex justify-center">
+            <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
+          </div>
+        {% endif %}
       </nav>
     </div>
   </div>

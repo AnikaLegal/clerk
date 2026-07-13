@@ -6,12 +6,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}">
+  <!-- Google fonts (match the public website) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Public website styles, so the shared header/footer render as they do on the site -->
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/global.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/components.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/daisyui.css' %}" />
+  <!-- The SPA's own styles (incl. SurveyJS) load after, so they win any clashes -->
   {% vite_hmr_client app="intake" %}
   {% vite_react_refresh app="intake" %}
   {% vite_asset 'main.tsx' app="intake" %}
 </head>
 <body>
+  {% include 'web/snippets/_navbar.html' %}
   <div id="app"></div>
+  {% include 'web/snippets/_footer.html' %}
   <script>
     window.REACT_CONTEXT = JSON.parse('{{ react_context|escapejs }}')
     window.SENTRY_CONTEXT = JSON.parse('{{ sentry_context|escapejs }}')
