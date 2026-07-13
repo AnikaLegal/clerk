@@ -26,6 +26,25 @@ header .h-\[63px\] img {
   width: auto;
 }
 
+/* SurveyJS renders its Previous / Next / Confirm buttons as <input> elements.
+   The website's components.css styles `form input` as a text field, and being
+   unlayered it beats daisyUI's cascade-layered button rules, so the daisyUI
+   classes we put on the buttons don't take on their own. Re-assert the daisyUI
+   button look here (unlayered + real specificity wins), reusing the theme's
+   colour variables. All nav buttons share the same solid primary style. */
+.intake-form input.d-btn {
+  width: auto;
+  height: 50px;
+  border: 1px solid transparent;
+  outline: none;
+  padding: 0 18px;
+  font-size: 15.75px;
+  line-height: 1;
+  letter-spacing: normal;
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
 .intake-splash {
   max-width: 640px;
   margin: 0 auto;
@@ -53,24 +72,6 @@ header .h-\[63px\] img {
   gap: 16px;
   margin-top: 32px;
   flex-wrap: wrap;
-}
-
-.intake-button {
-  display: inline-block;
-  padding: 12px 28px;
-  border: 2px solid #438fef;
-  border-radius: 28px;
-  color: #438fef;
-  background: #fff;
-  font-size: 17px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.intake-button-primary {
-  background: #438fef;
-  color: #fff;
 }
 
 .intake-noemail-form {

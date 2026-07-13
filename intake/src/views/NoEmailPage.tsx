@@ -89,7 +89,7 @@ export const NoEmailPage = () => {
           />
           I agree to share my details with Anika Legal by ticking this box.
         </label>
-        <button type="submit" className="intake-button intake-button-primary">
+        <button type="submit" className="d-btn d-btn-primary">
           Contact Us
         </button>
         {isSubmitted && <p>Contact request submitted</p>}

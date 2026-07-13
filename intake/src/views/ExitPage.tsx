@@ -21,13 +21,16 @@ export const ExitPage = () => {
       {content.body}
       <div className="intake-button-group">
         <button
-          className="intake-button intake-button-primary"
+          type="button"
+          className="d-btn d-btn-primary"
           onClick={() => navigate(-1)}
         >
           Go back
         </button>
-        <a href={LINKS.HOME} className="intake-button">
-          Return home
+        <a href={LINKS.HOME}>
+          <button type="button" className="d-btn d-btn-primary d-btn-soft">
+            Return home
+          </button>
         </a>
       </div>
     </div>

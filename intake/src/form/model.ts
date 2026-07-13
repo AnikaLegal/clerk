@@ -111,6 +111,23 @@ export const buildSurveyModel = (): Model => {
     storeOthersAsComment: false,
     completeText: 'Confirm',
   })
+  // Render the built-in navigation buttons (Previous / Next / Confirm) as
+  // daisyUI primary buttons so they match the public website. The default
+  // per-button classes carry SurveyJS's own `sd-btn` styles, which outrank
+  // daisyUI's low-specificity :where() rules, so clear them and keep only the
+  // daisyUI classes.
+  survey.css = {
+    navigationButton: 'd-btn d-btn-primary',
+    bodyNavigationButton: '',
+    navigation: {
+      prev: '',
+      next: '',
+      complete: '',
+      start: '',
+      preview: '',
+      edit: '',
+    },
+  }
   // Allow inline HTML (links etc) in question titles and descriptions.
   survey.onTextMarkdown.add((_, options) => {
     if (options.text.includes('<')) {

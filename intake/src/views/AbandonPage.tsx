@@ -14,13 +14,16 @@ export const AbandonPage = () => {
       </p>
       <div className="intake-button-group">
         <button
-          className="intake-button intake-button-primary"
+          type="button"
+          className="d-btn d-btn-primary"
           onClick={() => navigate(-1)}
         >
           Continue
         </button>
-        <a href={LINKS.HOME} className="intake-button">
-          Abandon case
+        <a href={LINKS.HOME}>
+          <button type="button" className="d-btn d-btn-primary d-btn-soft">
+            Abandon case
+          </button>
         </a>
       </div>
     </div>

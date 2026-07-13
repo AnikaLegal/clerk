@@ -26,15 +26,15 @@ export const LandingPage = () => (
       any questions about why we need your information, and what we do with it.
     </p>
     <div className="intake-button-group">
-      <Link
-        to={ROUTES.FORM}
-        className="intake-button intake-button-primary"
-        onClick={events.onStartIntake}
-      >
-        Let's get started
+      <Link to={ROUTES.FORM} onClick={events.onStartIntake}>
+        <button type="button" className="d-btn d-btn-primary">
+          Let's get started
+        </button>
       </Link>
-      <a href={LINKS.SERVICES} className="intake-button">
-        Learn more
+      <a href={LINKS.SERVICES}>
+        <button type="button" className="d-btn d-btn-primary d-btn-soft">
+          Learn more
+        </button>
       </a>
     </div>
   </div>
