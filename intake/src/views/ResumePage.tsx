@@ -30,7 +30,7 @@ export const ResumePage = () => {
           // Keys present on the wire are exactly the questions the user
           // passed; the form resumes at the first unanswered one.
           visited: Object.keys(submission.answers),
-          currentQuestion: null,
+          currentPage: null,
         })
         navigate(ROUTES.FORM, { replace: true })
       })

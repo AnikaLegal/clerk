@@ -1,6 +1,6 @@
 import { Model } from 'survey-core'
 
-import { QUESTIONS } from '../questions'
+import { PAGES, QUESTIONS_BY_NAME } from '../questions'
 import { IntakeQuestion } from './types'
 import './functions'
 
@@ -13,11 +13,14 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
     title: q.title,
     description: q.description,
     isRequired: q.required,
+    // Element-level visibility: pages can now hold several questions, so each
+    // question shows/hides on its own condition within a visible page.
+    visibleIf: q.visibleIf,
   }
   switch (q.type) {
     case 'DISPLAY':
       // html questions hold no value, so they never appear in survey.data.
-      return { type: 'html', name: q.name, html: q.html ?? '' }
+      return { type: 'html', name: q.name, html: q.html ?? '', visibleIf: q.visibleIf }
     case 'TEXT':
       return q.multiline
         ? { ...base, type: 'comment', autoGrow: true }
@@ -82,19 +85,21 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
 
 export const buildSurveyModel = (): Model => {
   const survey = new Model({
-    // One page per question: page name == question name, and page-level
-    // visibleIf means the built-in Next/Previous buttons skip non-matching
-    // branches (this replaces the old form's askCondition loop).
-    pages: QUESTIONS.map((q) => ({
-      name: q.name,
-      visibleIf: q.visibleIf,
-      elements: [toElement(q)],
+    // Questions are grouped into pages (see questions/pages.ts). A page-level
+    // visibleIf skips a whole branch's pages via the built-in Next/Previous
+    // buttons; element-level visibleIf hides individual questions within a
+    // visible page. Together they replace the old form's askCondition loop.
+    pages: PAGES.map((page) => ({
+      name: page.name,
+      visibleIf: page.visibleIf,
+      elements: page.questions.map((name) => toElement(QUESTIONS_BY_NAME[name])),
     })),
     showQuestionNumbers: 'off',
     showProgressBar: true,
     progressBarType: 'pages',
-    // Auto-advance after answering (the old form advanced on radio click).
-    // Checkboxes, long text and file uploads are excluded by SurveyJS.
+    // Auto-advance once every visible question on a page is answered (SurveyJS
+    // waits for the whole page, and never fires when the last answer is a
+    // checkbox, long text or file upload).
     autoAdvanceEnabled: true,
     autoAdvanceAllowComplete: false,
     // Keep answers when the user goes back and changes a branching answer;

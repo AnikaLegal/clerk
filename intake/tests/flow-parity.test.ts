@@ -5,8 +5,11 @@ import { Answers } from '../src/form/types'
 
 /**
  * Walk the survey page by page, answering from the persona's answer map,
- * and return the sequence of visited question names. Auto-advance is
- * disabled so the walk is deterministic.
+ * and return the sequence of visible question names encountered (in display
+ * order). Pages now hold several questions, so every question the persona
+ * answers is set before recording the page's visible questions - this lets
+ * intra-page conditional questions resolve. Auto-advance is disabled so the
+ * walk is deterministic.
  */
 const walk = (answers: Answers): string[] => {
   const survey = buildSurveyModel()
@@ -16,10 +19,16 @@ const walk = (answers: Answers): string[] => {
   while (guard++ < 200) {
     const page = survey.currentPage
     if (!page) break
-    seen.push(page.name)
-    const value = answers[page.name]
-    if (value !== undefined && value !== null) {
-      survey.setValue(page.name, value)
+    // Set every answer the persona has for this page's questions first, so
+    // conditional questions on the same page become visible.
+    for (const el of page.elements) {
+      const value = answers[el.name]
+      if (value !== undefined && value !== null) {
+        survey.setValue(el.name, value)
+      }
+    }
+    for (const el of page.elements) {
+      if (el.isVisible) seen.push(el.name)
     }
     if (survey.isLastPage) break
     const before = survey.currentPage.name

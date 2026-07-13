@@ -8,14 +8,15 @@ export interface StoredState {
   // Question names the user has passed via Next. Distinguishes "skipped"
   // (null on the wire) from "never reached" (absent on the wire).
   visited: string[]
-  currentQuestion: string | null
+  // Name of the page the user is on, so the form reopens where they left off.
+  currentPage: string | null
 }
 
 export const EMPTY_STATE: StoredState = {
   submissionId: null,
   data: {},
   visited: [],
-  currentQuestion: null,
+  currentPage: null,
 }
 
 export const loadState = (): StoredState => {
@@ -27,7 +28,7 @@ export const loadState = (): StoredState => {
       submissionId: parsed.submissionId ?? null,
       data: parsed.data ?? {},
       visited: Array.isArray(parsed.visited) ? parsed.visited : [],
-      currentQuestion: parsed.currentQuestion ?? null,
+      currentPage: parsed.currentPage ?? null,
     }
   } catch {
     return { ...EMPTY_STATE }

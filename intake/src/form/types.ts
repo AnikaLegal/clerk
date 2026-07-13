@@ -46,6 +46,18 @@ export interface IntakeQuestion {
   placeholder?: string
 }
 
+// A survey page groups one or more related questions. Questions keep their
+// individual definitions (and element-level visibleIf); the page just decides
+// which ones render together. `visibleIf` is a page-level guard used when
+// every question on the page belongs to a single branch, so the whole page is
+// skipped when that branch isn't taken.
+export interface IntakePage {
+  name: string
+  visibleIf?: string
+  // Ordered question names on the page, including any DISPLAY intros.
+  questions: string[]
+}
+
 import type { components } from '../api/types.generated'
 
 // A file upload as returned by POST /api/upload/ and stored in answers.

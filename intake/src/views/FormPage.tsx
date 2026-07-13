@@ -23,11 +23,22 @@ interface FormState {
   visited: Set<string>
 }
 
+interface PageElement {
+  name: string
+  isVisible: boolean
+}
+
 const isBlank = (value: unknown): boolean =>
   value === undefined ||
   value === null ||
   value === '' ||
   (Array.isArray(value) && value.length === 0)
+
+// Names of the questions currently visible on a page, in display order. A
+// hidden conditional question is excluded so its side effect / exit predicate
+// isn't evaluated against an absent answer.
+const visibleNames = (page: { elements: PageElement[] }): string[] =>
+  page.elements.filter((el) => el.isVisible).map((el) => el.name)
 
 const setUpForm = (): FormState => {
   const stored = loadState()
@@ -42,31 +53,35 @@ const setUpForm = (): FormState => {
       submissionId: saver.submissionId,
       data: survey.data,
       visited: [...visited],
-      currentQuestion: survey.currentPage?.name ?? null,
+      currentPage: survey.currentPage?.name ?? null,
     })
   }
 
-  // Restore position: the stored current question, or (after a resume, or
-  // when the stored question is no longer visible) the first question on
-  // the active branch the user hasn't passed yet.
+  // Restore position: the stored current page, or (after a resume, or when
+  // the stored page is no longer visible) the first visible page that still
+  // has an unanswered question the user hasn't passed.
   let restored = false
-  if (stored.currentQuestion) {
-    const page = survey.getPageByName(stored.currentQuestion)
+  if (stored.currentPage) {
+    const page = survey.getPageByName(stored.currentPage)
     if (page && page.isVisible) {
       survey.currentPage = page
       restored = true
     }
   }
   if (!restored && visited.size > 0) {
-    const nextPage = survey.pages.find((page) => {
-      const question = QUESTIONS_BY_NAME[page.name]
-      return (
+    const nextPage = survey.pages.find(
+      (page) =>
         page.isVisible &&
-        question &&
-        question.type !== 'DISPLAY' &&
-        !visited.has(page.name)
-      )
-    })
+        (page.elements as unknown as PageElement[]).some((el) => {
+          const question = QUESTIONS_BY_NAME[el.name]
+          return (
+            el.isVisible &&
+            question &&
+            question.type !== 'DISPLAY' &&
+            !visited.has(el.name)
+          )
+        })
+    )
     if (nextPage) {
       survey.currentPage = nextPage
     }
@@ -85,7 +100,7 @@ export const FormPage = () => {
         submissionId: saver.submissionId,
         data: survey.data,
         visited: [...visited],
-        currentQuestion: survey.currentPage?.name ?? null,
+        currentPage: survey.currentPage?.name ?? null,
       })
     }
 
@@ -95,24 +110,35 @@ export const FormPage = () => {
       if (!options.isGoingForward) return
       const page = options.oldCurrentPage
       if (!page) return
-      const question = QUESTIONS_BY_NAME[page.name]
-      // Apply skip defaults for questions left blank (e.g. dependants -> 0).
-      if (
-        question?.skipDefault !== undefined &&
-        isBlank(survey.getValue(page.name))
-      ) {
-        survey.setValue(page.name, question.skipDefault)
+      const names = visibleNames(page as unknown as { elements: PageElement[] })
+      // Apply skip defaults for questions left blank (e.g. dependants -> 0)
+      // and record every question on the page as passed.
+      for (const name of names) {
+        const question = QUESTIONS_BY_NAME[name]
+        if (!question || question.type === 'DISPLAY') continue
+        if (
+          question.skipDefault !== undefined &&
+          isBlank(survey.getValue(name))
+        ) {
+          survey.setValue(name, question.skipDefault)
+        }
+        visited.add(name)
       }
-      visited.add(page.name)
       const answers = serializeAnswers(survey, visited)
-      runSideEffect(page.name, { answers, saver })
-      persist()
-      const exit = getExitRoute(page.name, survey.data as Answers)
-      if (exit) {
-        options.allow = false
-        persist()
-        navigate(exit)
+      // Fire each question's side effect, then check its exit, in page order.
+      // The first exit that matches ejects the user (later questions on the
+      // page are treated as not reached, as they would be one-per-page).
+      for (const name of names) {
+        runSideEffect(name, { answers, saver })
+        const exit = getExitRoute(name, survey.data as Answers)
+        if (exit) {
+          options.allow = false
+          persist()
+          navigate(exit)
+          return
+        }
       }
+      persist()
     }
 
     const onPageChanged = () => {

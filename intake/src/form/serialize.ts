@@ -25,8 +25,11 @@ export const serializeAnswers = (
   const answers: Answers = {}
   for (const q of QUESTIONS) {
     if (q.type === 'DISPLAY') continue
-    const page = survey.getPageByName(q.name)
-    if (!page || !page.isVisible || !visited.has(q.name)) continue
+    // Questions now share pages, so visibility is read off the question
+    // itself (its element-level visibleIf, which also reflects its page being
+    // hidden), not a page named after it.
+    const question = survey.getQuestionByName(q.name)
+    if (!question || !question.isVisible || !visited.has(q.name)) continue
     let value = survey.getValue(q.name) as AnswerValue
     if (q.type === 'UPLOAD') {
       const items = (value ?? []) as unknown as SurveyFileItem[]
