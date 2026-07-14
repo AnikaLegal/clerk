@@ -3,15 +3,20 @@
    loaded alongside this one; the survey itself uses the default SurveyJS
    theme. */
 
-/* The website's components.css styles bare <form> elements as a centering
-   flex column (form { display: flex; flex-direction: column; align-items:
-   center }). That rule bleeds onto SurveyJS's own <form>, whose child then
-   shrink-wraps to min-content and collapses the survey to ~1px wide. Reset
-   the survey form back to block so SurveyJS controls its own layout. Scoped
-   to .intake-form so the no-email splash form keeps its intended flex layout. */
+/* The website's components.css styles bare <form> elements: a centering flex
+   column (form { display: flex; flex-direction: column; align-items: center }),
+   and under 800px a full-viewport breakout (width: 100vw with negative side
+   margins + padding). Both bleed onto SurveyJS's own <form> - the flex rule
+   collapses the survey to ~1px wide, and the breakout shifts it off the left
+   edge of the page. Reset the survey form to a plain full-width block so
+   SurveyJS controls its own layout. Scoped to .intake-form so the no-email
+   splash form keeps its intended flex layout. */
 .intake-form form {
   display: block;
   align-items: normal;
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 /* The website's navbar sizes the logo + charity badges purely through flex
