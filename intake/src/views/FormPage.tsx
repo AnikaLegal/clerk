@@ -102,17 +102,20 @@ const setUpForm = (): FormState => {
   return { survey, saver, visited }
 }
 
-// State for the progress stepper. section is -1 on the WELCOME page (which is
-// not part of any section, so the stepper hides there); page / pageCount drive
-// the "Page x of y" count over the question pages. Both the leading WELCOME
-// page (visible page 0) and the trailing SUBMIT page are excluded from the
-// total, so the first question reads as "Page 1" and the count never includes
-// the final agreement page.
-const readProgress = (survey: Model) => ({
-  section: sectionIndexForPage(survey.currentPage?.name),
-  page: survey.currentPageNo,
-  pageCount: survey.visiblePages.length - 2,
-})
+// State for the progress indicator. section is -1 on the WELCOME and SUBMIT
+// pages, which sit outside the sectioned flow, so both the stepper and the
+// "Page x of y" count hide there. page / pageCount drive the count over the
+// question pages; the leading WELCOME page (visible page 0) and the trailing
+// SUBMIT page are both excluded from the total, so the first question reads as
+// "Page 1" and the count never includes the final agreement page.
+const readProgress = (survey: Model) => {
+  const name = survey.currentPage?.name
+  return {
+    section: name === SUBMIT_PAGE ? -1 : sectionIndexForPage(name),
+    page: survey.currentPageNo,
+    pageCount: survey.visiblePages.length - 2,
+  }
+}
 
 export const FormPage = () => {
   const navigate = useNavigate()
@@ -213,11 +216,10 @@ export const FormPage = () => {
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
-      // Hide the count on WELCOME (section -1, where the stepper is also hidden)
-      // and on the final SUBMIT page, which is not counted as a page.
+      // The count follows the stepper: hidden wherever section is -1, i.e. on
+      // the WELCOME and SUBMIT pages.
       pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
-      pageCountItem.visible =
-        p.section >= 0 && survey.currentPage?.name !== SUBMIT_PAGE
+      pageCountItem.visible = p.section >= 0
       setProgress(p)
     }
     syncPage()
