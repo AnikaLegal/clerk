@@ -48,6 +48,9 @@ header .h-\[63px\] img {
    colour variables. All nav buttons share the same solid primary style. */
 .intake-form input.d-btn {
   width: auto;
+  /* A shared minimum so the short nav buttons (Previous / Next / Confirm) are a
+     consistent size; longer labels grow past it. */
+  min-width: 110px;
   height: 50px;
   border: 1px solid transparent;
   outline: none;
