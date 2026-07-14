@@ -66,9 +66,22 @@ header .h-\[63px\] img {
   margin-bottom: 32px;
 }
 
-.intake-splash h1 {
+/* Consistent heading typography across the whole intake flow: the splash /
+   exit pages and the survey's DISPLAY blocks. SurveyJS applies its own heading
+   styling (Open Sans, 48px, bold) to <h2> inside .sd-html, which clashes with
+   the splash pages and the surrounding site. Pin every intake heading to the
+   site's serif heading font at a single size that suits the narrow form
+   column. The .sd-html selector outranks SurveyJS's own .sd-html h2 rule. */
+.intake-splash h1,
+.intake-splash h2,
+.intake-form .sd-html h1,
+.intake-form .sd-html h2,
+.intake-form .sd-html h3 {
+  font-family: var(--font-serif);
   font-size: 28px;
+  font-weight: 400;
   line-height: 1.3;
+  margin: 0 0 1rem;
 }
 
 .intake-splash p,
