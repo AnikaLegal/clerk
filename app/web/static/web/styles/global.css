@@ -142,11 +142,11 @@ header {
   z-index: 1;
   max-width: 1240px;
   width: calc(100vw - 2 * var(--container-wide-padding));
-  height: var(--header-height);
+  min-height: var(--header-height);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  padding-top: 30px;
+  padding-top: 8px;
 }
 
 header a {
