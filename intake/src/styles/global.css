@@ -99,6 +99,20 @@ header .h-\[63px\] img {
   margin: 0 0 1rem;
 }
 
+/* SurveyJS renders .sd-html list items a couple of pixels larger than its
+   paragraphs; match them to the body copy so the start-page "have ready" list
+   sits consistently with the text around it. */
+.intake-form .sd-html ul {
+  padding-left: 22px;
+  margin-bottom: 1rem;
+}
+
+.intake-form .sd-html li {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
 .intake-splash p,
 .intake-splash li {
   font-size: 17px;
