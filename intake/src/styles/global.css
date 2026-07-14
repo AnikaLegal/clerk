@@ -6,17 +6,21 @@
 /* The website's components.css styles bare <form> elements: a centering flex
    column (form { display: flex; flex-direction: column; align-items: center }),
    and under 800px a full-viewport breakout (width: 100vw with negative side
-   margins + padding). Both bleed onto SurveyJS's own <form> - the flex rule
-   collapses the survey to ~1px wide, and the breakout shifts it off the left
-   edge of the page. Reset the survey form to a plain full-width block so
-   SurveyJS controls its own layout. Scoped to .intake-form so the no-email
-   splash form keeps its intended flex layout. */
+   margins + padding) plus z-index: 1. All bleed onto SurveyJS's own <form> -
+   the flex rule collapses the survey to ~1px wide, the breakout shifts it off
+   the left edge, and the z-index (with SurveyJS's position: relative on the
+   form) lifts the survey into the root stacking context at z-index 1, tying the
+   site header's z-index and, being later in the DOM, painting the form over the
+   mobile menu overlay. Reset the survey form to a plain full-width block in the
+   normal stacking order so SurveyJS controls its own layout. Scoped to
+   .intake-form so the no-email splash form keeps its intended flex layout. */
 .intake-form form {
   display: block;
   align-items: normal;
   width: auto;
   margin: 0;
   padding: 0;
+  z-index: auto;
 }
 
 /* The website's navbar sizes the logo + charity badges purely through flex
