@@ -6,7 +6,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     name: 'INTRO',
     required: false,
     type: 'DISPLAY',
-    html: "<h2>First of all, congratulations on taking the first step in solving your rental issues.</h2><p>Once you submit this form, we'll give you a phone call or email in a few business days to talk about how we can help you.</p>",
+    html: "<h2>First of all, congratulations on taking the first step in solving your rental issues.</h2><p>Once you submit this form, we'll contact you in a few business days to talk about how we can help you.</p>",
   },
   {
     name: 'ISSUES',
