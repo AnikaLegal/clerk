@@ -42,5 +42,5 @@ export const QUESTIONS: IntakeQuestion[] = [
 export const QUESTIONS_BY_NAME: Record<string, IntakeQuestion> =
   Object.fromEntries(QUESTIONS.map((q) => [q.name, q]))
 
-export { PAGES, PAGE_BY_NAME, EMAIL_PAGE } from './pages'
+export { PAGES, PAGE_BY_NAME, EMAIL_PAGE, SUBMIT_PAGE } from './pages'
 export { SECTIONS, sectionIndexForPage } from './sections'

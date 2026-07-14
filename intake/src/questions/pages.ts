@@ -4,6 +4,10 @@ import { IntakePage } from '../form/types'
 // not have an email address" button (see views/FormPage.tsx).
 export const EMAIL_PAGE = 'ABOUT_EMAIL'
 
+// The final agreement page. Its Confirm button performs the submit; it is not
+// shown in or counted by the "Page x of y" progress (see views/FormPage.tsx).
+export const SUBMIT_PAGE = 'SUBMIT'
+
 // Branch guard expressions, kept in step with the question-level visibleIf
 // values in the modules below. When every question on a page shares a branch
 // condition, the page carries it so SurveyJS skips the whole page off-branch.
@@ -257,7 +261,7 @@ export const PAGES: IntakePage[] = [
   },
 
   // Agreement + submit
-  { name: 'SUBMIT', questions: ['SUBMIT'] },
+  { name: SUBMIT_PAGE, questions: ['SUBMIT'] },
 ]
 
 export const PAGE_BY_NAME: Record<string, IntakePage> = Object.fromEntries(

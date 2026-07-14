@@ -15,7 +15,12 @@ import { clearState, loadState, saveState } from '../form/storage'
 import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
-import { EMAIL_PAGE, QUESTIONS_BY_NAME, sectionIndexForPage } from '../questions'
+import {
+  EMAIL_PAGE,
+  QUESTIONS_BY_NAME,
+  sectionIndexForPage,
+  SUBMIT_PAGE,
+} from '../questions'
 
 interface FormState {
   survey: Model
@@ -99,12 +104,14 @@ const setUpForm = (): FormState => {
 
 // State for the progress stepper. section is -1 on the WELCOME page (which is
 // not part of any section, so the stepper hides there); page / pageCount drive
-// the "Page x of y" count over the question pages, excluding WELCOME (visible
-// page 0) so the first question reads as "Page 1".
+// the "Page x of y" count over the question pages. Both the leading WELCOME
+// page (visible page 0) and the trailing SUBMIT page are excluded from the
+// total, so the first question reads as "Page 1" and the count never includes
+// the final agreement page.
 const readProgress = (survey: Model) => ({
   section: sectionIndexForPage(survey.currentPage?.name),
   page: survey.currentPageNo,
-  pageCount: survey.visiblePages.length - 1,
+  pageCount: survey.visiblePages.length - 2,
 })
 
 export const FormPage = () => {
@@ -206,10 +213,11 @@ export const FormPage = () => {
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
-      // section is -1 on WELCOME, where the count is hidden along with the
-      // stepper.
+      // Hide the count on WELCOME (section -1, where the stepper is also hidden)
+      // and on the final SUBMIT page, which is not counted as a page.
       pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
-      pageCountItem.visible = p.section >= 0
+      pageCountItem.visible =
+        p.section >= 0 && survey.currentPage?.name !== SUBMIT_PAGE
       setProgress(p)
     }
     syncPage()
