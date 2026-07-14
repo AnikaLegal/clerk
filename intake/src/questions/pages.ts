@@ -1,5 +1,9 @@
 import { IntakePage } from '../form/types'
 
+// The email question lives on its own page so it can carry a dedicated "I do
+// not have an email address" button (see views/FormPage.tsx).
+export const EMAIL_PAGE = 'ABOUT_EMAIL'
+
 // Branch guard expressions, kept in step with the question-level visibleIf
 // values in the modules below. When every question on a page shares a branch
 // condition, the page carries it so SurveyJS skips the whole page off-branch.
@@ -49,9 +53,10 @@ export const PAGES: IntakePage[] = [
   },
 
   // About you
+  { name: EMAIL_PAGE, questions: ['EMAIL'] },
   {
-    name: 'ABOUT_DETAILS',
-    questions: ['EMAIL', 'FIRST_NAME', 'LAST_NAME', 'PREFERRED_NAME'],
+    name: 'ABOUT_NAME',
+    questions: ['FIRST_NAME', 'LAST_NAME', 'PREFERRED_NAME'],
   },
   { name: 'ABOUT_CONTACT', questions: ['PHONE', 'AVAILABILITY'] },
 

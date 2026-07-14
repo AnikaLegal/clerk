@@ -32,7 +32,11 @@ header .h-\[63px\] img {
    into the survey - swaps the accent to the theme's primary colour. */
 .intake-form {
   --sjs-primary-backcolor: var(--color-primary);
-  --sjs-primary-backcolor-light: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --sjs-primary-backcolor-light: color-mix(
+    in oklab,
+    var(--color-primary) 10%,
+    transparent
+  );
   --sjs-primary-forecolor: var(--color-primary-content);
 }
 
@@ -53,6 +57,14 @@ header .h-\[63px\] img {
   letter-spacing: normal;
   background-color: var(--color-primary);
   color: var(--color-primary-content);
+}
+
+/* Secondary variant for nav buttons (e.g. "I don't have an email address"):
+   a soft primary tint instead of the solid fill, so it reads as an
+   alternative to the primary Next action. Overrides the solid colours above. */
+.intake-form input.intake-btn-secondary {
+  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
 }
 
 .intake-splash {

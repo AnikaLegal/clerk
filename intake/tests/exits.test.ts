@@ -33,11 +33,6 @@ describe('eligibility exits', () => {
     ).toBeUndefined()
   })
 
-  it('routes users without an email to the no-email page', () => {
-    expect(getExitRoute('EMAIL', { EMAIL: null })).toBe(ROUTES.NO_EMAIL)
-    expect(getExitRoute('EMAIL', { EMAIL: 'a@b.com' })).toBeUndefined()
-  })
-
   it('exits repairs users who already have a VCAT order', () => {
     expect(
       getExitRoute('REPAIRS_VCAT', { REPAIRS_VCAT: ['CAV', 'GOTTEN_VCAT'] })

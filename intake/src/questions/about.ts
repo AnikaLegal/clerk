@@ -3,11 +3,11 @@ import { IntakeQuestion } from '../form/types'
 export const ABOUT_QUESTIONS: IntakeQuestion[] = [
   {
     name: 'EMAIL',
-    required: false,
+    required: true,
     type: 'EMAIL',
     title: "What's the best <strong>email</strong> to reach you?",
     description:
-      "We'll only use this to contact you about your request. We won't share your details. If you do not have an email address, leave this blank and continue.",
+      "We'll only use this to contact you about your request. We won't share your details.",
   },
   {
     name: 'FIRST_NAME',

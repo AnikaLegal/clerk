@@ -18,8 +18,6 @@ export const EXITS: Record<string, (data: Answers) => string | undefined> = {
     d.IS_VICTORIAN_TENANT ? undefined : ROUTES.GEOGRAPHY,
   INELIGIBLE_CHOICE: (d) =>
     d.INELIGIBLE_CHOICE ? undefined : ROUTES.INELIGIBLE_MEANS,
-  // Leaving EMAIL blank routes to the no-email contact fallback.
-  EMAIL: (d) => (d.EMAIL ? undefined : ROUTES.NO_EMAIL),
   REPAIRS_VCAT: (d) =>
     Array.isArray(d.REPAIRS_VCAT) &&
     (d.REPAIRS_VCAT as string[]).includes('GOTTEN_VCAT')

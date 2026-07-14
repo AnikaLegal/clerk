@@ -14,7 +14,7 @@ import { clearState, loadState, saveState } from '../form/storage'
 import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
-import { QUESTIONS_BY_NAME } from '../questions'
+import { EMAIL_PAGE, QUESTIONS_BY_NAME } from '../questions'
 
 interface FormState {
   survey: Model
@@ -104,6 +104,21 @@ export const FormPage = () => {
   const { survey, saver, visited } = useMemo(setUpForm, [])
 
   useEffect(() => {
+    // A dedicated "I don't have an email address" navigation button that routes
+    // to the no-email contact fallback. It sits in the survey's navigation bar
+    // beside Previous / Next and is shown only while the email page is current.
+    const noEmailItem = survey.addNavigationItem({
+      id: 'nav-no-email',
+      title: "I don't have an email address",
+      innerCss: 'd-btn intake-btn-secondary',
+      visible: false,
+      action: () => navigate(ROUTES.NO_EMAIL),
+    })
+    const syncEmailPage = () => {
+      noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
+    }
+    syncEmailPage()
+
     const persist = () => {
       saveState({
         submissionId: saver.submissionId,
@@ -154,6 +169,7 @@ export const FormPage = () => {
       persist()
       saver.schedulePatch(serializeAnswers(survey, visited))
       window.scrollTo(0, 0)
+      syncEmailPage()
     }
 
     // Fired when the user presses Start on the start page. A restored session
@@ -161,6 +177,7 @@ export const FormPage = () => {
     // this only fires for a genuine fresh start.
     const onStarted = () => {
       events.onStartIntake()
+      syncEmailPage()
     }
 
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
