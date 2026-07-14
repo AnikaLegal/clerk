@@ -124,7 +124,11 @@ header .h-\[63px\] img {
 .intake-progress {
   max-width: 900px;
   margin: 0 auto;
-  padding: 12px 24px 40px;
+  /* The end dots sit at the row's edges (the bars flex to fill), so this
+     horizontal padding pulls them inward, leaving room for the current
+     section's centred label (widest under the first / last dots) to stay
+     within the page on narrow screens. */
+  padding: 12px 52px 40px;
 }
 
 .intake-progress__steps {
@@ -198,9 +202,12 @@ header .h-\[63px\] img {
 
 .intake-progress__bar {
   flex: 1;
-  min-width: 12px;
+  /* A small minimum so the six-dot row still fits inside the padded container
+     on narrow screens (rather than overflowing and pushing the end dots back
+     out to the edges). */
+  min-width: 8px;
   height: 2px;
-  margin: 0 6px;
+  margin: 0 2px;
   background-color: #ddd;
 }
 
