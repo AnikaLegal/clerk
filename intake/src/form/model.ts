@@ -135,8 +135,9 @@ export const buildSurveyModel = (): Model => {
     firstPageIsStartPage: true,
     startSurveyText: "Let's get started",
     showQuestionNumbers: 'off',
-    showProgressBar: true,
-    progressBarType: 'pages',
+    // The built-in per-page progress bar is replaced by a custom section-based
+    // stepper rendered in FormPage (see comps/SectionProgress.tsx).
+    showProgressBar: false,
     // Auto-advance once every visible question on a page is answered (SurveyJS
     // waits for the whole page, and never fires when the last answer is a
     // checkbox, long text or file upload).

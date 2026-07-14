@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 
 import { events } from '../analytics'
+import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
 import { getExitRoute } from '../form/exits'
 import { buildSurveyModel } from '../form/model'
@@ -14,7 +15,7 @@ import { clearState, loadState, saveState } from '../form/storage'
 import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
-import { EMAIL_PAGE, QUESTIONS_BY_NAME } from '../questions'
+import { EMAIL_PAGE, QUESTIONS_BY_NAME, sectionIndexForPage } from '../questions'
 
 interface FormState {
   survey: Model
@@ -99,9 +100,15 @@ const setUpForm = (): FormState => {
   return { survey, saver, visited }
 }
 
+// The section shown in the progress stepper, or -1 while the welcome start page
+// is up (currentPage skips the start page, so also guard on isShowStartingPage).
+const currentSection = (survey: Model): number =>
+  survey.isShowStartingPage ? -1 : sectionIndexForPage(survey.currentPage?.name)
+
 export const FormPage = () => {
   const navigate = useNavigate()
   const { survey, saver, visited } = useMemo(setUpForm, [])
+  const [section, setSection] = useState(() => currentSection(survey))
 
   useEffect(() => {
     // A dedicated "I don't have an email address" navigation button that routes
@@ -114,10 +121,13 @@ export const FormPage = () => {
       visible: false,
       action: () => navigate(ROUTES.NO_EMAIL),
     })
-    const syncEmailPage = () => {
+    // Keep the per-page UI in sync with the current page: the no-email button's
+    // visibility and the progress stepper's active section.
+    const syncPage = () => {
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
+      setSection(currentSection(survey))
     }
-    syncEmailPage()
+    syncPage()
 
     const persist = () => {
       saveState({
@@ -169,7 +179,7 @@ export const FormPage = () => {
       persist()
       saver.schedulePatch(serializeAnswers(survey, visited))
       window.scrollTo(0, 0)
-      syncEmailPage()
+      syncPage()
     }
 
     // Fired when the user presses Start on the start page. A restored session
@@ -177,7 +187,7 @@ export const FormPage = () => {
     // this only fires for a genuine fresh start.
     const onStarted = () => {
       events.onStartIntake()
-      syncEmailPage()
+      syncPage()
     }
 
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
@@ -214,6 +224,7 @@ export const FormPage = () => {
 
   return (
     <div className="intake-form">
+      {section >= 0 && <SectionProgress current={section} />}
       <Survey model={survey} />
     </div>
   )

@@ -38,6 +38,10 @@ header .h-\[63px\] img {
     transparent
   );
   --sjs-primary-forecolor: var(--color-primary-content);
+  /* Match the survey's own dim background so the section stepper rendered above
+     it reads as the top of the page content (where SurveyJS's progress bar
+     sat), rather than floating in the white header band. */
+  background-color: var(--sjs-general-backcolor-dim, #f3f3f3);
 }
 
 /* SurveyJS renders its Previous / Next / Confirm buttons as <input> elements.
@@ -88,6 +92,69 @@ header .h-\[63px\] img {
   padding: 8px 16px;
   border-radius: 6px;
   box-shadow: none;
+}
+
+/* Section-based progress stepper (comps/SectionProgress.tsx), shown above the
+   survey in place of SurveyJS's per-page progress bar. A row of connected dots
+   with the current section's label beneath it. */
+.intake-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 24px 40px;
+}
+
+.intake-progress__step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+}
+
+.intake-progress__step.is-current {
+  border-color: var(--color-primary);
+}
+
+.intake-progress__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccc;
+}
+
+.intake-progress__step.is-done .intake-progress__dot,
+.intake-progress__step.is-current .intake-progress__dot {
+  background-color: var(--color-primary);
+}
+
+.intake-progress__label {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.intake-progress__bar {
+  flex: 1;
+  min-width: 12px;
+  height: 2px;
+  margin: 0 6px;
+  background-color: #ddd;
+}
+
+.intake-progress__bar.is-done {
+  background-color: var(--color-primary);
 }
 
 .intake-splash {
