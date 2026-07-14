@@ -149,6 +149,10 @@ export const FormPage = () => {
   useEffect(() => {
     const target = (location.state as { page?: string } | null)?.page
     if (!target || lastPage.current === target) return
+    // While the welcome start page is up the survey has not begun; ignore any
+    // page named in a leftover history entry (e.g. returning via Back after a
+    // submit cleared the saved state) so Start always begins at the first page.
+    if (survey.isShowStartingPage) return
     if (survey.currentPage?.name === target) {
       lastPage.current = target
       return

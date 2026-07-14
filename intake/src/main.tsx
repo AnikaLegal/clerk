@@ -13,7 +13,7 @@ const root = document.getElementById('app')
 if (root) {
   createRoot(root).render(
     <ErrorBoundary>
-      <BrowserRouter basename="/intake">
+      <BrowserRouter basename="/intake/">
         <AppRoutes />
       </BrowserRouter>
     </ErrorBoundary>
