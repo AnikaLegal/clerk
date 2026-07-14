@@ -143,6 +143,10 @@ export const buildSurveyModel = (): Model => {
     // checkbox, long text or file upload).
     autoAdvanceEnabled: true,
     autoAdvanceAllowComplete: false,
+    // On each page change move keyboard focus to the first question, so tabbing
+    // after Previous / Next continues into the new page instead of past the
+    // button that was just activated.
+    autoFocusFirstQuestion: true,
     // Keep answers when the user goes back and changes a branching answer;
     // serializeAnswers filters out answers from branches no longer taken.
     clearInvisibleValues: 'none',
