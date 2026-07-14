@@ -55,7 +55,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
       { value: true, text: 'Yes' },
       { value: false, text: 'No' },
     ],
-    title: 'Do you speak a <strong>first</strong> language other than English?',
+    title: 'Do you speak a <strong>first language</strong> other than English?',
   },
   {
     name: 'INTERPRETER',
@@ -76,7 +76,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     type: 'TEXT',
     title:
-      'What is your <strong>preferred</strong> language other than English?',
+      'What is your <strong>preferred language</strong> other than English?',
     visibleIf: '{CAN_SPEAK_NON_ENGLISH} = true',
   },
   {
