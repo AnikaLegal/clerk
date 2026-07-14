@@ -14,9 +14,9 @@ import { Answers } from '../src/form/types'
 const walk = (answers: Answers): string[] => {
   const survey = buildSurveyModel()
   survey.autoAdvanceEnabled = false
-  // Leave the start page (firstPageIsStartPage) so the walk begins on the
-  // first real question page.
-  survey.start()
+  // Advance past the leading WELCOME page (intro only, no answers) so the walk
+  // begins on the first real question page.
+  survey.nextPage()
   const seen: string[] = []
   let guard = 0
   while (guard++ < 200) {

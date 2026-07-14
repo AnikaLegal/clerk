@@ -7,7 +7,7 @@ import { events } from '../analytics'
 import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
 import { getExitRoute } from '../form/exits'
-import { buildSurveyModel } from '../form/model'
+import { buildSurveyModel, WELCOME_PAGE } from '../form/model'
 import { SubmissionSaver } from '../form/save'
 import { serializeAnswers } from '../form/serialize'
 import { runSideEffect } from '../form/side-effects'
@@ -57,19 +57,10 @@ const setUpForm = (): FormState => {
     })
   }
 
-  // A returning or resuming visitor (with stored progress) skips the start
-  // page and picks up where they left off; a brand-new visitor stays on the
-  // start page until they press Start. Leaving the start page must happen
-  // before restoring a position, as currentPage only tracks real pages once
-  // the survey is running. This runs before onStarted is wired up in the
-  // effect below, so restoring here does not fire the startIntake event.
-  if (visited.size > 0 || stored.currentPage) {
-    survey.start()
-  }
-
   // Restore position: the stored current page, or (after a resume, or when
   // the stored page is no longer visible) the first visible page that still
-  // has an unanswered question the user hasn't passed.
+  // has an unanswered question the user hasn't passed. A brand-new visitor has
+  // no stored position and opens on the leading WELCOME page.
   let restored = false
   if (stored.currentPage) {
     const page = survey.getPageByName(stored.currentPage)
@@ -97,18 +88,23 @@ const setUpForm = (): FormState => {
     }
   }
 
+  // The WELCOME page's Next button reads "Let's get started"; every other page
+  // keeps the default. Set it before the first render (syncPage maintains it on
+  // later page changes) so a fresh visitor never sees the default label flash.
+  survey.pageNextText =
+    survey.currentPage?.name === WELCOME_PAGE ? "Let's get started" : 'Next'
+
   return { survey, saver, visited }
 }
 
-// State for the progress stepper. section is -1 while the welcome start page is
-// up (currentPage skips the start page, so also guard on isShowStartingPage);
-// page / pageCount drive the "Page x of y" count over the visible pages.
+// State for the progress stepper. section is -1 on the WELCOME page (which is
+// not part of any section, so the stepper hides there); page / pageCount drive
+// the "Page x of y" count over the question pages, excluding WELCOME (visible
+// page 0) so the first question reads as "Page 1".
 const readProgress = (survey: Model) => ({
-  section: survey.isShowStartingPage
-    ? -1
-    : sectionIndexForPage(survey.currentPage?.name),
-  page: survey.currentPageNo + 1,
-  pageCount: survey.visiblePages.length,
+  section: sectionIndexForPage(survey.currentPage?.name),
+  page: survey.currentPageNo,
+  pageCount: survey.visiblePages.length - 1,
 })
 
 export const FormPage = () => {
@@ -129,6 +125,9 @@ export const FormPage = () => {
   // backward move via the survey's Previous button steps back through history
   // rather than pushing a duplicate entry.
   const goingForward = useRef(true)
+  // Ensures the startIntake analytics event fires only once, even if the user
+  // navigates back to WELCOME and forward again.
+  const startFired = useRef(false)
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -148,11 +147,12 @@ export const FormPage = () => {
   // to the page named in the history entry we landed on.
   useEffect(() => {
     const target = (location.state as { page?: string } | null)?.page
-    if (!target || lastPage.current === target) return
-    // While the welcome start page is up the survey has not begun; ignore any
-    // page named in a leftover history entry (e.g. returning via Back after a
-    // submit cleared the saved state) so Start always begins at the first page.
-    if (survey.isShowStartingPage) return
+    // lastPage null means the initial entry has not been stamped yet (see the
+    // mount effect below); ignore any page named in a leftover history entry
+    // (e.g. returning via Back after a submit cleared the saved state) until
+    // then, so the survey opens where setUpForm placed it, not a stale page.
+    if (!target || lastPage.current === null || lastPage.current === target)
+      return
     if (survey.currentPage?.name === target) {
       lastPage.current = target
       return
@@ -165,13 +165,11 @@ export const FormPage = () => {
     }
   }, [location, survey])
 
-  // A resumed session opens directly on a question page (the start page is
-  // skipped, so onStarted never fires); stamp its initial history entry. Runs
-  // once on mount - recordPage / survey are stable for the component's life.
+  // Stamp the initial history entry for the page the survey opens on (WELCOME
+  // for a fresh visitor, or the restored page when resuming). Runs once on
+  // mount - recordPage / survey are stable for the component's life.
   useEffect(() => {
-    if (!survey.isShowStartingPage && survey.currentPage) {
-      recordPage(survey.currentPage.name)
-    }
+    recordPage(survey.currentPage?.name)
   }, [recordPage, survey])
 
   useEffect(() => {
@@ -186,9 +184,12 @@ export const FormPage = () => {
       action: () => navigate(ROUTES.NO_EMAIL),
     })
     // Keep the per-page UI in sync with the current page: the no-email button's
-    // visibility and the progress stepper's active section.
+    // visibility, the WELCOME page's "Let's get started" button label, and the
+    // progress stepper's active section.
     const syncPage = () => {
+      const onWelcome = survey.currentPage?.name === WELCOME_PAGE
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
+      survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
       setProgress(readProgress(survey))
     }
     syncPage()
@@ -212,6 +213,11 @@ export const FormPage = () => {
       if (!options.isGoingForward) return
       const page = options.oldCurrentPage
       if (!page) return
+      // Advancing off WELCOME ("Let's get started") begins the intake proper.
+      if (page.name === WELCOME_PAGE && !startFired.current) {
+        startFired.current = true
+        events.onStartIntake()
+      }
       const names = visibleNames(page as unknown as { elements: PageElement[] })
       // Apply skip defaults for questions left blank (e.g. dependants -> 0)
       // and record every question on the page as passed.
@@ -266,15 +272,6 @@ export const FormPage = () => {
       }
     }
 
-    // Fired when the user presses Start on the start page. A restored session
-    // leaves the start page in setUpForm (before this handler is attached), so
-    // this only fires for a genuine fresh start.
-    const onStarted = () => {
-      events.onStartIntake()
-      syncPage()
-      recordPage(survey.currentPage?.name)
-    }
-
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
       _,
       options
@@ -295,12 +292,10 @@ export const FormPage = () => {
         })
     }
 
-    survey.onStarted.add(onStarted)
     survey.onCurrentPageChanging.add(onPageChanging)
     survey.onCurrentPageChanged.add(onPageChanged)
     survey.onComplete.add(onComplete)
     return () => {
-      survey.onStarted.remove(onStarted)
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)

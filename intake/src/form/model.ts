@@ -8,9 +8,14 @@ import './functions'
 // Mirrors the old form's allowed upload extensions.
 export const ACCEPTED_UPLOAD_TYPES = '.png,.jpg,.jpeg,.pdf,.docx'
 
-// Content for the survey's start page (firstPageIsStartPage): the welcome /
-// intro screen shown before the questions begin, replacing the old standalone
-// landing splash page. Its built-in Start button begins the survey.
+// Name of the leading welcome page: the intro screen shown before the
+// questions. It is an ordinary first page (not a SurveyJS start page), so it
+// takes part in Previous / Next and browser Back / Forward like any other
+// page; it simply carries no answer.
+export const WELCOME_PAGE = 'WELCOME'
+
+// Content for the WELCOME page: the welcome / intro screen shown before the
+// questions begin, replacing the old standalone landing splash page.
 const WELCOME_HTML = `
   <h2>Welcome to the Anika Legal intake form!</h2>
   <p>We're here to help you with your rental problem. In order for us to help
@@ -115,13 +120,13 @@ export const buildSurveyModel = (): Model => {
     // visibleIf skips a whole branch's pages via the built-in Next/Previous
     // buttons; element-level visibleIf hides individual questions within a
     // visible page. Together they replace the old form's askCondition loop.
-    // The leading WELCOME page is the start page (firstPageIsStartPage below):
-    // it holds the intro and its Start button begins the survey. It carries no
-    // value, is excluded from the progress bar, and never appears in the
-    // question flow (survey.currentPage skips it).
+    // The leading WELCOME page holds the intro. It is an ordinary page (its
+    // Next button is relabelled "Let's get started" in FormPage): it carries no
+    // value, is not part of any section (so the stepper hides on it), and the
+    // question flow begins on the page after it.
     pages: [
       {
-        name: 'WELCOME',
+        name: WELCOME_PAGE,
         elements: [{ type: 'html', name: 'WELCOME_INTRO', html: WELCOME_HTML }],
       },
       ...PAGES.map((page) => ({
@@ -132,8 +137,6 @@ export const buildSurveyModel = (): Model => {
         ),
       })),
     ],
-    firstPageIsStartPage: true,
-    startSurveyText: "Let's get started",
     showQuestionNumbers: 'off',
     // The built-in per-page progress bar is replaced by a custom section-based
     // stepper rendered in FormPage (see comps/SectionProgress.tsx).
