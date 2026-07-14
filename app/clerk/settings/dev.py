@@ -43,7 +43,7 @@ CASES_FOLDER_ID = "014GE5DG2XPLXZF3NLYNGK4IDSYOAG5ICE"
 
 CLERK_BASE_URL = "http://localhost:8000"
 WAGTAILADMIN_BASE_URL = CLERK_BASE_URL
-INTAKE_URL = "https://localhost:3001"
+INTAKE_URL = "http://localhost:8000/intake/"
 
 DJANGO_VITE["default"]["dev_mode"] = True
 DJANGO_VITE["intake"]["dev_mode"] = True
