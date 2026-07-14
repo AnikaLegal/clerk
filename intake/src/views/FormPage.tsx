@@ -183,14 +183,34 @@ export const FormPage = () => {
       visible: false,
       action: () => navigate(ROUTES.NO_EMAIL),
     })
+    // A non-interactive "Page x of y" count rendered at the far right of the
+    // navigation bar, vertically centred with the Previous / Next buttons. Its
+    // wrapper is pushed right and its button styling stripped to plain text in
+    // global.css; disableTabStop keeps it out of the keyboard tab order. A high
+    // visibleIndex keeps it last so the right-push separates only it.
+    const pageCountItem = survey.addNavigationItem({
+      id: 'nav-page-count',
+      title: '',
+      css: 'intake-page-count',
+      innerCss: 'intake-page-count__text',
+      disableTabStop: true,
+      visibleIndex: 1000,
+      visible: false,
+      action: () => {},
+    })
     // Keep the per-page UI in sync with the current page: the no-email button's
-    // visibility, the WELCOME page's "Let's get started" button label, and the
-    // progress stepper's active section.
+    // visibility, the WELCOME page's "Let's get started" button label, the page
+    // count, and the progress stepper's active section.
     const syncPage = () => {
+      const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
-      setProgress(readProgress(survey))
+      // section is -1 on WELCOME, where the count is hidden along with the
+      // stepper.
+      pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
+      pageCountItem.visible = p.section >= 0
+      setProgress(p)
     }
     syncPage()
 
@@ -304,13 +324,7 @@ export const FormPage = () => {
 
   return (
     <div className="intake-form">
-      {progress.section >= 0 && (
-        <SectionProgress
-          current={progress.section}
-          page={progress.page}
-          pageCount={progress.pageCount}
-        />
-      )}
+      {progress.section >= 0 && <SectionProgress current={progress.section} />}
       <Survey model={survey} />
     </div>
   )

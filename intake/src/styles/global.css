@@ -133,13 +133,28 @@ header .h-\[63px\] img {
   justify-content: center;
 }
 
-/* "Page x of y" count, right-aligned above the stepper. */
-.intake-progress__count {
-  display: block;
-  text-align: right;
-  margin-bottom: 10px;
-  font-size: 14px;
+/* "Page x of y" count, added as a navigation item (see FormPage) so it sits in
+   the survey's navigation bar. Push its wrapper to the far right of the row;
+   the bar's align-items:center keeps it vertically centred with the Previous /
+   Next buttons. Strip the SurveyJS/site button styling so it reads as plain
+   text rather than a button. */
+.intake-form .sd-body__navigation .sv-action.intake-page-count {
+  margin-left: auto;
+}
+
+.intake-form input.intake-page-count__text {
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
   color: #6f6f6f;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  cursor: default;
+  pointer-events: none;
 }
 
 .intake-progress__step {

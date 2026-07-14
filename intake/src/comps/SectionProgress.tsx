@@ -5,20 +5,16 @@ import { SECTIONS } from '../questions'
 interface Props {
   // Index of the current section in SECTIONS.
   current: number
-  // 1-based current page number and total visible pages, for the "Page x of y"
-  // count shown above the stepper.
-  page: number
-  pageCount: number
 }
 
 /**
  * A section-based progress stepper (Getting started / About you / ...), shown
  * above the survey in place of the built-in per-page progress bar. Mirrors the
  * previous intake form: a row of connected dots with the current section's
- * label beneath it, earlier sections marked done, and a "Page x of y" count
- * above the stepper.
+ * label beneath it, earlier sections marked done. The "Page x of y" count sits
+ * in the survey's navigation bar (see FormPage), not here.
  */
-export const SectionProgress = ({ current, page, pageCount }: Props) => (
+export const SectionProgress = ({ current }: Props) => (
   <div
     className="intake-progress"
     role="progressbar"
@@ -27,9 +23,6 @@ export const SectionProgress = ({ current, page, pageCount }: Props) => (
     aria-valuenow={current + 1}
     aria-valuetext={SECTIONS[current]?.label}
   >
-    <span className="intake-progress__count">
-      Page {page} of {pageCount}
-    </span>
     <div className="intake-progress__steps">
       {SECTIONS.map((section, idx) => {
         const state =
