@@ -70,6 +70,26 @@ header .h-\[63px\] img {
   color: var(--color-primary);
 }
 
+/* The site styles every <button> that isn't a daisyUI .d-btn as a solid blue
+   pill (components.css `button:not(.d-btn, .gbtn)`, specificity 0,1,1), which
+   bleeds onto SurveyJS's own context buttons - notably the file upload "Clear"
+   button - making them look like primary CTAs. Restore SurveyJS's subtle,
+   text-style button. */
+.intake-form button.sd-context-btn {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  color: var(--sjs-general-forecolor, rgba(0, 0, 0, 0.91));
+  background: transparent;
+  font-family: inherit !important;
+  font-weight: 400;
+  letter-spacing: normal;
+  padding: 8px 16px;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
 .intake-splash {
   max-width: 640px;
   margin: 0 auto;
