@@ -64,6 +64,7 @@ header .h-\[63px\] img {
   letter-spacing: normal;
   background-color: var(--color-primary);
   color: var(--color-primary-content);
+  transition: background-color 0.15s ease;
 }
 
 /* Secondary variant for nav buttons (e.g. "I don't have an email address"):
@@ -72,6 +73,24 @@ header .h-\[63px\] img {
 .intake-form input.intake-btn-secondary {
   background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
   color: var(--color-primary);
+}
+
+/* Hover / focus effects matching the website's daisyUI buttons: darken the
+   fill on hover (daisyUI mixes 7% black), and show a clear focus ring on
+   keyboard focus. We use :focus-visible with an explicit primary-coloured
+   outline so the ring only appears for keyboard users and is actually visible
+   (the site's own buttons focus to a same-colour/invisible outline). */
+.intake-form input.d-btn:hover {
+  background-color: color-mix(in oklab, var(--color-primary), #000 7%);
+}
+
+.intake-form input.d-btn:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px;
+}
+
+.intake-form input.intake-btn-secondary:hover {
+  background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
 /* The site styles every <button> that isn't a daisyUI .d-btn as a solid blue
