@@ -64,6 +64,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     name: 'ANNUAL_INCOME_RANGE',
     required: true,
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     visibleIf: '{CENTRELINK_SUPPORT} = false',
     choices: [
       { value: 'UNDER_40K', text: 'Under $40,000' },
@@ -89,6 +90,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     name: 'ELIGIBILITY_CIRCUMSTANCES',
     required: false,
     type: 'CHOICE_MULTI',
+    colCount: 2,
     title: 'Do any of the following apply to you?',
     description:
       "This helps us prioritise support. You can skip this if you're not sure. To skip, leave this blank and continue.",

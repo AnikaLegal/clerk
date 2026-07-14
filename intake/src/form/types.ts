@@ -35,6 +35,10 @@ export interface IntakeQuestion {
   // skip link copy ("I do not have an email address") lives here too.
   description?: string
   choices?: ChoiceOption[]
+  // Number of columns for a choice question (radiogroup/checkbox). Set to 2 on
+  // long lists so they render in two columns rather than running down the page.
+  // Omit to keep the default single column.
+  colCount?: number
   // SurveyJS visibility expression, e.g. "{ISSUES} = 'BONDS'". Replaces the
   // old form's askCondition functions.
   visibleIf?: string

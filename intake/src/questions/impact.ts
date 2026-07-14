@@ -17,6 +17,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     name: 'GENDER',
     required: true,
     type: 'CHOICE_SINGLE_TEXT',
+    colCount: 2,
     choices: [
       { value: 'MALE', text: 'Male' },
       { value: 'FEMALE', text: 'Female' },
@@ -33,6 +34,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     name: 'IS_ABORIGINAL_OR_TORRES_STRAIT_ISLANDER',
     required: true,
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'NO', text: 'No' },
       { value: 'YES_ABORIGINAL', text: 'Yes, Aboriginal' },
@@ -84,6 +86,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title: 'Which best describes your work or study situation?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'WORKING_FULL_TIME', text: 'Working full time' },
       { value: 'WORKING_PART_TIME', text: 'Working part time' },
@@ -104,6 +107,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title: 'How did you hear about Anika?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'LEGAL_CENTRE', text: 'Legal centre' },
       { value: 'HOUSING_SERVICE', text: 'Housing service' },
@@ -124,6 +128,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     visibleIf: "{REFERRER_TYPE} = 'LEGAL_CENTRE'",
     title: 'Which legal centre referred you?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'Tenants Victoria', text: 'Tenants Victoria' },
       { value: 'Victoria Legal Aid', text: 'Victoria Legal Aid' },
@@ -145,6 +150,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title: 'Which housing service referred you?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'Launch Housing', text: 'Launch Housing' },
       { value: 'Quantum', text: 'Quantum' },
@@ -161,6 +167,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title: 'Which community organisation referred you?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       {
         value: 'Council of Single Mothers and their Children',
@@ -183,6 +190,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title: 'Which social media site did you find us on?',
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     choices: [
       { value: 'Facebook', text: 'Facebook' },
       { value: 'Instagram', text: 'Instagram' },

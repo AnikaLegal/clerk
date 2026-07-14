@@ -33,6 +33,12 @@ const WELCOME_HTML = `
   any questions about why we need your information, and what we do with it.</p>
 `
 
+// Pass through the question's colCount (e.g. 2 for long choice lists that
+// should render in two columns); omitted when unset so it keeps the default
+// single column.
+const choiceColumns = (q: IntakeQuestion): { colCount?: number } =>
+  q.colCount === undefined ? {} : { colCount: q.colCount }
+
 const toElement = (q: IntakeQuestion): Record<string, unknown> => {
   const base = {
     name: q.name,
@@ -88,7 +94,12 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
       // Native date input emits the wire format (YYYY-MM-DD) directly.
       return { ...base, type: 'text', inputType: 'date' }
     case 'CHOICE_SINGLE':
-      return { ...base, type: 'radiogroup', choices: q.choices }
+      return {
+        ...base,
+        type: 'radiogroup',
+        choices: q.choices,
+        ...choiceColumns(q),
+      }
     case 'CHOICE_SINGLE_TEXT':
       // With storeOthersAsComment disabled on the survey, the free text
       // replaces the choice value in survey.data - the old form's semantics.
@@ -98,9 +109,10 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         choices: q.choices,
         showOtherItem: true,
         otherText: q.placeholder ?? 'Prefer to self-describe',
+        ...choiceColumns(q),
       }
     case 'CHOICE_MULTI':
-      return { ...base, type: 'checkbox', choices: q.choices }
+      return { ...base, type: 'checkbox', choices: q.choices, ...choiceColumns(q) }
     case 'UPLOAD':
       return {
         ...base,

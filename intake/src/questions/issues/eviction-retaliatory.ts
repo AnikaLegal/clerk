@@ -55,6 +55,7 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
     name: 'EVICTION_RETALIATORY_NTV_TYPE',
     required: true,
     type: 'CHOICE_SINGLE',
+    colCount: 2,
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
     choices: [
       { value: '91ZM - Arrears', text: 'You owe at least two weeks rent' },
@@ -120,6 +121,7 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
     name: 'EVICTION_RETALIATORY_RETALIATORY_REASON',
     required: true,
     type: 'CHOICE_MULTI',
+    colCount: 2,
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
     choices: [
       { value: 'Repairs', text: 'I asked for repairs' },
