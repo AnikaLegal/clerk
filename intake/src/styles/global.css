@@ -102,6 +102,15 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
+/* The site's `form input` rule adds a 44px bottom margin under 1300px (to space
+   stacked form fields). It bleeds onto the navigation bar's <input> buttons and
+   the page count, so when the row wraps on narrow screens the wrapped items sit
+   far apart. The nav row spaces itself with its own flex gap, so drop the
+   bleed. */
+.intake-form .sd-body__navigation input {
+  margin-bottom: 0;
+}
+
 /* On the WELCOME page the only navigation button is "Let's get started":
    centre it in the row and give it the daisyUI wide-button width (d-btn-wide is
    width:100% capped at 16rem). The width is applied to the action wrapper so
