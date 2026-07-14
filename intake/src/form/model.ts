@@ -25,8 +25,7 @@ const WELCOME_HTML = `
   </ul>
   <p>You can have a look at our
   <a href="${LINKS.COLLECTIONS_STATEMENT}">collection statement</a> if you have
-  any questions about why we need your information, and what we do with it. You
-  can also <a href="${LINKS.SERVICES}">learn more about our services</a>.</p>
+  any questions about why we need your information, and what we do with it.</p>
 `
 
 const toElement = (q: IntakeQuestion): Record<string, unknown> => {
@@ -42,7 +41,12 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
   switch (q.type) {
     case 'DISPLAY':
       // html questions hold no value, so they never appear in survey.data.
-      return { type: 'html', name: q.name, html: q.html ?? '', visibleIf: q.visibleIf }
+      return {
+        type: 'html',
+        name: q.name,
+        html: q.html ?? '',
+        visibleIf: q.visibleIf,
+      }
     case 'TEXT':
       return q.multiline
         ? { ...base, type: 'comment', autoGrow: true }
