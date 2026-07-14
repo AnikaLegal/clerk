@@ -98,12 +98,24 @@ header .h-\[63px\] img {
    survey in place of SurveyJS's per-page progress bar. A row of connected dots
    with the current section's label beneath it. */
 .intake-progress {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 24px 40px;
+}
+
+.intake-progress__steps {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 16px 24px 40px;
+}
+
+/* "Page x of y" count, right-aligned above the stepper. */
+.intake-progress__count {
+  display: block;
+  text-align: right;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #6f6f6f;
 }
 
 .intake-progress__step {

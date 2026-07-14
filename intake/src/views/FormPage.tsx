@@ -100,15 +100,21 @@ const setUpForm = (): FormState => {
   return { survey, saver, visited }
 }
 
-// The section shown in the progress stepper, or -1 while the welcome start page
-// is up (currentPage skips the start page, so also guard on isShowStartingPage).
-const currentSection = (survey: Model): number =>
-  survey.isShowStartingPage ? -1 : sectionIndexForPage(survey.currentPage?.name)
+// State for the progress stepper. section is -1 while the welcome start page is
+// up (currentPage skips the start page, so also guard on isShowStartingPage);
+// page / pageCount drive the "Page x of y" count over the visible pages.
+const readProgress = (survey: Model) => ({
+  section: survey.isShowStartingPage
+    ? -1
+    : sectionIndexForPage(survey.currentPage?.name),
+  page: survey.currentPageNo + 1,
+  pageCount: survey.visiblePages.length,
+})
 
 export const FormPage = () => {
   const navigate = useNavigate()
   const { survey, saver, visited } = useMemo(setUpForm, [])
-  const [section, setSection] = useState(() => currentSection(survey))
+  const [progress, setProgress] = useState(() => readProgress(survey))
 
   useEffect(() => {
     // A dedicated "I don't have an email address" navigation button that routes
@@ -125,7 +131,7 @@ export const FormPage = () => {
     // visibility and the progress stepper's active section.
     const syncPage = () => {
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
-      setSection(currentSection(survey))
+      setProgress(readProgress(survey))
     }
     syncPage()
 
@@ -224,7 +230,13 @@ export const FormPage = () => {
 
   return (
     <div className="intake-form">
-      {section >= 0 && <SectionProgress current={section} />}
+      {progress.section >= 0 && (
+        <SectionProgress
+          current={progress.section}
+          page={progress.page}
+          pageCount={progress.pageCount}
+        />
+      )}
       <Survey model={survey} />
     </div>
   )
