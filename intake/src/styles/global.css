@@ -98,6 +98,25 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
+/* On the WELCOME page the only navigation button is "Let's get started":
+   centre it in the row and give it the daisyUI wide-button width (d-btn-wide is
+   width:100% capped at 16rem). The width is applied to the action wrapper so
+   the button stretches to fill it rather than staying at its content width. */
+.intake-form--welcome .sd-body__navigation {
+  justify-content: center;
+}
+
+.intake-form--welcome .sd-body__navigation .sv-action {
+  width: 100%;
+  max-width: 16rem;
+}
+
+.intake-form--welcome .sd-body__navigation .sv-action__content,
+.intake-form--welcome .sd-body__navigation input.d-btn {
+  width: 100%;
+  max-width: none;
+}
+
 /* The site styles every <button> that isn't a daisyUI .d-btn as a solid blue
    pill (components.css `button:not(.d-btn, .gbtn)`, specificity 0,1,1), which
    bleeds onto SurveyJS's own context buttons - notably the file upload "Clear"

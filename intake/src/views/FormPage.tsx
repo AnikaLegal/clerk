@@ -111,6 +111,7 @@ const setUpForm = (): FormState => {
 const readProgress = (survey: Model) => {
   const name = survey.currentPage?.name
   return {
+    name,
     section: name === SUBMIT_PAGE ? -1 : sectionIndexForPage(name),
     page: survey.currentPageNo,
     pageCount: survey.visiblePages.length - 2,
@@ -333,7 +334,13 @@ export const FormPage = () => {
   }, [survey, saver, visited, navigate, recordPage])
 
   return (
-    <div className="intake-form">
+    <div
+      className={
+        progress.name === WELCOME_PAGE
+          ? 'intake-form intake-form--welcome'
+          : 'intake-form'
+      }
+    >
       {progress.section >= 0 && <SectionProgress current={progress.section} />}
       <Survey model={survey} />
     </div>
