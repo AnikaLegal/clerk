@@ -23,5 +23,11 @@ export default defineConfig({
     host: true,
     port: 5174,
     strictPort: true,
+    // Django serves the page and django-vite loads the bundle from this dev
+    // server, but assets imported in JS (e.g. the notice-to-vacate PDF) resolve
+    // to base-relative URLs that the browser would request from Django (404).
+    // Setting origin makes those URLs absolute to the Vite dev server so it
+    // serves them directly. Dev only - ignored by the production build.
+    origin: 'http://localhost:5174',
   },
 })
