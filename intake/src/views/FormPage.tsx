@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 
@@ -113,8 +113,62 @@ const readProgress = (survey: Model) => ({
 
 export const FormPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { survey, saver, visited } = useMemo(setUpForm, [])
   const [progress, setProgress] = useState(() => readProgress(survey))
+
+  // Browser history <-> survey page sync, so the browser Back / Forward buttons
+  // move between the survey's pages instead of leaving the form. Each page gets
+  // its own history entry carrying its name in location.state. lastPage tracks
+  // the page recorded at the top of the stack; suppressPush marks a survey page
+  // change that is itself mirroring a Back / Forward, so it isn't re-recorded.
+  const lastPage = useRef<string | null>(null)
+  const suppressPush = useRef(false)
+  // Direction of the page change in progress, captured in onCurrentPageChanging
+  // (which carries it) and read in onCurrentPageChanged (which does not), so a
+  // backward move via the survey's Previous button steps back through history
+  // rather than pushing a duplicate entry.
+  const goingForward = useRef(true)
+
+  const recordPage = useCallback(
+    (name: string | null | undefined) => {
+      if (!name || lastPage.current === name) return
+      // The first real page replaces the initial entry in place (so Back from
+      // it leaves the form); later pages push a new entry to move forward over.
+      navigate(ROUTES.LANDING, {
+        state: { page: name },
+        replace: lastPage.current === null,
+      })
+      lastPage.current = name
+    },
+    [navigate]
+  )
+
+  // Mirror a browser Back / Forward (location change) onto the survey: move it
+  // to the page named in the history entry we landed on.
+  useEffect(() => {
+    const target = (location.state as { page?: string } | null)?.page
+    if (!target || lastPage.current === target) return
+    if (survey.currentPage?.name === target) {
+      lastPage.current = target
+      return
+    }
+    const page = survey.getPageByName(target)
+    if (page && page.isVisible) {
+      suppressPush.current = true
+      lastPage.current = target
+      survey.currentPage = page
+    }
+  }, [location, survey])
+
+  // A resumed session opens directly on a question page (the start page is
+  // skipped, so onStarted never fires); stamp its initial history entry. Runs
+  // once on mount - recordPage / survey are stable for the component's life.
+  useEffect(() => {
+    if (!survey.isShowStartingPage && survey.currentPage) {
+      recordPage(survey.currentPage.name)
+    }
+  }, [recordPage, survey])
 
   useEffect(() => {
     // A dedicated "I don't have an email address" navigation button that routes
@@ -147,6 +201,10 @@ export const FormPage = () => {
     const onPageChanging: Parameters<
       typeof survey.onCurrentPageChanging.add
     >[0] = (_, options) => {
+      goingForward.current = options.isGoingForward
+      // A history-driven move (Back / Forward) must not re-run the forward-only
+      // exit / side-effect logic or re-mark the page's questions as visited.
+      if (suppressPush.current) return
       if (!options.isGoingForward) return
       const page = options.oldCurrentPage
       if (!page) return
@@ -186,6 +244,22 @@ export const FormPage = () => {
       saver.schedulePatch(serializeAnswers(survey, visited))
       window.scrollTo(0, 0)
       syncPage()
+      const name = survey.currentPage?.name ?? null
+      if (suppressPush.current) {
+        // This change mirrors a Back / Forward - it is already in the history.
+        suppressPush.current = false
+        lastPage.current = name
+      } else if (goingForward.current) {
+        // Advancing to a page: give it its own history entry.
+        recordPage(name)
+      } else {
+        // Going back via the survey's Previous button: step back through the
+        // browser history to this page's existing entry (the reconcile effect
+        // sees the survey is already here and leaves it be), rather than
+        // pushing a duplicate that would desync the Back / Forward buttons.
+        lastPage.current = name
+        navigate(-1)
+      }
     }
 
     // Fired when the user presses Start on the start page. A restored session
@@ -194,6 +268,7 @@ export const FormPage = () => {
     const onStarted = () => {
       events.onStartIntake()
       syncPage()
+      recordPage(survey.currentPage?.name)
     }
 
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
@@ -226,7 +301,7 @@ export const FormPage = () => {
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
     }
-  }, [survey, saver, visited, navigate])
+  }, [survey, saver, visited, navigate, recordPage])
 
   return (
     <div className="intake-form">
