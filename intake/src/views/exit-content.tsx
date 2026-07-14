@@ -235,7 +235,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
   },
   [ROUTES.BONDS_RECOVERY]: {
     title:
-      'Our Bonds Recovery service focuses on helping you negotiate a settlement with your landlord once they have applied to VCAT to claim your bond held at the RTBA.',
+      'Our bond recovery service focuses on helping you negotiate a settlement with your landlord once they have applied to VCAT to claim your bond held at the RTBA.',
     body: (
       <>
         <p>
@@ -243,18 +243,8 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
           bond issues where you have general questions about bonds prior to
           leaving the property, the bond is not held by the RTBA, your dispute
           is with a co-tenant, or if your landlord hasn't applied to VCAT yet.
-          Depending on your situation, you may wish to have a look at our Bonds
-          resources:
-        </p>
-        <ul>
-          <li>
-            <a href={LINKS.BONDS_RESOURCES}>
-              Information about bonds and bond recovery
-            </a>
-          </li>
-        </ul>
-        <p>
-          <a href={LINKS.HOME}>Return home</a>
+          Depending on your situation, you may wish to have a look at our
+          <a href={LINKS.BONDS_RESOURCES}> bonds resources</a>.
         </p>
       </>
     ),
