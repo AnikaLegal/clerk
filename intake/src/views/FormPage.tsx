@@ -139,6 +139,12 @@ export const FormPage = () => {
   // Ensures the startIntake analytics event fires only once, even if the user
   // navigates back to WELCOME and forward again.
   const startFired = useRef(false)
+  // react-router's index of the history entry the form opened on. A backward
+  // survey move (Previous) only steps back through browser history when a prior
+  // form entry exists above this floor; at the floor - e.g. a resumed session
+  // whose earlier pages were never in this browser's history - it replaces the
+  // current entry instead, so Previous stays in the form rather than exiting.
+  const startIdx = useRef<number | null>(null)
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -180,6 +186,8 @@ export const FormPage = () => {
   // for a fresh visitor, or the restored page when resuming). Runs once on
   // mount - recordPage / survey are stable for the component's life.
   useEffect(() => {
+    const state = window.history.state as { idx?: number } | null
+    startIdx.current = state?.idx ?? 0
     recordPage(survey.currentPage?.name)
   }, [recordPage, survey])
 
@@ -294,12 +302,20 @@ export const FormPage = () => {
         // Advancing to a page: give it its own history entry.
         recordPage(name)
       } else {
-        // Going back via the survey's Previous button: step back through the
-        // browser history to this page's existing entry (the reconcile effect
-        // sees the survey is already here and leaves it be), rather than
-        // pushing a duplicate that would desync the Back / Forward buttons.
+        // Going back via the survey's Previous button. If a prior form entry
+        // exists in the browser history, step back to it (the reconcile effect
+        // sees the survey is already here and leaves it be) so Back / Forward
+        // stay in sync. At the history floor - e.g. a resumed session opened
+        // straight onto this page - there is nothing to pop to, so replace the
+        // current entry to stay in the form rather than navigating out of it.
+        const state = window.history.state as { idx?: number } | null
+        const idx = state?.idx
         lastPage.current = name
-        navigate(-1)
+        if (idx != null && startIdx.current != null && idx > startIdx.current) {
+          navigate(-1)
+        } else {
+          navigate(ROUTES.LANDING, { state: { page: name }, replace: true })
+        }
       }
     }
 
