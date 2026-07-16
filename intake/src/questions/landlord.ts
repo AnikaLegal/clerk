@@ -1,5 +1,11 @@
 import { IntakeQuestion } from '../form/types'
 
+// The landlord / agent contact details all live on a person's lease. The hint
+// sits on the first field of each of the two groups rather than under every
+// field.
+const LEASE_HINT =
+  'You can find this information on the first couple of pages of your lease.'
+
 export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
   {
     name: 'PROPERTY_MANAGER_INTRO',
@@ -13,8 +19,7 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: true,
     title:
       'Does your landlord use a <strong>real estate agent</strong> to manage the property?',
-    description:
-      'You can find this information on the first couple of pages of your lease.',
+    description: LEASE_HINT,
     choices: [
       { value: true, text: 'Yes' },
       { value: false, text: 'No' },
@@ -26,8 +31,6 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = true',
     title: "What is your landlord's agent's full name?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'AGENT_ADDRESS',
@@ -35,8 +38,6 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = true',
     title: "What is your landlord's agent's address?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'AGENT_EMAIL',
@@ -44,8 +45,6 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = true',
     title: "What is your landlord's agent's email?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'AGENT_PHONE',
@@ -53,16 +52,13 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = true',
     title: "What is your landlord's agent's phone number?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'LANDLORD_NAME',
     type: 'TEXT',
     required: false,
     title: "What is your landlord's full name?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
+    description: LEASE_HINT,
   },
   {
     name: 'LANDLORD_ADDRESS',
@@ -70,8 +66,6 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = false',
     title: "What is your landlord's address?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'LANDLORD_EMAIL',
@@ -79,8 +73,6 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = false',
     title: "What is your landlord's email?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
   {
     name: 'LANDLORD_PHONE',
@@ -88,7 +80,5 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     required: false,
     visibleIf: '{PROPERTY_MANAGER_IS_AGENT} = false',
     title: "What is your landlord's phone number?",
-    description:
-      'You can find this information on the first couple of pages of your lease.',
   },
 ]
