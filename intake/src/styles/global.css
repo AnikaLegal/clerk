@@ -111,6 +111,17 @@ header .h-\[63px\] img {
   margin-bottom: 0;
 }
 
+/* In its mobile layout SurveyJS gives each nav action flex-grow: 1 (via
+   .sd-root-modern--mobile ...), so the wrappers stretch to fill the row and
+   spread the buttons apart wherever there is free space. Match that modifier so
+   this wins, and keep the actions content-sized, so Previous / Next always sit
+   together with a constant gap. (On a full single row the count still flex-grows
+   to push itself to the far right.) 
+   */
+.intake-form .sd-root-modern--mobile .sd-body__navigation .sv-action {
+  flex-grow: 0;
+}
+
 /* On the WELCOME page the only navigation button is "Let's get started":
    centre it in the row and give it the daisyUI wide-button width (d-btn-wide is
    width:100% capped at 16rem). The width is applied to the action wrapper so
@@ -170,15 +181,26 @@ header .h-\[63px\] img {
 }
 
 /* "Page x of y" count, added as a navigation item (see FormPage) so it sits in
-   the survey's navigation bar. Push its wrapper to the far right of the row;
-   the bar's align-items:center keeps it vertically centred with the Previous /
-   Next buttons. Strip the SurveyJS/site button styling so it reads as plain
-   text rather than a button. */
+   the survey's navigation bar. Let its wrapper flex-grow to absorb the row's
+   free space and right-align its content, pushing the count to the far right
+   (via flexbox rather than an auto margin); the bar's align-items:center keeps
+   it vertically centred with the Previous / Next buttons. Strip the
+   SurveyJS/site button styling so it reads as plain text rather than a button. */
 .intake-form .sd-body__navigation .sv-action.intake-page-count {
-  margin-left: auto;
+  flex-grow: 1;
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action.intake-page-count
+  .sv-action__content {
+  justify-content: flex-end;
 }
 
 .intake-form input.intake-page-count__text {
+  /* Content-sized (overriding the site's form input width:100%) so the flex
+     end-alignment on its wrapper places the text hard against the right edge. */
+  width: auto;
   min-width: 0;
   height: auto;
   padding: 0;
