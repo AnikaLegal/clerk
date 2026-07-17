@@ -15,6 +15,20 @@ const questionnaireEvent = (action: string) => {
   window.gtag('event', action, { event_category: 'questionnaire' })
 }
 
+// Identifies this form's events so they can be told apart from any other forms
+// added later (GA4's form_start / form_submit use a form_id parameter the same
+// way). A future form would send its own form_id with the same event names.
+const FORM_ID = 'intake'
+
+interface FormStep {
+  // Position of the page in the survey's visible pages (survey.currentPageNo).
+  index: number
+  // The page's name (its UPPER_SNAKE key).
+  name: string
+  // Label of the section the page belongs to, if any.
+  section?: string
+}
+
 export const events = {
   // User starts the questionnaire
   onStartIntake: () => questionnaireEvent('startIntake'),
@@ -35,4 +49,14 @@ export const events = {
     questionnaireEvent('finishIntake')
     window.fbq('track', 'SubmitApplication')
   },
+  // Fired the first time the user reaches each form page (see FormPage), for
+  // per-page funnel / drop-off analysis. Finer-grained than the section events
+  // above; build a GA4 funnel exploration on step_index / step_name.
+  onFormStep: ({ index, name, section }: FormStep) =>
+    window.gtag('event', 'form_step', {
+      form_id: FORM_ID,
+      step_index: index,
+      step_name: name,
+      ...(section ? { section } : {}),
+    }),
 }

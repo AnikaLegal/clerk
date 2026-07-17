@@ -18,6 +18,7 @@ import { logException } from '../utils'
 import {
   EMAIL_PAGE,
   QUESTIONS_BY_NAME,
+  SECTIONS,
   sectionIndexForPage,
   SUBMIT_PAGE,
 } from '../questions'
@@ -145,6 +146,9 @@ export const FormPage = () => {
   // whose earlier pages were never in this browser's history - it replaces the
   // current entry instead, so Previous stays in the form rather than exiting.
   const startIdx = useRef<number | null>(null)
+  // Pages already sent a form_step analytics event, so each is counted once
+  // even when the user navigates back and forth.
+  const reportedSteps = useRef(new Set<string>())
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -231,7 +235,23 @@ export const FormPage = () => {
       pageCountItem.visible = p.section >= 0
       setProgress(p)
     }
+
+    // Send a per-page funnel event the first time each page is reached (so back
+    // / forward navigation doesn't recount it).
+    const reportPage = () => {
+      const name = survey.currentPage?.name
+      if (!name || reportedSteps.current.has(name)) return
+      reportedSteps.current.add(name)
+      const sectionIdx = sectionIndexForPage(name)
+      events.onFormStep({
+        index: survey.currentPageNo,
+        name,
+        section: sectionIdx >= 0 ? SECTIONS[sectionIdx]?.label : undefined,
+      })
+    }
+
     syncPage()
+    reportPage()
 
     const persist = () => {
       saveState({
@@ -293,6 +313,7 @@ export const FormPage = () => {
       saver.schedulePatch(serializeAnswers(survey, visited))
       window.scrollTo(0, 0)
       syncPage()
+      reportPage()
       const name = survey.currentPage?.name ?? null
       if (suppressPush.current) {
         // This change mirrors a Back / Forward - it is already in the history.
