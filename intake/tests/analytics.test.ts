@@ -2,22 +2,39 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { events } from '../src/analytics'
 
-// The GA4 funnel depends on the exact event name and parameter keys, which
+// The GA4 funnel depends on the exact event names and parameter keys, which
 // nothing else would fail on if they drifted - so pin them here. The node test
-// env has no window, so stub the gtag the analytics module calls.
+// env has no window, so stub the gtag / fbq the analytics module calls.
 const gtag = vi.fn()
+const fbq = vi.fn()
 
 beforeEach(() => {
   gtag.mockClear()
-  vi.stubGlobal('window', { gtag, fbq: vi.fn() })
+  fbq.mockClear()
+  vi.stubGlobal('window', { gtag, fbq })
 })
 
 afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('analytics onFormStep', () => {
-  it('sends form_step with the funnel parameters', () => {
+describe('analytics events', () => {
+  it('onFormBegin sends form_begin with the form id', () => {
+    events.onFormBegin()
+    expect(gtag).toHaveBeenCalledWith('event', 'form_begin', {
+      form_id: 'intake',
+    })
+  })
+
+  it('onFormComplete sends form_complete and the Facebook conversion', () => {
+    events.onFormComplete()
+    expect(gtag).toHaveBeenCalledWith('event', 'form_complete', {
+      form_id: 'intake',
+    })
+    expect(fbq).toHaveBeenCalledWith('track', 'SubmitApplication')
+  })
+
+  it('onFormStep sends form_step with the funnel parameters', () => {
     events.onFormStep({ index: 3, name: 'ABOUT_EMAIL', section: 'About you' })
     expect(gtag).toHaveBeenCalledWith('event', 'form_step', {
       form_id: 'intake',
@@ -27,7 +44,7 @@ describe('analytics onFormStep', () => {
     })
   })
 
-  it('omits section when the page has none', () => {
+  it('onFormStep omits section when the page has none', () => {
     events.onFormStep({ index: 0, name: 'WELCOME' })
     expect(gtag).toHaveBeenCalledWith('event', 'form_step', {
       form_id: 'intake',

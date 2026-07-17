@@ -1,8 +1,6 @@
-// Funnel events, ported verbatim from the old intake repo's
-// analytics/events.js so reporting continuity is preserved.
-// gtag is used for Adwords conversion tracking, fbq for Facebook ads.
-// The Django template guarantees window.gtag / window.fbq exist (no-op
-// stubs when analytics IDs are not configured).
+// Analytics for the intake funnel. gtag drives GA4 / Adwords, fbq the Facebook
+// pixel. The Django template guarantees window.gtag / window.fbq exist (no-op
+// stubs when the analytics IDs are not configured).
 
 declare global {
   interface Window {
@@ -11,13 +9,9 @@ declare global {
   }
 }
 
-const questionnaireEvent = (action: string) => {
-  window.gtag('event', action, { event_category: 'questionnaire' })
-}
-
 // Identifies this form's events so they can be told apart from any other forms
-// added later (GA4's form_start / form_submit use a form_id parameter the same
-// way). A future form would send its own form_id with the same event names.
+// added later (GA4's form_* events use a form_id parameter the same way). A
+// future form would send its own form_id with the same event names.
 const FORM_ID = 'intake'
 
 interface FormStep {
@@ -30,28 +24,13 @@ interface FormStep {
 }
 
 export const events = {
-  // User starts the questionnaire
-  onStartIntake: () => questionnaireEvent('startIntake'),
-  // When we first get the user's email and save the form for the first time.
-  onFirstSave: () => questionnaireEvent('firstSave'),
-  // Intake / Section 1 Complete (Eligibility)
-  onEligibilityComplete: () => questionnaireEvent('eligibilitySection'),
-  // Intake / Section 2 Complete (Basic Details)
-  onBasicDetailsComplete: () => questionnaireEvent('basicDetailsSection'),
-  // Intake / Section 3 Complete (Issues)
-  onIssueDetailsComplete: () => questionnaireEvent('issueSection'),
-  // Intake / Section 4 Complete (Landlord)
-  onLandlordDetailsComplete: () => questionnaireEvent('landlordSection'),
-  // Intake / Section 5 Complete (Personal Details)
-  onPersonalDetailsComplete: () => questionnaireEvent('personalDetailsSection'),
-  // User submits the questionnaire
-  onFinishIntake: () => {
-    questionnaireEvent('finishIntake')
-    window.fbq('track', 'SubmitApplication')
-  },
+  // User begins the questionnaire (advances off the welcome page). Named to sit
+  // in the form_* funnel family without clashing with GA4's reserved
+  // form_start / form_submit enhanced-measurement events.
+  onFormBegin: () => window.gtag('event', 'form_begin', { form_id: FORM_ID }),
   // Fired the first time the user reaches each form page (see FormPage), for
-  // per-page funnel / drop-off analysis. Finer-grained than the section events
-  // above; build a GA4 funnel exploration on step_index / step_name.
+  // per-page funnel / drop-off analysis. Build a GA4 funnel exploration on
+  // step_index / step_name; the section groups the per-section drop-off.
   onFormStep: ({ index, name, section }: FormStep) =>
     window.gtag('event', 'form_step', {
       form_id: FORM_ID,
@@ -59,4 +38,10 @@ export const events = {
       step_name: name,
       ...(section ? { section } : {}),
     }),
+  // User submits the questionnaire. Also fires the Facebook standard
+  // SubmitApplication conversion.
+  onFormComplete: () => {
+    window.gtag('event', 'form_complete', { form_id: FORM_ID })
+    window.fbq('track', 'SubmitApplication')
+  },
 }

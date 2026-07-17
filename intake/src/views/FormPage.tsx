@@ -137,7 +137,7 @@ export const FormPage = () => {
   // backward move via the survey's Previous button steps back through history
   // rather than pushing a duplicate entry.
   const goingForward = useRef(true)
-  // Ensures the startIntake analytics event fires only once, even if the user
+  // Ensures the form_begin analytics event fires only once, even if the user
   // navigates back to WELCOME and forward again.
   const startFired = useRef(false)
   // react-router's index of the history entry the form opened on. A backward
@@ -275,7 +275,7 @@ export const FormPage = () => {
       // Advancing off WELCOME ("Let's get started") begins the intake proper.
       if (page.name === WELCOME_PAGE && !startFired.current) {
         startFired.current = true
-        events.onStartIntake()
+        events.onFormBegin()
       }
       const names = visibleNames(page as unknown as { elements: PageElement[] })
       // Apply skip defaults for questions left blank (e.g. dependants -> 0)
@@ -349,7 +349,7 @@ export const FormPage = () => {
       saver
         .submit(answers)
         .then(() => {
-          events.onFinishIntake()
+          events.onFormComplete()
           clearState()
           navigate(ROUTES.SUBMITTED)
         })
