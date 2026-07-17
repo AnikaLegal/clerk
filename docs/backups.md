@@ -66,9 +66,9 @@ write backup objects - not to delete them.
 Alongside the database and client-info CSV dump, [AWS
 Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html)
 takes managed daily and monthly snapshots of the S3 buckets themselves. That
-widens the safety net well beyond the database: the app's uploaded documents,
-emails and call audio are all captured too, so the whole of Anika's S3 data can
-be rolled back rather than just the database.
+widens the safety net well beyond the database: the app's uploaded documents
+and call audio are captured too, so the whole of Anika's S3 data can be rolled
+back rather than just the database.
 
 Every snapshot is copied into a locked, [air-gapped
 vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/logicallyairgappedvault.html)
