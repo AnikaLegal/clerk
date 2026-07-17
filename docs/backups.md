@@ -39,10 +39,10 @@ from the staging backups.
 
 An encrypted backup must be decrypted with the passphrase before it can be
 loaded back into PostgreSQL. Each restore path - [refreshing staging from
-production](../app/scripts/tasks/staging-restore.sh) and [migrating to a new
-server](../infra/setup/migrate.sh) - does this automatically. The only 
-requirement is that whoever (or whatever) performs the restore has the
-passphrase available.
+production](../app/scripts/tasks/staging-restore.sh) and [restoring the
+databases to a new server](../infra/setup/restore-databases.sh) - does this
+automatically. The only requirement is that whoever (or whatever) performs
+the restore has the passphrase available.
 
 The [offline backups script](../infra/offline-backup.sh) includes a convenience
 option to decrypt a backup with the user-supplied passphrase.
