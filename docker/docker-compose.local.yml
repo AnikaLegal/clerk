@@ -70,7 +70,9 @@ services:
       - 5174:5174
     volumes:
       - ../intake/src:/intake/src
+      - ../intake/tests:/intake/tests
       - ../intake/vite.config.ts:/intake/vite.config.ts
+      - ../intake/vitest.config.ts:/intake/vitest.config.ts
       - ../intake/tsconfig.json:/intake/tsconfig.json
       - ../intake/package.json:/intake/package.json
   # For testing.
