@@ -16,10 +16,17 @@ def render_intake_page(request, title, react_context=None):
         "dsn": settings.SENTRY_JS_DSN or "",
         "environment": settings.ENVIRONMENT or "",
     }
+    # Runtime config the SPA reads from window.INTAKE_CONFIG. The Google Maps
+    # key powers the address autocomplete; when empty the form falls back to
+    # manual address entry.
+    intake_config = {
+        "googleMapsApiKey": settings.GOOGLE_MAPS_API_KEY or "",
+    }
     context = {
         "title": title,
         "react_context": json.dumps(react_context or {}),
         "sentry_context": json.dumps(sentry_context),
+        "intake_config": json.dumps(intake_config),
         # The shared navbar hides its "Get free help" call to action here: the
         # visitor is already in the intake form, so the link is redundant.
         "hide_intake_cta": True,

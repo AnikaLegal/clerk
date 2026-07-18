@@ -28,6 +28,7 @@
   <script>
     window.REACT_CONTEXT = JSON.parse('{{ react_context|escapejs }}')
     window.SENTRY_CONTEXT = JSON.parse('{{ sentry_context|escapejs }}')
+    window.INTAKE_CONFIG = JSON.parse('{{ intake_config|escapejs }}')
   </script>
   {% analytics %}
   <script>

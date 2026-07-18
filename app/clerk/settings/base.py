@@ -390,3 +390,9 @@ MS_GRAPH_DRIVE_ID = None
 MS_REMOVE_OFFICE_LICENCES = False
 
 SENTRY_JS_DSN = os.environ.get("SENTRY_JS_DSN")
+
+# Browser API key for the Google Places address autocomplete on the public
+# intake form. Referrer-restricted, so it is exposed to the client (via
+# window.INTAKE_CONFIG). Empty in dev/CI, where the form degrades to manual
+# address entry.
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")
