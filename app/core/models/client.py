@@ -139,7 +139,7 @@ class Client(TimestampedModel):
 
     # Eligibility
     centrelink_support = models.BooleanField(default=False)
-    eligibility_notes = models.CharField(max_length=1024, default="", blank=True)
+    eligibility_notes = models.TextField(default="", blank=True)
     is_aboriginal_or_torres_strait_islander = models.CharField(
         max_length=32,
         choices=AboriginalOrTorresStraitIslander.choices,
@@ -157,7 +157,7 @@ class Client(TimestampedModel):
 
     # Language
     primary_language_non_english = models.BooleanField(default=False)
-    primary_language = models.CharField(max_length=32, blank=True, default="")
+    primary_language = models.CharField(max_length=64, blank=True, default="")
 
     requires_interpreter = models.CharField(
         max_length=32,
