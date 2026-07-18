@@ -41,25 +41,29 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     description: 'You can find this written on your lease',
   },
   {
-    name: 'SUBURB',
+    name: 'ADDRESS',
     type: 'TEXT',
     required: true,
+    maxLength: 256,
+    title: 'What is your home address?',
+  },
+  {
+    name: 'SUBURB',
+    type: 'TEXT',
+    // Filled by the address search, or entered by hand in manual mode - hence
+    // required only when manual (see attachAddressAutocomplete / ADDRESS_MODE).
+    required: false,
+    requiredIf: "{ADDRESS_MODE} = 'manual'",
     maxLength: 128,
     title: 'What suburb do you live in?',
   },
   {
     name: 'POSTCODE',
     type: 'NUMBER',
-    required: true,
+    required: false,
+    requiredIf: "{ADDRESS_MODE} = 'manual'",
     max: 999999,
     title: 'What is your postcode?',
-  },
-  {
-    name: 'ADDRESS',
-    type: 'TEXT',
-    required: true,
-    maxLength: 256,
-    title: 'What is your street address?',
   },
   {
     name: 'WEEKLY_RENT',

@@ -205,7 +205,7 @@ export const PAGES: IntakePage[] = [
   },
   {
     name: 'PROPERTY_ADDRESS',
-    questions: ['SUBURB', 'POSTCODE', 'ADDRESS', 'WEEKLY_RENT'],
+    questions: ['ADDRESS', 'SUBURB', 'POSTCODE', 'WEEKLY_RENT'],
   },
 
   // Landlord

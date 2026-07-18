@@ -10,7 +10,7 @@
     "noEmit": true,
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "types": ["vite/client"]
+    "types": ["vite/client", "google.maps"]
   },
   "include": ["src/**/*", "tests/**/*"]
 }

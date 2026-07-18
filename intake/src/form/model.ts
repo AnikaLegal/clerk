@@ -48,6 +48,9 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
     // Element-level visibility: pages can now hold several questions, so each
     // question shows/hides on its own condition within a visible page.
     visibleIf: q.visibleIf,
+    // Conditional-required, e.g. the address suburb/postcode are only required
+    // when the user is entering the address manually.
+    requiredIf: q.requiredIf,
   }
   switch (q.type) {
     case 'DISPLAY':

@@ -42,6 +42,10 @@ export interface IntakeQuestion {
   // SurveyJS visibility expression, e.g. "{ISSUES} = 'BONDS'". Replaces the
   // old form's askCondition functions.
   visibleIf?: string
+  // SurveyJS conditional-required expression, e.g. "{ADDRESS_MODE} = 'manual'".
+  // Used where a field's requiredness depends on another answer (the address
+  // suburb/postcode are only required when entered manually).
+  requiredIf?: string
   // Value applied when the question is left blank on leaving its page, e.g.
   // NUMBER_OF_DEPENDENTS defaults to 0 (the old form's skip effect).
   skipDefault?: string | number | boolean

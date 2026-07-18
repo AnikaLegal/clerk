@@ -6,6 +6,7 @@ import { Survey } from 'survey-react-ui'
 import { events } from '../analytics'
 import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
+import { attachAddressAutocomplete } from '../form/address/attach'
 import { getExitRoute } from '../form/exits'
 import { buildSurveyModel, WELCOME_PAGE } from '../form/model'
 import { SubmissionSaver } from '../form/save'
@@ -56,6 +57,7 @@ const setUpForm = (): FormState => {
   const visited = new Set(stored.visited)
   survey.data = stored.data
   attachUploadHandler(survey)
+  attachAddressAutocomplete(survey)
 
   const saver = new SubmissionSaver(stored.submissionId, () => persist())
   const persist = () => {
