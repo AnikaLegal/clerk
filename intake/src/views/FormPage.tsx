@@ -34,6 +34,10 @@ interface PageElement {
   isVisible: boolean
 }
 
+// Direction of the last page change, used to slide the incoming page in from
+// the side the user is travelling towards (forward -> from the right).
+type Direction = 'forward' | 'back'
+
 const isBlank = (value: unknown): boolean =>
   value === undefined ||
   value === null ||
@@ -123,7 +127,10 @@ export const FormPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { survey, saver, visited } = useMemo(setUpForm, [])
-  const [progress, setProgress] = useState(() => readProgress(survey))
+  const [progress, setProgress] = useState(() => ({
+    ...readProgress(survey),
+    direction: 'forward' as Direction,
+  }))
 
   // Browser history <-> survey page sync, so the browser Back / Forward buttons
   // move between the survey's pages instead of leaving the form. Each page gets
@@ -233,7 +240,10 @@ export const FormPage = () => {
       // the WELCOME and SUBMIT pages.
       pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
       pageCountItem.visible = p.section >= 0
-      setProgress(p)
+      setProgress({
+        ...p,
+        direction: goingForward.current ? 'forward' : 'back',
+      })
     }
 
     // Send a per-page funnel event the first time each page is reached (so back
@@ -379,7 +389,18 @@ export const FormPage = () => {
       }
     >
       {progress.section >= 0 && <SectionProgress current={progress.section} />}
-      <Survey model={survey} />
+      {/* The outer div clips the horizontal slide; the inner is re-keyed by page
+          name so the direction-aware animation in global.css replays on every
+          page change. The survey Model is stable across the remount (it lives in
+          useMemo), so only the view is rebuilt. */}
+      <div className="intake-page">
+        <div
+          key={progress.name}
+          className={`intake-page__inner intake-page__inner--${progress.direction}`}
+        >
+          <Survey model={survey} />
+        </div>
+      </div>
     </div>
   )
 }
