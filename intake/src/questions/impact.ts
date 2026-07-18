@@ -77,6 +77,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     name: 'FIRST_LANGUAGE',
     required: true,
     type: 'TEXT',
+    maxLength: 64,
     title:
       'What is your <strong>preferred language</strong> other than English?',
     visibleIf: '{CAN_SPEAK_NON_ENGLISH} = true',

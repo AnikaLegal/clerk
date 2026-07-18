@@ -48,6 +48,13 @@ export interface IntakeQuestion {
   // TEXT only: render a textarea instead of a single line input.
   multiline?: boolean
   placeholder?: string
+  // Max characters for TEXT / EMAIL answers, mirroring the length of the DB
+  // column the answer is written to (see core/services/submission.py) so a user
+  // can't enter data that overflows the field when the submission is processed.
+  maxLength?: number
+  // Max value for NUMBER answers, for the same reason (e.g. POSTCODE fits its
+  // 6-char column, WEEKLY_RENT fits its integer field).
+  max?: number
 }
 
 // A survey page groups one or more related questions. Questions keep their

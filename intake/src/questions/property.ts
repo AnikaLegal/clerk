@@ -44,24 +44,28 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     name: 'SUBURB',
     type: 'TEXT',
     required: true,
+    maxLength: 128,
     title: 'What suburb do you live in?',
   },
   {
     name: 'POSTCODE',
     type: 'NUMBER',
     required: true,
+    max: 999999,
     title: 'What is your postcode?',
   },
   {
     name: 'ADDRESS',
     type: 'TEXT',
     required: true,
+    maxLength: 256,
     title: 'What is your street address?',
   },
   {
     name: 'WEEKLY_RENT',
     type: 'NUMBER',
     required: true,
+    max: 100000,
     title: 'How much is your weekly rent?',
   },
 ]

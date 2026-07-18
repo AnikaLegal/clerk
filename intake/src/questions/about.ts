@@ -5,6 +5,7 @@ export const ABOUT_QUESTIONS: IntakeQuestion[] = [
     name: 'EMAIL',
     required: true,
     type: 'EMAIL',
+    maxLength: 150,
     title: "What's the best <strong>email</strong> to reach you?",
     description:
       "We'll only use this to contact you about your request. We won't share your details.",
@@ -13,18 +14,21 @@ export const ABOUT_QUESTIONS: IntakeQuestion[] = [
     name: 'FIRST_NAME',
     required: true,
     type: 'TEXT',
+    maxLength: 150,
     title: "What's your <strong>first name?</strong>",
   },
   {
     name: 'LAST_NAME',
     required: true,
     type: 'TEXT',
+    maxLength: 150,
     title: 'And your <strong>last name?</strong>',
   },
   {
     name: 'PREFERRED_NAME',
     required: false,
     type: 'TEXT',
+    maxLength: 150,
     title:
       'Do you have a <strong>preferred name</strong> that you would like us to use?',
   },

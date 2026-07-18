@@ -60,20 +60,27 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
       }
     case 'TEXT':
       return q.multiline
-        ? { ...base, type: 'comment', autoGrow: true }
-        : { ...base, type: 'text', placeholder: q.placeholder }
+        ? { ...base, type: 'comment', autoGrow: true, maxLength: q.maxLength }
+        : {
+            ...base,
+            type: 'text',
+            placeholder: q.placeholder,
+            maxLength: q.maxLength,
+          }
     case 'NUMBER':
       return {
         ...base,
         type: 'text',
         inputType: 'number',
-        validators: [{ type: 'numeric' }],
+        max: q.max,
+        validators: [{ type: 'numeric', maxValue: q.max }],
       }
     case 'EMAIL':
       return {
         ...base,
         type: 'text',
         inputType: 'email',
+        maxLength: q.maxLength,
         validators: [{ type: 'email' }],
       }
     case 'PHONE':
@@ -169,6 +176,9 @@ export const buildSurveyModel = (): Model => {
     // GENDER free text replaces the choice value rather than being stored
     // in a separate comment field.
     storeOthersAsComment: false,
+    // Cap the "other" self-describe text (GENDER is the only such question) to
+    // the gender DB column's length, so it can't overflow during processing.
+    maxOthersLength: 64,
     completeText: 'Confirm',
   })
   // Render the built-in navigation buttons (Previous / Next / Confirm) as
