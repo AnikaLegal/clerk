@@ -467,3 +467,52 @@ header .h-\[63px\] img {
   background: color-mix(in oklab, var(--color-primary) 12%, transparent);
 }
 
+/* Clear (x) button inside the right edge of the search field. Room is made
+   with input padding so text never runs under the button. */
+.intake-combobox input {
+  padding-right: 40px;
+}
+
+/* The website's stylesheets paint bare <button> elements as full blue pill
+   buttons (padding, primary fill, pill radius, shadow), so - as with the nav
+   buttons above - reset every one of those properties at higher specificity
+   to get a small, quiet in-field control. */
+.intake-form button.intake-combobox__clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 0;
+  height: 28px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  color: #666;
+  cursor: pointer;
+}
+
+.intake-form button.intake-combobox__clear:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+
+.intake-form button.intake-combobox__clear:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* Only show the button when there is something to clear: hidden while the
+   field is empty (the placeholder is showing) or read-only (manual mode). */
+.intake-form .intake-combobox input:placeholder-shown ~ .intake-combobox__clear,
+.intake-form .intake-combobox input:read-only ~ .intake-combobox__clear {
+  display: none;
+}
+

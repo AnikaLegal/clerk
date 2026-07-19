@@ -152,6 +152,21 @@ export const attachAddressAutocomplete = (survey: Model) => {
     input.setAttribute('aria-controls', listId)
     input.setAttribute('aria-expanded', 'false')
 
+    // A clear (x) button inside the right edge of the field. Its visibility is
+    // pure CSS: hidden while the field is empty (:placeholder-shown - the
+    // question defines a placeholder) or read-only (manual mode's enableIf).
+    // The icon is an inline SVG cross: it centres geometrically in the button
+    // (a text glyph sits on a baseline) and follows the button's text colour.
+    const clearButton = document.createElement('button')
+    clearButton.type = 'button'
+    clearButton.className = 'intake-combobox__clear'
+    clearButton.setAttribute('aria-label', 'Clear address search')
+    clearButton.innerHTML =
+      '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">' +
+      '<path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>' +
+      '</svg>'
+    wrapper.appendChild(clearButton)
+
     // -- listbox state -------------------------------------------------------
     let suggestions: SuggestionLike[] = []
     let activeIndex = -1
@@ -305,6 +320,17 @@ export const attachAddressAutocomplete = (survey: Model) => {
 
     input.addEventListener('blur', () => {
       window.setTimeout(close, 150)
+    })
+
+    clearButton.addEventListener('click', () => {
+      // Same effect as the user deleting the text: reset the search, the
+      // filled parts and any error, then hand focus back to the field.
+      survey.setValue(SEARCH, undefined)
+      input.value = ''
+      clearParts()
+      question.clearErrors()
+      close()
+      input.focus()
     })
   })
 }
