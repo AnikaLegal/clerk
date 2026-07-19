@@ -19,9 +19,9 @@ export const BONDS_MOVE_OUT_PAGE = 'BONDS_MOVE_OUT'
 const IS_REPAIRS = "{ISSUES} = 'REPAIRS'"
 const IS_EVICTION = "{ISSUES} = 'EVICTION_RETALIATORY'"
 const IS_BONDS = "{ISSUES} = 'BONDS'"
-const IS_BONDS_WITH_CLAIM = `${IS_BONDS} and {BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM} = true`
+const IS_BONDS_WITH_APPLICATION = `${IS_BONDS} and {BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION} = true`
 const isClaimReason = (reason: string) =>
-  `${IS_BONDS_WITH_CLAIM} and {BONDS_CLAIM_REASONS} contains '${reason}'`
+  `${IS_BONDS_WITH_APPLICATION} and {BONDS_CLAIM_REASONS} contains '${reason}'`
 const MEANS_INELIGIBLE =
   'meansIneligible({CENTRELINK_SUPPORT}, {ELIGIBILITY_CIRCUMSTANCES}, {ANNUAL_INCOME_RANGE}, {NUMBER_OF_DEPENDENTS})'
 
@@ -134,13 +134,8 @@ export const PAGES: IntakePage[] = [
     questions: ['BOND_RTBA'],
   },
   {
-    name: 'BONDS_CLAIM',
-    visibleIf: IS_BONDS,
-    questions: ['BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM'],
-  },
-  {
     name: 'BONDS_RTBA_APPLICATION',
-    visibleIf: IS_BONDS_WITH_CLAIM,
+    visibleIf: IS_BONDS,
     questions: [
       'BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION',
       'BONDS_TENANT_HAS_RTBA_APPLICATION_COPY',
@@ -149,7 +144,7 @@ export const PAGES: IntakePage[] = [
   },
   {
     name: 'BONDS_REASONS',
-    visibleIf: IS_BONDS_WITH_CLAIM,
+    visibleIf: IS_BONDS_WITH_APPLICATION,
     questions: ['BONDS_CLAIM_REASONS'],
   },
   {

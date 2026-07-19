@@ -12,9 +12,12 @@ const REASONS = {
 }
 
 const IS_BONDS = "{ISSUES} = 'BONDS'"
-const IS_BONDS_WITH_CLAIM = `${IS_BONDS} and {BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM} = true`
+// The claim branch: only claims the landlord has actually lodged with VCAT
+// continue (a "No" / "I don't know" answer exits to the bond-recovery page,
+// see form/exits.ts).
+const IS_BONDS_WITH_APPLICATION = `${IS_BONDS} and {BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION} = true`
 const isClaimReason = (reason: string) =>
-  `${IS_BONDS_WITH_CLAIM} and {BONDS_CLAIM_REASONS} contains '${reason}'`
+  `${IS_BONDS_WITH_APPLICATION} and {BONDS_CLAIM_REASONS} contains '${reason}'`
 
 export const BONDS_QUESTIONS: IntakeQuestion[] = [
   {
@@ -49,20 +52,8 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     title: `Is your bond still held by the <a target="_blank" href="${RTBA_LINK}">RTBA</a>?`,
   },
   {
-    name: 'BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM',
-    visibleIf: IS_BONDS,
-    required: true,
-    type: 'CHOICE_SINGLE',
-    choices: [
-      { value: true, text: 'Yes' },
-      { value: false, text: 'No' },
-    ],
-    title:
-      'Has your landlord or agent already told you they intend to make a claim on your bond?',
-  },
-  {
     name: 'BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION',
-    visibleIf: IS_BONDS_WITH_CLAIM,
+    visibleIf: IS_BONDS,
     required: true,
     type: 'CHOICE_SINGLE',
     choices: [
@@ -74,7 +65,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
   },
   {
     name: 'BONDS_TENANT_HAS_RTBA_APPLICATION_COPY',
-    visibleIf: `${IS_BONDS_WITH_CLAIM} and {BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION} = true`,
+    visibleIf: IS_BONDS_WITH_APPLICATION,
     required: true,
     type: 'CHOICE_SINGLE',
     choices: [
@@ -85,14 +76,14 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
   },
   {
     name: 'BONDS_RTBA_APPLICATION_UPLOAD',
-    visibleIf: `${IS_BONDS_WITH_CLAIM} and {BONDS_TENANT_HAS_RTBA_APPLICATION_COPY} = true`,
+    visibleIf: `${IS_BONDS_WITH_APPLICATION} and {BONDS_TENANT_HAS_RTBA_APPLICATION_COPY} = true`,
     required: false,
     type: 'UPLOAD',
     title: `Please upload the landlord/real estate agent's <a target="_blank" href="${VCAT_LINK}">VCAT</a> application.`,
   },
   {
     name: 'BONDS_CLAIM_REASONS',
-    visibleIf: IS_BONDS_WITH_CLAIM,
+    visibleIf: IS_BONDS_WITH_APPLICATION,
     required: true,
     type: 'CHOICE_MULTI',
     choices: [

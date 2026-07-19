@@ -51,7 +51,6 @@ describe('eligibility exits', () => {
   it.each([
     ['BONDS_MOVE_OUT_DATE', null],
     ['BOND_RTBA', false],
-    ['BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', "I don't know"],
   ])('exits out-of-scope bonds cases (%s = %s)', (name, value) => {
