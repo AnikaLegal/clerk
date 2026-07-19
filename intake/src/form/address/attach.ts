@@ -1,6 +1,6 @@
 import { Model } from 'survey-core'
 
-import { getGoogleMapsApiKey } from '../../config'
+import { getGoogleMapsApiKey, isMockMaps } from '../../config'
 import { logException } from '../../utils'
 import { loadPlaces } from './load-maps'
 import { isVictoria, parseAddressComponents } from './parse'
@@ -82,7 +82,7 @@ const predictionLabel = (prediction: PredictionLike): string => {
  * form is plain manual entry.
  */
 export const attachAddressAutocomplete = (survey: Model) => {
-  const enabled = Boolean(getGoogleMapsApiKey())
+  const enabled = Boolean(getGoogleMapsApiKey()) || isMockMaps()
   survey.setValue(MAPS_AVAILABLE, enabled)
   if (!enabled) return
 

@@ -1,4 +1,4 @@
-import { getGoogleMapsApiKey } from '../../config'
+import { getGoogleMapsApiKey, isMockMaps } from '../../config'
 import { logException } from '../../utils'
 
 // Loads the Google Maps JS "places" library exactly once (a single in-flight
@@ -29,6 +29,15 @@ const injectScript = (key: string): Promise<boolean> =>
 
 export const loadPlaces = (): Promise<boolean> => {
   if (loadPromise) return loadPromise
+  if (isMockMaps()) {
+    // Dev preview: install the fake Places backend instead of loading Google.
+    // The dynamic import keeps the mock out of the production bundle.
+    loadPromise = import('./mock').then(({ installMockPlaces }) => {
+      installMockPlaces()
+      return true
+    })
+    return loadPromise
+  }
   const key = getGoogleMapsApiKey()
   if (!key) {
     loadPromise = Promise.resolve(false)
