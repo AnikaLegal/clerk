@@ -119,11 +119,18 @@ export const PAGES: IntakePage[] = [
   {
     name: 'EVICTION_HEARING',
     visibleIf: IS_EVICTION,
+    // The hearing date can eject the user (a hearing within a fortnight), so
+    // only its own gate question shares the page; the termination date lives
+    // on the next page, reached only by users who are continuing.
     questions: [
       'EVICTION_RETALIATORY_VCAT_HEARING',
       'EVICTION_RETALIATORY_VCAT_HEARING_DATE',
-      'EVICTION_RETALIATORY_TERMINATION_DATE',
     ],
+  },
+  {
+    name: 'EVICTION_TERMINATION',
+    visibleIf: IS_EVICTION,
+    questions: ['EVICTION_RETALIATORY_TERMINATION_DATE'],
   },
 
   // Bonds branch

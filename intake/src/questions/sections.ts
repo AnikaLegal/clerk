@@ -34,6 +34,7 @@ export const SECTIONS: IntakeSection[] = [
       'EVICTION_NOTICE_TYPE',
       'EVICTION_REASON',
       'EVICTION_HEARING',
+      'EVICTION_TERMINATION',
       'BONDS_MOVE_OUT',
       'BONDS_BOND',
       'BONDS_RTBA_APPLICATION',
