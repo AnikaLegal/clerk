@@ -88,8 +88,12 @@ export const PAGES: IntakePage[] = [
     questions: [
       'EVICTION_RETALIATORY_INTRO',
       'EVICTION_RETALIATORY_IS_ALREADY_REMOVED',
-      'EVICTION_RETALIATORY_HAS_NOTICE',
     ],
+  },
+  {
+    name: 'EVICTION_HAS_NOTICE',
+    visibleIf: IS_EVICTION,
+    questions: ['EVICTION_RETALIATORY_HAS_NOTICE'],
   },
   {
     name: 'EVICTION_NOTICE',
