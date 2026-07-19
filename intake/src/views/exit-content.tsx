@@ -227,9 +227,6 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
           </a>{' '}
           for advice.
         </p>
-        <p>
-          <a href={LINKS.HOME}>Return home</a>
-        </p>
       </>
     ),
   },
