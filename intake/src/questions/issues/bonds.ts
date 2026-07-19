@@ -27,11 +27,13 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
   {
     name: 'BONDS_MOVE_OUT_DATE',
     visibleIf: IS_BONDS,
-    required: false,
+    // Required: users who are not moving out take the dedicated "I'm not
+    // moving out" button on this page (see views/FormPage.tsx), which exits to
+    // the bond-recovery resources page instead of answering.
+    required: true,
     type: 'DATE',
     title:
       'When was, or what will be, the date you move out of your rental property?',
-    description: "Leave this blank if you're not moving out.",
   },
   {
     name: 'BOND_RTBA',

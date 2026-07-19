@@ -8,6 +8,11 @@ export const EMAIL_PAGE = 'ABOUT_EMAIL'
 // shown in or counted by the "Page x of y" progress (see views/FormPage.tsx).
 export const SUBMIT_PAGE = 'SUBMIT'
 
+// The bonds move-out date lives on its own page so it can carry a dedicated
+// "I'm not moving out" button that exits to the bond-recovery resources page
+// (see views/FormPage.tsx).
+export const BONDS_MOVE_OUT_PAGE = 'BONDS_MOVE_OUT'
+
 // Branch guard expressions, kept in step with the question-level visibleIf
 // values in the modules below. When every question on a page shares a branch
 // condition, the page carries it so SurveyJS skips the whole page off-branch.
@@ -119,9 +124,14 @@ export const PAGES: IntakePage[] = [
 
   // Bonds branch
   {
+    name: BONDS_MOVE_OUT_PAGE,
+    visibleIf: IS_BONDS,
+    questions: ['BONDS_INTRO', 'BONDS_MOVE_OUT_DATE'],
+  },
+  {
     name: 'BONDS_BOND',
     visibleIf: IS_BONDS,
-    questions: ['BONDS_INTRO', 'BONDS_MOVE_OUT_DATE', 'BOND_RTBA'],
+    questions: ['BOND_RTBA'],
   },
   {
     name: 'BONDS_CLAIM',

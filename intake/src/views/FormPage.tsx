@@ -17,6 +17,7 @@ import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
 import {
+  BONDS_MOVE_OUT_PAGE,
   EMAIL_PAGE,
   QUESTIONS_BY_NAME,
   SECTIONS,
@@ -221,6 +222,16 @@ export const FormPage = () => {
       visible: false,
       action: () => navigate(ROUTES.NO_EMAIL),
     })
+    // Its sibling on the bonds move-out date page: users who are not moving
+    // out exit to the bond-recovery resources page instead of answering the
+    // (required) date question.
+    const notMovingOutItem = survey.addNavigationItem({
+      id: 'nav-not-moving-out',
+      title: "I'm not moving out",
+      innerCss: 'd-btn intake-btn-secondary',
+      visible: false,
+      action: () => navigate(ROUTES.BONDS_RECOVERY),
+    })
     // A non-interactive "Page x of y" count rendered at the far right of the
     // navigation bar, vertically centred with the Previous / Next buttons. Its
     // wrapper is pushed right and its button styling stripped to plain text in
@@ -243,6 +254,8 @@ export const FormPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
+      notMovingOutItem.visible =
+        survey.currentPage?.name === BONDS_MOVE_OUT_PAGE
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
       // The count follows the stepper: hidden wherever section is -1, i.e. on
       // the WELCOME and SUBMIT pages.
