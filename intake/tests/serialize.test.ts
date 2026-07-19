@@ -53,6 +53,35 @@ describe('serializeAnswers', () => {
     expect('SUBMIT' in answers).toBe(false)
   })
 
+  it('never emits UI-only questions or bare data keys', () => {
+    const survey = buildSurveyModel()
+    survey.autoAdvanceEnabled = false
+    survey.data = {
+      MAPS_AVAILABLE: true,
+      ADDRESS_SEARCH: '12 Example Street, Fitzroy VIC 3065',
+      ADDRESS_MANUAL: false,
+      ADDRESS: '12 Example Street',
+      SUBURB: 'Fitzroy',
+      POSTCODE: 3065,
+    }
+    const visited = new Set([
+      'ADDRESS_SEARCH',
+      'ADDRESS_MANUAL',
+      'ADDRESS',
+      'SUBURB',
+      'POSTCODE',
+    ])
+    const answers = serializeAnswers(survey, visited)
+    // The real address fields are in the payload...
+    expect(answers.ADDRESS).toBe('12 Example Street')
+    expect(answers.SUBURB).toBe('Fitzroy')
+    expect(answers.POSTCODE).toBe(3065)
+    // ...but the search box, manual checkbox and availability flag are not.
+    expect('ADDRESS_SEARCH' in answers).toBe(false)
+    expect('ADDRESS_MANUAL' in answers).toBe(false)
+    expect('MAPS_AVAILABLE' in answers).toBe(false)
+  })
+
   it('drops answers from branches no longer taken', () => {
     const survey = buildSurveyModel()
     survey.autoAdvanceEnabled = false

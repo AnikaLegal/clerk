@@ -23,14 +23,15 @@ const walk = (answers: Answers): string[] => {
     const page = survey.currentPage
     if (!page) break
     // Set every answer the persona has for this page's questions first, so
-    // conditional questions on the same page become visible.
-    for (const el of page.elements) {
+    // conditional questions on the same page become visible. page.questions
+    // (not .elements) so questions nested inside panels are included.
+    for (const el of page.questions) {
       const value = answers[el.name]
       if (value !== undefined && value !== null) {
         survey.setValue(el.name, value)
       }
     }
-    for (const el of page.elements) {
+    for (const el of page.questions) {
       if (el.isVisible) seen.push(el.name)
     }
     if (survey.isLastPage) break

@@ -25,6 +25,9 @@ export const serializeAnswers = (
   const answers: Answers = {}
   for (const q of QUESTIONS) {
     if (q.type === 'DISPLAY') continue
+    // UI-only questions (address search box, manual-entry checkbox) drive
+    // in-form behaviour but are not part of the wire contract.
+    if (q.uiOnly) continue
     // Questions now share pages, so visibility is read off the question
     // itself (its element-level visibleIf, which also reflects its page being
     // hidden), not a page named after it.
@@ -52,6 +55,7 @@ export const deserializeAnswers = (answers: Answers): Answers => {
   const data: Answers = {}
   for (const q of QUESTIONS) {
     if (q.type === 'DISPLAY') continue
+    if (q.uiOnly) continue
     if (!(q.name in answers)) continue
     let value = answers[q.name]
     if (q.type === 'UPLOAD' && Array.isArray(value)) {

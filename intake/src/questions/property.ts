@@ -40,30 +40,68 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     title: 'When did you start living at this property?',
     description: 'You can find this written on your lease',
   },
+  // The home address block (grouped by the HOME_ADDRESS panel in pages.ts).
+  // With Google Places available, the search box drives the read-only street/
+  // suburb/postcode fields below it; the manual checkbox flips them editable
+  // (and required) instead. Without Places (no key: dev/CI, or script failure)
+  // MAPS_AVAILABLE is unset/false, so the search box and checkbox hide and the
+  // three fields are editable and required - plain manual entry.
+  // MAPS_AVAILABLE / ADDRESS_SEARCH / ADDRESS_MANUAL never reach the backend:
+  // the first is a bare survey.data key, the others are uiOnly questions.
+  {
+    name: 'ADDRESS_SEARCH',
+    type: 'TEXT',
+    required: false,
+    uiOnly: true,
+    // No maxLength: the search text is never submitted (uiOnly), and a cap
+    // would render SurveyJS's character counter on the field.
+    title: 'Find your address',
+    placeholder: 'Start typing your address...',
+    visibleIf: '{MAPS_AVAILABLE} = true',
+    enableIf: '{ADDRESS_MANUAL} <> true',
+    requiredIf: '{MAPS_AVAILABLE} = true and {ADDRESS_MANUAL} <> true',
+    validators: [
+      {
+        type: 'expression',
+        expression: '{ADDRESS} notempty or {ADDRESS_MANUAL} = true',
+        text: 'Please choose an address from the suggestions',
+      },
+    ],
+  },
+  {
+    name: 'ADDRESS_MANUAL',
+    type: 'BOOLEAN',
+    required: false,
+    uiOnly: true,
+    title: 'Enter address manually',
+    visibleIf: '{MAPS_AVAILABLE} = true',
+  },
   {
     name: 'ADDRESS',
     type: 'TEXT',
-    required: true,
+    required: false,
+    requiredIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
+    enableIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
     maxLength: 256,
-    title: 'What is your home address?',
+    title: 'Street address',
   },
   {
     name: 'SUBURB',
     type: 'TEXT',
-    // Filled by the address search, or entered by hand in manual mode - hence
-    // required only when manual (see attachAddressAutocomplete / ADDRESS_MODE).
     required: false,
-    requiredIf: "{ADDRESS_MODE} = 'manual'",
+    requiredIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
+    enableIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
     maxLength: 128,
-    title: 'What suburb do you live in?',
+    title: 'Suburb',
   },
   {
     name: 'POSTCODE',
     type: 'NUMBER',
     required: false,
-    requiredIf: "{ADDRESS_MODE} = 'manual'",
+    requiredIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
+    enableIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
     max: 999999,
-    title: 'What is your postcode?',
+    title: 'Postcode',
   },
   {
     name: 'WEEKLY_RENT',

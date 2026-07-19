@@ -47,9 +47,10 @@ const isBlank = (value: unknown): boolean =>
 
 // Names of the questions currently visible on a page, in display order. A
 // hidden conditional question is excluded so its side effect / exit predicate
-// isn't evaluated against an absent answer.
-const visibleNames = (page: { elements: PageElement[] }): string[] =>
-  page.elements.filter((el) => el.isVisible).map((el) => el.name)
+// isn't evaluated against an absent answer. Reads page.questions (not
+// .elements) so questions nested inside panels are included.
+const visibleNames = (page: { questions: PageElement[] }): string[] =>
+  page.questions.filter((el) => el.isVisible).map((el) => el.name)
 
 const setUpForm = (): FormState => {
   const stored = loadState()
@@ -85,12 +86,17 @@ const setUpForm = (): FormState => {
     const nextPage = survey.pages.find(
       (page) =>
         page.isVisible &&
-        (page.elements as unknown as PageElement[]).some((el) => {
+        // page.questions (not .elements) so questions inside panels count.
+        (page.questions as unknown as PageElement[]).some((el) => {
           const question = QUESTIONS_BY_NAME[el.name]
+          // DISPLAY and uiOnly questions don't hold answers, so they can't
+          // make a page count as unfinished (a server resume seeds visited
+          // from the answers, which never include them).
           return (
             el.isVisible &&
             question &&
             question.type !== 'DISPLAY' &&
+            !question.uiOnly &&
             !visited.has(el.name)
           )
         })
@@ -289,7 +295,7 @@ export const FormPage = () => {
         startFired.current = true
         events.onFormBegin()
       }
-      const names = visibleNames(page as unknown as { elements: PageElement[] })
+      const names = visibleNames(page as unknown as { questions: PageElement[] })
       // Apply skip defaults for questions left blank (e.g. dependants -> 0)
       // and record every question on the page as passed.
       for (const name of names) {

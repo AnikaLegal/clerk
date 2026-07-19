@@ -13,6 +13,7 @@ export type FieldType =
   | 'CHOICE_MULTI'
   | 'UPLOAD'
   | 'PHONE'
+  | 'BOOLEAN'
 
 export interface ChoiceOption {
   value: string | boolean
@@ -42,10 +43,20 @@ export interface IntakeQuestion {
   // SurveyJS visibility expression, e.g. "{ISSUES} = 'BONDS'". Replaces the
   // old form's askCondition functions.
   visibleIf?: string
-  // SurveyJS conditional-required expression, e.g. "{ADDRESS_MODE} = 'manual'".
+  // SurveyJS conditional-required expression, e.g. "{ADDRESS_MANUAL} = true".
   // Used where a field's requiredness depends on another answer (the address
-  // suburb/postcode are only required when entered manually).
+  // fields are only required when entered manually).
   requiredIf?: string
+  // SurveyJS conditional-enabled expression. When false the question renders
+  // read-only (e.g. the address fields are read-only unless entered manually).
+  enableIf?: string
+  // UI-only questions drive in-form behaviour (the address search box and its
+  // manual-entry checkbox) but are never part of the wire payload - both
+  // serializeAnswers and deserializeAnswers skip them.
+  uiOnly?: boolean
+  // Extra SurveyJS validators, e.g. the address search box's expression
+  // validator requiring a suggestion to have been chosen.
+  validators?: Record<string, unknown>[]
   // Value applied when the question is left blank on leaving its page, e.g.
   // NUMBER_OF_DEPENDENTS defaults to 0 (the old form's skip effect).
   skipDefault?: string | number | boolean
@@ -61,6 +72,16 @@ export interface IntakeQuestion {
   max?: number
 }
 
+// A group of questions rendered as a single SurveyJS panel: one visual block
+// with a shared title (e.g. the home-address search + street/suburb/postcode
+// fields). Purely presentational - the questions inside keep their own flat
+// names and values, unlike a composite question.
+export interface IntakePanel {
+  panel: string
+  title?: string
+  questions: string[]
+}
+
 // A survey page groups one or more related questions. Questions keep their
 // individual definitions (and element-level visibleIf); the page just decides
 // which ones render together. `visibleIf` is a page-level guard used when
@@ -69,9 +90,16 @@ export interface IntakeQuestion {
 export interface IntakePage {
   name: string
   visibleIf?: string
-  // Ordered question names on the page, including any DISPLAY intros.
-  questions: string[]
+  // Ordered question names on the page (including any DISPLAY intros), with
+  // panel groups inline where questions render as one block.
+  questions: (string | IntakePanel)[]
 }
+
+// The page's question names in display order, with panel groups flattened.
+export const pageQuestionNames = (page: IntakePage): string[] =>
+  page.questions.flatMap((entry) =>
+    typeof entry === 'string' ? entry : entry.questions
+  )
 
 import type { components } from '../api/types.generated'
 

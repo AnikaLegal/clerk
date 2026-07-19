@@ -432,57 +432,38 @@ header .h-\[63px\] img {
   }
 }
 
-/* Property address autocomplete (form/address/attach.ts). In search mode a
-   single Google Places box replaces the street/suburb/postcode inputs; the
-   suburb/postcode rows and the native street input are hidden via inline
-   styles by applyMode, so only these presentational styles live here. */
-.intake-address__search {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* Property address autocomplete (form/address/attach.ts): a WAI-ARIA combobox
+   on the ADDRESS_SEARCH question's own input. The suggestion list is rendered
+   inside the input's wrapper, positioned under the field. */
+.intake-combobox {
+  position: relative;
 }
 
-/* The <gmp-place-autocomplete> custom element renders its own input; make it a
-   full-width block so it lines up with the survey's other fields. */
-.intake-address__input {
-  display: block;
-  width: 100%;
-}
-
-/* Read-back of the chosen address (confirmation) and the non-Victoria
-   rejection message. */
-.intake-address__status {
-  margin: 0;
-  font-size: 14px;
-}
-
-.intake-address__status:empty {
-  display: none;
-}
-
-.intake-address__status--ok {
-  color: var(--color-primary);
-}
-
-.intake-address__status--error {
-  color: #d72207;
-}
-
-/* "Enter address manually" / "Search for my address instead" toggles: plain
-   text links, not the site's full-width form buttons. */
-.intake-form button.intake-address__toggle {
-  width: auto;
-  align-self: flex-start;
-  margin: 4px 0 0;
+.intake-combobox__list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 2px 0 0;
   padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-primary);
-  font-size: 14px;
-  text-decoration: underline;
-  cursor: pointer;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  max-height: 240px;
+  overflow: auto;
 }
 
-.intake-form button.intake-address__toggle:hover {
-  text-decoration: none;
+.intake-combobox__option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 15px;
 }
+
+.intake-combobox__option:hover,
+.intake-combobox__option--active {
+  background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+}
+

@@ -48,9 +48,12 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
     // Element-level visibility: pages can now hold several questions, so each
     // question shows/hides on its own condition within a visible page.
     visibleIf: q.visibleIf,
-    // Conditional-required, e.g. the address suburb/postcode are only required
-    // when the user is entering the address manually.
+    // Conditional-required, e.g. the address street/suburb/postcode are only
+    // required when the user is entering the address manually.
     requiredIf: q.requiredIf,
+    // Conditional-enabled: when false the question renders read-only (e.g. the
+    // address fields are read-only while the search box fills them).
+    enableIf: q.enableIf,
   }
   switch (q.type) {
     case 'DISPLAY':
@@ -69,6 +72,7 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
             type: 'text',
             placeholder: q.placeholder,
             maxLength: q.maxLength,
+            validators: q.validators,
           }
     case 'NUMBER':
       return {
@@ -76,7 +80,7 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         type: 'text',
         inputType: 'number',
         max: q.max,
-        validators: [{ type: 'numeric', maxValue: q.max }],
+        validators: [{ type: 'numeric', maxValue: q.max }, ...(q.validators ?? [])],
       }
     case 'EMAIL':
       return {
@@ -84,7 +88,7 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         type: 'text',
         inputType: 'email',
         maxLength: q.maxLength,
-        validators: [{ type: 'email' }],
+        validators: [{ type: 'email' }, ...(q.validators ?? [])],
       }
     case 'PHONE':
       // The old form validated phone numbers as non-empty and length < 16.
@@ -98,7 +102,18 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
             maxLength: 15,
             text: "Hold on, that phone number doesn't look valid",
           },
+          ...(q.validators ?? []),
         ],
+      }
+    case 'BOOLEAN':
+      // A single labelled checkbox (e.g. "Enter address manually"). The title
+      // is rendered as the checkbox label rather than a question heading.
+      return {
+        ...base,
+        type: 'boolean',
+        renderAs: 'checkbox',
+        titleLocation: 'hidden',
+        label: q.title,
       }
     case 'DATE':
       // Native date input emits the wire format (YYYY-MM-DD) directly.
@@ -154,8 +169,20 @@ export const buildSurveyModel = (): Model => {
       ...PAGES.map((page) => ({
         name: page.name,
         visibleIf: page.visibleIf,
-        elements: page.questions.map((name) =>
-          toElement(QUESTIONS_BY_NAME[name])
+        // A string entry is a question; a panel entry renders its questions as
+        // one visual block with a shared title. Panels are presentational only:
+        // the questions inside keep their own flat names and values.
+        elements: page.questions.map((entry) =>
+          typeof entry === 'string'
+            ? toElement(QUESTIONS_BY_NAME[entry])
+            : {
+                type: 'panel',
+                name: entry.panel,
+                title: entry.title,
+                elements: entry.questions.map((name) =>
+                  toElement(QUESTIONS_BY_NAME[name])
+                ),
+              }
         ),
       })),
     ],
