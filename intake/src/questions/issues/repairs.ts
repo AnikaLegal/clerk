@@ -14,8 +14,6 @@ export const REPAIRS_QUESTIONS: IntakeQuestion[] = [
     type: 'UPLOAD',
     visibleIf: "{ISSUES} = 'REPAIRS'",
     title: 'Do you have any photos of the problems that you could upload?',
-    description:
-      'If you do not have any photos of the problems to upload, that’s okay.',
   },
   {
     name: 'REPAIRS_ISSUE_START',

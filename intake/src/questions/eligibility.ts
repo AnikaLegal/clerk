@@ -82,8 +82,6 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'NUMBER',
     title: 'How many dependants do you have?',
-    description:
-      'If you do not have any dependants, leave this blank and continue.',
     skipDefault: 0,
   },
   {
@@ -92,8 +90,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     type: 'CHOICE_MULTI',
     colCount: 2,
     title: 'Do any of the following apply to you?',
-    description:
-      "This helps us prioritise support. You can skip this if you're not sure. To skip, leave this blank and continue.",
+    description: 'This helps us prioritise support.',
     choices: [
       { value: 'STRUGGLING', text: "I'm experiencing financial stress" },
       { value: 'HOUSING', text: 'I live in public or community housing' },

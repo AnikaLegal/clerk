@@ -39,10 +39,17 @@ const WELCOME_HTML = `
 const choiceColumns = (q: IntakeQuestion): { colCount?: number } =>
   q.colCount === undefined ? {} : { colCount: q.colCount }
 
+// Optional questions carry an "(optional)" suffix on their title so users
+// know they can skip them. Conditionally-required questions (requiredIf,
+// e.g. the address fields in manual mode) are left unmarked - they are
+// sometimes required, and SurveyJS shows its required asterisk dynamically.
+const titleFor = (q: IntakeQuestion): string | undefined =>
+  q.title && !q.required && !q.requiredIf ? `${q.title} (optional)` : q.title
+
 const toElement = (q: IntakeQuestion): Record<string, unknown> => {
   const base = {
     name: q.name,
-    title: q.title,
+    title: titleFor(q),
     description: q.description,
     isRequired: q.required,
     // Element-level visibility: pages can now hold several questions, so each

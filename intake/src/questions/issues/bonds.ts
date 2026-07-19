@@ -31,7 +31,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     type: 'DATE',
     title:
       'When was, or what will be, the date you move out of your rental property?',
-    description: "If you're not moving out, leave this blank and continue.",
+    description: "Leave this blank if you're not moving out.",
   },
   {
     name: 'BOND_RTBA',
