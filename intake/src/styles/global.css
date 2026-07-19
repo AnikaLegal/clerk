@@ -380,6 +380,29 @@ header .h-\[63px\] img {
   margin: 0;
 }
 
+/* Lists inside question titles/descriptions (e.g. the bonds cleaning upload's
+   document list). The website's stylesheets give bare li elements their own
+   typography (18px, 0.9px letter-spacing, tall line-height), which clashes
+   with the surrounding survey text - inherit the question typography instead
+   and keep conventional bullet indentation. */
+.intake-form .sd-question__title ul,
+.intake-form .sd-question__description ul {
+  margin: 8px 0 0;
+  padding: 0 0 0 22px;
+  list-style: disc;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+}
+
+.intake-form .sd-question__title li,
+.intake-form .sd-question__description li {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  margin: 0 0 4px;
+}
+
 /* Slide the incoming survey page in from the direction of travel: from the
    right when moving forward (Next), from the left when moving back (Previous).
    FormPage re-keys .intake-page__inner per page and sets the direction modifier,

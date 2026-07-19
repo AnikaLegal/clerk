@@ -201,8 +201,13 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.CLEANING),
     required: false,
     type: 'UPLOAD',
+    // The document list lives in the description (not the title) so it renders
+    // as regular supporting text and the "(optional)" title suffix stays on
+    // the title sentence rather than trailing the list.
     title:
-      "Please upload any of the following documents if you have them. It's okay if you don't.<ul><li>Conditions Report at the start of your tenancy</li><li>Conditions Report at the end of your tenancy</li><li>Receipt for end of lease cleaning you have already paid for</li><li>Quote for end of lease cleaning you have not yet paid for</li></ul>",
+      "Please upload any of the following documents if you have them. It's okay if you don't.",
+    description:
+      '<ul><li>Conditions Report at the start of your tenancy</li><li>Conditions Report at the end of your tenancy</li><li>Receipt for end of lease cleaning you have already paid for</li><li>Quote for end of lease cleaning you have not yet paid for</li></ul>',
   },
   {
     name: 'BONDS_LOCKS_INTRO',
