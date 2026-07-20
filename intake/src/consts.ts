@@ -35,11 +35,9 @@ export const API_URLS = {
 // side routes.
 export const LINKS = {
   HOME: '/',
-  SERVICES: '/services/',
   TERMS_OF_USE: '/resources/terms-of-use/',
   PRIVACY_POLICY: '/resources/privacy-policy/',
   COLLECTIONS_STATEMENT: '/resources/collections-statement/',
-  ELIGIBILITY_PAGE: '/resources/eligibility-criteria/',
   EVICTION_INFO: '/services/eviction-support/',
   REPAIRS_INFO: '/services/rental-repairs/',
   BONDS_INFO: '/services/bond-recovery/',
