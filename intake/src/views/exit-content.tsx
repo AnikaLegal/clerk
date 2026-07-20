@@ -41,7 +41,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://www.communitylegalqld.org.au/"
+              href="https://www.clcq.org.au/"
             >
               QLD
             </a>
@@ -59,7 +59,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://www.communitylegalwa.org.au/pages/faqs/category/clc-location?Take=26"
+              href="https://communitylegalwa.org.au/need-legal-help/"
             >
               WA
             </a>
@@ -68,7 +68,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://nt.gov.au/community/multicultural-communities/support-for-communities/community-legal-services"
+              href="https://nt.gov.au/law/processes/get-legal-advice/introduction"
             >
               NT
             </a>
@@ -77,7 +77,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
             <a
               target="_blank"
               rel="noreferrer"
-              href="http://www.clctas.org.au/"
+              href="https://clctas.org.au/"
             >
               TAS
             </a>
@@ -124,7 +124,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
           </a>{' '}
           or engage a{' '}
           <a
-            href="https://www.liv.asn.au/Referral"
+            href="https://www.liv.asn.au/legalhelp"
             target="_blank"
             rel="noreferrer"
           >
@@ -210,7 +210,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
         <p>
           We suggest you contact{' '}
           <a
-            href="https://www.legalaid.vic.gov.au/node/11560"
+            href="https://www.legalaid.vic.gov.au/speak-to-us"
             target="_blank"
             rel="noreferrer"
           >
