@@ -28,7 +28,7 @@ interface FormExit {
   // user, or a *_BUTTON identifier for the dedicated exit buttons ("I'm not
   // moving out", "I don't have an email address").
   question: string
-  // The exit page's client route, e.g. /bonds-recovery/.
+  // The exit page's client route, e.g. /ineligible/bond-out-of-scope/.
   route: string
 }
 
@@ -50,7 +50,7 @@ export const events = {
   // User is ejected to an eligibility exit page (or takes a dedicated exit
   // button). Fired on every occurrence - returning to the form and exiting
   // again is a new event. The question disambiguates exits that share a
-  // destination (e.g. the several gates that all lead to /bonds-recovery/).
+  // destination (e.g. the several gates that all lead to /ineligible/bond-out-of-scope/).
   onFormExit: ({ question, route }: FormExit) =>
     window.gtag('event', 'form_exit', {
       form_id: FORM_ID,

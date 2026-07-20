@@ -54,11 +54,14 @@ describe('analytics events', () => {
   })
 
   it('onFormExit sends form_exit with the trigger and destination', () => {
-    events.onFormExit({ question: 'BOND_RTBA', route: '/bonds-recovery/' })
+    events.onFormExit({
+      question: 'BOND_RTBA',
+      route: '/ineligible/bond-out-of-scope/',
+    })
     expect(gtag).toHaveBeenCalledWith('event', 'form_exit', {
       form_id: 'intake',
       question: 'BOND_RTBA',
-      route: '/bonds-recovery/',
+      route: '/ineligible/bond-out-of-scope/',
     })
   })
 })

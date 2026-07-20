@@ -7,16 +7,19 @@ export const ROUTES = {
   // Other splash pages
   SUBMITTED: '/submitted/',
   NO_EMAIL: '/no-email/',
-  // Eligibility exit pages
-  GEOGRAPHY: '/geography/',
-  LEGAL_SCOPE_COMPENSATION: '/legal-scope-compensation/',
-  INELIGIBLE_MEANS: '/means/',
-  INELIGIBLE_REPAIRS_APPLIED_VCAT: '/repairs-applied-vcat/',
-  INELIGIBLE_REPAIRS_GOTTEN_VCAT: '/repairs-gotten-vcat/',
-  INELIGIBLE_NO_EVICTIONS_NOTICE: '/ineligible/no-notice/',
-  INELIGIBLE_ALREADY_REMOVED: '/ineligible/already-removed/',
-  INELIGIBLE_VCAT_HEARING: '/ineligible/vcat-hearing/',
-  BONDS_RECOVERY: '/bonds-recovery/',
+  // Eligibility exit pages. Slugs name the exit reason in plain language under
+  // a shared /ineligible/ prefix (one path family for analytics filtering) -
+  // except VCAT representation, where the user opts not to continue rather
+  // than being ruled ineligible, hence the /exit/ prefix.
+  GEOGRAPHY: '/ineligible/outside-victoria/',
+  LEGAL_SCOPE_COMPENSATION: '/ineligible/compensation/',
+  INELIGIBLE_MEANS: '/ineligible/income/',
+  INELIGIBLE_REPAIRS_APPLIED_VCAT: '/exit/vcat-representation/',
+  INELIGIBLE_REPAIRS_GOTTEN_VCAT: '/ineligible/repairs-order-obtained/',
+  INELIGIBLE_NO_EVICTIONS_NOTICE: '/ineligible/no-notice-to-vacate/',
+  INELIGIBLE_ALREADY_REMOVED: '/ineligible/already-evicted/',
+  INELIGIBLE_VCAT_HEARING: '/ineligible/urgent-hearing/',
+  BONDS_RECOVERY: '/ineligible/bond-out-of-scope/',
   RESUME: '/resume/',
 } as const
 
