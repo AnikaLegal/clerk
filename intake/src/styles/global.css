@@ -102,12 +102,14 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
-/* The site's `form input` rule adds a 44px bottom margin under 1300px (to space
-   stacked form fields). It bleeds onto the navigation bar's <input> buttons and
-   the page count, so when the row wraps on narrow screens the wrapped items sit
-   far apart. The nav row spaces itself with its own flex gap, so drop the
-   bleed. */
-.intake-form .sd-body__navigation input {
+/* The site's `form input` rule adds a 44px bottom margin under 1300px (to
+   space its own stacked form fields). It bleeds onto every in-flow <input>
+   in the survey - question fields, the nav buttons, the page count - adding
+   44px of dead space under each field and spreading wrapped nav rows apart.
+   SurveyJS spaces its fields through its container padding, so drop the
+   bleed across the whole form and let that spacing take over. */
+.intake-form form input,
+.intake-form form select {
   margin-bottom: 0;
 }
 
