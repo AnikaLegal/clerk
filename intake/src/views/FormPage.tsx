@@ -220,7 +220,10 @@ export const FormPage = () => {
       title: "I don't have an email address",
       innerCss: 'd-btn intake-btn-secondary',
       visible: false,
-      action: () => navigate(ROUTES.NO_EMAIL),
+      action: () => {
+        events.onFormExit({ question: 'NO_EMAIL_BUTTON', route: ROUTES.NO_EMAIL })
+        navigate(ROUTES.NO_EMAIL)
+      },
     })
     // Its sibling on the bonds move-out date page: users who are not moving
     // out exit to the bond-recovery resources page instead of answering the
@@ -230,7 +233,13 @@ export const FormPage = () => {
       title: "I'm not moving out",
       innerCss: 'd-btn intake-btn-secondary',
       visible: false,
-      action: () => navigate(ROUTES.BONDS_RECOVERY),
+      action: () => {
+        events.onFormExit({
+          question: 'NOT_MOVING_OUT_BUTTON',
+          route: ROUTES.BONDS_RECOVERY,
+        })
+        navigate(ROUTES.BONDS_RECOVERY)
+      },
     })
     // A non-interactive "Page x of y" count rendered at the far right of the
     // navigation bar, vertically centred with the Previous / Next buttons. Its
@@ -332,6 +341,7 @@ export const FormPage = () => {
         if (exit) {
           options.allow = false
           persist()
+          events.onFormExit({ question: name, route: exit })
           navigate(exit)
           return
         }

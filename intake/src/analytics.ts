@@ -23,6 +23,15 @@ interface FormStep {
   section?: string
 }
 
+interface FormExit {
+  // What triggered the exit: the name of the question whose answer ejected the
+  // user, or a *_BUTTON identifier for the dedicated exit buttons ("I'm not
+  // moving out", "I don't have an email address").
+  question: string
+  // The exit page's client route, e.g. /bonds-recovery/.
+  route: string
+}
+
 export const events = {
   // User begins the questionnaire (advances off the welcome page). Named to sit
   // in the form_* funnel family without clashing with GA4's reserved
@@ -37,6 +46,16 @@ export const events = {
       step_index: index,
       step_name: name,
       ...(section ? { section } : {}),
+    }),
+  // User is ejected to an eligibility exit page (or takes a dedicated exit
+  // button). Fired on every occurrence - returning to the form and exiting
+  // again is a new event. The question disambiguates exits that share a
+  // destination (e.g. the several gates that all lead to /bonds-recovery/).
+  onFormExit: ({ question, route }: FormExit) =>
+    window.gtag('event', 'form_exit', {
+      form_id: FORM_ID,
+      question,
+      route,
     }),
   // User submits the questionnaire. Also fires the Facebook standard
   // SubmitApplication conversion.

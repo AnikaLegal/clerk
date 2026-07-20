@@ -52,4 +52,13 @@ describe('analytics events', () => {
       step_name: 'WELCOME',
     })
   })
+
+  it('onFormExit sends form_exit with the trigger and destination', () => {
+    events.onFormExit({ question: 'BOND_RTBA', route: '/bonds-recovery/' })
+    expect(gtag).toHaveBeenCalledWith('event', 'form_exit', {
+      form_id: 'intake',
+      question: 'BOND_RTBA',
+      route: '/bonds-recovery/',
+    })
+  })
 })
