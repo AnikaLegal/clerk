@@ -148,6 +148,14 @@ export const FormPage = () => {
   // change that is itself mirroring a Back / Forward, so it isn't re-recorded.
   const lastPage = useRef<string | null>(null)
   const suppressPush = useRef(false)
+  // Marks a browser-Forward move being replayed through survey.nextPage() so
+  // the full forward pipeline (validation, skip defaults, exits, side effects)
+  // runs, but the resulting page change is not re-recorded in the history.
+  const forwardReconcile = useRef(false)
+  // Set when onPageChanging ejects to an exit page, so the reconcile effect
+  // knows the blocked Forward move already navigated away and must not try to
+  // step the history back in line.
+  const exitFired = useRef(false)
   // Direction of the page change in progress, captured in onCurrentPageChanging
   // (which carries it) and read in onCurrentPageChanged (which does not), so a
   // backward move via the survey's Previous button steps back through history
@@ -195,12 +203,40 @@ export const FormPage = () => {
       return
     }
     const page = survey.getPageByName(target)
-    if (page && page.isVisible) {
+    if (!page || !page.isVisible) return
+    const pages = survey.visiblePages
+    const delta = pages.indexOf(page) - pages.indexOf(survey.currentPage)
+    if (delta <= 0) {
+      // Backward: mirror the history move directly - going back to an earlier
+      // page is always allowed.
       suppressPush.current = true
       lastPage.current = target
       survey.currentPage = page
+      return
     }
-  }, [location, survey])
+    if (delta > 1) {
+      // A multi-entry Forward jump (e.g. via the Forward button's long-press
+      // menu): unwind one entry at a time; each step lands back in this effect
+      // until the move is a single step that the gate below can vet.
+      navigate(-1)
+      return
+    }
+    // Single-step Forward: replay it through the survey's own forward pipeline
+    // (validation, skip defaults, eligibility exits, side effects) rather than
+    // teleporting past it - otherwise going back, changing an answer to a
+    // disqualifying one and pressing Forward would walk straight past the exit.
+    forwardReconcile.current = true
+    exitFired.current = false
+    survey.nextPage()
+    forwardReconcile.current = false
+    if (survey.currentPage?.name !== target && !exitFired.current) {
+      // Validation blocked the advance (errors are now showing): step the
+      // history back in line with the survey. The reconcile fires again for
+      // that entry and finds the survey already there.
+      lastPage.current = survey.currentPage?.name ?? null
+      navigate(-1)
+    }
+  }, [location, survey, navigate])
 
   // Stamp the initial history entry for the page the survey opens on (WELCOME
   // for a fresh visitor, or the restored page when resuming). Runs once on
@@ -340,6 +376,7 @@ export const FormPage = () => {
         const exit = getExitRoute(name, survey.data as Answers)
         if (exit) {
           options.allow = false
+          exitFired.current = true
           persist()
           events.onFormExit({ question: name, route: exit })
           navigate(exit)
@@ -356,7 +393,7 @@ export const FormPage = () => {
       syncPage()
       reportPage()
       const name = survey.currentPage?.name ?? null
-      if (suppressPush.current) {
+      if (suppressPush.current || forwardReconcile.current) {
         // This change mirrors a Back / Forward - it is already in the history.
         suppressPush.current = false
         lastPage.current = name
