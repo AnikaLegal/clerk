@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from django.urls import reverse
+from django_recaptcha.client import RecaptchaResponse
 
 from webhooks.models import JotformSubmission, WebflowContact
 
@@ -47,6 +48,67 @@ def test_webflow_form_create_fails(client):
     assert resp.status_code == 400
     assert resp.json()["type"] == "validation_error"
     assert resp.json()["errors"][0]["detail"] == "Invalid request format."
+    assert WebflowContact.objects.count() == 0
+
+
+@pytest.mark.django_db
+@mock.patch("django_recaptcha.fields.client.submit")
+@mock.patch("webhooks.services.slack.send_slack_message")
+def test_intake_no_email_create(mock_slack, mocked_submit, client):
+    """
+    A no-email intake contact request creates a WebflowContact (name + phone).
+    """
+    mocked_submit.return_value = RecaptchaResponse(
+        is_valid=True, action="intake_noemail", extra_data={"score": 1.0}
+    )
+    url = reverse("intake-noemail")
+    data = {
+        "name": "Jane Doe",
+        "phone": "0412345678",
+        "captcha": "dummy-captcha-response",
+    }
+    resp = client.post(url, data=data, content_type="application/json")
+    assert resp.status_code == 201
+    contact = WebflowContact.objects.get()
+    assert contact.name == "Jane Doe"
+    assert contact.phone == "0412345678"
+    assert contact.email == ""
+
+
+@pytest.mark.django_db
+@mock.patch("django_recaptcha.fields.client.submit")
+def test_intake_no_email_requires_valid_captcha(mocked_submit, client):
+    """
+    A missing or invalid captcha is rejected and no contact is created.
+    """
+    mocked_submit.return_value = RecaptchaResponse(is_valid=False)
+    url = reverse("intake-noemail")
+    data = {
+        "name": "Jane Doe",
+        "phone": "0412345678",
+        "captcha": "bad-captcha",
+    }
+    resp = client.post(url, data=data, content_type="application/json")
+    assert resp.status_code == 400
+    assert WebflowContact.objects.count() == 0
+
+
+@pytest.mark.django_db
+@mock.patch("django_recaptcha.fields.client.submit")
+def test_intake_no_email_requires_name_and_phone(mocked_submit, client):
+    """
+    Name and phone are required even with a valid captcha.
+    """
+    mocked_submit.return_value = RecaptchaResponse(
+        is_valid=True, action="intake_noemail", extra_data={"score": 1.0}
+    )
+    url = reverse("intake-noemail")
+    resp = client.post(
+        url,
+        data={"captcha": "dummy-captcha-response"},
+        content_type="application/json",
+    )
+    assert resp.status_code == 400
     assert WebflowContact.objects.count() == 0
 
 

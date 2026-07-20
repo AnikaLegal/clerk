@@ -102,6 +102,14 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
+/* Form-level failure message (e.g. the submit request failed), shown between the
+   form and the exit buttons. */
+.intake-form-error {
+  margin: 12px 0 0;
+  color: #e60a3e;
+  font-weight: 600;
+}
+
 /* The site's `form input` rule adds a 44px bottom margin under 1300px (to
    space its own stacked form fields). It bleeds onto every in-flow <input>
    in the survey - question fields, the nav buttons, the page count - adding
@@ -327,61 +335,6 @@ header .h-\[63px\] img {
   flex-wrap: wrap;
 }
 
-/* The public site's global form rules (components.css) bleed onto this form:
-   align-items:center, full-width inputs, a 44px bottom margin under 1300px, and
-   a full-viewport-width breakout (negative margins + padding) under 800px.
-   Neutralise them so the form stays a tidy, left-aligned column at every width
-   and its own flex gap controls the spacing. */
-.intake-noemail-form {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
-  width: 100%;
-  max-width: 420px;
-  margin: 24px 0 0;
-  padding: 0;
-}
-
-.intake-noemail-form input {
-  margin-bottom: 0;
-}
-
-.intake-noemail-form button {
-  align-self: flex-start;
-}
-
-.intake-noemail-form input[type='text'],
-.intake-noemail-form input[type='tel'] {
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.intake-checkbox {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  font-size: 15px;
-}
-
-/* The site's `form input { width: 100% }` stretches the checkbox to fill the
-   row; pin it to a real checkbox size and align it with the first label line. */
-.intake-checkbox input[type='checkbox'] {
-  width: 18px;
-  height: 18px;
-  min-width: 18px;
-  margin: 2px 0 0;
-  flex-shrink: 0;
-  accent-color: var(--color-primary);
-}
-
-.intake-error {
-  color: #d72207;
-  margin: 0;
-}
-
 /* Lists inside question titles/descriptions (e.g. the bonds cleaning upload's
    document list). The website's stylesheets give bare li elements their own
    typography (18px, 0.9px letter-spacing, tall line-height), which clashes
@@ -540,4 +493,3 @@ header .h-\[63px\] img {
 .intake-form .intake-combobox input:read-only ~ .intake-combobox__clear {
   display: none;
 }
-

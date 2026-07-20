@@ -1,5 +1,8 @@
 post:
   operationId: createIntakeNoEmailContact
+  description: >
+    Contact request from an intake user with no email address. Creates a
+    WebflowContact (name and phone only), guarded by reCAPTCHA v3.
   requestBody:
     content:
       application/json:
@@ -9,15 +12,21 @@ post:
             name:
               type: string
               minLength: 2
-            phone_number:
+              maxLength: 255
+            phone:
               type: string
               minLength: 6
+              maxLength: 255
+            captcha:
+              type: string
+              description: reCAPTCHA v3 token for the "intake_noemail" action.
           required:
             - name
-            - phone_number
+            - phone
+            - captcha
   responses:
-    "200":
-      description: Successful response.
+    "201":
+      description: Contact request created.
       content:
         application/json:
           schema:

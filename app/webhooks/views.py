@@ -4,11 +4,9 @@ import logging
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django.conf import settings
 
-from emails.models import Email, EmailState
+from .forms import IntakeNoEmailForm
 from .models import JotformSubmission, WebflowContact
-from .serializers import NoEmailSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -16,24 +14,16 @@ logger = logging.getLogger(__file__)
 @api_view(["POST"])
 def intake_no_email_view(request):
     """
-    For when a intake form user has no email but wants to contact us.
+    For when an intake form user has no email but wants to contact us. Creates
+    a WebflowContact (the same model, blacklist check and Slack callback alert
+    as the landing contact form), guarded by reCAPTCHA.
     """
-    serializer = NoEmailSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    name = serializer.validated_data["name"]
-    phone = serializer.validated_data["phone_number"]
-    email_data = {
-        "from_address": settings.DEFAULT_FROM_EMAIL,
-        "to_address": settings.INTAKE_NOEMAIL_EMAIL,
-        "subject": f"Intake submitted with no email address [{name}]",
-        "state": EmailState.READY_TO_SEND,
-        "text": f"{name} tried to complete the intake form but they have no email. Their phone number is {phone}",
-    }
-    logger.info("Received no-email intake submission %s", email_data)
-    if settings.INTAKE_NOEMAIL_EMAIL:
-        Email.objects.create(**email_data)
-
-    return Response({}, status=200)
+    form = IntakeNoEmailForm(request.data)
+    if not form.is_valid():
+        raise ValidationError(form.errors)
+    contact = form.save()
+    logger.info("Created no-email intake WebflowContact<%s>", contact.pk)
+    return Response({}, status=201)
 
 
 @api_view(["POST"])

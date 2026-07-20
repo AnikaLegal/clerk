@@ -1,6 +1,7 @@
 import { API_URLS } from '../consts'
 import { Answers, Upload } from '../form/types'
 import { http } from './client'
+import { getRecaptchaToken } from './recaptcha'
 import type { components } from './types.generated'
 
 // Contract types generated from openapi/ (npm run schema). The looser
@@ -43,12 +44,12 @@ export const api = {
     },
   },
   noemail: {
-    // Contact fallback for users without an email address.
-    create: async (name: string, phoneNumber: string): Promise<void> => {
-      await http.post(API_URLS.NO_EMAIL, {
-        name,
-        phone_number: phoneNumber,
-      })
+    // Contact fallback for users without an email address: creates a
+    // WebflowContact via the same pipeline as the site's landing contact form,
+    // guarded by a reCAPTCHA v3 token.
+    create: async (name: string, phone: string): Promise<void> => {
+      const captcha = await getRecaptchaToken('intake_noemail')
+      await http.post(API_URLS.NO_EMAIL, { name, phone, captcha })
     },
   },
 }

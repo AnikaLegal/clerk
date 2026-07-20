@@ -17,10 +17,12 @@ def render_intake_page(request, title, react_context=None):
         "environment": settings.ENVIRONMENT or "",
     }
     # Runtime config the SPA reads from window.INTAKE_CONFIG. The Google Maps
-    # key powers the address autocomplete; when empty the form falls back to
-    # manual address entry.
+    # key powers the address autocomplete (when empty the form falls back to
+    # manual address entry); the reCAPTCHA site key guards the no-email contact
+    # form.
     intake_config = {
         "googleMapsApiKey": settings.GOOGLE_MAPS_API_KEY or "",
+        "recaptchaSiteKey": settings.RECAPTCHA_PUBLIC_KEY or "",
     }
     context = {
         "title": title,

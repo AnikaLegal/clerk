@@ -77,6 +77,7 @@ export interface paths {
     }
     get?: never
     put?: never
+    /** @description Contact request from an intake user with no email address. Creates a WebflowContact (name and phone only), guarded by reCAPTCHA v3. */
     post: operations['createIntakeNoEmailContact']
     delete?: never
     options?: never
@@ -1512,13 +1513,15 @@ export interface operations {
       content: {
         'application/json': {
           name: string
-          phone_number: string
+          phone: string
+          /** @description reCAPTCHA v3 token for the "intake_noemail" action. */
+          captcha: string
         }
       }
     }
     responses: {
-      /** @description Successful response. */
-      200: {
+      /** @description Contact request created. */
+      201: {
         headers: {
           [name: string]: unknown
         }
