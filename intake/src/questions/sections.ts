@@ -28,6 +28,7 @@ export const SECTIONS: IntakeSection[] = [
     pages: [
       'REPAIRS_ABOUT',
       'REPAIRS_STEPS',
+      'REPAIRS_APPLIED',
       'EVICTION_STATUS',
       'EVICTION_HAS_NOTICE',
       'EVICTION_NOTICE',

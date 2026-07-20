@@ -78,7 +78,15 @@ export const PAGES: IntakePage[] = [
   {
     name: 'REPAIRS_STEPS',
     visibleIf: IS_REPAIRS,
-    questions: ['REPAIRS_VCAT', 'REPAIRS_APPLIED_VCAT'],
+    questions: ['REPAIRS_VCAT'],
+  },
+  {
+    // Only reached when the user applied to VCAT (and wasn't ejected for
+    // already holding an order): the continue-or-not gate stands alone, so a
+    // user being ejected off REPAIRS_STEPS is never asked to answer it first.
+    name: 'REPAIRS_APPLIED',
+    visibleIf: `${IS_REPAIRS} and {REPAIRS_VCAT} contains 'APPLIED_VCAT'`,
+    questions: ['REPAIRS_APPLIED_VCAT'],
   },
 
   // Eviction branch
