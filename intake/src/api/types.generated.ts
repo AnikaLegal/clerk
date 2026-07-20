@@ -763,8 +763,6 @@ export interface components {
           damage_quote?: components['schemas']['SubmissionFiles'] | null
           has_landlord_made_rtba_application?:
             components['schemas']['BooleanYesNo'] | null
-          landlord_intents_to_make_claim?:
-            components['schemas']['BooleanYesNo'] | null
           locks_changed_by_tenant?: components['schemas']['BooleanYesNo'] | null
           locks_claim_amount?: number | null
           locks_change_quote?: components['schemas']['SubmissionFiles'] | null

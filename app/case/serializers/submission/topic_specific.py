@@ -95,7 +95,6 @@ class BondsSpecificSerializer(serializers.Serializer):
         allow_null=True, child=FileUploadField(allow_null=True)
     )
     has_landlord_made_rtba_application = BooleanYesNoDisplayField(allow_null=True)
-    landlord_intents_to_make_claim = BooleanYesNoDisplayField(allow_null=True)
     locks_changed_by_tenant = BooleanYesNoDisplayField(allow_null=True)
     locks_claim_amount = serializers.IntegerField(allow_null=True)
     locks_change_quote = serializers.ListField(
@@ -118,9 +117,6 @@ class BondsSpecificSerializer(serializers.Serializer):
             "move_out_date": string_to_date(instance.get("BONDS_MOVE_OUT_DATE")),
             "has_landlord_made_rtba_application": instance.get(
                 "BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION"
-            ),
-            "landlord_intents_to_make_claim": instance.get(
-                "BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM"
             ),
             "tenant_has_rtba_application_copy": instance.get(
                 "BONDS_TENANT_HAS_RTBA_APPLICATION_COPY"

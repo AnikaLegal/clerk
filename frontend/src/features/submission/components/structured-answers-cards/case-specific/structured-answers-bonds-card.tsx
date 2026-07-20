@@ -20,10 +20,6 @@ export const StructuredAnswersBondsCard = ({
     [
       { label: 'Move out date', value: bonds.move_out_date },
       {
-        label: 'RP intends to make claim?',
-        value: bonds.landlord_intents_to_make_claim?.label,
-      },
-      {
         label: 'Tenant has RTBA application copy?',
         value: bonds.tenant_has_rtba_application_copy?.label,
       },

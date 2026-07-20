@@ -2176,10 +2176,6 @@ components:
                   allOf:
                     - $ref: "#/components/schemas/BooleanYesNo"
                   nullable: true
-                landlord_intents_to_make_claim:
-                  allOf:
-                    - $ref: "#/components/schemas/BooleanYesNo"
-                  nullable: true
                 locks_changed_by_tenant:
                   allOf:
                     - $ref: "#/components/schemas/BooleanYesNo"

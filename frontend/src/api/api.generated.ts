@@ -1045,7 +1045,6 @@ export type SubmissionAnswers = {
       damage_claim_description?: string | null;
       damage_quote?: SubmissionFiles | null;
       has_landlord_made_rtba_application?: BooleanYesNo | null;
-      landlord_intents_to_make_claim?: BooleanYesNo | null;
       locks_changed_by_tenant?: BooleanYesNo | null;
       locks_claim_amount?: number | null;
       locks_change_quote?: SubmissionFiles | null;

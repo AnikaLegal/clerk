@@ -559,7 +559,6 @@ class SubmissionFactory(TimestampedModelFactory):
                     length=fake.random_int(min=1, max=3),
                 ),
                 "BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION": fake.boolean(),
-                "BONDS_LANDLORD_INTENTS_TO_MAKE_CLAIM": fake.boolean(),
                 "BONDS_MOVE_OUT_DATE": fake.date_between(
                     start_date="-1y", end_date="today"
                 ).strftime("%Y-%m-%d"),
