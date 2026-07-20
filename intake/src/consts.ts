@@ -11,15 +11,15 @@ export const ROUTES = {
   // a shared /ineligible/ prefix (one path family for analytics filtering) -
   // except VCAT representation, where the user opts not to continue rather
   // than being ruled ineligible, hence the /exit/ prefix.
-  GEOGRAPHY: '/ineligible/outside-victoria/',
-  LEGAL_SCOPE_COMPENSATION: '/ineligible/compensation/',
-  INELIGIBLE_MEANS: '/ineligible/income/',
-  INELIGIBLE_REPAIRS_APPLIED_VCAT: '/exit/vcat-representation/',
-  INELIGIBLE_REPAIRS_GOTTEN_VCAT: '/ineligible/repairs-order-obtained/',
-  INELIGIBLE_NO_EVICTIONS_NOTICE: '/ineligible/no-notice-to-vacate/',
-  INELIGIBLE_ALREADY_REMOVED: '/ineligible/already-evicted/',
-  INELIGIBLE_VCAT_HEARING: '/ineligible/urgent-hearing/',
-  BONDS_RECOVERY: '/ineligible/bond-out-of-scope/',
+  INELIGIBLE_OUTSIDE_VICTORIA: '/ineligible/outside-victoria/',
+  INELIGIBLE_COMPENSATION: '/ineligible/compensation/',
+  INELIGIBLE_INCOME: '/ineligible/income/',
+  EXIT_VCAT_REPRESENTATION: '/exit/vcat-representation/',
+  INELIGIBLE_REPAIRS_ORDER_OBTAINED: '/ineligible/repairs-order-obtained/',
+  INELIGIBLE_NO_NOTICE_TO_VACATE: '/ineligible/no-notice-to-vacate/',
+  INELIGIBLE_ALREADY_EVICTED: '/ineligible/already-evicted/',
+  INELIGIBLE_URGENT_HEARING: '/ineligible/urgent-hearing/',
+  INELIGIBLE_BOND_OUT_OF_SCOPE: '/ineligible/bond-out-of-scope/',
   RESUME: '/resume/',
 } as const
 

@@ -236,9 +236,9 @@ export const FormPage = () => {
       action: () => {
         events.onFormExit({
           question: 'NOT_MOVING_OUT_BUTTON',
-          route: ROUTES.BONDS_RECOVERY,
+          route: ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE,
         })
-        navigate(ROUTES.BONDS_RECOVERY)
+        navigate(ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE)
       },
     })
     // A non-interactive "Page x of y" count rendered at the far right of the

@@ -10,7 +10,7 @@ const dateString = (offsetDays: number) =>
 describe('eligibility exits', () => {
   it('exits to compensation scope page', () => {
     expect(getExitRoute('ISSUES', { ISSUES: 'INELIGIBLE_COMPENSATION' })).toBe(
-      ROUTES.LEGAL_SCOPE_COMPENSATION
+      ROUTES.INELIGIBLE_COMPENSATION
     )
     expect(getExitRoute('ISSUES', { ISSUES: 'REPAIRS' })).toBeUndefined()
   })
@@ -18,7 +18,7 @@ describe('eligibility exits', () => {
   it('exits non-Victorian tenants', () => {
     expect(
       getExitRoute('IS_VICTORIAN_TENANT', { IS_VICTORIAN_TENANT: false })
-    ).toBe(ROUTES.GEOGRAPHY)
+    ).toBe(ROUTES.INELIGIBLE_OUTSIDE_VICTORIA)
     expect(
       getExitRoute('IS_VICTORIAN_TENANT', { IS_VICTORIAN_TENANT: true })
     ).toBeUndefined()
@@ -27,7 +27,7 @@ describe('eligibility exits', () => {
   it('exits users who decline to continue after failing the means test', () => {
     expect(
       getExitRoute('INELIGIBLE_CHOICE', { INELIGIBLE_CHOICE: false })
-    ).toBe(ROUTES.INELIGIBLE_MEANS)
+    ).toBe(ROUTES.INELIGIBLE_INCOME)
     expect(
       getExitRoute('INELIGIBLE_CHOICE', { INELIGIBLE_CHOICE: true })
     ).toBeUndefined()
@@ -36,7 +36,7 @@ describe('eligibility exits', () => {
   it('exits repairs users who already have a VCAT order', () => {
     expect(
       getExitRoute('REPAIRS_VCAT', { REPAIRS_VCAT: ['CAV', 'GOTTEN_VCAT'] })
-    ).toBe(ROUTES.INELIGIBLE_REPAIRS_GOTTEN_VCAT)
+    ).toBe(ROUTES.INELIGIBLE_REPAIRS_ORDER_OBTAINED)
     expect(
       getExitRoute('REPAIRS_VCAT', { REPAIRS_VCAT: ['APPLIED_VCAT'] })
     ).toBeUndefined()
@@ -45,7 +45,7 @@ describe('eligibility exits', () => {
   it('exits repairs users at VCAT stage who decline to continue', () => {
     expect(
       getExitRoute('REPAIRS_APPLIED_VCAT', { REPAIRS_APPLIED_VCAT: false })
-    ).toBe(ROUTES.INELIGIBLE_REPAIRS_APPLIED_VCAT)
+    ).toBe(ROUTES.EXIT_VCAT_REPRESENTATION)
   })
 
   it.each([
@@ -54,7 +54,7 @@ describe('eligibility exits', () => {
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', "I don't know"],
   ])('exits out-of-scope bonds cases (%s = %s)', (name, value) => {
-    expect(getExitRoute(name, { [name]: value })).toBe(ROUTES.BONDS_RECOVERY)
+    expect(getExitRoute(name, { [name]: value })).toBe(ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE)
   })
 
   it('keeps in-scope bonds cases', () => {
@@ -73,12 +73,12 @@ describe('eligibility exits', () => {
       getExitRoute('EVICTION_RETALIATORY_IS_ALREADY_REMOVED', {
         EVICTION_RETALIATORY_IS_ALREADY_REMOVED: true,
       })
-    ).toBe(ROUTES.INELIGIBLE_ALREADY_REMOVED)
+    ).toBe(ROUTES.INELIGIBLE_ALREADY_EVICTED)
     expect(
       getExitRoute('EVICTION_RETALIATORY_HAS_NOTICE', {
         EVICTION_RETALIATORY_HAS_NOTICE: false,
       })
-    ).toBe(ROUTES.INELIGIBLE_NO_EVICTIONS_NOTICE)
+    ).toBe(ROUTES.INELIGIBLE_NO_NOTICE_TO_VACATE)
   })
 
   it('exits VCAT hearings within a fortnight, keeps later hearings', () => {
@@ -86,7 +86,7 @@ describe('eligibility exits', () => {
       getExitRoute('EVICTION_RETALIATORY_VCAT_HEARING_DATE', {
         EVICTION_RETALIATORY_VCAT_HEARING_DATE: dateString(7),
       })
-    ).toBe(ROUTES.INELIGIBLE_VCAT_HEARING)
+    ).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
     expect(
       getExitRoute('EVICTION_RETALIATORY_VCAT_HEARING_DATE', {
         EVICTION_RETALIATORY_VCAT_HEARING_DATE: dateString(30),

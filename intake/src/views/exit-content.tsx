@@ -9,7 +9,7 @@ export interface ExitPageContent {
 // Keyed by client route (see consts.ts ROUTES). Copy is ported verbatim from
 // the old intake repo's splash views (src/views/splash/).
 export const EXIT_PAGES: Record<string, ExitPageContent> = {
-  [ROUTES.GEOGRAPHY]: {
+  [ROUTES.INELIGIBLE_OUTSIDE_VICTORIA]: {
     title:
       'Unfortunately, we can currently only help with residential rental issues in Victoria, Australia.',
     body: (
@@ -86,7 +86,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.LEGAL_SCOPE_COMPENSATION]: {
+  [ROUTES.INELIGIBLE_COMPENSATION]: {
     title: 'Unfortunately, compensation claims are outside Anika’s current scope.',
     body: (
       <>
@@ -104,7 +104,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.INELIGIBLE_MEANS]: {
+  [ROUTES.INELIGIBLE_INCOME]: {
     title: 'Unfortunately, your income is above our eligibility requirements.',
     body: (
       <>
@@ -135,7 +135,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.INELIGIBLE_REPAIRS_APPLIED_VCAT]: {
+  [ROUTES.EXIT_VCAT_REPRESENTATION]: {
     title: 'We are sorry we cannot represent you at VCAT.',
     body: (
       <p>
@@ -147,7 +147,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </p>
     ),
   },
-  [ROUTES.INELIGIBLE_REPAIRS_GOTTEN_VCAT]: {
+  [ROUTES.INELIGIBLE_REPAIRS_ORDER_OBTAINED]: {
     title:
       'Unfortunately, we are unable to help further once a Repairs Order has been obtained.',
     body: (
@@ -168,7 +168,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.INELIGIBLE_NO_EVICTIONS_NOTICE]: {
+  [ROUTES.INELIGIBLE_NO_NOTICE_TO_VACATE]: {
     title:
       'Unfortunately, we can only help once your landlord or real estate agent has sent you a Notice to Vacate.',
     body: (
@@ -188,7 +188,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.INELIGIBLE_ALREADY_REMOVED]: {
+  [ROUTES.INELIGIBLE_ALREADY_EVICTED]: {
     title:
       'Unfortunately, we are unable to assist if you have already been evicted from the property.',
     body: (
@@ -201,7 +201,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </p>
     ),
   },
-  [ROUTES.INELIGIBLE_VCAT_HEARING]: {
+  [ROUTES.INELIGIBLE_URGENT_HEARING]: {
     title:
       'Unfortunately, we are unable to assist you in time for your next VCAT hearing.',
     body: (
@@ -221,7 +221,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       </>
     ),
   },
-  [ROUTES.BONDS_RECOVERY]: {
+  [ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE]: {
     title: 'Unfortunately, your bond issue is outside our current scope.',
     body: (
       <>
