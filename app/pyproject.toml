@@ -69,6 +69,7 @@ dev = [
     "invoke>=2.2.0",
     "ipython",
     "python-dotenv>=1.2.1",
+    "rust-just>=1.57.0",
     "setuptools",
     "watchdog[watchmedo]>=5.0.2",
 ]
