@@ -192,36 +192,22 @@ shell print_sql="" debug="":
 psql:
     {{compose}} run --rm web psql
 
-# Run pytest ([path] is an optional positional arg, e.g. `just test app/case/tests`)
-[arg("path", help="Test path to run (a leading app/ is stripped)")]
+# Run pytest in the test container; extra args pass through (leading app/ stripped, dashed flags after --)
 [arg("interactive", long="interactive", short="i", value="1", help="Open a shell in the test container instead of running pytest")]
-[arg("recreate", long="recreate", short="r", value="1", help="Recreate the test DB (--create-db) instead of reusing it")]
-[arg("quiet", long="quiet", short="q", value="1", help="Quiet output and stop on first failure")]
-[arg("verbose", long="verbose", short="v", help="pytest verbosity count, e.g. 2 gives -vv")]
 [arg("debug", long="debug", short="d", value="1", help="Run under debugpy on port 8123")]
-test path="" interactive="" recreate="" quiet="" verbose="0" debug="":
+[arg("FLAGS", help="Args passed to pytest; put dashed flags after -- (e.g. -- -k EXPR)")]
+test interactive="" debug="" *FLAGS:
     #!/usr/bin/env bash
     set -euo pipefail
     export DJANGO_SETTINGS_MODULE={{app_name}}.settings.test
     if [ -n "{{interactive}}" ]; then
       cmd="bash"
     else
-      cmd="python -Xfrozen_modules=off -m pytest"
-      if [ -n "{{recreate}}" ]; then
-        cmd="$cmd --create-db"
-      else
-        cmd="$cmd --reuse-db"
-      fi
-      if [ -n "{{quiet}}" ]; then
-        cmd="$cmd --quiet --no-summary --exitfirst"
-      elif [ -n "{{verbose}}" ] && [ "{{verbose}}" != "0" ]; then
-        cmd="$cmd -$(printf 'v%.0s' $(seq 1 {{verbose}}))"
-      fi
-      if [ -n "{{path}}" ]; then
-        # Strip a host-style "app/" prefix; pytest runs from /app in the container.
-        path="{{path}}"
-        cmd="$cmd ${path#app/}"
-      fi
+      # Strip a host-style "app/" prefix from each arg; pytest runs from /app in the container.
+      given="{{FLAGS}}"
+      stripped=""
+      for a in $given; do stripped="$stripped ${a#app/}"; done
+      cmd="python -Xfrozen_modules=off -m pytest$stripped"
     fi
     debug_args=""
     if [ -n "{{debug}}" ]; then
