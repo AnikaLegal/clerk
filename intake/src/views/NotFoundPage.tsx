@@ -7,10 +7,8 @@ export const NotFoundPage = () => (
     <h1>Page not found</h1>
     <p>Sorry, we couldn't find that page.</p>
     <div className="intake-button-group">
-      <Link to={ROUTES.LANDING}>
-        <button type="button" className="d-btn d-btn-primary">
-          Go to the intake form
-        </button>
+      <Link to={ROUTES.LANDING} className="d-btn d-btn-primary">
+        Go to the intake form
       </Link>
     </div>
   </div>

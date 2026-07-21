@@ -7,10 +7,8 @@ export const SubmittedPage = () => (
     </h1>
     <p>Our paralegals will contact you soon to discuss how we can help you.</p>
     <div className="intake-button-group">
-      <a href={LINKS.HOME}>
-        <button type="button" className="d-btn d-btn-primary">
-          Return home
-        </button>
+      <a href={LINKS.HOME} className="d-btn d-btn-primary">
+        Return home
       </a>
     </div>
   </div>

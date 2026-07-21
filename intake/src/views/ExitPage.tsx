@@ -27,10 +27,8 @@ export const ExitPage = () => {
         >
           Go back
         </button>
-        <a href={LINKS.HOME}>
-          <button type="button" className="d-btn intake-btn-secondary">
-            Return home
-          </button>
+        <a href={LINKS.HOME} className="d-btn intake-btn-secondary">
+          Return home
         </a>
       </div>
     </div>

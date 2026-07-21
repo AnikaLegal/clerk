@@ -104,10 +104,10 @@ header .h-\[63px\] img {
 
 /* The splash pages' Go back / Return home buttons (no-email, eligibility
    exits) share the secondary nav look ("I don't have an email address").
-   They are real <button>s outside the survey - daisyUI's own d-btn-soft would
-   apply to them, but its softer tint reads differently, so restate the
-   nav-button metrics and tint from the input rules above instead. */
-.intake-button-group button.intake-btn-secondary {
+   They are <button>s and link <a>s outside the survey - daisyUI's own
+   d-btn-soft would apply to them, but its softer tint reads differently, so
+   restate the nav-button metrics and tint from the input rules above instead. */
+.intake-button-group .intake-btn-secondary {
   min-width: 110px;
   height: 50px;
   border: 1px solid transparent;
@@ -118,16 +118,26 @@ header .h-\[63px\] img {
   letter-spacing: normal;
   background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
   color: var(--color-primary);
+  text-decoration: none;
   transition: background-color 0.15s ease;
 }
 
-.intake-button-group button.intake-btn-secondary:hover {
+.intake-button-group .intake-btn-secondary:hover {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
-.intake-button-group button.intake-btn-secondary:focus-visible {
+.intake-button-group .intake-btn-secondary:focus-visible {
   outline: 2px solid var(--color-primary) !important;
   outline-offset: 2px;
+}
+
+/* Link <a>s styled as solid primary buttons (e.g. the 404 / submitted pages):
+   the site's unlayered link colour beats daisyUI's layered button foreground,
+   leaving primary-blue text on the primary-blue fill. Re-assert the button
+   text colour. */
+.intake-button-group a.d-btn-primary {
+  color: var(--color-primary-content);
+  text-decoration: none;
 }
 
 /* On the no-email page, treat the whole survey - the fields and the Contact us
