@@ -155,13 +155,13 @@ export const NoEmailPage = () => {
         <div className="intake-button-group">
           <button
             type="button"
-            className="d-btn d-btn-primary d-btn-soft"
+            className="d-btn intake-btn-secondary"
             onClick={() => navigate(-1)}
           >
             Go back
           </button>
           <a href={LINKS.HOME}>
-            <button type="button" className="d-btn d-btn-primary d-btn-soft">
+            <button type="button" className="d-btn intake-btn-secondary">
               Return home
             </button>
           </a>
@@ -190,13 +190,13 @@ export const NoEmailPage = () => {
       <div className="intake-button-group">
         <button
           type="button"
-          className="d-btn d-btn-primary d-btn-soft"
+          className="d-btn intake-btn-secondary"
           onClick={() => navigate(-1)}
         >
           Go back
         </button>
         <a href={LINKS.HOME}>
-          <button type="button" className="d-btn d-btn-primary d-btn-soft">
+          <button type="button" className="d-btn intake-btn-secondary">
             Return home
           </button>
         </a>

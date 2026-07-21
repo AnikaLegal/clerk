@@ -102,6 +102,34 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
+/* The splash pages' Go back / Return home buttons (no-email, eligibility
+   exits) share the secondary nav look ("I don't have an email address").
+   They are real <button>s outside the survey - daisyUI's own d-btn-soft would
+   apply to them, but its softer tint reads differently, so restate the
+   nav-button metrics and tint from the input rules above instead. */
+.intake-button-group button.intake-btn-secondary {
+  min-width: 110px;
+  height: 50px;
+  border: 1px solid transparent;
+  outline: none;
+  padding: 0 18px;
+  font-size: 15.75px;
+  line-height: 1;
+  letter-spacing: normal;
+  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  transition: background-color 0.15s ease;
+}
+
+.intake-button-group button.intake-btn-secondary:hover {
+  background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
+}
+
+.intake-button-group button.intake-btn-secondary:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px;
+}
+
 /* On the no-email page, treat the whole survey - the fields and the Contact us
    button together - as one card (matching the panel's card styling) rather than
    a carded panel with the button loose below it. .sd-body is the common wrapper
