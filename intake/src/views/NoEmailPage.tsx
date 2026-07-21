@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
@@ -110,29 +110,38 @@ export const NoEmailPage = () => {
   const navigate = useNavigate()
   const survey = useMemo(buildNoEmailModel, [])
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const isSubmitting = useRef(false)
 
   useEffect(() => {
-    const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
-      _,
+    const onCompleting: Parameters<typeof survey.onCompleting.add>[0] = (
+      sender,
       options
     ) => {
-      options.showSaveInProgress()
-      const name = String(survey.getValue('NAME') ?? '')
-      const phone = String(survey.getValue('PHONE') ?? '')
+      // Handle submission ourselves and block SurveyJS's own completion, so its
+      // built-in "saving"/completion page never flashes before our success
+      // view. Validation has already passed by the time onCompleting fires.
+      options.allow = false
+      if (isSubmitting.current) return
+      isSubmitting.current = true
+      setError(null)
+      const name = String(sender.getValue('NAME') ?? '')
+      const phone = String(sender.getValue('PHONE') ?? '')
       api.noemail
         .create(name, phone)
         .then(() => setIsSubmitted(true))
-        .catch((error) => {
-          logException(error)
-          // Keep the form (with a retry button) and tell the user it failed -
-          // they have no other way to reach us from here.
-          options.showSaveError(
+        .catch((err) => {
+          logException(err)
+          // Let the user retry and tell them it failed - they have no other way
+          // to reach us from here.
+          isSubmitting.current = false
+          setError(
             'Sorry, something went wrong and your details were not sent. Please try again.'
           )
         })
     }
-    survey.onComplete.add(onComplete)
-    return () => survey.onComplete.remove(onComplete)
+    survey.onCompleting.add(onCompleting)
+    return () => survey.onCompleting.remove(onCompleting)
   }, [survey])
 
   if (isSubmitted) {
@@ -173,6 +182,11 @@ export const NoEmailPage = () => {
       <div className="intake-form intake-form--contact">
         <Survey model={survey} />
       </div>
+      {error && (
+        <p className="intake-form-error" role="alert">
+          {error}
+        </p>
+      )}
       <div className="intake-button-group">
         <button
           type="button"
