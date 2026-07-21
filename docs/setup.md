@@ -8,7 +8,7 @@ You will need:
   You can use [Docker Engine](https://docs.docker.com/engine/install/) on Linux.
 - `docker compose (V2)` ([install](https://docs.docker.com/compose/install/))
 - `transcrypt` ([install](https://github.com/elasticdog/transcrypt#usage))
-- `inv` ([install](https://www.pyinvoke.org/installing.html))
+- `uv` ([install](https://docs.astral.sh/uv/getting-started/installation/))
 
 ## Optional for Local Development
 
@@ -37,33 +37,41 @@ transcrypt -c aes-256-cbc -p $TRANSCRYPT_PASSWORD
 
 The transcrypt password is available in the Tech team Bitwarden account.
 
-Next, build the Docker environment that we'll be using:
+We use [`just`](https://just.systems) as our task runner. It is installed as a dev
+dependency in the app virtualenv, so sync the environment and activate it:
 
 ```bash
-# Build frontend container
-inv build -f
-# Build intake form container
-inv build -i
-# Build Django container (requires the frontend and intake images)
-inv build
+uv --directory app sync
+source app/.venv/bin/activate
+```
+
+Activate the virtualenv in each new shell (or add the `source` line to your shell
+profile), and run all `just` commands from the project root. Run `just` on its own
+to list every recipe, or `just help <recipe>` to see a recipe's usage.
+
+Next, build the Docker containers we'll be using (`just build` builds both the
+frontend and backend images):
+
+```bash
+just build
 ```
 
 You can set up your database with the `reset` command:
 
 ```bash
-inv reset
+just reset
 ```
 
 Create a user for local development and testing using your Anika email address:
 
 ```bash
-inv superuser your.name@anikalegal.com
+just superuser your.name@anikalegal.com
 ```
 
 Finally you can bring up the web server:
 
 ```bash
-inv dev
+just dev
 ```
 
 You should now be able to access:
@@ -73,9 +81,9 @@ You should now be able to access:
 - The Django Admin Interface at
   [`http://localhost:8000/admin`](http://localhost:8000/admin).
 
-You can list other available commands using the `--list` argument of the
-`invoke` command:
+You can list all available recipes by running `just` with no arguments (or
+`just --list`):
 
 ```bash
-inv -l
+just
 ```
