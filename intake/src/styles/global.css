@@ -102,6 +102,42 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
+/* On the no-email page, treat the whole survey - the fields and the Contact us
+   button together - as one card (matching the panel's card styling) rather than
+   a carded panel with the button loose below it. .sd-body is the common wrapper
+   of the fields page and the navigation footer, so the card frame goes there. */
+/* The landing form's card sits straight on the white page, so drop the survey's
+   dim background here (it otherwise peeks out at the card's rounded corners). */
+.intake-form--contact,
+.intake-form--contact .sd-root-modern {
+  background-color: transparent;
+}
+
+/* SurveyJS's scroll wrappers clip at the survey's edge, which would slice off
+   the card's soft shadow. This one-page form never scrolls, so let it bleed. */
+.intake-form--contact .sd-root-modern,
+.intake-form--contact .sv-scroll__scroller {
+  overflow: visible !important;
+}
+
+.intake-form--contact .sd-body {
+  background-color: #fff;
+  /* Like the website landing page's contact form card (a large radius and a
+     soft, blue-tinted drop shadow, no border line), with the shadow pulled in
+     a little tighter. */
+  border-radius: 22px;
+  box-shadow: 0 3px 24px rgba(0, 55, 123, 0.15);
+}
+
+/* Flatten the inner panel so it isn't a second card nested in the sd-body card;
+   the sd-body padding then insets the fields from the card edge. */
+.intake-form--contact .sd-panel,
+.intake-form--contact .sd-panel__content {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
 /* Form-level failure message (e.g. the submit request failed), shown between the
    form and the exit buttons. */
 .intake-form-error {

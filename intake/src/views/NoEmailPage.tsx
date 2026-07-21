@@ -22,51 +22,59 @@ const buildNoEmailModel = (): Model => {
     textUpdateMode: 'onTyping',
     // A single page, so the form renders with the same page/card styling as the
     // main intake form's pages.
+    questionErrorLocation: 'bottom',
     pages: [
       {
         name: 'CONTACT',
         elements: [
           {
-            type: 'text',
-            name: 'NAME',
-            title: 'Name',
-            isRequired: true,
-            requiredErrorText: 'Please enter your name.',
-            maxLength: 255,
-          },
-          {
-            type: 'text',
-            name: 'PHONE',
-            title: 'Phone number',
-            inputType: 'tel',
-            // A tel input is excluded from the survey-wide onTyping commit
-            // (SurveyJS only live-commits text/number/password), so validate it
-            // on blur - the error then clears when the field is left with a
-            // valid number, with no per-keystroke nagging while one is typed.
-            textUpdateMode: 'onBlur',
-            isRequired: true,
-            requiredErrorText: 'Please enter your phone number.',
-            maxLength: 255,
-            validators: [
+            // Group the fields in a single panel so they read as one card.
+            type: 'panel',
+            name: 'CONTACT_PANEL',
+            elements: [
               {
-                type: 'regex',
-                regex: '^(?=.*[0-9]).{8,}$',
-                text: 'Please enter a valid phone number.',
+                type: 'text',
+                name: 'NAME',
+                title: 'Name',
+                isRequired: true,
+                requiredErrorText: 'Please enter your name.',
+                maxLength: 255,
               },
-            ],
-          },
-          {
-            // A single-choice checkbox: isRequired forces it to be ticked.
-            type: 'checkbox',
-            name: 'CONSENT',
-            titleLocation: 'hidden',
-            isRequired: true,
-            requiredErrorText:
-              'Please agree to share your details so we can contact you.',
-            choices: [
               {
-                value: 'agree',
-                text: 'I agree to share my details with Anika Legal.',
+                type: 'text',
+                name: 'PHONE',
+                title: 'Phone number',
+                inputType: 'tel',
+                // A tel input is excluded from the survey-wide onTyping commit
+                // (SurveyJS only live-commits text/number/password), so validate
+                // it on blur - the error then clears when the field is left with
+                // a valid number, with no per-keystroke nagging while typing.
+                textUpdateMode: 'onBlur',
+                isRequired: true,
+                requiredErrorText: 'Please enter your phone number.',
+                maxLength: 255,
+                validators: [
+                  {
+                    type: 'regex',
+                    regex: '^\\+?[0-9]{8,}$',
+                    text: 'Please enter a valid phone number.',
+                  },
+                ],
+              },
+              {
+                // A single-choice checkbox: isRequired forces it to be ticked.
+                type: 'checkbox',
+                name: 'CONSENT',
+                titleLocation: 'hidden',
+                isRequired: true,
+                requiredErrorText:
+                  'Please agree to share your details so we can contact you.',
+                choices: [
+                  {
+                    value: 'agree',
+                    text: 'I agree to share my details with Anika Legal.',
+                  },
+                ],
               },
             ],
           },
@@ -138,7 +146,7 @@ export const NoEmailPage = () => {
         <div className="intake-button-group">
           <button
             type="button"
-            className="d-btn d-btn-primary"
+            className="d-btn d-btn-primary d-btn-soft"
             onClick={() => navigate(-1)}
           >
             Go back
@@ -162,13 +170,13 @@ export const NoEmailPage = () => {
         we&apos;ll call you to see if we&apos;re able to help. If not,
         we&apos;ll point you to another organisation.
       </p>
-      <div className="intake-form">
+      <div className="intake-form intake-form--contact">
         <Survey model={survey} />
       </div>
       <div className="intake-button-group">
         <button
           type="button"
-          className="d-btn d-btn-primary"
+          className="d-btn d-btn-primary d-btn-soft"
           onClick={() => navigate(-1)}
         >
           Go back

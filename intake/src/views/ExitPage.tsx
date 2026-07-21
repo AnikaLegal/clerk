@@ -22,7 +22,7 @@ export const ExitPage = () => {
       <div className="intake-button-group">
         <button
           type="button"
-          className="d-btn d-btn-primary"
+          className="d-btn d-btn-primary d-btn-soft"
           onClick={() => navigate(-1)}
         >
           Go back
