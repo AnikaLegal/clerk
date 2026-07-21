@@ -16,13 +16,13 @@ const buildNoEmailModel = (): Model => {
     showQuestionNumbers: 'off',
     showProgressBar: false,
     completeText: 'Contact us',
+    questionErrorLocation: 'bottom',
     // Re-validate on every value change, so a shown error clears as soon as
     // the field is corrected (the default only re-checks on the next submit).
     checkErrorsMode: 'onValueChanged',
     textUpdateMode: 'onTyping',
     // A single page, so the form renders with the same page/card styling as the
     // main intake form's pages.
-    questionErrorLocation: 'bottom',
     pages: [
       {
         name: 'CONTACT',
