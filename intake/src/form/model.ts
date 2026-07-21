@@ -186,6 +186,10 @@ export const buildSurveyModel = (): Model => {
                 type: 'panel',
                 name: entry.panel,
                 title: entry.title,
+                // Panel fields sit close together under a shared title, so show
+                // each question's error below its input (as on the no-email
+                // form) instead of between the question title and the field.
+                questionErrorLocation: 'bottom',
                 elements: entry.questions.map((name) =>
                   toElement(QUESTIONS_BY_NAME[name])
                 ),
