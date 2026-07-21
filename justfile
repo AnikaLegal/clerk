@@ -1,4 +1,4 @@
-# Clerk task runner (mirrors tasks.py).
+# Clerk task runner.
 #
 # Requires just >= 1.46 (uses the [arg(...)] attribute for --long / -short flags).
 # All recipes run from the project root. Run `just` (or `just --list`) to see them.

@@ -6,7 +6,7 @@ Clerk is **Anika Legal's case management system & public website**. It's a monor
 - `frontend/` - React 18 + TypeScript + Vite SPA (the "Clerk" CMS UI)
 - `openapi/` - the hand-authored OpenAPI spec that is the **source of truth** for the API; it generates both the backend schema and the frontend API client
 
-Everything runs in Docker, orchestrated through `just` recipes in the root `justfile`. `just` ships in the app dev venv, so activate it (`source app/.venv/bin/activate`) or call `app/.venv/bin/just` directly, and run `just` from the project root. (The legacy `inv`/`tasks.py` runner is being retired.)
+Everything runs in Docker, orchestrated through `just` recipes in the root `justfile`. `just` ships in the app dev venv, so activate it (`source app/.venv/bin/activate`) or call `app/.venv/bin/just` directly, and run `just` from the project root.
 
 ## Common commands
 
