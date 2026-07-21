@@ -19,21 +19,21 @@ help recipe:
 schema:
     cd frontend && npm run schema
 
-# Build images locally (no target: frontend + backend; or any of: backend | frontend | base)
+# Build images locally (no target: frontend + intake + backend; or any of: backend | frontend | intake | base)
 [arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-[arg("targets", help="backend | frontend | base (default: frontend + backend)")]
+[arg("targets", help="backend | frontend | intake | base (default: frontend + intake + backend)")]
 build no_cache="" *targets:
     #!/usr/bin/env bash
     set -euo pipefail
     j="{{just_executable()}}"
     nc=""; [ -n "{{no_cache}}" ] && nc="--no-cache"
     targets="{{targets}}"
-    [ -z "$targets" ] && targets="frontend backend"
+    [ -z "$targets" ] && targets="frontend intake backend"
     for t in $targets; do
       case "$t" in
-        backend|frontend|base) "$j" build-"$t" $nc ;;
+        backend|frontend|intake|base) "$j" build-"$t" $nc ;;
         *)
-          echo "Unknown build target: $t (expected backend, frontend, or base)" >&2
+          echo "Unknown build target: $t (expected backend, frontend, intake, or base)" >&2
           exit 1
           ;;
       esac
@@ -50,6 +50,12 @@ build-backend no_cache="":
 [arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
 build-frontend no_cache="":
     docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
+
+# Build the intake form image
+[private]
+[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
+build-intake no_cache="":
+    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.intake --tag {{app_name}}-intake:local .
 
 # Build the multi-platform base image
 [private]

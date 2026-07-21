@@ -49,8 +49,8 @@ Activate the virtualenv in each new shell (or add the `source` line to your shel
 profile), and run all `just` commands from the project root. Run `just` on its own
 to list every recipe, or `just help <recipe>` to see a recipe's usage.
 
-Next, build the Docker containers we'll be using (`just build` builds both the
-frontend and backend images):
+Next, build the Docker containers we'll be using (`just build` builds the
+frontend, intake and backend images):
 
 ```bash
 just build
