@@ -64,5 +64,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 - **Never use en dashes or em dashes** in code, comments, commit messages, docs, or any other text. Use a normal hyphen (-) instead.
 - **Branch off and PR into `develop`** (not `master`). Use conventional-commit style messages (`fix(case): ...`, `chore: ...`), matching recent history.
 - **Don't add `Co-Authored-By` trailers** (or any similar attribution lines) to commit messages.
+- **Don't include test output results in commit messages** (e.g. "Checks green: intake tsc/lint/86 tests").
+- **Don't assume the git repository state** - the user may have made changes manually or in another session. Check the actual state (`git status`, `git log`, etc.) before reporting it.
 - **Secrets are transcrypt-encrypted** `.env` files (`env/`). Never decrypt them into plaintext, commit decrypted values, or print their contents.
 - After any API change, regenerate with `just schema` and never edit the generated files directly.
