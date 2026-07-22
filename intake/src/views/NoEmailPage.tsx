@@ -139,7 +139,7 @@ export const NoEmailPage = () => {
       <div className="intake-form">
         <div className="intake-splash">
           <h1 tabIndex={-1} ref={headingRef}>
-            Thanks, we&apos;ll be in touch.
+            Thanks, we&apos;ll be in touch
           </h1>
           <p>
             We&apos;ve received your details and one of our team will call you

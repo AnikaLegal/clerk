@@ -11,7 +11,7 @@ export interface ExitPageContent {
 export const EXIT_PAGES: Record<string, ExitPageContent> = {
   [ROUTES.INELIGIBLE_OUTSIDE_VICTORIA]: {
     title:
-      'Unfortunately, we can currently only help with residential rental issues in Victoria, Australia.',
+      'Unfortunately, we can currently only help with residential rental issues in Victoria, Australia',
     body: (
       <>
         <p>
@@ -87,7 +87,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     ),
   },
   [ROUTES.INELIGIBLE_COMPENSATION]: {
-    title: 'Unfortunately, compensation claims are outside Anika’s current scope.',
+    title: 'Unfortunately, compensation claims are outside Anika’s current scope',
     body: (
       <>
         <p>
@@ -105,7 +105,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     ),
   },
   [ROUTES.INELIGIBLE_INCOME]: {
-    title: 'Unfortunately, your income is above our eligibility requirements.',
+    title: 'Unfortunately, your income is above our eligibility requirements',
     body: (
       <>
         <p>
@@ -136,7 +136,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     ),
   },
   [ROUTES.EXIT_VCAT_REPRESENTATION]: {
-    title: 'We are sorry we cannot represent you at VCAT.',
+    title: 'We are sorry we cannot represent you at VCAT',
     body: (
       <p>
         You may wish to contact{' '}
@@ -149,7 +149,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
   },
   [ROUTES.INELIGIBLE_REPAIRS_ORDER_OBTAINED]: {
     title:
-      'Unfortunately, we are unable to help further once a Repairs Order has been obtained.',
+      'Unfortunately, we are unable to help further once a Repairs Order has been obtained',
     body: (
       <>
         <p>
@@ -170,7 +170,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
   },
   [ROUTES.INELIGIBLE_NO_NOTICE_TO_VACATE]: {
     title:
-      'Unfortunately, we can only help once your landlord or real estate agent has sent you a Notice to Vacate.',
+      'Unfortunately, we can only help once your landlord or real estate agent has sent you a Notice to Vacate',
     body: (
       <>
         <p>If you receive a Notice to Vacate, please come back and let us know.</p>
@@ -190,7 +190,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
   },
   [ROUTES.INELIGIBLE_ALREADY_EVICTED]: {
     title:
-      'Unfortunately, we are unable to assist if you have already been evicted from the property.',
+      'Unfortunately, we are unable to assist if you have already been evicted from the property',
     body: (
       <p>
         You may wish to contact{' '}
@@ -203,7 +203,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
   },
   [ROUTES.INELIGIBLE_URGENT_HEARING]: {
     title:
-      'Unfortunately, we are unable to assist you in time for your next VCAT hearing.',
+      'Unfortunately, we are unable to assist you in time for your next VCAT hearing',
     body: (
       <>
         <p>Our evictions service is not an urgent advice service.</p>
@@ -222,7 +222,7 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     ),
   },
   [ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE]: {
-    title: 'Unfortunately, your bond issue is outside our current scope.',
+    title: 'Unfortunately, your bond issue is outside our current scope',
     body: (
       <>
         <p>
