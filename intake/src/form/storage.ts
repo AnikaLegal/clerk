@@ -12,17 +12,19 @@ export interface StoredState {
   currentPage: string | null
 }
 
-export const EMPTY_STATE: StoredState = {
+// A factory (not a shared constant) so every load returns an independent
+// state object - callers can mutate their copy without corrupting later loads.
+const emptyState = (): StoredState => ({
   submissionId: null,
   data: {},
   visited: [],
   currentPage: null,
-}
+})
 
 export const loadState = (): StoredState => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { ...EMPTY_STATE }
+    if (!raw) return emptyState()
     const parsed = JSON.parse(raw)
     return {
       submissionId: parsed.submissionId ?? null,
@@ -31,7 +33,7 @@ export const loadState = (): StoredState => {
       currentPage: parsed.currentPage ?? null,
     }
   } catch {
-    return { ...EMPTY_STATE }
+    return emptyState()
   }
 }
 
