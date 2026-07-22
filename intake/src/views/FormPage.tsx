@@ -16,6 +16,7 @@ import { clearState, loadState, saveState } from '../form/storage'
 import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
+import { setDocumentTitle } from './announce'
 import {
   BONDS_MOVE_OUT_PAGE,
   EMAIL_PAGE,
@@ -140,6 +141,13 @@ export const FormPage = () => {
     ...readProgress(survey),
     direction: 'forward' as Direction,
   }))
+
+  // Restore the form's title after a splash view (e.g. Go back from an exit
+  // page) changed it. Matches the title the Django shell renders on load.
+  // Focus is handled by the survey itself (autoFocusFirstQuestion).
+  useEffect(() => {
+    setDocumentTitle('Get free help')
+  }, [])
 
   // Browser history <-> survey page sync, so the browser Back / Forward buttons
   // move between the survey's pages instead of leaving the form. Each page gets

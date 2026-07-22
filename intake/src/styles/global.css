@@ -376,6 +376,14 @@ header .h-\[63px\] img {
   margin: 0 0 1rem;
 }
 
+/* Splash headings receive programmatic focus after an SPA route swap (see
+   views/announce.ts) purely to move the keyboard / screen reader position onto
+   the new content. They are not interactive and never a tab stop, so no focus
+   ring. */
+.intake-splash h1[tabindex]:focus {
+  outline: none;
+}
+
 /* SurveyJS renders .sd-html list items a couple of pixels larger than its
    paragraphs; match them to the body copy so the start-page "have ready" list
    sits consistently with the text around it. */

@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { LINKS } from '../consts'
+import { useAnnouncePage } from './announce'
 import { EXIT_PAGES } from './exit-content'
 
 /**
@@ -12,12 +13,15 @@ export const ExitPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const content = EXIT_PAGES[normalise(location.pathname)]
+  const headingRef = useAnnouncePage(content?.title ?? '')
   if (!content) {
     return null
   }
   return (
     <div className="intake-splash">
-      <h1>{content.title}</h1>
+      <h1 tabIndex={-1} ref={headingRef}>
+        {content.title}
+      </h1>
       {content.body}
       <div className="intake-button-group">
         <button

@@ -7,6 +7,7 @@ import { api } from '../api'
 import { LINKS } from '../consts'
 import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from '../form/phone'
 import { logException } from '../utils'
+import { useAnnouncePage } from './announce'
 
 // A small SurveyJS form so the no-email contact fields get the same validation
 // behaviour and styling as the rest of the intake form. Only name and phone
@@ -97,6 +98,10 @@ export const NoEmailPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isSubmitting = useRef(false)
+  // Keyed on the view state, so the swap to the success view is announced too.
+  const headingRef = useAnnouncePage(
+    isSubmitted ? "Thanks, we'll be in touch" : 'Contact us'
+  )
 
   useEffect(() => {
     const onCompleting: Parameters<typeof survey.onCompleting.add>[0] = (
@@ -133,7 +138,9 @@ export const NoEmailPage = () => {
     return (
       <div className="intake-form">
         <div className="intake-splash">
-          <h1>Thanks, we&apos;ll be in touch.</h1>
+          <h1 tabIndex={-1} ref={headingRef}>
+            Thanks, we&apos;ll be in touch.
+          </h1>
           <p>
             We&apos;ve received your details and one of our team will call you
             to see if we&apos;re able to help.
@@ -160,7 +167,9 @@ export const NoEmailPage = () => {
     // .intake-splash inside centres the content column on top of it.
     <div className="intake-form">
       <div className="intake-splash">
-        <h1>Contact us</h1>
+        <h1 tabIndex={-1} ref={headingRef}>
+          Contact us
+        </h1>
         <p>
           Anika Legal is an online service, so we usually communicate by email.
           If you don&apos;t have an email address, leave your details below and
