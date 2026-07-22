@@ -7,20 +7,15 @@ import { api } from '../api'
 import { LINKS } from '../consts'
 import { logException } from '../utils'
 
-// A small SurveyJS form so the no-email contact fields get the same live
-// validation (errors that clear as they are fixed) and styling as the rest of
-// the intake form. Only name and phone are submitted; the consent checkbox is
-// a required gate.
+// A small SurveyJS form so the no-email contact fields get the same validation
+// behaviour and styling as the rest of the intake form. Only name and phone
+// are submitted; the consent checkbox is a required gate.
 const buildNoEmailModel = (): Model => {
   const survey = new Model({
     showQuestionNumbers: 'off',
     showProgressBar: false,
     completeText: 'Contact us',
     questionErrorLocation: 'bottom',
-    // Re-validate on every value change, so a shown error clears as soon as
-    // the field is corrected (the default only re-checks on the next submit).
-    checkErrorsMode: 'onValueChanged',
-    textUpdateMode: 'onTyping',
     // A single page, so the form renders with the same page/card styling as the
     // main intake form's pages.
     pages: [
@@ -45,11 +40,6 @@ const buildNoEmailModel = (): Model => {
                 name: 'PHONE',
                 title: 'Phone number',
                 inputType: 'tel',
-                // A tel input is excluded from the survey-wide onTyping commit
-                // (SurveyJS only live-commits text/number/password), so validate
-                // it on blur - the error then clears when the field is left with
-                // a valid number, with no per-keystroke nagging while typing.
-                textUpdateMode: 'onBlur',
                 isRequired: true,
                 requiredErrorText: 'Please enter your phone number.',
                 maxLength: 255,
