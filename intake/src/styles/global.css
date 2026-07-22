@@ -102,20 +102,26 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
-/* The splash pages' Go back / Return home buttons (no-email, eligibility
-   exits) share the secondary nav look ("I don't have an email address").
-   They are <button>s and link <a>s outside the survey - daisyUI's own
-   d-btn-soft would apply to them, but its softer tint reads differently, so
-   restate the nav-button metrics and tint from the input rules above instead. */
-.intake-button-group .intake-btn-secondary {
+/* Every splash action button (Go back / Return home / Try again ...) shares
+   the survey nav buttons' metrics, so primary and secondary variants sit side
+   by side at the same size. */
+.intake-button-group .d-btn {
   min-width: 110px;
   height: 50px;
-  border: 1px solid transparent;
-  outline: none;
   padding: 0 18px;
   font-size: 15.75px;
   line-height: 1;
   letter-spacing: normal;
+}
+
+/* The splash pages' secondary buttons (no-email, eligibility exits) share the
+   secondary nav look ("I don't have an email address"). They are <button>s
+   and link <a>s outside the survey - daisyUI's own d-btn-soft would apply to
+   them, but its softer tint reads differently, so restate the nav-button tint
+   from the input rules above instead. */
+.intake-button-group .intake-btn-secondary {
+  border: 1px solid transparent;
+  outline: none;
   background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
   color: var(--color-primary);
   text-decoration: none;
