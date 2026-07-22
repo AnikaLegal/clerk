@@ -57,7 +57,12 @@ export const SECTIONS: IntakeSection[] = [
   },
   {
     label: 'More about you',
-    pages: ['IMPACT_ABOUT', 'IMPACT_CIRCUMSTANCES', 'IMPACT_REFERRER', 'SUBMIT'],
+    pages: [
+      'IMPACT_ABOUT',
+      'IMPACT_CIRCUMSTANCES',
+      'IMPACT_REFERRER',
+      'SUBMIT',
+    ],
   },
 ]
 
