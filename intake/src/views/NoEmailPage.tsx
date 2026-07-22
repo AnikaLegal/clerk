@@ -146,12 +146,48 @@ export const NoEmailPage = () => {
 
   if (isSubmitted) {
     return (
+      <div className="intake-form">
+        <div className="intake-splash">
+          <h1>Thanks, we&apos;ll be in touch.</h1>
+          <p>
+            We&apos;ve received your details and one of our team will call you
+            to see if we&apos;re able to help.
+          </p>
+          <div className="intake-button-group">
+            <button
+              type="button"
+              className="d-btn intake-btn-secondary"
+              onClick={() => navigate(-1)}
+            >
+              Go back
+            </button>
+            <a href={LINKS.HOME} className="d-btn intake-btn-secondary">
+              Return home
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    // .intake-form is the full-width grey backdrop (as on the main form); the
+    // .intake-splash inside centres the content column on top of it.
+    <div className="intake-form">
       <div className="intake-splash">
-        <h1>Thanks, we&apos;ll be in touch.</h1>
+        <h1>Contact us</h1>
         <p>
-          We&apos;ve received your details and one of our team will call you to
-          see if we&apos;re able to help.
+          Anika Legal is an online service, so we usually communicate by email.
+          If you don&apos;t have an email address, leave your details below and
+          we&apos;ll call you to see if we&apos;re able to help. If not,
+          we&apos;ll point you to another organisation.
         </p>
+        <Survey model={survey} />
+        {error && (
+          <p className="intake-form-error" role="alert">
+            {error}
+          </p>
+        )}
         <div className="intake-button-group">
           <button
             type="button"
@@ -164,38 +200,6 @@ export const NoEmailPage = () => {
             Return home
           </a>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="intake-splash">
-      <h1>Contact us</h1>
-      <p>
-        Anika Legal is an online service, so we usually communicate by email. If
-        you don&apos;t have an email address, leave your details below and
-        we&apos;ll call you to see if we&apos;re able to help. If not,
-        we&apos;ll point you to another organisation.
-      </p>
-      <div className="intake-form intake-form--contact">
-        <Survey model={survey} />
-      </div>
-      {error && (
-        <p className="intake-form-error" role="alert">
-          {error}
-        </p>
-      )}
-      <div className="intake-button-group">
-        <button
-          type="button"
-          className="d-btn intake-btn-secondary"
-          onClick={() => navigate(-1)}
-        >
-          Go back
-        </button>
-        <a href={LINKS.HOME} className="d-btn intake-btn-secondary">
-          Return home
-        </a>
       </div>
     </div>
   )
