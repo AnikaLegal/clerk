@@ -37,7 +37,8 @@ export const REPAIRS_QUESTIONS: IntakeQuestion[] = [
       { value: 'GOTTEN_VCAT', text: "I've already gotten a VCAT order" },
     ],
     title: 'Have you done any of the following?',
-    description: 'Please select all that apply',
+    description:
+      'Please select all that apply. CAV is Consumer Affairs Victoria; VCAT is the Victorian Civil and Administrative Tribunal.',
   },
   {
     name: 'REPAIRS_APPLIED_VCAT',

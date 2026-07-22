@@ -48,7 +48,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
       { value: false, text: 'No' },
     ],
     description:
-      'Check your email for a RTBA bond receipt, and use it to check your bond lodgment on the RTBA website. If in doubt, call the RTBA.',
+      'The RTBA (Residential Tenancies Bond Authority) holds Victorian rental bonds. Check your email for an RTBA bond receipt, and use it to check your bond lodgment on the RTBA website. If in doubt, call the RTBA.',
     title: `Is your bond still held by the <a target="_blank" href="${RTBA_LINK}">RTBA</a>?`,
   },
   {
@@ -61,6 +61,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
       { value: false, text: 'No' },
       { value: "I don't know", text: "I don't know" },
     ],
+    description: 'VCAT is the Victorian Civil and Administrative Tribunal.',
     title: `Has your landlord/real estate agent made an application to <a target="_blank" href="${VCAT_LINK}">VCAT</a> for your bond?`,
   },
   {
