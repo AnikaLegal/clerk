@@ -55,7 +55,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 
 ## Intake form (`intake/`)
 
-- The public client intake form: a SurveyJS (survey-core + survey-react-ui) SPA served by the `app/intake` Django app at `/intake/` (dev Vite server on port 5174, image `clerk-intake:local`, built via `inv build --intake`).
+- The public client intake form: a SurveyJS (survey-core + survey-react-ui) SPA served by the `app/intake` Django app at `/intake/` (dev Vite server on port 5174, image `clerk-intake:local`, built via `just build intake`).
 - The question list in `src/questions/` is the source of truth; question names are the UPPER_SNAKE_CASE answer keys that `core/services/submission.py` processes - do not rename them. Flow logic (eligibility exits, saves, analytics) hooks into SurveyJS events in `src/views/FormPage.tsx` + `src/form/`.
 - Commands: `npm run dev`, `npm run build`, `npm run test` (vitest - flow parity/serialization tests), `npm run lint`, `npm run format`.
 
