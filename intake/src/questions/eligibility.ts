@@ -32,7 +32,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'DISPLAY',
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
-    html: `<h2>Anika Legal can only help you with evictions if you believe the eviction is retaliatory.</h2><p>If your eviction isn't retaliatory, see what <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">other legal help</a> is available in your area. Otherwise please continue.</p>`,
+    html: `<h2>Anika Legal can only help you with evictions if you believe the eviction is retaliatory.</h2><p>A retaliatory eviction is when your landlord tries to evict you because you stood up for your rights - for example, asking for repairs or challenging a rent increase.</p><p>If your eviction isn't retaliatory, see what <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">other legal help</a> is available in your area. Otherwise please continue.</p>`,
   },
   {
     name: 'IS_VICTORIAN_TENANT',
