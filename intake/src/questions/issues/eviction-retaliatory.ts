@@ -58,64 +58,64 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
     colCount: 2,
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
     choices: [
-      { value: '91ZM - Arrears', text: 'You owe at least two weeks rent' },
+      { value: '91ZM - Arrears', text: "You owe at least two weeks' rent" },
       {
         value: '91ZX - Repairs',
-        text: 'Rental Provider intends to repair or renovate the Property',
+        text: 'Your landlord intends to repair or renovate the property',
       },
       {
         value: '91ZZA - Moving in',
-        text: 'Rental Provider or their family intend to move in',
+        text: 'Your landlord or their family intend to move in',
       },
       {
         value: '91ZZB - Selling',
-        text: 'Rental Provider intends to sell the Property',
+        text: 'Your landlord intends to sell the property',
       },
       {
         value: '91ZZD - DA - End of lease',
-        text: 'Your lease is ending and the Rental Provider does not want to renew it',
+        text: 'Your lease is ending and your landlord does not want to renew it',
       },
       {
         value: '91ZW - Principal place of residence',
-        text: 'Your lease is ending and the Rental Provider wants to move back in',
+        text: 'Your lease is ending and your landlord wants to move back in',
       },
       {
         value: '91ZY - Demolition',
-        text: 'Rental Provider intends to demolish the Property',
+        text: 'Your landlord intends to demolish the property',
       },
       {
         value: '91ZL - Uninhabitable',
-        text: 'Rental Provider has deemed the Property unfit for habitation',
+        text: 'Your landlord has deemed the property unfit for habitation',
       },
       {
         value: '91ZK - Threats and intimidation',
-        text: 'Rental Provider claims you have threatened or intimidated them or their staff',
+        text: 'Your landlord claims you have threatened or intimidated them or their staff',
       },
       {
         value: '91ZI - Damage',
-        text: 'Rental Provider claims you have damaged the Property',
+        text: 'Your landlord claims you have damaged the property',
       },
       {
         value: '91ZJ - Danger',
-        text: 'Rental Provider claims you have endangered safety',
+        text: 'Your landlord claims you have endangered safety',
       },
       {
         value: '91ZP - Breaches',
-        text: 'Rental Provider claims you have breached the lease or law',
+        text: 'Your landlord claims you have breached the lease or law',
       },
       {
         value: '91ZQ - Illegal use',
-        text: 'Rental Provider claims you have used the Property for illegal purposes',
+        text: 'Your landlord claims you have used the property for illegal purposes',
       },
       {
         value: '91ZZ - Business',
-        text: 'Rental Provider would like to use the Property for their business',
+        text: 'Your landlord would like to use the property for their business',
       },
       { value: 'Unsure', text: "I'm not sure" },
     ],
     title: 'What is the reason given on the Notice to Vacate?',
     description:
-      "If you've received multiple Notices to Vacate, please select the reason on the Notice to Vacate with the earliest Termination Date.",
+      "If you've received multiple Notices to Vacate, please select the reason on the Notice to Vacate with the earliest Termination Date. Your notice may call your landlord the 'rental provider'.",
   },
   {
     name: 'EVICTION_RETALIATORY_RETALIATORY_REASON',
@@ -130,7 +130,7 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
       { value: 'Rent Increase', text: 'I challenged a rent increase' },
       {
         value: 'No notice access',
-        text: 'I asked the rental provider or their agent to not enter the property without notice',
+        text: 'I asked my landlord or their agent to not enter the property without notice',
       },
       { value: 'Other', text: 'Something else' },
     ],
