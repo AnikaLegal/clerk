@@ -8,7 +8,7 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'DISPLAY',
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
-    html: `<h2>Retaliatory Eviction</h2><p>Anika Legal can help you negotiate with your landlord and self-represent at VCAT.</p><p>Please be aware we cannot represent you at VCAT. If you need representation, you may wish to contact your <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">local community legal centres</a> who will be better placed to look into your matter.</p><p>If you would like us to support you to self-represent at VCAT, please continue and make sure you have your Notice to Vacate with you.</p>`,
+    html: `<h2>Retaliatory Eviction</h2><p>Anika Legal can help you negotiate with your landlord and prepare you to represent yourself at VCAT.</p><p>Please be aware we cannot represent you at VCAT. If you need representation, you may wish to contact <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">Victoria Legal Aid</a>, who will be better placed to look into your matter.</p><p>If you would like us to support you to self-represent at VCAT, please continue and make sure you have your Notice to Vacate with you.</p>`,
   },
   {
     name: 'EVICTION_RETALIATORY_IS_ALREADY_REMOVED',

@@ -175,8 +175,8 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
         text: 'Council of Single Mothers and their Children',
       },
       {
-        value: 'Ethic Communities Council of Victoria',
-        text: 'Ethic Communities Council of Victoria',
+        value: 'Ethnic Communities Council of Victoria',
+        text: 'Ethnic Communities Council of Victoria',
       },
       { value: 'Jewish Care', text: 'Jewish Care' },
       { value: 'Sacred Heart Mission', text: 'Sacred Heart Mission' },

@@ -222,6 +222,7 @@ export const PAGES: IntakePage[] = [
     name: 'PROPERTY_TENANCY',
     questions: [
       'PROPERTY_INTRO',
+      'PROPERTY_INTRO_BONDS',
       'RENTAL_CIRCUMSTANCES',
       'IS_ON_LEASE',
       'START_DATE',
@@ -232,7 +233,7 @@ export const PAGES: IntakePage[] = [
     questions: [
       {
         panel: 'HOME_ADDRESS',
-        title: 'What is your home address?',
+        title: 'What is the address of your rental property?',
         questions: [
           'ADDRESS_SEARCH',
           'ADDRESS_MANUAL',

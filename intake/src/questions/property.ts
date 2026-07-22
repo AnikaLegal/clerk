@@ -5,7 +5,17 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     name: 'PROPERTY_INTRO',
     type: 'DISPLAY',
     required: false,
+    visibleIf: "{ISSUES} <> 'BONDS'",
     html: '<h2>Your rental property</h2><p>Thanks for your answers so far. We have a few questions about the home that you are renting.</p>',
+  },
+  {
+    // Bonds users may already have moved out, so this variant avoids assuming
+    // a current tenancy.
+    name: 'PROPERTY_INTRO_BONDS',
+    type: 'DISPLAY',
+    required: false,
+    visibleIf: "{ISSUES} = 'BONDS'",
+    html: '<h2>Your rental property</h2><p>Thanks for your answers so far. We have a few questions about the rental property your bond relates to.</p>',
   },
   {
     name: 'RENTAL_CIRCUMSTANCES',
@@ -108,6 +118,8 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     type: 'NUMBER',
     required: true,
     max: 100000,
-    title: 'How much is your weekly rent?',
+    // {RENT_IS} renders as 'is (or was)' on the bonds branch and 'is'
+    // elsewhere (see calculatedValues in form/model.ts).
+    title: 'How much {RENT_IS} your weekly rent?',
   },
 ]

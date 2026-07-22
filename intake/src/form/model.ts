@@ -192,6 +192,17 @@ export const buildSurveyModel = (): Model => {
       })),
     ],
     showQuestionNumbers: 'off',
+    // Text fragments interpolated into question copy (e.g. {RENT_IS}), so a
+    // single wire question can read differently per branch. Not answers: they
+    // are never serialized or persisted.
+    calculatedValues: [
+      {
+        // Bonds users may already have moved out of the property; every other
+        // branch is a current tenancy.
+        name: 'RENT_IS',
+        expression: "iif({ISSUES} = 'BONDS', 'is (or was)', 'is')",
+      },
+    ],
     // The built-in per-page progress bar is replaced by a custom section-based
     // stepper rendered in FormPage (see comps/SectionProgress.tsx).
     showProgressBar: false,
