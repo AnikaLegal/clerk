@@ -176,6 +176,19 @@ header .h-\[63px\] img {
   margin-bottom: 0;
 }
 
+/* SurveyJS sizes some input types (tel, email, password, ...) as content-box
+   with compensating width/height calcs; combined with the site's own form-input
+   padding those calcs come out ~24px over, so on focus (when the character
+   counter adds padding) the input grows past its question card. Text inputs are
+   plain border-box + width:100% and render correctly, so normalise the special
+   types to the same metrics. !important outranks the type[]:focus-within width
+   variants. */
+.intake-form input.sd-input {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
 /* In its mobile layout SurveyJS gives each nav action flex-grow: 1 (via
    .sd-root-modern--mobile ...), so the wrappers stretch to fill the row and
    spread the buttons apart wherever there is free space. Match that modifier so
