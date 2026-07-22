@@ -116,6 +116,36 @@ def test_contact_form_captcha_required_and_valid(client):
 
 @pytest.mark.django_db
 @patch("django_recaptcha.fields.client.submit")
+def test_contact_form_email_must_be_valid(mocked_submit, client):
+    """
+    Test submitting the contact form on the landing page with an invalid email.
+    """
+
+    # Mock a successful ReCaptcha response.
+    mocked_submit.return_value = RecaptchaResponse(
+        is_valid=True, action="contact", extra_data={"score": 1.0}
+    )
+
+    assert WebflowContact.objects.count() == 0
+    url = reverse("landing-contact")
+
+    contact_stub = WebflowContactFactory.stub()
+    data = {
+        "name": contact_stub.name,
+        "email": "not-an-email",
+        "phone": contact_stub.phone,
+        "referral": contact_stub.referral,
+        "captcha": "dummy-captcha-response",
+    }
+    response = client.post(url, data)
+
+    assert response.status_code == 200
+    assert "email: enter a valid email address" in response.content.decode().lower()
+    assert WebflowContact.objects.count() == 0
+
+
+@pytest.mark.django_db
+@patch("django_recaptcha.fields.client.submit")
 def test_tracked_document_download(mocked_submit, client):
     """
     Test that we intercept tracked document download with a form page and that

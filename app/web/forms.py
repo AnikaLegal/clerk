@@ -19,6 +19,9 @@ class ContactForm(forms.ModelForm):
             "captcha",
         ]
 
+    # The model allows a blank email (the intake no-email page has none), so
+    # require a valid one here; the plain CharField on the model checks nothing.
+    email = forms.EmailField(max_length=255)
     captcha = HtmxReCaptchaV3Field(action="contact")
 
 

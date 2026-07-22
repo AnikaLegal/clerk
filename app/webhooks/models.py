@@ -23,7 +23,8 @@ class WebflowContact(TimestampedModel):
     """
 
     name = models.CharField(max_length=255)
-    email = models.CharField(max_length=255)
+    # Blank: the intake no-email page submits a name and phone number only.
+    email = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=255)
     referral = models.CharField(max_length=255, default="", blank=True)
     requires_callback = models.BooleanField(default=True)
