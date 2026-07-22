@@ -4,7 +4,7 @@ import { IntakePage } from '../form/types'
 // not have an email address" button (see views/FormPage.tsx).
 export const EMAIL_PAGE = 'ABOUT_EMAIL'
 
-// The final agreement page. Its Confirm button performs the submit; it is not
+// The final agreement page. Its Submit button performs the submit; it is not
 // shown in or counted by the "Page x of y" progress (see views/FormPage.tsx).
 export const SUBMIT_PAGE = 'SUBMIT'
 

@@ -15,12 +15,17 @@ const SUBMIT_QUESTION: IntakeQuestion = {
   type: 'DISPLAY',
   required: false,
   html: `
-    <h2>
+    <h2>That's everything we need.</h2>
+    <p>
+      Press Submit to send us your answers. One of our team will contact you
+      in a few business days to talk about how we can help.
+    </p>
+    <p>
       By submitting this form, you are agreeing to our
       <a href="${LINKS.PRIVACY_POLICY}" target="_blank">Privacy Policy</a>,
       <a href="${LINKS.COLLECTIONS_STATEMENT}" target="_blank">Collections Statement</a>
       and website <a href="${LINKS.TERMS_OF_USE}" target="_blank">Terms of Use</a>.
-    </h2>
+    </p>
   `,
 }
 

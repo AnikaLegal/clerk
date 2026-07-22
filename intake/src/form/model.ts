@@ -88,7 +88,10 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         type: 'text',
         inputType: 'number',
         max: q.max,
-        validators: [{ type: 'numeric', maxValue: q.max }, ...(q.validators ?? [])],
+        validators: [
+          { type: 'numeric', maxValue: q.max },
+          ...(q.validators ?? []),
+        ],
       }
     case 'EMAIL':
       return {
@@ -138,7 +141,12 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         ...choiceColumns(q),
       }
     case 'CHOICE_MULTI':
-      return { ...base, type: 'checkbox', choices: q.choices, ...choiceColumns(q) }
+      return {
+        ...base,
+        type: 'checkbox',
+        choices: q.choices,
+        ...choiceColumns(q),
+      }
     case 'UPLOAD':
       return {
         ...base,
@@ -225,9 +233,9 @@ export const buildSurveyModel = (): Model => {
     // Cap the "other" self-describe text (GENDER is the only such question) to
     // the gender DB column's length, so it can't overflow during processing.
     maxOthersLength: 64,
-    completeText: 'Confirm',
+    completeText: 'Submit',
   })
-  // Render the built-in navigation buttons (Previous / Next / Confirm) as
+  // Render the built-in navigation buttons (Previous / Next / Submit) as
   // daisyUI primary buttons so they match the public website. The default
   // per-button classes carry SurveyJS's own `sd-btn` styles, which outrank
   // daisyUI's low-specificity :where() rules, so clear them and keep only the
