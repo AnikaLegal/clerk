@@ -50,8 +50,8 @@ export const REPAIRS_QUESTIONS: IntakeQuestion[] = [
       { value: true, text: 'Yes' },
       { value: false, text: 'No' },
     ],
-    title:
-      'Our Repairs service focuses on helping renters write a formal compliance request to their real estate agent and/or rental provider. Due to limited capacity, we can only provide support once the matter is at VCAT stage by providing you with a self-representation guide. We cannot represent you at VCAT.',
-    description: 'Would you still like to continue?',
+    description:
+      'Our Repairs service focuses on helping renters write a formal compliance request to their real estate agent and/or landlord. Due to limited capacity, once the matter is at the VCAT stage we can only support you with a self-representation guide.',
+    title: 'We cannot represent you at VCAT. Would you still like to continue?',
   },
 ]

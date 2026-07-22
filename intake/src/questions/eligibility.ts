@@ -126,8 +126,10 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
       { value: true, text: 'Yes' },
       { value: false, text: 'No' },
     ],
+    description:
+      'If you continue with our intake form, we cannot guarantee that we can assist you.',
     title:
-      "It looks like you're not eligible for our service. If you continue with our intake form, we cannot guarantee that we can assist you. Would you still like to continue?",
+      "It looks like you're not eligible for our service. Would you still like to continue?",
   },
   {
     name: 'ELIGIBILITY_NOTES',
