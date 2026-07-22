@@ -44,7 +44,10 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
         text: 'Yes, Aboriginal and Torres Strait Islander',
       },
       { value: 'PREFER_NOT_TO_ANSWER', text: 'Prefer not to answer' },
-      { value: 'NOT_STATED', text: 'Not Stated' },
+      // Kept alongside 'Prefer not to answer': used when the form is filled
+      // in on the client's behalf, so the client hasn't declined - the answer
+      // is genuinely not stated.
+      { value: 'NOT_STATED', text: 'Not stated' },
     ],
     title:
       'Do you identify as an Aboriginal and/or Torres Strait Islander person?',
@@ -112,7 +115,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     choices: [
       { value: 'LEGAL_CENTRE', text: 'Legal centre' },
       { value: 'HOUSING_SERVICE', text: 'Housing service' },
-      { value: 'COMMUNITY_ORGANISATION', text: 'Community Organisation' },
+      { value: 'COMMUNITY_ORGANISATION', text: 'Community organisation' },
       { value: 'SOCIAL_MEDIA', text: 'Social media' },
       { value: 'SEARCH', text: 'Google search' },
       { value: 'WORD_OF_MOUTH', text: 'Word of mouth' },
