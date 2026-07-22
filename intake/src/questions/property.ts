@@ -48,7 +48,7 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     type: 'DATE',
     required: true,
     title: 'When did you start living at this property?',
-    description: 'You can find this written on your lease',
+    description: 'You can find this written on your lease.',
   },
   // The home address block (grouped by the HOME_ADDRESS panel in pages.ts).
   // With Google Places available, the search box drives the read-only street/

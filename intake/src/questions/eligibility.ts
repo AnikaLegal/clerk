@@ -25,7 +25,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
       },
     ],
     title: 'What do you need help with?',
-    description: `Anika can help with <a target="_blank" href="${LINKS.BONDS_INFO}">bond recovery</a>, <a target="_blank" href="${LINKS.REPAIRS_INFO}">rental repairs</a> and <a target="_blank" href="${LINKS.EVICTION_INFO}">retaliatory evictions.</a>`,
+    description: `Anika can help with <a target="_blank" href="${LINKS.BONDS_INFO}">bond recovery</a>, <a target="_blank" href="${LINKS.REPAIRS_INFO}">rental repairs</a> and <a target="_blank" href="${LINKS.EVICTION_INFO}">retaliatory evictions</a>.`,
   },
   {
     name: 'PRE_EVICTION_NOTICE',
@@ -90,7 +90,8 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     type: 'CHOICE_MULTI',
     colCount: 2,
     title: 'Do any of the following apply to you?',
-    description: 'This helps us prioritise support.',
+    description:
+      'Please select all that apply. This helps us prioritise support.',
     choices: [
       { value: 'STRUGGLING', text: "I'm experiencing financial stress" },
       { value: 'HOUSING', text: 'I live in public or community housing' },

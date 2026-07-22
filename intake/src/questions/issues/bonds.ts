@@ -96,7 +96,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     ],
     title:
       'What are the reason(s) your landlord or agent is using to claim your bond?',
-    description: 'Choose as many as you need',
+    description: 'Please select all that apply.',
   },
   {
     name: 'BONDS_DAMAGE_INTRO',

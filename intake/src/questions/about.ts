@@ -52,6 +52,6 @@ export const ABOUT_QUESTIONS: IntakeQuestion[] = [
     ],
     title: 'What are the best times for us to call you?',
     description:
-      "We know you're busy: we'll try to call you during these times.",
+      "Please select all that apply. We know you're busy: we'll try to call you during these times.",
   },
 ]

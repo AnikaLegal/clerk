@@ -21,10 +21,15 @@ const MAPS_AVAILABLE = 'MAPS_AVAILABLE'
 // Rough bounding box of Victoria, to restrict autocomplete suggestions. A
 // bordering address can still slip through, so selections are validated with
 // isVictoria as well.
-export const VIC_BOUNDS = { west: 140.8, south: -39.3, east: 150.1, north: -33.9 }
+export const VIC_BOUNDS = {
+  west: 140.8,
+  south: -39.3,
+  east: 150.1,
+  north: -33.9,
+}
 
 const NON_VIC_MESSAGE =
-  'Sorry, we can only help renters in Victoria. Please choose a Victorian address'
+  'Sorry, we can only help renters in Victoria. Please choose a Victorian address.'
 
 const DEBOUNCE_MS = 300
 const MIN_CHARS = 3
@@ -295,7 +300,10 @@ export const attachAddressAutocomplete = (survey: Model) => {
         close()
         return
       }
-      debounceTimer = window.setTimeout(() => fetchSuggestions(text), DEBOUNCE_MS)
+      debounceTimer = window.setTimeout(
+        () => fetchSuggestions(text),
+        DEBOUNCE_MS
+      )
     })
 
     input.addEventListener('keydown', (event) => {
