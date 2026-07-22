@@ -5,6 +5,7 @@ import { Survey } from 'survey-react-ui'
 
 import { api } from '../api'
 import { LINKS } from '../consts'
+import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from '../form/phone'
 import { logException } from '../utils'
 
 // A small SurveyJS form so the no-email contact fields get the same validation
@@ -42,14 +43,8 @@ const buildNoEmailModel = (): Model => {
                 inputType: 'tel',
                 isRequired: true,
                 requiredErrorText: 'Please enter your phone number.',
-                maxLength: 255,
-                validators: [
-                  {
-                    type: 'regex',
-                    regex: '^\\+?[0-9]{8,}$',
-                    text: 'Please enter a valid phone number.',
-                  },
-                ],
+                maxLength: PHONE_MAX_LENGTH,
+                validators: [PHONE_VALIDATOR],
               },
               {
                 // A single-choice checkbox: isRequired forces it to be ticked.

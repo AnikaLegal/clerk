@@ -2,6 +2,7 @@ import { Model } from 'survey-core'
 
 import { LINKS } from '../consts'
 import { PAGES, QUESTIONS_BY_NAME } from '../questions'
+import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from './phone'
 import { IntakeQuestion } from './types'
 import './functions'
 
@@ -98,19 +99,12 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         validators: [{ type: 'email' }, ...(q.validators ?? [])],
       }
     case 'PHONE':
-      // The old form validated phone numbers as non-empty and length < 16.
       return {
         ...base,
         type: 'text',
         inputType: 'tel',
-        validators: [
-          {
-            type: 'text',
-            maxLength: 15,
-            text: "Hold on, that phone number doesn't look valid",
-          },
-          ...(q.validators ?? []),
-        ],
+        maxLength: PHONE_MAX_LENGTH,
+        validators: [PHONE_VALIDATOR, ...(q.validators ?? [])],
       }
     case 'BOOLEAN':
       // A single labelled checkbox (e.g. "Enter address manually"). The title
