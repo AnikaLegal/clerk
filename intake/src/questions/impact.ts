@@ -5,7 +5,7 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
     name: 'IMPACT_INTRO',
     required: false,
     type: 'DISPLAY',
-    html: '<h2>Great job. That is all the questions we have about your landlord. Finally, we just need a few details about you.</h2><p>These details will help us to better understand who you are and how we can best support you.</p>',
+    html: '<h2>Finally, we just need a few details about you.</h2><p>These details will help us to better understand who you are and how we can best support you.</p>',
   },
   {
     name: 'DOB',
