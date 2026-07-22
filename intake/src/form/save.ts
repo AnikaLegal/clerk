@@ -1,19 +1,9 @@
 import { api } from '../api'
-import { ApiError } from '../api/client'
+import { isAlreadySubmitted } from '../api/errors'
 import { logException } from '../utils'
 import { Answers } from './types'
 
 const PATCH_DEBOUNCE_MS = 1500
-
-// True when the backend refuses because the submission is already complete
-// (SubmittedException, code "already_submitted"). A plain 403 is NOT enough:
-// CSRF failures are 403 too and must stay errors.
-const isAlreadySubmitted = (error: unknown): boolean => {
-  const apiError = error as ApiError
-  if (apiError?.status !== 403) return false
-  const errors = (apiError.data as { errors?: { code?: string }[] })?.errors
-  return errors?.some((e) => e.code === 'already_submitted') ?? false
-}
 
 /**
  * Manages the submission lifecycle against the backend: create once (at the
@@ -58,6 +48,19 @@ export class SubmissionSaver {
     this.pendingAnswers = answers
     if (this.debounceTimer) clearTimeout(this.debounceTimer)
     this.debounceTimer = setTimeout(() => this.runPatch(), PATCH_DEBOUNCE_MS)
+  }
+
+  // Send any pending snapshot immediately: cancel the debounce and start the
+  // PATCH now. Used when waiting is no longer safe - an eligibility exit (the
+  // blocked page change means the normal PATCH never fires) and the tab being
+  // closed or hidden. Single-flight still applies, and it is a no-op before
+  // the submission exists or when nothing is pending.
+  flush() {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
+    }
+    this.runPatch()
   }
 
   private runPatch() {

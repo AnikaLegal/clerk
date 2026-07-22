@@ -204,6 +204,44 @@ describe('SubmissionSaver.schedulePatch', () => {
     expect(submission.submit).toHaveBeenCalledTimes(1)
   })
 
+  it('flush sends the pending snapshot immediately', () => {
+    const saver = new SubmissionSaver('sub-1', () => {})
+    saver.schedulePatch({ N: 1 })
+    saver.flush()
+    expect(submission.update).toHaveBeenCalledTimes(1)
+    expect(submission.update).toHaveBeenCalledWith('sub-1', { N: 1 })
+    // The cancelled debounce timer must not fire a second PATCH later.
+    vi.advanceTimersByTime(DEBOUNCE_MS * 3)
+    expect(submission.update).toHaveBeenCalledTimes(1)
+  })
+
+  it('flush is a no-op with nothing pending or before the submission exists', () => {
+    const idle = new SubmissionSaver('sub-1', () => {})
+    idle.flush()
+    const uncreated = new SubmissionSaver(null, () => {})
+    uncreated.schedulePatch({ N: 1 })
+    uncreated.flush()
+    expect(submission.update).not.toHaveBeenCalled()
+  })
+
+  it('flush respects a PATCH already in flight and keeps latest-wins', async () => {
+    let resolveFirst!: (value: { id: string; answers: typeof ANSWERS }) => void
+    submission.update.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveFirst = resolve))
+    )
+    const saver = new SubmissionSaver('sub-1', () => {})
+    saver.schedulePatch({ N: 1 })
+    saver.flush() // First PATCH now in flight.
+    saver.schedulePatch({ N: 2 })
+    saver.flush() // Must not start a second concurrent PATCH.
+    expect(submission.update).toHaveBeenCalledTimes(1)
+
+    resolveFirst({ id: 'sub-1', answers: ANSWERS })
+    await flushMicrotasks()
+    expect(submission.update).toHaveBeenCalledTimes(2)
+    expect(submission.update).toHaveBeenLastCalledWith('sub-1', { N: 2 })
+  })
+
   it('submit still succeeds when the awaited in-flight PATCH fails', async () => {
     // Guards the runPatch construction: patchInFlight has its rejection
     // consumed by .catch(logException), so awaiting it in submit() must never

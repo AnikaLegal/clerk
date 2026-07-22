@@ -265,7 +265,10 @@ export const FormPage = () => {
       innerCss: 'd-btn intake-btn-secondary',
       visible: false,
       action: () => {
-        events.onFormExit({ question: 'NO_EMAIL_BUTTON', route: ROUTES.NO_EMAIL })
+        events.onFormExit({
+          question: 'NO_EMAIL_BUTTON',
+          route: ROUTES.NO_EMAIL,
+        })
         navigate(ROUTES.NO_EMAIL)
       },
     })
@@ -361,7 +364,9 @@ export const FormPage = () => {
         startFired.current = true
         events.onFormBegin()
       }
-      const names = visibleNames(page as unknown as { questions: PageElement[] })
+      const names = visibleNames(
+        page as unknown as { questions: PageElement[] }
+      )
       // Apply skip defaults for questions left blank (e.g. dependants -> 0)
       // and record every question on the page as passed.
       for (const name of names) {
@@ -386,6 +391,11 @@ export const FormPage = () => {
           options.allow = false
           exitFired.current = true
           persist()
+          // The blocked page change means onPageChanged never fires, so send
+          // the answers - including the exit-triggering one - to the server
+          // now, or staff can't tell an exited user from an abandoner.
+          saver.schedulePatch(answers)
+          saver.flush()
           events.onFormExit({ question: name, route: exit })
           navigate(exit)
           return
@@ -446,10 +456,23 @@ export const FormPage = () => {
         })
     }
 
+    // Flush the pending answers PATCH when the tab is closed or backgrounded:
+    // the "answer, Next, close the tab" gesture would otherwise land inside
+    // the debounce window and the last page's answers would never reach the
+    // server (the request survives teardown via the PATCH's fetch keepalive).
+    const flushOnPageHide = () => saver.flush()
+    const flushOnHidden = () => {
+      if (document.visibilityState === 'hidden') saver.flush()
+    }
+    window.addEventListener('pagehide', flushOnPageHide)
+    document.addEventListener('visibilitychange', flushOnHidden)
+
     survey.onCurrentPageChanging.add(onPageChanging)
     survey.onCurrentPageChanged.add(onPageChanged)
     survey.onComplete.add(onComplete)
     return () => {
+      window.removeEventListener('pagehide', flushOnPageHide)
+      document.removeEventListener('visibilitychange', flushOnHidden)
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)

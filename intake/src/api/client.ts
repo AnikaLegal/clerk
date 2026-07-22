@@ -57,6 +57,10 @@ export const http = {
     const resp = await fetch(url, {
       method: 'PATCH',
       body: JSON.stringify(data),
+      // Let an answers PATCH ride out page teardown (the tab-close flush).
+      // Keepalive bodies are capped at 64KB; the per-question input caps keep
+      // answer payloads far below that.
+      keepalive: true,
       headers: { ...baseHeaders(), 'Content-Type': 'application/json' },
     })
     return handleResponse(resp)
