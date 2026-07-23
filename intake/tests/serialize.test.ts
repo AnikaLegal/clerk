@@ -53,6 +53,18 @@ describe('serializeAnswers', () => {
     expect('SUBMIT' in answers).toBe(false)
   })
 
+  it('emits null for a visited-but-skipped upload, like any skipped question', () => {
+    const survey = buildSurveyModel()
+    survey.autoAdvanceEnabled = false
+    survey.data = { ISSUES: 'REPAIRS' }
+    // Reached the photo upload page but added no files.
+    const visited = new Set(['ISSUES', 'REPAIRS_ISSUE_PHOTO'])
+    const answers = serializeAnswers(survey, visited)
+    // Present (visited) but null, not an empty array - the tidyData contract.
+    expect('REPAIRS_ISSUE_PHOTO' in answers).toBe(true)
+    expect(answers.REPAIRS_ISSUE_PHOTO).toBeNull()
+  })
+
   it('never emits UI-only questions or bare data keys', () => {
     const survey = buildSurveyModel()
     survey.autoAdvanceEnabled = false

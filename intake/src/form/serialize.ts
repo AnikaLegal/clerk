@@ -35,8 +35,11 @@ export const serializeAnswers = (
     if (!question || !question.isVisible || !visited.has(q.name)) continue
     let value = survey.getValue(q.name) as AnswerValue
     if (q.type === 'UPLOAD') {
-      const items = (value ?? []) as unknown as SurveyFileItem[]
-      value = items.map((item) => item.content)
+      // A skipped upload emits null like any other skipped question (the
+      // tidyData contract), not an empty array; the backend normalises both
+      // with `answers.get(k) or []` either way.
+      const items = value as unknown as SurveyFileItem[] | null | undefined
+      value = items?.length ? items.map((item) => item.content) : null
     }
     if (value === NONE_OF_THE_ABOVE) {
       // Sentinel for choices whose wire value is null.
