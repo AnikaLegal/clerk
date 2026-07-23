@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ROUTES } from '../src/consts'
 import { getExitRoute } from '../src/form/exits'
@@ -6,6 +6,10 @@ import { getExitRoute } from '../src/form/exits'
 const DAY_MS = 24 * 60 * 60 * 1000
 const dateString = (offsetDays: number) =>
   new Date(Date.now() + offsetDays * DAY_MS).toISOString().slice(0, 10)
+
+const HEARING = 'EVICTION_RETALIATORY_VCAT_HEARING_DATE'
+const hearingExit = (value: string) =>
+  getExitRoute(HEARING, { [HEARING]: value })
 
 describe('eligibility exits', () => {
   it('exits to compensation scope page', () => {
@@ -54,7 +58,9 @@ describe('eligibility exits', () => {
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', "I don't know"],
   ])('exits out-of-scope bonds cases (%s = %s)', (name, value) => {
-    expect(getExitRoute(name, { [name]: value })).toBe(ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE)
+    expect(getExitRoute(name, { [name]: value })).toBe(
+      ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE
+    )
   })
 
   it('keeps in-scope bonds cases', () => {
@@ -82,15 +88,41 @@ describe('eligibility exits', () => {
   })
 
   it('exits VCAT hearings within a fortnight, keeps later hearings', () => {
-    expect(
-      getExitRoute('EVICTION_RETALIATORY_VCAT_HEARING_DATE', {
-        EVICTION_RETALIATORY_VCAT_HEARING_DATE: dateString(7),
-      })
-    ).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
-    expect(
-      getExitRoute('EVICTION_RETALIATORY_VCAT_HEARING_DATE', {
-        EVICTION_RETALIATORY_VCAT_HEARING_DATE: dateString(30),
-      })
-    ).toBeUndefined()
+    expect(hearingExit(dateString(7))).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
+    expect(hearingExit(dateString(30))).toBeUndefined()
+  })
+})
+
+describe('VCAT hearing fortnight boundary', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('exits a hearing exactly 14 calendar days away, regardless of time of day', () => {
+    // Late in the local day: the old UTC-parse vs local-now comparison flipped
+    // an exactly-14-days hearing between eligible (morning) and ineligible
+    // (afternoon). Calendar-day math must not.
+    vi.setSystemTime(new Date(2026, 0, 1, 23, 30, 0))
+    expect(hearingExit('2026-01-15')).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
+    vi.setSystemTime(new Date(2026, 0, 1, 0, 30, 0))
+    expect(hearingExit('2026-01-15')).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
+  })
+
+  it('keeps a hearing 15 days away', () => {
+    vi.setSystemTime(new Date(2026, 0, 1, 9, 0, 0))
+    expect(hearingExit('2026-01-16')).toBeUndefined()
+  })
+
+  it('exits a hearing today and one on the fortnight boundary', () => {
+    vi.setSystemTime(new Date(2026, 0, 1, 12, 0, 0))
+    expect(hearingExit('2026-01-01')).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
+    expect(hearingExit('2026-01-14')).toBe(ROUTES.INELIGIBLE_URGENT_HEARING)
+  })
+
+  it('treats a missing or unparseable date as no exit (fail-open)', () => {
+    vi.setSystemTime(new Date(2026, 0, 1, 12, 0, 0))
+    expect(hearingExit('')).toBeUndefined()
+    expect(hearingExit('not-a-date')).toBeUndefined()
+    expect(hearingExit('2026-02-31')).toBeUndefined()
+    expect(getExitRoute(HEARING, {})).toBeUndefined()
   })
 })
