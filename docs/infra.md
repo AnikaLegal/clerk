@@ -70,13 +70,15 @@ Each environment's configuration and secrets live in a transcrypt-encrypted env 
 
 The only state that matters lives in PostgreSQL and S3:
 
-- the two PostgreSQL databases on the instance
+- the two PostgreSQL databases, which run on the instance's own disk (not in S3)
 - uploaded files in `s3://anika-clerk` and `s3://anika-clerk-staging`
 - images referenced by sent emails (e.g. logos) in `s3://anika-emails` and `s3://anika-emails-staging`
 - call centre audio in `s3://anika-twilio-audio` and `s3://anika-twilio-audio-staging`
 - database backups in `s3://anika-database-backups` and `s3://anika-database-backups-staging`
 
-Database backups run nightly via GitHub Actions, and AWS Backup additionally snapshots the S3 buckets - see [backups.md](./backups.md) for the full story. Everything else - the EC2 instance, the Docker images and containers - holds no important state and can be blown away and rebuilt at will (see [Server setup](#server-setup)).
+The S3 buckets are durable independently of the instance. The PostgreSQL databases are **not**: they live on the instance's disk, so if the instance is lost, so is any database data written since the last backup. What keeps that loss bounded is the nightly dump: the production database is dumped to S3 every night via GitHub Actions (staging is not backed up directly - it is regenerated from production), and AWS Backup additionally snapshots the S3 buckets - see [backups.md](./backups.md) for the full story.
+
+So rebuilding the server means restoring the databases from those S3 backups (step 3 of [Server setup](#server-setup)), which recovers database state only as far as the most recent nightly dump. With that caveat, everything else - the EC2 instance, the Docker images and containers - holds no state that cannot be restored, and can be blown away and rebuilt (see [Server setup](#server-setup)).
 
 ## Images and builds
 
