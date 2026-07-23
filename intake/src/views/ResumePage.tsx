@@ -103,7 +103,8 @@ export const ResumePage = () => {
         </h1>
         <p>
           Something went wrong on the way to our server. Please try again - if
-          it keeps happening, you can start a new application instead.
+          it keeps happening, you can start a new application instead or{' '}
+          <a href={LINKS.CONTACT}>contact us</a>.
         </p>
         <div className="intake-button-group">
           <button

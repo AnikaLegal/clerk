@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <p>
             Sorry, something broke. Please refresh the page to continue - your
             answers are saved on this device. If the problem persists, please{' '}
-            <a href={LINKS.HOME}>contact us</a>.
+            <a href={LINKS.CONTACT}>contact us</a>.
           </p>
         </div>
       )
