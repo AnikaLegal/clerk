@@ -39,10 +39,41 @@ from the staging backups.
 
 An encrypted backup must be decrypted with the passphrase before it can be
 loaded back into PostgreSQL. Each restore path - [refreshing staging from
-production](../app/scripts/tasks/staging-restore.sh), and [migrating to a new
-server](../infra/setup/migrate.sh) - does this automatically. The only 
-requirement is that whoever (or whatever) performs the restore has the
-passphrase available.
+production](../app/scripts/tasks/staging-restore.sh) and [restoring the
+databases to a new server](../infra/setup/restore-databases.sh) - does this
+automatically. The only requirement is that whoever (or whatever) performs
+the restore has the passphrase available.
 
 The [offline backups script](../infra/offline-backup.sh) includes a convenience
 option to decrypt a backup with the user-supplied passphrase.
+
+## Storage
+
+The dumps live in two private S3 buckets, one for production and one for staging,
+in the Sydney region. Both keep old object versions, are encrypted at rest by S3,
+block all public access, and expire old backups automatically on a lifecycle rule
+(production keeps them a good deal longer than staging). That server-side
+encryption is only a second layer: because the production dumps are already
+GPG-encrypted before upload, the bucket never holds anything AWS itself can read.
+
+Access is entirely through IAM. The nightly job and the restore scripts sign in
+as a single [`clerk-backup`](../infra/offline-backup.sh) user whose keys reach
+nothing beyond these two buckets, with just enough permission to list, read and
+write backup objects - not to delete them.
+
+## AWS Backup
+
+Alongside the database and client-info CSV dump, [AWS
+Backup](https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html)
+takes managed daily and monthly snapshots of the S3 buckets themselves. That
+widens the safety net well beyond the database: the app's uploaded documents
+and call audio are captured too, so the whole of Anika's S3 data can be rolled
+back rather than just the database.
+
+Every snapshot is copied into a locked, [air-gapped
+vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/logicallyairgappedvault.html)
+whose recovery points cannot be changed or deleted until they age out - the
+safeguard against ransomware or an accidental wipe. Production's copy is held in a
+second Australian region (Melbourne) for geographic isolation, while staging is
+backed up the same way with shorter retention. Everything stays in Australian
+regions, keeping the data onshore.

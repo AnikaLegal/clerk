@@ -403,6 +403,25 @@ TEAM_MEMBERS = [
         ],
     },
     {
+        "image": "web/img/photos/team/annie.png",
+        "name": "Annie Cassidy",
+        "title": "Head of Partnerships & Fundraising",
+        "linkedin": "https://www.linkedin.com/in/annie-cassidy-thehuman/",
+        "brags": [
+            """Annie is Anika's Head of Partnerships & Fundraising, responsible
+            for building the partnerships and fundraising strategy that enables
+            Anika's work and its sustainable growth. Her connection to Anika
+            began as a client, giving her firsthand insight into the impact of
+            its work.""",
+            """Annie joins us from Cerebral Palsy Alliance, where she spent
+            several years managing corporate partnerships and major fundraising
+            campaigns. Annie brings a proven track record of building lasting
+            funder relationships, and is focused on growing the strategic
+            partnerships that help Anika reach more people who need free legal
+            help.""",
+        ],
+    },
+    {
         "image": "web/img/photos/team/luca.png",
         "name": "Luca Vari",
         "title": "Lead Software Developer",
@@ -449,16 +468,16 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/tom.png",
-        "name": "Tom Fletcher",
-        "title": "Lawyer",
-        "linkedin": "https://www.linkedin.com/in/tom-fletcher-9586971b3/",
+        "image": "web/img/photos/team/alex.png",
+        "name": "Alexandra Wardlaw",
+        "title": "Secondee Lawyer",
+        "linkedin": "https://www.linkedin.com/in/alexandra-wardlaw-156904191/",
         "brags": [
-            """Tom is a member of our casework team and is responsible for
+            """Alex is a member of our casework team and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
-            """Tom is generously seconded to us from Hall & Wilcox where he
-            works as an Associate in the Pro Bono & Community team.""",
+            """Alex is generously seconded to us from Hall & Wilcox where she
+            works as a Lawyer in the Property and Projects team.""",
         ],
     },
 ]

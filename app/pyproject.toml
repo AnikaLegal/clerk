@@ -66,9 +66,8 @@ dev = [
     "django-debug-toolbar>=6.0.0",
     "django-extensions",
     "django-zeal>=2.0.4",
-    "invoke>=2.2.0",
     "ipython",
-    "python-dotenv>=1.2.1",
+    "rust-just>=1.57.0",
     "setuptools",
     "watchdog[watchmedo]>=5.0.2",
 ]
