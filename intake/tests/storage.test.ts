@@ -13,6 +13,7 @@ const EMPTY: StoredState = {
   data: {},
   visited: [],
   currentPage: null,
+  session: null,
 }
 
 const STATE: StoredState = {
@@ -20,6 +21,7 @@ const STATE: StoredState = {
   data: { EMAIL: 'test@example.com', ISSUES: ['REPAIRS'] },
   visited: ['EMAIL', 'ISSUES'],
   currentPage: 'ISSUES_REPAIRS',
+  session: 'session-abc',
 }
 
 // The tests run in node, so provide a minimal Map-backed localStorage. The
@@ -76,16 +78,14 @@ describe('storage', () => {
     expect(loadState()).toEqual(EMPTY)
   })
 
-  it.each([
-    'not json at all',
-    '"a string"',
-    '42',
-    'null',
-  ])('tolerates corrupt stored JSON: %s', (raw) => {
-    const store = stubStorage()
-    store.set(STORAGE_KEY, raw)
-    expect(loadState()).toEqual(EMPTY)
-  })
+  it.each(['not json at all', '"a string"', '42', 'null'])(
+    'tolerates corrupt stored JSON: %s',
+    (raw) => {
+      const store = stubStorage()
+      store.set(STORAGE_KEY, raw)
+      expect(loadState()).toEqual(EMPTY)
+    }
+  )
 
   it('repairs wrong-shaped fields to safe defaults', () => {
     const store = stubStorage()

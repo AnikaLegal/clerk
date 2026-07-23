@@ -31,6 +31,9 @@ interface FormState {
   survey: Model
   saver: SubmissionSaver
   visited: Set<string>
+  // Id for this form-filling session, stamped into history entries (see the
+  // reconcile effect).
+  session: string
 }
 
 interface PageElement {
@@ -63,6 +66,12 @@ const setUpForm = (): FormState => {
   attachUploadHandler(survey)
   attachAddressAutocomplete(survey)
 
+  // Carry the stored session across remounts (exit / no-email round trips,
+  // reloads); mint a fresh one when there is no state (a new visitor, or Back
+  // after a submit cleared it) so leftover history entries from the previous
+  // session are recognised as stale.
+  const session = stored.session ?? crypto.randomUUID()
+
   const saver = new SubmissionSaver(stored.submissionId, () => persist())
   const persist = () => {
     saveState({
@@ -70,6 +79,7 @@ const setUpForm = (): FormState => {
       data: survey.data,
       visited: [...visited],
       currentPage: survey.currentPage?.name ?? null,
+      session,
     })
   }
 
@@ -115,7 +125,7 @@ const setUpForm = (): FormState => {
   survey.pageNextText =
     survey.currentPage?.name === WELCOME_PAGE ? "Let's get started" : 'Next'
 
-  return { survey, saver, visited }
+  return { survey, saver, visited, session }
 }
 
 // State for the progress indicator. section is -1 on the WELCOME and SUBMIT
@@ -137,7 +147,7 @@ const readProgress = (survey: Model) => {
 export const FormPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { survey, saver, visited } = useMemo(setUpForm, [])
+  const { survey, saver, visited, session } = useMemo(setUpForm, [])
   const [progress, setProgress] = useState(() => ({
     ...readProgress(survey),
     direction: 'forward' as Direction,
@@ -183,22 +193,27 @@ export const FormPage = () => {
       // The first real page replaces the initial entry in place (so Back from
       // it leaves the form); later pages push a new entry to move forward over.
       navigate(ROUTES.LANDING, {
-        state: { page: name },
+        state: { page: name, session },
         replace: lastPage.current === null,
       })
       lastPage.current = name
     },
-    [navigate]
+    [navigate, session]
   )
 
   // Mirror a browser Back / Forward (location change) onto the survey: move it
   // to the page named in the history entry we landed on.
   useEffect(() => {
-    const target = (location.state as { page?: string } | null)?.page
+    const entry = location.state as { page?: string; session?: string } | null
+    const target = entry?.page
+    // Ignore entries stamped by an earlier form session (e.g. Back after a
+    // submit cleared the state and remounted with a fresh session): honouring
+    // them would jump the new empty survey to a mid-form page.
+    if (entry?.session !== session) return
     // lastPage null means the initial entry has not been stamped yet (see the
     // mount effect below); ignore any page named in a leftover history entry
-    // (e.g. returning via Back after a submit cleared the saved state) until
-    // then, so the survey opens where setUpForm placed it, not a stale page.
+    // until then, so the survey opens where setUpForm placed it, not a stale
+    // page.
     if (!target || lastPage.current === null || lastPage.current === target)
       return
     if (survey.currentPage?.name === target) {
@@ -239,7 +254,7 @@ export const FormPage = () => {
       lastPage.current = survey.currentPage?.name ?? null
       navigate(-1)
     }
-  }, [location, survey, navigate])
+  }, [location, survey, navigate, session])
 
   // Stamp the initial history entry for the page the survey opens on (WELCOME
   // for a fresh visitor, or the restored page when resuming). Runs once on
@@ -340,6 +355,7 @@ export const FormPage = () => {
         data: survey.data,
         visited: [...visited],
         currentPage: survey.currentPage?.name ?? null,
+        session,
       })
     }
 
@@ -424,7 +440,10 @@ export const FormPage = () => {
         if (idx != null && startIdx.current != null && idx > startIdx.current) {
           navigate(-1)
         } else {
-          navigate(ROUTES.LANDING, { state: { page: name }, replace: true })
+          navigate(ROUTES.LANDING, {
+            state: { page: name, session },
+            replace: true,
+          })
         }
       }
     }
@@ -471,7 +490,7 @@ export const FormPage = () => {
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
     }
-  }, [survey, saver, visited, navigate, recordPage])
+  }, [survey, saver, visited, navigate, recordPage, session])
 
   return (
     <div

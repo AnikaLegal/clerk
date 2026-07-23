@@ -8,6 +8,7 @@ const local = (overrides: Partial<StoredState>): StoredState => ({
   data: {},
   visited: [],
   currentPage: null,
+  session: null,
   ...overrides,
 })
 

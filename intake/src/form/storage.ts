@@ -10,6 +10,11 @@ export interface StoredState {
   visited: string[]
   // Name of the page the user is on, so the form reopens where they left off.
   currentPage: string | null
+  // Id for this form-filling session, stamped into each browser history entry
+  // so the history-reconcile effect can ignore leftover entries from an
+  // earlier session (e.g. Back after a submit that cleared the state). Null
+  // until setUpForm assigns one.
+  session: string | null
 }
 
 // A factory (not a shared constant) so every load returns an independent
@@ -19,6 +24,7 @@ const emptyState = (): StoredState => ({
   data: {},
   visited: [],
   currentPage: null,
+  session: null,
 })
 
 export const loadState = (): StoredState => {
@@ -31,6 +37,7 @@ export const loadState = (): StoredState => {
       data: parsed.data ?? {},
       visited: Array.isArray(parsed.visited) ? parsed.visited : [],
       currentPage: parsed.currentPage ?? null,
+      session: typeof parsed.session === 'string' ? parsed.session : null,
     }
   } catch {
     return emptyState()

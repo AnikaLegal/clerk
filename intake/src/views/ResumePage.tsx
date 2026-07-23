@@ -55,6 +55,8 @@ export const ResumePage = () => {
             // passed; the form resumes at the first unanswered one.
             visited: Object.keys(submission.answers),
             currentPage: null,
+            // setUpForm mints the session id on the next mount.
+            session: null,
           })
         }
         navigate(ROUTES.LANDING, { replace: true })
