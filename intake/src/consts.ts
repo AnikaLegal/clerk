@@ -52,3 +52,6 @@ export const LINKS = {
 
 // localStorage key for in-progress form state.
 export const STORAGE_KEY = 'anika-intake-form'
+
+// sessionStorage key for analytics funnel dedupe (see form/funnel.ts).
+export const FUNNEL_KEY = 'anika-intake-funnel'

@@ -8,6 +8,7 @@ import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
 import { attachAddressAutocomplete } from '../form/address/attach'
 import { getExitRoute } from '../form/exits'
+import { markFormBegun, markStepReported, resetFunnel } from '../form/funnel'
 import { buildSurveyModel, WELCOME_PAGE } from '../form/model'
 import { SubmissionSaver } from '../form/save'
 import { serializeAnswers } from '../form/serialize'
@@ -169,18 +170,12 @@ export const FormPage = () => {
   // backward move via the survey's Previous button steps back through history
   // rather than pushing a duplicate entry.
   const goingForward = useRef(true)
-  // Ensures the form_begin analytics event fires only once, even if the user
-  // navigates back to WELCOME and forward again.
-  const startFired = useRef(false)
   // react-router's index of the history entry the form opened on. A backward
   // survey move (Previous) only steps back through browser history when a prior
   // form entry exists above this floor; at the floor - e.g. a resumed session
   // whose earlier pages were never in this browser's history - it replaces the
   // current entry instead, so Previous stays in the form rather than exiting.
   const startIdx = useRef<number | null>(null)
-  // Pages already sent a form_step analytics event, so each is counted once
-  // even when the user navigates back and forth.
-  const reportedSteps = useRef(new Set<string>())
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -327,8 +322,7 @@ export const FormPage = () => {
     // / forward navigation doesn't recount it).
     const reportPage = () => {
       const name = survey.currentPage?.name
-      if (!name || reportedSteps.current.has(name)) return
-      reportedSteps.current.add(name)
+      if (!name || !markStepReported(name)) return
       const sectionIdx = sectionIndexForPage(name)
       events.onFormStep({
         index: survey.currentPageNo,
@@ -360,8 +354,7 @@ export const FormPage = () => {
       const page = options.oldCurrentPage
       if (!page) return
       // Advancing off WELCOME ("Let's get started") begins the intake proper.
-      if (page.name === WELCOME_PAGE && !startFired.current) {
-        startFired.current = true
+      if (page.name === WELCOME_PAGE && markFormBegun()) {
         events.onFormBegin()
       }
       const names = visibleNames(
@@ -447,6 +440,7 @@ export const FormPage = () => {
         .then(() => {
           events.onFormComplete()
           clearState()
+          resetFunnel()
           navigate(ROUTES.SUBMITTED)
         })
         .catch((error) => {
