@@ -110,6 +110,7 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     requiredIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
     enableIf: '{ADDRESS_MANUAL} = true or {MAPS_AVAILABLE} <> true',
+    min: 0,
     max: 999999,
     title: 'Postcode',
   },
@@ -117,6 +118,7 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     name: 'WEEKLY_RENT',
     type: 'NUMBER',
     required: true,
+    min: 0,
     max: 100000,
     // {RENT_IS} renders as 'is (or was)' on the bonds branch and 'is'
     // elsewhere (see calculatedValues in form/model.ts).

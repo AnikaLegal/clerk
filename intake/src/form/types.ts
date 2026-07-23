@@ -70,6 +70,8 @@ export interface IntakeQuestion {
   // Max value for NUMBER answers, for the same reason (e.g. POSTCODE fits its
   // 6-char column, WEEKLY_RENT fits its integer field).
   max?: number
+  // Min value for NUMBER answers (e.g. dependants can't be negative).
+  min?: number
 }
 
 // A group of questions rendered as a single SurveyJS panel: one visual block

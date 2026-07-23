@@ -87,9 +87,10 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         ...base,
         type: 'text',
         inputType: 'number',
+        min: q.min,
         max: q.max,
         validators: [
-          { type: 'numeric', maxValue: q.max },
+          { type: 'numeric', minValue: q.min, maxValue: q.max },
           ...(q.validators ?? []),
         ],
       }

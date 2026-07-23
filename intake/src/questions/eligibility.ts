@@ -82,6 +82,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'NUMBER',
     title: 'How many dependants do you have?',
+    min: 0,
     skipDefault: 0,
   },
   {

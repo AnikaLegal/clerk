@@ -118,6 +118,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.DAMAGE),
     required: true,
     type: 'NUMBER',
+    min: 0,
     title: 'How much is the landlord claiming for damage?',
   },
   {
@@ -161,6 +162,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.MONEY_OWED),
     required: true,
     type: 'NUMBER',
+    min: 0,
     title: 'How much is the landlord claiming for money owing?',
   },
   {
@@ -195,6 +197,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.CLEANING),
     required: true,
     type: 'NUMBER',
+    min: 0,
     title: 'How much is the landlord claiming for cleaning costs?',
   },
   {
@@ -222,6 +225,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.LOCKS),
     required: true,
     type: 'NUMBER',
+    min: 0,
     title: 'How much is the landlord claiming for locks and security devices?',
   },
   {
@@ -265,6 +269,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: isClaimReason(REASONS.OTHER),
     required: true,
     type: 'NUMBER',
+    min: 0,
     title: 'How much is the landlord claiming for other reasons?',
   },
 ]
