@@ -19,19 +19,21 @@ export const WELCOME_PAGE = 'WELCOME'
 // questions begin, replacing the old standalone landing splash page.
 const WELCOME_HTML = `
   <h2>Welcome to the Anika Legal intake form!</h2>
-  <p>We're here to help you with your rental problem. In order for us to help
-  you, we need to ask you a series of simple questions to see whether you're
-  eligible. This questionnaire takes approximately 10 minutes to complete.</p>
-  <p>Before starting the intake form, please have the information ready about:</p>
+  <p>We're here to help you with your rental problem. We need to ask you a
+  series of simple questions to check whether you're eligible and to understand
+  your problem. This questionnaire takes approximately 10 minutes to
+  complete.</p>
+  <p>Before starting, please have the following ready:</p>
   <ul>
-    <li>Your rental property</li>
-    <li>Your rental provider</li>
-    <li>Your agent, if applicable</li>
+    <li>Your rental property details</li>
+    <li>Your landlord's details</li>
+    <li>Your agent's details, if applicable</li>
     <li>Your income</li>
   </ul>
   <p>You can have a look at our
-  <a href="${LINKS.COLLECTIONS_STATEMENT}">collection statement</a> if you have
-  any questions about why we need your information, and what we do with it.</p>
+  <a href="${LINKS.COLLECTIONS_STATEMENT}" target="_blank">Collections
+  Statement</a> if you have any questions about why we need your information,
+  and what we do with it.</p>
 `
 
 // Pass through the question's colCount (e.g. 2 for long choice lists that
