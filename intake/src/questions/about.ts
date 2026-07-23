@@ -38,7 +38,7 @@ export const ABOUT_QUESTIONS: IntakeQuestion[] = [
     type: 'PHONE',
     title: 'What is the best <strong>phone number</strong> to contact you on?',
     description:
-      'Our paralegals will use this to contact you after you complete this questionnaire.',
+      "We'll only use this to contact you about your request. We won't share your details.",
   },
   {
     name: 'AVAILABILITY',
