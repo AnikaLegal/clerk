@@ -38,7 +38,7 @@ export const REPAIRS_QUESTIONS: IntakeQuestion[] = [
     ],
     title: 'Have you done any of the following?',
     description:
-      'Please select all that apply. CAV is Consumer Affairs Victoria; VCAT is the Victorian Civil and Administrative Tribunal.',
+      'CAV is Consumer Affairs Victoria; VCAT is the Victorian Civil and Administrative Tribunal. Please select all that apply.',
   },
   {
     name: 'REPAIRS_APPLIED_VCAT',

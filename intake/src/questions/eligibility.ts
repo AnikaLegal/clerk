@@ -92,7 +92,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     colCount: 2,
     title: 'Do any of the following apply to you?',
     description:
-      'Please select all that apply. This helps us prioritise support.',
+      'This helps us prioritise support. Please select all that apply.',
     choices: [
       { value: 'STRUGGLING', text: "I'm experiencing financial stress" },
       { value: 'HOUSING', text: 'I live in public or community housing' },
