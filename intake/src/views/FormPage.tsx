@@ -9,6 +9,7 @@ import { ROUTES } from '../consts'
 import { attachAddressAutocomplete } from '../form/address/attach'
 import { getExitRoute } from '../form/exits'
 import { markFormBegun, markStepReported, resetFunnel } from '../form/funnel'
+import { restorePosition } from '../form/restore'
 import { buildSurveyModel, WELCOME_PAGE } from '../form/model'
 import { SubmissionSaver } from '../form/save'
 import { serializeAnswers } from '../form/serialize'
@@ -83,41 +84,8 @@ const setUpForm = (): FormState => {
     })
   }
 
-  // Restore position: the stored current page, or (after a resume, or when
-  // the stored page is no longer visible) the first visible page that still
-  // has an unanswered question the user hasn't passed. A brand-new visitor has
-  // no stored position and opens on the leading WELCOME page.
-  let restored = false
-  if (stored.currentPage) {
-    const page = survey.getPageByName(stored.currentPage)
-    if (page && page.isVisible) {
-      survey.currentPage = page
-      restored = true
-    }
-  }
-  if (!restored && visited.size > 0) {
-    const nextPage = survey.pages.find(
-      (page) =>
-        page.isVisible &&
-        // page.questions (not .elements) so questions inside panels count.
-        (page.questions as unknown as PageElement[]).some((el) => {
-          const question = QUESTIONS_BY_NAME[el.name]
-          // DISPLAY and uiOnly questions don't hold answers, so they can't
-          // make a page count as unfinished (a server resume seeds visited
-          // from the answers, which never include them).
-          return (
-            el.isVisible &&
-            question &&
-            question.type !== 'DISPLAY' &&
-            !question.uiOnly &&
-            !visited.has(el.name)
-          )
-        })
-    )
-    if (nextPage) {
-      survey.currentPage = nextPage
-    }
-  }
+  // Restore where the returning user re-enters the form (see restorePosition).
+  restorePosition(survey, visited, stored.currentPage)
 
   // The WELCOME page's Next button reads "Let's get started"; every other page
   // keeps the default. Set it before the first render (syncPage maintains it on
