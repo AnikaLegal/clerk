@@ -80,7 +80,7 @@ Application code is packaged into Docker images, defined in the `docker` directo
 
 - `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `infra/build_base_image.sh` when it changes
 - `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built and pushed by the [Test workflow](../.github/workflows/test.yml) after tests pass - merges to `develop` produce the `staging` tag, merges to `master` produce the `prod` tag
-- `Dockerfile.frontend`: builds the frontend (the Clerk CMS SPA), whose output is copied into the application image
+- `Dockerfile.frontend`: builds the Clerk CMS SPA (`frontend/`), whose output is copied into the application image and served at `/clerk/`
 - `Dockerfile.intake`: builds the public intake form SPA (`intake/`), whose output is copied into the application image and served at `/intake/`
 
 Compose files in the same directory define how the images run: `docker-compose.local.yml` (local development), `docker-compose.ci.yml` (tests in CI), and `docker-compose.staging.yml` / `docker-compose.prod.yml` (the Swarm stacks).
