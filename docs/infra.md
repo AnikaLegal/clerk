@@ -9,10 +9,6 @@ flowchart LR
     user([Browser])
     retool["Retool SaaS<br>anika.retool.com"]
 
-    subgraph s3["AWS S3"]
-        intake["Intake static site<br>intake.anikalegal.org.au"]
-    end
-
     cloudflare["CloudFlare<br>DNS + SSL termination"]
 
     subgraph ec2["AWS EC2 instance"]
@@ -31,9 +27,7 @@ flowchart LR
     end
 
     user -->|"anikalegal.org.au"| cloudflare
-    user --> intake
     user --> retool
-    intake -->|"REST API"| cloudflare
     cloudflare -->|"HTTP :80"| nginx
     nginx -->|":8000"| web_prod
     nginx -->|":8001"| web_staging
@@ -53,7 +47,7 @@ The instance also hosts two services outside of Docker:
 
 [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, so the instance itself only serves plain HTTP on port 80.
 
-The intake frontend is a separate static site hosted on S3, which talks to the backend via its REST API.
+The public intake form (a Vite/SurveyJS SPA in `intake/`) is built into the application image and served by the Django `web` service at `/intake/` via the thin `app/intake` app, so it sits behind NGINX and CloudFlare like the rest of the site.
 
 ## Environments
 
@@ -62,7 +56,7 @@ The intake frontend is a separate static site hosted on S3, which talks to the b
 | Staging | [staging.anikalegal.org.au](https://staging.anikalegal.org.au/admin) | `develop` | `clerk_staging` | 8001 | `clerk_staging` |
 | Production | [anikalegal.org.au](https://anikalegal.org.au/admin) | `master` | `clerk_prod` | 8000 | `clerk_prod` |
 
-The staging backend is used by the [staging intake frontend](https://intake-staging.anikalegal.org.au), the production backend by the [production intake frontend](https://intake.anikalegal.org.au).
+Each environment serves its own intake form at `/intake/` (e.g. [anikalegal.org.au/intake/](https://anikalegal.org.au/intake/)).
 
 Each environment's configuration and secrets live in a transcrypt-encrypted env file (`env/staging.env`, `env/prod.env`), which the compose files pass to the containers. See [setup.md](./setup.md) for how to unlock transcrypt.
 
@@ -84,7 +78,8 @@ Application code is packaged into Docker images, defined in the `docker` directo
 
 - `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `infra/build_base_image.sh` when it changes
 - `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built and pushed by the [Test workflow](../.github/workflows/test.yml) after tests pass - merges to `develop` produce the `staging` tag, merges to `master` produce the `prod` tag
-- `Dockerfile.frontend`: builds the frontend, whose output is copied into the application image
+- `Dockerfile.frontend`: builds the frontend (the Clerk CMS SPA), whose output is copied into the application image
+- `Dockerfile.intake`: builds the public intake form SPA (`intake/`), whose output is copied into the application image and served at `/intake/`
 
 Compose files in the same directory define how the images run: `docker-compose.local.yml` (local development), `docker-compose.ci.yml` (tests in CI), and `docker-compose.staging.yml` / `docker-compose.prod.yml` (the Swarm stacks).
 
