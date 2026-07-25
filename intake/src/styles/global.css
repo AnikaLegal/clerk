@@ -390,6 +390,33 @@ header .h-\[63px\] img {
   outline: none;
 }
 
+/* The post-submit splash (SubmitStatus: saving / failure states) is a single
+   short message rather than a full page, so unlike the exit / submitted pages
+   it reads best centred vertically in the band. Text stays left-aligned (like
+   the rest of the flow); only the retry button is centred, sitting between the
+   two blocks of message text. `gap` spaces the heading, message and button
+   without adding a trailing gap when the heading is alone. */
+.intake-splash--centred {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 320px;
+}
+
+.intake-splash--centred h1,
+.intake-splash--centred p {
+  margin: 0;
+}
+
+.intake-splash--centred .intake-button-group {
+  justify-content: center;
+  /* Rely on the container `gap` for even spacing; the default top margin (for
+     the exit / submitted pages, where the buttons are last) would otherwise
+     stack on the gap and push the button off-centre between the text blocks. */
+  margin-top: 0;
+}
+
 /* SurveyJS renders .sd-html list items a couple of pixels larger than its
    paragraphs; match them to the body copy so the start-page "have ready" list
    sits consistently with the text around it. */

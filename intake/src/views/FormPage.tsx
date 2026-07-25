@@ -4,8 +4,9 @@ import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 
 import { events } from '../analytics'
+import { ApiError } from '../api/client'
 import { SectionProgress } from '../comps/SectionProgress'
-import { ROUTES } from '../consts'
+import { LINKS, ROUTES } from '../consts'
 import { attachAddressAutocomplete } from '../form/address/attach'
 import { getExitRoute } from '../form/exits'
 import { markFormBegun, markStepReported, resetFunnel } from '../form/funnel'
@@ -18,7 +19,7 @@ import { clearState, loadState, saveState } from '../form/storage'
 import { Answers } from '../form/types'
 import { attachUploadHandler } from '../form/upload-handler'
 import { logException } from '../utils'
-import { setDocumentTitle } from './announce'
+import { setDocumentTitle, useAnnouncePage } from './announce'
 import {
   BONDS_MOVE_OUT_PAGE,
   EMAIL_PAGE,
@@ -45,6 +46,76 @@ interface PageElement {
 // Direction of the last page change, used to slide the incoming page in from
 // the side the user is travelling towards (forward -> from the right).
 type Direction = 'forward' | 'back'
+
+// The post-submit view: saving in progress, an unrecoverable failure
+// (permanent), or a retryable connection / server failure (transient).
+type SubmitState = 'submitting' | 'permanent' | 'transient'
+
+const SUBMIT_TITLES: Record<SubmitState, string> = {
+  submitting: 'Submitting your answers',
+  permanent: "We couldn't submit your form",
+  transient: 'Something went wrong',
+}
+
+// Renders the post-submit splash. Shares the splash chrome and typography with
+// the exit / submitted pages; centred vertically in its band (intake-splash--
+// centred) since it is a single short message rather than a full page. The
+// heading takes focus on show, like the other splash routes.
+const SubmitStatus = ({
+  state,
+  onRetry,
+}: {
+  state: SubmitState
+  onRetry: () => void
+}) => {
+  const headingRef = useAnnouncePage(SUBMIT_TITLES[state])
+  return (
+    <div className="intake-splash intake-splash--centred">
+      {state === 'submitting' && (
+        <h1 tabIndex={-1} ref={headingRef}>
+          Submitting your answers...
+        </h1>
+      )}
+      {state === 'permanent' && (
+        <>
+          <h1 tabIndex={-1} ref={headingRef}>
+            Sorry, we couldn&apos;t submit your form
+          </h1>
+          <p>
+            Trying again won&apos;t fix it. Please email{' '}
+            <a href={LINKS.CONTACT}>tech@anikalegal.com</a> - your answers are
+            still saved on this device.
+          </p>
+        </>
+      )}
+      {state === 'transient' && (
+        <>
+          <h1 tabIndex={-1} ref={headingRef}>
+            Sorry, something went wrong
+          </h1>
+          <p>
+            We could not submit your form. Please check your connection and try
+            again.
+          </p>
+          <div className="intake-button-group">
+            <button
+              type="button"
+              className="d-btn d-btn-primary"
+              onClick={onRetry}
+            >
+              Try again
+            </button>
+          </div>
+          <p>
+            If this keeps happening, email{' '}
+            <a href={LINKS.CONTACT}>tech@anikalegal.com</a> - your answers are
+            still saved on this device.
+          </p>
+        </>
+      )}
+    </div>
+  )
+}
 
 const isBlank = (value: unknown): boolean =>
   value === undefined ||
@@ -120,6 +191,35 @@ export const FormPage = () => {
     ...readProgress(survey),
     direction: 'forward' as Direction,
   }))
+
+  // Post-submit state, rendered as our own splash (see SubmitStatus) instead of
+  // SurveyJS's completed page / save-data banner, so both errors match the rest
+  // of the intake flow and the unrecoverable case can drop the retry button.
+  // null while filling the form; a successful submit navigates to SubmittedPage.
+  const [submitState, setSubmitState] = useState<SubmitState | null>(null)
+
+  const attemptSubmit = useCallback(() => {
+    setSubmitState('submitting')
+    const answers = serializeAnswers(survey, visited)
+    saver
+      .submit(answers)
+      .then(() => {
+        events.onFormComplete()
+        clearState()
+        resetFunnel()
+        navigate(ROUTES.SUBMITTED)
+      })
+      .catch((error) => {
+        logException(error)
+        const status = (error as ApiError)?.status
+        // A 4xx is not transient (e.g. a missing-CSRF 403 or a validation 400):
+        // retrying just loops on the same failure, so offer no retry and point
+        // the user to a person. Network errors and 5xx are worth retrying.
+        const permanent =
+          typeof status === 'number' && status >= 400 && status < 500
+        setSubmitState(permanent ? 'permanent' : 'transient')
+      })
+  }, [survey, saver, visited, navigate])
 
   // Restore the form's title after a splash view (e.g. Go back from an exit
   // page) changed it. Matches the title the Django shell renders on load.
@@ -383,7 +483,16 @@ export const FormPage = () => {
 
     const onPageChanged = () => {
       persist()
-      saver.schedulePatch(serializeAnswers(survey, visited))
+      const answers = serializeAnswers(survey, visited)
+      saver.schedulePatch(answers)
+      // Retry the submission create if the EMAIL-time one failed (a network
+      // blip): without a submission id, PATCHes no-op and no partial
+      // submission exists server-side, so abandonment reminders never fire.
+      // create() is idempotent - a no-op once the id exists or a create is
+      // already in flight.
+      if (!saver.submissionId && answers.EMAIL) {
+        saver.create(answers).catch(logException)
+      }
       window.scrollTo(0, 0)
       syncPage()
       reportPage()
@@ -416,25 +525,8 @@ export const FormPage = () => {
       }
     }
 
-    const onComplete: Parameters<typeof survey.onComplete.add>[0] = (
-      _,
-      options
-    ) => {
-      options.showSaveInProgress()
-      const answers = serializeAnswers(survey, visited)
-      saver
-        .submit(answers)
-        .then(() => {
-          events.onFormComplete()
-          clearState()
-          resetFunnel()
-          navigate(ROUTES.SUBMITTED)
-        })
-        .catch((error) => {
-          logException(error)
-          // Renders a message with a retry button that re-fires onComplete.
-          options.showSaveError()
-        })
+    const onComplete: Parameters<typeof survey.onComplete.add>[0] = () => {
+      attemptSubmit()
     }
 
     // Flush the pending answers PATCH when the tab is closed or backgrounded:
@@ -458,7 +550,17 @@ export const FormPage = () => {
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
     }
-  }, [survey, saver, visited, navigate, recordPage, session])
+  }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
+
+  // Once the form is submitting or has failed, replace the survey with the
+  // post-submit splash (a successful submit navigates away before this shows).
+  if (submitState) {
+    return (
+      <div className="intake-form">
+        <SubmitStatus state={submitState} onRetry={attemptSubmit} />
+      </div>
+    )
+  }
 
   return (
     <div

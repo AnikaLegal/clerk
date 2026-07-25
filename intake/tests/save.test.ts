@@ -44,6 +44,21 @@ describe('SubmissionSaver', () => {
     expect(saver.submissionId).toBe('sub-1')
   })
 
+  it('retries create after a failure without leaving an id set', async () => {
+    submission.create.mockRejectedValueOnce({ status: 503 })
+    const onId = vi.fn()
+    const saver = new SubmissionSaver(null, onId)
+    // First attempt fails - no id, so the next page change can retry.
+    await expect(saver.create(ANSWERS)).rejects.toBeDefined()
+    expect(saver.submissionId).toBeNull()
+    expect(onId).not.toHaveBeenCalled()
+    // A later attempt starts a fresh create and succeeds.
+    await saver.create(ANSWERS)
+    expect(submission.create).toHaveBeenCalledTimes(2)
+    expect(saver.submissionId).toBe('sub-1')
+    expect(onId).toHaveBeenCalledWith('sub-1')
+  })
+
   it('submit awaits a pending create instead of creating a duplicate', async () => {
     let resolveCreate: (value: { id: string; answers: typeof ANSWERS }) => void
     submission.create.mockImplementationOnce(

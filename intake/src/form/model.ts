@@ -237,6 +237,11 @@ export const buildSurveyModel = (): Model => {
     // the gender DB column's length, so it can't overflow during processing.
     maxOthersLength: 64,
     completeText: 'Submit',
+    // On completion FormPage replaces the survey with its own SubmitStatus
+    // splash, so this completed page is only a one-frame guard before that
+    // swap. Keep it neutral - SurveyJS's default "Thank you for completing the
+    // survey" would flash as success even when the submit then fails.
+    completedHtml: '<h1>Submitting your answers...</h1>',
   })
   // Render the built-in navigation buttons (Previous / Next / Submit) as
   // daisyUI primary buttons so they match the public website. The default
