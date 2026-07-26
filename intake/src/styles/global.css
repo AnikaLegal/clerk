@@ -335,7 +335,11 @@ header .h-\[63px\] img {
   white-space: nowrap;
   font-size: 15px;
   font-weight: 600;
-  color: var(--color-primary);
+  /* The brand primary (#428eef) is only ~3.3:1 on white, below the 4.5:1 WCAG
+     AA needs for this label's size; darken it enough to pass while keeping the
+     blue. The dots/bars keep the exact brand colour (non-text indicators, held
+     to the lower 3:1 bar). */
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
 }
 
 .intake-progress__bar {
