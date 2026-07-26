@@ -109,7 +109,20 @@ export const useFormNavigation = ({
       return
     }
     const page = survey.getPageByName(target)
-    if (!page || !page.isVisible) return
+    if (!page || !page.isVisible) {
+      // The entry names a page that is no longer visible - the user went back
+      // and changed a branching answer that hid it. The browser has already
+      // advanced to this entry, so returning here would leave history pointing
+      // at an unreachable page (the move looks eaten, and a second Forward then
+      // jumps two entries). Realign: replace this entry with the survey's
+      // actual page so Back / Forward stay in step with the survey.
+      lastPage.current = survey.currentPage?.name ?? null
+      navigate(ROUTES.LANDING, {
+        state: { page: survey.currentPage?.name, session },
+        replace: true,
+      })
+      return
+    }
     const pages = survey.visiblePages
     const delta = pages.indexOf(page) - pages.indexOf(survey.currentPage)
     if (delta <= 0) {
