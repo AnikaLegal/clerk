@@ -1,0 +1,302 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Model } from 'survey-core'
+
+import { events } from '../analytics'
+import { ROUTES } from '../consts'
+import { logException } from '../utils'
+import { markFormBegun, markStepReported } from './funnel'
+import { WELCOME_PAGE } from './model'
+import { addNavItems } from './nav-items'
+import { applyPageAdvance } from './page-advance'
+import { Direction, readProgress } from './progress'
+import { SubmissionSaver } from './save'
+import { serializeAnswers } from './serialize'
+import { persistState } from './setup'
+import {
+  BONDS_MOVE_OUT_PAGE,
+  EMAIL_PAGE,
+  SECTIONS,
+  sectionIndexForPage,
+} from '../questions'
+
+interface FormNavigation {
+  survey: Model
+  saver: SubmissionSaver
+  visited: Set<string>
+  session: string
+  // Runs the final submit + post-submit splash (see FormPage); fired on the
+  // survey's completion.
+  attemptSubmit: () => void
+}
+
+// Wires the survey's page-change lifecycle to browser history, per-page funnel
+// analytics, eligibility exits, skip defaults, local persistence and the
+// custom navigation-bar items, and returns the progress-indicator state. Kept
+// out of FormPage so the component is just the model, submit state and render.
+export const useFormNavigation = ({
+  survey,
+  saver,
+  visited,
+  session,
+  attemptSubmit,
+}: FormNavigation) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [progress, setProgress] = useState(() => ({
+    ...readProgress(survey),
+    direction: 'forward' as Direction,
+  }))
+
+  // Browser history <-> survey page sync, so the browser Back / Forward buttons
+  // move between the survey's pages instead of leaving the form. Each page gets
+  // its own history entry carrying its name in location.state. lastPage tracks
+  // the page recorded at the top of the stack; suppressPush marks a survey page
+  // change that is itself mirroring a Back / Forward, so it isn't re-recorded.
+  const lastPage = useRef<string | null>(null)
+  const suppressPush = useRef(false)
+  // Marks a browser-Forward move being replayed through survey.nextPage() so
+  // the full forward pipeline (validation, skip defaults, exits, side effects)
+  // runs, but the resulting page change is not re-recorded in the history.
+  const forwardReconcile = useRef(false)
+  // Set when onPageChanging ejects to an exit page, so the reconcile effect
+  // knows the blocked Forward move already navigated away and must not try to
+  // step the history back in line.
+  const exitFired = useRef(false)
+  // Direction of the page change in progress, captured in onCurrentPageChanging
+  // (which carries it) and read in onCurrentPageChanged (which does not), so a
+  // backward move via the survey's Previous button steps back through history
+  // rather than pushing a duplicate entry.
+  const goingForward = useRef(true)
+  // react-router's index of the history entry the form opened on. A backward
+  // survey move (Previous) only steps back through browser history when a prior
+  // form entry exists above this floor; at the floor - e.g. a resumed session
+  // whose earlier pages were never in this browser's history - it replaces the
+  // current entry instead, so Previous stays in the form rather than exiting.
+  const startIdx = useRef<number | null>(null)
+
+  const recordPage = useCallback(
+    (name: string | null | undefined) => {
+      if (!name || lastPage.current === name) return
+      // The first real page replaces the initial entry in place (so Back from
+      // it leaves the form); later pages push a new entry to move forward over.
+      navigate(ROUTES.LANDING, {
+        state: { page: name, session },
+        replace: lastPage.current === null,
+      })
+      lastPage.current = name
+    },
+    [navigate, session]
+  )
+
+  // Mirror a browser Back / Forward (location change) onto the survey: move it
+  // to the page named in the history entry we landed on.
+  useEffect(() => {
+    const entry = location.state as { page?: string; session?: string } | null
+    const target = entry?.page
+    // Ignore entries stamped by an earlier form session (e.g. Back after a
+    // submit cleared the state and remounted with a fresh session): honouring
+    // them would jump the new empty survey to a mid-form page.
+    if (entry?.session !== session) return
+    // lastPage null means the initial entry has not been stamped yet (see the
+    // mount effect below); ignore any page named in a leftover history entry
+    // until then, so the survey opens where setUpForm placed it, not a stale
+    // page.
+    if (!target || lastPage.current === null || lastPage.current === target)
+      return
+    if (survey.currentPage?.name === target) {
+      lastPage.current = target
+      return
+    }
+    const page = survey.getPageByName(target)
+    if (!page || !page.isVisible) return
+    const pages = survey.visiblePages
+    const delta = pages.indexOf(page) - pages.indexOf(survey.currentPage)
+    if (delta <= 0) {
+      // Backward: mirror the history move directly - going back to an earlier
+      // page is always allowed.
+      suppressPush.current = true
+      lastPage.current = target
+      survey.currentPage = page
+      return
+    }
+    if (delta > 1) {
+      // A multi-entry Forward jump (e.g. via the Forward button's long-press
+      // menu): unwind one entry at a time; each step lands back in this effect
+      // until the move is a single step that the gate below can vet.
+      navigate(-1)
+      return
+    }
+    // Single-step Forward: replay it through the survey's own forward pipeline
+    // (validation, skip defaults, eligibility exits, side effects) rather than
+    // teleporting past it - otherwise going back, changing an answer to a
+    // disqualifying one and pressing Forward would walk straight past the exit.
+    forwardReconcile.current = true
+    exitFired.current = false
+    survey.nextPage()
+    forwardReconcile.current = false
+    if (survey.currentPage?.name !== target && !exitFired.current) {
+      // Validation blocked the advance (errors are now showing): step the
+      // history back in line with the survey. The reconcile fires again for
+      // that entry and finds the survey already there.
+      lastPage.current = survey.currentPage?.name ?? null
+      navigate(-1)
+    }
+  }, [location, survey, navigate, session])
+
+  // Stamp the initial history entry for the page the survey opens on (WELCOME
+  // for a fresh visitor, or the restored page when resuming). Runs once on
+  // mount - recordPage / survey are stable for the component's life.
+  useEffect(() => {
+    const state = window.history.state as { idx?: number } | null
+    startIdx.current = state?.idx ?? 0
+    recordPage(survey.currentPage?.name)
+  }, [recordPage, survey])
+
+  useEffect(() => {
+    const { noEmailItem, notMovingOutItem, pageCountItem } = addNavItems(
+      survey,
+      navigate
+    )
+    // Keep the per-page UI in sync with the current page: the no-email button's
+    // visibility, the WELCOME page's "Let's get started" button label, the page
+    // count, and the progress stepper's active section.
+    const syncPage = () => {
+      const p = readProgress(survey)
+      const onWelcome = survey.currentPage?.name === WELCOME_PAGE
+      noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
+      notMovingOutItem.visible =
+        survey.currentPage?.name === BONDS_MOVE_OUT_PAGE
+      survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
+      // The count follows the stepper: hidden wherever section is -1, i.e. on
+      // the WELCOME and SUBMIT pages.
+      pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
+      pageCountItem.visible = p.section >= 0
+      setProgress({
+        ...p,
+        direction: goingForward.current ? 'forward' : 'back',
+      })
+    }
+
+    // Send a per-page funnel event the first time each page is reached (so back
+    // / forward navigation doesn't recount it).
+    const reportPage = () => {
+      const name = survey.currentPage?.name
+      if (!name || !markStepReported(name)) return
+      const sectionIdx = sectionIndexForPage(name)
+      events.onFormStep({
+        index: survey.currentPageNo,
+        name,
+        section: sectionIdx >= 0 ? SECTIONS[sectionIdx]?.label : undefined,
+      })
+    }
+
+    syncPage()
+    reportPage()
+
+    const persist = () => persistState(survey, saver, visited, session)
+
+    const onPageChanging: Parameters<
+      typeof survey.onCurrentPageChanging.add
+    >[0] = (_, options) => {
+      goingForward.current = options.isGoingForward
+      // A history-driven move (Back / Forward) must not re-run the forward-only
+      // exit / side-effect logic or re-mark the page's questions as visited.
+      if (suppressPush.current) return
+      if (!options.isGoingForward) return
+      const page = options.oldCurrentPage
+      if (!page) return
+      // Advancing off WELCOME ("Let's get started") begins the intake proper.
+      if (page.name === WELCOME_PAGE && markFormBegun()) {
+        events.onFormBegin()
+      }
+      const { answers, exit } = applyPageAdvance(survey, page, visited, saver)
+      if (exit) {
+        options.allow = false
+        exitFired.current = true
+        persist()
+        // The blocked page change means onPageChanged never fires, so send the
+        // answers - including the exit-triggering one - to the server now, or
+        // staff can't tell an exited user from an abandoner.
+        saver.schedulePatch(answers)
+        saver.flush()
+        events.onFormExit({ question: exit.question, route: exit.route })
+        navigate(exit.route)
+        return
+      }
+      persist()
+    }
+
+    const onPageChanged = () => {
+      persist()
+      const answers = serializeAnswers(survey, visited)
+      saver.schedulePatch(answers)
+      // Retry the submission create if the EMAIL-time one failed (a network
+      // blip): without a submission id, PATCHes no-op and no partial
+      // submission exists server-side, so abandonment reminders never fire.
+      // create() is idempotent - a no-op once the id exists or a create is
+      // already in flight.
+      if (!saver.submissionId && answers.EMAIL) {
+        saver.create(answers).catch(logException)
+      }
+      window.scrollTo(0, 0)
+      syncPage()
+      reportPage()
+      const name = survey.currentPage?.name ?? null
+      if (suppressPush.current || forwardReconcile.current) {
+        // This change mirrors a Back / Forward - it is already in the history.
+        suppressPush.current = false
+        lastPage.current = name
+      } else if (goingForward.current) {
+        // Advancing to a page: give it its own history entry.
+        recordPage(name)
+      } else {
+        // Going back via the survey's Previous button. If a prior form entry
+        // exists in the browser history, step back to it (the reconcile effect
+        // sees the survey is already here and leaves it be) so Back / Forward
+        // stay in sync. At the history floor - e.g. a resumed session opened
+        // straight onto this page - there is nothing to pop to, so replace the
+        // current entry to stay in the form rather than navigating out of it.
+        const state = window.history.state as { idx?: number } | null
+        const idx = state?.idx
+        lastPage.current = name
+        if (idx != null && startIdx.current != null && idx > startIdx.current) {
+          navigate(-1)
+        } else {
+          navigate(ROUTES.LANDING, {
+            state: { page: name, session },
+            replace: true,
+          })
+        }
+      }
+    }
+
+    const onComplete: Parameters<typeof survey.onComplete.add>[0] = () => {
+      attemptSubmit()
+    }
+
+    // Flush the pending answers PATCH when the tab is closed or backgrounded:
+    // the "answer, Next, close the tab" gesture would otherwise land inside
+    // the debounce window and the last page's answers would never reach the
+    // server (the request survives teardown via the PATCH's fetch keepalive).
+    const flushOnPageHide = () => saver.flush()
+    const flushOnHidden = () => {
+      if (document.visibilityState === 'hidden') saver.flush()
+    }
+    window.addEventListener('pagehide', flushOnPageHide)
+    document.addEventListener('visibilitychange', flushOnHidden)
+
+    survey.onCurrentPageChanging.add(onPageChanging)
+    survey.onCurrentPageChanged.add(onPageChanged)
+    survey.onComplete.add(onComplete)
+    return () => {
+      window.removeEventListener('pagehide', flushOnPageHide)
+      document.removeEventListener('visibilitychange', flushOnHidden)
+      survey.onCurrentPageChanging.remove(onPageChanging)
+      survey.onCurrentPageChanged.remove(onPageChanged)
+      survey.onComplete.remove(onComplete)
+    }
+  }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
+
+  return progress
+}
