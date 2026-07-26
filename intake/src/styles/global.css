@@ -325,7 +325,11 @@ header .h-\[63px\] img {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #ccc;
+  /* Upcoming-step indicator. WCAG 1.4.11 wants 3:1 for graphical objects, so
+     low-vision users can see how many steps remain; #8a8a8a clears 3:1 on the
+     #f3f3f3 band where the old #ccc was only ~1.4:1. Done/current dots use the
+     brand primary below. */
+  background-color: #8a8a8a;
 }
 
 .intake-progress__step.is-done .intake-progress__dot,
@@ -343,8 +347,8 @@ header .h-\[63px\] img {
   font-weight: 600;
   /* The brand primary (#428eef) is only ~3.3:1 on white, below the 4.5:1 WCAG
      AA needs for this label's size; darken it enough to pass while keeping the
-     blue. The dots/bars keep the exact brand colour (non-text indicators, held
-     to the lower 3:1 bar). */
+     blue. (The done/current dots and bars stay the exact brand colour - as
+     non-text indicators they only need 3:1.) */
   color: color-mix(in oklab, var(--color-primary), #000 20%);
 }
 
@@ -356,7 +360,8 @@ header .h-\[63px\] img {
   min-width: 8px;
   height: 2px;
   margin: 0 2px;
-  background-color: #ddd;
+  /* Matches the upcoming dot's 3:1 grey (was #ddd, ~1.2:1). */
+  background-color: #8a8a8a;
 }
 
 .intake-progress__bar.is-done {

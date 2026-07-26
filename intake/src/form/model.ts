@@ -1,4 +1,4 @@
-import { Model } from 'survey-core'
+import { Model, settings } from 'survey-core'
 
 import { LINKS } from '../consts'
 import { PAGES, QUESTIONS_BY_NAME } from '../questions'
@@ -164,6 +164,15 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
 }
 
 export const buildSurveyModel = (): Model => {
+  // SurveyJS's built-in element animations (a visibleIf question fading/sliding
+  // in, error boxes growing) have no prefers-reduced-motion handling of their
+  // own, so honour the OS setting here - our page-slide already does (see
+  // global.css). Guarded for the non-browser test environment.
+  settings.animationEnabled = !(
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
   const survey = new Model({
     // Questions are grouped into pages (see questions/pages.ts). A page-level
     // visibleIf skips a whole branch's pages via the built-in Next/Previous
