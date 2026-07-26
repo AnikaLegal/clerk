@@ -32,11 +32,22 @@ export const loadState = (): StoredState => {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return emptyState()
     const parsed = JSON.parse(raw)
+    // Type-check every field, not just parse: a parseable-but-wrong-shaped
+    // value (a stale/future schema, hand-edited storage) must degrade to the
+    // empty default rather than flow through. A junk submissionId is the worst
+    // case - the saver would treat any truthy id as real, 404 every PATCH, and
+    // wedge the final submit in a retry loop (clearState only runs on success).
+    const isRecord = (v: unknown): v is Answers =>
+      typeof v === 'object' && v !== null && !Array.isArray(v)
     return {
-      submissionId: parsed.submissionId ?? null,
-      data: parsed.data ?? {},
-      visited: Array.isArray(parsed.visited) ? parsed.visited : [],
-      currentPage: parsed.currentPage ?? null,
+      submissionId:
+        typeof parsed.submissionId === 'string' ? parsed.submissionId : null,
+      data: isRecord(parsed.data) ? parsed.data : {},
+      visited: Array.isArray(parsed.visited)
+        ? parsed.visited.filter((v: unknown): v is string => typeof v === 'string')
+        : [],
+      currentPage:
+        typeof parsed.currentPage === 'string' ? parsed.currentPage : null,
       session: typeof parsed.session === 'string' ? parsed.session : null,
     }
   } catch {

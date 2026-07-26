@@ -96,6 +96,27 @@ describe('storage', () => {
     expect(loadState()).toEqual({ ...EMPTY, submissionId: 'sub-9' })
   })
 
+  it('drops wrong-typed submissionId / data / currentPage', () => {
+    const store = stubStorage()
+    store.set(
+      STORAGE_KEY,
+      JSON.stringify({
+        // A non-string id must not reach the saver (it would treat it as real
+        // and wedge submit); a non-object data must not reach survey.data.
+        submissionId: { id: 1 },
+        data: 'not-an-object',
+        currentPage: 42,
+        visited: ['EMAIL', 7],
+        session: 'session-abc',
+      })
+    )
+    expect(loadState()).toEqual({
+      ...EMPTY,
+      visited: ['EMAIL'],
+      session: 'session-abc',
+    })
+  })
+
   it('survives an unavailable localStorage', () => {
     stubBrokenStorage()
     expect(loadState()).toEqual(EMPTY)
