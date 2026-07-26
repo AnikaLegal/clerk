@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildSurveyModel } from '../src/form/model'
+import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from '../src/form/phone'
 
 // These caps mirror the length of the DB column each answer is written to in
 // core/services/submission.py, so a user can't enter data that overflows the
@@ -50,6 +51,27 @@ describe('input length caps', () => {
       )
       expect((numeric as unknown as { maxValue?: number })?.maxValue).toBe(
         expected
+      )
+    }
+  )
+
+  // PHONE / AGENT_PHONE / LANDLORD_PHONE are not plain maxLength text fields:
+  // the length cap and format validator are injected together in the model's
+  // PHONE branch (model.ts). Pin that wiring - a dropped branch would let an
+  // oversized number reach the 32 char phone column - including the
+  // user-facing error message.
+  it.each(['PHONE', 'AGENT_PHONE', 'LANDLORD_PHONE'])(
+    'caps and format-validates %s',
+    (name) => {
+      const question = survey.getQuestionByName(name)
+      expect(question?.maxLength).toBe(PHONE_MAX_LENGTH)
+      const regex = (question?.validators ?? []).find(
+        (v) =>
+          (v as unknown as { regex?: string }).regex === PHONE_VALIDATOR.regex
+      )
+      expect(regex).toBeDefined()
+      expect((regex as unknown as { text?: string }).text).toBe(
+        PHONE_VALIDATOR.text
       )
     }
   )

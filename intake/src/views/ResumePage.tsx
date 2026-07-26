@@ -63,12 +63,17 @@ export const ResumePage = () => {
       })
       .catch((error) => {
         if (cancelled) return
-        logException(error)
         const failure = classifyResumeError(error)
         if (failure === 'not-found') {
           // A genuinely dead link - start from scratch.
           navigate(ROUTES.LANDING, { replace: true })
           return
+        }
+        // Only report genuinely unexpected failures. An already-submitted 403
+        // and a not-found 404 are the normal outcomes of stale resume links
+        // and would otherwise flood Sentry every time one is clicked.
+        if (failure === 'error') {
+          logException(error)
         }
         setStatus(failure)
       })

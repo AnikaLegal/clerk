@@ -28,11 +28,16 @@ export const serializeAnswers = (
     // UI-only questions (address search box, manual-entry checkbox) drive
     // in-form behaviour but are not part of the wire contract.
     if (q.uiOnly) continue
-    // Questions now share pages, so visibility is read off the question
-    // itself (its element-level visibleIf, which also reflects its page being
-    // hidden), not a page named after it.
+    // Questions now share pages, so visibility is read off the question, not a
+    // page named after it. isVisibleInSurvey (not isVisible) is deliberate:
+    // isVisible is only the element's own visibleIf, whereas a question can be
+    // hidden purely by its page's visibleIf (a branch the user left). Reading
+    // the effective in-survey visibility keeps stale answers from an abandoned
+    // branch out of the wire payload even if the question has no visibleIf of
+    // its own.
     const question = survey.getQuestionByName(q.name)
-    if (!question || !question.isVisible || !visited.has(q.name)) continue
+    if (!question || !question.isVisibleInSurvey || !visited.has(q.name))
+      continue
     let value = survey.getValue(q.name) as AnswerValue
     if (q.type === 'UPLOAD') {
       // A skipped upload emits null like any other skipped question (the

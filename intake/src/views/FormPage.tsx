@@ -32,7 +32,15 @@ export const FormPage = () => {
     saver
       .submit(answers)
       .then(() => {
-        events.onFormComplete()
+        // Guard the analytics call: a throwing gtag/fbq (e.g. clobbered by a
+        // privacy extension) must not land in .catch and show the submit-error
+        // screen for a submission the server already accepted - which would
+        // also loop, since the retry re-runs this same throwing call.
+        try {
+          events.onFormComplete()
+        } catch (error) {
+          logException(error)
+        }
         clearState()
         resetFunnel()
         navigate(ROUTES.SUBMITTED)

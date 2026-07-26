@@ -1,5 +1,3 @@
-import { logException } from '../utils'
-
 export interface ApiError {
   status: number
   data?: unknown
@@ -31,7 +29,11 @@ const handleResponse = async (resp: Response): Promise<unknown> => {
     } catch {
       error = { status: resp.status }
     }
-    logException(error)
+    // Don't report here: some non-2xx responses are expected and handled by
+    // the caller (a 403 already_submitted is treated as success in
+    // SubmissionSaver.submit; 403/404 are start-from-scratch in ResumePage).
+    // Every caller logs genuinely unexpected failures itself, so reporting
+    // here would only double-count and bury real 500s under handled noise.
     throw error
   }
   if (resp.status === 204) {
