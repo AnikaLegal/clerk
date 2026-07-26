@@ -1,6 +1,6 @@
 import { Model } from 'survey-core'
 
-import { QUESTIONS_BY_NAME } from '../questions'
+import { QUESTIONS_BY_NAME, SUBMIT_PAGE } from '../questions'
 
 interface PageElement {
   name: string
@@ -12,7 +12,8 @@ interface PageElement {
  * accordingly. Restores the stored page when it is still visible; otherwise
  * (the stored page is on a branch no longer taken, or - after a server resume
  * via ResumePage - there is no stored page) lands on the first visible page
- * that still holds a question the user has not passed. A fresh visitor (empty
+ * that still holds a question the user has not passed, or - when every
+ * question is already answered - the final SUBMIT page. A fresh visitor (empty
  * visited, no stored page) is left on the survey's default first page.
  *
  * The uiOnly exclusion is load-bearing for server resume: ResumePage seeds
@@ -53,5 +54,16 @@ export const restorePosition = (
   )
   if (nextPage) {
     survey.currentPage = nextPage
+    return
+  }
+  // No unfinished page: every question is answered. This happens on a
+  // fully-answered server resume (currentPage is null - e.g. the user reached
+  // SUBMIT, the submit failed, and they reopened the reminder link later). Land
+  // on the final SUBMIT page, one click from done, rather than leaving the
+  // survey on its default WELCOME page and forcing a Next through the whole
+  // form again.
+  const submitPage = survey.getPageByName(SUBMIT_PAGE)
+  if (submitPage) {
+    survey.currentPage = submitPage
   }
 }

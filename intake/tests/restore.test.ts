@@ -57,6 +57,17 @@ describe('restorePosition', () => {
     )
   })
 
+  it('lands a fully-answered server resume on the submit page', () => {
+    const survey = buildSurveyModel()
+    survey.data = { ISSUES: 'REPAIRS' }
+    // Every real question answered (the user reached SUBMIT before abandoning);
+    // no page has an unvisited question, so without the fallback the survey
+    // would sit on WELCOME.
+    const visited = visitedThrough(survey, 'SUBMIT')
+    restorePosition(survey, visited, null)
+    expect(survey.currentPage.name).toBe('SUBMIT')
+  })
+
   it('leaves a fresh visitor on the welcome page', () => {
     const survey = buildSurveyModel()
     restorePosition(survey, new Set(), null)
