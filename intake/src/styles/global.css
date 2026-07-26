@@ -47,6 +47,12 @@ header .h-\[63px\] img {
     transparent
   );
   --sjs-primary-forecolor: var(--color-primary-content);
+  /* The default light foreground (question descriptions / hints, placeholders)
+     is rgba(0,0,0,0.45) - only ~3.35:1 on white, below WCAG AA's 4.5:1.
+     Darken it to ~0.6 alpha (~5.7:1 on white, ~5.6:1 on the grey band) while
+     keeping it a translucent grey so it still reads as secondary to the
+     near-black question titles. */
+  --sjs-general-forecolor-light: rgba(0, 0, 0, 0.6);
   /* Match the survey's own dim background so the section stepper rendered above
      it reads as the top of the page content (where SurveyJS's progress bar
      sat), rather than floating in the white header band. */
