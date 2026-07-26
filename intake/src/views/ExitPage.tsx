@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { LINKS } from '../consts'
+import { LINKS, ROUTES } from '../consts'
 import { useAnnouncePage } from './announce'
 import { EXIT_PAGES } from './exit-content'
 
@@ -17,6 +17,18 @@ export const ExitPage = () => {
   if (!content) {
     return null
   }
+  // Exit URLs are shareable, so a user can arrive with no in-app history (a
+  // link from a caseworker, a new tab from browser history). navigate(-1) would
+  // then do nothing or leave the site, so at the history floor go to the form
+  // instead - it resumes from localStorage, landing them back where they were.
+  const goBack = () => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0
+    if (idx === 0) {
+      navigate(ROUTES.LANDING)
+    } else {
+      navigate(-1)
+    }
+  }
   return (
     <div className="intake-splash">
       <h1 tabIndex={-1} ref={headingRef}>
@@ -27,7 +39,7 @@ export const ExitPage = () => {
         <button
           type="button"
           className="d-btn intake-btn-secondary"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
         >
           Go back
         </button>
