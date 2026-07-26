@@ -159,7 +159,10 @@ export const IMPACT_QUESTIONS: IntakeQuestion[] = [
       { value: 'Launch Housing', text: 'Launch Housing' },
       { value: 'Quantum', text: 'Quantum' },
       { value: 'Women’s Housing', text: 'Women’s Housing' },
-      { value: 'Rental and Housing Union', text: 'Rental and Housing Union' },
+      {
+        value: 'Rental and Housing Union',
+        text: 'Rental and Housing Union (RAHU)',
+      },
       { value: 'Better Renting', text: 'Better Renting' },
       { value: 'Tenants Victoria', text: 'Tenants Victoria' },
       { value: 'Other', text: 'Other' },
