@@ -321,6 +321,41 @@ header .h-\[63px\] img {
   border-color: var(--color-primary);
 }
 
+/* A completed / answered step is a <button> that jumps to that section. The
+   site styles bare buttons as big primary buttons, so re-assert the step-circle
+   geometry with real specificity and strip that chrome - a jumpable step looks
+   identical to the plain dots, just interactive, with a soft primary halo on
+   hover / keyboard focus to read as clickable. */
+.intake-form button.intake-progress__step {
+  width: 30px;
+  height: 30px;
+  min-width: 0;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-progress__step:hover {
+  background-color: color-mix(in oklab, var(--color-primary) 15%, transparent);
+}
+
+/* On keyboard focus, ring the step in the primary colour like the current
+   section, but with a thinner 2px border (the current section keeps the full
+   3px), so a focused jumpable step reads as related but distinct. The base
+   border is 3px transparent and box-sizing is border-box, so only the width and
+   colour change - no outline, no layout shift, and the dot stays centred. */
+.intake-form button.intake-progress__step:focus-visible {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  outline: none;
+}
+
 .intake-progress__dot {
   width: 8px;
   height: 8px;
@@ -332,8 +367,14 @@ header .h-\[63px\] img {
   background-color: #8a8a8a;
 }
 
+/* Done and current dots are the brand primary, and so are forward steps the
+   user can jump to (rendered as --jump buttons): a blue dot marks a reachable
+   section. Only the dots turn blue - the connector bars ahead of the current
+   step keep their grey (is-done, applied to backward bars only, is untouched),
+   so forward lines stay grey while their end dots read as clickable. */
 .intake-progress__step.is-done .intake-progress__dot,
-.intake-progress__step.is-current .intake-progress__dot {
+.intake-progress__step.is-current .intake-progress__dot,
+.intake-progress__step--jump .intake-progress__dot {
   background-color: var(--color-primary);
 }
 

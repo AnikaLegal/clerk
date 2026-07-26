@@ -58,8 +58,8 @@ export const FormPage = () => {
   }, [survey, saver, visited, navigate])
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
-  // and read back the progress-indicator state.
-  const progress = useFormNavigation({
+  // and read back the progress-indicator state plus the jump-to-section wiring.
+  const { progress, navigable, jumpToSection } = useFormNavigation({
     survey,
     saver,
     visited,
@@ -97,6 +97,8 @@ export const FormPage = () => {
           current={progress.section}
           page={progress.page}
           pageCount={progress.pageCount}
+          navigable={navigable}
+          onJump={jumpToSection}
         />
       )}
       {/* The outer div clips the horizontal slide; the inner is re-keyed by page

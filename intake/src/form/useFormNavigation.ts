@@ -10,6 +10,7 @@ import { WELCOME_PAGE } from './model'
 import { addNavItems } from './nav-items'
 import { applyPageAdvance } from './page-advance'
 import { Direction, readProgress } from './progress'
+import { navigableSections } from './section-nav'
 import { SubmissionSaver } from './save'
 import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
@@ -47,6 +48,10 @@ export const useFormNavigation = ({
     ...readProgress(survey),
     direction: 'forward' as Direction,
   }))
+  // Sections the user can jump to right now (index -> that section's first
+  // visible page), recomputed on every page and answer change. Drives the
+  // clickable stepper. See section-nav.ts for the reachability rules.
+  const [navigable, setNavigable] = useState<Map<number, string>>(new Map())
 
   // Browser history <-> survey page sync, so the browser Back / Forward buttons
   // move between the survey's pages instead of leaving the form. Each page gets
@@ -74,6 +79,10 @@ export const useFormNavigation = ({
   // whose earlier pages were never in this browser's history - it replaces the
   // current entry instead, so Previous stays in the form rather than exiting.
   const startIdx = useRef<number | null>(null)
+  // Each page's browser-history entry index, recorded as the user moves, so a
+  // backward section jump can rewind straight to that entry (keeping the
+  // history order consistent with the form) rather than pushing a new one.
+  const pageEntryIdx = useRef<Record<string, number>>({})
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -87,6 +96,67 @@ export const useFormNavigation = ({
       lastPage.current = name
     },
     [navigate, session]
+  )
+
+  // Jump to a section's first page from a click on the stepper. Recomputed
+  // fresh so a stale render can't offer a page that is no longer reachable.
+  const jumpToSection = useCallback(
+    (sectionIndex: number) => {
+      const targetPage = navigableSections(survey, visited).get(sectionIndex)
+      if (!targetPage) return
+      const target = survey.getPageByName(targetPage)
+      if (!target || !target.isVisible) return
+      const pages = survey.visiblePages
+      const currentIndex = pages.indexOf(survey.currentPage)
+      const targetIndex = pages.indexOf(target)
+      if (currentIndex < 0 || targetIndex < 0 || targetIndex === currentIndex) {
+        return
+      }
+
+      if (targetIndex > currentIndex) {
+        // Forward: re-walk Next page by page so the forward pipeline (skip
+        // defaults, side effects and - crucially - eligibility exits) runs for
+        // each page in between; a changed answer that now disqualifies still
+        // ejects rather than being skipped. Reachability guarantees every step
+        // passes, so it won't stall. Runs inside the click handler, so React
+        // batches the per-step history pushes into one location update.
+        let guard = 0
+        while (survey.currentPage !== target && guard < pages.length) {
+          const before = survey.currentPage
+          exitFired.current = false
+          survey.nextPage()
+          if (exitFired.current || survey.currentPage === before) return
+          guard++
+        }
+        return
+      }
+
+      // Backward: rewind browser history to the target page's existing entry so
+      // the entry order stays consistent with the form; the reconcile effect
+      // then moves the survey. When that entry is unknown - a resumed session
+      // that never visited the page in this browser - fall back to moving the
+      // survey directly and replacing the current entry.
+      const entryIdx = pageEntryIdx.current[targetPage]
+      const currentEntryIdx = (window.history.state as { idx?: number } | null)
+        ?.idx
+      if (
+        entryIdx != null &&
+        currentEntryIdx != null &&
+        entryIdx < currentEntryIdx
+      ) {
+        navigate(entryIdx - currentEntryIdx)
+        return
+      }
+      suppressPush.current = true
+      lastPage.current = targetPage
+      survey.currentPage = target
+      suppressPush.current = false
+      navigate(ROUTES.LANDING, {
+        state: { page: targetPage, session },
+        replace: true,
+      })
+    },
+    [survey, visited, navigate, session]
   )
 
   // Mirror a browser Back / Forward (location change) onto the survey: move it
@@ -166,6 +236,14 @@ export const useFormNavigation = ({
     recordPage(survey.currentPage?.name)
   }, [recordPage, survey])
 
+  // Remember the browser-history index of whatever page each entry holds, so a
+  // backward section jump can rewind straight to it.
+  useEffect(() => {
+    const name = (location.state as { page?: string } | null)?.page
+    const idx = (window.history.state as { idx?: number } | null)?.idx
+    if (name && idx != null) pageEntryIdx.current[name] = idx
+  }, [location])
+
   useEffect(() => {
     const { noEmailItem, notMovingOutItem, pageCountItem } = addNavItems(
       survey,
@@ -189,6 +267,7 @@ export const useFormNavigation = ({
         ...p,
         direction: goingForward.current ? 'forward' : 'back',
       })
+      setNavigable(navigableSections(survey, visited))
     }
 
     // Send a per-page funnel event the first time each page is reached (so back
@@ -331,18 +410,26 @@ export const useFormNavigation = ({
     window.addEventListener('pagehide', flushOnPageHide)
     document.addEventListener('visibilitychange', flushOnHidden)
 
+    // An answer change (not just a page change) can change how far forward is
+    // reachable - a branching answer reveals/hides pages, an exit answer
+    // collapses the run - so recompute the clickable sections live.
+    const onValueChanged = () =>
+      setNavigable(navigableSections(survey, visited))
+
     survey.onCurrentPageChanging.add(onPageChanging)
     survey.onCurrentPageChanged.add(onPageChanged)
     survey.onComplete.add(onComplete)
+    survey.onValueChanged.add(onValueChanged)
     return () => {
       window.removeEventListener('pagehide', flushOnPageHide)
       document.removeEventListener('visibilitychange', flushOnHidden)
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
+      survey.onValueChanged.remove(onValueChanged)
       pageCountObserver?.disconnect()
     }
   }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
 
-  return progress
+  return { progress, navigable, jumpToSection }
 }
