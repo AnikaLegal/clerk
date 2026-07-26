@@ -84,7 +84,13 @@ export const FormPage = () => {
           : 'intake-form'
       }
     >
-      {progress.section >= 0 && <SectionProgress current={progress.section} />}
+      {progress.section >= 0 && (
+        <SectionProgress
+          current={progress.section}
+          page={progress.page}
+          pageCount={progress.pageCount}
+        />
+      )}
       {/* The outer div clips the horizontal slide; the inner is re-keyed by page
           name so the direction-aware animation in global.css replays on every
           page change. The survey Model is stable across the remount (it lives in

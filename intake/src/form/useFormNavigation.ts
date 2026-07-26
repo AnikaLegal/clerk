@@ -275,6 +275,38 @@ export const useFormNavigation = ({
       attemptSubmit()
     }
 
+    // The "Page x of y" nav item renders as an <input type="button"> (SurveyJS
+    // has no non-button nav item). It is a read-only status, not a control, so
+    // hide it from assistive tech - the named progressbar already conveys
+    // progress - rather than announce a button that does nothing when
+    // activated. Both attributes are required and verified against axe-core:
+    // aria-hidden alone is an aria-hidden-focus violation because the input is
+    // still focusable (disableTabStop only sets tabindex="-1"), and disabled
+    // makes it non-focusable so the pair is clean. (No valid ARIA role turns an
+    // input button into static text - the allowed role overrides are all
+    // interactive.) SurveyJS re-renders the item on every page with the new
+    // count, and the render timing differs between fresh, resumed and
+    // page-change entry, so keep the attributes applied with an observer on the
+    // survey container rather than chase individual render events.
+    const container = document.querySelector('.intake-page')
+    const hidePageCount = () => {
+      const el = container?.querySelector<HTMLInputElement>(
+        '.intake-page-count__text'
+      )
+      if (el && el.getAttribute('aria-hidden') !== 'true') {
+        el.setAttribute('aria-hidden', 'true')
+        el.disabled = true
+      }
+    }
+    const pageCountObserver = container
+      ? new MutationObserver(hidePageCount)
+      : null
+    pageCountObserver?.observe(container as Node, {
+      childList: true,
+      subtree: true,
+    })
+    hidePageCount()
+
     // Flush the pending answers PATCH when the tab is closed or backgrounded:
     // the "answer, Next, close the tab" gesture would otherwise land inside
     // the debounce window and the last page's answers would never reach the
@@ -295,6 +327,7 @@ export const useFormNavigation = ({
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
+      pageCountObserver?.disconnect()
     }
   }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
 
