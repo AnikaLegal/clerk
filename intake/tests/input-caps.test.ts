@@ -38,9 +38,12 @@ const NUMBER_CAPS: Record<string, number> = {
 describe('input length caps', () => {
   const survey = buildSurveyModel()
 
-  it.each(Object.entries(TEXT_CAPS))('caps %s at %i chars', (name, expected) => {
-    expect(survey.getQuestionByName(name)?.maxLength).toBe(expected)
-  })
+  it.each(Object.entries(TEXT_CAPS))(
+    'caps %s at %i chars',
+    (name, expected) => {
+      expect(survey.getQuestionByName(name)?.maxLength).toBe(expected)
+    }
+  )
 
   it.each(Object.entries(NUMBER_CAPS))(
     'caps %s at a max value of %i',

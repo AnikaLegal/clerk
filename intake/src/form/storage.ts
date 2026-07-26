@@ -44,7 +44,9 @@ export const loadState = (): StoredState => {
         typeof parsed.submissionId === 'string' ? parsed.submissionId : null,
       data: isRecord(parsed.data) ? parsed.data : {},
       visited: Array.isArray(parsed.visited)
-        ? parsed.visited.filter((v: unknown): v is string => typeof v === 'string')
+        ? parsed.visited.filter(
+            (v: unknown): v is string => typeof v === 'string'
+          )
         : [],
       currentPage:
         typeof parsed.currentPage === 'string' ? parsed.currentPage : null,
