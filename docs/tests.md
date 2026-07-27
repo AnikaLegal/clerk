@@ -1,7 +1,7 @@
 ## Testing
 
 Tests are run automatically via GitHub Actions when the `develop` or `master`
-branches are pushed.
+branches are pushed, and on pull requests into them.
 
 If you are making changes, please run them locally:
 

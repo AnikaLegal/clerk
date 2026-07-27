@@ -96,7 +96,7 @@ Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk
 
 When making a change or bugfix, you should:
 
-- create a branch from `develop` called e.g. `feature/my-branch-name` and test it locally
+- create a branch from `develop` named `<your-name>/<commit-type>/<short-description>`, e.g. `jane/proj/my-project-name`, or Linear's suggested branch name when working from an issue, e.g. `jane/tec-1234-my-issue-title`, and test it locally
 - merge the branch into `develop` and trigger a release to the staging environment
 - check your changes in the staging environment
 - merge the `develop` branch into `master` and trigger a release to the production environment
