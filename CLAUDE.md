@@ -42,7 +42,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 - Django 5 + Wagtail, DRF for the API. Python pinned to **3.12.5**, deps managed with **uv** (`uv.lock`, `pyproject.toml`).
 - Settings split by environment in `app/clerk/settings/` (`base`, `dev`, `staging`, `prod`, `test`). Tests use `clerk.settings.test`.
 - Apps (see [README.md](README.md) for the full list): `case` (the core CMS - serializers/views/urls live here), `core` (domain models), `accounts`, `emails`, `intake`, `web` (public site/blog), plus integrations: `microsoft`/`google`/`slack`/`caller`/`webhooks`/`notify`.
-- Tests: pytest (`pytest-django`, `pytest-factoryboy`, factory-based). Run via `just test` - **always run the suite before considering backend work done**. CI runs the same suite on PRs to `develop`/`master`.
+- Tests: pytest (`pytest-django`, `pytest-factoryboy`, factory-based). Run via `just test` - **always run the suite before considering backend work done**. CI runs the same suite on pushes to `develop`/`master` and on PRs into them.
 - **Don't run black/isort/flake8** as a finishing step - they aren't wired into CI or a documented flow. Match the surrounding style instead.
 
 ## Frontend (`frontend/`)
@@ -55,7 +55,8 @@ Backend responses are validated against the contract in tests (`django-contract-
 ## Conventions & guardrails
 
 - **Never use en dashes or em dashes** in code, comments, commit messages, docs, or any other text. Use a normal hyphen (-) instead.
-- **Branch off and PR into `develop`** (not `master`). Use conventional-commit style messages (`fix(case): ...`, `chore: ...`), matching recent history.
+- **Branch off `develop`** (not `master`). Use conventional-commit style messages (`fix(case): ...`, `chore: ...`), matching recent history.
+- **Don't assume a pull request is required.** The PR-based flow in [docs/setup.md](docs/setup.md#contributing) is written for volunteers and outside contributors; core tech team members commit to `develop` directly. Follow whichever the user is using, and ask if it isn't clear.
 - **Don't add `Co-Authored-By` trailers** (or any similar attribution lines) to commit messages.
 - **Don't include test output results in commit messages** (e.g. "Checks green: intake tsc/lint/86 tests").
 - **Don't assume the git repository state** - the user may have made changes manually or in another session. Check the actual state (`git status`, `git log`, etc.) before reporting it.
