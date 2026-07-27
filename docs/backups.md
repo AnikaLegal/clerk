@@ -59,6 +59,11 @@ the restore has the passphrase available.
 The [offline backups script](../infra/offline-backup.sh) includes a convenience
 option to decrypt a backup with the user-supplied passphrase.
 
+If the backup bucket itself is unavailable - deleted, corrupted, or during a
+region outage - [`restore-db-backup.sh`](../infra/restore-db-backup.sh) restores a
+recovery point (the latest by default) from either AWS Backup vault, regular or
+air-gapped, into a fresh bucket, from which the dumps can be decrypted as above.
+
 ## Storage
 
 The dumps live in two private S3 buckets, one for production and one for staging,
