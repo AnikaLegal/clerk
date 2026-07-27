@@ -1,46 +1,136 @@
-## Docker
+# Infrastructure
 
-The environment for this app is built using Docker, and the app runs in production using Docker Swarm. Our The `docker` directory has the following files:
+Clerk runs on a single AWS EC2 instance in the Sydney region, with file storage and backups in S3 and CloudFlare in front for DNS and SSL. Both the staging and production environments live on that one instance as Docker Swarm stacks. This page describes the architecture and how to build, deploy, rebuild and monitor it.
 
-- Dockerfile.base: base Docker image, used to build [anikalaw/clerkbase](https://hub.docker.com/repository/docker/anikalaw/clerkbase)
-- Dockerfile: final Docker image, used to build [anikalaw/clerk](https://hub.docker.com/repository/docker/anikalaw/clerk)
-- docker.compose.local.yml: Docker Compose config for local development
-- docker.compose.staging.yml: Docker Swarm config for staging environment
-- docker.compose.prod.yml: Docker Swarm config for production environment
+## Architecture
+
+```mermaid
+flowchart LR
+    user([Browser])
+    retool["Retool SaaS<br>anika.retool.com"]
+
+    subgraph s3["AWS S3"]
+        intake["Intake static site<br>intake.anikalegal.org.au"]
+    end
+
+    cloudflare["CloudFlare<br>DNS + SSL termination"]
+
+    subgraph ec2["AWS EC2 instance"]
+        nginx["NGINX :80"]
+        subgraph swarm["Docker Swarm"]
+            subgraph stack_prod["clerk_prod stack"]
+                web_prod["Django web"]
+                worker_prod["Django Q worker"]
+            end
+            subgraph stack_staging["clerk_staging stack"]
+                web_staging["Django web"]
+                worker_staging["Django Q worker"]
+            end
+        end
+        postgres[("PostgreSQL<br>clerk_prod + clerk_staging")]
+    end
+
+    user -->|"anikalegal.org.au"| cloudflare
+    user --> intake
+    user --> retool
+    intake -->|"REST API"| cloudflare
+    cloudflare -->|"HTTP :80"| nginx
+    nginx -->|":8000"| web_prod
+    nginx -->|":8001"| web_staging
+    web_prod --> postgres
+    worker_prod --> postgres
+    web_staging --> postgres
+    worker_staging --> postgres
+    retool -->|"TCP :5432"| postgres
+```
+
+The EC2 instance runs Docker Swarm with one stack per environment. Each stack has two services: a Django web server and a [Django Q](https://django-q2.readthedocs.io/en/master/) worker for background tasks. The worker uses the database as its task broker, so there is no separate queue or cache service.
+
+The instance also hosts two services outside of Docker:
+
+- PostgreSQL, with one database per environment. The containers connect to it over a unix socket; [Retool](https://retool.com) connects directly over TCP for internal reporting (see `infra/setup/postgres/pg_hba.conf`).
+- NGINX, which reverse proxies each environment's domain to its web service.
+
+[CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, so the instance itself only serves plain HTTP on port 80.
+
+The intake frontend is a separate static site hosted on S3, which talks to the backend via its REST API.
+
+## Environments
+
+| Environment | Domain | Deployed from | Swarm stack | Web port | Database |
+| ----------- | ------ | ------------- | ----------- | -------- | -------- |
+| Staging | [staging.anikalegal.org.au](https://staging.anikalegal.org.au/admin) | `develop` | `clerk_staging` | 8001 | `clerk_staging` |
+| Production | [anikalegal.org.au](https://anikalegal.org.au/admin) | `master` | `clerk_prod` | 8000 | `clerk_prod` |
+
+The staging backend is used by the [staging intake frontend](https://intake-staging.anikalegal.org.au), the production backend by the [production intake frontend](https://intake.anikalegal.org.au).
+
+Each environment's configuration and secrets live in a transcrypt-encrypted env file (`env/staging.env`, `env/prod.env`), which the compose files pass to the containers. See [setup.md](./setup.md) for how to unlock transcrypt.
+
+## Data and state
+
+The only state that matters lives in PostgreSQL and S3:
+
+- the two PostgreSQL databases, which run on the instance's own disk (not in S3)
+- uploaded files in `s3://anika-clerk` and `s3://anika-clerk-staging`
+- images referenced by sent emails (e.g. logos) in `s3://anika-emails` and `s3://anika-emails-staging`
+- call centre audio in `s3://anika-twilio-audio` and `s3://anika-twilio-audio-staging`
+- database backups in `s3://anika-database-backups` and `s3://anika-database-backups-staging`
+
+The S3 buckets are durable independently of the instance. The PostgreSQL databases are **not**: they live on the instance's disk, so if the instance is lost, so is any database data written since the last backup. What keeps that loss bounded is the nightly dump: the production database is dumped to S3 every night via GitHub Actions (staging is not backed up directly - it is regenerated from production), and AWS Backup additionally snapshots the S3 buckets - see [backups.md](./backups.md) for the full story.
+
+So rebuilding the server means restoring the databases from those S3 backups (step 3 of [Server setup](#server-setup)), which recovers database state only as far as the most recent nightly dump. With that caveat, everything else - the EC2 instance, the Docker images and containers - holds no state that cannot be restored, and can be blown away and rebuilt (see [Server setup](#server-setup)).
+
+## Images and builds
+
+Application code is packaged into Docker images, defined in the `docker` directory:
+
+- `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `infra/build_base_image.sh` when it changes
+- `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built and pushed by the [Test workflow](../.github/workflows/test.yml) after tests pass - merges to `develop` produce the `staging` tag, merges to `master` produce the `prod` tag
+- `Dockerfile.frontend`: builds the frontend, whose output is copied into the application image
+
+Compose files in the same directory define how the images run: `docker-compose.local.yml` (local development), `docker-compose.ci.yml` (tests in CI), and `docker-compose.staging.yml` / `docker-compose.prod.yml` (the Swarm stacks).
 
 ## Deployment
 
-Deployment is done via a GitHub workflow [here](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy). A deployment involves SSHing into the target server and updating the Docker Swarm config. Deployment must be manually triggered from GitHub. There are two environments to deploy to, staging and production:
-
-- [staging backend](https://staging.anikalegal.org.au/admin), which is deployed to by `develop` branch, used by the [staging frontend](https://intake-staging.anikalegal.org.au)
-
-- [production backend](https://anikalegal.org.au/admin), which is deployed to by `master` branch, used by the [production frontend](https://intake.anikalegal.org.au)
+Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy), which must be triggered manually from GitHub. It connects to the server's Docker daemon over SSH and updates the environment's Swarm stack to the latest image. It does not build anything: images come from the Test workflow (see above).
 
 When making a change or bugfix, you should:
 
-- create a branch from `develop` called e.g. `feature/my-branch-name` and test it locally
+- create a branch from `develop` named `<your-name>/<commit-type>/<short-description>`, e.g. `jane/proj/my-project-name`, or Linear's suggested branch name when working from an issue, e.g. `jane/tec-1234-my-issue-title`, and test it locally
 - merge the branch into `develop` and trigger a release to the staging environment
 - check your changes in the staging environment
 - merge the `develop` branch into `master` and trigger a release to the production environment
 
-## Infrastructure
+## Server setup
 
-![infra](./img/infra.png)
+The server is provisioned and environments are initialised with the scripts under [infra/setup](../infra/setup):
 
-There are two containers that run the application. A Django web server and a [Django Q](https://django-q2.readthedocs.io/en/master/) worker server. Both connect to a common database.
+1. `provision.sh <HOST>` makes a fresh Ubuntu 24.04 machine a Clerk server: NGINX, PostgreSQL, Docker Swarm, the AWS CLI and SSH hardening.
+2. `init-env.sh <HOST> <staging|prod>` initialises an environment on a provisioned host: it creates the Postgres user and database and deploys the Swarm stack.
+3. `restore-databases.sh <HOST>` restores the staging and production databases from the latest S3 backups. It refuses to target the current server.
 
-The application runs on Docker Swarm. The test and prod environments both run on a single AWS EC2 instance. That instance also contains the PostgreSQL database and a NGINX server which reverse proxies requests into the Docker containers.
+To rebuild the server from scratch: launch a new Ubuntu instance, run the three scripts against it, then update the new IP address in CloudFlare and in `CLERK_HOST` in the env files.
 
-Production database backups are automated via GitHub Actions and stored in `s3://anika-database-backups`. Uploaded files are stored in `s3://anika-clerk` and `s3://anika-clerk-staging`. Other than uploaded files and the contents of the PostgreSQL database, there is no important state on the EC2 instance or Docker images, which can be blown away and rebuilt at will. The only thing that will change is that EC2 instance IP address, which will need to be updated in CloudFlare.
+The scripts pin the versions of software that matter for reproducing the server: PostgreSQL, Docker Engine and the AWS CLI. Each pin is a variable at the top of the relevant script, plus an `ARG` in `Dockerfile.base` for the PostgreSQL client tools, whose major version must match the database server or backups taken with one may not restore with the other. When bumping a pin, upgrade the live server to match.
 
-DNS is handled by [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records), which also does SSL termination for us.
+## External services
 
-Emails are sent using [SendGrid](https://app.sendgrid.com).
+| Service | Role | More info |
+| ------- | ---- | --------- |
+| [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) | DNS and SSL termination | |
+| [SendGrid](https://app.sendgrid.com) | Outbound and inbound email | [emails.md](./emails.md) |
+| [Twilio](https://www.twilio.com) | Call centre voice prompts and SMS | [twilio.md](./twilio.md) |
+| Microsoft 365 | Case documents in SharePoint, staff accounts | [sharepoint.md](./sharepoint.md), [msgraph.md](./msgraph.md) |
+| [Retool](https://retool.com) | Internal reporting, with direct database access | |
+| Google | Staff login (OAuth) and Workspace directory | |
+| Slack | Notifications and alerts | |
+| [MailChimp](https://mailchimp.com) | Mailing lists | |
+| [Docker Hub](https://hub.docker.com/u/anikalaw) | Image registry | |
 
-Infrastructure configuration and scripts can be found under the `infra` directory.
+Credentials for these services live in the env files.
 
-## Logging and Error Reporting
+## Monitoring
 
 - All application logs are logged to [Sumo Logic](https://service.au.sumologic.com/ui/).
 - Errors are reported to [Sentry](https://sentry.io/organizations/anika-legal/projects/).
-- Application uptime is tracked by [StatusCake](https://app.statuscake.com/YourStatus.php).
+- Application uptime is tracked by [StatusCake](https://app.statuscake.com/).

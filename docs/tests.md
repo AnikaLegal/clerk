@@ -1,15 +1,21 @@
 ## Testing
 
 Tests are run automatically via GitHub Actions when the `develop` or `master`
-branches are pushed.
+branches are pushed, and on pull requests into them.
 
 If you are making changes, please run them locally:
 
 ```
-inv test
+just test
 ```
 
 This launches a docker container used to run the tests.
+
+To run a subset, pass a path (a leading `app/` is stripped automatically):
+
+```
+just test app/case/tests/...
+```
 
 ### Interactive
 
@@ -18,7 +24,7 @@ docker container. The `pytest` utility can then be used to run specific tests
 directly:
 
 ```
-inv test -i
+just test -i
 pytest -vv path/to/test.py
 ```
 
@@ -28,7 +34,7 @@ To debug tests using vscode use the `--debug` flag to run the python `debugpy`
 debugger on the docker container:
 
 ```
-inv test -d
+just test -d
 ```
 
 The debugger will wait for the client to attach. You can attach using the same
@@ -39,7 +45,7 @@ You can also debug specific tests using the `--interactive` and `--debug` flags
 together:
 
 ```
-inv test -d -i
+just test -d -i
 pytest -vv path/to/test.py
 ```
 

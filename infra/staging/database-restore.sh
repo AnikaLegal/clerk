@@ -31,6 +31,6 @@ echo -e "\n>>> Restoring staging environment on host $CLERK_HOST"
 docker compose \
     --project-name task \
     --file docker/docker-compose.staging.yml \
-    run --pull always --rm web /app/scripts/tasks/staging-restore.sh
+    run --pull always --rm -e BACKUP_PASSPHRASE web /app/scripts/tasks/staging-restore.sh
 
 echo -e "\n>>> Restore finished"

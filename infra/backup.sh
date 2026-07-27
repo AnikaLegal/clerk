@@ -3,6 +3,23 @@
 set -o errexit
 set -o pipefail
 
+# Whether to encrypt the backup before upload. Encryption is ON by default; pass
+# --no-encrypt for environments whose data does not need it (e.g. staging, which is
+# obfuscated).
+encrypt_backup=true
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --no-encrypt)
+            encrypt_backup=false
+            ;;
+        *)
+            echo -e "\n>>> Error: unknown argument '$1' (supported: --no-encrypt)"
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 TIME=$(date "+%s")
 
 if [[ -z "$CLERK_PRIVATE_SSH_KEY" ]]; then
@@ -24,10 +41,24 @@ if [[ -z "$CLERK_HOST" ]]; then
     exit 1
 fi
 
-DB_FILE="postgres_clerk_${COMPOSE_SUFFIX}_${TIME}.sql"
+# Encrypt backups before upload, so the bucket only ever holds ciphertext. 
+if [[ "$encrypt_backup" == "true" ]]; then
+    if [[ -z "$BACKUP_PASSPHRASE" ]]; then
+        echo -e "\n>>> Error: Environment variable BACKUP_PASSPHRASE is required (or pass --no-encrypt)"
+        exit 1
+    fi
+    encrypt=(gpg --batch --quiet --no-symkey-cache --pinentry-mode=loopback \
+        --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output -)
+    ext=".gpg"
+else
+    encrypt=(cat)
+    ext=""
+fi
+
+DB_FILE="postgres_clerk_${COMPOSE_SUFFIX}_${TIME}.sql${ext}"
 DB_PATH="$S3_BUCKET/$DB_FILE"
 
-CLIENT_FILE="client_info_${COMPOSE_SUFFIX}_${TIME}.csv"
+CLIENT_FILE="client_info_${COMPOSE_SUFFIX}_${TIME}.csv${ext}"
 CLIENT_PATH="$S3_BUCKET/$CLIENT_FILE"
 
 echo -e "\n>>> Setting up SSH"
@@ -48,6 +79,7 @@ echo -e "\n>>> Streaming database backup from host $CLERK_HOST to $DB_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
     run --pull always --no-deps --rm web pg_dump --format=custom |
+    "${encrypt[@]}" |
     aws s3 cp - $DB_PATH
 
 # Disaster recovery
@@ -55,6 +87,7 @@ echo -e "\n>>> Streaming client info from host $CLERK_HOST to $CLIENT_PATH"
 docker compose --project-name task \
     --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
     run --pull always --no-deps --rm web python manage.py export_client_info |
+    "${encrypt[@]}" |
     aws s3 cp - $CLIENT_PATH
 
 echo -e "\n>>> Finished backup"

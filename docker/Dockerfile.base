@@ -8,6 +8,11 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONIOENCODING=UTF-8
 ENV TIMEZONE=Australia/Melbourne
 
+# PostgreSQL major version for the client tools (pg_dump, pg_restore, psql).
+# Must match the server version installed by infra/setup/postgres/setup.sh so
+# that database backups and restores stay compatible. See docs/infra.md.
+ARG POSTGRES_VERSION=16
+
 WORKDIR /app
 
 RUN echo "Updating apt sources" && \
@@ -16,12 +21,25 @@ RUN echo "Updating apt sources" && \
 # Install generic useful stuff.
 # wget + curl: for HTTP debugging.
 # iputils-ping: for pinging things.
-# postgresql-client: for talking to PostgreSQL database.
-# postgresql-common: PostgreSQL database-cluster manager.
+# gnupg: for decrypting encrypted database backups during restore.
 RUN echo "Installing generic stuff" && \
     apt-get -qq install \
+    ca-certificates \
     curl \
     wget \
     iputils-ping \
-    postgresql-client \
+    gnupg
+
+# Install PostgreSQL client tools from the PGDG apt repository, pinned to the
+# same major version as the production database server.
+# postgresql-client: for talking to PostgreSQL database.
+# postgresql-common: PostgreSQL database-cluster manager.
+RUN echo "Installing PostgreSQL $POSTGRES_VERSION client" && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/pgdg.asc && \
+    chmod a+r /etc/apt/keyrings/pgdg.asc && \
+    echo "deb [signed-by=/etc/apt/keyrings/pgdg.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    apt-get -qq update && \
+    apt-get -qq install \
+    postgresql-client-$POSTGRES_VERSION \
     postgresql-common

@@ -246,20 +246,6 @@ BOARD = [
             Victorian Government, and as a ministerial media advisor."""
         ],
     },
-    {
-        "image": "web/img/photos/team/noel.png",
-        "name": "Noel Lim",
-        "title": "Board Member & CEO",
-        "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
-        "brags": [
-            """Noel is the Chief Executive Officer and co-founder of Anika
-            Legal, and has led the founding team to become an organisation of 62
-            volunteers, and to receive successive AFR Client Choice Awards for
-            Startup of the Year (2019, 2020). Noel was a finalist for the
-            Victorian Young Australian of the Year (2023) and NFP Emerging
-            Leader award (2023).""",
-        ],
-    },
 ]
 
 
@@ -359,14 +345,32 @@ ADVISORS = [
 
 TEAM_MEMBERS = [
     {
+        "image": "web/img/photos/team/dale.png",
+        "name": "Dale Clough",
+        "title": "Chief Executive Officer",
+        "linkedin": "https://www.linkedin.com/in/dale-clough/",
+        "brags": [
+            """Dale drives the direction of our organisation and ensures that
+            each portfolio is successfully managed.""",
+            """Dale has a Masters of Business Administration and brings over a
+            decade of experience in leading large, highly engaged teams across
+            the private and not-for-profit sectors.""",
+        ],
+    },
+    {
         "image": "web/img/photos/team/noel.png",
         "name": "Noel Lim",
-        "title": "Chief Executive Officer",
+        "title": "Co-Founder",
         "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
         "brags": [
-            """Noel drives the direction of our organisation and ensures that
-            each portfolio is successfully managed.""",
-            """Noel is the full-time CEO and co-founder of Anika Legal.""",
+            """Noel co-founded Anika Legal with the belief that the untapped
+            energy of law students and lawyers could help close the justice gap
+            for Victoria's renters. After leading Anika as Founding CEO, he now
+            focuses on strategic partnerships and systems change for a fairer
+            housing system.""",
+            """Noel was named Victorian of the Year in 2025 and is a Westpac
+            Social Change Fellow. He is also a founding member of the Access to
+            Justice & Technology Network.""",
         ],
     },
     {
@@ -384,34 +388,37 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/dale.png",
-        "name": "Dale Clough",
-        "title": "Head of Partnerships & Fundraising",
-        "linkedin": "https://www.linkedin.com/in/dale-clough/",
-        "brags": [
-            """Dale leads our Partnerships & Fundraising function, ensuring that
-            Anika can continue to grow sustainably.""",
-            """Dale has over eight years of experience in leading large, highly
-            engaged teams and managing strategic partnerships across the private
-            and not-for-profit sectors. Dale has a Masters of Business
-            Administration, and a strong understanding of the donor development
-            cycle and solicitation process, as well as how to use data to
-            increase fundraising effectiveness.""",
-        ],
-    },
-    {
         "image": "web/img/photos/team/emily.png",
         "name": "Emily Southwell",
         "title": "Principal Lawyer",
         "linkedin": "https://www.linkedin.com/in/emily-southwell-95459213a/",
         "brags": [
-            """Emily is our Principal lawyer, and is responsible for developing
+            """Emily is our Principal lawyer and is responsible for developing
             and delivering the legal service we provide.""",
             """Emily brings a wealth of diverse experiences to Anika Legal. She
             has previously worked as a Coroner's Solicitor at the Coroner's
             Court of Victoria and has significant expertise in policy
             development, particularly in the areas of justice and Aboriginal
             affairs.""",
+        ],
+    },
+    {
+        "image": "web/img/photos/team/annie.png",
+        "name": "Annie Cassidy",
+        "title": "Head of Partnerships & Fundraising",
+        "linkedin": "https://www.linkedin.com/in/annie-cassidy-thehuman/",
+        "brags": [
+            """Annie is Anika's Head of Partnerships & Fundraising, responsible
+            for building the partnerships and fundraising strategy that enables
+            Anika's work and its sustainable growth. Her connection to Anika
+            began as a client, giving her firsthand insight into the impact of
+            its work.""",
+            """Annie joins us from Cerebral Palsy Alliance, where she spent
+            several years managing corporate partnerships and major fundraising
+            campaigns. Annie brings a proven track record of building lasting
+            funder relationships, and is focused on growing the strategic
+            partnerships that help Anika reach more people who need free legal
+            help.""",
         ],
     },
     {
@@ -435,7 +442,7 @@ TEAM_MEMBERS = [
         "title": "Lawyer",
         "linkedin": "",
         "brags": [
-            """Sharon's journey at Anika is a story of growth, passion, and
+            """Sharon's journey at Anika is a story of growth, passion and
             making a real difference in the legal world. Starting out as a
             volunteer paralegal through a Deakin University internship, Sharon
             quickly rose through the ranks, becoming a paralegal lead. After she
@@ -461,16 +468,16 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/tom.png",
-        "name": "Tom Fletcher",
-        "title": "Lawyer",
-        "linkedin": "https://www.linkedin.com/in/tom-fletcher-9586971b3/",
+        "image": "web/img/photos/team/alex.png",
+        "name": "Alexandra Wardlaw",
+        "title": "Secondee Lawyer",
+        "linkedin": "https://www.linkedin.com/in/alexandra-wardlaw-156904191/",
         "brags": [
-            """Tom is a member of our casework team and is responsible for
+            """Alex is a member of our casework team and is responsible for
             supporting our paralegals and delivering legal services directly to
             clients.""",
-            """Tom is generously seconded to us from Hall & Wilcox where he
-            works as an Associate in the Pro Bono & Community team.""",
+            """Alex is generously seconded to us from Hall & Wilcox where she
+            works as a Lawyer in the Property and Projects team.""",
         ],
     },
 ]
