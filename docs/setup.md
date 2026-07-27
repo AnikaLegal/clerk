@@ -87,3 +87,21 @@ You can list all available recipes by running `just` with no arguments (or
 ```bash
 just
 ```
+
+## Contributing
+
+Changes are made on a branch and merged via a pull request. To contribute:
+
+- branch off `develop` (not `master`), naming your branch
+  `<your-name>/<commit-type>/<short-description>`, e.g.
+  `jane/proj/my-project-name`, or use Linear's suggested branch name when
+  working from an issue, e.g. `jane/tec-1234-my-issue-title`
+- make your change and test it locally, running the test suite with `just test`
+  (see [Testing](tests.md))
+- write commit messages in the conventional-commit style used in the repository
+  history, e.g. `fix(case): correct email validation error format`
+- push your branch and open a pull request into `develop`. The test suite runs
+  automatically on the pull request and must pass
+- ask the tech team for a review. Once approved and merged, your change is
+  released to staging and then production by the team (see
+  [Infra and deployment](infra.md#deployment))
