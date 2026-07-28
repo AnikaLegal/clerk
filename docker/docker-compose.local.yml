@@ -18,7 +18,6 @@ services:
       - 8123:8123 # Debug
     volumes:
       - ../app:/app
-      - /app/.venv/ # Exclude
       - config_local:/root/.config
       - dist_local:/dist
     links:
@@ -38,7 +37,6 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
-      - /app/.venv/ # Exclude
     links:
       - clerk_db
     env_file:
@@ -66,7 +64,6 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
-      - /app/.venv/ # Exclude
     links:
       - clerk_db
     env_file:
