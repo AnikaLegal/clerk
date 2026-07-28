@@ -14,8 +14,9 @@ usage() {
     echo "Usage: $prog <HOST>"
     echo ""
     echo "Restore the staging and production databases from the latest backups"
-    echo "on AWS to HOST. Refuses to target the current staging or production"
-    echo "server."
+    echo "on AWS to HOST. The host must already be provisioned (provision.sh)"
+    echo "and have its environments initialised (init-env.sh). Refuses to"
+    echo "target the current staging or production server."
 }
 
 if [ -z "${1:-}" ]; then
@@ -38,6 +39,14 @@ if [ -z "${BACKUP_PASSPHRASE:-}" ]; then
     read -r -s -p $'Enter Clerk backup passphrase:\n' BACKUP_PASSPHRASE
 fi
 
+export AWS_ACCESS_KEY_ID="$AWS_BACKUP_USER_ACCESS_KEY"
+export AWS_SECRET_ACCESS_KEY="$AWS_BACKUP_USER_SECRET_ACCESS_KEY"
+# Pass a session token through if one is set, so temporary credentials (e.g.
+# from aws login or an assumed role) work too.
+if [ -n "${AWS_SESSION_TOKEN:-}" ]; then
+    export AWS_SESSION_TOKEN
+fi
+
 cd $base_dir
 
 unset LC_ALL
@@ -57,61 +66,90 @@ done
 # fail on a changed host key.
 SSH_OPTS="-o StrictHostKeyChecking=accept-new"
 
-(
-    echo -e "\n>>> Restoring staging database from backup to host $HOST"
-    # Extract only the variables we need (see init-env.sh for why we do not
-    # export the whole env file).
-    PGUSER=$(grep '^PGUSER=' env/staging.env | cut -d '=' -f2-)
-    PGPASSWORD=$(grep '^PGPASSWORD=' env/staging.env | cut -d '=' -f2-)
+restore_database() {
+    local env_name=$1
+    local db_name="clerk_${env_name}"
 
-    export AWS_ACCESS_KEY_ID="$AWS_BACKUP_USER_ACCESS_KEY"
-    export AWS_SECRET_ACCESS_KEY="$AWS_BACKUP_USER_SECRET_ACCESS_KEY"
+    echo -e "\n>>> Restoring $env_name database from backup to host $HOST"
 
-    S3_BUCKET="s3://anika-database-backups-staging"
-    DUMP_NAME=$(aws s3 ls ${S3_BUCKET} |
+    # Extract only the variables we need (do not export the whole env file:
+    # some values contain spaces, which breaks a bulk export and leaks
+    # secret fragments into its error output).
+    local pguser pgpassword
+    pguser=$(grep '^PGUSER=' env/${env_name}.env | cut -d '=' -f2-)
+    pgpassword=$(grep '^PGPASSWORD=' env/${env_name}.env | cut -d '=' -f2-)
+
+    local s3_bucket decrypt
+    if [ "$env_name" == "prod" ]; then
+        s3_bucket="s3://anika-database-backups"
+        # Prod backups are GPG-encrypted at rest.
+        decrypt=(gpg --decrypt --quiet --no-symkey-cache
+            --pinentry-mode=loopback --passphrase "$BACKUP_PASSPHRASE")
+    else
+        s3_bucket="s3://anika-database-backups-staging"
+        decrypt=(cat)
+    fi
+
+    # Locate the backup before touching anything on the host, so that bad
+    # credentials or an empty bucket abort with the host left untouched.
+    local dump_name
+    dump_name=$(aws s3 ls ${s3_bucket} |
         sort |
         grep postgres_clerk |
         tail -n 1 |
         awk '{print $4}')
+    echo -e "\n>>> Found backup: $dump_name"
 
-    echo -e "\n>>> Found backup: $DUMP_NAME"
+    # Stop the environment's services so nothing writes to the database
+    # while it is replaced. Tolerate the services not existing. The scale
+    # command can return slightly before the containers have actually
+    # exited, so also wait for them to be gone: dropping the database while
+    # they are still shutting down races their final queue polls.
+    echo -e "\n>>> Stopping $env_name services on $HOST"
+    ssh $SSH_OPTS root@$HOST "
+        docker service scale ${db_name}_web=0 ${db_name}_worker=0 2> /dev/null || true
+        for i in \$(seq 1 30); do
+            [ -z \"\$(docker ps -q --filter name=${db_name}_)\" ] && break
+            sleep 2
+        done"
 
-    echo -e "\n>>> Restoring backup $DUMP_NAME to host $HOST"
-    aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - |
+    # Drop and recreate the database so the restore starts from a clean
+    # slate: restoring over an existing schema (e.g. one freshly created by
+    # the web container's boot-time migrations) makes pg_restore fail on
+    # schema differences. FORCE terminates any remaining connections. The
+    # database is recreated by the same init script used by init-env.sh, so
+    # ownership and privileges stay consistent.
+    echo -e "\n>>> Recreating database $db_name on $HOST"
+    ssh $SSH_OPTS root@$HOST \
+        "sudo -Hiu postgres psql -tAc 'DROP DATABASE IF EXISTS $db_name WITH (FORCE);'"
+    ssh $SSH_OPTS root@$HOST \
+        PGDATABASE=$db_name \
+        PGUSER=$pguser \
+        PGPASSWORD=$pgpassword \
+        /srv/infra/postgres/init.sh
+    if [ "$env_name" == "staging" ]; then
+        # Reapply the staging privilege adjustments made by init-env.sh.
         ssh $SSH_OPTS root@$HOST \
-        PGDATABASE=clerk_staging \
-        PGUSER=$PGUSER \
-        PGPASSWORD=$PGPASSWORD \
-        pg_restore --clean --if-exists --no-owner --no-privileges --username=clerk_staging --dbname=clerk_staging
-)
-
-(
-    echo -e "\n>>> Restoring production database from backup to host $HOST"
-    # Extract only the variables we need (see init-env.sh for why we do not
-    # export the whole env file).
-    PGUSER=$(grep '^PGUSER=' env/prod.env | cut -d '=' -f2-)
-    PGPASSWORD=$(grep '^PGPASSWORD=' env/prod.env | cut -d '=' -f2-)
-
-    export AWS_ACCESS_KEY_ID="$AWS_BACKUP_USER_ACCESS_KEY"
-    export AWS_SECRET_ACCESS_KEY="$AWS_BACKUP_USER_SECRET_ACCESS_KEY"
-
-    S3_BUCKET="s3://anika-database-backups"
-    DUMP_NAME=$(aws s3 ls ${S3_BUCKET} |
-        sort |
-        grep postgres_clerk |
-        tail -n 1 |
-        awk '{print $4}')
-    echo -e "\n>>> Found backup: $DUMP_NAME"
-
-    echo -e "\n>>> Restoring backup $DUMP_NAME to host $HOST"
-    aws s3 cp ${S3_BUCKET}/${DUMP_NAME} - |
-        gpg --decrypt --quiet --no-symkey-cache \
-            --pinentry-mode=loopback  --passphrase "$BACKUP_PASSPHRASE" |
+            "sudo -Hiu postgres psql -tAc 'ALTER DATABASE $db_name OWNER TO $pguser;'"
         ssh $SSH_OPTS root@$HOST \
-        PGDATABASE=clerk_prod \
-        PGUSER=$PGUSER \
-        PGPASSWORD=$PGPASSWORD \
-        pg_restore --clean --if-exists --no-owner --no-privileges --username=clerk_prod --dbname=clerk_prod
-)
+            "sudo -Hiu postgres psql -tAc 'ALTER USER $pguser WITH CREATEDB;'"
+    fi
+
+    echo -e "\n>>> Restoring backup $dump_name to host $HOST"
+    aws s3 cp ${s3_bucket}/${dump_name} - |
+        "${decrypt[@]}" |
+        ssh $SSH_OPTS root@$HOST \
+        PGDATABASE=$db_name \
+        PGUSER=$pguser \
+        PGPASSWORD=$pgpassword \
+        pg_restore --no-owner --no-privileges --username=$pguser --dbname=$db_name
+
+    echo -e "\n>>> Starting $env_name services on $HOST"
+    ssh $SSH_OPTS root@$HOST \
+        "docker service scale --detach ${db_name}_web=1 ${db_name}_worker=1 2> /dev/null || true"
+}
+
+restore_database staging
+restore_database prod
 
 exit 0
