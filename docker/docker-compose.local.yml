@@ -20,6 +20,12 @@ services:
       - ../app:/app
       - config_local:/root/.config
       - dist_local:/dist
+    # Hide the host's app/.venv, which the bind mount above would otherwise
+    # expose. Nothing in the container uses it (PATH points at /venv), but the
+    # file watcher would walk ~9k files across the bind mount, and a host-side
+    # `uv sync` would fire change events and restart the dev server.
+    tmpfs:
+      - /app/.venv
     links:
       - clerk_db
       - worker
@@ -37,6 +43,8 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
+    tmpfs:
+      - /app/.venv # Hide the host venv, as above
     links:
       - clerk_db
     env_file:
@@ -64,6 +72,8 @@ services:
     image: clerk:local
     volumes:
       - ../app:/app
+    tmpfs:
+      - /app/.venv # Hide the host venv, as above
     links:
       - clerk_db
     env_file:
