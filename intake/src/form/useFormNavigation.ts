@@ -10,7 +10,7 @@ import { WELCOME_PAGE } from './model'
 import { addNavItems } from './nav-items'
 import { applyPageAdvance } from './page-advance'
 import { Direction, readProgress } from './progress'
-import { navigableSections } from './section-nav'
+import { firstVisiblePageOfSection, navigableSections } from './section-nav'
 import { SubmissionSaver } from './save'
 import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
@@ -19,6 +19,7 @@ import {
   EMAIL_PAGE,
   SECTIONS,
   sectionIndexForPage,
+  SUBMIT_PAGE,
 } from '../questions'
 
 interface FormNavigation {
@@ -52,6 +53,18 @@ export const useFormNavigation = ({
   // visible page), recomputed on every page and answer change. Drives the
   // clickable stepper. See section-nav.ts for the reachability rules.
   const [navigable, setNavigable] = useState<Map<number, string>>(new Map())
+  // Whether the submit-page answer-review panel is expanded. Toggled by the
+  // ghost nav-bar button (see addNavItems), read by FormPage to render the
+  // panel, and reset to false whenever the user leaves the submit page.
+  const [reviewOpen, setReviewOpen] = useState(false)
+  // The review toggle nav item, held so the reviewOpen effect can keep its
+  // label and aria-expanded in step with the panel state.
+  const reviewToggle = useRef<ReturnType<Model['addNavigationItem']> | null>(
+    null
+  )
+  // Mirrors reviewOpen for the nav-DOM observer, which runs outside React and
+  // needs the current value without re-subscribing.
+  const reviewOpenRef = useRef(false)
 
   // Browser history <-> survey page sync, so the browser Back / Forward buttons
   // move between the survey's pages instead of leaving the form. Each page gets
@@ -98,12 +111,16 @@ export const useFormNavigation = ({
     [navigate, session]
   )
 
-  // Jump to a section's first page from a click on the stepper. Recomputed
-  // fresh so a stale render can't offer a page that is no longer reachable.
-  const jumpToSection = useCallback(
-    (sectionIndex: number) => {
-      const targetPage = navigableSections(survey, visited).get(sectionIndex)
-      if (!targetPage) return
+  // Move the survey to a reachable page by name, keeping browser history in
+  // step. Forward moves re-walk Next page by page so the forward pipeline (skip
+  // defaults, side effects and - crucially - eligibility exits) runs for each
+  // page in between; a changed answer that now disqualifies still ejects rather
+  // than being skipped, and reachability guarantees every step passes so it
+  // won't stall. Backward moves rewind history to the target page's existing
+  // entry so the entry order stays consistent with the form. Runs inside the
+  // click handler, so React batches the per-step history updates into one.
+  const jumpToPage = useCallback(
+    (targetPage: string) => {
       const target = survey.getPageByName(targetPage)
       if (!target || !target.isVisible) return
       const pages = survey.visiblePages
@@ -114,12 +131,6 @@ export const useFormNavigation = ({
       }
 
       if (targetIndex > currentIndex) {
-        // Forward: re-walk Next page by page so the forward pipeline (skip
-        // defaults, side effects and - crucially - eligibility exits) runs for
-        // each page in between; a changed answer that now disqualifies still
-        // ejects rather than being skipped. Reachability guarantees every step
-        // passes, so it won't stall. Runs inside the click handler, so React
-        // batches the per-step history pushes into one location update.
         let guard = 0
         while (survey.currentPage !== target && guard < pages.length) {
           const before = survey.currentPage
@@ -131,11 +142,9 @@ export const useFormNavigation = ({
         return
       }
 
-      // Backward: rewind browser history to the target page's existing entry so
-      // the entry order stays consistent with the form; the reconcile effect
-      // then moves the survey. When that entry is unknown - a resumed session
-      // that never visited the page in this browser - fall back to moving the
-      // survey directly and replacing the current entry.
+      // Backward: rewind to the target page's existing entry when it is known;
+      // a resumed session that never visited the page in this browser falls
+      // back to moving the survey directly and replacing the current entry.
       const entryIdx = pageEntryIdx.current[targetPage]
       const currentEntryIdx = (window.history.state as { idx?: number } | null)
         ?.idx
@@ -156,7 +165,30 @@ export const useFormNavigation = ({
         replace: true,
       })
     },
-    [survey, visited, navigate, session]
+    [survey, navigate, session]
+  )
+
+  // Jump to a section's first page from a click on the stepper. Recomputed
+  // fresh so a stale render can't offer a page that is no longer reachable.
+  const jumpToSection = useCallback(
+    (sectionIndex: number) => {
+      const targetPage = navigableSections(survey, visited).get(sectionIndex)
+      if (targetPage) jumpToPage(targetPage)
+    },
+    [survey, visited, jumpToPage]
+  )
+
+  // Edit a section from the submit-page answer review: jump to its first
+  // visible page. Unlike jumpToSection this ignores the "navigable" gate, so
+  // the section the submit page sits in (its own, never offered as a forward
+  // jump) can still be edited; from the submit page every section is behind the
+  // user, so jumpToPage always makes a backward move.
+  const editSection = useCallback(
+    (sectionIndex: number) => {
+      const targetPage = firstVisiblePageOfSection(survey, sectionIndex)
+      if (targetPage) jumpToPage(targetPage)
+    },
+    [survey, jumpToPage]
   )
 
   // Mirror a browser Back / Forward (location change) onto the survey: move it
@@ -245,10 +277,12 @@ export const useFormNavigation = ({
   }, [location])
 
   useEffect(() => {
-    const { noEmailItem, notMovingOutItem, pageCountItem } = addNavItems(
-      survey,
-      navigate
-    )
+    const { noEmailItem, notMovingOutItem, pageCountItem, reviewToggleItem } =
+      addNavItems(survey, navigate)
+    // Toggle the review panel from the ghost nav-bar button; the reviewOpen
+    // effect below keeps the button's label and aria-expanded in sync.
+    reviewToggle.current = reviewToggleItem
+    reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
     // Keep the per-page UI in sync with the current page: the no-email button's
     // visibility, the WELCOME page's "Let's get started" button label, the page
     // count, and the progress stepper's active section.
@@ -258,6 +292,11 @@ export const useFormNavigation = ({
       noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
       notMovingOutItem.visible =
         survey.currentPage?.name === BONDS_MOVE_OUT_PAGE
+      // The review toggle lives on the submit page only; collapse the panel
+      // whenever the user leaves, so it reopens closed next time.
+      const onSubmit = survey.currentPage?.name === SUBMIT_PAGE
+      reviewToggleItem.visible = onSubmit
+      if (!onSubmit) setReviewOpen(false)
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
       // The count follows the stepper: hidden wherever section is -1, i.e. on
       // the WELCOME and SUBMIT pages.
@@ -381,23 +420,30 @@ export const useFormNavigation = ({
     // page-change entry, so keep the attributes applied with an observer on the
     // survey container rather than chase individual render events.
     const container = document.querySelector('.intake-page')
-    const hidePageCount = () => {
-      const el = container?.querySelector<HTMLInputElement>(
+    const syncNavAttributes = () => {
+      const count = container?.querySelector<HTMLInputElement>(
         '.intake-page-count__text'
       )
-      if (el && el.getAttribute('aria-hidden') !== 'true') {
-        el.setAttribute('aria-hidden', 'true')
-        el.disabled = true
+      if (count && count.getAttribute('aria-hidden') !== 'true') {
+        count.setAttribute('aria-hidden', 'true')
+        count.disabled = true
+      }
+      // SurveyJS doesn't render an action's ariaExpanded onto the button, so
+      // reflect the review panel's open state on the toggle element ourselves.
+      const toggle = container?.querySelector('.intake-review__toggle')
+      const expanded = String(reviewOpenRef.current)
+      if (toggle && toggle.getAttribute('aria-expanded') !== expanded) {
+        toggle.setAttribute('aria-expanded', expanded)
       }
     }
-    const pageCountObserver = container
-      ? new MutationObserver(hidePageCount)
+    const navObserver = container
+      ? new MutationObserver(syncNavAttributes)
       : null
-    pageCountObserver?.observe(container as Node, {
+    navObserver?.observe(container as Node, {
       childList: true,
       subtree: true,
     })
-    hidePageCount()
+    syncNavAttributes()
 
     // Flush the pending answers PATCH when the tab is closed or backgrounded:
     // the "answer, Next, close the tab" gesture would otherwise land inside
@@ -427,9 +473,23 @@ export const useFormNavigation = ({
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
       survey.onValueChanged.remove(onValueChanged)
-      pageCountObserver?.disconnect()
+      navObserver?.disconnect()
     }
   }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
 
-  return { progress, navigable, jumpToSection }
+  // Keep the ghost toggle's label and aria-expanded in step with the panel.
+  useEffect(() => {
+    reviewOpenRef.current = reviewOpen
+    const item = reviewToggle.current
+    if (item) {
+      item.title = reviewOpen ? 'Hide your answers' : 'Review your answers'
+    }
+    // aria-expanded isn't rendered from the action (see syncNavAttributes); set
+    // it now, and the observer re-applies it after SurveyJS re-renders.
+    document
+      .querySelector('.intake-review__toggle')
+      ?.setAttribute('aria-expanded', String(reviewOpen))
+  }, [reviewOpen])
+
+  return { progress, navigable, jumpToSection, editSection, reviewOpen }
 }

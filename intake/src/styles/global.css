@@ -409,6 +409,144 @@ header .h-\[63px\] img {
   background-color: var(--color-primary);
 }
 
+/* Submit-page answer review (see comps/AnswerReview): a summary of the user's
+   answers grouped by section, each with an Edit link back into the form. It is
+   disclosed by the ghost "Review your answers" button in the survey navigation
+   bar (styled by daisyUI's d-btn-ghost) and rendered just below that bar. */
+/* While the review is disclosed, collapse the survey's padding below the nav
+   buttons (32px on the action bar + 64px on the body) so the panel's own top
+   margin fully controls the button-to-panel gap. A negative margin on the
+   panel can't do that job: the padding it offsets varies with viewport (the
+   nav wraps to two rows on narrow screens), so any fixed offset ends up
+   overlapping the wrapped buttons. The modifier only exists while the panel
+   is open (see FormPage), so the closed submit page and every other page keep
+   the survey's normal spacing. */
+.intake-form--review-open .sd-body,
+.intake-form--review-open .sd-body__navigation {
+  padding-bottom: 0;
+}
+
+/* The breathing room below the open panel lives as padding on the form (inside
+   its grey background), not as a bottom margin on the panel - a margin would
+   collapse through the form's bottom edge and show as a white strip between
+   the grey and the footer. */
+.intake-form--review-open {
+  padding-bottom: 40px;
+}
+
+.intake-review {
+  /* Cap at 640px on wide screens; on narrow ones keep 24px clear of each edge,
+     matching the survey column's own side padding (.sd-body's 24px), so the
+     panel lines up with the SurveyJS content above it. */
+  width: min(640px, 100% - 48px);
+  /* 50px top matches the gap between the agreement text and the buttons. */
+  margin: 50px auto 0;
+  padding: 4px 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Ghost variant for the "Review your answers" nav-bar toggle: transparent fill
+   with primary text and a hover tint. It's an <input class="d-btn"> like the
+   other nav buttons, so it keeps their size and shape from `.intake-form
+   input.d-btn` above; this rule shares that selector's specificity (0,2,1) but
+   sits later in the file, so it wins the solid fill (the same trick the
+   secondary variant uses). The focus ring comes from input.d-btn:focus-visible.
+   Primary is only ~3.3:1 on the page, below AA for this text, so darken it. */
+.intake-form input.intake-review__toggle {
+  background-color: transparent;
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+  font-weight: 600;
+}
+
+.intake-form input.intake-review__toggle:hover {
+  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+}
+
+.intake-review__section {
+  padding: 16px 0;
+  border-bottom: 1px solid #ececec;
+}
+
+.intake-review__section:last-child {
+  border-bottom: none;
+}
+
+.intake-review__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.intake-review__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* The site styles bare buttons as large primary pills, so strip that chrome and
+   render Edit as a plain underlined link. The brand primary is only ~3.3:1 on
+   white, below AA at this size, so darken it (as the stepper label does).
+   margin: 0 counters the site's under-600px `button { margin: 0 auto }`, whose
+   auto side margins would otherwise absorb the flex row's free space and pull
+   the button off the section head's right edge. */
+.intake-form button.intake-review__edit {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+  text-decoration: underline;
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-review__edit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.intake-review__list {
+  margin: 0;
+}
+
+.intake-review__row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  /* Centre the answer vertically against a question that wraps to more lines
+     (and vice versa). */
+  align-items: center;
+  gap: 4px 32px;
+  padding: 4px 0;
+}
+
+.intake-review__label {
+  color: #6f6f6f;
+  font-size: 14px;
+}
+
+.intake-review__value {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* Stack label over value on narrow screens rather than squeezing two columns. */
+@media (max-width: 480px) {
+  .intake-review__row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 .intake-splash {
   max-width: 640px;
   margin: 0 auto;

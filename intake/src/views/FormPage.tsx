@@ -4,6 +4,7 @@ import { Survey } from 'survey-react-ui'
 
 import { events } from '../analytics'
 import { ApiError } from '../api/client'
+import { AnswerReview } from '../comps/AnswerReview'
 import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
 import { resetFunnel } from '../form/funnel'
@@ -12,6 +13,7 @@ import { serializeAnswers } from '../form/serialize'
 import { setUpForm } from '../form/setup'
 import { clearState } from '../form/storage'
 import { useFormNavigation } from '../form/useFormNavigation'
+import { SUBMIT_PAGE } from '../questions'
 import { logException } from '../utils'
 import { setDocumentTitle } from './announce'
 import { SubmitState, SubmitStatus } from './SubmitStatus'
@@ -59,13 +61,14 @@ export const FormPage = () => {
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
   // and read back the progress-indicator state plus the jump-to-section wiring.
-  const { progress, navigable, jumpToSection } = useFormNavigation({
-    survey,
-    saver,
-    visited,
-    session,
-    attemptSubmit,
-  })
+  const { progress, navigable, jumpToSection, editSection, reviewOpen } =
+    useFormNavigation({
+      survey,
+      saver,
+      visited,
+      session,
+      attemptSubmit,
+    })
 
   // Restore the form's title after a splash view (e.g. Go back from an exit
   // page) changed it. Matches the title the Django shell renders on load.
@@ -84,14 +87,19 @@ export const FormPage = () => {
     )
   }
 
+  // The review-open modifier collapses the survey's padding below the nav
+  // buttons while the answer review is disclosed, so the panel's own margin
+  // sets the button-to-panel gap (see .intake-form--review-open in global.css).
+  const rootClass = [
+    'intake-form',
+    progress.name === WELCOME_PAGE && 'intake-form--welcome',
+    reviewOpen && 'intake-form--review-open',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <div
-      className={
-        progress.name === WELCOME_PAGE
-          ? 'intake-form intake-form--welcome'
-          : 'intake-form'
-      }
-    >
+    <div className={rootClass}>
       {progress.section >= 0 && (
         <SectionProgress
           current={progress.section}
@@ -113,6 +121,11 @@ export const FormPage = () => {
           <Survey model={survey} />
         </div>
       </div>
+      {/* Disclosed by the ghost "Review your answers" button in the survey's
+          navigation bar; rendered here (below it) rather than inside the survey. */}
+      {progress.name === SUBMIT_PAGE && reviewOpen && (
+        <AnswerReview survey={survey} onEdit={editSection} />
+      )}
     </div>
   )
 }

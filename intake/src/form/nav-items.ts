@@ -54,5 +54,18 @@ export const addNavItems = (survey: Model, navigate: NavigateFunction) => {
     visible: false,
     action: () => {},
   })
-  return { noEmailItem, notMovingOutItem, pageCountItem }
+  // A ghost "Review your answers" toggle shown only on the submit page, sitting
+  // to the right of the Submit button. It discloses the answer-review panel;
+  // its action, dynamic label and aria-expanded are wired in useFormNavigation
+  // (they track the React state that renders the panel). A visibleIndex below
+  // the page count's keeps it left of that (though the count is hidden here).
+  const reviewToggleItem = survey.addNavigationItem({
+    id: 'nav-review-toggle',
+    title: 'Review your answers',
+    innerCss: 'd-btn d-btn-ghost intake-review__toggle',
+    visibleIndex: 900,
+    visible: false,
+    action: () => {},
+  })
+  return { noEmailItem, notMovingOutItem, pageCountItem, reviewToggleItem }
 }
