@@ -56,7 +56,7 @@ export const SectionProgress = ({
                 type="button"
                 className={`intake-progress__step intake-progress__step--jump ${state}`}
                 onClick={() => onJump(idx)}
-                title={`Go to ${section.label}`}
+                title={section.label}
                 aria-label={`Go to ${section.label}`}
               >
                 {inner}
