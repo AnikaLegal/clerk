@@ -13,7 +13,10 @@ RUN echo "Building web assets" && \
 FROM anikalaw/clerkbase:latest
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
 ARG DJANGO_SECRET_KEY=not-a-secret
-ENV PATH="/app/.venv/bin:${PATH}"
+# Keep the virtualenv outside /app so that the local dev bind mount of the app
+# source does not shadow it (see docker/docker-compose.local.yml).
+ENV UV_PROJECT_ENVIRONMENT=/venv
+ENV PATH="/venv/bin:${PATH}"
 
 # Mount the codebase
 ADD app /app
