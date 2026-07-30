@@ -8,30 +8,24 @@ producing results), falls back to a minimal message built from OUTCOME
 alone. Does nothing but print a notice if no webhook is configured; a
 configured webhook that cannot be posted to exits non-zero.
 
-Pass --dry-run to print the payload instead of posting it.
-
 Environment: OUTCOME (PASS|FAIL), SLACK_WEBHOOK_URL, RESULTS_FILE, and
 optionally RUN_URL and GITHUB_REPOSITORY (shown in the message footer).
 """
 
+import argparse
 import json
 import os
 import sys
 import urllib.error
 import urllib.request
 from datetime import datetime
+from typing import NamedTuple
 from zoneinfo import ZoneInfo
 
-EMOJI = {"PASS": "white_check_mark", "WARN": "warning", "FAIL": "x"}
+STATUS_EMOJI = {"PASS": "white_check_mark", "WARN": "warning", "FAIL": "x"}
 
 
-def human_size(n: float) -> str:
-    for unit in ["B", "KB", "MB", "GB"]:
-        if n < 1000 or unit == "GB":
-            break
-        n /= 1000
-    size = f"{n:.1f}".removesuffix(".0")
-    return f"{size} {unit}"
+# --- Block Kit primitives ---------------------------------------------------
 
 
 def mrkdwn(text: str) -> dict:
@@ -40,6 +34,10 @@ def mrkdwn(text: str) -> dict:
 
 def raw(text: str) -> dict:
     return {"type": "raw_text", "text": text}
+
+
+def emoji(name: str) -> dict:
+    return {"type": "emoji", "name": name}
 
 
 def rich(*elements: dict) -> dict:
@@ -54,6 +52,67 @@ def text_run(text: str, **style: bool) -> dict:
     if style:
         run["style"] = style
     return run
+
+
+# --- Message assembly -------------------------------------------------------
+
+
+class Summary(NamedTuple):
+    icon: str
+    notify: str  # notification and screen reader fallback
+    status: str  # the mrkdwn status line under the header
+
+
+def summarise(outcome: str, checks: list[dict], crashed: bool) -> Summary:
+    warned = [check["label"] for check in checks if check["status"] == "WARN"]
+    if outcome != "PASS":
+        status = (
+            "*FAILED* - no results were produced; the check may have crashed early."
+            if crashed
+            else "*FAILED* - the latest backup may not be restorable. Please investigate."
+        )
+        return Summary(":x:", "Database restore check FAILED - please investigate.", status)
+    if warned:
+        plural = "s" if len(warned) > 1 else ""
+        return Summary(
+            ":warning:",
+            f"Database restore check passed with {len(warned)} warning{plural}.",
+            f"*Passed with {len(warned)} warning{plural}* - {', '.join(warned)}",
+        )
+    return Summary(
+        ":white_check_mark:",
+        "Database restore check passed.",
+        "*Passed* - all checks passed",
+    )
+
+
+def human_size(n: float) -> str:
+    for unit in ["B", "KB", "MB", "GB"]:
+        if n < 1000 or unit == "GB":
+            break
+        n /= 1000
+    size = f"{n:.1f}".removesuffix(".0")
+    return f"{size} {unit}"
+
+
+def metadata_fields(results: dict) -> list[dict]:
+    """The Date / Size / file name facts about the backup that was tested."""
+    fields = []
+    if results.get("dump_time"):
+        date = datetime.fromtimestamp(
+            results["dump_time"], tz=ZoneInfo("Australia/Melbourne")
+        )
+        fields.append(mrkdwn(f"*Date*\n{date.isoformat(timespec='seconds')}"))
+    if results.get("dump_bytes"):
+        size = f"{human_size(results['dump_bytes'])} db"
+        if results.get("client_bytes"):
+            size += f" - {human_size(results['client_bytes'])} client"
+        fields.append(mrkdwn(f"*Size*\n{size}"))
+    if results.get("dump_file"):
+        fields.append(mrkdwn(f"*Backup file*\n`{results['dump_file']}`"))
+    if results.get("client_file"):
+        fields.append(mrkdwn(f"*Client file*\n`{results['client_file']}`"))
+    return fields
 
 
 def label_cell(label: str) -> dict:
@@ -72,113 +131,106 @@ def detail_cell(value: str, note: str) -> dict:
     return rich(*runs)
 
 
+def checks_table(checks: list[dict]) -> dict:
+    rows = [[raw("Check"), raw("Result"), raw("Detail")]]
+    for check in checks:
+        rows.append(
+            [
+                label_cell(check["label"]),
+                rich(emoji(STATUS_EMOJI.get(check["status"], "x"))),
+                detail_cell(check.get("value", ""), check.get("note", "")),
+            ]
+        )
+    return {
+        "type": "table",
+        "column_settings": [
+            {"align": "left", "is_wrapped": False},
+            {"align": "center", "is_wrapped": False},
+            {"align": "left", "is_wrapped": True},
+        ],
+        "rows": rows,
+    }
+
+
+def footer_blocks() -> list[dict]:
+    parts = []
+    if os.environ.get("GITHUB_REPOSITORY"):
+        parts.append(os.environ["GITHUB_REPOSITORY"])
+    if os.environ.get("RUN_URL"):
+        parts.append(f"<{os.environ['RUN_URL']}|Workflow run>")
+    if not parts:
+        return []
+    return [
+        {"type": "divider"},
+        {"type": "context", "elements": [mrkdwn(" - ".join(parts))]},
+    ]
+
+
 def build_payload(results: dict | None, outcome: str) -> dict:
     checks = (results or {}).get("checks", [])
-    warnings = sum(1 for check in checks if check["status"] == "WARN")
-
-    if outcome != "PASS":
-        icon = ":x:"
-        notify = "Database restore check FAILED - please investigate."
-        status = (
-            "*FAILED* - the latest backup may not be restorable. Please investigate."
-        )
-        if not results:
-            status = (
-                "*FAILED* - no results were produced; the check may have crashed early."
-            )
-    elif warnings:
-        icon = ":warning:"
-        plural = "s" if warnings > 1 else ""
-        warned = ", ".join(c["label"] for c in checks if c["status"] == "WARN")
-        notify = f"Database restore check passed with {warnings} warning{plural}."
-        status = f"*Passed with {warnings} warning{plural}* - {warned}"
-    else:
-        icon = ":white_check_mark:"
-        notify = "Database restore check passed."
-        status = "*Passed* - all checks passed"
+    summary = summarise(outcome, checks, crashed=results is None)
 
     blocks: list[dict] = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"{icon} Monthly database restore check",
+                "text": f"{summary.icon} Monthly database restore check",
                 "emoji": True,
             },
         },
-        {"type": "section", "text": mrkdwn(status)},
+        {"type": "section", "text": mrkdwn(summary.status)},
     ]
-
-    fields = []
-    if results:
-        if results.get("dump_time"):
-            date = datetime.fromtimestamp(
-                results["dump_time"], tz=ZoneInfo("Australia/Melbourne")
-            )
-            fields.append(mrkdwn(f"*Date*\n{date.isoformat(timespec='seconds')}"))
-        if results.get("dump_bytes"):
-            size = f"{human_size(results['dump_bytes'])} db"
-            if results.get("client_bytes"):
-                size += f" - {human_size(results['client_bytes'])} client"
-            fields.append(mrkdwn(f"*Size*\n{size}"))
-        if results.get("dump_file"):
-            fields.append(mrkdwn(f"*Backup file*\n`{results['dump_file']}`"))
-        if results.get("client_file"):
-            fields.append(mrkdwn(f"*Client file*\n`{results['client_file']}`"))
-    if fields:
+    if fields := metadata_fields(results or {}):
         blocks.append({"type": "section", "fields": fields})
-
     if checks:
-        rows = [[raw("Check"), raw("Result"), raw("Detail")]]
-        for check in checks:
-            rows.append(
-                [
-                    label_cell(check["label"]),
-                    rich({"type": "emoji", "name": EMOJI.get(check["status"], "x")}),
-                    detail_cell(check.get("value", ""), check.get("note", "")),
-                ]
-            )
-        blocks.append(
-            {
-                "type": "table",
-                "column_settings": [
-                    {"align": "left", "is_wrapped": False},
-                    {"align": "center", "is_wrapped": False},
-                    {"align": "left", "is_wrapped": True},
-                ],
-                "rows": rows,
-            }
-        )
+        blocks.append(checks_table(checks))
+    blocks += footer_blocks()
 
-    footer = []
-    if os.environ.get("GITHUB_REPOSITORY"):
-        footer.append(os.environ["GITHUB_REPOSITORY"])
-    if os.environ.get("RUN_URL"):
-        footer.append(f"<{os.environ['RUN_URL']}|Workflow run>")
-    if footer:
-        blocks.append({"type": "divider"})
-        blocks.append({"type": "context", "elements": [mrkdwn(" - ".join(footer))]})
+    return {"text": summary.notify, "blocks": blocks}
 
-    # The top-level text is the notification and screen reader fallback.
-    return {"text": notify, "blocks": blocks}
+
+# --- Entry point ------------------------------------------------------------
+
+
+def load_results(path: str) -> dict | None:
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def post(webhook: str, payload: dict) -> None:
+    request = urllib.request.Request(
+        webhook,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=30):
+        pass
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print the payload instead of posting it",
+    )
+    args = parser.parse_args()
+
     outcome = os.environ.get("OUTCOME", "")
     if outcome not in ("PASS", "FAIL"):
-        sys.exit("Error: OUTCOME must be PASS or FAIL")
-    dry_run = "--dry-run" in sys.argv[1:]
+        parser.error("environment variable OUTCOME must be PASS or FAIL")
 
-    results_file = os.environ.get("RESULTS_FILE", "restore-check-results.json")
-    try:
-        with open(results_file) as f:
-            results = json.load(f)
-    except (OSError, json.JSONDecodeError):
-        results = None
-
+    results = load_results(os.environ.get("RESULTS_FILE", "restore-check-results.json"))
     payload = build_payload(results, results["outcome"] if results else outcome)
 
-    if dry_run:
+    if args.dry_run:
         print(json.dumps(payload, indent=2))
         return 0
 
@@ -188,14 +240,8 @@ def main() -> int:
         return 0
 
     print(">>> Posting result to Slack")
-    request = urllib.request.Request(
-        webhook,
-        data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"},
-    )
     try:
-        with urllib.request.urlopen(request, timeout=30):
-            pass
+        post(webhook, payload)
     except (urllib.error.URLError, OSError) as error:
         print(f">>> Error: failed to post the Slack message: {error}", file=sys.stderr)
         return 1
