@@ -30,7 +30,7 @@ S3_BUCKET = os.environ.get("S3_BUCKET", "")
 DB_NAME = "restore_check"
 
 # Sanity floors used when a dump predates the row count manifest feature.
-FLOORS = {"auth_user": 100, "core_issue": 1000, "wagtailcore_page": 50}
+FLOORS = {"auth_user": 450, "core_issue": 4000, "wagtailcore_page": 200}
 
 
 class Backup(NamedTuple):
