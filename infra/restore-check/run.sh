@@ -92,9 +92,12 @@ if [ "$READY" != "true" ]; then
 fi
 
 echo -e "\n>>> Running the restore check on the instance"
-OUTPUT_LOG=$(mktemp)
 CHECK_STATUS=0
 send_key
+# The check prints the markdown summary and the results JSON after their
+# respective marker lines; the awk stage diverts those sections into their
+# files for reporting and passes only the human-readable progress through
+# to the log, unbuffered so it still streams live.
 {
     # Secrets travel over SSH stdin only: they never appear in user data,
     # command lines, AWS logs or OpenTofu state. The remote bash reads its
@@ -108,16 +111,12 @@ send_key
     printf 'export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=restore-check\n'
     printf 'exec python3 -\n'
     cat "$(dirname "$0")/check.py"
-} | "${SSH[@]}" bash -s | tee "$OUTPUT_LOG" || CHECK_STATUS=$?
-
-# The check prints the markdown summary and the results JSON after their
-# respective marker lines; split them into their files for reporting.
-awk -v summary="$SUMMARY_FILE" -v results="$RESULTS_FILE" '
+} | "${SSH[@]}" bash -s | awk -v summary="$SUMMARY_FILE" -v results="$RESULTS_FILE" '
     /===RESTORE-CHECK-RESULTS===/ { mode = 2; next }
     /===RESTORE-CHECK-SUMMARY===/ { mode = 1; next }
-    mode == 2 { print > results }
-    mode == 1 { print > summary }
-' "$OUTPUT_LOG"
-rm -f "$OUTPUT_LOG"
+    mode == 2 { print > results; next }
+    mode == 1 { print > summary; next }
+    { print; fflush() }
+' || CHECK_STATUS=$?
 
 exit "$CHECK_STATUS"
