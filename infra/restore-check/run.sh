@@ -23,7 +23,8 @@
 #   CHECK_AWS_ACCESS_KEY_ID / CHECK_AWS_SECRET_ACCESS_KEY - the clerk-backup
 #       IAM user, passed to the instance to read the backup bucket.
 #   BACKUP_PASSPHRASE, S3_BUCKET - passed to the instance for the check.
-#   SUMMARY_FILE - where to write the extracted check summary.
+#   SUMMARY_FILE - where to write the extracted markdown summary.
+#   RESULTS_FILE - where to write the extracted results JSON.
 
 set -o errexit
 set -o nounset
@@ -33,6 +34,7 @@ set -o pipefail
 : "${CHECK_AWS_ACCESS_KEY_ID:?}" "${CHECK_AWS_SECRET_ACCESS_KEY:?}"
 : "${BACKUP_PASSPHRASE:?}" "${S3_BUCKET:?}"
 SUMMARY_FILE="${SUMMARY_FILE:-restore-check-summary.md}"
+RESULTS_FILE="${RESULTS_FILE:-restore-check-results.json}"
 
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-ap-southeast-2}"
 
@@ -108,7 +110,14 @@ send_key
     cat "$(dirname "$0")/check.py"
 } | "${SSH[@]}" bash -s | tee "$OUTPUT_LOG" || CHECK_STATUS=$?
 
-awk 'found { print } /===RESTORE-CHECK-SUMMARY===/ { found = 1 }' "$OUTPUT_LOG" > "$SUMMARY_FILE"
+# The check prints the markdown summary and the results JSON after their
+# respective marker lines; split them into their files for reporting.
+awk -v summary="$SUMMARY_FILE" -v results="$RESULTS_FILE" '
+    /===RESTORE-CHECK-RESULTS===/ { mode = 2; next }
+    /===RESTORE-CHECK-SUMMARY===/ { mode = 1; next }
+    mode == 2 { print > results }
+    mode == 1 { print > summary }
+' "$OUTPUT_LOG"
 rm -f "$OUTPUT_LOG"
 
 exit "$CHECK_STATUS"

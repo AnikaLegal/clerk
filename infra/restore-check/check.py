@@ -12,7 +12,9 @@ variables for a Postgres server where the connecting role may create and
 drop databases.
 
 Prints a markdown summary of the checks after a ===RESTORE-CHECK-SUMMARY===
-marker line; run.sh extracts it for reporting.
+marker line, then the same results as JSON (plus backup metadata) after a
+===RESTORE-CHECK-RESULTS=== marker line; run.sh extracts both for
+reporting.
 """
 
 import json
@@ -30,12 +32,18 @@ DB_NAME = "restore_check"
 # Sanity floors used when a dump predates the row count manifest feature.
 FLOORS = {"auth_user": 100, "core_issue": 1000, "wagtailcore_page": 50}
 
-RESULTS: list[tuple[str, str, str]] = []
+# One entry per check: (label, status, value, note). The value is the
+# check's headline number, kept separate so reporting can style it.
+RESULTS: list[tuple[str, str, str, str]] = []
 
 
-def record(check: str, result: str, detail: str = "") -> None:
-    RESULTS.append((check, result, detail))
-    print(f">>> {check}: {result} {detail}")
+def record(label: str, status: str, value: str = "", note: str = "") -> None:
+    RESULTS.append((label, status, value, note))
+    print(f">>> {label}: {status} {detail(value, note)}")
+
+
+def detail(value: str, note: str) -> str:
+    return " ".join(part for part in (value, note) if part)
 
 
 def run_out(args: list[str]) -> str:
@@ -71,9 +79,11 @@ def table_count(table: str) -> int | None:
 
 def main() -> int:
     print(f"\n>>> Locating latest backup in {S3_BUCKET}")
-    listing = [line.split()[-1]
-               for line in run_out(["aws", "s3", "ls", f"{S3_BUCKET}/"]).splitlines()
-               if line.split()]
+    listing: dict[str, int] = {}
+    for line in run_out(["aws", "s3", "ls", f"{S3_BUCKET}/"]).splitlines():
+        parts = line.split()
+        if len(parts) == 4 and parts[2].isdigit():
+            listing[parts[3]] = int(parts[2])
     dump_names = sorted(name for name in listing
                         if name.startswith("postgres_clerk") and "manifest" not in name)
     if not dump_names:
@@ -81,27 +91,30 @@ def main() -> int:
     dump_name = dump_names[-1]
     manifest_name = re.sub(r"\.sql(\.gpg)?$", "", dump_name) + ".manifest.json"
     client_names = sorted(name for name in listing if name.startswith("client_info"))
+    client_name = client_names[-1] if client_names else None
     print(f">>> Latest dump: {dump_name}")
 
     print("\n>>> Checking backup freshness")
+    dump_time = None
     match = re.fullmatch(r"postgres_clerk_[a-z]+_(\d+)\.sql(\.gpg)?", dump_name)
     if match:
-        age = int((time.time() - int(match.group(1))) / 3600)
+        dump_time = int(match.group(1))
+        age = int((time.time() - dump_time) / 3600)
         # The backup is nightly and the scheduled check runs an hour after
         # it, so a healthy latest dump is about an hour old. One missed
         # night is worth flagging; more than two days means backups have
         # stopped.
         if age <= 26:
-            record("backup freshness", "PASS", f"latest dump is {age}h old")
+            record("Backup recency", "PASS", f"{age}h", "old")
         elif age <= 50:
-            record("backup freshness", "WARN",
-                   f"latest dump is {age}h old; a nightly backup may have been missed")
+            record("Backup recency", "WARN", f"{age}h",
+                   "old; a nightly backup may have been missed")
         else:
-            record("backup freshness", "FAIL",
-                   f"latest dump is {age}h old; nightly backups appear to have stopped")
+            record("Backup recency", "FAIL", f"{age}h",
+                   "old; nightly backups appear to have stopped")
     else:
-        record("backup freshness", "WARN",
-               f"could not parse a timestamp from {dump_name}")
+        record("Backup recency", "WARN",
+               note=f"could not parse a timestamp from {dump_name}")
 
     print(f"\n>>> Restoring {dump_name} into scratch database {DB_NAME}")
     subprocess.run(["dropdb", "--if-exists", DB_NAME], check=True)
@@ -114,10 +127,11 @@ def main() -> int:
     errors = [line for line in restore.stderr.splitlines()
               if line.startswith("pg_restore:")]
     if not any([restore.returncode, dec.wait(), fetch.wait()]) and not errors:
-        record("pg_restore", "PASS", "restored with no errors")
+        record("Database restore", "PASS", note="no errors")
     else:
         example = f", e.g. {errors[0][:150]}" if errors else ""
-        record("pg_restore", "FAIL", f"{len(errors)} error lines{example}")
+        record("Database restore", "FAIL", str(len(errors)),
+               f"error lines{example}")
 
     print("\n>>> Verifying row counts")
     try:
@@ -132,40 +146,54 @@ def main() -> int:
             # the dump and some tables (e.g. inbound emails) change around
             # the clock.
             ok = actual is not None and abs(actual - expected) <= max(5, expected / 100)
-            record(f"rows: {table}", "PASS" if ok else "FAIL",
-                   f"{'n/a' if actual is None else actual} restored vs {expected} at dump time")
+            record(f"{table} rows", "PASS" if ok else "FAIL",
+                   "n/a" if actual is None else f"{actual:,}",
+                   f"restored vs {expected:,} at dump time")
     else:
         # Dumps taken before the manifest feature have no manifest; fall
         # back to sanity floors so the check still means something.
-        record("manifest", "WARN", f"{manifest_name} not found; using minimum count floors")
+        record("Backup manifest", "WARN",
+               note=f"{manifest_name} not found; using minimum row floors")
         for table, floor in FLOORS.items():
             actual = table_count(table)
             ok = actual is not None and actual >= floor
-            record(f"rows: {table}", "PASS" if ok else "FAIL",
-                   f"{'n/a' if actual is None else actual} restored (floor {floor})")
+            record(f"{table} rows", "PASS" if ok else "FAIL",
+                   "n/a" if actual is None else f"{actual:,}",
+                   f"restored (floor {floor:,})")
 
     print("\n>>> Verifying client info CSV")
-    if client_names:
-        client_name = client_names[-1]
+    if client_name:
         fetch, dec = s3_stream(client_name)
         # Validate without writing the (PII-bearing) content anywhere.
         lines = sum(1 for _ in dec.stdout)
         if not any([dec.wait(), fetch.wait()]) and lines > 1:
-            record("client info CSV", "PASS",
-                   f"{client_name} decrypts and parses ({lines} lines)")
+            record("Client info", "PASS", f"{lines:,}",
+                   "lines; decrypts and parses")
         else:
-            record("client info CSV", "FAIL", f"{client_name} produced {lines} lines")
+            record("Client info", "FAIL", str(lines), "lines produced")
     else:
-        record("client info CSV", "FAIL", f"no client_info file found in {S3_BUCKET}")
+        record("Client info", "FAIL",
+               note=f"no client_info file found in {S3_BUCKET}")
 
-    overall = "FAIL" if any(result == "FAIL" for _, result, _ in RESULTS) else "PASS"
+    overall = "FAIL" if any(status == "FAIL" for _, status, _, _ in RESULTS) else "PASS"
     print("===RESTORE-CHECK-SUMMARY===")
     print(f"**Database restore check: {overall}**\n")
     print(f"Backup: `{dump_name}`\n")
     print("| Check | Result | Detail |")
     print("| --- | --- | --- |")
-    for check, result, detail in RESULTS:
-        print(f"| {check} | {result} | {detail} |")
+    for label, status, value, note in RESULTS:
+        print(f"| {label} | {status} | {detail(value, note)} |")
+    print("===RESTORE-CHECK-RESULTS===")
+    print(json.dumps({
+        "outcome": overall,
+        "dump_file": dump_name,
+        "dump_bytes": listing.get(dump_name),
+        "dump_time": dump_time,
+        "client_file": client_name,
+        "client_bytes": listing.get(client_name) if client_name else None,
+        "checks": [{"label": label, "status": status, "value": value, "note": note}
+                   for label, status, value, note in RESULTS],
+    }))
     return 0 if overall == "PASS" else 1
 
 

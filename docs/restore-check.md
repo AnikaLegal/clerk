@@ -43,7 +43,7 @@ The check itself ([check.py](../infra/restore-check/check.py)) verifies:
 
 The runner receives only the check summary (statuses and row counts), which
 it publishes on the workflow run and
-[report.sh](../infra/restore-check/report.sh) posts to Slack.
+[report.py](../infra/restore-check/report.py) posts to Slack.
 
 The workflow is configured through GitHub Actions variables and secrets:
 

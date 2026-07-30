@@ -43,7 +43,7 @@ jobs:
       shell: bash
       run: |
         cat restore-check-summary.md >> "$GITHUB_STEP_SUMMARY" 2> /dev/null || true
-        ./infra/restore-check/report.sh
+        ./infra/restore-check/report.py
       env:
         OUTCOME: ${{ steps.check.outcome == 'success' && 'PASS' || 'FAIL' }}
         RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
