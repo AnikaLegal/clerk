@@ -205,7 +205,7 @@ def check_row_counts(backup: Backup) -> None:
         # Dumps taken before the manifest feature have no manifest; fall
         # back to sanity floors so the check still means something.
         record("Backup manifest", "WARN",
-               note=f"{backup.manifest_name} not found; using minimum row floors")
+               note="missing; using minimum row floors")
         for table, floor in FLOORS.items():
             actual = table_count(table)
             ok = actual is not None and actual >= floor

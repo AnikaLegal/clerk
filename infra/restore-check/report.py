@@ -54,6 +54,12 @@ def text_run(text: str, **style: bool) -> dict:
     return run
 
 
+def spacer() -> dict:
+    # Block Kit has no spacer block; an effectively-empty section renders
+    # as a little vertical white space.
+    return {"type": "section", "text": mrkdwn(" ")}
+
+
 # --- Message assembly -------------------------------------------------------
 
 
@@ -160,10 +166,7 @@ def footer_blocks() -> list[dict]:
         parts.append(f"<{os.environ['RUN_URL']}|Workflow run>")
     if not parts:
         return []
-    return [
-        {"type": "divider"},
-        {"type": "context", "elements": [mrkdwn(" - ".join(parts))]},
-    ]
+    return [{"type": "context", "elements": [mrkdwn(" - ".join(parts))]}]
 
 
 def build_payload(results: dict | None, outcome: str) -> dict:
@@ -184,7 +187,7 @@ def build_payload(results: dict | None, outcome: str) -> dict:
     if fields := metadata_fields(results or {}):
         blocks.append({"type": "section", "fields": fields})
     if checks:
-        blocks.append(checks_table(checks))
+        blocks += [spacer(), checks_table(checks), spacer()]
     blocks += footer_blocks()
 
     return {"text": summary.notify, "blocks": blocks}
