@@ -59,6 +59,9 @@ the restore has the passphrase available.
 The [offline backups script](../infra/offline-backup.sh) includes a convenience
 option to decrypt a backup with the user-supplied passphrase.
 
+Backups are tested regularly to make sure they actually restore: see
+[restore-check.md](./restore-check.md).
+
 ## Storage
 
 The dumps live in two private S3 buckets, one for production and one for staging,
