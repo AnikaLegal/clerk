@@ -208,6 +208,25 @@ data "aws_iam_policy_document" "ci" {
     }
   }
 
+  # The provider sets instance_initiated_shutdown_behavior with a separate
+  # ModifyInstanceAttribute call after launch, so CI may set exactly that
+  # attribute, on its own tagged instances, and nothing else.
+  statement {
+    sid       = "ModifyOnlyTaggedInstancesShutdownBehaviour"
+    actions   = ["ec2:ModifyInstanceAttribute"]
+    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.account_id}:instance/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/Purpose"
+      values   = ["restore-check"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:Attribute"
+      values   = ["InstanceInitiatedShutdownBehavior"]
+    }
+  }
+
   statement {
     sid       = "TunnelThroughEndpoint"
     actions   = ["ec2-instance-connect:OpenTunnel"]
