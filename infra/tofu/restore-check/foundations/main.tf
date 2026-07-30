@@ -220,10 +220,13 @@ data "aws_iam_policy_document" "ci" {
       variable = "ec2:ResourceTag/Purpose"
       values   = ["restore-check"]
     }
+    # IfExists with both documented casings: pins the attribute when EC2
+    # provides the context key, and falls back to the tag fence when the
+    # call shape omits it (absent key + plain StringEquals would deny).
     condition {
-      test     = "StringEquals"
+      test     = "StringEqualsIfExists"
       variable = "ec2:Attribute"
-      values   = ["InstanceInitiatedShutdownBehavior"]
+      values   = ["InstanceInitiatedShutdownBehavior", "instanceInitiatedShutdownBehavior"]
     }
   }
 
