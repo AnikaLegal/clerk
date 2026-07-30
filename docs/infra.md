@@ -108,6 +108,10 @@ To rebuild the server from scratch: launch a new Ubuntu instance, run the three 
 
 The scripts pin the versions of software that matter for reproducing the server: PostgreSQL, Docker Engine and the AWS CLI. Each pin is a variable at the top of the relevant script, plus an `ARG` in `Dockerfile.base` for the PostgreSQL client tools, whose major version must match the database server or backups taken with one may not restore with the other. When bumping a pin, upgrade the live server to match.
 
+## Infrastructure as code
+
+The AWS resources behind the [restore check](./restore-check.md) - an OpenTofu state bucket, an EC2 Instance Connect Endpoint, security groups and a CI IAM user - are defined with [OpenTofu](https://opentofu.org) under [infra/tofu](../infra/tofu). This is the first slice of describing the cloud state as code: the rest of the AWS account (buckets, IAM, AWS Backup, DNS) is still console-managed and documented on these pages, and new AWS resources should be added under [infra/tofu](../infra/tofu) rather than made by hand. See [infra/tofu/README.md](../infra/tofu/README.md) for the layout.
+
 ## External services
 
 | Service | Role | More info |

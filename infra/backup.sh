@@ -61,6 +61,9 @@ DB_PATH="$S3_BUCKET/$DB_FILE"
 CLIENT_FILE="client_info_${COMPOSE_SUFFIX}_${TIME}.csv${ext}"
 CLIENT_PATH="$S3_BUCKET/$CLIENT_FILE"
 
+MANIFEST_FILE="postgres_clerk_${COMPOSE_SUFFIX}_${TIME}.manifest.json"
+MANIFEST_PATH="$S3_BUCKET/$MANIFEST_FILE"
+
 echo -e "\n>>> Setting up SSH"
 mkdir ~/.ssh
 echo -e "$CLERK_PRIVATE_SSH_KEY" >~/.ssh/id_ed25519
@@ -89,5 +92,25 @@ docker compose --project-name task \
     run --pull always --no-deps --rm web python manage.py export_client_info |
     "${encrypt[@]}" |
     aws s3 cp - $CLIENT_PATH
+
+# Row count manifest, used by the restore check workflow to verify that a
+# restored copy of the backup is complete. Contains no sensitive data, so it
+# is uploaded unencrypted.
+MANIFEST_SQL="SELECT json_build_object(
+    'dump_file', '$DB_FILE',
+    'server_version', current_setting('server_version'),
+    'counts', json_build_object(
+        'auth_user', (SELECT count(*) FROM auth_user),
+        'core_client', (SELECT count(*) FROM core_client),
+        'core_issue', (SELECT count(*) FROM core_issue),
+        'emails_email', (SELECT count(*) FROM emails_email),
+        'wagtailcore_page', (SELECT count(*) FROM wagtailcore_page)
+    )
+);"
+echo -e "\n>>> Streaming row count manifest from host $CLERK_HOST to $MANIFEST_PATH"
+docker compose --project-name task \
+    --file docker/docker-compose.${COMPOSE_SUFFIX}.yml \
+    run --no-deps --rm web psql --tuples-only --no-align --command "$MANIFEST_SQL" |
+    aws s3 cp - $MANIFEST_PATH
 
 echo -e "\n>>> Finished backup"
