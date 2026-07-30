@@ -18,6 +18,8 @@ reporting.
 """
 
 import argparse
+import csv
+import io
 import json
 import os
 import re
@@ -221,12 +223,33 @@ def check_client_csv(backup: Backup) -> None:
                note=f"no client_info file found in {S3_BUCKET}")
         return
     fetch, dec = s3_stream(backup.client_name)
+    if dec.stdout is None:  # cannot happen: s3_stream always pipes stdout
+        record("Client info", "FAIL", note="no decryption stream was produced")
+        return
     # Validate without writing the (PII-bearing) content anywhere.
-    lines = sum(1 for _ in dec.stdout)
-    if not any([dec.wait(), fetch.wait()]) and lines > 1:
-        record("Client info", "PASS", f"{lines:,}", "lines; decrypts and parses")
+    reader = csv.reader(io.TextIOWrapper(dec.stdout, encoding="utf-8", newline=""))
+    try:
+        header = next(reader, [])
+        rows = ragged = 0
+        for row in reader:
+            rows += 1
+            ragged += len(row) != len(header)
+    except (csv.Error, UnicodeDecodeError) as error:
+        dec.kill()
+        fetch.kill()
+        record("Client info", "FAIL", note=f"does not parse as CSV: {error}")
+        return
+    if any([dec.wait(), fetch.wait()]):
+        record("Client info", "FAIL",
+               note="decryption or download exited non-zero (see the log)")
+    elif not header or not rows:
+        record("Client info", "FAIL", str(rows), "data rows produced")
+    elif ragged:
+        record("Client info", "FAIL", f"{ragged:,}",
+               f"of {rows:,} rows do not match the {len(header)}-column header")
     else:
-        record("Client info", "FAIL", str(lines), "lines produced")
+        record("Client info", "PASS", f"{rows:,}",
+               f"rows of {len(header)} columns; decrypts and parses")
 
 
 # --- Output -------------------------------------------------------------------
