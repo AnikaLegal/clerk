@@ -64,6 +64,9 @@ region outage - [`restore-db-backup.sh`](../infra/restore-db-backup.sh) restores
 recovery point (the latest by default) from either AWS Backup vault, regular or
 air-gapped, into a fresh bucket, from which the dumps can be decrypted as above.
 
+Backups are tested regularly to make sure they actually restore: see
+[restore-check.md](./restore-check.md).
+
 ## Storage
 
 The dumps live in two private S3 buckets, one for production and one for staging,

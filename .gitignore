@@ -16,3 +16,8 @@ test_media/
 
 # frontend
 node_modules/
+
+# OpenTofu (the .terraform.lock.hcl lock files ARE committed)
+.terraform/
+*.tfstate
+*.tfstate.*
