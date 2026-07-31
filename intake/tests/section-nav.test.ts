@@ -75,13 +75,15 @@ describe('navigableSections', () => {
     // Fully answered, then jumped back to an About-you page.
     const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
     const nav = navigableSections(survey, visited)
-    // 1 (About you) is current; 0 backward, 2-5 forward - all reachable.
-    expect(keys(nav)).toEqual([0, 2, 3, 4, 5])
+    // 1 (About you) is current; 0 backward, 2-6 forward - all reachable,
+    // including the final Submit step.
+    expect(keys(nav)).toEqual([0, 2, 3, 4, 5, 6])
     // Each lands on the section's first visible page.
     expect(nav.get(0)).toBe('ELIGIBILITY_ISSUE')
     expect(nav.get(2)).toBe('REPAIRS_ABOUT')
     expect(nav.get(3)).toBe('PROPERTY_TENANCY')
     expect(nav.get(5)).toBe('IMPACT_ABOUT')
+    expect(nav.get(6)).toBe('SUBMIT')
   })
 
   it('drops forward sections when an answer now triggers an exit', () => {
@@ -96,8 +98,8 @@ describe('navigableSections', () => {
 
   it('offers the forward sections again once the exit answer is cleared', () => {
     const { survey, visited } = setUp(FULL, 'ELIGIBILITY_LOCATION')
-    // Getting started is current; About you onward are all reachable.
-    expect(keys(navigableSections(survey, visited))).toEqual([1, 2, 3, 4, 5])
+    // Getting started is current; About you through Submit are all reachable.
+    expect(keys(navigableSections(survey, visited))).toEqual([1, 2, 3, 4, 5, 6])
   })
 
   it('keeps the end locked when an exit sits ahead, even after stepping back behind it', () => {
@@ -105,13 +107,13 @@ describe('navigableSections', () => {
     // ELIGIBILITY_LOCATION, then stepped back to the page before it. The exit
     // now sits between the user and everything past it. The forward walk still
     // reaches the exit page and stops there, so nothing beyond it is offered -
-    // SUBMIT (the furthest page, in section 5) least of all.
+    // the Submit step (the furthest page, section 6) least of all.
     const { survey, visited } = setUp(
       { ...FULL, IS_VICTORIAN_TENANT: false },
       'ELIGIBILITY_ISSUE'
     )
     const nav = navigableSections(survey, visited)
-    expect(nav.has(5)).toBe(false)
+    expect(nav.has(6)).toBe(false)
     expect(keys(nav)).toEqual([])
   })
 

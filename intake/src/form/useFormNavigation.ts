@@ -298,10 +298,11 @@ export const useFormNavigation = ({
       reviewToggleItem.visible = onSubmit
       if (!onSubmit) setReviewOpen(false)
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
-      // The count follows the stepper: hidden wherever section is -1, i.e. on
-      // the WELCOME and SUBMIT pages.
+      // The count shows only on the counted question pages: hidden on WELCOME
+      // (section -1) and on SUBMIT, which sits past the counted total (the
+      // stepper still shows there as the final Submit step).
       pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
-      pageCountItem.visible = p.section >= 0
+      pageCountItem.visible = p.section >= 0 && p.page <= p.pageCount
       setProgress({
         ...p,
         direction: goingForward.current ? 'forward' : 'back',

@@ -6,7 +6,9 @@ interface Props {
   // Index of the current section in SECTIONS (drives the visual dots).
   current: number
   // Current page number and total, surfaced to assistive tech in the nav label
-  // (the visible "Page x of y" lives in the survey footer).
+  // (the visible "Page x of y" lives in the survey footer). On the final
+  // SUBMIT page, page sits past the counted total and the label drops the
+  // page fragment.
   page: number
   pageCount: number
   // Sections the user can jump to right now (index -> first visible page),
@@ -35,7 +37,11 @@ export const SectionProgress = ({
 }: Props) => (
   <nav
     className="intake-progress"
-    aria-label={`Form progress, page ${page} of ${pageCount}`}
+    aria-label={
+      page <= pageCount
+        ? `Form progress, page ${page} of ${pageCount}`
+        : 'Form progress'
+    }
   >
     <div className="intake-progress__steps">
       {SECTIONS.map((section, idx) => {

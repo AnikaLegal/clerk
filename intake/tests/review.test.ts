@@ -109,8 +109,9 @@ describe('firstVisiblePageOfSection', () => {
   it('returns the first visible page of a section', () => {
     const survey = setUp(FULL)
     expect(firstVisiblePageOfSection(survey, 0)).toBe('ELIGIBILITY_ISSUE')
-    // The submit page's own section resolves to its first (editable) page.
     expect(firstVisiblePageOfSection(survey, 5)).toBe('IMPACT_ABOUT')
+    // The final Submit section is the agreement page itself.
+    expect(firstVisiblePageOfSection(survey, 6)).toBe('SUBMIT')
   })
 
   it('skips pages on a branch the user is not taking', () => {

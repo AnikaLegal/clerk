@@ -409,6 +409,15 @@ header .h-\[63px\] img {
   background-color: var(--color-primary);
 }
 
+/* With seven steps (Submit included) the row is tight on phone widths: drop
+   the bars' side margins there so the dots and bars fit within the padded
+   container instead of spilling past it. */
+@media (max-width: 480px) {
+  .intake-progress__bar {
+    margin: 0;
+  }
+}
+
 /* Submit-page answer review (see comps/AnswerReview): a summary of the user's
    answers grouped by section, each with an Edit link back into the form. It is
    disclosed by the ghost "Review your answers" button in the survey navigation
