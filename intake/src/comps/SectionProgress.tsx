@@ -18,9 +18,9 @@ interface Props {
 }
 
 /**
- * A section-based progress stepper (Getting started / About you / ...), shown
- * above the survey. A row of connected dots with the current section's label
- * beneath it, earlier sections marked done. Completed / already-answered
+ * A section-based progress stepper (Getting started / Getting in touch / ...),
+ * shown above the survey. A row of connected dots with the current section's
+ * label beneath it, earlier sections marked done. Completed / already-answered
  * sections are buttons the user can click to jump straight to that section's
  * first page (backward, or forward when the pages in between are all answered);
  * see form/section-nav.ts for what counts as navigable. It is a navigation

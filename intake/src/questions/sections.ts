@@ -1,6 +1,6 @@
 // Section groupings for the progress indicator: the previous intake form's six
-// stages (Getting started / About you / ...) plus a final Submit step. Each
-// page belongs to exactly one section; tests/sections.test.ts asserts the
+// stages (Getting started / Getting in touch / ...) plus a final Submit step.
+// Each page belongs to exactly one section; tests/sections.test.ts asserts the
 // mapping covers every page in PAGES so it can't silently drift when pages are
 // added or renamed.
 export interface IntakeSection {
@@ -21,7 +21,7 @@ export const SECTIONS: IntakeSection[] = [
     ],
   },
   {
-    label: 'About you',
+    label: 'Getting in touch',
     pages: ['ABOUT_EMAIL', 'ABOUT_NAME', 'ABOUT_CONTACT'],
   },
   {
@@ -57,7 +57,7 @@ export const SECTIONS: IntakeSection[] = [
     pages: ['LANDLORD_AGENT', 'LANDLORD_DETAILS'],
   },
   {
-    label: 'More about you',
+    label: 'About you',
     pages: ['IMPACT_ABOUT', 'IMPACT_CIRCUMSTANCES', 'IMPACT_REFERRER'],
   },
   // The final agreement page gets its own step, so the stepper shows the whole

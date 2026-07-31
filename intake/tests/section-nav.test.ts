@@ -75,7 +75,7 @@ describe('navigableSections', () => {
     // Fully answered, then jumped back to an About-you page.
     const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
     const nav = navigableSections(survey, visited)
-    // 1 (About you) is current; 0 backward, 2-6 forward - all reachable,
+    // 1 (Getting in touch) is current; 0 backward, 2-6 forward - all reachable,
     // including the final Submit step.
     expect(keys(nav)).toEqual([0, 2, 3, 4, 5, 6])
     // Each lands on the section's first visible page.
@@ -98,7 +98,8 @@ describe('navigableSections', () => {
 
   it('offers the forward sections again once the exit answer is cleared', () => {
     const { survey, visited } = setUp(FULL, 'ELIGIBILITY_LOCATION')
-    // Getting started is current; About you through Submit are all reachable.
+    // Getting started is current; Getting in touch through Submit are all
+    // reachable.
     expect(keys(navigableSections(survey, visited))).toEqual([1, 2, 3, 4, 5, 6])
   })
 
@@ -118,8 +119,8 @@ describe('navigableSections', () => {
   })
 
   it('offers reachable sections mid-form, including the next section start', () => {
-    // Answered through About you, standing back on its first page, nothing past
-    // it visited yet.
+    // Answered through Getting in touch, standing back on its first page,
+    // nothing past it visited yet.
     const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL', 'ABOUT_CONTACT')
     const nav = navigableSections(survey, visited)
     // Getting started is complete behind us, and Your problem's first page is

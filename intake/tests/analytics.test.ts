@@ -35,12 +35,16 @@ describe('analytics events', () => {
   })
 
   it('onFormStep sends form_step with the funnel parameters', () => {
-    events.onFormStep({ index: 3, name: 'ABOUT_EMAIL', section: 'About you' })
+    events.onFormStep({
+      index: 3,
+      name: 'ABOUT_EMAIL',
+      section: 'Getting in touch',
+    })
     expect(gtag).toHaveBeenCalledWith('event', 'form_step', {
       form_id: 'intake',
       step_index: 3,
       step_name: 'ABOUT_EMAIL',
-      section: 'About you',
+      section: 'Getting in touch',
     })
   })
 

@@ -61,7 +61,7 @@ export const PAGES: IntakePage[] = [
     questions: ['ELIGIBILITY_NOTES'],
   },
 
-  // About you
+  // Getting in touch
   { name: EMAIL_PAGE, questions: ['EMAIL'] },
   {
     name: 'ABOUT_NAME',
