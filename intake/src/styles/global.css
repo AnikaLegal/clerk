@@ -83,19 +83,13 @@ header .h-\[63px\] img {
   transition: background-color 0.15s ease;
 }
 
-/* Secondary variant for nav buttons (e.g. "I don't have an email address"):
-   a soft primary tint instead of the solid fill, so it reads as an
-   alternative to the primary Next action. Overrides the solid colours above. */
-.intake-form input.intake-btn-secondary {
-  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
-}
-
 /* Hover / focus effects matching the website's daisyUI buttons: darken the
    fill on hover (daisyUI mixes 7% black), and show a clear focus ring on
    keyboard focus. We use :focus-visible with an explicit primary-coloured
    outline so the ring only appears for keyboard users and is actually visible
-   (the site's own buttons focus to a same-colour/invisible outline). */
+   (the site's own buttons focus to a same-colour/invisible outline). These
+   sit before the variant rules below so an equal-specificity variant hover
+   (outline / forward / secondary) wins the tie on source order. */
 .intake-form input.d-btn:hover {
   background-color: color-mix(in oklab, var(--color-primary), #000 7%);
 }
@@ -105,8 +99,188 @@ header .h-\[63px\] img {
   outline-offset: 2px;
 }
 
+/* Secondary variant for nav buttons (e.g. "I don't have an email address"):
+   a soft primary tint instead of the solid fill, so it reads as an
+   alternative to the primary Next action. Overrides the solid colours above. */
+.intake-form input.intake-btn-secondary {
+  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+}
+
 .intake-form input.intake-btn-secondary:hover {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
+}
+
+/* The survey footer's buttons take the design handoff's footer metrics
+   exactly: 44px control height, 8px radius, 600-weight 13px system-ui
+   labels. Scoped to the navigation bar so the splash-page buttons keep the
+   site's pill styling. */
+.intake-form .sd-body__navigation input.d-btn {
+  height: 44px;
+  border-radius: 8px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  /* The site's button styles force grayscale antialiasing, which on macOS
+     renders the white-on-blue label visibly thinner than the design (which
+     leaves smoothing at the default). Restore the default subpixel
+     rendering so the 600 weight reads as bold as the design's. */
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Outline variant, used by the Back button per the design handoff: white
+   surface, hairline border and secondary text (the design's #cfccc5 /
+   #5c5850 tokens - ~5.9:1 on white, AA). Overrides the solid colours above.
+   On hover the surface tints and the border firms up, per the design's
+   directional hover treatment (5d); the arrow movement lives on the wrapper
+   pseudo-elements below. */
+.intake-form input.intake-btn-outline {
+  /* Back is a compact fixed-width button, visibly smaller than the primary
+     action beside it. */
+  width: 90px;
+  min-width: 0;
+  background-color: #fff;
+  border-color: #cfccc5;
+  color: #5c5850;
+  /* No drop shadow (daisyUI gives every d-btn one): flat outline per the
+     design's Back button. */
+  box-shadow: none;
+  transition:
+    background-color 0.13s ease,
+    border-color 0.13s ease;
+}
+
+.intake-form input.intake-btn-outline:hover {
+  background-color: #f4f2ee;
+  border-color: #b5b0a8;
+}
+
+/* The forward button (Continue / Submit) darkens a full step on hover, per
+   the design's hover treatments; ~20% black keeps white text comfortably
+   above 4.5:1. A wide floor (up from the design's 150px) and 22px side
+   padding make it always read larger than Back - much wider than its own
+   label needs; longer labels ("Let's get started") still grow past it. */
+.intake-form input.intake-btn-forward {
+  min-width: 220px;
+  padding: 0 22px;
+  color: #fff;
+  transition: background-color 0.13s ease;
+}
+
+.intake-form input.intake-btn-forward:hover {
+  background-color: color-mix(in oklab, var(--color-primary), #000 20%);
+}
+
+/* Per the design's narrow frame: the primary action stretches to fill the
+   rest of the footer row. */
+@media (max-width: 650px) {
+  .intake-form .sd-body__navigation .sv-action:has(input.intake-btn-forward) {
+    flex: 1 1 auto;
+  }
+
+  .intake-form input.intake-btn-forward {
+    width: 100%;
+  }
+}
+
+/* The design's directional hover (5d): each nav button carries a persistent
+   arrow pointing its direction of travel, and on hover the arrow slides 3px
+   that way while the button itself stays put (and merely darkens, above).
+   SurveyJS renders the buttons as <input>s, which can't hold markup or
+   pseudo-elements, so the arrows render on the buttons' .sv-action wrappers,
+   absolutely positioned so each arrow-label group reads centred with the
+   design's ~6px gap: Back's label is nudged right of centre by asymmetric
+   padding with the arrow in the space left of it; the forward arrow hangs
+   off the centred label's right at 50% plus half the "Continue" label. They
+   are decorative: the labels carry the meaning, and pointer-events stays off
+   so clicks pass through. */
+.intake-form input.intake-btn-outline {
+  padding: 0 4px 0 20px;
+}
+
+.intake-form .sd-body__navigation .sv-action:has(input.intake-btn-outline),
+.intake-form .sd-body__navigation .sv-action:has(input.intake-btn-forward) {
+  position: relative;
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-outline)::before,
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-forward)::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.16s ease;
+  pointer-events: none;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  /* The browser promotes a focused input to its own paint layer, which would
+     lift it over a z-index:auto pseudo-element - the arrow vanished while
+     the button held focus. An explicit z-index keeps the arrows on top. */
+  z-index: 1;
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-outline)::before {
+  content: '\2190';
+  left: 22px;
+  color: #5c5850;
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-forward)::after {
+  content: '\2192';
+  left: calc(50% + 36px);
+  color: #fff;
+}
+
+/* The WELCOME page's "Let's get started" button carries no arrow: its wider
+   label would run under the centre-anchored arrow, and as the form's opening
+   action it doesn't need the directional cue. */
+.intake-form--welcome
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-forward)::after {
+  content: none;
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-outline:hover)::before {
+  transform: translate(-3px, -50%);
+}
+
+.intake-form
+  .sd-body__navigation
+  .sv-action:has(input.intake-btn-forward:hover)::after {
+  transform: translate(3px, -50%);
+}
+
+/* Per the design: reduced motion drops the slide and keeps the darken. */
+@media (prefers-reduced-motion: reduce) {
+  .intake-form
+    .sd-body__navigation
+    .sv-action:has(input.intake-btn-outline)::before,
+  .intake-form
+    .sd-body__navigation
+    .sv-action:has(input.intake-btn-forward)::after {
+    transition: none;
+  }
+
+  .intake-form
+    .sd-body__navigation
+    .sv-action:has(input.intake-btn-outline:hover)::before,
+  .intake-form
+    .sd-body__navigation
+    .sv-action:has(input.intake-btn-forward:hover)::after {
+    transform: translateY(-50%);
+  }
 }
 
 /* Every splash action button (Go back / Return home / Try again ...) shares

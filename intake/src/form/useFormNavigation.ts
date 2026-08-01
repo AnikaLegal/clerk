@@ -295,7 +295,7 @@ export const useFormNavigation = ({
       const onSubmit = survey.currentPage?.name === SUBMIT_PAGE
       reviewToggleItem.visible = onSubmit
       if (!onSubmit) setReviewOpen(false)
-      survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
+      survey.pageNextText = onWelcome ? "Let's get started" : 'Continue'
       setProgress({
         ...p,
         direction: goingForward.current ? 'forward' : 'back',
@@ -399,14 +399,21 @@ export const useFormNavigation = ({
       attemptSubmit()
     }
 
-    // SurveyJS doesn't render an action's ariaExpanded onto the button, so
-    // reflect the review panel's open state on the toggle element ourselves.
-    // SurveyJS re-renders the item on every page, and the render timing
-    // differs between fresh, resumed and page-change entry, so keep the
-    // attribute applied with an observer on the survey container rather than
-    // chase individual render events.
+    // Attributes SurveyJS renders wrongly for us, kept fixed with an observer
+    // on the survey container - SurveyJS re-renders the nav elements on every
+    // page, and the render timing differs between fresh, resumed and
+    // page-change entry, so observing beats chasing individual render events.
+    // The observer watches childList only, so setting attributes here cannot
+    // retrigger it.
     const container = document.querySelector('.intake-page')
     const syncNavAttributes = () => {
+      // SurveyJS copies each nav button's label into its title attribute,
+      // which browsers surface as a redundant tooltip on hover - drop them.
+      container
+        ?.querySelectorAll('.sd-body__navigation input[title]')
+        .forEach((el) => el.removeAttribute('title'))
+      // SurveyJS doesn't render an action's ariaExpanded onto the button, so
+      // reflect the review panel's open state on the toggle element ourselves.
       const toggle = container?.querySelector('.intake-review__toggle')
       const expanded = String(reviewOpenRef.current)
       if (toggle && toggle.getAttribute('aria-expanded') !== expanded) {

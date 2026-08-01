@@ -57,11 +57,12 @@ export const setUpForm = (): FormState => {
   // Restore where the returning user re-enters the form (see restorePosition).
   restorePosition(survey, visited, stored.currentPage)
 
-  // The WELCOME page's Next button reads "Let's get started"; every other page
-  // keeps the default. Set it before the first render (syncPage maintains it on
-  // later page changes) so a fresh visitor never sees the default label flash.
+  // The WELCOME page's forward button reads "Let's get started"; every other
+  // page uses the design's "Continue". Set it before the first render
+  // (syncPage maintains it on later page changes) so a fresh visitor never
+  // sees the wrong label flash.
   survey.pageNextText =
-    survey.currentPage?.name === WELCOME_PAGE ? "Let's get started" : 'Next'
+    survey.currentPage?.name === WELCOME_PAGE ? "Let's get started" : 'Continue'
 
   return { survey, saver, visited, session }
 }

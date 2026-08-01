@@ -233,6 +233,9 @@ export const buildSurveyModel = (): Model => {
     // Cap the "other" self-describe text (GENDER is the only such question) to
     // the gender DB column's length, so it can't overflow during processing.
     maxOthersLength: 64,
+    // The design's footer reads Back / Continue; setup.ts and syncPage manage
+    // the forward label per page ("Let's get started" on WELCOME).
+    pagePrevText: 'Back',
     completeText: 'Submit',
     // On completion FormPage replaces the survey with its own SubmitStatus
     // splash, so this completed page is only a one-frame guard before that
@@ -261,14 +264,18 @@ export const buildSurveyModel = (): Model => {
   // daisyUI primary buttons so they match the public website. The default
   // per-button classes carry SurveyJS's own `sd-btn` styles, which outrank
   // daisyUI's low-specificity :where() rules, so clear them and keep only the
-  // daisyUI classes.
+  // daisyUI classes. Previous additionally takes the outline look (white,
+  // bordered - see .intake-btn-outline in global.css), so the footer reads
+  // Back (secondary) then the primary action, and the forward buttons are
+  // marked so both directions carry the design's sliding hover arrows (see
+  // the directional-hover rules in global.css).
   survey.css = {
     navigationButton: 'd-btn d-btn-primary',
     bodyNavigationButton: '',
     navigation: {
-      prev: '',
-      next: '',
-      complete: '',
+      prev: 'intake-btn-outline',
+      next: 'intake-btn-forward',
+      complete: 'intake-btn-forward',
       start: '',
       preview: '',
       edit: '',
