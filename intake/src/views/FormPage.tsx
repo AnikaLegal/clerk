@@ -106,9 +106,8 @@ export const FormPage = () => {
           the view is rebuilt. */}
       <div className="intake-page">
         <div className="intake-card">
-          {/* "Page x of y" at the top of the question area, per the design's
-              question-number label. Hidden on WELCOME (section -1) and on
-              SUBMIT, which sits past the counted total. */}
+          {/* "Page x of y" at the top of the question area. Hidden on WELCOME
+              (section -1) and on SUBMIT, which sits past the counted total. */}
           {progress.section >= 0 && progress.page <= progress.pageCount && (
             <div className="intake-qcount">
               Page {progress.page} of {progress.pageCount}

@@ -18,8 +18,7 @@ export const ABOUT_QUESTIONS: IntakeQuestion[] = [
   },
   {
     // The escape hatch for users without an email address, rendered as a
-    // selectable row under the field per the design handoff (in place of the
-    // old navigation-bar button). Ticking it disables the email field, and
+    // selectable row under the field. Ticking it disables the email field, and
     // Continue exits to the no-email contact fallback (see exits.ts). Never
     // serialized: the wire contract has no such field.
     name: 'NO_EMAIL',

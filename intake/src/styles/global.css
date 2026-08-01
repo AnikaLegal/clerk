@@ -53,10 +53,9 @@ header .h-\[63px\] img {
      keeping it a translucent grey so it still reads as secondary to the
      near-black question titles. */
   --sjs-general-forecolor-light: rgba(0, 0, 0, 0.6);
-  /* The band the survey card floats on: the design handoff's canvas token
-     (#f0eee9), covering the whole form container so anything rendered around
-     the survey sits on the same band rather than floating in the white
-     header band. */
+  /* The warm canvas band the survey card floats on, covering the whole form
+     container so anything rendered around the survey sits on the same band
+     rather than floating in the white header band. */
   background-color: #f0eee9;
 }
 
@@ -111,10 +110,9 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
-/* The survey footer's buttons take the design handoff's footer metrics
-   exactly: 44px control height, 8px radius, 600-weight 13px system-ui
-   labels. Scoped to the navigation bar so the splash-page buttons keep the
-   site's pill styling. */
+/* The survey footer's buttons: 44px control height, 8px radius, 600-weight
+   13px system-ui labels. Scoped to the navigation bar so the splash-page
+   buttons keep the site's pill styling. */
 .intake-form .sd-body__navigation input.d-btn {
   height: 44px;
   border-radius: 8px;
@@ -122,19 +120,16 @@ header .h-\[63px\] img {
   font-size: 13px;
   font-weight: 600;
   /* The site's button styles force grayscale antialiasing, which on macOS
-     renders the white-on-blue label visibly thinner than the design (which
-     leaves smoothing at the default). Restore the default subpixel
-     rendering so the 600 weight reads as bold as the design's. */
+     renders the white-on-blue label visibly thinner. Restore the default
+     subpixel rendering so the 600 weight reads properly bold. */
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
 }
 
-/* Outline variant, used by the Back button per the design handoff: white
-   surface, hairline border and secondary text (the design's #cfccc5 /
-   #5c5850 tokens - ~5.9:1 on white, AA). Overrides the solid colours above.
-   On hover the surface tints and the border firms up, per the design's
-   directional hover treatment (5d); the arrow movement lives on the wrapper
-   pseudo-elements below. */
+/* Outline variant, used by the Back button: white surface, hairline border
+   and secondary text (#cfccc5 / #5c5850 - ~5.9:1 on white, AA). Overrides
+   the solid colours above. On hover the surface tints and the border firms
+   up; the arrow movement lives on the wrapper pseudo-elements below. */
 .intake-form input.intake-btn-outline {
   /* Back is a compact fixed-width button, visibly smaller than the primary
      action beside it. */
@@ -156,11 +151,11 @@ header .h-\[63px\] img {
   border-color: #b5b0a8;
 }
 
-/* The forward button (Continue / Submit) darkens a full step on hover, per
-   the design's hover treatments; ~20% black keeps white text comfortably
-   above 4.5:1. A wide floor (up from the design's 150px) and 22px side
-   padding make it always read larger than Back - much wider than its own
-   label needs; longer labels ("Let's get started") still grow past it. */
+/* The forward button (Continue / Submit) darkens a full step on hover;
+   ~20% black keeps white text comfortably above 4.5:1. A wide floor and
+   22px side padding make it always read larger than Back - much wider than
+   its own label needs; longer labels ("Let's get started") still grow past
+   it. */
 .intake-form input.intake-btn-forward {
   min-width: 220px;
   padding: 0 22px;
@@ -172,8 +167,8 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary), #000 20%);
 }
 
-/* Per the design's narrow frame: the primary action stretches to fill the
-   rest of the footer row. */
+/* On narrow screens the primary action stretches to fill the rest of the
+   footer row. */
 @media (max-width: 650px) {
   .intake-form .sd-body__navigation .sv-action:has(input.intake-btn-forward) {
     flex: 1 1 auto;
@@ -184,7 +179,7 @@ header .h-\[63px\] img {
   }
 }
 
-/* The design's directional hover (5d): each nav button carries a persistent
+/* Directional hover: each nav button carries a persistent
    arrow pointing its direction of travel, and on hover the arrow slides 3px
    that way while the button itself stays put (and merely darkens, above).
    SurveyJS renders the buttons as <input>s, which can't hold markup or
@@ -262,7 +257,7 @@ header .h-\[63px\] img {
   transform: translate(3px, -50%);
 }
 
-/* Per the design: reduced motion drops the slide and keeps the darken. */
+/* Reduced motion drops the slide and keeps the darken. */
 @media (prefers-reduced-motion: reduce) {
   .intake-form
     .sd-body__navigation
@@ -709,11 +704,10 @@ header .h-\[63px\] img {
 }
 
 /* The survey card: the page count, question area and Previous / Next bar
-   framed as one bordered card per the design handoff's frame tokens (1px
-   border #d8d5ce, 12px radius, white surface). Sized like the survey body it
-   wraps (720px, centred). overflow-x: clip (not hidden) contains the page
-   slide animation while leaving vertical overflow visible, so focus outlines
-   are never cut off. */
+   framed as one bordered card (1px #d8d5ce border, 12px radius, white
+   surface). Sized like the survey body it wraps (720px, centred).
+   overflow-x: clip (not hidden) contains the page slide animation while
+   leaving vertical overflow visible, so focus outlines are never cut off. */
 .intake-form .intake-card {
   max-width: 720px;
   margin: 0 auto;
@@ -723,9 +717,8 @@ header .h-\[63px\] img {
   overflow-x: clip;
 }
 
-/* "Page x of y" at the top of the card, above the question - the design's
-   question-number label (small, muted; #6f6f6f clears WCAG AA's 4.5:1 where
-   the design's own grey token falls short). Side padding matches the question
+/* "Page x of y" at the top of the card, above the question - small and
+   muted (#6f6f6f clears WCAG AA's 4.5:1). Side padding matches the question
    content's inset below it: 40px from sd-page normally, 24px from sd-body in
    SurveyJS's mobile mode (a container width of ~600px, so ~650px viewport
    with the band padding). */
@@ -763,8 +756,8 @@ header .h-\[63px\] img {
 }
 
 /* The Previous / Next action row, sectioned off from the questions with a
-   top rule (the design handoff's inner-rule token #ebe8e2), balanced 32px
-   (4 base units) above and below the buttons. The margin holds the rule a
+   top rule (#ebe8e2), balanced 32px (4 base units) above and below the
+   buttons. The margin holds the rule a
    fixed 32px clear of the page content - without it the gap is whatever
    bottom margin the last question happens to carry, sometimes nothing.
 

@@ -58,9 +58,9 @@ export const setUpForm = (): FormState => {
   restorePosition(survey, visited, stored.currentPage)
 
   // The WELCOME page's forward button reads "Let's get started"; every other
-  // page uses the design's "Continue". Set it before the first render
-  // (syncPage maintains it on later page changes) so a fresh visitor never
-  // sees the wrong label flash.
+  // page uses "Continue". Set it before the first render (syncPage maintains
+  // it on later page changes) so a fresh visitor never sees the wrong label
+  // flash.
   survey.pageNextText =
     survey.currentPage?.name === WELCOME_PAGE ? "Let's get started" : 'Continue'
 
