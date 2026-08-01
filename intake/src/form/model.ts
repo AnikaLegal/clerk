@@ -1,4 +1,5 @@
 import { Model, settings } from 'survey-core'
+import { DefaultLightPanelless } from 'survey-core/themes'
 
 import { LINKS } from '../consts'
 import { PAGES, QUESTIONS_BY_NAME } from '../questions'
@@ -251,6 +252,23 @@ export const buildSurveyModel = (): Model => {
     // swap. Keep it neutral - SurveyJS's default "Thank you for completing the
     // survey" would flash as success even when the submit then fails.
     completedHtml: '<h1>Submitting your answers...</h1>',
+  })
+  // The panelless variant of the default light theme: questions render flat on
+  // the page background instead of each sitting in its own white card.
+  // applyTheme writes the theme's variables as inline styles on the survey
+  // root, which would override the brand-accent and contrast variables
+  // global.css sets on .intake-form (they still cover the no-email splash
+  // survey, which is unthemed) - so merge those same overrides into the theme.
+  survey.applyTheme({
+    ...DefaultLightPanelless,
+    cssVariables: {
+      ...DefaultLightPanelless.cssVariables,
+      '--sjs-primary-backcolor': 'var(--color-primary)',
+      '--sjs-primary-backcolor-light':
+        'color-mix(in oklab, var(--color-primary) 10%, transparent)',
+      '--sjs-primary-forecolor': 'var(--color-primary-content)',
+      '--sjs-general-forecolor-light': 'rgba(0, 0, 0, 0.6)',
+    },
   })
   // Render the built-in navigation buttons (Previous / Next / Submit) as
   // daisyUI primary buttons so they match the public website. The default
