@@ -65,6 +65,8 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
     // Conditional-enabled: when false the question renders read-only (e.g. the
     // address fields are read-only while the search box fills them).
     enableIf: q.enableIf,
+    // Conditional-reset: clears the value when the expression becomes true.
+    resetValueIf: q.resetValueIf,
   }
   switch (q.type) {
     case 'DISPLAY':

@@ -34,6 +34,10 @@ const daysUntil = (value: string): number => {
  * before navigating, so returning to the form resumes mid-flow.
  */
 export const EXITS: Record<string, (data: Answers) => string | undefined> = {
+  // Not an eligibility exit: the online flow is keyed on an email address, so
+  // users without one leave for the no-email contact fallback. Triggered by
+  // the checkbox under the email field (see questions/about.ts).
+  NO_EMAIL: (d) => (d.NO_EMAIL ? ROUTES.NO_EMAIL : undefined),
   ISSUES: (d) =>
     d.ISSUES === 'INELIGIBLE_COMPENSATION'
       ? ROUTES.INELIGIBLE_COMPENSATION

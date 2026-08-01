@@ -3,12 +3,30 @@ import { IntakeQuestion } from '../form/types'
 export const ABOUT_QUESTIONS: IntakeQuestion[] = [
   {
     name: 'EMAIL',
-    required: true,
+    required: false,
     type: 'EMAIL',
     maxLength: 150,
     title: "What's the best <strong>email</strong> to reach you?",
     description:
       "We'll only use this to contact you about your request. We won't share your details.",
+    // Disabled (and no longer required) while the no-email escape hatch below
+    // is ticked, so the page visibly reflects the choice - and any typed email
+    // is cleared, so a contradictory address can't linger in the answers.
+    enableIf: '{NO_EMAIL} <> true',
+    requiredIf: '{NO_EMAIL} <> true',
+    resetValueIf: '{NO_EMAIL} = true',
+  },
+  {
+    // The escape hatch for users without an email address, rendered as a
+    // selectable row under the field per the design handoff (in place of the
+    // old navigation-bar button). Ticking it disables the email field, and
+    // Continue exits to the no-email contact fallback (see exits.ts). Never
+    // serialized: the wire contract has no such field.
+    name: 'NO_EMAIL',
+    type: 'BOOLEAN',
+    required: false,
+    uiOnly: true,
+    title: "I don't have an email address",
   },
   {
     name: 'FIRST_NAME',

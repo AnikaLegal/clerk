@@ -50,6 +50,10 @@ export interface IntakeQuestion {
   // SurveyJS conditional-enabled expression. When false the question renders
   // read-only (e.g. the address fields are read-only unless entered manually).
   enableIf?: string
+  // SurveyJS conditional-reset expression. When it becomes true the question's
+  // value is cleared (e.g. a typed email when "I don't have an email address"
+  // is ticked).
+  resetValueIf?: string
   // UI-only questions drive in-form behaviour (the address search box and its
   // manual-entry checkbox) but are never part of the wire payload - both
   // serializeAnswers and deserializeAnswers skip them.

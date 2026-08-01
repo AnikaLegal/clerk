@@ -93,6 +93,7 @@ describe('flow parity', () => {
       'NUMBER_OF_DEPENDENTS',
       'ELIGIBILITY_CIRCUMSTANCES',
       'EMAIL',
+      'NO_EMAIL',
       'FIRST_NAME',
       'LAST_NAME',
       'PREFERRED_NAME',

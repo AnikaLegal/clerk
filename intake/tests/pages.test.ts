@@ -25,6 +25,16 @@ describe('page grouping', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
+  it('clears a typed email when the no-email escape hatch is ticked', () => {
+    const survey = buildSurveyModel()
+    survey.setValue('EMAIL', 'typed@example.com')
+    survey.setValue('NO_EMAIL', true)
+    expect(survey.getValue('EMAIL')).toBeUndefined()
+    // Unticking re-enables the field but doesn't resurrect the old value.
+    survey.setValue('NO_EMAIL', false)
+    expect(survey.getValue('EMAIL')).toBeUndefined()
+  })
+
   it('keeps the home address block together on the address page', () => {
     const survey = buildSurveyModel()
     const page = survey.getPageByName('PROPERTY_ADDRESS')

@@ -16,7 +16,6 @@ import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
 import {
   BONDS_MOVE_OUT_PAGE,
-  EMAIL_PAGE,
   SECTIONS,
   sectionIndexForPage,
   SUBMIT_PAGE,
@@ -274,20 +273,16 @@ export const useFormNavigation = ({
   }, [location])
 
   useEffect(() => {
-    const { noEmailItem, notMovingOutItem, reviewToggleItem } = addNavItems(
-      survey,
-      navigate
-    )
+    const { notMovingOutItem, reviewToggleItem } = addNavItems(survey, navigate)
     // Toggle the review panel from the ghost nav-bar button; the reviewOpen
     // effect below keeps the button's label and aria-expanded in sync.
     reviewToggle.current = reviewToggleItem
     reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
-    // Keep the per-page UI in sync with the current page: the no-email button's
+    // Keep the per-page UI in sync with the current page: the exit buttons'
     // visibility and the WELCOME page's "Let's get started" button label.
     const syncPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
-      noEmailItem.visible = survey.currentPage?.name === EMAIL_PAGE
       notMovingOutItem.visible =
         survey.currentPage?.name === BONDS_MOVE_OUT_PAGE
       // The review toggle lives on the submit page only; collapse the panel

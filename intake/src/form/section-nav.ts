@@ -24,10 +24,15 @@ const canPassPage = (
   const elements = (page as unknown as { questions: PageElement[] }).questions
   for (const el of elements) {
     const question = QUESTIONS_BY_NAME[el.name]
-    if (!question || question.type === 'DISPLAY' || question.uiOnly) continue
+    if (!question || question.type === 'DISPLAY') continue
     if (!el.isVisible) continue
-    if (!visited.has(el.name)) return false
+    // A ui-only question can still carry an exit (the no-email checkbox), so
+    // check that before skipping it - but it never holds a wire answer, so it
+    // is not expected in `visited` (a server resume seeds visited from the
+    // serialized answers, which exclude ui-only questions).
     if (getExitRoute(el.name, survey.data as Answers)) return false
+    if (question.uiOnly) continue
+    if (!visited.has(el.name)) return false
   }
   return true
 }

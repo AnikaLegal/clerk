@@ -12,6 +12,12 @@ const hearingExit = (value: string) =>
   getExitRoute(HEARING, { [HEARING]: value })
 
 describe('eligibility exits', () => {
+  it('exits users without an email to the contact fallback', () => {
+    expect(getExitRoute('NO_EMAIL', { NO_EMAIL: true })).toBe(ROUTES.NO_EMAIL)
+    expect(getExitRoute('NO_EMAIL', { NO_EMAIL: false })).toBeUndefined()
+    expect(getExitRoute('NO_EMAIL', {})).toBeUndefined()
+  })
+
   it('exits to compensation scope page', () => {
     expect(getExitRoute('ISSUES', { ISSUES: 'INELIGIBLE_COMPENSATION' })).toBe(
       ROUTES.INELIGIBLE_COMPENSATION

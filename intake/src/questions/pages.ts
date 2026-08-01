@@ -1,7 +1,8 @@
 import { IntakePage } from '../form/types'
 
-// The email question lives on its own page so it can carry a dedicated "I do
-// not have an email address" button (see views/FormPage.tsx).
+// The email question lives on its own page with its no-email escape hatch: a
+// checkbox that disables the field and exits to the contact fallback on
+// Continue (see questions/about.ts and form/exits.ts).
 export const EMAIL_PAGE = 'ABOUT_EMAIL'
 
 // The final agreement page. Its Submit button performs the submit; it is not
@@ -62,7 +63,7 @@ export const PAGES: IntakePage[] = [
   },
 
   // Getting in touch
-  { name: EMAIL_PAGE, questions: ['EMAIL'] },
+  { name: EMAIL_PAGE, questions: ['EMAIL', 'NO_EMAIL'] },
   {
     name: 'ABOUT_NAME',
     questions: ['FIRST_NAME', 'LAST_NAME', 'PREFERRED_NAME'],
