@@ -49,10 +49,6 @@ export const useFormNavigation = ({
     ...readProgress(survey),
     direction: 'forward' as Direction,
   }))
-  // Sections the user can jump to right now (index -> that section's first
-  // visible page), recomputed on every page and answer change. Drives the
-  // clickable stepper. See section-nav.ts for the reachability rules.
-  const [navigable, setNavigable] = useState<Map<number, string>>(new Map())
   // Whether the submit-page answer-review panel is expanded. Toggled by the
   // ghost nav-bar button (see addNavItems), read by FormPage to render the
   // panel, and reset to false whenever the user leaves the submit page.
@@ -168,8 +164,9 @@ export const useFormNavigation = ({
     [survey, navigate, session]
   )
 
-  // Jump to a section's first page from a click on the stepper. Recomputed
-  // fresh so a stale render can't offer a page that is no longer reachable.
+  // Jump to a section's first page (see navigableSections for the
+  // reachability rules). Recomputed fresh so a stale render can't offer a
+  // page that is no longer reachable.
   const jumpToSection = useCallback(
     (sectionIndex: number) => {
       const targetPage = navigableSections(survey, visited).get(sectionIndex)
@@ -284,8 +281,8 @@ export const useFormNavigation = ({
     reviewToggle.current = reviewToggleItem
     reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
     // Keep the per-page UI in sync with the current page: the no-email button's
-    // visibility, the WELCOME page's "Let's get started" button label, the page
-    // count, and the progress stepper's active section.
+    // visibility, the WELCOME page's "Let's get started" button label and the
+    // page count.
     const syncPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
@@ -299,15 +296,13 @@ export const useFormNavigation = ({
       if (!onSubmit) setReviewOpen(false)
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
       // The count shows only on the counted question pages: hidden on WELCOME
-      // (section -1) and on SUBMIT, which sits past the counted total (the
-      // stepper still shows there as the final Submit step).
+      // (section -1) and on SUBMIT, which sits past the counted total.
       pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
       pageCountItem.visible = p.section >= 0 && p.page <= p.pageCount
       setProgress({
         ...p,
         direction: goingForward.current ? 'forward' : 'back',
       })
-      setNavigable(navigableSections(survey, visited))
     }
 
     // Send a per-page funnel event the first time each page is reached (so back
@@ -457,23 +452,15 @@ export const useFormNavigation = ({
     window.addEventListener('pagehide', flushOnPageHide)
     document.addEventListener('visibilitychange', flushOnHidden)
 
-    // An answer change (not just a page change) can change how far forward is
-    // reachable - a branching answer reveals/hides pages, an exit answer
-    // collapses the run - so recompute the clickable sections live.
-    const onValueChanged = () =>
-      setNavigable(navigableSections(survey, visited))
-
     survey.onCurrentPageChanging.add(onPageChanging)
     survey.onCurrentPageChanged.add(onPageChanged)
     survey.onComplete.add(onComplete)
-    survey.onValueChanged.add(onValueChanged)
     return () => {
       window.removeEventListener('pagehide', flushOnPageHide)
       document.removeEventListener('visibilitychange', flushOnHidden)
       survey.onCurrentPageChanging.remove(onPageChanging)
       survey.onCurrentPageChanged.remove(onPageChanged)
       survey.onComplete.remove(onComplete)
-      survey.onValueChanged.remove(onValueChanged)
       navObserver?.disconnect()
     }
   }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
@@ -492,5 +479,5 @@ export const useFormNavigation = ({
       ?.setAttribute('aria-expanded', String(reviewOpen))
   }, [reviewOpen])
 
-  return { progress, navigable, jumpToSection, editSection, reviewOpen }
+  return { progress, jumpToSection, editSection, reviewOpen }
 }

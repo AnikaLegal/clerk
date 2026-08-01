@@ -53,9 +53,9 @@ header .h-\[63px\] img {
      keeping it a translucent grey so it still reads as secondary to the
      near-black question titles. */
   --sjs-general-forecolor-light: rgba(0, 0, 0, 0.6);
-  /* Match the survey's own dim background so the section stepper rendered above
-     it reads as the top of the page content (where SurveyJS's progress bar
-     sat), rather than floating in the white header band. */
+  /* Extend the survey's own dim background over the whole form container so
+     anything rendered around the survey (e.g. the answer review) sits on the
+     same band rather than floating in the white header band. */
   background-color: var(--sjs-general-backcolor-dim, #f3f3f3);
 }
 
@@ -251,25 +251,6 @@ header .h-\[63px\] img {
   box-shadow: none;
 }
 
-/* Section-based progress stepper (comps/SectionProgress.tsx), shown above the
-   survey in place of SurveyJS's per-page progress bar. A row of connected dots
-   with the current section's label beneath it. */
-.intake-progress {
-  max-width: 900px;
-  margin: 0 auto;
-  /* The end dots sit at the row's edges (the bars flex to fill), so this
-     horizontal padding pulls them inward, leaving room for the current
-     section's centred label (widest under the first / last dots) to stay
-     within the page on narrow screens. */
-  padding: 12px 52px 40px;
-}
-
-.intake-progress__steps {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* "Page x of y" count, added as a navigation item (see FormPage) so it sits in
    the survey's navigation bar. Let its wrapper flex-grow to absorb the row's
    free space and right-align its content, pushing the count to the far right
@@ -303,119 +284,6 @@ header .h-\[63px\] img {
   letter-spacing: normal;
   cursor: default;
   pointer-events: none;
-}
-
-.intake-progress__step {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 3px solid transparent;
-  border-radius: 50%;
-}
-
-.intake-progress__step.is-current {
-  border-color: var(--color-primary);
-}
-
-/* A completed / answered step is a <button> that jumps to that section. The
-   site styles bare buttons as big primary buttons, so re-assert the step-circle
-   geometry with real specificity and strip that chrome - a jumpable step looks
-   identical to the plain dots, just interactive, with a soft primary halo on
-   hover / keyboard focus to read as clickable. */
-.intake-form button.intake-progress__step {
-  width: 30px;
-  height: 30px;
-  min-width: 0;
-  padding: 0;
-  border: 3px solid transparent;
-  border-radius: 50%;
-  background: none;
-  box-shadow: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  appearance: none;
-}
-
-.intake-form button.intake-progress__step:hover {
-  background-color: color-mix(in oklab, var(--color-primary) 15%, transparent);
-}
-
-/* On keyboard focus, ring the step in the primary colour like the current
-   section, but with a thinner 2px border (the current section keeps the full
-   3px), so a focused jumpable step reads as related but distinct. The base
-   border is 3px transparent and box-sizing is border-box, so only the width and
-   colour change - no outline, no layout shift, and the dot stays centred. */
-.intake-form button.intake-progress__step:focus-visible {
-  border-color: var(--color-primary);
-  border-width: 2px;
-  outline: none;
-}
-
-.intake-progress__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  /* Upcoming-step indicator. WCAG 1.4.11 wants 3:1 for graphical objects, so
-     low-vision users can see how many steps remain; #8a8a8a clears 3:1 on the
-     #f3f3f3 band where the old #ccc was only ~1.4:1. Done/current dots use the
-     brand primary below. */
-  background-color: #8a8a8a;
-}
-
-/* Done and current dots are the brand primary, and so are forward steps the
-   user can jump to (rendered as --jump buttons): a blue dot marks a reachable
-   section. Only the dots turn blue - the connector bars ahead of the current
-   step keep their grey (is-done, applied to backward bars only, is untouched),
-   so forward lines stay grey while their end dots read as clickable. */
-.intake-progress__step.is-done .intake-progress__dot,
-.intake-progress__step.is-current .intake-progress__dot,
-.intake-progress__step--jump .intake-progress__dot {
-  background-color: var(--color-primary);
-}
-
-.intake-progress__label {
-  position: absolute;
-  top: 34px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 15px;
-  font-weight: 600;
-  /* The brand primary (#428eef) is only ~3.3:1 on white, below the 4.5:1 WCAG
-     AA needs for this label's size; darken it enough to pass while keeping the
-     blue. (The done/current dots and bars stay the exact brand colour - as
-     non-text indicators they only need 3:1.) */
-  color: color-mix(in oklab, var(--color-primary), #000 20%);
-}
-
-.intake-progress__bar {
-  flex: 1;
-  /* A small minimum so the six-dot row still fits inside the padded container
-     on narrow screens (rather than overflowing and pushing the end dots back
-     out to the edges). */
-  min-width: 8px;
-  height: 2px;
-  margin: 0 2px;
-  /* Matches the upcoming dot's 3:1 grey (was #ddd, ~1.2:1). */
-  background-color: #8a8a8a;
-}
-
-.intake-progress__bar.is-done {
-  background-color: var(--color-primary);
-}
-
-/* With seven steps (Submit included) the row is tight on phone widths: drop
-   the bars' side margins there so the dots and bars fit within the padded
-   container instead of spilling past it. */
-@media (max-width: 480px) {
-  .intake-progress__bar {
-    margin: 0;
-  }
 }
 
 /* Submit-page answer review (see comps/AnswerReview): a summary of the user's

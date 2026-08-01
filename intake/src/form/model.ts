@@ -223,8 +223,8 @@ export const buildSurveyModel = (): Model => {
         expression: "iif({ISSUES} = 'BONDS', 'is (or was)', 'is')",
       },
     ],
-    // The built-in per-page progress bar is replaced by a custom section-based
-    // stepper rendered in FormPage (see comps/SectionProgress.tsx).
+    // The built-in per-page progress bar is switched off - the form renders
+    // its own section-based navigation around the survey (see views/FormPage).
     showProgressBar: false,
     // Auto-advance once every visible question on a page is answered (SurveyJS
     // waits for the whole page, and never fires when the last answer is a

@@ -5,7 +5,6 @@ import { Survey } from 'survey-react-ui'
 import { events } from '../analytics'
 import { ApiError } from '../api/client'
 import { AnswerReview } from '../comps/AnswerReview'
-import { SectionProgress } from '../comps/SectionProgress'
 import { ROUTES } from '../consts'
 import { resetFunnel } from '../form/funnel'
 import { WELCOME_PAGE } from '../form/model'
@@ -60,15 +59,14 @@ export const FormPage = () => {
   }, [survey, saver, visited, navigate])
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
-  // and read back the progress-indicator state plus the jump-to-section wiring.
-  const { progress, navigable, jumpToSection, editSection, reviewOpen } =
-    useFormNavigation({
-      survey,
-      saver,
-      visited,
-      session,
-      attemptSubmit,
-    })
+  // and read back the progress state plus the jump-to-section wiring.
+  const { progress, editSection, reviewOpen } = useFormNavigation({
+    survey,
+    saver,
+    visited,
+    session,
+    attemptSubmit,
+  })
 
   // Restore the form's title after a splash view (e.g. Go back from an exit
   // page) changed it. Matches the title the Django shell renders on load.
@@ -100,15 +98,6 @@ export const FormPage = () => {
 
   return (
     <div className={rootClass}>
-      {progress.section >= 0 && (
-        <SectionProgress
-          current={progress.section}
-          page={progress.page}
-          pageCount={progress.pageCount}
-          navigable={navigable}
-          onJump={jumpToSection}
-        />
-      )}
       {/* The outer div clips the horizontal slide; the inner is re-keyed by page
           name so the direction-aware animation in global.css replays on every
           page change. The survey Model is stable across the remount (it lives in
