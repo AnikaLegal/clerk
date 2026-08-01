@@ -213,11 +213,9 @@ export const buildSurveyModel = (): Model => {
     // The built-in per-page progress bar is switched off - the form renders
     // its own section-based navigation around the survey (see views/FormPage).
     showProgressBar: false,
-    // Auto-advance once every visible question on a page is answered (SurveyJS
-    // waits for the whole page, and never fires when the last answer is a
-    // checkbox, long text or file upload).
-    autoAdvanceEnabled: true,
-    autoAdvanceAllowComplete: false,
+    // No auto-advance: the user moves forward with the Continue button only,
+    // so answering a radio never yanks the page away mid-thought.
+    autoAdvanceEnabled: false,
     // On each page change move keyboard focus to the first question, so tabbing
     // after Previous / Next continues into the new page instead of past the
     // button that was just activated.
