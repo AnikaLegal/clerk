@@ -612,6 +612,240 @@ header .h-\[63px\] img {
   outline: none;
 }
 
+/* Offboarding template (see comps/Offboard.tsx): the skeleton every exit
+   page shares. Never styled as an error (no red), the same card frame and
+   measure as the form itself, so an offboard never looks like a different
+   product. Grey text is darkened wherever WCAG AA (4.5:1) needs it, matching
+   the greys used elsewhere in the form. */
+.intake-offboard-page {
+  padding: 32px 24px;
+}
+
+.intake-offboard {
+  /* Same measure as the survey card, so the offboard reads as the same
+     product. */
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid #d8d5ce;
+  border-radius: 12px;
+  background: #fff;
+  padding: 30px 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.intake-offboard__headline {
+  margin: 0;
+  font:
+    600 25px/1.22 system-ui,
+    sans-serif;
+  color: #1a1a1a;
+}
+
+.intake-offboard__headline[tabindex]:focus {
+  outline: none;
+}
+
+.intake-offboard__explanation {
+  margin: 0;
+  font:
+    400 14px/1.6 system-ui,
+    sans-serif;
+  color: #5c5850;
+}
+
+/* Referral cards for the body slot (see OffboardReferral): outbound links
+   presented as cards, each carrying the organisation's name and what they
+   offer, on a slightly sunken surface so they read as cards within the
+   white frame. */
+.intake-offboard__referrals {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.intake-offboard a.intake-offboard__referral {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: #fbfaf8;
+  border: 1px solid #e6e3dd;
+  border-radius: 10px;
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color 0.13s ease,
+    background-color 0.13s ease;
+}
+
+.intake-offboard a.intake-offboard__referral:hover {
+  border-color: var(--color-primary);
+  background: #fff;
+}
+
+.intake-offboard a.intake-offboard__referral:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The lookup-key section on the card's left, split off with a border. */
+.intake-offboard__referral-tag {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  border-right: 1px solid #e6e3dd;
+  font:
+    600 13px system-ui,
+    sans-serif;
+  color: #5c5850;
+}
+
+.intake-offboard__referral-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px 16px;
+}
+
+.intake-offboard__referral-name {
+  font:
+    600 14px system-ui,
+    sans-serif;
+  color: #1a1a1a;
+}
+
+.intake-offboard__referral-desc {
+  font:
+    400 12.5px/1.5 system-ui,
+    sans-serif;
+  color: #6b675f;
+}
+
+/* The one primary action (46px, 8px radius, content width with a 170px
+   floor; full width on narrow screens, matching the form's footer button).
+   Rendered as an <a> or a <button>, so both need the site's link /
+   bare-button bleed reset. */
+.intake-offboard a.intake-offboard__primary,
+.intake-form button.intake-offboard__primary {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  min-width: 170px;
+  height: 46px;
+  margin: 0;
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  box-shadow: none;
+  font:
+    600 13.5px system-ui,
+    sans-serif;
+  /* !important because the site pins its own font on bare <button>s with
+     !important. */
+  font-family: system-ui, sans-serif !important;
+  letter-spacing: normal;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  transition: background-color 0.13s ease;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+.intake-offboard a.intake-offboard__primary:hover,
+.intake-form button.intake-offboard__primary:hover {
+  background: color-mix(in oklab, var(--color-primary), #000 20%);
+  color: #fff;
+}
+
+.intake-offboard a.intake-offboard__primary:focus-visible,
+.intake-form button.intake-offboard__primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The escape links - always "Go back" first, then the home link, as text
+   links, never pills. Stacked 44px rows with full accent weight: they often
+   close the page (the data note is optional), so they carry its bottom
+   edge on their own. The accent is darkened to clear 4.5:1 at this size;
+   hover darkens a step further instead of underlining. */
+.intake-offboard__links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.intake-form button.intake-offboard__back,
+.intake-offboard a.intake-offboard__home {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  min-width: 0;
+  min-height: 44px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font:
+    600 13.5px system-ui,
+    sans-serif;
+  /* !important because the site pins its own font on bare <button>s with
+     !important - which would also swap the arrow glyph's typeface. */
+  font-family: system-ui, sans-serif !important;
+  letter-spacing: normal;
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-offboard__back:hover,
+.intake-offboard a.intake-offboard__home:hover {
+  color: color-mix(in oklab, var(--color-primary), #000 35%);
+}
+
+.intake-form button.intake-offboard__back:focus-visible,
+.intake-offboard a.intake-offboard__home:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* The data note, sectioned off with a hairline. */
+.intake-offboard__note {
+  align-self: stretch;
+  border-top: 1px solid #dcd8d1;
+  padding-top: 12px;
+  font:
+    400 11.5px/1.5 system-ui,
+    sans-serif;
+  /* Muted grey, darkened to clear 4.5:1. */
+  color: #6f6f6f;
+}
+
+@media (max-width: 650px) {
+  .intake-offboard a.intake-offboard__primary,
+  .intake-form button.intake-offboard__primary {
+    width: 100%;
+  }
+}
+
 /* The post-submit splash (SubmitStatus: saving / failure states) is a single
    short message rather than a full page, so unlike the exit / submitted pages
    it reads best centred vertically in the band. Text stays left-aligned (like

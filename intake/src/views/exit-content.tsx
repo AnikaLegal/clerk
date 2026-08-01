@@ -1,93 +1,89 @@
 import { ReactNode } from 'react'
+import { OffboardPrimary, OffboardReferral } from '../comps/Offboard'
 import { LINKS, ROUTES } from '../consts'
 
-export interface ExitPageContent {
+// A page still on the legacy splash layout (title + free-form body).
+export interface SplashExitContent {
   title: string
   body: ReactNode
 }
+
+// A page migrated to the offboarding template (see comps/Offboard). Pages
+// move over one at a time; when all have, the splash shape can go.
+export interface OffboardExitContent {
+  offboard: {
+    headline: string
+    explanation: ReactNode
+    body?: ReactNode
+    primary?: OffboardPrimary
+    dataNote?: ReactNode
+  }
+}
+
+export type ExitPageContent = SplashExitContent | OffboardExitContent
 
 // Keyed by client route (see consts.ts ROUTES). Copy is ported verbatim from
 // the old intake repo's splash views (src/views/splash/).
 export const EXIT_PAGES: Record<string, ExitPageContent> = {
   [ROUTES.INELIGIBLE_OUTSIDE_VICTORIA]: {
-    title:
-      'Unfortunately, we can currently only help with residential rental issues in Victoria, Australia',
-    body: (
-      <>
-        <p>
-          Follow the links below to find local community legal centres in your
-          state or territory that may be better placed to look into your matter.
-        </p>
-        <ul>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.clcnsw.org.au/"
-            >
-              NSW
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.actlawsociety.asn.au/for-the-public/legal-help/community-legal-centres"
-            >
-              ACT
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.clcq.org.au/"
-            >
-              QLD
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.clcsa.org.au/"
-            >
-              SA
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://communitylegalwa.org.au/need-legal-help/"
-            >
-              WA
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://nt.gov.au/law/processes/get-legal-advice/introduction"
-            >
-              NT
-            </a>
-          </li>
-          <li>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://clctas.org.au/"
-            >
-              TAS
-            </a>
-          </li>
-        </ul>
-      </>
-    ),
+    offboard: {
+      headline:
+        'We can currently only help with residential rental issues in Victoria, Australia',
+      explanation:
+        'Follow the links below to find local community legal centres in ' +
+        'your state or territory that may be better placed to look into ' +
+        'your matter.',
+      body: (
+        <div className="intake-offboard__referrals">
+          <OffboardReferral
+            name="ACT Law Society"
+            description="Find a community legal centre in the Australian Capital Territory"
+            href="https://www.actlawsociety.asn.au/for-the-public/legal-help/community-legal-centres"
+            tag="ACT"
+          />
+          <OffboardReferral
+            name="Community Legal Centres NSW"
+            description="Free legal help across New South Wales"
+            href="https://www.clcnsw.org.au/"
+            tag="NSW"
+          />
+          <OffboardReferral
+            name="NT.GOV.AU"
+            description="The Northern Territory Government's guide to getting legal advice"
+            href="https://nt.gov.au/law/processes/get-legal-advice/introduction"
+            tag="NT"
+          />
+          <OffboardReferral
+            name="Community Legal Centres Queensland"
+            description="Free legal help across Queensland"
+            href="https://www.clcq.org.au/"
+            tag="QLD"
+          />
+          <OffboardReferral
+            name="Community Legal Centres South Australia"
+            description="Free legal advice, assistance and referrals across South Australia"
+            href="https://www.clcsa.org.au/"
+            tag="SA"
+          />
+          <OffboardReferral
+            name="Community Legal Centres Tasmania"
+            description="Free legal help across Tasmania"
+            href="https://clctas.org.au/"
+            tag="TAS"
+          />
+          <OffboardReferral
+            name="Community Legal WA"
+            description="Find free legal help in Western Australia"
+            href="https://communitylegalwa.org.au/need-legal-help/"
+            tag="WA"
+          />
+        </div>
+      ),
+    },
   },
   [ROUTES.INELIGIBLE_COMPENSATION]: {
-    title: 'Unfortunately, compensation claims are outside Anika’s current scope',
+    title:
+      'Unfortunately, compensation claims are outside Anika’s current scope',
     body: (
       <>
         <p>
@@ -109,8 +105,8 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     body: (
       <>
         <p>
-          Due to our limited capacity, we must prioritise people who fall
-          within our eligibility criteria. We hope you understand.
+          Due to our limited capacity, we must prioritise people who fall within
+          our eligibility criteria. We hope you understand.
         </p>
         <p>
           If you are not eligible for free legal help, you can get legal
@@ -155,8 +151,8 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
         <p>
           Our Repairs service focuses on helping renters write a formal
           compliance request to their real estate agent or rental provider, and
-          our service ends once a Repairs Order has been obtained. Based on
-          what you&apos;ve told us, you have already obtained one.
+          our service ends once a Repairs Order has been obtained. Based on what
+          you&apos;ve told us, you have already obtained one.
         </p>
         <p>
           You may wish to contact{' '}
@@ -173,7 +169,9 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
       'Unfortunately, we can only help once your landlord or real estate agent has sent you a Notice to Vacate',
     body: (
       <>
-        <p>If you receive a Notice to Vacate, please come back and let us know.</p>
+        <p>
+          If you receive a Notice to Vacate, please come back and let us know.
+        </p>
         <p>
           For more information about the evictions process, see the{' '}
           <a
@@ -230,9 +228,13 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
           settlement with your landlord once they have applied to VCAT to claim
           your bond held at the RTBA.
         </p>
-        <p>Due to resource constraints, we are currently unable to assist when:</p>
+        <p>
+          Due to resource constraints, we are currently unable to assist when:
+        </p>
         <ul>
-          <li>you have general questions about bonds before leaving the property</li>
+          <li>
+            you have general questions about bonds before leaving the property
+          </li>
           <li>your bond is not held by the RTBA</li>
           <li>your dispute is with a co-tenant</li>
           <li>your landlord has not applied to VCAT yet</li>
