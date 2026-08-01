@@ -20,8 +20,7 @@ const isBlank = (value: unknown): boolean =>
 
 // Names of the questions currently visible on a page, in display order. A
 // hidden conditional question is excluded so its side effect / exit predicate
-// isn't evaluated against an absent answer. Reads page.questions (not
-// .elements) so questions nested inside panels are included.
+// isn't evaluated against an absent answer.
 const visibleNames = (page: { questions: PageElement[] }): string[] =>
   page.questions.filter((el) => el.isVisible).map((el) => el.name)
 

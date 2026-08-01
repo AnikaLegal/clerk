@@ -169,6 +169,22 @@ header .h-\[63px\] img {
   padding: 0;
 }
 
+/* A DISPLAY-question heading that should read as a question title (e.g. the
+   shared heading over the home-address fields), not as a page heading: mirror
+   the tokens SurveyJS's own .sd-question__title resolves to. The .sd-html hop
+   is needed to outrank the serif pin on ".intake-form .sd-html h2" below. */
+.intake-form .sd-html .intake-question-heading {
+  margin: 0;
+  font-family: var(--sjs-font-family, var(--font-family));
+  font-size: var(--sjs-font-questiontitle-size, var(--sjs-font-size, 16px));
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(
+    --sjs-font-questiontitle-color,
+    var(--sjs-general-forecolor, rgba(0, 0, 0, 0.91))
+  );
+}
+
 /* Form-level failure message (e.g. the submit request failed), shown between the
    form and the exit buttons. */
 .intake-form-error {

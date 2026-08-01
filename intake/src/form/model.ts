@@ -191,24 +191,8 @@ export const buildSurveyModel = (): Model => {
       ...PAGES.map((page) => ({
         name: page.name,
         visibleIf: page.visibleIf,
-        // A string entry is a question; a panel entry renders its questions as
-        // one visual block with a shared title. Panels are presentational only:
-        // the questions inside keep their own flat names and values.
-        elements: page.questions.map((entry) =>
-          typeof entry === 'string'
-            ? toElement(QUESTIONS_BY_NAME[entry])
-            : {
-                type: 'panel',
-                name: entry.panel,
-                title: entry.title,
-                // Panel fields sit close together under a shared title, so show
-                // each question's error below its input (as on the no-email
-                // form) instead of between the question title and the field.
-                questionErrorLocation: 'bottom',
-                elements: entry.questions.map((name) =>
-                  toElement(QUESTIONS_BY_NAME[name])
-                ),
-              }
+        elements: page.questions.map((name) =>
+          toElement(QUESTIONS_BY_NAME[name])
         ),
       })),
     ],
@@ -240,6 +224,9 @@ export const buildSurveyModel = (): Model => {
     // serializeAnswers filters out answers from branches no longer taken.
     clearInvisibleValues: 'none',
     checkErrorsMode: 'onNextPage',
+    // Show validation errors below the question's input (as on the no-email
+    // form) instead of between the question title and the field.
+    questionErrorLocation: 'bottom',
     // GENDER free text replaces the choice value rather than being stored
     // in a separate comment field.
     storeOthersAsComment: false,

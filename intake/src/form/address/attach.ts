@@ -6,7 +6,7 @@ import { loadPlaces } from './load-maps'
 import { isVictoria, parseAddressComponents } from './parse'
 import type { AddressComponentLike } from './parse'
 
-// Question names in the HOME_ADDRESS panel (see questions/property.ts).
+// Question names in the home-address block (see questions/property.ts).
 const SEARCH = 'ADDRESS_SEARCH'
 const ADDRESS = 'ADDRESS'
 const SUBURB = 'SUBURB'

@@ -91,7 +91,7 @@ describe('buildAnswerSummary', () => {
     expect(names).not.toContain('ADDRESS_MANUAL') // uiOnly
     // A bonds/eviction question is on a branch the repairs user isn't taking.
     expect(names).not.toContain('EVICTION_RETALIATORY_HAS_NOTICE')
-    // Flat address fields inside the panel are still included.
+    // The flat address fields are still included.
     expect(names).toContain('ADDRESS')
     expect(names).toContain('POSTCODE')
   })

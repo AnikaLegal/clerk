@@ -50,7 +50,7 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
     title: 'When did you start living at this property?',
     description: 'You can find this written on your lease.',
   },
-  // The home address block (grouped by the HOME_ADDRESS panel in pages.ts).
+  // The home address block (the ADDRESS_INTRO heading through POSTCODE).
   // With Google Places available, the search box drives the read-only street/
   // suburb/postcode fields below it; the manual checkbox flips them editable
   // (and required) instead. Without Places (no key: dev/CI, or script failure)
@@ -58,6 +58,15 @@ export const PROPERTY_QUESTIONS: IntakeQuestion[] = [
   // three fields are editable and required - plain manual entry.
   // MAPS_AVAILABLE / ADDRESS_SEARCH / ADDRESS_MANUAL never reach the backend:
   // the first is a bare survey.data key, the others are uiOnly questions.
+  {
+    // The block's shared heading - asked once here rather than per field.
+    // Styled to read as a question title (see .intake-question-heading in
+    // global.css), not as the page-level serif h2 the other intros use.
+    name: 'ADDRESS_INTRO',
+    type: 'DISPLAY',
+    required: false,
+    html: '<h2 class="intake-question-heading">What is the address of your rental property?</h2>',
+  },
   {
     name: 'ADDRESS_SEARCH',
     type: 'TEXT',

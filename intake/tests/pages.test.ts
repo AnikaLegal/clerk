@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildSurveyModel } from '../src/form/model'
-import { pageQuestionNames } from '../src/form/types'
 import { PAGES, QUESTIONS, QUESTIONS_BY_NAME } from '../src/questions'
 
 describe('page grouping', () => {
   it('places every question on exactly one page, in order', () => {
-    const placed = PAGES.flatMap(pageQuestionNames)
+    const placed = PAGES.flatMap((page) => page.questions)
 
     // No question appears on more than one page.
     expect(new Set(placed).size).toBe(placed.length)
@@ -26,19 +25,19 @@ describe('page grouping', () => {
     expect(new Set(names).size).toBe(names.length)
   })
 
-  it('groups the home address block into a panel with flat values', () => {
+  it('keeps the home address block together on the address page', () => {
     const survey = buildSurveyModel()
-    const panel = survey.getPanelByName('HOME_ADDRESS')
-    expect(panel).toBeTruthy()
-    expect(panel.questions.map((q) => q.name)).toEqual([
+    const page = survey.getPageByName('PROPERTY_ADDRESS')
+    expect(page.questions.map((q) => q.name)).toEqual([
+      'ADDRESS_INTRO',
       'ADDRESS_SEARCH',
       'ADDRESS_MANUAL',
       'ADDRESS',
       'SUBURB',
       'POSTCODE',
+      'WEEKLY_RENT',
     ])
-    // Panels are presentational only: the questions inside keep their own
-    // flat top-level values (the backend wire contract).
+    // The fields hold flat top-level values (the backend wire contract).
     survey.setValue('ADDRESS', '12 Example Street')
     expect((survey.data as Record<string, unknown>).ADDRESS).toBe(
       '12 Example Street'

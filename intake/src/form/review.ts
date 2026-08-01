@@ -51,8 +51,6 @@ export const buildAnswerSummary = (survey: Model): SectionSummary[] => {
       if (!visibleNames.has(pageName)) continue
       const page = survey.getPageByName(pageName)
       if (!page) continue
-      // page.questions (not .elements) flattens questions nested in panels, so
-      // the address fields inside the home-address panel are included.
       for (const question of page.questions) {
         const meta = QUESTIONS_BY_NAME[question.name]
         if (!meta || meta.type === 'DISPLAY' || meta.uiOnly) continue

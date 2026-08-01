@@ -37,7 +37,6 @@ export const restorePosition = (
   const nextPage = survey.pages.find(
     (page) =>
       page.isVisible &&
-      // page.questions (not .elements) so questions inside panels count.
       (page.questions as unknown as PageElement[]).some((el) => {
         const question = QUESTIONS_BY_NAME[el.name]
         // DISPLAY and uiOnly questions don't hold answers, so they can't make

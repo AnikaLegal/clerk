@@ -74,16 +74,6 @@ export interface IntakeQuestion {
   min?: number
 }
 
-// A group of questions rendered as a single SurveyJS panel: one visual block
-// with a shared title (e.g. the home-address search + street/suburb/postcode
-// fields). Purely presentational - the questions inside keep their own flat
-// names and values, unlike a composite question.
-export interface IntakePanel {
-  panel: string
-  title?: string
-  questions: string[]
-}
-
 // A survey page groups one or more related questions. Questions keep their
 // individual definitions (and element-level visibleIf); the page just decides
 // which ones render together. `visibleIf` is a page-level guard used when
@@ -92,16 +82,9 @@ export interface IntakePanel {
 export interface IntakePage {
   name: string
   visibleIf?: string
-  // Ordered question names on the page (including any DISPLAY intros), with
-  // panel groups inline where questions render as one block.
-  questions: (string | IntakePanel)[]
+  // Ordered question names on the page (including any DISPLAY intros).
+  questions: string[]
 }
-
-// The page's question names in display order, with panel groups flattened.
-export const pageQuestionNames = (page: IntakePage): string[] =>
-  page.questions.flatMap((entry) =>
-    typeof entry === 'string' ? entry : entry.questions
-  )
 
 import type { components } from '../api/types.generated'
 
