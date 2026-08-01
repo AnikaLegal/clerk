@@ -98,16 +98,28 @@ export const FormPage = () => {
 
   return (
     <div className={rootClass}>
-      {/* The outer div clips the horizontal slide; the inner is re-keyed by page
-          name so the direction-aware animation in global.css replays on every
-          page change. The survey Model is stable across the remount (it lives in
-          useMemo), so only the view is rebuilt. */}
+      {/* The card wraps the page count and the survey (question area + nav
+          buttons) as one bordered frame; it also clips the horizontal slide.
+          The inner div is re-keyed by page name so the direction-aware
+          animation in global.css replays on every page change. The survey
+          Model is stable across the remount (it lives in useMemo), so only
+          the view is rebuilt. */}
       <div className="intake-page">
-        <div
-          key={progress.name}
-          className={`intake-page__inner intake-page__inner--${progress.direction}`}
-        >
-          <Survey model={survey} />
+        <div className="intake-card">
+          {/* "Page x of y" at the top of the question area, per the design's
+              question-number label. Hidden on WELCOME (section -1) and on
+              SUBMIT, which sits past the counted total. */}
+          {progress.section >= 0 && progress.page <= progress.pageCount && (
+            <div className="intake-qcount">
+              Page {progress.page} of {progress.pageCount}
+            </div>
+          )}
+          <div
+            key={progress.name}
+            className={`intake-page__inner intake-page__inner--${progress.direction}`}
+          >
+            <Survey model={survey} />
+          </div>
         </div>
       </div>
       {/* Disclosed by the ghost "Review your answers" button in the survey's

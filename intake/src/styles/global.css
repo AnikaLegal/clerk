@@ -268,41 +268,6 @@ header .h-\[63px\] img {
   box-shadow: none;
 }
 
-/* "Page x of y" count, added as a navigation item (see FormPage) so it sits in
-   the survey's navigation bar. Let its wrapper flex-grow to absorb the row's
-   free space and right-align its content, pushing the count to the far right
-   (via flexbox rather than an auto margin); the bar's align-items:center keeps
-   it vertically centred with the Previous / Next buttons. Strip the
-   SurveyJS/site button styling so it reads as plain text rather than a button. */
-.intake-form .sd-body__navigation .sv-action.intake-page-count {
-  flex-grow: 1;
-}
-
-.intake-form
-  .sd-body__navigation
-  .sv-action.intake-page-count
-  .sv-action__content {
-  justify-content: flex-end;
-}
-
-.intake-form input.intake-page-count__text {
-  /* Content-sized (overriding the site's form input width:100%) so the flex
-     end-alignment on its wrapper places the text hard against the right edge. */
-  width: auto;
-  min-width: 0;
-  height: auto;
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  color: #6f6f6f;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: normal;
-  cursor: default;
-  pointer-events: none;
-}
-
 /* Submit-page answer review (see comps/AnswerReview): a summary of the user's
    answers grouped by section, each with an Edit link back into the form. It is
    disclosed by the ghost "Review your answers" button in the survey navigation
@@ -563,32 +528,63 @@ header .h-\[63px\] img {
    example - a CSS transform driven by the page change - tuned to a short,
    understated slide + fade. Honours prefers-reduced-motion.
 
-   The outer container clips the horizontal slide so an incoming page never adds
-   a transient scrollbar. overflow-x: clip (not hidden) leaves vertical overflow
-   visible, so focus outlines are never cut off. The padding floats the survey
-   card (below) off the band's edges - and gives it a side gap on viewports
-   narrower than the card's 720px max-width. */
+   The padding floats the survey card (below) off the band's edges - and gives
+   it a side gap on viewports narrower than the card's 720px max-width. */
 .intake-page {
-  overflow-x: clip;
   padding: 32px 24px;
 }
 
-/* The survey card: the question area plus its Previous / Next bar (.sd-body),
+/* The survey card: the page count, question area and Previous / Next bar
    framed as one bordered card per the design handoff's frame tokens (1px
-   border #d8d5ce, 12px radius, white surface). The panelless theme paints its
-   page background on the survey root; move it off the root so the site band
-   shows around the card instead. Scoped through .intake-page so the no-email
-   splash survey (which has its own card styling) is untouched. */
+   border #d8d5ce, 12px radius, white surface). Sized like the survey body it
+   wraps (720px, centred). overflow-x: clip (not hidden) contains the page
+   slide animation while leaving vertical overflow visible, so focus outlines
+   are never cut off. */
+.intake-form .intake-card {
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid #d8d5ce;
+  border-radius: 12px;
+  background: var(--sjs-general-backcolor, #fff);
+  overflow-x: clip;
+}
+
+/* "Page x of y" at the top of the card, above the question - the design's
+   question-number label (small, muted; #6f6f6f clears WCAG AA's 4.5:1 where
+   the design's own grey token falls short). Side padding matches the question
+   content's inset below it: 40px from sd-page normally, 24px from sd-body in
+   SurveyJS's mobile mode (a container width of ~600px, so ~650px viewport
+   with the band padding). */
+.intake-form .intake-qcount {
+  padding: 24px 40px 0;
+  font-size: 13px;
+  color: #6f6f6f;
+  text-align: right;
+  /* Optical correction: the box gaps above and below the count are equal
+     (24px), but its own half-leading and the first element's line-height
+     leading both pad the lower gap, so it reads larger. Pull the survey up
+     to even the two out visually. */
+  margin-bottom: -6px;
+}
+
+@media (max-width: 650px) {
+  .intake-form .intake-qcount {
+    padding: 24px 24px 0;
+  }
+}
+
+/* The panelless theme paints its page background on the survey root; the card
+   carries the surface now, so drop it. Scoped through .intake-page so the
+   no-email splash survey (which has its own card styling) is untouched. */
 .intake-form .intake-page .sd-root-modern {
   background: transparent;
 }
 
 .intake-form .intake-page .sd-body {
-  border: 1px solid #d8d5ce;
-  border-radius: 12px;
-  background: var(--sjs-general-backcolor, #fff);
-  /* The theme's 64px bottom padding under the nav bar; the bar's own padding
-     is enough inside the bordered card. */
+  /* Trim the theme's 48px top padding to suit the card frame, and drop its
+     64px bottom padding under the nav bar - the bar's own padding covers
+     that inside the bordered card. */
+  padding-top: calc(3 * var(--sjs-base-unit, var(--base-unit, 8px)));
   padding-bottom: 0;
 }
 

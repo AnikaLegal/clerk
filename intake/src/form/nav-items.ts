@@ -39,26 +39,10 @@ export const addNavItems = (survey: Model, navigate: NavigateFunction) => {
       navigate(ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE)
     },
   })
-  // A non-interactive "Page x of y" count rendered at the far right of the
-  // navigation bar, vertically centred with the Previous / Next buttons. Its
-  // wrapper is pushed right and its button styling stripped to plain text in
-  // global.css; disableTabStop keeps it out of the keyboard tab order. A high
-  // visibleIndex keeps it last so the right-push separates only it.
-  const pageCountItem = survey.addNavigationItem({
-    id: 'nav-page-count',
-    title: '',
-    css: 'intake-page-count',
-    innerCss: 'intake-page-count__text',
-    disableTabStop: true,
-    visibleIndex: 1000,
-    visible: false,
-    action: () => {},
-  })
   // A ghost "Review your answers" toggle shown only on the submit page, sitting
   // to the right of the Submit button. It discloses the answer-review panel;
   // its action, dynamic label and aria-expanded are wired in useFormNavigation
-  // (they track the React state that renders the panel). A visibleIndex below
-  // the page count's keeps it left of that (though the count is hidden here).
+  // (they track the React state that renders the panel).
   const reviewToggleItem = survey.addNavigationItem({
     id: 'nav-review-toggle',
     title: 'Review your answers',
@@ -67,5 +51,5 @@ export const addNavItems = (survey: Model, navigate: NavigateFunction) => {
     visible: false,
     action: () => {},
   })
-  return { noEmailItem, notMovingOutItem, pageCountItem, reviewToggleItem }
+  return { noEmailItem, notMovingOutItem, reviewToggleItem }
 }

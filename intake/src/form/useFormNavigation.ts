@@ -274,15 +274,16 @@ export const useFormNavigation = ({
   }, [location])
 
   useEffect(() => {
-    const { noEmailItem, notMovingOutItem, pageCountItem, reviewToggleItem } =
-      addNavItems(survey, navigate)
+    const { noEmailItem, notMovingOutItem, reviewToggleItem } = addNavItems(
+      survey,
+      navigate
+    )
     // Toggle the review panel from the ghost nav-bar button; the reviewOpen
     // effect below keeps the button's label and aria-expanded in sync.
     reviewToggle.current = reviewToggleItem
     reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
     // Keep the per-page UI in sync with the current page: the no-email button's
-    // visibility, the WELCOME page's "Let's get started" button label and the
-    // page count.
+    // visibility and the WELCOME page's "Let's get started" button label.
     const syncPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
@@ -295,10 +296,6 @@ export const useFormNavigation = ({
       reviewToggleItem.visible = onSubmit
       if (!onSubmit) setReviewOpen(false)
       survey.pageNextText = onWelcome ? "Let's get started" : 'Next'
-      // The count shows only on the counted question pages: hidden on WELCOME
-      // (section -1) and on SUBMIT, which sits past the counted total.
-      pageCountItem.title = `Page ${p.page} of ${p.pageCount}`
-      pageCountItem.visible = p.section >= 0 && p.page <= p.pageCount
       setProgress({
         ...p,
         direction: goingForward.current ? 'forward' : 'back',
@@ -402,30 +399,14 @@ export const useFormNavigation = ({
       attemptSubmit()
     }
 
-    // The "Page x of y" nav item renders as an <input type="button"> (SurveyJS
-    // has no non-button nav item). It is a read-only status, not a control, so
-    // hide it from assistive tech - the named progressbar already conveys
-    // progress - rather than announce a button that does nothing when
-    // activated. Both attributes are required and verified against axe-core:
-    // aria-hidden alone is an aria-hidden-focus violation because the input is
-    // still focusable (disableTabStop only sets tabindex="-1"), and disabled
-    // makes it non-focusable so the pair is clean. (No valid ARIA role turns an
-    // input button into static text - the allowed role overrides are all
-    // interactive.) SurveyJS re-renders the item on every page with the new
-    // count, and the render timing differs between fresh, resumed and
-    // page-change entry, so keep the attributes applied with an observer on the
-    // survey container rather than chase individual render events.
+    // SurveyJS doesn't render an action's ariaExpanded onto the button, so
+    // reflect the review panel's open state on the toggle element ourselves.
+    // SurveyJS re-renders the item on every page, and the render timing
+    // differs between fresh, resumed and page-change entry, so keep the
+    // attribute applied with an observer on the survey container rather than
+    // chase individual render events.
     const container = document.querySelector('.intake-page')
     const syncNavAttributes = () => {
-      const count = container?.querySelector<HTMLInputElement>(
-        '.intake-page-count__text'
-      )
-      if (count && count.getAttribute('aria-hidden') !== 'true') {
-        count.setAttribute('aria-hidden', 'true')
-        count.disabled = true
-      }
-      // SurveyJS doesn't render an action's ariaExpanded onto the button, so
-      // reflect the review panel's open state on the toggle element ourselves.
       const toggle = container?.querySelector('.intake-review__toggle')
       const expanded = String(reviewOpenRef.current)
       if (toggle && toggle.getAttribute('aria-expanded') !== expanded) {
