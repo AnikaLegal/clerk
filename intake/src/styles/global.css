@@ -564,9 +564,66 @@ header .h-\[63px\] img {
 
    The outer container clips the horizontal slide so an incoming page never adds
    a transient scrollbar. overflow-x: clip (not hidden) leaves vertical overflow
-   visible, so focus outlines are never cut off. */
+   visible, so focus outlines are never cut off. The padding floats the survey
+   card (below) off the band's edges - and gives it a side gap on viewports
+   narrower than the card's 720px max-width. */
 .intake-page {
   overflow-x: clip;
+  padding: 24px 16px;
+}
+
+/* The survey card: the question area plus its Previous / Next bar (.sd-body),
+   framed as one bordered card per the design handoff's frame tokens (1px
+   border #d8d5ce, 12px radius, white surface). The panelless theme paints its
+   page background on the survey root; move it off the root so the site band
+   shows around the card instead. Scoped through .intake-page so the no-email
+   splash survey (which has its own card styling) is untouched. */
+.intake-form .intake-page .sd-root-modern {
+  background: transparent;
+}
+
+.intake-form .intake-page .sd-body {
+  border: 1px solid #d8d5ce;
+  border-radius: 12px;
+  background: var(--sjs-general-backcolor, #fff);
+  /* The theme's 64px bottom padding under the nav bar; the bar's own padding
+     is enough inside the bordered card. */
+  padding-bottom: 0;
+}
+
+/* The Previous / Next action row, sectioned off from the questions with a
+   top rule (the design handoff's inner-rule token #ebe8e2), balanced 32px
+   (4 base units) above and below the buttons. The margin holds the rule a
+   fixed 32px clear of the page content - without it the gap is whatever
+   bottom margin the last question happens to carry, sometimes nothing.
+
+   SurveyJS's own paddings vary by mode - 56px top / 32px bottom normally,
+   but its mobile mode (sd-root-modern--mobile, below ~640px) zeroes the
+   bottom and relied on the sd-body padding removed above, which would leave
+   the buttons touching the card's bottom border. !important because the
+   mobile zeroing rule carries five classes of specificity. */
+.intake-form .intake-page .sd-body__navigation {
+  border-top: 1px solid #ebe8e2;
+  margin-top: calc(4 * var(--sjs-base-unit, var(--base-unit, 8px)));
+  padding-top: calc(4 * var(--sjs-base-unit, var(--base-unit, 8px))) !important;
+  padding-bottom: calc(
+    4 * var(--sjs-base-unit, var(--base-unit, 8px))
+  ) !important;
+}
+
+/* In mobile mode the card's side padding sits on sd-body itself, which would
+   stop the action row's top rule short of the card edges. Bleed the row out
+   over that padding and restore the same inset inside it, so the rule spans
+   the full card width and the buttons keep their alignment. */
+.intake-form .intake-page .sd-root-modern--mobile .sd-body__navigation {
+  margin-left: calc(-3 * var(--sjs-base-unit, var(--base-unit, 8px)));
+  margin-right: calc(-3 * var(--sjs-base-unit, var(--base-unit, 8px)));
+  padding-left: calc(
+    3 * var(--sjs-base-unit, var(--base-unit, 8px))
+  ) !important;
+  padding-right: calc(
+    3 * var(--sjs-base-unit, var(--base-unit, 8px))
+  ) !important;
 }
 
 .intake-page__inner--forward {
