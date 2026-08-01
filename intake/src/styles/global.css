@@ -53,10 +53,11 @@ header .h-\[63px\] img {
      keeping it a translucent grey so it still reads as secondary to the
      near-black question titles. */
   --sjs-general-forecolor-light: rgba(0, 0, 0, 0.6);
-  /* Extend the survey's own dim background over the whole form container so
-     anything rendered around the survey (e.g. the answer review) sits on the
-     same band rather than floating in the white header band. */
-  background-color: var(--sjs-general-backcolor-dim, #f3f3f3);
+  /* The band the survey card floats on: the design handoff's canvas token
+     (#f0eee9), covering the whole form container so anything rendered around
+     the survey sits on the same band rather than floating in the white
+     header band. */
+  background-color: #f0eee9;
 }
 
 /* SurveyJS renders its Previous / Next / Confirm buttons as <input> elements.
@@ -569,7 +570,7 @@ header .h-\[63px\] img {
    narrower than the card's 720px max-width. */
 .intake-page {
   overflow-x: clip;
-  padding: 24px 16px;
+  padding: 32px 24px;
 }
 
 /* The survey card: the question area plus its Previous / Next bar (.sd-body),
