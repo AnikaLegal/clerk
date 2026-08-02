@@ -30,13 +30,28 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
   {
     name: 'BONDS_MOVE_OUT_DATE',
     visibleIf: IS_BONDS,
-    // Required: users who are not moving out take the dedicated "I'm not
-    // moving out" button on this page (see views/FormPage.tsx), which exits to
-    // the bond-recovery resources page instead of answering.
-    required: true,
+    required: false,
     type: 'DATE',
     title:
       'When was, or what will be, the date you move out of your rental property?',
+    // Disabled (and no longer required) while the not-moving-out escape hatch
+    // below is ticked, so the page visibly reflects the choice - and any
+    // picked date is cleared, so a contradictory answer can't linger.
+    enableIf: '{NOT_MOVING_OUT} <> true',
+    requiredIf: '{NOT_MOVING_OUT} <> true',
+    resetValueIf: '{NOT_MOVING_OUT} = true',
+  },
+  {
+    // The escape hatch for users who are not moving out, rendered as a
+    // selectable row under the date. Ticking it disables the date field, and
+    // Continue exits to the bond-recovery resources page (see exits.ts).
+    // Never serialized: the wire contract has no such field.
+    name: 'NOT_MOVING_OUT',
+    visibleIf: IS_BONDS,
+    type: 'BOOLEAN',
+    required: false,
+    uiOnly: true,
+    title: "I'm not moving out",
   },
   {
     name: 'BOND_RTBA',

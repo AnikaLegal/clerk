@@ -53,8 +53,17 @@ export const EXITS: Record<string, (data: Answers) => string | undefined> = {
       : undefined,
   REPAIRS_APPLIED_VCAT: (d) =>
     d.REPAIRS_APPLIED_VCAT ? undefined : ROUTES.EXIT_VCAT_REPRESENTATION,
+  // Not an eligibility answer but the page's escape hatch (like NO_EMAIL):
+  // users who are not moving out leave for the bond-recovery resources page.
+  NOT_MOVING_OUT: (d) =>
+    d.NOT_MOVING_OUT ? ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE : undefined,
+  // A blank date otherwise also exits - but when the escape hatch above is
+  // ticked (which clears the date), defer to it so the funnel event names
+  // the real reason.
   BONDS_MOVE_OUT_DATE: (d) =>
-    d.BONDS_MOVE_OUT_DATE ? undefined : ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE,
+    d.BONDS_MOVE_OUT_DATE || d.NOT_MOVING_OUT
+      ? undefined
+      : ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE,
   BOND_RTBA: (d) =>
     d.BOND_RTBA ? undefined : ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE,
   BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION: (d) =>

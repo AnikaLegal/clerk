@@ -14,12 +14,7 @@ import { firstVisiblePageOfSection, navigableSections } from './section-nav'
 import { SubmissionSaver } from './save'
 import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
-import {
-  BONDS_MOVE_OUT_PAGE,
-  SECTIONS,
-  sectionIndexForPage,
-  SUBMIT_PAGE,
-} from '../questions'
+import { SECTIONS, sectionIndexForPage, SUBMIT_PAGE } from '../questions'
 
 interface FormNavigation {
   survey: Model
@@ -273,18 +268,16 @@ export const useFormNavigation = ({
   }, [location])
 
   useEffect(() => {
-    const { notMovingOutItem, reviewToggleItem } = addNavItems(survey, navigate)
+    const { reviewToggleItem } = addNavItems(survey)
     // Toggle the review panel from the ghost nav-bar button; the reviewOpen
     // effect below keeps the button's label and aria-expanded in sync.
     reviewToggle.current = reviewToggleItem
     reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
-    // Keep the per-page UI in sync with the current page: the exit buttons'
+    // Keep the per-page UI in sync with the current page: the review toggle's
     // visibility and the WELCOME page's "Let's get started" button label.
     const syncPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
-      notMovingOutItem.visible =
-        survey.currentPage?.name === BONDS_MOVE_OUT_PAGE
       // The review toggle lives on the submit page only; collapse the panel
       // whenever the user leaves, so it reopens closed next time.
       const onSubmit = survey.currentPage?.name === SUBMIT_PAGE

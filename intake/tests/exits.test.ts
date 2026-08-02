@@ -60,6 +60,7 @@ describe('eligibility exits', () => {
 
   it.each([
     ['BONDS_MOVE_OUT_DATE', null],
+    ['NOT_MOVING_OUT', true],
     ['BOND_RTBA', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', false],
     ['BONDS_HAS_LANDLORD_MADE_RTBA_APPLICATION', "I don't know"],
@@ -67,6 +68,14 @@ describe('eligibility exits', () => {
     expect(getExitRoute(name, { [name]: value })).toBe(
       ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE
     )
+  })
+
+  it('defers the blank-date exit to the not-moving-out escape hatch', () => {
+    // The ticked checkbox clears the date; the date exit stands aside so the
+    // funnel event names the checkbox as the reason.
+    expect(
+      getExitRoute('BONDS_MOVE_OUT_DATE', { NOT_MOVING_OUT: true })
+    ).toBeUndefined()
   })
 
   it('keeps in-scope bonds cases', () => {
