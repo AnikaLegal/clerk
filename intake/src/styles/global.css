@@ -640,11 +640,11 @@ header .h-\[63px\] img {
   border: 1px solid #d8d5ce;
   border-radius: 12px;
   background: #fff;
-  padding: 30px 34px;
+  padding: 32px 34px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
+  gap: 16px;
 }
 
 .intake-offboard__headline {
@@ -662,7 +662,7 @@ header .h-\[63px\] img {
 .intake-offboard__explanation {
   margin: 0;
   font:
-    400 14px/1.6 system-ui,
+    400 16px/1.6 system-ui,
     sans-serif;
   color: #5c5850;
 }
@@ -673,7 +673,7 @@ header .h-\[63px\] img {
 .intake-offboard > ul {
   margin: 0;
   font:
-    400 14px/1.6 system-ui,
+    400 16px/1.6 system-ui,
     sans-serif;
   color: #5c5850;
 }
@@ -744,14 +744,14 @@ header .h-\[63px\] img {
 
 .intake-offboard__referral-name {
   font:
-    600 14px system-ui,
+    600 15px system-ui,
     sans-serif;
   color: #1a1a1a;
 }
 
 .intake-offboard__referral-desc {
   font:
-    400 12.5px/1.5 system-ui,
+    400 14px/1.5 system-ui,
     sans-serif;
   color: #6b675f;
 }
@@ -832,7 +832,7 @@ header .h-\[63px\] img {
   background: none;
   box-shadow: none;
   font:
-    600 13.5px system-ui,
+    600 15px system-ui,
     sans-serif;
   /* !important because the site pins its own font on bare <button>s with
      !important - which would also swap the arrow glyph's typeface. */
@@ -862,7 +862,7 @@ header .h-\[63px\] img {
   border-top: 1px solid #dcd8d1;
   padding-top: 12px;
   font:
-    400 11.5px/1.5 system-ui,
+    400 13px/1.5 system-ui,
     sans-serif;
   /* Muted grey, darkened to clear 4.5:1. */
   color: #6f6f6f;
