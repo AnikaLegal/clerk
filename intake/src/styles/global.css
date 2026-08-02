@@ -322,18 +322,29 @@ header .h-\[63px\] img {
   text-decoration: none;
 }
 
-/* The no-email contact form (the only survey rendered inside a splash column):
-   the whole survey - fields and the Contact us button - reads as one card, so
-   the panel's white card styling (background, radius, shadow) moves up to the
-   survey root and the panel inside is flattened to a plain group. */
-.intake-splash .sd-root-modern {
-  background-color: var(--sjs-general-backcolor, #fff);
-  border-radius: var(--sjs-corner-radius, 4px);
-  box-shadow: var(--sjs-shadow-small, 0px 1px 2px 0px rgba(0, 0, 0, 0.15));
+/* The no-email contact form, rendered in the offboard template's body slot:
+   the survey reads as one white form card (matching the referral-card tone),
+   with the panel inside flattened to a plain group and SurveyJS's page
+   paddings collapsed to the card's own. */
+.intake-offboard .sd-root-modern {
+  align-self: stretch;
+  background-color: #fff;
+  border: 1px solid #e6e3dd;
+  border-radius: 10px;
 }
 
-.intake-splash .sd-panel,
-.intake-splash .sd-panel__content {
+.intake-offboard .sd-body.sd-body--static,
+.intake-offboard .sd-body.sd-body--responsive {
+  max-width: none;
+  padding: 20px;
+}
+
+.intake-offboard .sd-page {
+  padding: 0;
+}
+
+.intake-offboard .sd-panel,
+.intake-offboard .sd-panel__content {
   background-color: transparent;
   box-shadow: none;
   padding: 0;

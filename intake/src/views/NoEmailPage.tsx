@@ -1,25 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Model } from 'survey-core'
 import { Survey } from 'survey-react-ui'
 
 import { api } from '../api'
-import { LINKS } from '../consts'
+import { Offboard } from '../comps/Offboard'
 import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from '../form/phone'
 import { logException } from '../utils'
-import { useAnnouncePage } from './announce'
 
 // A small SurveyJS form so the no-email contact fields get the same validation
 // behaviour and styling as the rest of the intake form. Only name and phone
-// are submitted; the consent checkbox is a required gate.
+// are submitted; the consent checkbox is a required gate. The offboard
+// template's primary action submits the form, so the survey's own navigation
+// buttons are hidden.
 const buildNoEmailModel = (): Model => {
   const survey = new Model({
     showQuestionNumbers: 'off',
     showProgressBar: false,
-    completeText: 'Contact us',
+    showNavigationButtons: false,
     questionErrorLocation: 'bottom',
-    // A single page, so the form renders with the same page/card styling as the
-    // main intake form's pages.
     pages: [
       {
         name: 'CONTACT',
@@ -68,40 +66,21 @@ const buildNoEmailModel = (): Model => {
       },
     ],
   })
-  // Match the main intake form's navigation styling: render the Complete
-  // ("Contact us") button as a daisyUI primary button and clear SurveyJS's own
-  // sd-btn classes (which otherwise outrank the daisyUI rules and force a
-  // smaller radius) so the daisyUI look fully applies.
-  survey.css = {
-    navigationButton: 'd-btn d-btn-primary',
-    bodyNavigationButton: '',
-    navigation: {
-      prev: '',
-      next: '',
-      complete: '',
-      start: '',
-      preview: '',
-      edit: '',
-    },
-  }
   return survey
 }
 
 /**
  * Contact fallback for users without an email address: takes a name and phone
  * number and asks the coordinators to call them back. Feeds the same
- * WebflowContact pipeline as the public site's landing contact form.
+ * WebflowContact pipeline as the public site's landing contact form. Rendered
+ * on the offboarding template with the form card in the body slot; the
+ * template swaps to a plain success fill once the details are sent.
  */
 export const NoEmailPage = () => {
-  const navigate = useNavigate()
   const survey = useMemo(buildNoEmailModel, [])
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isSubmitting = useRef(false)
-  // Keyed on the view state, so the swap to the success view is announced too.
-  const headingRef = useAnnouncePage(
-    isSubmitted ? "Thanks, we'll be in touch" : 'Contact us'
-  )
 
   useEffect(() => {
     const onCompleting: Parameters<typeof survey.onCompleting.add>[0] = (
@@ -136,65 +115,33 @@ export const NoEmailPage = () => {
 
   if (isSubmitted) {
     return (
-      <div className="intake-form">
-        <div className="intake-splash">
-          <h1 tabIndex={-1} ref={headingRef}>
-            Thanks, we&apos;ll be in touch
-          </h1>
-          <p>
-            We&apos;ve received your details and one of our team will call you
-            to see if we&apos;re able to help.
-          </p>
-          <div className="intake-button-group">
-            <button
-              type="button"
-              className="d-btn intake-btn-secondary"
-              onClick={() => navigate(-1)}
-            >
-              Go back
-            </button>
-            <a href={LINKS.HOME} className="d-btn intake-btn-secondary">
-              Return home
-            </a>
-          </div>
-        </div>
-      </div>
+      <Offboard
+        headline="Thanks, we'll be in touch"
+        explanation="We've received your details and one of our team will call
+        you to see if we're able to help."
+      />
     )
   }
 
   return (
-    // .intake-form is the full-width grey backdrop (as on the main form); the
-    // .intake-splash inside centres the content column on top of it.
-    <div className="intake-form">
-      <div className="intake-splash">
-        <h1 tabIndex={-1} ref={headingRef}>
-          Contact us
-        </h1>
-        <p>
-          Anika Legal is an online service, so we usually communicate by email.
-          If you don&apos;t have an email address, leave your details below and
-          we&apos;ll call you to see if we&apos;re able to help. If not,
-          we&apos;ll point you to another organisation.
+    <Offboard
+      headline="Contact us"
+      explanation="Anika Legal is an online service, so we usually communicate
+      by email. If you don't have an email address, leave your details below
+      and we'll call you to see if we're able to help. If not, we'll point you
+      to another organisation."
+      primary={{
+        label: 'Send my details',
+        // Validates the form and fires onCompleting above.
+        onClick: () => survey.tryComplete(),
+      }}
+    >
+      <Survey model={survey} />
+      {error && (
+        <p className="intake-form-error" role="alert">
+          {error}
         </p>
-        <Survey model={survey} />
-        {error && (
-          <p className="intake-form-error" role="alert">
-            {error}
-          </p>
-        )}
-        <div className="intake-button-group">
-          <button
-            type="button"
-            className="d-btn intake-btn-secondary"
-            onClick={() => navigate(-1)}
-          >
-            Go back
-          </button>
-          <a href={LINKS.HOME} className="d-btn intake-btn-secondary">
-            Return home
-          </a>
-        </div>
-      </div>
-    </div>
+      )}
+    </Offboard>
   )
 }
