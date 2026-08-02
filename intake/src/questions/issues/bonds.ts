@@ -95,7 +95,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     visibleIf: `${IS_BONDS_WITH_APPLICATION} and {BONDS_TENANT_HAS_RTBA_APPLICATION_COPY} = true`,
     required: false,
     type: 'UPLOAD',
-    title: `Please upload the landlord/real estate agent's <a target="_blank" href="${VCAT_LINK}">VCAT</a> application.`,
+    title: `Please upload the landlord/real estate agent's <a target="_blank" href="${VCAT_LINK}">VCAT</a> application`,
   },
   {
     name: 'BONDS_CLAIM_REASONS',
@@ -126,7 +126,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     required: true,
     type: 'TEXT',
     multiline: true,
-    title: 'Tell us more about the damage the landlord is making a claim for.',
+    title: 'Tell us more about the damage the landlord is making a claim for',
   },
   {
     name: 'BONDS_DAMAGE_CLAIM_AMOUNT',
@@ -155,7 +155,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'UPLOAD',
     title:
-      'If you caused the damage, have you obtained your own quote for repair? If so, please upload.',
+      'If you caused the damage, have you obtained your own quote for repair? If so, please upload',
   },
   {
     name: 'BONDS_MONEY_OWED_INTRO',
@@ -170,7 +170,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     required: true,
     type: 'TEXT',
     multiline: true,
-    title: 'Tell us more about the money the landlord says you owe.',
+    title: 'Tell us more about the money the landlord says you owe',
   },
   {
     name: 'BONDS_MONEY_OWED_CLAIM_AMOUNT',
@@ -205,7 +205,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     type: 'TEXT',
     multiline: true,
     title:
-      'Tell us more about the cleaning costs the landlord is trying to claim.',
+      'Tell us more about the cleaning costs the landlord is trying to claim',
   },
   {
     name: 'BONDS_CLEANING_CLAIM_AMOUNT',
@@ -262,7 +262,7 @@ export const BONDS_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'UPLOAD',
     title:
-      'If you have altered the locks/security devices at your property and have obtained a quote to change it back, please upload the quote.',
+      'If you have altered the locks/security devices at your property and have obtained a quote to change it back, please upload the quote',
   },
   {
     name: 'BONDS_OTHER_INTRO',

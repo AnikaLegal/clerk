@@ -40,7 +40,7 @@ export const EVICTION_RETALIATORY_QUESTIONS: IntakeQuestion[] = [
     type: 'UPLOAD',
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
     title:
-      'Please upload a copy of the Notice to Vacate that your landlord or agent has given you.',
+      'Please upload a copy of the Notice to Vacate that your landlord or agent has given you',
     description:
       'If you have received multiple Notices to Vacate, please upload all that have not been withdrawn. Please also upload all supporting documents attached to the Notice to Vacate.',
   },

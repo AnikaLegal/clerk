@@ -11,7 +11,7 @@ export const LANDLORD_QUESTIONS: IntakeQuestion[] = [
     name: 'PROPERTY_MANAGER_INTRO',
     type: 'DISPLAY',
     required: false,
-    html: '<h2>Almost done! Now just a few questions about your landlord.</h2><p>We use this information to run a conflict check and to help us write letters for you. We will <strong>not</strong> contact your landlord without your permission.</p>',
+    html: '<h2>Almost done! Now just a few questions about your landlord</h2><p>We use this information to run a conflict check and to help us write letters for you. We will <strong>not</strong> contact your landlord without your permission.</p>',
   },
   {
     name: 'PROPERTY_MANAGER_IS_AGENT',

@@ -6,7 +6,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     name: 'INTRO',
     required: false,
     type: 'DISPLAY',
-    html: "<h2>First of all, congratulations on taking the first step in solving your rental issues.</h2><p>Once you submit this form, we'll contact you in a few business days to talk about how we can help you.</p>",
+    html: "<h2>First of all, congratulations on taking the first step in solving your rental issues</h2><p>Once you submit this form, we'll contact you in a few business days to talk about how we can help you.</p>",
   },
   {
     name: 'ISSUES',
@@ -32,7 +32,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     required: false,
     type: 'DISPLAY',
     visibleIf: "{ISSUES} = 'EVICTION_RETALIATORY'",
-    html: `<h2>Anika Legal can only help you with evictions if you believe the eviction is retaliatory.</h2><p>A retaliatory eviction is when your landlord tries to evict you because you stood up for your rights - for example, asking for repairs or challenging a rent increase.</p><p>If your eviction isn't retaliatory, see what <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">other legal help</a> is available in your area. Otherwise please continue.</p>`,
+    html: `<h2>Anika Legal can only help you with evictions if you believe the eviction is retaliatory</h2><p>A retaliatory eviction is when your landlord tries to evict you because you stood up for your rights - for example, asking for repairs or challenging a rent increase.</p><p>If your eviction isn't retaliatory, see what <a target="_blank" href="${LINKS.VIC_LEGAL_AID}">other legal help</a> is available in your area. Otherwise please continue.</p>`,
   },
   {
     name: 'IS_VICTORIAN_TENANT',
@@ -48,7 +48,7 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
     name: 'ELIGIBILITY_INTRO',
     required: false,
     type: 'DISPLAY',
-    html: "<h2>You're in the right place.</h2><p>We just need a few more details to understand your situation and how we can help.</p>",
+    html: "<h2>You're in the right place</h2><p>We just need a few more details to understand your situation and how we can help.</p>",
   },
   {
     name: 'CENTRELINK_SUPPORT',
@@ -141,6 +141,6 @@ export const ELIGIBILITY_QUESTIONS: IntakeQuestion[] = [
       'meansIneligible({CENTRELINK_SUPPORT}, {ELIGIBILITY_CIRCUMSTANCES}, {ANNUAL_INCOME_RANGE}, {NUMBER_OF_DEPENDENTS})',
     multiline: true,
     title:
-      'So that we can assess your circumstances holistically, please tell us if you have any other special circumstances that you would like us to consider.',
+      'So that we can assess your circumstances holistically, please tell us if you have any other special circumstances that you would like us to consider',
   },
 ]
