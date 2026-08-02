@@ -220,30 +220,31 @@ export const EXIT_PAGES: Record<string, ExitPageContent> = {
     ),
   },
   [ROUTES.INELIGIBLE_BOND_OUT_OF_SCOPE]: {
-    title: 'Unfortunately, your bond issue is outside our current scope',
-    body: (
-      <>
-        <p>
-          Our bond recovery service focuses on helping you negotiate a
-          settlement with your landlord once they have applied to VCAT to claim
-          your bond held at the RTBA.
-        </p>
-        <p>
-          Due to resource constraints, we are currently unable to assist when:
-        </p>
-        <ul>
-          <li>
-            you have general questions about bonds before leaving the property
-          </li>
-          <li>your bond is not held by the RTBA</li>
-          <li>your dispute is with a co-tenant</li>
-          <li>your landlord has not applied to VCAT yet</li>
-        </ul>
-        <p>
-          Depending on your situation, you may wish to have a look at our{' '}
-          <a href={LINKS.BONDS_RESOURCES}>bonds resources</a>.
-        </p>
-      </>
-    ),
+    offboard: {
+      headline: 'Your bond issue is outside our current scope',
+      explanation:
+        'Our bond recovery service focuses on helping you negotiate a ' +
+        'settlement with your landlord once they have applied to VCAT to ' +
+        'claim your bond held at the RTBA.',
+      body: (
+        <>
+          <p>
+            Due to resource constraints, we are currently unable to assist when:
+          </p>
+          <ul>
+            <li>
+              you have general questions about bonds before leaving the property
+            </li>
+            <li>your bond is not held by the RTBA</li>
+            <li>your dispute is with a co-tenant</li>
+            <li>your landlord has not applied to VCAT yet</li>
+          </ul>
+        </>
+      ),
+      primary: {
+        label: 'See our bonds resources',
+        href: LINKS.BONDS_RESOURCES,
+      },
+    },
   },
 }

@@ -667,6 +667,24 @@ header .h-\[63px\] img {
   color: #5c5850;
 }
 
+/* Free-form body content (paragraphs and lists from migrated exit copy)
+   matches the explanation's type, so the whole card reads as one block. */
+.intake-offboard > p,
+.intake-offboard > ul {
+  margin: 0;
+  font:
+    400 14px/1.6 system-ui,
+    sans-serif;
+  color: #5c5850;
+}
+
+.intake-offboard > ul {
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 /* Referral cards for the body slot (see OffboardReferral): outbound links
    presented as cards, each carrying the organisation's name and what they
    offer, on a slightly sunken surface so they read as cards within the
