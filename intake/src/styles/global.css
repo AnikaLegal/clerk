@@ -21,6 +21,11 @@
   margin: 0;
   padding: 0;
   z-index: auto;
+  /* The site rule also sets gap: 40px. That is inert on a block form, but the
+     card's bottom-aligned navigation makes this form a flex column again (see
+     the flex chain further down), which would revive it as a 40px gap above the
+     questions. */
+  gap: 0;
 }
 
 /* The website's navbar sizes the logo + charity badges purely through flex
@@ -966,18 +971,153 @@ header .h-\[63px\] img {
   padding: 32px 24px;
 }
 
-/* The survey card: the page count, question area and Previous / Next bar
-   framed as one bordered card (1px #d8d5ce border, 12px radius, white
-   surface). Sized like the survey body it wraps (720px, centred).
-   overflow-x: clip (not hidden) contains the page slide animation while
-   leaving vertical overflow visible, so focus outlines are never cut off. */
+/* The survey card: the side navigation, page count, question area and Back /
+   Continue bar framed as one bordered card (1px #d8d5ce border, 12px radius,
+   white surface). The question column is sized like the survey body it wraps
+   (720px); the card widens by the navigation rail when that is docked, and both
+   columns are flush inside the one frame, divided by a hairline rather than a
+   gap. Centred in the band.
+
+   overflow-x: clip (not hidden) contains the page slide animation while leaving
+   vertical overflow visible, so focus outlines are never cut off. */
 .intake-form .intake-card {
+  display: flex;
+  align-items: stretch;
   max-width: 720px;
   margin: 0 auto;
   border: 1px solid #d8d5ce;
   border-radius: 12px;
   background: var(--sjs-general-backcolor, #fff);
   overflow-x: clip;
+}
+
+/* The question column: fills whatever the navigation rail leaves. */
+.intake-form .intake-card__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sit the survey's Back / Continue bar on the card's bottom edge: the rail
+   usually makes the card taller than the questions, and the buttons shouldn't
+   float halfway up it. SurveyJS nests that bar nine levels below the question
+   column, so the spare height has to be handed down the chain - every level a
+   flex column, every level's body the growing child, ending on the question page
+   itself. Done with flex rather than height: 100% so it works both ways: a page
+   whose questions are taller than the rail grows the card instead of scrolling
+   inside it. */
+.intake-form .intake-page__inner,
+.intake-form .intake-page .sd-root-modern,
+.intake-form .intake-page .sv-scroll__container,
+.intake-form .intake-page .sd-root-modern__wrapper,
+.intake-form .intake-page form,
+.intake-form .intake-page .sd-container-modern,
+.intake-form .intake-page .sd-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.intake-form .intake-page__inner,
+.intake-form .intake-page .sd-root-modern,
+.intake-form .intake-page .sv-scroll__wrapper,
+.intake-form .intake-page .sv-scroll__scroller,
+.intake-form .intake-page .sv-scroll__container,
+.intake-form .intake-page .sd-root-modern__wrapper,
+.intake-form .intake-page form,
+.intake-form .intake-page .sd-container-modern,
+.intake-form .intake-page .sv-components-row,
+.intake-form .intake-page .sd-body,
+.intake-form .intake-page .sd-body > .sd-page {
+  flex: 1 1 auto;
+}
+
+/* SurveyJS's fit-to-container mode pins the survey root to height: 100%. Now
+   that the card hands it a definite height, that would clip a long page into an
+   inner scroll area (the root also carries overflow: auto), so let it size to
+   its content and take the slack through the flex chain above instead. */
+.intake-form .intake-page .sd-root-modern {
+  height: auto;
+}
+
+/* The side navigation column: hidden until there is room for it beside the
+   720px question column (a narrow-screen affordance comes later), so the card
+   keeps its 720px width below the breakpoint. */
+.intake-sidebar {
+  display: none;
+}
+
+/* The rail docks once the widened card (982px) fits between the band's 24px
+   gutters. */
+@media (min-width: 1040px) {
+  .intake-form .intake-card--with-nav {
+    /* The 720px question column plus the 262px rail. */
+    max-width: 982px;
+  }
+
+  .intake-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    width: 262px;
+    /* A warm tint (the referral cards' surface) so the rail reads as its own
+       surface against the white question column. */
+    background: #fbfaf8;
+    /* The rail's outer corners follow the card's: 12px less the card's 1px
+       border is the frame's inner radius. Its inner edge stays square against
+       the question column, divided from it by the same hairline the survey
+       draws above its Back / Continue buttons. */
+    border-radius: 11px 0 0 11px;
+    border-right: 1px solid #ebe8e2;
+    /* Warm the SurveyJS list's hover fill (a cool grey by default) to match the
+       tint - the same hover as the Back button's. */
+    --sjs-general-backcolor-dark: #f4f2ee;
+    /* SurveyJS's border colours, in the rail's palette (the list's focused-item
+       outline is the one that shows). These also have to be set for those
+       borders to render at all out here: the fallback chain ends in
+       var(--border), and the website defines --border as a width (1px), so the
+       colour slot resolves to a length and the whole border declaration is
+       dropped. The survey's own elements are unaffected - the theme sets these
+       variables on the survey root, so the fallback is never reached inside it. */
+    --sjs-border-default: #ebe8e2;
+    --sjs-border-light: #ebe8e2;
+  }
+
+  /* The rail's own bands. Both are the height of the survey's Back / Continue
+     bar - 32px padding, a 44px button, 32px padding, plus its 1px rule, which
+     each band carries as its own hairline - so the foot's hairline continues the
+     one above the buttons and the head balances it at the top. */
+  .intake-sidebar__head,
+  .intake-sidebar__foot {
+    flex: none;
+    height: 109px;
+  }
+
+  .intake-sidebar__head {
+    border-bottom: 1px solid #ebe8e2;
+  }
+
+  .intake-sidebar__foot {
+    border-top: 1px solid #ebe8e2;
+  }
+
+  /* The list takes the height between them. */
+  .intake-sidebar__list {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  /* The TOC panel fills its band (by default it sizes itself for the survey's
+     own left column). Its surface and divider give way to the rail's, so the
+     tint carries the rounded corners and the divider spans the full height. */
+  .intake-sidebar .sv_progress-toc {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border-right: none;
+  }
 }
 
 /* "Page x of y" at the top of the card, above the question - small and

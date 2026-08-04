@@ -5,6 +5,7 @@ import { Survey } from 'survey-react-ui'
 import { events } from '../analytics'
 import { ApiError } from '../api/client'
 import { AnswerReview } from '../comps/AnswerReview'
+import { FormSidebar } from '../comps/FormSidebar'
 import { ROUTES } from '../consts'
 import { resetFunnel } from '../form/funnel'
 import { WELCOME_PAGE } from '../form/model'
@@ -96,28 +97,40 @@ export const FormPage = () => {
     .filter(Boolean)
     .join(' ')
 
+  // The side navigation shares the card with the question column, so the card
+  // widens to hold it. Not on WELCOME, which is a full-width intro with nothing
+  // to navigate yet (and on narrow screens it is hidden in CSS - the card then
+  // reads as the single column it was before).
+  const showNav = progress.name !== WELCOME_PAGE
+  const cardClass = showNav
+    ? 'intake-card intake-card--with-nav'
+    : 'intake-card'
+
   return (
     <div className={rootClass}>
-      {/* The card wraps the page count and the survey (question area + nav
-          buttons) as one bordered frame; it also clips the horizontal slide.
-          The inner div is re-keyed by page name so the direction-aware
-          animation in global.css replays on every page change. The survey
-          Model is stable across the remount (it lives in useMemo), so only
-          the view is rebuilt. */}
+      {/* The card wraps the side navigation, the page count and the survey
+          (question area + nav buttons) as one bordered frame; it also clips the
+          horizontal slide. The inner div is re-keyed by page name so the
+          direction-aware animation in global.css replays on every page change.
+          The survey Model is stable across the remount (it lives in useMemo), so
+          only the view is rebuilt. */}
       <div className="intake-page">
-        <div className="intake-card">
-          {/* "Page x of y" at the top of the question area. Hidden on WELCOME
-              (section -1) and on SUBMIT, which sits past the counted total. */}
-          {progress.section >= 0 && progress.page <= progress.pageCount && (
-            <div className="intake-qcount">
-              Page {progress.page} of {progress.pageCount}
+        <div className={cardClass}>
+          {showNav && <FormSidebar survey={survey} />}
+          <div className="intake-card__main">
+            {/* "Page x of y" at the top of the question area. Hidden on WELCOME
+                (section -1) and on SUBMIT, which sits past the counted total. */}
+            {progress.section >= 0 && progress.page <= progress.pageCount && (
+              <div className="intake-qcount">
+                Page {progress.page} of {progress.pageCount}
+              </div>
+            )}
+            <div
+              key={progress.name}
+              className={`intake-page__inner intake-page__inner--${progress.direction}`}
+            >
+              <Survey model={survey} />
             </div>
-          )}
-          <div
-            key={progress.name}
-            className={`intake-page__inner intake-page__inner--${progress.direction}`}
-          >
-            <Survey model={survey} />
           </div>
         </div>
       </div>
