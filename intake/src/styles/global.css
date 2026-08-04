@@ -1281,6 +1281,13 @@ header .h-\[63px\] img {
   animation: intake-page-slide-back 320ms ease-out;
 }
 
+/* Arriving on an offboarding page (an eligibility exit, the no-email contact
+   page) is a forward move out of the form, so its card slides in the same way
+   a survey page does. */
+.intake-offboard {
+  animation: intake-page-slide-forward 320ms ease-out;
+}
+
 @keyframes intake-page-slide-forward {
   from {
     opacity: 0;
@@ -1305,7 +1312,8 @@ header .h-\[63px\] img {
 
 @media (prefers-reduced-motion: reduce) {
   .intake-page__inner--forward,
-  .intake-page__inner--back {
+  .intake-page__inner--back,
+  .intake-offboard {
     animation: none;
   }
 }
