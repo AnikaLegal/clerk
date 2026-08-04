@@ -64,7 +64,7 @@ export const SECTIONS: IntakeSection[] = [
   // journey - including on the submit page itself, where every earlier section
   // is a click away.
   {
-    label: 'Submit',
+    label: 'Review & send',
     pages: ['SUBMIT'],
   },
 ]

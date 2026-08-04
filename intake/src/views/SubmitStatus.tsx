@@ -6,8 +6,8 @@ import { useAnnouncePage } from './announce'
 export type SubmitState = 'submitting' | 'permanent' | 'transient'
 
 const SUBMIT_TITLES: Record<SubmitState, string> = {
-  submitting: 'Submitting your answers',
-  permanent: "We couldn't submit your form",
+  submitting: 'Sending your answers',
+  permanent: "We couldn't send your answers",
   transient: 'Something went wrong',
 }
 
@@ -27,13 +27,13 @@ export const SubmitStatus = ({
     <div className="intake-splash intake-splash--centred">
       {state === 'submitting' && (
         <h1 tabIndex={-1} ref={headingRef}>
-          Submitting your answers...
+          Sending your answers...
         </h1>
       )}
       {state === 'permanent' && (
         <>
           <h1 tabIndex={-1} ref={headingRef}>
-            Sorry, we couldn&apos;t submit your form
+            Sorry, we couldn&apos;t send your answers
           </h1>
           <p>
             Trying again won&apos;t fix it. Please email{' '}
@@ -48,7 +48,7 @@ export const SubmitStatus = ({
             Sorry, something went wrong
           </h1>
           <p>
-            We could not submit your form. Please check your connection and try
+            We could not send your answers. Please check your connection and try
             again.
           </p>
           <div className="intake-button-group">

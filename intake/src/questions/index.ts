@@ -17,11 +17,11 @@ const SUBMIT_QUESTION: IntakeQuestion = {
   html: `
     <h2>That's everything we need</h2>
     <p>
-      Press Submit to send us your answers. One of our team will contact you
-      in a few business days to talk about how we can help.
+      When you're ready, send us your answers. One of our team will contact
+      you in a few business days to talk about how we can help.
     </p>
     <p>
-      By submitting this form, you are agreeing to our
+      By sending us your answers, you are agreeing to our
       <a href="${LINKS.PRIVACY_POLICY}" target="_blank">Privacy Policy</a>,
       <a href="${LINKS.COLLECTIONS_STATEMENT}" target="_blank">Collections Statement</a>
       and website <a href="${LINKS.TERMS_OF_USE}" target="_blank">Terms of Use</a>.

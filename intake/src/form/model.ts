@@ -234,14 +234,15 @@ export const buildSurveyModel = (): Model => {
     // the gender DB column's length, so it can't overflow during processing.
     maxOthersLength: 64,
     // The footer reads Back / Continue; setup.ts and syncPage manage the
-    // forward label per page ("Let's get started" on WELCOME).
+    // forward label per page ("Let's get started" on WELCOME). The last page's
+    // action says what it does - "submit" is form-speak.
     pagePrevText: 'Back',
-    completeText: 'Submit',
+    completeText: 'Send my answers',
     // On completion FormPage replaces the survey with its own SubmitStatus
     // splash, so this completed page is only a one-frame guard before that
     // swap. Keep it neutral - SurveyJS's default "Thank you for completing the
     // survey" would flash as success even when the submit then fails.
-    completedHtml: '<h1>Submitting your answers...</h1>',
+    completedHtml: '<h1>Sending your answers...</h1>',
   })
   // The panelless variant of the default light theme: questions render flat on
   // the page background instead of each sitting in its own white card.
