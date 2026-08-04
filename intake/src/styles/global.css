@@ -1118,6 +1118,86 @@ header .h-\[63px\] img {
     background: transparent;
     border-right: none;
   }
+
+  /* Each row is a marker and a name (see comps/FormSidebar). */
+  .intake-sidebar .sv-list__item-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* The current section's name carries emphasis (SurveyJS's own TOC rule pins
+     the selected row back to 400, so match its specificity). */
+  .intake-sidebar .sv-list__item.sv-list__item--selected .sv-list__item-body {
+    font-weight: 600;
+  }
+
+  .intake-nav__label {
+    min-width: 0;
+  }
+}
+
+/* Section markers: the section's number in a circle, whose weight and fill
+   carry the state - a filled disc with a white tick once the section is
+   complete, a heavier ring for the section the user is in, a light ring for one
+   they can open, and a grey ring for one they cannot reach yet. Shape carries
+   the state as well as colour. */
+.intake-nav__marker {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  /* The page's inherited line-height (~34px) would push the digit out of the
+     circle. */
+  line-height: 1;
+  /* Optical nudge: the digits sit a hair left of centre in the circle, so bias
+     the content box half a pixel right (the tick below gets a matching nudge in
+     its transform). */
+  padding-left: 1px;
+  border: 1px solid var(--color-primary);
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+}
+
+.intake-nav__marker--current {
+  border-width: 2px;
+}
+
+/* A section that cannot be opened yet: the row itself is greyed by SurveyJS
+   (sv-list__item--disabled), and its marker follows. */
+.sv-list__item--disabled .intake-nav__marker {
+  border-color: #b5b5b5;
+  color: #767676;
+}
+
+/* Complete: a filled disc with a white tick, drawn as a rotated two-edge
+   border. Wins over the disabled rule above - a done section stays ticked even
+   when a changed answer has momentarily put it out of reach. */
+.sv-list__item--disabled .intake-nav__marker--done,
+.intake-nav__marker--done {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.intake-nav__marker--done::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  /* Centre the tick's own box on the circle, then rotate it into a check. The
+     nudge off dead centre is optical: rotating puts the check's weight low and
+     right of its box centre, and the circle biases its content 1px right (see
+     the marker's padding-left). Placed this way rather than by offset so the
+     tick stays centred if the circle is resized. */
+  transform: translate(-48%, -62%) rotate(45deg);
 }
 
 /* "Page x of y" at the top of the card, above the question - small and

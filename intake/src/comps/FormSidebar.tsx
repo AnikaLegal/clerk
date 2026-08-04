@@ -1,27 +1,65 @@
 import { useEffect, useMemo } from 'react'
-import { createTOCListModel, getTocRootCss, Model } from 'survey-core'
-import { List } from 'survey-react-ui'
+import { Action, ListModel, Model, getTocRootCss } from 'survey-core'
+import { List, ReactElementFactory } from 'survey-react-ui'
+
+import { readSectionStates, SectionState } from '../form/section-nav'
+import { SECTIONS } from '../questions'
+
+interface FormSidebarProps {
+  survey: Model
+  // Questions the user has passed, as maintained by the form (see setUpForm).
+  // Together with the survey it decides each section's state.
+  visited: Set<string>
+  // Jumps to a section's first visible page; a no-op for a section that is not
+  // currently reachable (see useFormNavigation's jumpToSection).
+  onJump: (sectionIndex: number) => void
+}
 
 /**
- * The form's side navigation, built on SurveyJS's table of contents.
+ * The form's side navigation: the questionnaire's sections (see
+ * questions/sections.ts), listed on SurveyJS's own list model - the same
+ * machinery its built-in table of contents uses, which gives us its list
+ * markup, roles and keyboard handling while the entries, their states and where
+ * they navigate stay ours.
  *
- * createTOCListModel gives us the same list the built-in TOC uses (one entry
- * per visible page, kept in step with the current page, each entry navigating
- * on click), but as a plain model we render ourselves - so the list sits in our
- * own column beside the question card rather than inside the survey root, and
- * its contents and styling are ours to shape from here.
- *
- * Currently the SurveyJS default: page navigation titles, which fall back to
- * page names, and entries that navigate straight to their page.
+ * Each row is numbered in a circle, which carries the section's state: a tick
+ * once the section is complete, a heavier ring for the one the user is in, and a
+ * grey ring for a section that cannot be opened yet. A section ahead becomes
+ * reachable once every page between here and its first page has been passed, so
+ * a jump can never skip a question or an eligibility exit that Continue would
+ * have stopped on (see form/section-nav.ts).
  */
-export const FormSidebar = ({ survey }: { survey: Model }) => {
-  // The list subscribes to the survey (current page, page list), so it is built
-  // once per survey and disposed with the component.
-  const list = useMemo(() => createTOCListModel(survey), [survey])
-  useEffect(() => () => list.dispose(), [list])
+export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
+  const list = useMemo(() => buildSectionList(survey, onJump), [survey, onJump])
+  // Keep the rows in step with the survey. Answering a question doesn't
+  // re-render FormPage (SurveyJS renders its own questions), yet it can change
+  // the section states without a page change - picking an answer that triggers
+  // an eligibility exit must drop the ticks from the completed sections past it
+  // there and then. So sync on the survey's own value changes as well as on
+  // page changes; the rows re-render on their own (the state is a SurveyJS
+  // property on each action).
+  useEffect(() => {
+    const sync = () => {
+      readSectionStates(survey, visited).forEach((status) => {
+        const action = list.actions[status.index] as SectionAction
+        // The marker: a complete section keeps its tick even while current -
+        // jumping back into a finished section must not revert it to a number.
+        action.sectionState = status.complete ? 'done' : status.state
+        action.enabled = status.state === 'current' || status.navigable
+        if (status.state === 'current') list.selectedItem = action
+      })
+    }
+    sync()
+    survey.onValueChanged.add(sync)
+    survey.onCurrentPageChanged.add(sync)
+    return () => {
+      survey.onValueChanged.remove(sync)
+      survey.onCurrentPageChanged.remove(sync)
+    }
+  }, [survey, visited, list])
 
   return (
-    <nav className="intake-sidebar" aria-label="Form navigation">
+    <nav className="intake-sidebar" aria-label="Form sections">
       {/* The rail is banded like the question column: a head, the list, and a
           foot whose hairline continues the one above the Back / Continue
           buttons. Head and foot are empty for now - the progress summary and
@@ -35,4 +73,62 @@ export const FormSidebar = ({ survey }: { survey: Model }) => {
       <div className="intake-sidebar__foot" />
     </nav>
   )
+}
+
+// A list entry carrying its section's state. Held as a SurveyJS property so the
+// list item re-renders when it changes.
+class SectionAction extends Action {
+  get sectionState(): SectionState {
+    return this.getPropertyValue('sectionState') ?? 'later'
+  }
+
+  set sectionState(state: SectionState) {
+    this.setPropertyValue('sectionState', state)
+  }
+}
+
+// The row's content: the numbered marker (a tick once the section is done) and
+// the section name. The marker is decorative - the row's own state is conveyed
+// by the list item's selected / disabled state.
+const SectionRow = ({ item }: { item: SectionAction }) => (
+  <>
+    <span
+      className={`intake-nav__marker intake-nav__marker--${item.sectionState}`}
+      aria-hidden="true"
+    >
+      {item.sectionState === 'done' ? null : Number(item.id) + 1}
+    </span>
+    <span className="intake-nav__label">{item.title}</span>
+  </>
+)
+
+const SECTION_ROW_COMPONENT = 'intake-nav-item'
+ReactElementFactory.Instance.registerElement(SECTION_ROW_COMPONENT, (props) => (
+  <SectionRow {...(props as { item: SectionAction })} />
+))
+
+// One entry per section, in flow order. Mirrors the options SurveyJS builds its
+// own table of contents with (see createTOCListModel): a menu of radio-like
+// items, no search box, and selection driven by us rather than by clicks.
+const buildSectionList = (
+  survey: Model,
+  onJump: (sectionIndex: number) => void
+): ListModel<Action> => {
+  const list = new ListModel<Action>({
+    items: SECTIONS.map(
+      (section, index) =>
+        new SectionAction({
+          id: String(index),
+          title: section.label,
+          component: SECTION_ROW_COMPONENT,
+          action: () => onJump(index),
+        })
+    ),
+    searchEnabled: false,
+    locOwner: survey,
+    listRole: 'menu',
+    listItemRole: 'menuitemradio',
+  })
+  list.allowSelection = false
+  return list
 }

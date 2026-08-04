@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildSurveyModel } from '../src/form/model'
-import { navigableSections } from '../src/form/section-nav'
+import { navigableSections, readSectionStates } from '../src/form/section-nav'
 import { Answers } from '../src/form/types'
 import { QUESTIONS_BY_NAME } from '../src/questions'
 
@@ -136,5 +136,76 @@ describe('navigableSections', () => {
     // section still resolves to its repairs pages, never a bonds page.
     const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
     expect(navigableSections(survey, visited).get(2)).toBe('REPAIRS_ABOUT')
+  })
+})
+
+describe('readSectionStates', () => {
+  const states = (data: Answers, currentPage: string, cutoff?: string) => {
+    const { survey, visited } = setUp(data, currentPage, cutoff)
+    return readSectionStates(survey, visited).map((s) => s.state)
+  }
+
+  it('keeps the answered sections done after a jump back into the form', () => {
+    // Fully answered, then jumped back to an About-you page: the sections either
+    // side stay complete, the one landed in reads as current, and Submit - which
+    // holds no answers and has not been passed - is still ahead.
+    expect(states(FULL, 'ABOUT_EMAIL')).toEqual([
+      'done',
+      'current',
+      'done',
+      'done',
+      'done',
+      'done',
+      'later',
+    ])
+  })
+
+  it('reports the current section complete when fully answered', () => {
+    // The state stays `current`, but the completeness travels separately so the
+    // marker keeps its tick when the user jumps back into a finished section.
+    const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
+    expect(readSectionStates(survey, visited).map((s) => s.complete)).toEqual([
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+    ])
+  })
+
+  it('drops the ticks past an answer that now triggers an exit', () => {
+    // Back on the first page of a complete form, having chosen the compensation
+    // exit. Everything from that page on is unreachable, so no later section may
+    // still read as complete - even though its answers are all there.
+    expect(
+      states(
+        { ...FULL, ISSUES: 'INELIGIBLE_COMPENSATION' },
+        'ELIGIBILITY_ISSUE'
+      )
+    ).toEqual(['current', 'later', 'later', 'later', 'later', 'later', 'later'])
+  })
+
+  it('drops the ticks past an exit the user has stepped back behind', () => {
+    // The non-Victorian exit sits on ELIGIBILITY_LOCATION, one page ahead. The
+    // section holding it is current, and nothing beyond the exit is complete.
+    expect(
+      states({ ...FULL, IS_VICTORIAN_TENANT: false }, 'ELIGIBILITY_ISSUE')
+    ).toEqual(['current', 'later', 'later', 'later', 'later', 'later', 'later'])
+  })
+
+  it('marks only the passed sections done mid-form', () => {
+    // Answered through Getting in touch, standing back on its first page: the
+    // section behind is done, the rest are still ahead.
+    expect(states(FULL, 'ABOUT_EMAIL', 'ABOUT_CONTACT')).toEqual([
+      'done',
+      'current',
+      'later',
+      'later',
+      'later',
+      'later',
+      'later',
+    ])
   })
 })

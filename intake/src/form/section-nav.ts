@@ -98,6 +98,98 @@ export const navigableSections = (
   return result
 }
 
+// Where the user stands in a section: behind it (and done with it), in it, or
+// yet to reach it. Navigability is tracked separately (see SectionStatus): a
+// later section can be reachable, and a done one momentarily not.
+export type SectionState = 'done' | 'current' | 'later'
+
+export interface SectionStatus {
+  index: number
+  label: string
+  state: SectionState
+  // Whether the section's answers are complete, independent of the state: the
+  // current section is `current` even when fully answered, but its marker
+  // should keep the completion tick rather than revert to a number.
+  complete: boolean
+  // Whether the section can be jumped into from here (never the current one).
+  navigable: boolean
+}
+
+/**
+ * Per-section status for the side navigation, derived - like navigableSections -
+ * from the survey's visible pages, the visited set and the current answers.
+ *
+ * A section is `done` when every one of its visible pages lies behind the first
+ * page of the form that cannot be passed: sections wholly behind the user
+ * qualify, and one that is still fully answered after a backward jump keeps its
+ * tick. The section holding the current page is `current` even when fully
+ * answered, and everything ahead is `later`.
+ */
+export const readSectionStates = (
+  survey: Model,
+  visited: Set<string>
+): SectionStatus[] => {
+  const pages = survey.visiblePages
+  const currentIndex = pages.indexOf(survey.currentPage)
+  const currentSection = sectionIndexForPage(survey.currentPage?.name)
+  const indexByName = new Map(pages.map((p, i) => [p.name, i]))
+  const reachable = navigableSections(survey, visited)
+  const pageAt = (name: string) => pages[indexByName.get(name) as number]
+
+  // The first page of the whole form that cannot be passed - an unanswered
+  // required question, or an answer that now triggers an eligibility exit - or
+  // the end of the form when everything is answered. Nothing from there on is
+  // complete: the run stops at that page, so a later section's answers, however
+  // full, are no longer part of a finished form. Without this, going back and
+  // choosing a disqualifying answer would leave every later section ticked.
+  let frontier = 0
+  while (
+    frontier < pages.length &&
+    canPassPage(survey, visited, pages[frontier])
+  ) {
+    frontier++
+  }
+
+  return SECTIONS.map((section, index): SectionStatus => {
+    const visiblePages = section.pages.filter((name) => indexByName.has(name))
+    // A section holding no answers (the submit page is all display content) is
+    // vacuously passable, so passability alone can't mark it done - it counts
+    // only once the user is wholly past it.
+    const holdsAnswers = visiblePages.some((name) => {
+      const elements = (pageAt(name) as unknown as { questions: PageElement[] })
+        .questions
+      return elements.some((el) => {
+        const question = QUESTIONS_BY_NAME[el.name]
+        return (
+          question &&
+          question.type !== 'DISPLAY' &&
+          !question.uiOnly &&
+          el.isVisible
+        )
+      })
+    })
+    const whollyBehind =
+      visiblePages.length > 0 &&
+      visiblePages.every((name) => indexByName.get(name)! < currentIndex)
+    const isDone =
+      visiblePages.length > 0 &&
+      (holdsAnswers || whollyBehind) &&
+      visiblePages.every((name) => indexByName.get(name)! < frontier)
+    return {
+      index,
+      label: section.label,
+      state:
+        index === currentSection
+          ? 'current'
+          : isDone
+            ? 'done'
+            : ('later' as const),
+      complete: isDone,
+      navigable: reachable.has(index),
+    }
+  })
+}
+
 /**
  * The first still-visible page of a section, or undefined when the whole
  * section is on a branch the user isn't taking. Used by the submit-page answer

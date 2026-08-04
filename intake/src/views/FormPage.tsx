@@ -61,13 +61,14 @@ export const FormPage = () => {
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
   // and read back the progress state plus the jump-to-section wiring.
-  const { progress, editSection, reviewOpen } = useFormNavigation({
-    survey,
-    saver,
-    visited,
-    session,
-    attemptSubmit,
-  })
+  const { progress, jumpToSection, editSection, reviewOpen } =
+    useFormNavigation({
+      survey,
+      saver,
+      visited,
+      session,
+      attemptSubmit,
+    })
 
   // Restore the form's title after a splash view (e.g. Go back from an exit
   // page) changed it. Matches the title the Django shell renders on load.
@@ -116,7 +117,13 @@ export const FormPage = () => {
           only the view is rebuilt. */}
       <div className="intake-page">
         <div className={cardClass}>
-          {showNav && <FormSidebar survey={survey} />}
+          {showNav && (
+            <FormSidebar
+              survey={survey}
+              visited={visited}
+              onJump={jumpToSection}
+            />
+          )}
           <div className="intake-card__main">
             {/* "Page x of y" at the top of the question area. Hidden on WELCOME
                 (section -1) and on SUBMIT, which sits past the counted total. */}
