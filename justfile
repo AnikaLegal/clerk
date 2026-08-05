@@ -19,19 +19,29 @@ help recipe:
 schema:
     cd frontend && npm run schema
 
-# Build images locally (no target: frontend + backend; or any of: backend | frontend | base)
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-[arg("targets", help="backend | frontend | base (default: frontend + backend)")]
-build no_cache="" *targets:
+# Build images locally, e.g. `just build backend -- --no-cache` (no target: frontend + backend)
+[arg("args", help="backend | frontend | base (default: frontend + backend), then docker build options after --")]
+build *args:
     #!/usr/bin/env bash
     set -euo pipefail
     j="{{just_executable()}}"
-    nc=""; [ -n "{{no_cache}}" ] && nc="--no-cache"
-    targets="{{targets}}"
+    # Targets come first; the first dashed arg and everything after it is for docker build.
+    # A bare `--` only marks the split, so `just build backend -- --no-cache` works too.
+    targets=""; opts=""; in_opts=0
+    for a in {{args}}; do
+      if [ "$a" = "--" ]; then
+        in_opts=1
+      elif [ "$in_opts" = 1 ] || [ "${a#-}" != "$a" ]; then
+        in_opts=1
+        opts="$opts $a"
+      else
+        targets="$targets $a"
+      fi
+    done
     [ -z "$targets" ] && targets="frontend backend"
     for t in $targets; do
       case "$t" in
-        backend|frontend|base) "$j" build-"$t" $nc ;;
+        backend|frontend|base) "$j" build-"$t" $opts ;;
         *)
           echo "Unknown build target: $t (expected backend, frontend, or base)" >&2
           exit 1
@@ -41,21 +51,21 @@ build no_cache="" *targets:
 
 # Build the backend (app) image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-backend no_cache="":
-    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile --tag {{app_name}}:local .
+[arg("opts", help="Options passed to docker build")]
+build-backend *opts:
+    docker build {{opts}} --file docker/Dockerfile --tag {{app_name}}:local .
 
 # Build the frontend image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-frontend no_cache="":
-    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
+[arg("opts", help="Options passed to docker build")]
+build-frontend *opts:
+    docker build {{opts}} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
 
 # Build the multi-platform base image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-base no_cache="":
-    docker build --platform=linux/amd64,linux/arm64 {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.base --tag anikalaw/clerkbase:latest .
+[arg("opts", help="Options passed to docker build")]
+build-base *opts:
+    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag anikalaw/clerkbase:latest .
 
 # Run Django dev server within a Docker container
 dev:
