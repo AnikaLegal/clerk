@@ -39,14 +39,13 @@ import urllib.request
 import uuid
 
 import boto3
+import report
 from aws_durable_execution_sdk_python import (
     DurableContext,
     durable_execution,
     durable_step,
 )
 from aws_durable_execution_sdk_python.config import Duration
-
-import report
 
 CLUSTER = os.environ["CLUSTER"]
 TASK_DEFINITION = os.environ["TASK_DEFINITION"]
@@ -83,8 +82,11 @@ def sweep_leftovers(step_context) -> dict:
         age = time.time() - task["createdAt"].timestamp()
         if age > POLL_SECONDS * MAX_POLLS:
             step_context.logger.info(f"Stopping stale task {task['taskArn']}")
-            ecs.stop_task(cluster=CLUSTER, task=task["taskArn"],
-                          reason="stale restore check task (swept by a new run)")
+            ecs.stop_task(
+                cluster=CLUSTER,
+                task=task["taskArn"],
+                reason="stale restore check task (swept by a new run)",
+            )
         else:
             in_flight = True
     return {"in_flight": in_flight}
@@ -127,9 +129,9 @@ def run_task(step_context) -> str:
 
 @durable_step
 def task_state(step_context, task_arn: str) -> dict:
-    tasks = boto3.client("ecs").describe_tasks(
-        cluster=CLUSTER, tasks=[task_arn]
-    )["tasks"]
+    tasks = boto3.client("ecs").describe_tasks(cluster=CLUSTER, tasks=[task_arn])[
+        "tasks"
+    ]
     if not tasks:
         return {"status": "MISSING", "exit_code": None, "reason": "task not found"}
     task = tasks[0]
