@@ -19,8 +19,19 @@ terraform {
 
   required_providers {
     aws = {
+      # 6.25 is the first release with aws_lambda_function durable_config.
       source  = "hashicorp/aws"
-      version = "~> 6.0"
+      version = "~> 6.25"
+    }
+
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
+
+    sentry = {
+      source  = "jianyuan/sentry"
+      version = "~> 0.15"
     }
   }
 
@@ -41,6 +52,11 @@ provider "aws" {
     }
   }
 }
+
+# Authenticates via the SENTRY_AUTH_TOKEN environment variable: an
+# org-scoped API token held in Anika BitWarden. Export it before running
+# plan or apply (validate needs no token).
+provider "sentry" {}
 
 locals {
   region       = "ap-southeast-2"

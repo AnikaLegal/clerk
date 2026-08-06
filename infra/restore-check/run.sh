@@ -110,7 +110,7 @@ send_key
     printf 'export S3_BUCKET=%q\n' "$S3_BUCKET"
     printf 'export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=restore-check\n'
     printf 'exec python3 -\n'
-    cat "$(dirname "$0")/check.py"
+    cat "$(dirname "$0")/db-check.py"
 } | "${SSH[@]}" bash -s | awk -v summary="$SUMMARY_FILE" -v results="$RESULTS_FILE" '
     /===RESTORE-CHECK-RESULTS===/ { mode = 2; next }
     /===RESTORE-CHECK-SUMMARY===/ { mode = 1; next }
