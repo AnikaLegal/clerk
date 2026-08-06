@@ -54,7 +54,7 @@ provider "aws" {
 }
 
 # Authenticates via the SENTRY_AUTH_TOKEN environment variable: the token
-# of the "opentofu" internal integration, held in Anika BitWarden - owned
+# of the "Clerk OpenTofu" internal integration, held in Anika BitWarden - owned
 # by the organization rather than any user account. Creation steps and
 # permissions are in ../../README.md (one-time setup). Export it before
 # running plan or apply (validate needs no token).

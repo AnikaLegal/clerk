@@ -35,7 +35,7 @@ access is limited to the `run` state key for the same reason.
    Sentry UI, as an org Owner or Manager:
    1. Settings > Developer Settings > Custom Integrations > Create New
       Integration > Internal Integration.
-   2. Name it `opentofu`. Leave everything else empty - no webhook URL,
+   2. Name it `Clerk OpenTofu`. Leave everything else empty - no webhook URL,
       no redirect URL, no UI components, no webhook event boxes. It
       exists only to mint an API token.
    3. Set the permissions. The form varies: newer ones have an Alerts
