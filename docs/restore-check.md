@@ -59,15 +59,14 @@ kept out of code so no secret enters the public repo or OpenTofu state:
 
 Operating it:
 
-- **Run it by hand**: `aws lambda invoke --function-name
-  restore-check-db:live --invocation-type Event --payload '{}'
-  /dev/stdout`
+- **Run it by hand**: `just restore-check db` (needs AWS credentials
+  that may invoke the Lambda).
 - **Watch a run**: the step-by-step execution timeline is in the Lambda
   console under Durable executions; the full check log is in the
   CloudWatch log group `/restore-check/db` (the Slack report footer links
   straight to it).
 - **Change the check**: edit under `infra/restore-check/` and run
-  `just restore-check-db-image` - the task pulls `:latest`, so the push
+  `just restore-check db-image` - the task pulls `:latest`, so the push
   alone deploys it. Changes to db-lambda.py, report.py or the tofu need a
   foundations apply instead.
 - **Alerting**: Slack carries every run's result table; Sentry alerts

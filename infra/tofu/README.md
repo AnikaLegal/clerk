@@ -59,7 +59,7 @@ Each directory is an independent root with its own remote state in the
    enters state or the public repo - the values and commands are in the
    header of
    [restore-check/foundations/db.tf](restore-check/foundations/db.tf).
-5. Build and push the check image: `just restore-check-db-image`.
+5. Build and push the check image: `just restore-check db-image`.
 
 ## Conventions
 
