@@ -67,20 +67,8 @@ build-frontend *opts:
 build-base *opts:
     docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag anikalaw/clerkbase:latest .
 
-# Build and push the DB restore check image to ECR (this deploys the check)
-restore-check-db-image:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    region="ap-southeast-2"
-    account=$(aws sts get-caller-identity --query Account --output text)
-    registry="$account.dkr.ecr.$region.amazonaws.com"
-    # Fargate runs x86_64; pin the platform so builds from ARM machines work.
-    docker build --platform linux/amd64 \
-        --file infra/restore-check/Dockerfile.database \
-        --tag "$registry/restore-check-db:latest" infra/restore-check
-    aws ecr get-login-password --region "$region" \
-        | docker login --username AWS --password-stdin "$registry"
-    docker push "$registry/restore-check-db:latest"
+# Restore check recipes, e.g. `just restore-check db` to trigger one by hand
+mod restore-check "infra/restore-check/justfile"
 
 # Run Django dev server within a Docker container
 dev:

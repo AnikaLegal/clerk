@@ -15,7 +15,7 @@
 # The Sentry cron monitor defined below is the check's dead-man switch:
 # db-lambda.py checks in against it, and Sentry alerts when a run is
 # missed, times out, or fails. The check image is built and pushed with
-# `just restore-check-db-image`; the task definition tracks :latest, so a
+# `just restore-check db-image`; the task definition tracks :latest, so a
 # push alone deploys a change.
 
 locals {
