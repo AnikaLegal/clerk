@@ -108,18 +108,3 @@ Isolation rules for rehearsals:
   Microsoft).
 - Keep the host up only as long as needed.
 - Confirm teardown with a tag sweep.
-
-## History
-
-The process was established in July 2026. The provisioning and restore flow
-was verified end to end on throwaway hosts on 2026-07-17 (TEC-2035, which also
-surfaced and fixed several latent defects) and 2026-07-23 (TEC-2038). Those
-runs restored staging backups; from the first automated run onward, checks
-run against production backups.
-
-The monthly check originally ran from GitHub Actions, orchestrating an
-ephemeral EC2 instance over SSH. In August 2026 it moved entirely into
-AWS (TEC-2065) - EventBridge Scheduler, a Lambda durable function, and a
-Fargate task - removing the AWS credentials and GPG passphrase the
-workflow had held in GitHub. Its first end-to-end run (2026-08-07)
-immediately caught a silently missed nightly backup (TEC-2067).
