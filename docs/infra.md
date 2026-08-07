@@ -115,7 +115,7 @@ The scripts pin the versions of software that matter for reproducing the server:
 
 ## Infrastructure as code
 
-The AWS resources behind the [restore check](./restore-check.md) - an OpenTofu state bucket, an EC2 Instance Connect Endpoint, security groups and a CI IAM user - are defined with [OpenTofu](https://opentofu.org) under [infra/tofu](../infra/tofu). This is the first slice of describing the cloud state as code: the rest of the AWS account (buckets, IAM, AWS Backup, DNS) is still console-managed and documented on these pages, and new AWS resources should be added under [infra/tofu](../infra/tofu) rather than made by hand. See [infra/tofu/README.md](../infra/tofu/README.md) for the layout.
+The resources behind the [restore check](./restore-check.md) - an OpenTofu state bucket, an EventBridge schedule, a Lambda, an ECS cluster and task definition, an ECR repository, IAM roles, and a Sentry cron monitor - are defined with [OpenTofu](https://opentofu.org) under [infra/tofu](../infra/tofu). This is the first slice of describing the cloud state as code: the rest of the AWS account (buckets, IAM, AWS Backup, DNS) is still console-managed and documented on these pages, and new AWS resources should be added under [infra/tofu](../infra/tofu) rather than made by hand. See [infra/tofu/README.md](../infra/tofu/README.md) for the layout.
 
 ## External services
 

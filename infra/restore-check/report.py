@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""Report the restore check result (TEC-1987) to Slack.
+"""Build and post the restore check's Slack report (TEC-1987).
 
-Builds a Block Kit message from the structured results check.py emits (which
-run.sh extracts into RESULTS_FILE) and posts it to a Slack incoming webhook.
-When the results file is missing or unparseable (the check crashed before
-producing results), falls back to a minimal message built from OUTCOME
-alone. Does nothing but print a notice if no webhook is configured; a
-configured webhook that cannot be posted to exits non-zero.
+Builds a Block Kit message from the structured results db-check.py emits
+and posts it to a Slack incoming webhook. When no results are available
+(the check crashed or timed out before producing any), falls back to a
+minimal message built from the outcome alone.
 
-Environment: OUTCOME (PASS|FAIL), SLACK_WEBHOOK_URL, RESULTS_FILE, and
-optionally RUN_URL and GITHUB_REPOSITORY (shown in the message footer).
+Imported by db-lambda.py, which supplies the results it parsed from the
+check's log stream; also runnable as a CLI for local testing, reading the
+environment: OUTCOME (PASS|FAIL), RESULTS_FILE, SLACK_WEBHOOK_URL, and
+optionally RUN_URL (linked in the message footer). Without a webhook the
+CLI just prints a notice; a webhook that cannot be posted to exits
+non-zero.
 """
 
 import argparse
@@ -73,7 +75,7 @@ def summarise(outcome: str, checks: list[dict], crashed: bool) -> Summary:
     warned = [check["label"] for check in checks if check["status"] == "WARN"]
     if outcome != "PASS":
         status = (
-            "*FAILED* - no results were produced; the check may have crashed early."
+            "*FAILED* - no results were produced; the check may have crashed or timed out."
             if crashed
             else "*FAILED* - the latest backup may not be restorable. Please investigate."
         )
@@ -158,18 +160,13 @@ def checks_table(checks: list[dict]) -> dict:
     }
 
 
-def footer_blocks() -> list[dict]:
-    parts = []
-    if os.environ.get("GITHUB_REPOSITORY"):
-        parts.append(os.environ["GITHUB_REPOSITORY"])
-    if os.environ.get("RUN_URL"):
-        parts.append(f"<{os.environ['RUN_URL']}|Workflow run>")
-    if not parts:
+def footer_blocks(run_url: str | None) -> list[dict]:
+    if not run_url:
         return []
-    return [{"type": "context", "elements": [mrkdwn(" - ".join(parts))]}]
+    return [{"type": "context", "elements": [mrkdwn(f"<{run_url}|Run log>")]}]
 
 
-def build_payload(results: dict | None, outcome: str) -> dict:
+def build_payload(results: dict | None, outcome: str, run_url: str | None = None) -> dict:
     checks = (results or {}).get("checks", [])
     summary = summarise(outcome, checks, crashed=results is None)
 
@@ -188,7 +185,7 @@ def build_payload(results: dict | None, outcome: str) -> dict:
         blocks.append({"type": "section", "fields": fields})
     if checks:
         blocks += [spacer(), checks_table(checks), spacer()]
-    blocks += footer_blocks()
+    blocks += footer_blocks(run_url)
 
     return {"text": summary.notify, "blocks": blocks}
 
@@ -231,7 +228,11 @@ def main() -> int:
         parser.error("environment variable OUTCOME must be PASS or FAIL")
 
     results = load_results(os.environ.get("RESULTS_FILE", "restore-check-results.json"))
-    payload = build_payload(results, results["outcome"] if results else outcome)
+    payload = build_payload(
+        results,
+        results["outcome"] if results else outcome,
+        run_url=os.environ.get("RUN_URL"),
+    )
 
     if args.dry_run:
         print(json.dumps(payload, indent=2))
