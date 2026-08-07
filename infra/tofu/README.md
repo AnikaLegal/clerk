@@ -16,14 +16,7 @@ Each directory is an independent root with its own remote state in the
 | Root | Creates | Applied by | State key |
 | --- | --- | --- | --- |
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
-| `restore-check/foundations` | Instance Connect Endpoint, security groups, `restore-check-ci` IAM user and policy | admin, rarely | `restore-check/foundations/terraform.tfstate` |
-| `restore-check/run` | the ephemeral check instance | CI, monthly (apply then destroy) | `restore-check/run/terraform.tfstate` |
-
-`foundations` and `run` are separate roots because they have different
-lifecycles and credentials: `run` is applied and destroyed by the CI user
-every month, and must not contain the resources that define that user - a
-misfired destroy would delete its own credentials mid-run. The CI user's S3
-access is limited to the `run` state key for the same reason.
+| `restore-check/foundations` | everything behind the [restore check](../../docs/restore-check.md): schedule, Lambda, ECS cluster and task definition, ECR repository, IAM roles, Sentry cron monitor and alert | admin, rarely | `restore-check/foundations/terraform.tfstate` |
 
 ## One-time setup
 
@@ -62,22 +55,21 @@ access is limited to the `run` state key for the same reason.
 3. Apply `restore-check/foundations` with admin AWS credentials and the
    Sentry token exported: `export SENTRY_AUTH_TOKEN=...` (plan and apply
    need it; validate does not).
-4. Mint the CI access key (kept out of OpenTofu so the secret never enters
-   state): `aws iam create-access-key --user-name restore-check-ci`
-5. In GitHub Actions, set the repository variables
-   `RESTORE_CHECK_EICE_ID`, `RESTORE_CHECK_SUBNET_ID` and
-   `RESTORE_CHECK_INSTANCE_SG_ID` from the foundations outputs, plus
-   `RESTORE_CHECK_AWS_ACCESS_KEY` and the
-   `RESTORE_CHECK_AWS_SECRET_ACCESS_KEY` secret from step 4.
+4. Create the three SecureString parameters by hand, so no secret ever
+   enters state or the public repo - the values and commands are in the
+   header of
+   [restore-check/foundations/db.tf](restore-check/foundations/db.tf).
+5. Build and push the check image: `just restore-check-db-image`.
 
 ## Conventions
 
 - Pin versions: each root pins `required_version` and the AWS provider.
   Commit the `.terraform.lock.hcl` provider lock file a root's first
   `tofu init` generates.
-- No secrets in state or user data: access keys are minted manually, never
-  as `aws_iam_access_key` resources, and secrets reach the check instance
-  over SSH stdin only. Both user data and state are readable to anyone with
-  access to the API or the state bucket.
+- No secrets in state: secrets live in hand-created SSM SecureString
+  parameters, never in OpenTofu resources - ECS injects the passphrase
+  into the check container, and the Lambda reads the webhook and Sentry
+  URL at run time. State is readable to anyone with access to the state
+  bucket (and this repo is public), so treat both accordingly.
 - Never `tofu destroy` in `bootstrap` or `foundations` unless
   decommissioning the restore check entirely.

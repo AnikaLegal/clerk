@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Verify that the latest database backup actually restores (TEC-1987).
 
-Runs on the ephemeral EC2 check instance (see run.sh, which pipes this
-script to it over SSH): the dump is restored into a scratch database,
-verified, and dropped again. Runnable against any disposable Postgres via
-the PG* environment variables.
+Runs in the ephemeral Fargate check container (see Dockerfile.database and
+db-entrypoint.sh, which brings up a throwaway Postgres first): the dump is
+restored into a scratch database, verified, and dropped again. Runnable
+against any disposable Postgres via the PG* environment variables.
 
 Requires in the environment: S3_BUCKET, BACKUP_PASSPHRASE (for encrypted
 dumps), AWS credentials that can read the backup bucket, and PG* connection
@@ -12,9 +12,10 @@ variables for a Postgres server where the connecting role may create and
 drop databases.
 
 Prints a markdown summary of the checks after a ===RESTORE-CHECK-SUMMARY===
-marker line, then the same results as JSON (plus backup metadata) after a
-===RESTORE-CHECK-RESULTS=== marker line; run.sh extracts both for
-reporting.
+marker line (a human-readable recap in the run log), then the same results
+as JSON (plus backup metadata) after a ===RESTORE-CHECK-RESULTS=== marker
+line, which db-lambda.py reads back from the task's log stream to build
+the Slack report.
 """
 
 import argparse
