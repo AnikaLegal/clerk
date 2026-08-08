@@ -8,6 +8,7 @@ set default-list := true
 
 
 app_name := "clerk"
+base_image := "anikalaw/clerkbase"
 compose := "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 # Show usage for a recipe, e.g. `just help build`
@@ -65,7 +66,16 @@ build-frontend *opts:
 [private]
 [arg("opts", help="Options passed to docker build")]
 build-base *opts:
-    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag anikalaw/clerkbase:latest .
+    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:latest .
+
+# Log in to Docker Hub
+[private]
+docker-login:
+    docker login --username anikalaw
+
+# Build the base image from scratch and push it to Docker Hub
+push-base: docker-login (build-base "--no-cache")
+    docker push {{base_image}}:latest
 
 # Restore check recipes, e.g. `just restore-check db` to trigger one by hand
 mod restore-check "infra/restore-check/justfile"
