@@ -109,23 +109,6 @@ wheels = [
 ]
 
 [[package]]
-name = "awscli"
-version = "1.36.12"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "botocore" },
-    { name = "colorama" },
-    { name = "docutils" },
-    { name = "pyyaml" },
-    { name = "rsa" },
-    { name = "s3transfer" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8d/e9/85378362711627deaabc50c5826fd770f30e5929afaa7ed1af77965afaa4/awscli-1.36.12.tar.gz", hash = "sha256:97d045bcfceafed74f0b697334432dfa723ce752f2b1b20ab2a2b194d558c9e0", size = 1832999, upload-time = "2024-11-27T20:26:05.751Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/a9/1a002bad23dcd82efaf3bea3e3860b8b54e75ff5dfe62367b3ae79769d43/awscli-1.36.12-py3-none-any.whl", hash = "sha256:7ced75838de8e7b21db4488b8fcd57d142375fdb87ec43ae4f40f53dee7ab479", size = 4536034, upload-time = "2024-11-27T20:26:02.618Z" },
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.15.0"
 source = { registry = "https://pypi.org/simple" }
@@ -255,7 +238,6 @@ name = "clerk"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "awscli" },
     { name = "beautifulsoup4" },
     { name = "black" },
     { name = "boto3" },
@@ -321,7 +303,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "awscli" },
     { name = "beautifulsoup4" },
     { name = "black" },
     { name = "boto3" },
@@ -769,15 +750,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/2c/ce/31482eb688bdb4e271027076199e1aa8d02507e530b6d272ab8b4481557c/djangorestframework-3.15.2.tar.gz", hash = "sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad", size = 1067420, upload-time = "2024-06-19T07:59:32.891Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7c/b6/fa99d8f05eff3a9310286ae84c4059b08c301ae4ab33ae32e46e8ef76491/djangorestframework-3.15.2-py3-none-any.whl", hash = "sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20", size = 1071235, upload-time = "2024-06-19T07:59:26.106Z" },
-]
-
-[[package]]
-name = "docutils"
-version = "0.16"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2f/e0/3d435b34abd2d62e8206171892f174b180cd37b09d57b924ca5c2ef2219d/docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc", size = 1962041, upload-time = "2020-01-12T13:55:25.917Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/44/8a15e45ffa96e6cf82956dd8d7af9e666357e16b0d93b253903475ee947f/docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af", size = 548181, upload-time = "2020-01-12T13:55:21.393Z" },
 ]
 
 [[package]]
