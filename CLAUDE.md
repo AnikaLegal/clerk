@@ -62,6 +62,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 ## Conventions & guardrails
 
 - **Never use en dashes or em dashes** in code, comments, commit messages, docs, or any other text. Use a normal hyphen (-) instead.
+- **Number every list in a reply** - tasks, findings, options, next steps - so the user can refer to an item by its number. Number across the whole reply rather than restarting per section.
 - **Branch off `develop`** (not `master`). Use conventional-commit style messages (`fix(case): ...`, `chore: ...`), matching recent history.
 - **Don't assume a pull request is required.** The PR-based flow in [docs/setup.md](docs/setup.md#contributing) is written for volunteers and outside contributors; core tech team members commit to `develop` directly. Follow whichever the user is using, and ask if it isn't clear.
 - **Don't add `Co-Authored-By` trailers** (or any similar attribution lines) to commit messages.
