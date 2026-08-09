@@ -22,13 +22,25 @@ RUN echo "Updating apt sources" && \
 # wget + curl: for HTTP debugging.
 # iputils-ping: for pinging things.
 # gnupg: for decrypting encrypted database backups during restore.
+# unzip: for extracting the AWS CLI installer below.
 RUN echo "Installing generic stuff" && \
     apt-get -qq install \
     ca-certificates \
     curl \
     wget \
     iputils-ping \
-    gnupg
+    gnupg \
+    unzip
+
+# Install the AWS CLI, used by the database restore scripts in
+# app/scripts/tasks. The same pinned version as the server and the restore
+# check images (see infra/setup/aws/setup.sh).
+RUN echo "Installing AWS CLI" && \
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-2.34.0.zip" \
+    -o /tmp/awscliv2.zip && \
+    unzip -q -d /tmp /tmp/awscliv2.zip && \
+    /tmp/aws/install && \
+    rm -rf /tmp/aws /tmp/awscliv2.zip
 
 # Install PostgreSQL client tools from the PGDG apt repository, pinned to the
 # same major version as the production database server.
