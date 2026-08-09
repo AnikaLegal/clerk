@@ -52,18 +52,28 @@ else
     # Prod backups are already GPG-encrypted at rest, so just download them as-is.
     # Decrypt later with: ${prog} -d <FILE>
 
-    # Get the db backup from the AWS prod backup bucket.
+    # Get the db backup from the AWS prod backup bucket. Each dump has a
+    # row count manifest next to it which must not match here.
     echo "Finding latest database backup..."
     db_backup_file=$(
         aws s3 ls ${s3_bucket} |
             sort |
             grep postgres_clerk |
+            grep -v manifest |
             tail -n 1 |
             awk '{{print $4}}'
     )
 
     echo "Downloading database backup file $db_backup_file"
     aws s3 cp ${s3_bucket}/${db_backup_file} "${db_backup_file}"
+
+    # Get the dump's row count manifest too: it says what a successful
+    # restore of this backup should contain.
+    manifest_file="${db_backup_file%.gpg}"
+    manifest_file="${manifest_file%.sql}.manifest.json"
+    echo "Downloading manifest file $manifest_file"
+    aws s3 cp ${s3_bucket}/${manifest_file} "${manifest_file}" ||
+        echo "No manifest found for ${db_backup_file}, skipping"
 
     # Get the client info backup from the AWS prod backup bucket.
     echo "Finding latest client info backup..."
