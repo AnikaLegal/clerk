@@ -16,6 +16,10 @@ You will need:
 
   For testing inbound emails.
 
+- `aws` ([install](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
+
+  For the infrastructure scripts and `just` recipes that talk to AWS.
+
 ## Getting Started
 
 If you are using Windows ensure that git is setup to use LF not CLRF
