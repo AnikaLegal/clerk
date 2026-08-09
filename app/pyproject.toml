@@ -8,7 +8,6 @@ authors = [
     { name = "Luca Vari", email = "luca.vari@anikalegal.org.au" },
 ]
 dependencies = [
-    "awscli",
     "beautifulsoup4",
     "black",
     "boto3",
