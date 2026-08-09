@@ -8,6 +8,7 @@ set default-list := true
 
 
 app_name := "clerk"
+base_image := "anikalaw/clerkbase"
 compose := "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 # Show usage for a recipe, e.g. `just help build`
@@ -19,19 +20,29 @@ help recipe:
 schema:
     cd frontend && npm run schema
 
-# Build images locally (no target: frontend + intake + backend; or any of: backend | frontend | intake | base)
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-[arg("targets", help="backend | frontend | intake | base (default: frontend + intake + backend)")]
-build no_cache="" *targets:
+# Build images locally, e.g. `just build backend -- --no-cache` (no target: frontend + backend)
+[arg("args", help="backend | frontend | base (default: frontend + backend), then docker build options after --")]
+build *args:
     #!/usr/bin/env bash
     set -euo pipefail
     j="{{just_executable()}}"
-    nc=""; [ -n "{{no_cache}}" ] && nc="--no-cache"
-    targets="{{targets}}"
-    [ -z "$targets" ] && targets="frontend intake backend"
+    # Targets come first; the first dashed arg and everything after it is for docker build.
+    # A bare `--` only marks the split, so `just build backend -- --no-cache` works too.
+    targets=""; opts=""; in_opts=0
+    for a in {{args}}; do
+      if [ "$a" = "--" ]; then
+        in_opts=1
+      elif [ "$in_opts" = 1 ] || [ "${a#-}" != "$a" ]; then
+        in_opts=1
+        opts="$opts $a"
+      else
+        targets="$targets $a"
+      fi
+    done
+    [ -z "$targets" ] && targets="frontend backend"
     for t in $targets; do
       case "$t" in
-        backend|frontend|intake|base) "$j" build-"$t" $nc ;;
+        backend|frontend|base) "$j" build-"$t" $opts ;;
         *)
           echo "Unknown build target: $t (expected backend, frontend, intake, or base)" >&2
           exit 1
@@ -41,15 +52,15 @@ build no_cache="" *targets:
 
 # Build the backend (app) image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-backend no_cache="":
-    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile --tag {{app_name}}:local .
+[arg("opts", help="Options passed to docker build")]
+build-backend *opts:
+    docker build {{opts}} --file docker/Dockerfile --tag {{app_name}}:local .
 
 # Build the frontend image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-frontend no_cache="":
-    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
+[arg("opts", help="Options passed to docker build")]
+build-frontend *opts:
+    docker build {{opts}} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
 
 # Build the intake form image
 [private]
@@ -59,9 +70,21 @@ build-intake no_cache="":
 
 # Build the multi-platform base image
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-base no_cache="":
-    docker build --platform=linux/amd64,linux/arm64 {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.base --tag anikalaw/clerkbase:latest .
+[arg("opts", help="Options passed to docker build")]
+build-base *opts:
+    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:latest .
+
+# Log in to Docker Hub
+[private]
+docker-login:
+    docker login --username anikalaw
+
+# Build the base image from scratch and push it to Docker Hub
+push-base: docker-login (build-base "--no-cache")
+    docker push {{base_image}}:latest
+
+# Restore check recipes, e.g. `just restore-check db` to trigger one by hand
+mod restore-check "infra/restore-check/justfile"
 
 # Run Django dev server within a Docker container
 dev:

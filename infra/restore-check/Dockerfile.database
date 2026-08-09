@@ -1,0 +1,26 @@
+# The database restore check container (TEC-2065): a throwaway Postgres of
+# the pinned major - which must match the server pin, see
+# infra/setup/postgres/setup.sh and docs/infra.md - plus the tools
+# db-check.py needs. Built and pushed with `just restore-check db-image`;
+# run monthly as a Fargate task by the restore-check-db Lambda.
+# Contains no secrets: ECS injects BACKUP_PASSPHRASE at run time.
+FROM postgres:16
+
+RUN apt-get update -qq \
+    && apt-get install --yes -qq --no-install-recommends \
+        ca-certificates curl gnupg python3 unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# The same pinned AWS CLI v2 as the server (see infra/setup/aws/setup.sh).
+RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-2.34.0.zip" \
+        -o /tmp/awscliv2.zip \
+    && unzip -q -d /tmp /tmp/awscliv2.zip \
+    && /tmp/aws/install \
+    && rm -rf /tmp/aws /tmp/awscliv2.zip
+
+COPY db-entrypoint.sh db-check.py /
+
+# timeout is the in-container failsafe: if the check wedges, the task kills
+# itself well before the orchestrating Lambda's own give-up (and the data
+# is scratch, so SIGKILL after the grace minute costs nothing).
+ENTRYPOINT ["timeout", "--signal=TERM", "--kill-after=60s", "90m", "/db-entrypoint.sh"]
