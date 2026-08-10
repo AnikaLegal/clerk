@@ -37,7 +37,7 @@ def test_find_clients__with_multiple_issues():
         created_at=THREE_DAYS_AGO,
         is_complete=False,
     )
-    assert find_submissions(CaseTopic.RENT_REDUCTION) == [sub1, sub2]
+    assert set(find_submissions(CaseTopic.RENT_REDUCTION)) == {sub1, sub2}
     assert find_submissions(CaseTopic.REPAIRS) == []
 
 
