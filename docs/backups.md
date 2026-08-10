@@ -109,6 +109,13 @@ layout is historical. Staging is deliberately left out of AWS Backup: its data
 is obfuscated and can be regenerated from production, so there is nothing there
 worth an extra copy.
 
+Both vaults and the protected-bucket selection are defined as code under
+[infra/tofu/backup](../infra/tofu/backup/main.tf), imported unchanged from
+the console-built originals. The backup plan itself (daily 5AM and monthly
+snapshots, 35-day and 365-day retention, copies to Melbourne) is still
+console-managed: the OpenTofu provider cannot yet express two of its live
+settings - the file header has the details.
+
 A monthly AWS Budget (`aws-backup-monthly`) emails tech@anikalegal.com if AWS
 Backup spend climbs beyond its expected range, so cost drift does not go
 unnoticed.
