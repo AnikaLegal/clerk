@@ -3,6 +3,11 @@
 # `just restore-check <recipe>`. Recipes execute with this directory as
 # their working directory.
 
+# Trigger the daily S3 backup landing check by hand (sync, prints the result)
+backup-check:
+    aws lambda invoke --region ap-southeast-2 \
+        --function-name backup-check-s3 --no-cli-pager /dev/stdout
+
 # Trigger the monthly DB restore check by hand (runs in AWS, ~10 minutes)
 db:
     #!/usr/bin/env bash
