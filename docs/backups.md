@@ -109,6 +109,21 @@ layout is historical. Staging is deliberately left out of AWS Backup: its data
 is obfuscated and can be regenerated from production, so there is nothing there
 worth an extra copy.
 
+Both vaults and the protected-bucket selection are defined as code under
+[infra/tofu/backup](../infra/tofu/backup/main.tf), imported unchanged from
+the console-built originals. The backup plan itself (daily 5AM and monthly
+snapshots, 35-day and 365-day retention, copies to Melbourne) is still
+console-managed: the OpenTofu provider cannot yet express two of its live
+settings - the file header has the details.
+
+Whether those snapshots actually land is checked every morning: the
+[backup-check-s3 Lambda](../infra/restore-check/backup-check-lambda.py)
+asserts that each protected bucket has a fresh recovery point in Sydney
+and that its copy reached the Melbourne vault, alerting Slack on any gap.
+A Sentry cron monitor stands behind the check itself, so the check
+silently stopping is also an alert. Whether the snapshots also *restore*
+is proven separately - see [restore-check.md](./restore-check.md).
+
 A monthly AWS Budget (`aws-backup-monthly`) emails tech@anikalegal.com if AWS
 Backup spend climbs beyond its expected range, so cost drift does not go
 unnoticed.
