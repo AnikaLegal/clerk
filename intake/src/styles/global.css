@@ -1119,6 +1119,12 @@ header .h-\[63px\] img {
     border-right: none;
   }
 
+  /* The website's components.css tracks list text out (ul { letter-spacing:
+     0.05em }), which inherits into the SurveyJS list the rows render in. */
+  .intake-sidebar .sv-list {
+    letter-spacing: normal;
+  }
+
   /* Each row is a marker and a name (see comps/FormSidebar). */
   .intake-sidebar .sv-list__item-body {
     display: flex;
