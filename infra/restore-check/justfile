@@ -19,6 +19,17 @@ db:
     echo "the Lambda console (restore-check-db > Durable executions) or the"
     echo "CloudWatch log group /restore-check/db."
 
+# Trigger the S3 restore test report by hand (runs in AWS, result lands in Slack)
+s3:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    aws lambda invoke --region ap-southeast-2 \
+        --function-name restore-check-s3-report:live \
+        --invocation-type Event --no-cli-pager /dev/null
+    echo "S3 restore report launched: it covers the restore jobs of the last"
+    echo "24 hours and the result lands in Slack. Follow along in the Lambda"
+    echo "console (restore-check-s3-report > Durable executions)."
+
 # Build and push the DB restore check image to ECR (this deploys the check)
 db-image:
     #!/usr/bin/env bash

@@ -17,7 +17,7 @@ Each directory is an independent root with its own remote state in the
 | --- | --- | --- | --- |
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
 | `backup` | the [AWS Backup scheme](../../docs/backups.md): both vaults and the protected-bucket selection, imported from the console-built originals (the plan itself stays console-managed - see the file header for why) | admin, rarely | `backup/terraform.tfstate` |
-| `restore-check/foundations` | everything behind the [restore check](../../docs/restore-check.md): schedule, Lambda, ECS cluster and task definition, ECR repository, IAM roles, Sentry cron monitor and alert | admin, rarely | `restore-check/foundations/terraform.tfstate` |
+| `restore-check/foundations` | everything behind the [restore checks](../../docs/restore-check.md): schedules, Lambdas, the db check's ECS cluster/task definition and ECR repository, the S3 restore testing plans, IAM roles, Sentry cron monitors and alerts | admin, rarely | `restore-check/foundations/terraform.tfstate` |
 
 ## One-time setup
 
@@ -56,10 +56,11 @@ Each directory is an independent root with its own remote state in the
 3. Apply `restore-check/foundations` with admin AWS credentials and the
    Sentry token exported: `export SENTRY_AUTH_TOKEN=...` (plan and apply
    need it; validate does not).
-4. Create the three SecureString parameters by hand, so no secret ever
-   enters state or the public repo - the values and commands are in the
-   header of
-   [restore-check/foundations/db.tf](restore-check/foundations/db.tf).
+4. Create the SecureString parameters by hand, so no secret ever enters
+   state or the public repo - each check's parameters and the commands
+   are in the headers of the per-check files in
+   [restore-check/foundations](restore-check/foundations) (`db.tf`,
+   `backup-check.tf`, `s3.tf`).
 5. Build and push the check image: `just restore-check db-image`.
 
 ## Conventions
