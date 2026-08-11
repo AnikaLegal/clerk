@@ -16,6 +16,7 @@ Each directory is an independent root with its own remote state in the
 | Root | Creates | Applied by | State key |
 | --- | --- | --- | --- |
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
+| `backup` | the [AWS Backup scheme](../../docs/backups.md): both vaults and the protected-bucket selection, imported from the console-built originals (the plan itself stays console-managed - see the file header for why) | admin, rarely | `backup/terraform.tfstate` |
 | `restore-check/foundations` | everything behind the [restore check](../../docs/restore-check.md): schedule, Lambda, ECS cluster and task definition, ECR repository, IAM roles, Sentry cron monitor and alert | admin, rarely | `restore-check/foundations/terraform.tfstate` |
 
 ## One-time setup
