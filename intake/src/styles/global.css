@@ -1161,10 +1161,6 @@ header .h-\[63px\] img {
   /* The page's inherited line-height (~34px) would push the digit out of the
      circle. */
   line-height: 1;
-  /* Optical nudge: the digits sit a hair left of centre in the circle, so bias
-     the content box half a pixel right (the tick below gets a matching nudge in
-     its transform). */
-  padding-left: 1px;
   border: 1px solid var(--color-primary);
   color: color-mix(in oklab, var(--color-primary), #000 20%);
 }
