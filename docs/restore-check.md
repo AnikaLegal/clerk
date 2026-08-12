@@ -129,19 +129,43 @@ Operating it:
 
 A recurring [Linear
 issue](https://linear.app/anika-legal/issue/TEC-2044/bi-annual-restore-rehearsal)
-schedules a full disaster recovery rehearsal every 6 months. The full
-checklist lives on the issue; in outline:
+schedules a full disaster recovery rehearsal every 6 months. Unlike the
+monthly checks it is deliberately human-driven: the point is proving a
+person can go from the BitWarden secrets to a rebuilt, restored
+environment. The mechanics are automated as the `rehearsal` just module
+([infra/rehearsal](../infra/rehearsal/justfile) plus the ephemeral
+[infra/tofu/rehearsal](../infra/tofu/rehearsal/main.tf) root, which holds
+nothing between drills). The full checklist lives on the issue; in
+outline:
 
-1. Retrieve the secrets from BitWarden - this deliberately tests the human
-   path the automation cannot.
-2. Provision a throwaway EC2 instance with
-   [provision.sh](../infra/setup/provision.sh).
-3. Deploy the staging environment with
-   [init-env.sh](../infra/setup/init-env.sh).
-4. Restore both databases with
-   [restore-databases.sh](../infra/setup/restore-databases.sh).
-5. Verify, and record the results on the issue.
-6. Tear everything down.
+1. Retrieve the secrets from BitWarden and prove they work (fresh clone +
+   transcrypt unlock) - this deliberately tests the human path the
+   automation cannot.
+2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
+   armed with a 4-hour self-destruct so production data cannot sit on a
+   forgotten host. A long drill can disarm it on the host
+   (`systemctl stop rehearsal-self-destruct.timer`) and re-arm with a new
+   deadline (the `systemd-run` line in
+   [user-data.yml.tftpl](../infra/tofu/rehearsal/user-data.yml.tftpl)) -
+   do this deliberately, not by default.
+3. `just rehearsal setup <ip>` -
+   [provision.sh](../infra/setup/provision.sh) then the staging stack via
+   [init-env.sh](../infra/setup/init-env.sh) (staging only; the recipe
+   accepts no other environment).
+4. `just rehearsal restore <ip>` -
+   [restore-databases.sh](../infra/setup/restore-databases.sh), which
+   prompts for the backup credentials and passphrase.
+5. `just rehearsal verify <ip>` - row counts against the manifest of the
+   dump that was actually restored (exact match), the staging app
+   answering through nginx, and the Sentry blackhole holding inside the
+   containers; prints the results block to paste onto the Linear issue.
+6. `just rehearsal down` - destroys the host and then *asserts* nothing
+   tagged `Purpose=rehearsal` remains (`just rehearsal sweep` re-runs the
+   assertion alone any time).
+7. Report the outcome to senior management, then close the issue.
+
+The host null-routes Sentry ingest, so the drill's staging workers cannot
+leak errors into the real staging Sentry project.
 
 Isolation rules for rehearsals:
 

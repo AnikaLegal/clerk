@@ -1,0 +1,85 @@
+# Recipes for the bi-annual restore rehearsal (TEC-2044), loaded by the
+# root justfile as the `rehearsal` module: run them from the project root
+# as `just rehearsal <recipe>`. The full drill, in order (secrets from
+# BitWarden first - see docs/restore-check.md):
+#
+#   just rehearsal up
+#   just rehearsal setup <ip>
+#   just rehearsal restore <ip>
+#   just rehearsal verify <ip>
+#   just rehearsal down
+
+tofu_dir := "../tofu/rehearsal"
+
+# Launch the throwaway host (SSH from your IP only; 4h self-destruct)
+up ip="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    operator_ip="{{ip}}"
+    if [ -z "$operator_ip" ]; then
+        operator_ip=$(curl -sf https://checkip.amazonaws.com)
+    fi
+    if ! [[ "$operator_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: could not determine your public IPv4 (got '$operator_ip')." >&2
+        echo "Pass it explicitly: just rehearsal up ip=x.x.x.x" >&2
+        exit 1
+    fi
+    # Override with REHEARSAL_SSH_KEY if your public key lives elsewhere.
+    key_file="${REHEARSAL_SSH_KEY:-$HOME/.ssh/id_ed25519.pub}"
+    if [ ! -f "$key_file" ]; then
+        echo "Error: no SSH public key at $key_file (set REHEARSAL_SSH_KEY)" >&2
+        exit 1
+    fi
+    ssh_public_key=$(cat "$key_file")
+    echo ">>> SSH will be allowed from $operator_ip only, as root, using $key_file"
+    tofu -chdir={{tofu_dir}} init > /dev/null
+    tofu -chdir={{tofu_dir}} apply \
+        -var "operator_ip=$operator_ip" \
+        -var "ssh_public_key=$ssh_public_key"
+    host=$(tofu -chdir={{tofu_dir}} output -raw public_ip)
+    echo ""
+    echo ">>> Host is booting. Next:"
+    echo ">>>   just rehearsal setup $host"
+
+# Provision the host and deploy the staging stack (staging only, by design)
+setup host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # cloud-init installs the SSH key late in boot; wait for it rather
+    # than letting provision.sh trip over an auth failure.
+    echo ">>> Waiting for the host to accept SSH"
+    for i in $(seq 1 30); do
+        if ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=5 \
+            root@{{host}} true 2> /dev/null; then
+            break
+        fi
+        if [ "$i" -eq 30 ]; then
+            echo "Error: {{host}} never accepted SSH; check the instance" >&2
+            exit 1
+        fi
+        sleep 10
+    done
+    ../setup/provision.sh {{host}}
+    ../setup/init-env.sh {{host}} staging
+
+# Restore both databases from the latest backups (prompts for the secrets)
+restore host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo ">>> Reminder: the host self-destructs 4h after boot. If the drill"
+    echo ">>> runs long, disarm deliberately (see docs/restore-check.md)."
+    ../setup/restore-databases.sh {{host}}
+
+# Verify the restore and print the results block for the Linear issue
+verify host:
+    ./verify.py {{host}}
+
+# Destroy the host and prove nothing tagged Purpose=rehearsal remains
+down:
+    tofu -chdir={{tofu_dir}} init > /dev/null
+    tofu -chdir={{tofu_dir}} destroy
+    ./sweep.sh
+
+# Just the leftover-resource check (rerunnable any time)
+sweep:
+    ./sweep.sh
