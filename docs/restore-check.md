@@ -127,9 +127,12 @@ Operating it:
 
 ## Bi-annually: full rebuild rehearsal
 
-A recurring [Linear
-issue](https://linear.app/anika-legal/issue/TEC-2044/bi-annual-restore-rehearsal)
-schedules a full disaster recovery rehearsal every 6 months. Unlike the
+A [recurring Linear
+issue](https://linear.app/anika-legal/settings/teams/TEC/recurring-issues/afc1fbf9-9beb-44bb-a9cc-cef4fd718913/edit)
+(managed under the Tech team's [recurring issues
+settings](https://linear.app/anika-legal/settings/teams/TEC/recurring-issues/))
+schedules a full disaster recovery rehearsal every 6 months, spawning an
+instance issue with the drill checklist each time. Unlike the
 monthly checks it is deliberately human-driven: the point is proving a
 person can go from the BitWarden secrets to a rebuilt, restored
 environment. The mechanics are automated as the `rehearsal` just module
