@@ -1,0 +1,21 @@
+#cloud-config
+# Rendered by main.tf. Three jobs: let the setup scripts in as root, keep
+# the drill's Sentry noise off the real staging project, and arm the
+# self-destruct that bounds how long production data can sit on a
+# forgotten host (the halt terminates the instance - see
+# instance_initiated_shutdown_behavior in main.tf).
+#
+# The self-destruct is a transient systemd timer rather than a scheduled
+# `shutdown -h +N`: shutdown scheduling lives in logind, which the
+# hardening step's package upgrade can restart (silently cancelling it),
+# while a timer registered with pid 1 survives that. Disarm deliberately
+# with `systemctl stop rehearsal-self-destruct.timer`; re-arm by running
+# the systemd-run line again with a new duration.
+disable_root: false
+runcmd:
+  - install -d -m 700 /root/.ssh
+  - echo "${ssh_public_key}" >> /root/.ssh/authorized_keys
+%{ for host in sentry_hosts ~}
+  - echo "127.0.0.1 ${host}" >> /etc/hosts
+%{ endfor ~}
+  - systemd-run --unit=rehearsal-self-destruct --on-active=${self_destruct_minutes}min /usr/sbin/shutdown -h now

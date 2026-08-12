@@ -18,6 +18,7 @@ Each directory is an independent root with its own remote state in the
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
 | `backup` | the [AWS Backup scheme](../../docs/backups.md): both vaults and the protected-bucket selection, imported from the console-built originals (the plan itself stays console-managed - see the file header for why) | admin, rarely | `backup/terraform.tfstate` |
 | `restore-check/foundations` | everything behind the [restore checks](../../docs/restore-check.md): schedules, Lambdas, the db check's ECS cluster/task definition and ECR repository, the S3 restore testing plans, IAM roles, Sentry cron monitors and alerts | admin, rarely | `restore-check/foundations/terraform.tfstate` |
+| `rehearsal` | the throwaway host for the [bi-annual restore rehearsal](../../docs/restore-check.md#bi-annually-full-rebuild-rehearsal), applied and destroyed per drill via `just rehearsal up`/`down` - holds nothing between drills | admin, twice a year | `rehearsal/terraform.tfstate` |
 
 ## One-time setup
 

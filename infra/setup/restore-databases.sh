@@ -92,10 +92,12 @@ restore_database() {
 
     # Locate the backup before touching anything on the host, so that bad
     # credentials or an empty bucket abort with the host left untouched.
+    # Match dumps only: the bucket also holds the row count manifests,
+    # which sort after their dump (uploaded minutes later).
     local dump_name
     dump_name=$(aws s3 ls ${s3_bucket} |
         sort |
-        grep postgres_clerk |
+        grep -E 'postgres_clerk_.*\.sql(\.gpg)?$' |
         tail -n 1 |
         awk '{print $4}')
     echo -e "\n>>> Found backup: $dump_name"
@@ -143,6 +145,12 @@ restore_database() {
         PGUSER=$pguser \
         PGPASSWORD=$pgpassword \
         pg_restore --no-owner --no-privileges --username=$pguser --dbname=$db_name
+
+    # Record what was restored, on the host it was restored to: provenance
+    # for whoever inspects the server later, and what the rehearsal's
+    # verify step checks row counts against.
+    ssh $SSH_OPTS root@$HOST \
+        "echo '$dump_name' > /root/clerk-restored-$env_name"
 
     echo -e "\n>>> Starting $env_name services on $HOST"
     ssh $SSH_OPTS root@$HOST \

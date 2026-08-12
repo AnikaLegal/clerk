@@ -80,6 +80,9 @@ push-base: docker-login (build-base "--no-cache")
 # Restore check recipes, e.g. `just restore-check db` to trigger one by hand
 mod restore-check "infra/restore-check/justfile"
 
+# Bi-annual restore rehearsal recipes, e.g. `just rehearsal up` (see docs/restore-check.md)
+mod rehearsal "infra/rehearsal/justfile"
+
 # Run Django dev server within a Docker container
 dev:
     {{compose}} up web
