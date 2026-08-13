@@ -49,6 +49,10 @@ for arn in $arns; do
             state=$(probe describe-volumes --volume-ids "$id" \
                 --query 'Volumes[].VolumeId')
             ;;
+        *:security-group-rule/*)
+            state=$(probe describe-security-group-rules --security-group-rule-ids "$id" \
+                --query 'SecurityGroupRules[].SecurityGroupRuleId')
+            ;;
         *:security-group/*)
             state=$(probe describe-security-groups --group-ids "$id" \
                 --query 'SecurityGroups[].GroupId')
