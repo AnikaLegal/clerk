@@ -59,7 +59,14 @@ setup host:
         fi
         sleep 10
     done
-    ../setup/provision.sh {{host}}
+    # Skip provisioning on a rerun (mirroring provision.sh's own guard,
+    # which aborts rather than skips), so a failure in the deploy half
+    # leaves this recipe safely re-runnable.
+    if ssh -o StrictHostKeyChecking=accept-new root@{{host}} '[ -d /srv/infra ]' 2> /dev/null; then
+        echo ">>> Host is already provisioned, skipping provision.sh"
+    else
+        ../setup/provision.sh {{host}}
+    fi
     ../setup/init-env.sh {{host}} staging
 
 # Restore both databases from the latest backups (prompts for the secrets)

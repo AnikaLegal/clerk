@@ -143,7 +143,11 @@ outline:
 
 1. Retrieve the secrets from BitWarden and prove they work (fresh clone +
    transcrypt unlock) - this deliberately tests the human path the
-   automation cannot.
+   automation cannot. Also make sure your SSH key is served by an agent
+   (`ssh-add`), not just sitting as a passphrase-protected file: the
+   stack deploy runs Docker over SSH, which cannot prompt. If your ssh
+   config routes everything to the 1Password agent, scope a
+   `IdentityAgent SSH_AUTH_SOCK` block for the drill host above it.
 2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
    armed with a 4-hour self-destruct so production data cannot sit on a
    forgotten host. A long drill can disarm it on the host
