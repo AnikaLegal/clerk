@@ -87,7 +87,7 @@ resource "aws_security_group" "rehearsal" {
 
 resource "aws_vpc_security_group_ingress_rule" "rehearsal_ssh" {
   security_group_id = aws_security_group.rehearsal.id
-  description       = "SSH from the operator's IP"
+  description       = "SSH from the operator IP only"
   ip_protocol       = "tcp"
   from_port         = 22
   to_port           = 22
