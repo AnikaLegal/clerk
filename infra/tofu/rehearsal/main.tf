@@ -50,8 +50,8 @@ variable "operator_ip" {
   default     = "127.0.0.1"
 }
 
-variable "ssh_public_key" {
-  description = "The operator's SSH public key, installed for root"
+variable "ssh_public_keys" {
+  description = "The operator's SSH public key(s), one per line, installed for root"
   type        = string
   default     = ""
 }
@@ -120,7 +120,7 @@ resource "aws_instance" "rehearsal" {
   user_data_replace_on_change = true
 
   user_data = templatefile("${path.module}/user-data.yml.tftpl", {
-    ssh_public_key        = var.ssh_public_key
+    ssh_public_keys       = var.ssh_public_keys
     self_destruct_minutes = var.self_destruct_minutes
     # Every hostname the clerk Sentry DSNs point at, blackholed in
     # /etc/hosts so the drill's staging stack cannot leak errors into the

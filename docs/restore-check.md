@@ -143,33 +143,54 @@ outline:
 
 1. Retrieve the secrets from BitWarden and prove they work (fresh clone +
    transcrypt unlock) - this deliberately tests the human path the
-   automation cannot. Also make sure your SSH key is served by an agent
-   (`ssh-add`), not just sitting as a passphrase-protected file: the
-   stack deploy runs Docker over SSH, which cannot prompt. If your ssh
-   config routes everything to the 1Password agent, scope a
-   `IdentityAgent SSH_AUTH_SOCK` block for the drill host above it.
+   automation cannot.
 2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
    armed with a 4-hour self-destruct so production data cannot sit on a
-   forgotten host. A long drill can disarm it on the host
+   forgotten host. It installs for root the union of
+   `~/.ssh/id_ed25519.pub` (if present) and every key your ssh agent
+   serves (`ssh-add -L`) - so whichever of them ssh ends up offering, a
+   matching key is on the host; set `REHEARSAL_SSH_KEY` to a public key
+   file to install exactly that key instead. Note `ssh-add` only sees
+   the agent at `$SSH_AUTH_SOCK` - if your keys live in a different
+   agent (a password manager's, say), point that variable at its socket
+   in the drill shell first. A long drill can disarm it on the host
    (`systemctl stop rehearsal-self-destruct.timer`) and re-arm with a new
    deadline (the `systemd-run` line in
    [user-data.yml.tftpl](../infra/tofu/rehearsal/user-data.yml.tftpl)) -
    do this deliberately, not by default.
-3. `just rehearsal setup <ip>` -
+3. Confirm your SSH auth needs no prompting: the stack deploy runs
+   Docker over SSH, which cannot answer a key passphrase prompt, so
+   signing must come from an agent that holds your key (or a
+   passphrase-less key). The test is that `ssh root@<drill ip> true`
+   runs silently, first try. If it prompts instead:
+   - No agent, or the key is not loaded: `ssh-add ~/.ssh/<key>`.
+   - Key held by an agent, still prompting: something in `~/.ssh/config`
+     points the host at a different agent - `ssh -G <ip> | grep -i
+     identityagent` shows which. Either move the key into that agent
+     (password managers' agents approve through their own UI, which
+     works where terminal prompts cannot), or override it for the drill
+     host with a block *above* the global entry (ssh uses the first
+     value it finds per option):
+
+     ```
+     Host <drill host IP>       # update each drill; `up` prints the IP
+         IdentityAgent SSH_AUTH_SOCK
+     ```
+4. `just rehearsal setup <ip>` -
    [provision.sh](../infra/setup/provision.sh) then the staging stack via
    [init-env.sh](../infra/setup/init-env.sh) (staging only; the recipe
    accepts no other environment).
-4. `just rehearsal restore <ip>` -
+5. `just rehearsal restore <ip>` -
    [restore-databases.sh](../infra/setup/restore-databases.sh), which
    prompts for the backup credentials and passphrase.
-5. `just rehearsal verify <ip>` - row counts against the manifest of the
+6. `just rehearsal verify <ip>` - row counts against the manifest of the
    dump that was actually restored (exact match), the staging app
    answering through nginx, and the Sentry blackhole holding inside the
    containers; prints the results block to paste onto the Linear issue.
-6. `just rehearsal down` - destroys the host and then *asserts* nothing
+7. `just rehearsal down` - destroys the host and then *asserts* nothing
    tagged `Purpose=rehearsal` remains (`just rehearsal sweep` re-runs the
    assertion alone any time).
-7. Report the outcome to senior management, then close the issue.
+8. Report the outcome to senior management, then close the issue.
 
 The host null-routes Sentry ingest, so the drill's staging workers cannot
 leak errors into the real staging Sentry project.

@@ -12,9 +12,16 @@
 # with `systemctl stop rehearsal-self-destruct.timer`; re-arm by running
 # the systemd-run line again with a new duration.
 disable_root: false
+# The operator may bring several public keys (e.g. everything an ssh
+# agent serves); write_files takes the multi-line block safely where a
+# runcmd echo could not.
+write_files:
+  - path: /root/.ssh/authorized_keys
+    permissions: "0600"
+    content: |
+      ${indent(6, ssh_public_keys)}
 runcmd:
-  - install -d -m 700 /root/.ssh
-  - echo "${ssh_public_key}" >> /root/.ssh/authorized_keys
+  - chmod 700 /root/.ssh
 %{ for host in sentry_hosts ~}
   - echo "127.0.0.1 ${host}" >> /etc/hosts
 %{ endfor ~}
