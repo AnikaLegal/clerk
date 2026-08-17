@@ -18,26 +18,31 @@ errfile=$(mktemp)
 trap 'rm -f "$errfile"' EXIT
 
 # probe <service> <command args...>: "live", "gone", or abort on anything
-# else. Deleted resources answer NotFound (EC2) or NoSuchHostedZone
-# (Route 53).
+# else. Only definitive answers classify: NotFound/NoSuchHostedZone or an
+# irreversible terminal state mean gone. A successful describe with an
+# empty answer means the API has not settled around a recent change, so
+# it is retried - and still counts as live if it never settles, leaving
+# the operator to re-run the sweep rather than trusting an unproven
+# clean.
 probe() {
-    local out
-    if out=$(aws "$@" --region "$REGION" --output text 2> "$errfile"); then
-        # A describe can succeed yet answer with nothing (an instance so
-        # recently reaped the API is still settling), with "terminated",
-        # or with "shutting-down" (termination is irreversible) - all of
-        # those are gone. Anything else that still describes is live.
-        case "$out" in
-            "" | terminated | shutting-down) echo gone ;;
-            *) echo live ;;
-        esac
-    elif grep -qE 'NotFound|NoSuchHostedZone' "$errfile"; then
-        echo gone
-    else
-        echo "Error: could not verify a resource:" >&2
-        cat "$errfile" >&2
-        exit 2
-    fi
+    local out attempt
+    for attempt in 1 2 3 4 5 6; do
+        if out=$(aws "$@" --region "$REGION" --output text 2> "$errfile"); then
+            case "$out" in
+                "") sleep 5 ;;
+                "terminated" | "shutting-down") echo "gone"; return ;;
+                *) echo "live"; return ;;
+            esac
+        elif grep -qE 'NotFound|NoSuchHostedZone' "$errfile"; then
+            echo "gone"
+            return
+        else
+            echo "Error: could not verify a resource:" >&2
+            cat "$errfile" >&2
+            exit 2
+        fi
+    done
+    echo "live"
 }
 
 arns=$(aws resourcegroupstaggingapi get-resources --region "$REGION" \
