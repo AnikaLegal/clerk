@@ -146,9 +146,10 @@ outline:
    automation cannot.
 2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
    armed with a 4-hour self-destruct so production data cannot sit on a
-   forgotten host. A long drill can disarm it on the host
-   (`systemctl stop rehearsal-self-destruct.timer`) and re-arm with a new
-   deadline (the `systemd-run` line in
+   forgotten host. If a drill legitimately needs longer, you can disarm
+   the self-destruct on the host
+   (`systemctl stop rehearsal-self-destruct.timer`) and re-arm it with a
+   new deadline (the `systemd-run` line in
    [user-data.yml.tftpl](../infra/tofu/rehearsal/user-data.yml.tftpl)) -
    do this deliberately, not by default.
 
