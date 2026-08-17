@@ -95,6 +95,9 @@ setup host:
         ../setup/provision.sh {{host}}
     fi
     ../setup/init-env.sh {{host}} staging
+    echo ""
+    echo ">>> Next:"
+    echo ">>>   just rehearsal restore {{host}}"
 
 # Restore both databases from the latest backups (prompts for the secrets)
 restore host:
@@ -103,16 +106,25 @@ restore host:
     echo ">>> Reminder: the host self-destructs 4h after boot. If the drill"
     echo ">>> runs long, disarm deliberately (see docs/restore-check.md)."
     ../setup/restore-databases.sh {{host}}
+    echo ""
+    echo ">>> Next:"
+    echo ">>>   just rehearsal verify {{host}}"
 
 # Verify the restore and print the results block for the Linear issue
 verify host:
     ./verify.py {{host}}
+    @echo ""
+    @echo ">>> Next:"
+    @echo ">>>   just rehearsal down"
 
 # Destroy the host and prove nothing tagged Purpose=rehearsal remains
 down:
     tofu -chdir={{tofu_dir}} init > /dev/null
     tofu -chdir={{tofu_dir}} destroy
     ./sweep.sh
+    @echo ""
+    @echo ">>> Remaining: record the verify results on the Linear issue and"
+    @echo ">>> report the outcome (docs/restore-check.md)."
 
 # Just the leftover-resource check (rerunnable any time)
 sweep:
