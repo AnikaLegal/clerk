@@ -146,18 +146,19 @@ outline:
    automation cannot.
 2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
    armed with a 4-hour self-destruct so production data cannot sit on a
-   forgotten host. It installs for root the union of
-   `~/.ssh/id_ed25519.pub` (if present) and every key your ssh agent
-   serves (`ssh-add -L`) - so whichever of them ssh ends up offering, a
-   matching key is on the host; set `REHEARSAL_SSH_KEY` to a public key
-   file to install exactly that key instead. Note `ssh-add` only sees
-   the agent at `$SSH_AUTH_SOCK` - if your keys live in a different
-   agent (a password manager's, say), point that variable at its socket
-   in the drill shell first. A long drill can disarm it on the host
+   forgotten host. A long drill can disarm it on the host
    (`systemctl stop rehearsal-self-destruct.timer`) and re-arm with a new
    deadline (the `systemd-run` line in
    [user-data.yml.tftpl](../infra/tofu/rehearsal/user-data.yml.tftpl)) -
    do this deliberately, not by default.
+
+   The host trusts for root the union of `~/.ssh/id_ed25519.pub`
+   (if present) and every key your ssh agent serves (`ssh-add -L`) - so
+   whichever of them ssh ends up offering, a matching key is on the
+   host; set `REHEARSAL_SSH_KEY` to a public key file to install exactly
+   that key instead. `ssh-add` only sees the agent at `$SSH_AUTH_SOCK` -
+   if your keys live in a different agent (a password manager's, say),
+   point that variable at its socket in the drill shell first.
 3. Confirm your SSH auth needs no prompting: the stack deploy runs
    Docker over SSH, which cannot answer a key passphrase prompt, so
    signing must come from an agent that holds your key (or a
