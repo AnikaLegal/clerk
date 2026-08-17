@@ -7,12 +7,13 @@
 #   just rehearsal up      # apply (detects your IP, installs your SSH key)
 #   just rehearsal down    # destroy + tag sweep
 #
-# Safety posture: SSH from the operator's IP only, nothing else inbound;
-# real production data lands on this host during the drill, so user-data
-# arms a self-destruct - the instance terminates itself after
-# self_destruct_minutes even if the operator walks away. A drill that
-# legitimately needs longer can disarm and re-arm it (see
-# docs/restore-check.md).
+# Safety posture: the host lives in its own throwaway VPC (nothing
+# shared with the live server's network), SSH from the operator's IP
+# only, nothing else inbound; real production data lands on this host
+# during the drill, so user-data arms a self-destruct - the instance
+# terminates itself after self_destruct_minutes even if the operator
+# walks away. A drill that legitimately needs longer can disarm and
+# re-arm it (see docs/restore-check.md).
 
 terraform {
   required_version = ">= 1.10"
@@ -62,15 +63,54 @@ variable "self_destruct_minutes" {
   default     = 240
 }
 
-data "aws_vpc" "default" {
-  default = true
+# The drill's own throwaway network: the host carries real production
+# data, so it shares nothing with the live server's VPC - and the Sentry
+# blackhole zone below can attach here with a blast radius of exactly
+# this drill. DNS support and hostnames must both be on for a private
+# hosted zone to resolve.
+resource "aws_vpc" "rehearsal" {
+  cidr_block           = "10.66.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "rehearsal"
+  }
 }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+resource "aws_subnet" "rehearsal" {
+  vpc_id     = aws_vpc.rehearsal.id
+  cidr_block = "10.66.0.0/24"
+
+  tags = {
+    Name = "rehearsal"
   }
+}
+
+resource "aws_internet_gateway" "rehearsal" {
+  vpc_id = aws_vpc.rehearsal.id
+
+  tags = {
+    Name = "rehearsal"
+  }
+}
+
+resource "aws_route_table" "rehearsal" {
+  vpc_id = aws_vpc.rehearsal.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.rehearsal.id
+  }
+
+  tags = {
+    Name = "rehearsal"
+  }
+}
+
+resource "aws_route_table_association" "rehearsal" {
+  subnet_id      = aws_subnet.rehearsal.id
+  route_table_id = aws_route_table.rehearsal.id
 }
 
 # The latest Canonical Ubuntu 24.04 AMI, resolved through AWS' public SSM
@@ -82,7 +122,7 @@ data "aws_ssm_parameter" "ubuntu_noble_ami" {
 resource "aws_security_group" "rehearsal" {
   name        = "rehearsal-host"
   description = "Rehearsal host: SSH from the operator only"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = aws_vpc.rehearsal.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rehearsal_ssh" {
@@ -103,7 +143,7 @@ resource "aws_vpc_security_group_egress_rule" "rehearsal_all_out" {
 resource "aws_instance" "rehearsal" {
   ami                    = data.aws_ssm_parameter.ubuntu_noble_ami.value
   instance_type          = "t3.small"
-  subnet_id              = sort(data.aws_subnets.default.ids)[0]
+  subnet_id              = aws_subnet.rehearsal.id
   vpc_security_group_ids = [aws_security_group.rehearsal.id]
 
   # A public address: SSH in from the operator, apt/S3/Docker Hub out.
@@ -122,21 +162,6 @@ resource "aws_instance" "rehearsal" {
   user_data = templatefile("${path.module}/user-data.yml.tftpl", {
     ssh_public_keys       = var.ssh_public_keys
     self_destruct_minutes = var.self_destruct_minutes
-    # Every hostname the clerk Sentry DSNs point at, blackholed in
-    # /etc/hosts so the drill's staging stack cannot leak errors into the
-    # real staging Sentry project (it shares the DSN; only the environment
-    # tag differs). /etc/hosts matches exact names only, so each host the
-    # env files reference is listed: the backend RAVEN_DSN targets plain
-    # sentry.io, the SENTRY_JS_DSN targets the org ingest host, and the
-    # modern .us form is included for when the DSNs are next rotated.
-    # (Browser-side JS events from anyone viewing the drill site originate
-    # off-host and cannot be blocked here - only the operator ever loads
-    # it, so that residue is accepted.)
-    sentry_hosts = [
-      "sentry.io",
-      "o264950.ingest.sentry.io",
-      "o264950.ingest.us.sentry.io",
-    ]
   })
 
   # Room for the restored databases plus the Docker images.
@@ -155,6 +180,36 @@ resource "aws_instance" "rehearsal" {
     Name    = "rehearsal"
     Purpose = "rehearsal"
   }
+}
+
+# Sentry blackhole: the drill stack uses the real staging Sentry DSN, so
+# resolve sentry.io (apex and every subdomain) to loopback for the drill
+# VPC's resolver, which the containers' DNS goes through. Attach only to
+# the drill's own VPC - on a shared VPC this would also silence the
+# production host's error reporting.
+resource "aws_route53_zone" "sentry_blackhole" {
+  name    = "sentry.io"
+  comment = "Rehearsal drill Sentry blackhole - exists only while a drill host does"
+
+  vpc {
+    vpc_id = aws_vpc.rehearsal.id
+  }
+}
+
+resource "aws_route53_record" "sentry_apex" {
+  zone_id = aws_route53_zone.sentry_blackhole.zone_id
+  name    = "sentry.io"
+  type    = "A"
+  ttl     = 60
+  records = ["127.0.0.1"]
+}
+
+resource "aws_route53_record" "sentry_wildcard" {
+  zone_id = aws_route53_zone.sentry_blackhole.zone_id
+  name    = "*.sentry.io"
+  type    = "A"
+  ttl     = 60
+  records = ["127.0.0.1"]
 }
 
 output "public_ip" {

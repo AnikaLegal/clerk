@@ -1,9 +1,10 @@
 #cloud-config
-# Rendered by main.tf. Three jobs: let the setup scripts in as root, keep
-# the drill's Sentry noise off the real staging project, and arm the
-# self-destruct that bounds how long production data can sit on a
-# forgotten host (the halt terminates the instance - see
-# instance_initiated_shutdown_behavior in main.tf).
+# Rendered by main.tf. Two jobs: let the setup scripts in as root, and
+# arm the self-destruct that bounds how long production data can sit on
+# a forgotten host (the halt terminates the instance - see
+# instance_initiated_shutdown_behavior in main.tf). The Sentry blackhole
+# lives in main.tf as a VPC private zone - a hosts-file entry here never
+# reaches the Docker containers where the staging stack runs.
 #
 # The self-destruct is a transient systemd timer rather than a scheduled
 # `shutdown -h +N`: shutdown scheduling lives in logind, which the
@@ -22,7 +23,4 @@ write_files:
       ${indent(6, ssh_public_keys)}
 runcmd:
   - chmod 700 /root/.ssh
-%{ for host in sentry_hosts ~}
-  - echo "127.0.0.1 ${host}" >> /etc/hosts
-%{ endfor ~}
   - systemd-run --unit=rehearsal-self-destruct --on-active=${self_destruct_minutes}min /usr/sbin/shutdown -h now

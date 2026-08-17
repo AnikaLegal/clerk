@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Assert nothing tagged Purpose=rehearsal still exists (TEC-2044,
-# checklist teardown step): the throwaway host, its volume and its
-# security group must all be gone. Exits non-zero with a listing if
+# checklist teardown step): the throwaway host, its volume, its security
+# group, its VPC and that VPC's plumbing must all be gone. Exits non-zero with a listing if
 # anything remains. The tagging API keeps deleted resources visible for a
 # while, so each ARN is checked against its live state - and only a
 # definite "not found" counts as gone: any other API failure (expired
@@ -17,14 +17,21 @@ REGION="ap-southeast-2"
 errfile=$(mktemp)
 trap 'rm -f "$errfile"' EXIT
 
-# probe <ec2 describe args...>: "live", "gone", or abort on anything else.
+# probe <service> <command args...>: "live", "gone", or abort on anything
+# else. Deleted resources answer NotFound (EC2) or NoSuchHostedZone
+# (Route 53).
 probe() {
     local out
-    if out=$(aws ec2 "$@" --region "$REGION" --output text 2> "$errfile"); then
-        # An instance may exist in state "terminated"; anything else that
-        # still describes is live.
-        if [ "$out" = "terminated" ]; then echo gone; else echo live; fi
-    elif grep -q 'NotFound' "$errfile"; then
+    if out=$(aws "$@" --region "$REGION" --output text 2> "$errfile"); then
+        # A describe can succeed yet answer with nothing (an instance so
+        # recently reaped the API is still settling), with "terminated",
+        # or with "shutting-down" (termination is irreversible) - all of
+        # those are gone. Anything else that still describes is live.
+        case "$out" in
+            "" | terminated | shutting-down) echo gone ;;
+            *) echo live ;;
+        esac
+    elif grep -qE 'NotFound|NoSuchHostedZone' "$errfile"; then
         echo gone
     else
         echo "Error: could not verify a resource:" >&2
@@ -42,20 +49,40 @@ for arn in $arns; do
     id="${arn##*/}"
     case "$arn" in
         *:instance/*)
-            state=$(probe describe-instances --instance-ids "$id" \
+            state=$(probe ec2 describe-instances --instance-ids "$id" \
                 --query 'Reservations[].Instances[].State.Name')
             ;;
         *:volume/*)
-            state=$(probe describe-volumes --volume-ids "$id" \
+            state=$(probe ec2 describe-volumes --volume-ids "$id" \
                 --query 'Volumes[].VolumeId')
             ;;
         *:security-group-rule/*)
-            state=$(probe describe-security-group-rules --security-group-rule-ids "$id" \
+            state=$(probe ec2 describe-security-group-rules --security-group-rule-ids "$id" \
                 --query 'SecurityGroupRules[].SecurityGroupRuleId')
             ;;
         *:security-group/*)
-            state=$(probe describe-security-groups --group-ids "$id" \
+            state=$(probe ec2 describe-security-groups --group-ids "$id" \
                 --query 'SecurityGroups[].GroupId')
+            ;;
+        *:hostedzone/*)
+            state=$(probe route53 get-hosted-zone --id "$id" \
+                --query 'HostedZone.Id')
+            ;;
+        *:vpc/*)
+            state=$(probe ec2 describe-vpcs --vpc-ids "$id" \
+                --query 'Vpcs[].VpcId')
+            ;;
+        *:subnet/*)
+            state=$(probe ec2 describe-subnets --subnet-ids "$id" \
+                --query 'Subnets[].SubnetId')
+            ;;
+        *:internet-gateway/*)
+            state=$(probe ec2 describe-internet-gateways --internet-gateway-ids "$id" \
+                --query 'InternetGateways[].InternetGatewayId')
+            ;;
+        *:route-table/*)
+            state=$(probe ec2 describe-route-tables --route-table-ids "$id" \
+                --query 'RouteTables[].RouteTableId')
             ;;
         *)
             # A resource type this script does not know how to probe:

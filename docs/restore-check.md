@@ -192,8 +192,13 @@ outline:
    assertion alone any time).
 8. Report the outcome to senior management, then close the issue.
 
-The host null-routes Sentry ingest, so the drill's staging workers cannot
-leak errors into the real staging Sentry project.
+The drill runs in its own throwaway VPC - sharing nothing with the live
+server's network - where a private DNS zone blackholes `sentry.io`, so
+the drill's staging workers cannot leak errors into the real staging
+Sentry project. Both exist only while a drill host does. The blackhole
+only covers DNS inside the VPC: browser-side JS events from anyone
+viewing the drill site resolve normally and would still reach Sentry.
+Only the operator ever loads the site, so that residue is accepted.
 
 Isolation rules for rehearsals:
 

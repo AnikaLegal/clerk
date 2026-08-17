@@ -62,12 +62,10 @@ up ip="":
         -var "ssh_public_keys=$ssh_public_keys"
     host=$(tofu -chdir={{tofu_dir}} output -raw public_ip)
     echo ""
-    echo ">>> Host is booting. If your ssh config routes to the 1Password"
-    echo ">>> agent, point your drill block at this host first (see"
-    echo ">>> docs/restore-check.md):"
-    echo ">>>   Host $host"
-    echo ">>>       IdentityAgent SSH_AUTH_SOCK"
-    echo ">>> Next:"
+    echo ">>> Host is booting. Confirm ssh works without prompting before"
+    echo ">>> continuing (remedies are in docs/restore-check.md):"
+    echo ">>>   ssh root@$host true"
+    echo ">>> Then:"
     echo ">>>   just rehearsal setup $host"
 
 # Provision the host and deploy the staging stack (staging only, by design)
