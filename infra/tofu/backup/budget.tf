@@ -31,7 +31,7 @@ resource "aws_budgets_budget" "backup_monthly" {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 80
     threshold_type             = "PERCENTAGE"
-    subscriber_email_addresses = ["tech@anikalegal.com"]
+    subscriber_email_addresses = ["tech@anikalegal.org.au"]
   }
 
   notification {
@@ -39,7 +39,7 @@ resource "aws_budgets_budget" "backup_monthly" {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 100
     threshold_type             = "PERCENTAGE"
-    subscriber_email_addresses = ["tech@anikalegal.com"]
+    subscriber_email_addresses = ["tech@anikalegal.org.au"]
   }
 
   notification {
@@ -47,7 +47,7 @@ resource "aws_budgets_budget" "backup_monthly" {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 100
     threshold_type             = "PERCENTAGE"
-    subscriber_email_addresses = ["tech@anikalegal.com"]
+    subscriber_email_addresses = ["tech@anikalegal.org.au"]
   }
 }
 

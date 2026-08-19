@@ -126,5 +126,5 @@ is proven separately - see [restore-check.md](./restore-check.md).
 
 A monthly AWS Budget (`aws-backup-monthly`, defined in
 [infra/tofu/backup](../infra/tofu/backup/budget.tf) with the reasoning
-behind its limit) emails tech@anikalegal.com if AWS Backup spend climbs
+behind its limit) emails tech@anikalegal.org.au if AWS Backup spend climbs
 beyond its expected range, so cost drift does not go unnoticed.

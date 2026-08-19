@@ -53,7 +53,7 @@ MAILCHIMP_REPAIRS_EMAIL_ID = "04fb17ccee"
 EMAIL_DOMAIN = "mail.staging.anikalegal.org.au"
 EMAIL_DOMAIN_LEGACY = "em7221.test-mail.anikalegal.com"
 EMAIL_BUCKET_NAME = "anika-emails-staging"
-INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.com"
+INTAKE_NOEMAIL_EMAIL = "tech@anikalegal.org.au"
 
 # Call Centre powered by Twilio
 TWILIO_PHONE_NUMBER = "+61480015687"

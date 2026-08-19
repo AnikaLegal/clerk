@@ -336,7 +336,7 @@ class SlackMessage:
 
 SLACK_MESSAGE = SlackMessage
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
-SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.com"  # Set to None in prod only
+SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.org.au"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
 INTAKE_NOEMAIL_EMAIL = None
