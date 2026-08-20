@@ -18,7 +18,7 @@ echo -e "\nRestoring database from backup"
 S3_BUCKET="s3://anika-database-backups"
 LATEST_BACKUP=$(aws s3 ls $S3_BUCKET |
     sort |
-    grep postgres_clerk |
+    grep 'postgres_clerk_.*\.sql\.gpg$' |
     tail -n 1 |
     awk '{print $4}')
 echo -e "\nFound backup $LATEST_BACKUP"

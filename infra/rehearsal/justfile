@@ -1,0 +1,131 @@
+# Recipes for the bi-annual restore rehearsal (TEC-2044), loaded by the
+# root justfile as the `rehearsal` module: run them from the project root
+# as `just rehearsal <recipe>`. The full drill, in order (secrets from
+# BitWarden first - see docs/restore-check.md):
+#
+#   just rehearsal up
+#   just rehearsal setup <ip>
+#   just rehearsal restore <ip>
+#   just rehearsal verify <ip>
+#   just rehearsal down
+
+tofu_dir := "../tofu/rehearsal"
+
+# Launch the throwaway host (SSH from your IP only; 4h self-destruct)
+up ip="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    operator_ip="{{ip}}"
+    if [ -z "$operator_ip" ]; then
+        operator_ip=$(curl -sf https://checkip.amazonaws.com)
+    fi
+    if ! [[ "$operator_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: could not determine your public IPv4 (got '$operator_ip')." >&2
+        echo "Pass it explicitly: just rehearsal up ip=x.x.x.x" >&2
+        exit 1
+    fi
+    # The public keys to install for root. An explicit REHEARSAL_SSH_KEY
+    # is installed alone (you named the exact key). Otherwise: the union
+    # of the conventional key file and everything the ssh agent serves -
+    # installing both sides means a matching key is on the host whichever
+    # one ssh ends up offering (an IdentityAgent in ssh config, e.g.
+    # 1Password's, can differ from SSH_AUTH_SOCK).
+    if [ -n "${REHEARSAL_SSH_KEY:-}" ]; then
+        if [ ! -f "$REHEARSAL_SSH_KEY" ]; then
+            echo "Error: no SSH public key at $REHEARSAL_SSH_KEY" >&2
+            exit 1
+        fi
+        ssh_public_keys=$(cat "$REHEARSAL_SSH_KEY")
+        sources="$REHEARSAL_SSH_KEY (alone, by request)"
+    else
+        ssh_public_keys=""
+        sources=""
+        if [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
+            ssh_public_keys=$(cat "$HOME/.ssh/id_ed25519.pub")
+            sources="$HOME/.ssh/id_ed25519.pub"
+        fi
+        if agent_keys=$(ssh-add -L 2> /dev/null) && [ -n "$agent_keys" ]; then
+            ssh_public_keys=$(printf '%s\n%s' "$ssh_public_keys" "$agent_keys" | sort -u | sed '/^$/d')
+            sources="$sources${sources:+ + }your agent (ssh-add -L)"
+        fi
+    fi
+    if [ -z "$ssh_public_keys" ]; then
+        echo "Error: no SSH public key found. Provide one via REHEARSAL_SSH_KEY," >&2
+        echo "~/.ssh/id_ed25519.pub, or an agent holding your key (ssh-add -L)," >&2
+        echo "pointing SSH_AUTH_SOCK at that agent's socket." >&2
+        exit 1
+    fi
+    echo ">>> SSH will be allowed from $operator_ip only, as root, keys from: $sources"
+    tofu -chdir={{tofu_dir}} init > /dev/null
+    tofu -chdir={{tofu_dir}} apply \
+        -var "operator_ip=$operator_ip" \
+        -var "ssh_public_keys=$ssh_public_keys"
+    host=$(tofu -chdir={{tofu_dir}} output -raw public_ip)
+    echo ""
+    echo ">>> Host is booting. Confirm ssh works without prompting before"
+    echo ">>> continuing (remedies are in docs/restore-check.md):"
+    echo ">>>   ssh root@$host true"
+    echo ">>> Then:"
+    echo ">>>   just rehearsal setup $host"
+
+# Provision the host and deploy the staging stack (staging only, by design)
+setup host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # cloud-init installs the SSH key late in boot; wait for it rather
+    # than letting provision.sh trip over an auth failure.
+    echo ">>> Waiting for the host to accept SSH"
+    for i in $(seq 1 30); do
+        if ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=5 \
+            root@{{host}} true 2> /dev/null; then
+            break
+        fi
+        if [ "$i" -eq 30 ]; then
+            echo "Error: {{host}} never accepted SSH; check the instance" >&2
+            exit 1
+        fi
+        sleep 10
+    done
+    # Skip provisioning on a rerun (mirroring provision.sh's own guard,
+    # which aborts rather than skips), so a failure in the deploy half
+    # leaves this recipe safely re-runnable.
+    if ssh -o StrictHostKeyChecking=accept-new root@{{host}} '[ -d /srv/infra ]' 2> /dev/null; then
+        echo ">>> Host is already provisioned, skipping provision.sh"
+    else
+        ../setup/provision.sh {{host}}
+    fi
+    ../setup/init-env.sh {{host}} staging
+    echo ""
+    echo ">>> Next:"
+    echo ">>>   just rehearsal restore {{host}}"
+
+# Restore both databases from the latest backups (prompts for the secrets)
+restore host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo ">>> Reminder: the host self-destructs 4h after boot. If the drill"
+    echo ">>> runs long, disarm deliberately (see docs/restore-check.md)."
+    ../setup/restore-databases.sh {{host}}
+    echo ""
+    echo ">>> Next:"
+    echo ">>>   just rehearsal verify {{host}}"
+
+# Verify the restore and print the results block for the Linear issue
+verify host:
+    ./verify.py {{host}}
+    @echo ""
+    @echo ">>> Next:"
+    @echo ">>>   just rehearsal down"
+
+# Destroy the host and prove nothing tagged Purpose=rehearsal remains
+down:
+    tofu -chdir={{tofu_dir}} init > /dev/null
+    tofu -chdir={{tofu_dir}} destroy
+    ./sweep.sh
+    @echo ""
+    @echo ">>> Remaining: record the verify results on the Linear issue and"
+    @echo ">>> report the outcome (docs/restore-check.md)."
+
+# Just the leftover-resource check (rerunnable any time)
+sweep:
+    ./sweep.sh

@@ -71,7 +71,7 @@ class Summary(NamedTuple):
     status: str  # the mrkdwn status line under the header
 
 
-def summarise(outcome: str, checks: list[dict], crashed: bool) -> Summary:
+def summarise(outcome: str, checks: list[dict], crashed: bool, name: str) -> Summary:
     warned = [check["label"] for check in checks if check["status"] == "WARN"]
     if outcome != "PASS":
         status = (
@@ -79,17 +79,17 @@ def summarise(outcome: str, checks: list[dict], crashed: bool) -> Summary:
             if crashed
             else "*FAILED* - the latest backup may not be restorable. Please investigate."
         )
-        return Summary(":x:", "Database restore check FAILED - please investigate.", status)
+        return Summary(":x:", f"{name} FAILED - please investigate.", status)
     if warned:
         plural = "s" if len(warned) > 1 else ""
         return Summary(
             ":warning:",
-            f"Database restore check passed with {len(warned)} warning{plural}.",
+            f"{name} passed with {len(warned)} warning{plural}.",
             f"*Passed with {len(warned)} warning{plural}* - {', '.join(warned)}",
         )
     return Summary(
         ":white_check_mark:",
-        "Database restore check passed.",
+        f"{name} passed.",
         "*Passed* - all checks passed",
     )
 
@@ -166,16 +166,22 @@ def footer_blocks(run_url: str | None) -> list[dict]:
     return [{"type": "context", "elements": [mrkdwn(f"<{run_url}|Run log>")]}]
 
 
-def build_payload(results: dict | None, outcome: str, run_url: str | None = None) -> dict:
+def build_payload(
+    results: dict | None,
+    outcome: str,
+    run_url: str | None = None,
+    title: str = "Monthly database restore check",
+    name: str = "Database restore check",
+) -> dict:
     checks = (results or {}).get("checks", [])
-    summary = summarise(outcome, checks, crashed=results is None)
+    summary = summarise(outcome, checks, crashed=results is None, name=name)
 
     blocks: list[dict] = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"{summary.icon} Monthly database restore check",
+                "text": f"{summary.icon} {title}",
                 "emoji": True,
             },
         },

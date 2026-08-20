@@ -73,29 +73,134 @@ Operating it:
   when a run is missed, times out, or fails. The monitor's schedule
   mirrors the EventBridge schedule in tofu - change both together.
 
-## Quarterly: S3 restore check
+## Monthly: automated S3 restore check
 
-Planned, not yet built: restore the media buckets from an AWS Backup recovery
-point into a scratch bucket and verify a sample of objects, with at least one
-run per year restoring from the air-gapped vault copy in Melbourne.
+Whether the AWS Backup snapshots of the production buckets *land* is
+asserted every morning by the daily landing check (see
+[backups.md](./backups.md#aws-backup)); this check proves they *restore*.
+AWS Backup [restore
+testing](https://docs.aws.amazon.com/aws-backup/latest/devguide/restore-testing.html)
+plans restore each protected bucket's latest recovery point into a
+scratch bucket the service creates and later deletes
+(`awsbackup-restore-test-*`): the Sydney vault monthly at 5AM Melbourne
+time on the 1st, the air-gapped Melbourne vault quarterly
+(Jan/Apr/Jul/Oct). Two Lambdas turn those restores into a verdict:
+
+1. [s3-validate-lambda.py](../infra/restore-check/s3-validate-lambda.py)
+   runs once per completed restore job - the documented EventBridge
+   validation hook; Melbourne's events forward cross-region to the same
+   rule. It compares the restored bucket against the live one (every
+   object older than the recovery point must be present with matching
+   size, drift since the snapshot is tolerated), fetches 25 sampled
+   objects end to end, and stamps SUCCESSFUL or FAILED onto the job with
+   `PutRestoreValidationResult`.
+2. [s3-report-lambda.py](../infra/restore-check/s3-report-lambda.py), a
+   Lambda durable function like the db check's, runs at noon the same
+   day: it suspends until every job is finished and validated (giving up
+   after ~6 hours), asserts that every protected bucket actually produced
+   a restore job - a bucket AWS Backup silently skipped is a failure, not
+   a missing row - and posts one Slack table covering both vaults. The
+   `restore-check-s3` Sentry cron monitor stands behind it as the
+   dead-man switch.
+
+The protected-bucket list comes from the
+[infra/tofu/backup](../infra/tofu/backup/main.tf) root, so a bucket added
+to the backup selection is automatically restore-tested too. Everything
+is defined in the same foundations root as the db check, plus one more
+hand-made SecureString parameter, `/restore-check-s3/sentry-cron-url`.
+
+Operating it:
+
+- **Run the report by hand**: `just restore-check s3` - it reports on
+  whatever restore jobs the last 24 hours produced (with none, every
+  bucket rows up as FAIL, which is itself the honest answer).
+- **Start a restore test off-schedule**: there is no on-demand start for
+  a restore testing plan; temporarily move its `schedule_expression` a
+  few minutes ahead with `aws backup update-restore-testing-plan`, let it
+  fire, then `tofu apply` to put the schedule back.
+- **Watch a run**: restore jobs (type Test) and their validation verdicts
+  are on the Backup console's restore jobs page; the validator's log is
+  in the `/aws/lambda/restore-check-s3-validate` log group.
+- **Costs**: restore testing bills per evaluated recovery point, plus a
+  few days of scratch-bucket storage until the service's cleanup
+  lifecycle deletes it - cents at our scale.
 
 ## Bi-annually: full rebuild rehearsal
 
-A recurring [Linear
-issue](https://linear.app/anika-legal/issue/TEC-2044/bi-annual-restore-rehearsal)
-schedules a full disaster recovery rehearsal every 6 months. The full
-checklist lives on the issue; in outline:
+A [recurring Linear
+issue](https://linear.app/anika-legal/settings/teams/TEC/recurring-issues/afc1fbf9-9beb-44bb-a9cc-cef4fd718913/edit)
+(managed under the Tech team's [recurring issues
+settings](https://linear.app/anika-legal/settings/teams/TEC/recurring-issues/))
+schedules a full disaster recovery rehearsal every 6 months, spawning an
+instance issue with the drill checklist each time. Unlike the
+monthly checks it is deliberately human-driven: the point is proving a
+person can go from the BitWarden secrets to a rebuilt, restored
+environment. The mechanics are automated as the `rehearsal` just module
+([infra/rehearsal](../infra/rehearsal/justfile) plus the ephemeral
+[infra/tofu/rehearsal](../infra/tofu/rehearsal/main.tf) root, which holds
+nothing between drills). The full checklist lives on the issue; in
+outline:
 
-1. Retrieve the secrets from BitWarden - this deliberately tests the human
-   path the automation cannot.
-2. Provision a throwaway EC2 instance with
-   [provision.sh](../infra/setup/provision.sh).
-3. Deploy the staging environment with
-   [init-env.sh](../infra/setup/init-env.sh).
-4. Restore both databases with
-   [restore-databases.sh](../infra/setup/restore-databases.sh).
-5. Verify, and record the results on the issue.
-6. Tear everything down.
+1. Retrieve the secrets from BitWarden and prove they work (fresh clone +
+   transcrypt unlock) - this deliberately tests the human path the
+   automation cannot.
+2. `just rehearsal up` - a throwaway EC2 host, SSH from your IP only,
+   armed with a 4-hour self-destruct so production data cannot sit on a
+   forgotten host. If a drill legitimately needs longer, you can disarm
+   the self-destruct on the host
+   (`systemctl stop rehearsal-self-destruct.timer`) and re-arm it with a
+   new deadline (the `systemd-run` line in
+   [user-data.yml.tftpl](../infra/tofu/rehearsal/user-data.yml.tftpl)) -
+   do this deliberately, not by default.
+
+   The host trusts for root the union of `~/.ssh/id_ed25519.pub`
+   (if present) and every key your ssh agent serves (`ssh-add -L`) - so
+   whichever of them ssh ends up offering, a matching key is on the
+   host; set `REHEARSAL_SSH_KEY` to a public key file to install exactly
+   that key instead. `ssh-add` only sees the agent at `$SSH_AUTH_SOCK` -
+   if your keys live in a different agent (a password manager's, say),
+   point that variable at its socket in the drill shell first.
+3. Confirm your SSH auth needs no prompting: the stack deploy runs
+   Docker over SSH, which cannot answer a key passphrase prompt, so
+   signing must come from an agent that holds your key (or a
+   passphrase-less key). The test is that `ssh root@<drill ip> true`
+   runs silently, first try. If it prompts instead:
+   - No agent, or the key is not loaded: `ssh-add ~/.ssh/<key>`.
+   - Key held by an agent, still prompting: something in `~/.ssh/config`
+     points the host at a different agent - `ssh -G <ip> | grep -i
+     identityagent` shows which. Either move the key into that agent
+     (password managers' agents approve through their own UI, which
+     works where terminal prompts cannot), or override it for the drill
+     host with a block *above* the global entry (ssh uses the first
+     value it finds per option):
+
+     ```
+     Host <drill host IP>       # update each drill; `up` prints the IP
+         IdentityAgent SSH_AUTH_SOCK
+     ```
+4. `just rehearsal setup <ip>` -
+   [provision.sh](../infra/setup/provision.sh) then the staging stack via
+   [init-env.sh](../infra/setup/init-env.sh) (staging only; the recipe
+   accepts no other environment).
+5. `just rehearsal restore <ip>` -
+   [restore-databases.sh](../infra/setup/restore-databases.sh), which
+   prompts for the backup credentials and passphrase.
+6. `just rehearsal verify <ip>` - row counts against the manifest of the
+   dump that was actually restored (exact match), the staging app
+   answering through nginx, and the Sentry blackhole holding inside the
+   containers; prints the results block to paste onto the Linear issue.
+7. `just rehearsal down` - destroys the host and then *asserts* nothing
+   tagged `Purpose=rehearsal` remains (`just rehearsal sweep` re-runs the
+   assertion alone any time).
+8. Report the outcome to senior management, then close the issue.
+
+The drill runs in its own throwaway VPC - sharing nothing with the live
+server's network - where a private DNS zone blackholes `sentry.io`, so
+the drill's staging workers cannot leak errors into the real staging
+Sentry project. Both exist only while a drill host does. The blackhole
+only covers DNS inside the VPC: browser-side JS events from anyone
+viewing the drill site resolve normally and would still reach Sentry.
+Only the operator ever loads the site, so that residue is accepted.
 
 Isolation rules for rehearsals:
 
