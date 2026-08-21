@@ -14,7 +14,7 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-INTAKE_NOEMAIL_EMAIL = "coordinators@anikalegal.com"
+INTAKE_NOEMAIL_EMAIL = "coordinators@anikalegal.org.au"
 
 SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
 SESSION_SAVE_EVERY_REQUEST = True

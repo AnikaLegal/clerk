@@ -69,7 +69,7 @@ just reset
 Create a user for local development and testing using your Anika email address:
 
 ```bash
-just superuser your.name@anikalegal.com
+just superuser your.name@anikalegal.org.au
 ```
 
 Finally you can bring up the web server:

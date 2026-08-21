@@ -9,7 +9,7 @@ IS_PROD = False
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEFAULT_FROM_EMAIL = "noreply@anikalegal.com"
+DEFAULT_FROM_EMAIL = "noreply@anikalegal.org.au"
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [

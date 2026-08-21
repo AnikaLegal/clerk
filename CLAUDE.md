@@ -25,7 +25,7 @@ just                     # List all recipes (also `just --list`; `just help <rec
 
 App URLs (via `just dev`): website `http://localhost:8000`, Clerk CMS `/clerk`, Django admin `/admin`.
 
-First-time setup (Docker, transcrypt, `uv --directory app sync` + venv activation, `just build`, `just reset`, `just superuser you@anikalegal.com`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
+First-time setup (Docker, transcrypt, `uv --directory app sync` + venv activation, `just build`, `just reset`, `just superuser you@anikalegal.org.au`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
 
 ## API contract workflow (important)
 
