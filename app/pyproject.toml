@@ -5,7 +5,7 @@ description = ""
 requires-python = "==3.12.5"
 authors = [
     { name = "Matt Segal", email = "matt.segal@anikalegal.com" },
-    { name = "Luca Vari", email = "luca.vari@anikalegal.com" },
+    { name = "Luca Vari", email = "luca.vari@anikalegal.org.au" },
 ]
 dependencies = [
     "beautifulsoup4",
