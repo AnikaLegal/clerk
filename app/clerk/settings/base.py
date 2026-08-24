@@ -79,6 +79,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # First so that static files served by WhiteNoise get the header too.
+    "web.middleware.NoIndexMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
