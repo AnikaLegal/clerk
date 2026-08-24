@@ -224,21 +224,23 @@ describe('readFormStatus meter', () => {
 
   it('fills the current section fractionally as its pages are passed', () => {
     // Getting started's second visible page (of three on this branch): a third
-    // of one seventh. The meter moves within a section, not only at its end.
+    // of one sixth. The meter moves within a section, not only at its end.
     const { survey, visited } = setUp(
       { ISSUES: 'REPAIRS' },
       'ELIGIBILITY_LOCATION',
       'ELIGIBILITY_ISSUE'
     )
-    expect(readFormStatus(survey, visited).percent).toBe(5)
+    expect(readFormStatus(survey, visited).percent).toBe(6)
   })
 
   it('counts complete sections as full shares, wherever the user stands', () => {
-    // Fully answered, jumped back to Getting in touch: six of seven sections
-    // complete (Submit holds no answers and is never done).
+    // Fully answered, jumped back to Getting in touch: all six countable
+    // sections complete - the summary and meter read finished (Review & send
+    // holds no answers and is outside the count, so "6 of 6" is reachable).
     const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
     const status = readFormStatus(survey, visited)
-    expect(status.percent).toBe(86)
+    expect(status.percent).toBe(100)
     expect(status.doneCount).toBe(6)
+    expect(status.sectionCount).toBe(6)
   })
 })

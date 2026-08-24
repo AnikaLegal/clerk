@@ -117,13 +117,18 @@ export interface SectionStatus {
 
 export interface FormStatus {
   sections: SectionStatus[]
-  // Whole-form completion for the progress meter, 0-100. Every section weighs
-  // the same: a complete one contributes a full share, the current one the
-  // fraction of its pages passed - so the meter moves on every page, not only
-  // at section boundaries.
+  // Whole-form completion for the progress meter, 0-100. Every countable
+  // section weighs the same: a complete one contributes a full share, the
+  // current one the fraction of its pages passed - so the meter moves on every
+  // page, not only at section boundaries.
   percent: number
   // How many sections are complete, for the "x of n done" summary.
   doneCount: number
+  // The n in that summary, and the meter's denominator: the sections that can
+  // actually complete. The final Review & send step holds no answers, so it
+  // never reads done - counting it would leave the summary stuck at "n-1 of n"
+  // and the meter short of full on the review page itself.
+  sectionCount: number
 }
 
 /**
@@ -215,11 +220,12 @@ export const readFormStatus = (
     }
   })
 
+  const sectionCount = SECTIONS.length - 1
   const percent = Math.min(
     100,
-    Math.round(((doneCount + currentFill) / SECTIONS.length) * 100)
+    Math.round(((doneCount + currentFill) / sectionCount) * 100)
   )
-  return { sections, percent, doneCount }
+  return { sections, percent, doneCount, sectionCount }
 }
 
 // The per-section states alone (see readFormStatus).

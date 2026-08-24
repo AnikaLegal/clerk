@@ -32,7 +32,11 @@ interface FormSidebarProps {
 export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
   const list = useMemo(() => buildSectionList(survey, onJump), [survey, onJump])
   // The head's progress summary: whole-form percent and sections complete.
-  const [meter, setMeter] = useState({ percent: 0, doneCount: 0 })
+  const [meter, setMeter] = useState({
+    percent: 0,
+    doneCount: 0,
+    sectionCount: SECTIONS.length - 1,
+  })
   // Keep the rows and the meter in step with the survey. Answering a question
   // doesn't re-render FormPage (SurveyJS renders its own questions), yet it can
   // change the section states without a page change - picking an answer that
@@ -42,7 +46,10 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
   // a SurveyJS property on each action), the meter through React state.
   useEffect(() => {
     const sync = () => {
-      const { sections, percent, doneCount } = readFormStatus(survey, visited)
+      const { sections, percent, doneCount, sectionCount } = readFormStatus(
+        survey,
+        visited
+      )
       sections.forEach((status) => {
         const action = list.actions[status.index] as SectionAction
         // The marker: a complete section keeps its tick even while current -
@@ -54,7 +61,7 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
       setMeter((prev) =>
         prev.percent === percent && prev.doneCount === doneCount
           ? prev
-          : { percent, doneCount }
+          : { percent, doneCount, sectionCount }
       )
     }
     sync()
@@ -88,7 +95,7 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
           />
         </div>
         <span className="intake-sidebar__subtitle">
-          {meter.doneCount} of {SECTIONS.length} done
+          {meter.doneCount} of {meter.sectionCount} done
         </span>
       </div>
       <div className="intake-sidebar__list">
