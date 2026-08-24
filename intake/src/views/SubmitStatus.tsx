@@ -37,8 +37,8 @@ export const SubmitStatus = ({
           </h1>
           <p>
             Trying again won&apos;t fix it. Please email{' '}
-            <a href={LINKS.CONTACT}>tech@anikalegal.com</a> - your answers are
-            still saved on this device.
+            <a href={LINKS.CONTACT}>tech@anikalegal.org.au</a> - your answers
+            are still saved on this device.
           </p>
         </>
       )}
@@ -62,8 +62,8 @@ export const SubmitStatus = ({
           </div>
           <p>
             If this keeps happening, email{' '}
-            <a href={LINKS.CONTACT}>tech@anikalegal.com</a> - your answers are
-            still saved on this device.
+            <a href={LINKS.CONTACT}>tech@anikalegal.org.au</a> - your answers
+            are still saved on this device.
           </p>
         </>
       )}
