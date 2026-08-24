@@ -37,7 +37,7 @@ export const LINKS = {
   HOME: '/',
   // Direct email for people who hit a technical problem (error boundary,
   // resume failure) and need to reach a person, not fill in a form.
-  CONTACT: 'mailto:tech@anikalegal.com',
+  CONTACT: 'mailto:tech@anikalegal.org.au',
   TERMS_OF_USE: '/resources/terms-of-use/',
   PRIVACY_POLICY: '/resources/privacy-policy/',
   COLLECTIONS_STATEMENT: '/resources/collections-statement/',

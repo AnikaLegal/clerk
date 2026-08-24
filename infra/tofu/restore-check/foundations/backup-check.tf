@@ -26,12 +26,16 @@ locals {
   backup_check_name      = "backup-check-s3"
   backup_check_parameter = "/backup-check-s3/sentry-cron-url"
 
-  # The backup plan runs daily at 5AM Melbourne; the check runs at 9AM, by
-  # which time both the snapshot and its Melbourne copy should exist. The
-  # copy gets a little longer to allow for its lag behind the snapshot.
+  # The backup plan stamps its daily recovery points 5AM Melbourne, but
+  # the jobs take hours to COMPLETE (anika-twilio-audio routinely finishes
+  # ~9:30AM), so the 9AM check must not race the same-day job. The
+  # contract is that YESTERDAY's point - exactly 28h old at check time -
+  # has landed, with margin on top for jitter; a genuinely missed backup
+  # still alerts within a day, when the newest point reaches ~52h. The
+  # copy gets a little longer for its lag behind the snapshot.
   backup_check_schedule   = "0 9 * * *" # crontab (Sentry) form
-  primary_threshold_hours = 28
-  copy_threshold_hours    = 30
+  primary_threshold_hours = 30
+  copy_threshold_hours    = 32
 }
 
 # --- The Lambda ------------------------------------------------------------------

@@ -26,7 +26,7 @@ just                     # List all recipes (also `just --list`; `just help <rec
 
 App URLs (via `just dev`): website `http://localhost:8000`, Clerk CMS `/clerk`, Django admin `/admin`.
 
-First-time setup (Docker, transcrypt, `uv --directory app sync` + venv activation, `just build`, `just reset`, `just superuser you@anikalegal.com`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
+First-time setup (Docker, transcrypt, `uv --directory app sync` + venv activation, `just build`, `just reset`, `just superuser you@anikalegal.org.au`) is in [docs/setup.md](docs/setup.md). Topic docs live in [docs/](docs/).
 
 ## API contract workflow (important)
 
@@ -67,6 +67,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 - **Don't assume a pull request is required.** The PR-based flow in [docs/setup.md](docs/setup.md#contributing) is written for volunteers and outside contributors; core tech team members commit to `develop` directly. Follow whichever the user is using, and ask if it isn't clear.
 - **Don't add `Co-Authored-By` trailers** (or any similar attribution lines) to commit messages.
 - **Don't include test output results in commit messages** (e.g. "Checks green: intake tsc/lint/86 tests").
+- **Keep code comments brief and evergreen** - say why the code is there and any constraint it can't show, in a few lines. Never reference conversation or project history ("the first drill proved...") - that's commit-message material. Never state facts owned by another file (e.g. "verify.py asserts this") - they go stale when that file changes; document them in the file that owns them. Prefer one short comment over a grouped block of related code to a narrative.
 - **Don't assume the git repository state** - the user may have made changes manually or in another session. Check the actual state (`git status`, `git log`, etc.) before reporting it.
 - **Secrets are transcrypt-encrypted** `.env` files (`env/`). Never decrypt them into plaintext, commit decrypted values, or print their contents.
 - After any API change, regenerate with `just schema` and never edit the generated files directly.
