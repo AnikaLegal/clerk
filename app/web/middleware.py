@@ -1,7 +1,20 @@
+from django.conf import settings
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 
 from .models import WebRedirect
+
+
+class NoIndexMiddleware(MiddlewareMixin):
+    """
+    Keeps non-production environments out of search engine results.
+    """
+
+    def process_response(self, request, response):
+        if not settings.IS_PROD:
+            response["X-Robots-Tag"] = "noindex, nofollow"
+
+        return response
 
 
 class RedirectMiddleware(MiddlewareMixin):

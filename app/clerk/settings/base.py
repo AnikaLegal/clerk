@@ -9,7 +9,7 @@ IS_PROD = False
 DEBUG = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEFAULT_FROM_EMAIL = "noreply@anikalegal.com"
+DEFAULT_FROM_EMAIL = "noreply@anikalegal.org.au"
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -79,6 +79,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # First so that static files served by WhiteNoise get the header too.
+    "web.middleware.NoIndexMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -343,7 +345,7 @@ class SlackMessage:
 
 SLACK_MESSAGE = SlackMessage
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
-SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.com"  # Set to None in prod only
+SLACK_EMAIL_ALERT_OVERRIDE = "tech@anikalegal.org.au"  # Set to None in prod only
 SLACK_MESSAGE_DISABLED = False
 
 

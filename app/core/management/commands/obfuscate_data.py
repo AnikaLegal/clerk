@@ -68,7 +68,7 @@ class Command(BaseCommand):
             Q(groups__name__in=[CaseGroups.ADMIN])
             | Q(is_superuser=True)
             | Q(is_staff=True)
-            | Q(email="coordinators@anikalegal.com")
+            | Q(email="coordinators@anikalegal.org.au")
         ).distinct()
 
         for t in tenancies.iterator():

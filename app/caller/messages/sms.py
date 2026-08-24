@@ -1,6 +1,6 @@
 # The SMS message we send to people who send us SMS's.
 # We don't do inbound SMS communications so we ask them to send us an email instead.
-INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.com"
+INBOUND_SMS_REPLY_MESSAGE = "Thank you for sending us an SMS. Please call us on this number or direct written enquiries to contact@anikalegal.org.au"
 
 
 from django.conf import settings
@@ -13,7 +13,7 @@ To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 
-If you have any other enquiries you can email us at contact@anikalegal.com
+If you have any other enquiries you can email us at contact@anikalegal.org.au
 """
 
 # The SMS message we send to people who are enquiring about bonds.
@@ -24,7 +24,7 @@ To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 
-If you have any other enquiries you can email us at contact@anikalegal.com
+If you have any other enquiries you can email us at contact@anikalegal.org.au
 """
 
 
@@ -36,7 +36,7 @@ To get help, please fill in this form: {settings.INTAKE_URL}
 
 For more info on Anika's services, please visit https://anikalegal.org.au/services/
 
-If you have any other enquiries you can email us at contact@anikalegal.com
+If you have any other enquiries you can email us at contact@anikalegal.org.au
 """
 
 
@@ -46,5 +46,5 @@ Thank you for contacting us about your enquiry, one of our staff will call you i
 
 In the meantime, for more info on Anika's services, please visit https://anikalegal.org.au/services/
 
-If you have any other enquiries you can email us at contact@anikalegal.com
+If you have any other enquiries you can email us at contact@anikalegal.org.au
 """
