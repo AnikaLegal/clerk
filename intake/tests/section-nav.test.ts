@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildSurveyModel } from '../src/form/model'
-import { navigableSections, readSectionStates } from '../src/form/section-nav'
+import {
+  navigableSections,
+  readFormStatus,
+  readSectionStates,
+} from '../src/form/section-nav'
 import { Answers } from '../src/form/types'
 import { QUESTIONS_BY_NAME } from '../src/questions'
 
@@ -207,5 +211,34 @@ describe('readSectionStates', () => {
       'later',
       'later',
     ])
+  })
+})
+
+describe('readFormStatus meter', () => {
+  it('starts empty on a fresh form', () => {
+    const { survey, visited } = setUp({}, 'ELIGIBILITY_ISSUE', 'WELCOME')
+    const status = readFormStatus(survey, visited)
+    expect(status.percent).toBe(0)
+    expect(status.doneCount).toBe(0)
+  })
+
+  it('fills the current section fractionally as its pages are passed', () => {
+    // Getting started's second visible page (of three on this branch): a third
+    // of one seventh. The meter moves within a section, not only at its end.
+    const { survey, visited } = setUp(
+      { ISSUES: 'REPAIRS' },
+      'ELIGIBILITY_LOCATION',
+      'ELIGIBILITY_ISSUE'
+    )
+    expect(readFormStatus(survey, visited).percent).toBe(5)
+  })
+
+  it('counts complete sections as full shares, wherever the user stands', () => {
+    // Fully answered, jumped back to Getting in touch: six of seven sections
+    // complete (Submit holds no answers and is never done).
+    const { survey, visited } = setUp(FULL, 'ABOUT_EMAIL')
+    const status = readFormStatus(survey, visited)
+    expect(status.percent).toBe(86)
+    expect(status.doneCount).toBe(6)
   })
 })

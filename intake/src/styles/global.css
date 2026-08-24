@@ -1095,6 +1095,13 @@ header .h-\[63px\] img {
 
   .intake-sidebar__head {
     border-bottom: 1px solid #ebe8e2;
+    /* Title, progress meter, subtitle - stacked and vertically centred in the
+       band (the fixed height above makes it line up with the footer band). */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 20px;
   }
 
   .intake-sidebar__foot {
@@ -1140,6 +1147,44 @@ header .h-\[63px\] img {
 
   .intake-nav__label {
     min-width: 0;
+  }
+}
+
+/* The head band's content: the rail's title, whole-form progress meter and
+   time-remaining subtitle (see comps/FormSidebar). */
+.intake-sidebar__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.intake-sidebar__subtitle {
+  font-size: 12px;
+  line-height: 1.3;
+  color: #6f6f6f;
+}
+
+/* One continuous bar filled to the whole form's completion, the fill moving on
+   every page passed (see readFormStatus). Track in the palette's inert fill;
+   progress is also announced through the element's progressbar role, so colour
+   is not the only signal. */
+.intake-nav__meter {
+  height: 5px;
+  border-radius: 3px;
+  background: #e6e3dd;
+  overflow: hidden;
+}
+
+.intake-nav__meter-fill {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intake-nav__meter-fill {
+    transition: none;
   }
 }
 

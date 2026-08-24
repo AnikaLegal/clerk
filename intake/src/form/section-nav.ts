@@ -115,9 +115,21 @@ export interface SectionStatus {
   navigable: boolean
 }
 
+export interface FormStatus {
+  sections: SectionStatus[]
+  // Whole-form completion for the progress meter, 0-100. Every section weighs
+  // the same: a complete one contributes a full share, the current one the
+  // fraction of its pages passed - so the meter moves on every page, not only
+  // at section boundaries.
+  percent: number
+  // How many sections are complete, for the "x of n done" summary.
+  doneCount: number
+}
+
 /**
- * Per-section status for the side navigation, derived - like navigableSections -
- * from the survey's visible pages, the visited set and the current answers.
+ * The whole form's status for the side navigation - per-section states plus the
+ * progress meter's inputs - derived, like navigableSections, from the survey's
+ * visible pages, the visited set and the current answers.
  *
  * A section is `done` when every one of its visible pages lies behind the first
  * page of the form that cannot be passed: sections wholly behind the user
@@ -125,10 +137,10 @@ export interface SectionStatus {
  * tick. The section holding the current page is `current` even when fully
  * answered, and everything ahead is `later`.
  */
-export const readSectionStates = (
+export const readFormStatus = (
   survey: Model,
   visited: Set<string>
-): SectionStatus[] => {
+): FormStatus => {
   const pages = survey.visiblePages
   const currentIndex = pages.indexOf(survey.currentPage)
   const currentSection = sectionIndexForPage(survey.currentPage?.name)
@@ -150,7 +162,13 @@ export const readSectionStates = (
     frontier++
   }
 
-  return SECTIONS.map((section, index): SectionStatus => {
+  let doneCount = 0
+  // The current section's share of the meter: the fraction of its pages the
+  // user is past, or a full share once it is complete - a backward jump into
+  // a finished form must not drain the meter.
+  let currentFill = 0
+
+  const sections = SECTIONS.map((section, index): SectionStatus => {
     const visiblePages = section.pages.filter((name) => indexByName.has(name))
     // A section holding no answers (the submit page is all display content) is
     // vacuously passable, so passability alone can't mark it done - it counts
@@ -175,6 +193,14 @@ export const readSectionStates = (
       visiblePages.length > 0 &&
       (holdsAnswers || whollyBehind) &&
       visiblePages.every((name) => indexByName.get(name)! < frontier)
+    if (isDone) doneCount += 1
+    if (index === currentSection && !isDone) {
+      const position = visiblePages.findIndex(
+        (name) => indexByName.get(name) === currentIndex
+      )
+      currentFill =
+        position > 0 ? position / Math.max(visiblePages.length, 1) : 0
+    }
     return {
       index,
       label: section.label,
@@ -188,7 +214,19 @@ export const readSectionStates = (
       navigable: reachable.has(index),
     }
   })
+
+  const percent = Math.min(
+    100,
+    Math.round(((doneCount + currentFill) / SECTIONS.length) * 100)
+  )
+  return { sections, percent, doneCount }
 }
+
+// The per-section states alone (see readFormStatus).
+export const readSectionStates = (
+  survey: Model,
+  visited: Set<string>
+): SectionStatus[] => readFormStatus(survey, visited).sections
 
 /**
  * The first still-visible page of a section, or undefined when the whole

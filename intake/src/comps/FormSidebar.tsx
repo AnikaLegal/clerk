@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Action, ListModel, Model, getTocRootCss } from 'survey-core'
 import { List, ReactElementFactory } from 'survey-react-ui'
 
-import { readSectionStates, SectionState } from '../form/section-nav'
+import { readFormStatus, SectionState } from '../form/section-nav'
 import { SECTIONS } from '../questions'
 
 interface FormSidebarProps {
@@ -31,16 +31,19 @@ interface FormSidebarProps {
  */
 export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
   const list = useMemo(() => buildSectionList(survey, onJump), [survey, onJump])
-  // Keep the rows in step with the survey. Answering a question doesn't
-  // re-render FormPage (SurveyJS renders its own questions), yet it can change
-  // the section states without a page change - picking an answer that triggers
-  // an eligibility exit must drop the ticks from the completed sections past it
-  // there and then. So sync on the survey's own value changes as well as on
-  // page changes; the rows re-render on their own (the state is a SurveyJS
-  // property on each action).
+  // The head's progress summary: whole-form percent and sections complete.
+  const [meter, setMeter] = useState({ percent: 0, doneCount: 0 })
+  // Keep the rows and the meter in step with the survey. Answering a question
+  // doesn't re-render FormPage (SurveyJS renders its own questions), yet it can
+  // change the section states without a page change - picking an answer that
+  // triggers an eligibility exit must drop the ticks from the completed
+  // sections past it there and then. So sync on the survey's own value changes
+  // as well as on page changes; the rows re-render on their own (the state is
+  // a SurveyJS property on each action), the meter through React state.
   useEffect(() => {
     const sync = () => {
-      readSectionStates(survey, visited).forEach((status) => {
+      const { sections, percent, doneCount } = readFormStatus(survey, visited)
+      sections.forEach((status) => {
         const action = list.actions[status.index] as SectionAction
         // The marker: a complete section keeps its tick even while current -
         // jumping back into a finished section must not revert it to a number.
@@ -48,6 +51,11 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
         action.enabled = status.state === 'current' || status.navigable
         if (status.state === 'current') list.selectedItem = action
       })
+      setMeter((prev) =>
+        prev.percent === percent && prev.doneCount === doneCount
+          ? prev
+          : { percent, doneCount }
+      )
     }
     sync()
     survey.onValueChanged.add(sync)
@@ -60,11 +68,29 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
 
   return (
     <nav className="intake-sidebar" aria-label="Form sections">
-      {/* The rail is banded like the question column: a head, the list, and a
-          foot whose hairline continues the one above the Back / Continue
-          buttons. Head and foot are empty for now - the progress summary and
-          the save-and-finish-later action land in them later. */}
-      <div className="intake-sidebar__head" />
+      {/* The rail is banded like the question column: a head holding the
+          progress summary, the section list, and a foot whose hairline
+          continues the one above the Back / Continue buttons. The foot is
+          empty for now - the save-and-finish-later action lands in it later. */}
+      <div className="intake-sidebar__head">
+        <span className="intake-sidebar__title">Your progress</span>
+        <div
+          className="intake-nav__meter"
+          role="progressbar"
+          aria-label="Form progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={meter.percent}
+        >
+          <div
+            className="intake-nav__meter-fill"
+            style={{ width: `${meter.percent}%` }}
+          />
+        </div>
+        <span className="intake-sidebar__subtitle">
+          {meter.doneCount} of {SECTIONS.length} done
+        </span>
+      </div>
       <div className="intake-sidebar__list">
         <div className={getTocRootCss(survey)}>
           <List model={list} />
