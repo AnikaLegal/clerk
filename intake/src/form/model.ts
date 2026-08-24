@@ -4,6 +4,7 @@ import { DefaultLightPanelless } from 'survey-core/themes'
 import { LINKS } from '../consts'
 import { PAGES, QUESTIONS_BY_NAME } from '../questions'
 import { PHONE_MAX_LENGTH, PHONE_VALIDATOR } from './phone'
+import { REVIEW_QUESTION_TYPE } from './review-question'
 import { IntakeQuestion } from './types'
 import './functions'
 
@@ -75,6 +76,14 @@ const toElement = (q: IntakeQuestion): Record<string, unknown> => {
         type: 'html',
         name: q.name,
         html: q.html ?? '',
+        visibleIf: q.visibleIf,
+      }
+    case 'REVIEW':
+      // The answer review, rendered by our own React component inside the page
+      // (see form/review-question and comps/AnswerReview). Holds no value.
+      return {
+        type: REVIEW_QUESTION_TYPE,
+        name: q.name,
         visibleIf: q.visibleIf,
       }
     case 'TEXT':

@@ -127,7 +127,11 @@ describe('flow parity', () => {
       'WORK_OR_STUDY_CIRCUMSTANCES',
       'REFERRER_TYPE',
       'SOCIAL_REFERRER',
+      // The send page's three display elements: the heading, the collapsed
+      // answer review and the agreement.
       'SUBMIT',
+      'REVIEW',
+      'AGREEMENT',
     ])
   })
 

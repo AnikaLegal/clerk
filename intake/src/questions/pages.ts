@@ -295,8 +295,8 @@ export const PAGES: IntakePage[] = [
     ],
   },
 
-  // Agreement + submit
-  { name: SUBMIT_PAGE, questions: ['SUBMIT'] },
+  // Review + agreement + send
+  { name: SUBMIT_PAGE, questions: ['SUBMIT', 'REVIEW', 'AGREEMENT'] },
 ]
 
 export const PAGE_BY_NAME: Record<string, IntakePage> = Object.fromEntries(

@@ -7,14 +7,13 @@ import { ROUTES } from '../consts'
 import { logException } from '../utils'
 import { markFormBegun, markStepReported } from './funnel'
 import { WELCOME_PAGE } from './model'
-import { addNavItems } from './nav-items'
 import { applyPageAdvance } from './page-advance'
 import { Direction, readProgress } from './progress'
 import { firstVisiblePageOfSection, navigableSections } from './section-nav'
 import { SubmissionSaver } from './save'
 import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
-import { SECTIONS, sectionIndexForPage, SUBMIT_PAGE } from '../questions'
+import { SECTIONS, sectionIndexForPage } from '../questions'
 
 interface FormNavigation {
   survey: Model
@@ -43,19 +42,6 @@ export const useFormNavigation = ({
     ...readProgress(survey),
     direction: 'forward' as Direction,
   }))
-  // Whether the submit-page answer-review panel is expanded. Toggled by the
-  // ghost nav-bar button (see addNavItems), read by FormPage to render the
-  // panel, and reset to false whenever the user leaves the submit page.
-  const [reviewOpen, setReviewOpen] = useState(false)
-  // The review toggle nav item, held so the reviewOpen effect can keep its
-  // label and aria-expanded in step with the panel state.
-  const reviewToggle = useRef<ReturnType<Model['addNavigationItem']> | null>(
-    null
-  )
-  // Mirrors reviewOpen for the nav-DOM observer, which runs outside React and
-  // needs the current value without re-subscribing.
-  const reviewOpenRef = useRef(false)
-
   // Browser history <-> survey page sync, so the browser Back / Forward buttons
   // move between the survey's pages instead of leaving the form. Each page gets
   // its own history entry carrying its name in location.state. lastPage tracks
@@ -268,21 +254,11 @@ export const useFormNavigation = ({
   }, [location])
 
   useEffect(() => {
-    const { reviewToggleItem } = addNavItems(survey)
-    // Toggle the review panel from the ghost nav-bar button; the reviewOpen
-    // effect below keeps the button's label and aria-expanded in sync.
-    reviewToggle.current = reviewToggleItem
-    reviewToggleItem.action = () => setReviewOpen((wasOpen) => !wasOpen)
-    // Keep the per-page UI in sync with the current page: the review toggle's
-    // visibility and the WELCOME page's "Let's get started" button label.
+    // Keep the per-page UI in sync with the current page: the WELCOME page's
+    // "Let's get started" button label.
     const syncPage = () => {
       const p = readProgress(survey)
       const onWelcome = survey.currentPage?.name === WELCOME_PAGE
-      // The review toggle lives on the submit page only; collapse the panel
-      // whenever the user leaves, so it reopens closed next time.
-      const onSubmit = survey.currentPage?.name === SUBMIT_PAGE
-      reviewToggleItem.visible = onSubmit
-      if (!onSubmit) setReviewOpen(false)
       survey.pageNextText = onWelcome ? "Let's get started" : 'Continue'
       setProgress({
         ...p,
@@ -400,13 +376,6 @@ export const useFormNavigation = ({
       container
         ?.querySelectorAll('.sd-body__navigation input[title]')
         .forEach((el) => el.removeAttribute('title'))
-      // SurveyJS doesn't render an action's ariaExpanded onto the button, so
-      // reflect the review panel's open state on the toggle element ourselves.
-      const toggle = container?.querySelector('.intake-review__toggle')
-      const expanded = String(reviewOpenRef.current)
-      if (toggle && toggle.getAttribute('aria-expanded') !== expanded) {
-        toggle.setAttribute('aria-expanded', expanded)
-      }
     }
     const navObserver = container
       ? new MutationObserver(syncNavAttributes)
@@ -441,19 +410,5 @@ export const useFormNavigation = ({
     }
   }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
 
-  // Keep the ghost toggle's label and aria-expanded in step with the panel.
-  useEffect(() => {
-    reviewOpenRef.current = reviewOpen
-    const item = reviewToggle.current
-    if (item) {
-      item.title = reviewOpen ? 'Hide your answers' : 'Review your answers'
-    }
-    // aria-expanded isn't rendered from the action (see syncNavAttributes); set
-    // it now, and the observer re-applies it after SurveyJS re-renders.
-    document
-      .querySelector('.intake-review__toggle')
-      ?.setAttribute('aria-expanded', String(reviewOpen))
-  }, [reviewOpen])
-
-  return { progress, jumpToSection, editSection, reviewOpen }
+  return { progress, jumpToSection, editSection }
 }

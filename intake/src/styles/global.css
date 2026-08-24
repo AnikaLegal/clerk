@@ -453,59 +453,91 @@ header .h-\[63px\] img {
   box-shadow: none;
 }
 
-/* Submit-page answer review (see comps/AnswerReview): a summary of the user's
-   answers grouped by section, each with an Edit link back into the form. It is
-   disclosed by the ghost "Review your answers" button in the survey navigation
-   bar (styled by daisyUI's d-btn-ghost) and rendered just below that bar. */
-/* While the review is disclosed, collapse the survey's padding below the nav
-   buttons (32px on the action bar + 64px on the body) so the panel's own top
-   margin fully controls the button-to-panel gap. A negative margin on the
-   panel can't do that job: the padding it offsets varies with viewport (the
-   nav wraps to two rows on narrow screens), so any fixed offset ends up
-   overlapping the wrapped buttons. The modifier only exists while the panel
-   is open (see FormPage), so the closed submit page and every other page keep
-   the survey's normal spacing. */
-.intake-form--review-open .sd-body,
-.intake-form--review-open .sd-body__navigation {
-  padding-bottom: 0;
-}
-
-/* The breathing room below the open panel lives as padding on the form (inside
-   its grey background), not as a bottom margin on the panel - a margin would
-   collapse through the form's bottom edge and show as a white strip between
-   the grey and the footer. */
-.intake-form--review-open {
-  padding-bottom: 40px;
-}
-
+/* Submit-page answer review (see comps/AnswerReview): the answers, grouped by
+   section with an Edit link into each, collapsed behind a row that says what is
+   inside them. Rendered as a question inside the page, so it sits between the
+   agreement copy and the Back / Send buttons. */
 .intake-review {
-  /* Cap at 640px on wide screens; on narrow ones keep 24px clear of each edge,
-     matching the survey column's own side padding (.sd-body's 24px), so the
-     panel lines up with the SurveyJS content above it. */
-  width: min(640px, 100% - 48px);
-  /* 50px top matches the gap between the agreement text and the buttons. */
-  margin: 50px auto 0;
-  padding: 4px 20px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid #d8d5ce;
   border-radius: 8px;
   background: #fff;
+  overflow: hidden;
+  /* SurveyJS keeps its question rows on one line (.sd-row__question), which
+     would otherwise stop every question and answer here from wrapping. */
+  white-space: normal;
 }
 
-/* Ghost variant for the "Review your answers" nav-bar toggle: transparent fill
-   with primary text and a hover tint. It's an <input class="d-btn"> like the
-   other nav buttons, so it keeps their size and shape from `.intake-form
-   input.d-btn` above; this rule shares that selector's specificity (0,2,1) but
-   sits later in the file, so it wins the solid fill (the same trick the
-   secondary variant uses). The focus ring comes from input.d-btn:focus-visible.
-   Primary is only ~3.3:1 on the page, below AA for this text, so darken it. */
-.intake-form input.intake-review__toggle {
-  background-color: transparent;
-  color: color-mix(in oklab, var(--color-primary), #000 20%);
+/* The disclosure row: what is inside on the left, chevron on the right. The
+   site styles bare buttons as large primary pills - including a centred flex
+   column - so this strips that chrome back to a plain full-width row. */
+.intake-form button.intake-review__toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  letter-spacing: normal;
+  color: #1a1a1a;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-review__toggle:hover {
+  background-color: #f7f5f1;
+}
+
+.intake-form button.intake-review__toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.intake-review__toggle-label {
+  font-size: 15px;
   font-weight: 600;
+  /* Push the count and chevron to the right edge. */
+  flex: 1;
 }
 
-.intake-form input.intake-review__toggle:hover {
-  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+.intake-review__toggle-count {
+  font-size: 13px;
+  color: #6f6f6f;
+}
+
+/* Chevron drawn from two borders, rotated - pointing down when collapsed, up
+   when open. */
+.intake-review__chevron {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: solid #6f6f6f;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 150ms ease;
+}
+
+.intake-review__toggle[aria-expanded='true'] .intake-review__chevron {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intake-review__chevron {
+    transition: none;
+  }
+}
+
+.intake-review__panel {
+  padding: 0 16px;
+  border-top: 1px solid #ebe8e2;
 }
 
 .intake-review__section {
@@ -527,8 +559,8 @@ header .h-\[63px\] img {
 
 .intake-review__title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* The site styles bare buttons as large primary pills, so strip that chrome and
@@ -546,7 +578,9 @@ header .h-\[63px\] img {
   background: none;
   box-shadow: none;
   font: inherit;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: normal;
   color: color-mix(in oklab, var(--color-primary), #000 20%);
   text-decoration: underline;
   cursor: pointer;

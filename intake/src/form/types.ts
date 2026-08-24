@@ -4,6 +4,7 @@
 
 export type FieldType =
   | 'DISPLAY'
+  | 'REVIEW'
   | 'TEXT'
   | 'NUMBER'
   | 'EMAIL'

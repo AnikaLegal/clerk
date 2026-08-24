@@ -15,11 +15,30 @@ const SUBMIT_QUESTION: IntakeQuestion = {
   type: 'DISPLAY',
   required: false,
   html: `
-    <h2>That's everything we need</h2>
+    <h2>Ready to send</h2>
     <p>
-      When you're ready, send us your answers. One of our team will contact
-      you in a few business days to talk about how we can help.
+      One of our team will contact you in a few business days to talk about
+      how we can help. You can check your answers first if you'd like to.
     </p>
+  `,
+}
+
+// The answers, collapsed behind a row that says what is inside them (see
+// comps/AnswerReview). Sending stays available without opening it.
+const REVIEW_QUESTION: IntakeQuestion = {
+  name: 'REVIEW',
+  type: 'REVIEW',
+  required: false,
+  // Never serialized: it holds no answer of its own.
+  uiOnly: true,
+}
+
+// The declaration, below the review so it sits directly above the send button.
+const AGREEMENT_QUESTION: IntakeQuestion = {
+  name: 'AGREEMENT',
+  type: 'DISPLAY',
+  required: false,
+  html: `
     <p>
       By sending us your answers, you are agreeing to our
       <a href="${LINKS.PRIVACY_POLICY}" target="_blank">Privacy Policy</a>,
@@ -42,6 +61,8 @@ export const QUESTIONS: IntakeQuestion[] = [
   ...LANDLORD_QUESTIONS,
   ...IMPACT_QUESTIONS,
   SUBMIT_QUESTION,
+  REVIEW_QUESTION,
+  AGREEMENT_QUESTION,
 ]
 
 export const QUESTIONS_BY_NAME: Record<string, IntakeQuestion> =
