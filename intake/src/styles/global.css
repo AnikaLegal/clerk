@@ -173,14 +173,33 @@ header .h-\[63px\] img {
 }
 
 /* On narrow screens the primary action stretches to fill the rest of the
-   footer row. */
+   footer row. Its 220px floor goes with it: the pair has to share one row down
+   to the narrowest phones, and that floor is wider than what is left beside
+   Back once the card is under ~420px, so the action bar would wrap the two onto
+   separate rows. */
 @media (max-width: 650px) {
+  /* Grows into the space beside Back, but no further than its desktop width -
+     stretched across a 600px row it reads as a banner rather than a button. The
+     cap sits on the wrapper, not the input: the sliding arrow is positioned
+     against the wrapper, so a wrapper wider than the button would strand the
+     arrow off its edge. */
   .intake-form .sd-body__navigation .sv-action:has(input.intake-btn-forward) {
     flex: 1 1 auto;
+    max-width: 220px;
   }
 
   .intake-form input.intake-btn-forward {
     width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Below ~420px the row is tight enough that Back, the bar's gap and Continue's
+   own label no longer fit: trim the primary's side padding so the pair still
+   shares one row on the narrowest phones. */
+@media (max-width: 420px) {
+  .intake-form input.intake-btn-forward {
+    padding: 0 12px;
   }
 }
 
