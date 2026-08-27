@@ -115,12 +115,13 @@ header .h-\[63px\] img {
   background-color: color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
-/* The survey footer's buttons: 44px control height, 8px radius, 600-weight
-   13px system-ui labels. Scoped to the navigation bar so the splash-page
-   buttons keep the site's pill styling. */
+/* The survey footer's buttons: 44px control height, 600-weight 13px system-ui
+   labels, and the website's pill shape so the form's actions read as the same
+   kit as the site's. Scoped to the navigation bar, which is the only place we
+   restyle the daisyUI buttons. */
 .intake-form .sd-body__navigation input.d-btn {
   height: 44px;
-  border-radius: 8px;
+  border-radius: 9999px;
   font-family: system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
