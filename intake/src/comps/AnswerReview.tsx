@@ -1,4 +1,4 @@
-import { createContext, useContext, useId, useState } from 'react'
+import { createContext, useContext, useId } from 'react'
 import { Model } from 'survey-core'
 import { ReactQuestionFactory } from 'survey-react-ui'
 
@@ -7,9 +7,11 @@ import { REVIEW_QUESTION_TYPE } from '../form/review-question'
 
 interface ReviewControls {
   survey: Model
-  // Jump back to a section's first page to edit it (see useFormNavigation's
-  // editSection).
-  onEdit: (sectionIndex: number) => void
+  // Go back to the page holding one answer to change it, and return here after
+  // (see useFormNavigation's editAnswer).
+  onEdit: (questionName: string) => void
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
 // The review renders inside the survey (see form/review-question), so what it
@@ -29,10 +31,10 @@ export const ReviewContext = createContext<ReviewControls | null>(null)
  */
 export const AnswerReview = () => {
   const controls = useContext(ReviewContext)
-  const [open, setOpen] = useState(false)
   const panelId = useId()
   // Rendered by SurveyJS, so the context can be missing in isolation.
   if (!controls) return null
+  const { open, setOpen } = controls
   const summary = buildAnswerSummary(controls.survey)
   // Nothing answered (shouldn't happen on the submit page) - render nothing.
   if (summary.length === 0) return null
@@ -48,7 +50,7 @@ export const AnswerReview = () => {
         className="intake-review__toggle"
         aria-expanded={open}
         aria-controls={panelId}
-        onClick={() => setOpen((wasOpen) => !wasOpen)}
+        onClick={() => setOpen(!open)}
       >
         <span className="intake-review__toggle-label">Check my answers</span>
         <span className="intake-review__toggle-count">
@@ -66,22 +68,27 @@ export const AnswerReview = () => {
       >
         {summary.map((section) => (
           <section key={section.index} className="intake-review__section">
-            <div className="intake-review__head">
-              <h3 className="intake-review__title">{section.label}</h3>
-              <button
-                type="button"
-                className="intake-review__edit"
-                onClick={() => controls.onEdit(section.index)}
-                aria-label={`Edit ${section.label}`}
-              >
-                Edit
-              </button>
-            </div>
+            <h3 className="intake-review__title">{section.label}</h3>
             <dl className="intake-review__list">
               {section.rows.map((row) => (
                 <div key={row.name} className="intake-review__row">
                   <dt className="intake-review__label">{row.label}</dt>
                   <dd className="intake-review__value">{row.value}</dd>
+                  <dd className="intake-review__action">
+                    <button
+                      type="button"
+                      className="intake-review__edit"
+                      onClick={() => controls.onEdit(row.name)}
+                    >
+                      Change
+                      {/* Every row's link reads "Change", so name what it
+                          changes for anyone listening rather than looking. */}
+                      <span className="intake-visually-hidden">
+                        {' '}
+                        {row.label}
+                      </span>
+                    </button>
+                  </dd>
                 </div>
               ))}
             </dl>

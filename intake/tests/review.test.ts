@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { buildSurveyModel } from '../src/form/model'
 import { buildAnswerSummary } from '../src/form/review'
-import { firstVisiblePageOfSection } from '../src/form/section-nav'
 import { Answers } from '../src/form/types'
 
 // A fully-answered repairs submission (mirrors the section-nav fixture).
@@ -102,20 +101,5 @@ describe('buildAnswerSummary', () => {
       setUp({ ISSUES: 'REPAIRS', IS_VICTORIAN_TENANT: true })
     ).map((s) => s.label)
     expect(labels).toEqual(['Getting started'])
-  })
-})
-
-describe('firstVisiblePageOfSection', () => {
-  it('returns the first visible page of a section', () => {
-    const survey = setUp(FULL)
-    expect(firstVisiblePageOfSection(survey, 0)).toBe('ELIGIBILITY_ISSUE')
-    expect(firstVisiblePageOfSection(survey, 5)).toBe('IMPACT_ABOUT')
-    // The final Submit section is the agreement page itself.
-    expect(firstVisiblePageOfSection(survey, 6)).toBe('SUBMIT')
-  })
-
-  it('skips pages on a branch the user is not taking', () => {
-    // Repairs branch: "Your problem" resolves to the repairs page, not a bond.
-    expect(firstVisiblePageOfSection(setUp(FULL), 2)).toBe('REPAIRS_ABOUT')
   })
 })

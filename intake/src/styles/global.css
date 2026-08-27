@@ -549,18 +549,23 @@ header .h-\[63px\] img {
   border-bottom: none;
 }
 
-.intake-review__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
 .intake-review__title {
-  margin: 0;
+  margin: 0 0 8px;
   font-size: 15px;
   font-weight: 600;
+}
+
+/* Text for screen readers only: kept in the accessibility tree, out of sight. */
+.intake-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* The site styles bare buttons as large primary pills, so strip that chrome and
@@ -596,14 +601,21 @@ header .h-\[63px\] img {
   margin: 0;
 }
 
+/* Question, answer and a Change link for that answer - the third column sized
+   to the link so the two content columns keep the width. */
 .intake-review__row {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto;
   /* Centre the answer vertically against a question that wraps to more lines
      (and vice versa). */
   align-items: center;
-  gap: 4px 32px;
+  gap: 4px 20px;
   padding: 4px 0;
+}
+
+.intake-review__action {
+  margin: 0;
+  text-align: right;
 }
 
 .intake-review__label {
@@ -617,11 +629,16 @@ header .h-\[63px\] img {
   overflow-wrap: anywhere;
 }
 
-/* Stack label over value on narrow screens rather than squeezing two columns. */
+/* Stack question, answer and Change on narrow screens rather than squeezing
+   three columns. */
 @media (max-width: 480px) {
   .intake-review__row {
     grid-template-columns: 1fr;
     gap: 0;
+  }
+
+  .intake-review__action {
+    text-align: left;
   }
 }
 

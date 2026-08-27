@@ -60,19 +60,26 @@ export const FormPage = () => {
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
   // and read back the progress state plus the jump-to-section wiring.
-  const { progress, jumpToSection, editSection } = useFormNavigation({
-    survey,
-    saver,
-    visited,
-    session,
-    attemptSubmit,
-  })
+  const { progress, jumpToSection, editAnswer, reviewOpen, setReviewOpen } =
+    useFormNavigation({
+      survey,
+      saver,
+      visited,
+      session,
+      attemptSubmit,
+    })
 
   // Handed to the answer review, which SurveyJS renders inside the submit page
-  // (see comps/AnswerReview).
+  // (see comps/AnswerReview). Its open state lives in the navigation hook, so
+  // returning from an edit can reopen it.
   const reviewControls = useMemo(
-    () => ({ survey, onEdit: editSection }),
-    [survey, editSection]
+    () => ({
+      survey,
+      onEdit: editAnswer,
+      open: reviewOpen,
+      setOpen: setReviewOpen,
+    }),
+    [survey, editAnswer, reviewOpen, setReviewOpen]
   )
 
   // Restore the form's title after a splash view (e.g. Go back from an exit

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Model } from 'survey-core'
+import { Model, PageModel } from 'survey-core'
 
 import { events } from '../analytics'
 import { ROUTES } from '../consts'
@@ -9,11 +9,11 @@ import { markFormBegun, markStepReported } from './funnel'
 import { WELCOME_PAGE } from './model'
 import { applyPageAdvance } from './page-advance'
 import { Direction, readProgress } from './progress'
-import { firstVisiblePageOfSection, navigableSections } from './section-nav'
+import { navigableSections } from './section-nav'
 import { SubmissionSaver } from './save'
 import { serializeAnswers } from './serialize'
 import { persistState } from './setup'
-import { SECTIONS, sectionIndexForPage } from '../questions'
+import { SECTIONS, sectionIndexForPage, SUBMIT_PAGE } from '../questions'
 
 interface FormNavigation {
   survey: Model
@@ -72,6 +72,17 @@ export const useFormNavigation = ({
   // backward section jump can rewind straight to that entry (keeping the
   // history order consistent with the form) rather than pushing a new one.
   const pageEntryIdx = useRef<Record<string, number>>({})
+  // Set while the user is off editing one answer from the send page's review:
+  // every forward move then tries to carry on to the send page, so they come
+  // straight back to the review instead of walking the rest of the form. It
+  // stays set until they arrive, so an edit that opens up new questions (a
+  // changed branch) routes them through those first.
+  const returnToReview = useRef(false)
+  // The question an edit is aimed at, focused once its page has rendered.
+  const pendingFocus = useRef<string | null>(null)
+  // Whether the review is open. Held here so the return trip can reopen it on
+  // arrival; FormPage hands it to the review through a context.
+  const [reviewOpen, setReviewOpen] = useState(false)
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -85,6 +96,30 @@ export const useFormNavigation = ({
       lastPage.current = name
     },
     [navigate, session]
+  )
+
+  // Point the current history entry at the page the survey is on, so the entry
+  // always names what is on screen.
+  const replaceHistoryWithCurrentPage = useCallback(() => {
+    const name = survey.currentPage?.name
+    lastPage.current = name ?? null
+    navigate(ROUTES.LANDING, {
+      state: { page: name, session },
+      replace: true,
+    })
+  }, [survey, navigate, session])
+
+  // Put the survey on a page directly. Used for backward moves that can't
+  // rewind to an existing entry, and for edit jumps, which must land on exactly
+  // the page asked for.
+  const goToPage = useCallback(
+    (target: PageModel) => {
+      suppressPush.current = true
+      survey.currentPage = target
+      suppressPush.current = false
+      replaceHistoryWithCurrentPage()
+    },
+    [survey, replaceHistoryWithCurrentPage]
   )
 
   // Move the survey to a reachable page by name, keeping browser history in
@@ -132,16 +167,9 @@ export const useFormNavigation = ({
         navigate(entryIdx - currentEntryIdx)
         return
       }
-      suppressPush.current = true
-      lastPage.current = targetPage
-      survey.currentPage = target
-      suppressPush.current = false
-      navigate(ROUTES.LANDING, {
-        state: { page: targetPage, session },
-        replace: true,
-      })
+      goToPage(target)
     },
-    [survey, navigate, session]
+    [survey, navigate, session, goToPage]
   )
 
   // Jump to a section's first page (see navigableSections for the
@@ -155,18 +183,48 @@ export const useFormNavigation = ({
     [survey, visited, jumpToPage]
   )
 
-  // Edit a section from the submit-page answer review: jump to its first
-  // visible page. Unlike jumpToSection this ignores the "navigable" gate, so
-  // the section the submit page sits in (its own, never offered as a forward
-  // jump) can still be edited; from the submit page every section is behind the
-  // user, so jumpToPage always makes a backward move.
-  const editSection = useCallback(
-    (sectionIndex: number) => {
-      const targetPage = firstVisiblePageOfSection(survey, sectionIndex)
-      if (targetPage) jumpToPage(targetPage)
+  // Edit one answer from the send page's review: go to the page holding that
+  // question and put the cursor in it. Unlike jumpToSection this ignores the
+  // "navigable" gate - from the send page every question is behind the user, so
+  // jumpToPage always makes a backward move - and it arms the return trip
+  // below, so the user comes back to the review rather than having to walk the
+  // rest of the form again.
+  const editAnswer = useCallback(
+    (questionName: string) => {
+      const target = survey.getQuestionByName(questionName)?.page as
+        PageModel | undefined
+      if (!target) return
+      returnToReview.current = true
+      // Not jumpToPage: its backward branch rewinds to whichever history entry
+      // it recorded for the page, and a long editing session leaves those stale
+      // (entries get replaced, so an index can name a different page by now),
+      // while an edit has to land on exactly the page asked for.
+      goToPage(target)
+      // The cursor goes into this question once the new page is on screen (see
+      // the effect below). Hold off the survey's own first-question focus until
+      // then, or it would land on whichever question happens to come first.
+      pendingFocus.current = questionName
+      survey.autoFocusFirstQuestion = false
     },
-    [survey, jumpToPage]
+    [survey, goToPage]
   )
+
+  // Put the cursor in the question an edit was aimed at. It has to wait for the
+  // page swap to finish: the survey focuses the question as it renders, but
+  // FormPage then re-keys the survey wrapper for the page-change animation, and
+  // the remount drops that focus. This effect runs after that remount.
+  useEffect(() => {
+    const questionName = pendingFocus.current
+    if (!questionName) return
+    pendingFocus.current = null
+    survey.focusQuestion(questionName)
+    // The survey defers its own first-question focus by a tick after each page
+    // renders, so let that pass before handing the behaviour back.
+    const restore = setTimeout(() => {
+      survey.autoFocusFirstQuestion = true
+    }, 100)
+    return () => clearTimeout(restore)
+  }, [progress.name, survey])
 
   // Mirror a browser Back / Forward (location change) onto the survey: move it
   // to the page named in the history entry we landed on.
@@ -357,6 +415,17 @@ export const useFormNavigation = ({
           })
         }
       }
+      // Coming back from editing one answer: carry on to the send page and
+      // reopen the review. Deferred so this page change finishes first, and
+      // routed through jumpToPage so the walk still stops on any page the edit
+      // has left unanswered - the user finishes those, and the next move tries
+      // again.
+      if (returnToReview.current && name === SUBMIT_PAGE) {
+        returnToReview.current = false
+        setReviewOpen(true)
+      } else if (returnToReview.current && goingForward.current) {
+        queueMicrotask(() => jumpToPage(SUBMIT_PAGE))
+      }
     }
 
     const onComplete: Parameters<typeof survey.onComplete.add>[0] = () => {
@@ -408,7 +477,16 @@ export const useFormNavigation = ({
       survey.onComplete.remove(onComplete)
       navObserver?.disconnect()
     }
-  }, [survey, saver, visited, navigate, recordPage, session, attemptSubmit])
+  }, [
+    survey,
+    saver,
+    visited,
+    navigate,
+    recordPage,
+    session,
+    attemptSubmit,
+    jumpToPage,
+  ])
 
-  return { progress, jumpToSection, editSection }
+  return { progress, jumpToSection, editAnswer, reviewOpen, setReviewOpen }
 }

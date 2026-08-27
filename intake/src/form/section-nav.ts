@@ -233,22 +233,3 @@ export const readSectionStates = (
   survey: Model,
   visited: Set<string>
 ): SectionStatus[] => readFormStatus(survey, visited).sections
-
-/**
- * The first still-visible page of a section, or undefined when the whole
- * section is on a branch the user isn't taking. Used by the submit-page answer
- * review to jump back into a section for editing, independent of whether the
- * section is currently "navigable" - the submit page's own section is the
- * current one (never offered as a forward jump), yet its answers still need an
- * Edit link, and from the submit page every section sits behind the user, so
- * the jump is always a valid backward move.
- */
-export const firstVisiblePageOfSection = (
-  survey: Model,
-  sectionIndex: number
-): string | undefined => {
-  const section = SECTIONS[sectionIndex]
-  if (!section) return undefined
-  const visibleNames = new Set(survey.visiblePages.map((page) => page.name))
-  return section.pages.find((name) => visibleNames.has(name))
-}
