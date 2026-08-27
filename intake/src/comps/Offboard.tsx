@@ -64,7 +64,7 @@ export const OffboardReferral = ({
  * The offboarding template: every page that takes someone out of the form -
  * ineligible, out of area, we can't help, no email - is this same skeleton
  * with slots switched on or off. The escape-links slot is fixed: always
- * "Go back" first, then "Return home", as text links. Never styled as an
+ * "Go back" first, then the home page, as text links. Never styled as an
  * error - the person did nothing wrong.
  */
 export const Offboard = ({
@@ -131,7 +131,7 @@ export const Offboard = ({
             <span aria-hidden="true">{'←'}</span> Go back
           </button>
           <a className="intake-offboard__home" href={LINKS.HOME}>
-            Return to the Anika Legal home page
+            Go to the Anika Legal home page
           </a>
         </div>
         {dataNote && <div className="intake-offboard__note">{dataNote}</div>}

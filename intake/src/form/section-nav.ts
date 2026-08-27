@@ -124,10 +124,7 @@ export interface FormStatus {
   percent: number
   // How many sections are complete, for the "x of n done" summary.
   doneCount: number
-  // The n in that summary, and the meter's denominator: the sections that can
-  // actually complete. The final Review & send step holds no answers, so it
-  // never reads done - counting it would leave the summary stuck at "n-1 of n"
-  // and the meter short of full on the review page itself.
+  // The n in that summary, and the meter's denominator.
   sectionCount: number
 }
 
@@ -141,10 +138,14 @@ export interface FormStatus {
  * qualify, and one that is still fully answered after a backward jump keeps its
  * tick. The section holding the current page is `current` even when fully
  * answered, and everything ahead is `later`.
+ *
+ * The final Review & send section holds no answers of its own, so nothing about
+ * the form can complete it: `sent` does, once the user has sent their answers.
  */
 export const readFormStatus = (
   survey: Model,
-  visited: Set<string>
+  visited: Set<string>,
+  sent = false
 ): FormStatus => {
   const pages = survey.visiblePages
   const currentIndex = pages.indexOf(survey.currentPage)
@@ -194,10 +195,14 @@ export const readFormStatus = (
     const whollyBehind =
       visiblePages.length > 0 &&
       visiblePages.every((name) => indexByName.get(name)! < currentIndex)
+    // The send step completes on the send itself; every other section on its
+    // own answers.
     const isDone =
-      visiblePages.length > 0 &&
-      (holdsAnswers || whollyBehind) &&
-      visiblePages.every((name) => indexByName.get(name)! < frontier)
+      index === SECTIONS.length - 1
+        ? sent
+        : visiblePages.length > 0 &&
+          (holdsAnswers || whollyBehind) &&
+          visiblePages.every((name) => indexByName.get(name)! < frontier)
     if (isDone) doneCount += 1
     if (index === currentSection && !isDone) {
       const position = visiblePages.findIndex(
@@ -220,7 +225,7 @@ export const readFormStatus = (
     }
   })
 
-  const sectionCount = SECTIONS.length - 1
+  const sectionCount = SECTIONS.length
   const percent = Math.min(
     100,
     Math.round(((doneCount + currentFill) / sectionCount) * 100)
@@ -231,5 +236,6 @@ export const readFormStatus = (
 // The per-section states alone (see readFormStatus).
 export const readSectionStates = (
   survey: Model,
-  visited: Set<string>
-): SectionStatus[] => readFormStatus(survey, visited).sections
+  visited: Set<string>,
+  sent = false
+): SectionStatus[] => readFormStatus(survey, visited, sent).sections

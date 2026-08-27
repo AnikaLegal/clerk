@@ -4,8 +4,8 @@ export const ROUTES = {
   // The form itself lives at the root: it opens on a SurveyJS start page
   // (the welcome/intro screen) and the survey takes over from there.
   LANDING: '/',
-  // Other splash pages
-  SUBMITTED: '/submitted/',
+  // Other splash pages. The confirmation has no route of its own: sending
+  // finishes inside the form, as its last step (see views/FormPage).
   NO_EMAIL: '/no-email/',
   // Eligibility exit pages. Slugs name the exit reason in plain language under
   // a shared /ineligible/ prefix (one path family for analytics filtering) -

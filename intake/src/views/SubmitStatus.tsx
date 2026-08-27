@@ -1,11 +1,12 @@
 import { LINKS } from '../consts'
 import { useAnnouncePage } from './announce'
 
-// The post-submit view: saving in progress, an unrecoverable failure
-// (permanent), or a retryable connection / server failure (transient).
-export type SubmitState = 'submitting' | 'permanent' | 'transient'
+// The post-submit view: saving in progress, sent (rendered by
+// comps/SubmittedMessage, not here), an unrecoverable failure (permanent), or a
+// retryable connection / server failure (transient).
+export type SubmitState = 'submitting' | 'sent' | 'permanent' | 'transient'
 
-const SUBMIT_TITLES: Record<SubmitState, string> = {
+const SUBMIT_TITLES: Partial<Record<SubmitState, string>> = {
   submitting: 'Sending your answers',
   permanent: "We couldn't send your answers",
   transient: 'Something went wrong',
@@ -22,7 +23,7 @@ export const SubmitStatus = ({
   state: SubmitState
   onRetry: () => void
 }) => {
-  const headingRef = useAnnouncePage(SUBMIT_TITLES[state])
+  const headingRef = useAnnouncePage(SUBMIT_TITLES[state] ?? '')
   return (
     <div className="intake-splash intake-splash--centred">
       {state === 'submitting' && (

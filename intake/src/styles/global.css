@@ -1050,6 +1050,68 @@ header .h-\[63px\] img {
   flex-direction: column;
 }
 
+/* The send and confirmation steps put a message in the question column rather
+   than a survey page; centre it in the height the rail sets, and set its type
+   from the offboarding template's, so every message the form shows in place of
+   questions reads the same. */
+.intake-form .intake-card__message {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+}
+
+.intake-form .intake-card__message h1 {
+  margin: 0;
+  font:
+    600 25px/1.22 system-ui,
+    sans-serif;
+  color: #1a1a1a;
+}
+
+/* The heading takes focus so the step is announced; it is not interactive, so
+   it needs no ring. */
+.intake-form .intake-card__message h1[tabindex]:focus {
+  outline: none;
+}
+
+.intake-form .intake-card__message p {
+  margin: 0;
+  font:
+    400 16px/1.6 system-ui,
+    sans-serif;
+  color: #5c5850;
+}
+
+/* The way out of a finished form, in the offboarding pages' escape-link
+   treatment: a text link at a 44px target, darkened accent for AA, darkening
+   again on hover rather than underlining. Styled on the class alone, since it
+   is shown both inside the card and on the standalone confirmation route. */
+a.intake-home-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  font:
+    600 15px system-ui,
+    sans-serif;
+  letter-spacing: normal;
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+  text-decoration: none;
+}
+
+a.intake-home-link:hover {
+  color: color-mix(in oklab, var(--color-primary), #000 35%);
+}
+
+a.intake-home-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* Sit the survey's Back / Continue bar on the card's bottom edge: the rail
    usually makes the card taller than the questions, and the buttons shouldn't
    float halfway up it. SurveyJS nests that bar nine levels below the question
@@ -1194,6 +1256,18 @@ header .h-\[63px\] img {
      the selected row back to 400, so match its specificity). */
   .intake-sidebar .sv-list__item.sv-list__item--selected .sv-list__item-body {
     font-weight: 600;
+  }
+
+  /* On the send and confirmation steps the rail is a record of what was
+     answered, not a way to move: the rows keep their normal weight but offer
+     nothing to click. */
+  .intake-sidebar--readonly .sv-list__item .sv-list__item-body {
+    color: #5c5850;
+    cursor: default;
+  }
+
+  .intake-sidebar--readonly .sv-list__item .sv-list__item-body:hover {
+    background: none;
   }
 
   .intake-nav__label {

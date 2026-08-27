@@ -13,6 +13,12 @@ interface FormSidebarProps {
   // Jumps to a section's first visible page; a no-op for a section that is not
   // currently reachable (see useFormNavigation's jumpToSection).
   onJump: (sectionIndex: number) => void
+  // Whether the answers have been sent, which is what completes the final
+  // Review & send section (see readFormStatus).
+  sent?: boolean
+  // Show the sections without offering them: on the send and confirmation
+  // steps there is nowhere left to navigate to.
+  readOnly?: boolean
 }
 
 /**
@@ -29,13 +35,19 @@ interface FormSidebarProps {
  * a jump can never skip a question or an eligibility exit that Continue would
  * have stopped on (see form/section-nav.ts).
  */
-export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
+export const FormSidebar = ({
+  survey,
+  visited,
+  onJump,
+  sent = false,
+  readOnly = false,
+}: FormSidebarProps) => {
   const list = useMemo(() => buildSectionList(survey, onJump), [survey, onJump])
   // The head's progress summary: whole-form percent and sections complete.
   const [meter, setMeter] = useState({
     percent: 0,
     doneCount: 0,
-    sectionCount: SECTIONS.length - 1,
+    sectionCount: SECTIONS.length,
   })
   // Keep the rows and the meter in step with the survey. Answering a question
   // doesn't re-render FormPage (SurveyJS renders its own questions), yet it can
@@ -48,14 +60,16 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
     const sync = () => {
       const { sections, percent, doneCount, sectionCount } = readFormStatus(
         survey,
-        visited
+        visited,
+        sent
       )
       sections.forEach((status) => {
         const action = list.actions[status.index] as SectionAction
         // The marker: a complete section keeps its tick even while current -
         // jumping back into a finished section must not revert it to a number.
         action.sectionState = status.complete ? 'done' : status.state
-        action.enabled = status.state === 'current' || status.navigable
+        action.enabled =
+          !readOnly && (status.state === 'current' || status.navigable)
         if (status.state === 'current') list.selectedItem = action
       })
       setMeter((prev) =>
@@ -71,10 +85,13 @@ export const FormSidebar = ({ survey, visited, onJump }: FormSidebarProps) => {
       survey.onValueChanged.remove(sync)
       survey.onCurrentPageChanged.remove(sync)
     }
-  }, [survey, visited, list])
+  }, [survey, visited, list, sent, readOnly])
 
   return (
-    <nav className="intake-sidebar" aria-label="Form sections">
+    <nav
+      className={`intake-sidebar${readOnly ? ' intake-sidebar--readonly' : ''}`}
+      aria-label="Form sections"
+    >
       {/* The rail is banded like the question column: a head holding the
           progress summary, the section list, and a foot whose hairline
           continues the one above the Back / Continue buttons. The foot is

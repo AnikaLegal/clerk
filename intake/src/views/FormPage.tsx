@@ -6,7 +6,7 @@ import { events } from '../analytics'
 import { ApiError } from '../api/client'
 import { ReviewContext } from '../comps/AnswerReview'
 import { FormSidebar } from '../comps/FormSidebar'
-import { ROUTES } from '../consts'
+import { SubmittedMessage } from '../comps/SubmittedMessage'
 import { resetFunnel } from '../form/funnel'
 import { WELCOME_PAGE } from '../form/model'
 import { serializeAnswers } from '../form/serialize'
@@ -24,7 +24,8 @@ export const FormPage = () => {
   // Post-submit state, rendered as our own splash (see SubmitStatus) instead of
   // SurveyJS's completed page / save-data banner, so both errors match the rest
   // of the intake flow and the unrecoverable case can drop the retry button.
-  // null while filling the form; a successful submit navigates to SubmittedPage.
+  // null while filling the form; a successful send lands on 'sent', the
+  // confirmation the form finishes on.
   const [submitState, setSubmitState] = useState<SubmitState | null>(null)
 
   const attemptSubmit = useCallback(() => {
@@ -44,7 +45,10 @@ export const FormPage = () => {
         }
         clearState()
         resetFunnel()
-        navigate(ROUTES.SUBMITTED)
+        // Stay in the form: the confirmation is its last step, shown in the
+        // card with the side navigation beside it (see the 'sent' branch
+        // below), rather than a separate page the user is dropped onto.
+        setSubmitState('sent')
       })
       .catch((error) => {
         logException(error)
@@ -89,8 +93,40 @@ export const FormPage = () => {
     setDocumentTitle('Get free help')
   }, [])
 
-  // Once the form is submitting or has failed, replace the survey with the
-  // post-submit splash (a successful submit navigates away before this shows).
+  // Sending, and then sent: both stay in the card with the side navigation
+  // beside them, so the send and its confirmation are the form's last step
+  // rather than a page the user is dropped onto. Sending is what completes that
+  // step, so this is where the rail finally reads as done - and with nothing
+  // left to navigate to, it is read-only.
+  if (submitState === 'submitting' || submitState === 'sent') {
+    return (
+      <div className="intake-form">
+        <div className="intake-page">
+          <div className="intake-card intake-card--with-nav">
+            <FormSidebar
+              survey={survey}
+              visited={visited}
+              onJump={jumpToSection}
+              sent
+              readOnly
+            />
+            <div className="intake-card__main">
+              <div className="intake-card__message">
+                {submitState === 'sent' ? (
+                  <SubmittedMessage />
+                ) : (
+                  <SubmitStatus state={submitState} onRetry={attemptSubmit} />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // A send that failed: the splash alone, with the retry. No rail - it would
+  // otherwise claim a form that has not gone anywhere is finished.
   if (submitState) {
     return (
       <div className="intake-form">
