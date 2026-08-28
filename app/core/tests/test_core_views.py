@@ -121,3 +121,102 @@ def test_submission_submit_requires_email_and_issues(anon_client):
     assert resp.status_code == 400
     sub = Submission.objects.get(pk=sub_id)
     assert not sub.is_complete
+
+
+@pytest.mark.django_db
+def test_submission_email_resume_link(anon_client, mailoutbox):
+    """
+    A user can have their own resume link emailed to the address the
+    submission holds, so they can finish the form on another device.
+    """
+    url = reverse("submission-list")
+    resp = anon_client.post(
+        url, data={"answers": {"EMAIL": "test@example.com", "ISSUES": "REPAIRS"}}
+    )
+    sub_id = resp.data["id"]
+
+    email_url = reverse("submission-email-resume-link", kwargs={"pk": sub_id})
+    resp = anon_client.post(email_url)
+    assert resp.status_code == 200
+
+    assert len(mailoutbox) == 1
+    email = mailoutbox[0]
+    assert email.to == ["test@example.com"]
+    assert f"resume/?sub={sub_id}" in email.body
+
+
+@pytest.mark.django_db
+def test_submission_email_resume_link_requires_an_email(anon_client, mailoutbox):
+    """
+    There is nowhere to send the link without an email answer.
+    """
+    url = reverse("submission-list")
+    resp = anon_client.post(url, data={"answers": {"ISSUES": "REPAIRS"}})
+    sub_id = resp.data["id"]
+
+    email_url = reverse("submission-email-resume-link", kwargs={"pk": sub_id})
+    assert anon_client.post(email_url).status_code == 400
+    assert len(mailoutbox) == 0
+
+
+@pytest.mark.django_db
+def test_submission_email_resume_link_rejects_submitted(anon_client, mailoutbox):
+    """
+    A submitted form has nothing to resume, and the link would only lead to an
+    error.
+    """
+    url = reverse("submission-list")
+    resp = anon_client.post(
+        url, data={"answers": {"EMAIL": "test@example.com", "ISSUES": "REPAIRS"}}
+    )
+    sub_id = resp.data["id"]
+    anon_client.post(reverse("submission-submit", kwargs={"pk": sub_id}))
+
+    email_url = reverse("submission-email-resume-link", kwargs={"pk": sub_id})
+    assert anon_client.post(email_url).status_code == 403
+    assert len(mailoutbox) == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "answers,greeting",
+    [
+        ({"PREFERRED_NAME": "Janey", "FIRST_NAME": "Jane"}, "Hi Janey,"),
+        ({"FIRST_NAME": "Jane"}, "Hi Jane,"),
+        ({}, "Hi,"),
+    ],
+)
+def test_submission_email_resume_link_greeting(
+    anon_client, mailoutbox, answers, greeting
+):
+    """
+    The email greets the user by the name they asked to be called, then their
+    first name, and plainly when the form has neither yet.
+    """
+    url = reverse("submission-list")
+    resp = anon_client.post(
+        url, data={"answers": {"EMAIL": "test@example.com", **answers}}
+    )
+    sub_id = resp.data["id"]
+
+    email_url = reverse("submission-email-resume-link", kwargs={"pk": sub_id})
+    assert anon_client.post(email_url).status_code == 200
+    assert mailoutbox[0].body.startswith(greeting)
+
+
+@pytest.mark.django_db
+def test_submission_email_resume_link_is_throttled(anon_client, mailoutbox):
+    """
+    The link goes to whatever address the submission holds, so the endpoint is
+    capped - otherwise a caller could post mail to that address on repeat.
+    """
+    url = reverse("submission-list")
+    resp = anon_client.post(url, data={"answers": {"EMAIL": "test@example.com"}})
+    email_url = reverse(
+        "submission-email-resume-link", kwargs={"pk": resp.data["id"]}
+    )
+
+    for _ in range(5):
+        assert anon_client.post(email_url).status_code == 200
+    assert anon_client.post(email_url).status_code == 429
+    assert len(mailoutbox) == 5

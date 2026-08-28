@@ -277,6 +277,14 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "clerk.utils.custom_exception_handler",
     "DATE_FORMAT": "%d/%m/%Y",
     "DATE_INPUT_FORMATS": ["iso-8601", "%d/%m/%Y"],
+    # Rate for the intake form's resume-link email (see core.views'
+    # ResumeEmailThrottle, which is applied to that endpoint alone rather than
+    # by default - the form PATCHes answers on every page).
+    "DEFAULT_THROTTLE_RATES": {"intake-email": "5/hour"},
+    # NUM_PROXIES is set per environment: it says how many hops to count back
+    # through X-Forwarded-For to find the client, so it only holds where those
+    # hops actually exist. Left unset here, DRF falls back to the whole header
+    # or REMOTE_ADDR, which is what a directly-served environment wants.
 }
 
 ONE_HUNDRED_YEARS = 100 * 365 * 24 * 60 * 60  # seconds

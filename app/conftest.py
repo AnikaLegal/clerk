@@ -12,6 +12,7 @@ from accounts.models import CaseGroups, User
 from case.middleware import annotate_group_access
 from core import factories
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from openapi_tester import SchemaTester
 from openapi_tester.clients import OpenAPIClient
 from utils.signals import disable_signals, restore_signals
@@ -36,6 +37,18 @@ def set_faker_locale():
 def use_zeal():
     with zeal_context():
         yield
+
+
+@pytest.fixture(autouse=True)
+def reset_throttles():
+    """
+    DRF counts throttled requests in the cache, which outlives a test - without
+    this, tests hitting a throttled endpoint would start failing based on what
+    ran before them.
+    """
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture(autouse=True)  # Automatically use in tests.

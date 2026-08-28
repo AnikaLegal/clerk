@@ -27,6 +27,9 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Same two hops as production - nginx logs Cloudflare as the peer here too.
+REST_FRAMEWORK["NUM_PROXIES"] = 2
+
 AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 

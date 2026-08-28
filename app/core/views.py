@@ -2,10 +2,22 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.viewsets import GenericViewSet
 
 from core.models import FileUpload, Submission
 from core.serializers import FileUploadSerializer, SubmissionSerializer
+from core.services.resume import email_resume_link
+
+
+class ResumeEmailThrottle(AnonRateThrottle):
+    """
+    Caps how often anyone can have a resume link emailed. The link goes to
+    whatever address the submission holds, so without this an unthrottled
+    endpoint would let a caller post mail to that address on repeat.
+    """
+
+    scope = "intake-email"
 
 
 class UploadViewSet(GenericViewSet, CreateModelMixin):
@@ -44,6 +56,28 @@ class SubmissionViewSet(
             )
         submission.is_complete = True
         submission.save()
+        return Response({}, status=200)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="email-resume-link",
+        throttle_classes=[ResumeEmailThrottle],
+    )
+    def email_resume_link(self, request, *args, **kwargs):
+        """
+        Email this submission's resume link to the address it holds, so the
+        user can carry on from another device.
+        """
+        submission = self.get_object()
+        if submission.is_complete:
+            # Nothing to resume, and the link would only lead to an error.
+            raise SubmittedException()
+        if not (submission.answers or {}).get("EMAIL"):
+            raise ValidationError(
+                {"answers": "Cannot email a resume link without an email address."}
+            )
+        email_resume_link(submission)
         return Response({}, status=200)
 
     def retrieve(self, request, *args, **kwargs):

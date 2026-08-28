@@ -83,6 +83,9 @@ export const useFormNavigation = ({
   // Whether the review is open. Held here so the return trip can reopen it on
   // arrival; FormPage hands it to the review through a context.
   const [reviewOpen, setReviewOpen] = useState(false)
+  // When the answers were last written down, for the side navigation's save
+  // state. Null until the first page change of this visit.
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
 
   const recordPage = useCallback(
     (name: string | null | undefined) => {
@@ -340,7 +343,10 @@ export const useFormNavigation = ({
     syncPage()
     reportPage()
 
-    const persist = () => persistState(survey, saver, visited, session)
+    const persist = () => {
+      persistState(survey, saver, visited, session)
+      setLastSavedAt(Date.now())
+    }
 
     const onPageChanging: Parameters<
       typeof survey.onCurrentPageChanging.add
@@ -488,5 +494,12 @@ export const useFormNavigation = ({
     jumpToPage,
   ])
 
-  return { progress, jumpToSection, editAnswer, reviewOpen, setReviewOpen }
+  return {
+    progress,
+    jumpToSection,
+    editAnswer,
+    reviewOpen,
+    setReviewOpen,
+    lastSavedAt,
+  }
 }

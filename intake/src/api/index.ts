@@ -33,6 +33,11 @@ export const api = {
     submit: async (id: string): Promise<void> => {
       await http.post(`${API_URLS.SUBMISSION}${id}/submit/`, {})
     },
+    // Email the user their own resume link, so they can finish on another
+    // device. Rejected (400) when the submission holds no email address.
+    emailResumeLink: async (id: string): Promise<void> => {
+      await http.post(`${API_URLS.SUBMISSION}${id}/email-resume-link/`, {})
+    },
   },
   upload: {
     // Upload a single file. The returned object is the answer value stored

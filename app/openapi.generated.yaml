@@ -95,6 +95,33 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
         "404":
           $ref: "#/components/responses/NotFound"
+  /api/submission/{id}/email-resume-link/:
+    post:
+      operationId: emailIntakeSubmissionResumeLink
+      description: Email the submission's own resume link to the address it holds, so the user can pick the form up on another device. Requires an EMAIL answer.
+      parameters:
+        - name: id
+          description: Submission ID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
   /api/upload/:
     post:
       operationId: createIntakeUpload
@@ -3682,6 +3709,12 @@ components:
             $ref: "#/components/schemas/Error"
     NotFound:
       description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    TooManyRequests:
+      description: Too many requests
       content:
         application/json:
           schema:

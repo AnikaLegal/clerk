@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Survey } from 'survey-react-ui'
 
 import { events } from '../analytics'
+import { api } from '../api'
 import { ApiError } from '../api/client'
 import { ReviewContext } from '../comps/AnswerReview'
 import { FormSidebar } from '../comps/FormSidebar'
+import { SavedMessage, SaveExitConfirm } from '../comps/SavedMessage'
 import { SubmittedMessage } from '../comps/SubmittedMessage'
 import { resetFunnel } from '../form/funnel'
 import { WELCOME_PAGE } from '../form/model'
@@ -64,14 +66,45 @@ export const FormPage = () => {
 
   // Drive the survey's page lifecycle (history sync, funnel, exits, persistence)
   // and read back the progress state plus the jump-to-section wiring.
-  const { progress, jumpToSection, editAnswer, reviewOpen, setReviewOpen } =
-    useFormNavigation({
-      survey,
-      saver,
-      visited,
-      session,
-      attemptSubmit,
-    })
+  const {
+    progress,
+    jumpToSection,
+    editAnswer,
+    reviewOpen,
+    setReviewOpen,
+    lastSavedAt,
+  } = useFormNavigation({
+    survey,
+    saver,
+    visited,
+    session,
+    attemptSubmit,
+  })
+
+  // Leaving the form: 'asking' while the user confirms, 'sending' while the
+  // resume link goes out, then the address it reached (null when there was
+  // nowhere to send it).
+  const [exitState, setExitState] = useState<
+    null | 'asking' | 'sending' | { emailedTo: string | null }
+  >(null)
+
+  // Finish later: the answers are already saved, so the only work here is
+  // getting the user a way back from another device. A failed send is not worth
+  // stopping them over - they are told what they do have instead.
+  const confirmSaveExit = useCallback(async () => {
+    let emailedTo: string | null = null
+    const email = survey.getValue('EMAIL') as string | undefined
+    if (saver.submissionId && email) {
+      setExitState('sending')
+      try {
+        await api.submission.emailResumeLink(saver.submissionId)
+        emailedTo = email
+      } catch (error) {
+        logException(error)
+      }
+    }
+    setExitState({ emailedTo })
+  }, [survey, saver])
 
   // Handed to the answer review, which SurveyJS renders inside the submit page
   // (see comps/AnswerReview). Its open state lives in the navigation hook, so
@@ -92,6 +125,44 @@ export const FormPage = () => {
   useEffect(() => {
     setDocumentTitle('Get free help')
   }, [])
+
+  // Finishing later: asked first, then confirmed - both in the same card, with
+  // the rail showing how far they got so they can see what is waiting for them.
+  if (exitState) {
+    const asking = exitState === 'asking' || exitState === 'sending'
+    return (
+      <div className="intake-form">
+        <div className="intake-page">
+          <div className="intake-card intake-card--with-nav">
+            <FormSidebar
+              survey={survey}
+              visited={visited}
+              onJump={jumpToSection}
+              readOnly
+              lastSavedAt={lastSavedAt}
+            />
+            <div className="intake-card__main">
+              <div className="intake-card__message">
+                {asking ? (
+                  <SaveExitConfirm
+                    email={(survey.getValue('EMAIL') as string) || null}
+                    sending={exitState === 'sending'}
+                    onConfirm={confirmSaveExit}
+                    onCancel={() => setExitState(null)}
+                  />
+                ) : (
+                  <SavedMessage
+                    emailedTo={exitState.emailedTo}
+                    onResume={() => setExitState(null)}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // Sending, and then sent: both stay in the card with the side navigation
   // beside them, so the send and its confirmation are the form's last step
@@ -166,6 +237,8 @@ export const FormPage = () => {
               survey={survey}
               visited={visited}
               onJump={jumpToSection}
+              lastSavedAt={lastSavedAt}
+              onSaveExit={() => setExitState('asking')}
             />
           )}
           <div className="intake-card__main">

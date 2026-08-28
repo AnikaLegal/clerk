@@ -12,6 +12,8 @@ paths:
     $ref: paths/intake-submission-detail.yaml
   /api/submission/{id}/submit/:
     $ref: paths/intake-submission-submit.yaml
+  /api/submission/{id}/email-resume-link/:
+    $ref: paths/intake-submission-email-resume.yaml
   /api/upload/:
     $ref: paths/intake-upload-list.yaml
   /api/webhooks/intake-noemail/:

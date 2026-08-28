@@ -29,6 +29,12 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 # Turn off browsable DRF API in prod.
 REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",)
 
+# Cloudflare then nginx sit in front, so throttles find the client's own
+# address second from the end of X-Forwarded-For. nginx appends its peer rather
+# than replacing the header, so anything a caller sends lands ahead of those two
+# and cannot move the entry that is read.
+REST_FRAMEWORK["NUM_PROXIES"] = 2
+
 # Get DRF to use HTTPS in links.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 

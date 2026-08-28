@@ -1,0 +1,5 @@
+description: Too many requests
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Error.yaml

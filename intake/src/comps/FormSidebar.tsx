@@ -19,6 +19,13 @@ interface FormSidebarProps {
   // Show the sections without offering them: on the send and confirmation
   // steps there is nowhere left to navigate to.
   readOnly?: boolean
+  // When the answers were last written down, for the save state; null before
+  // this visit has saved anything.
+  lastSavedAt?: number | null
+  // Leaves the form for good: emails the resume link where there is an address
+  // to send it to, then shows the way out. Omitted where there is nothing left
+  // to come back to.
+  onSaveExit?: () => void
 }
 
 /**
@@ -41,6 +48,8 @@ export const FormSidebar = ({
   onJump,
   sent = false,
   readOnly = false,
+  lastSavedAt = null,
+  onSaveExit,
 }: FormSidebarProps) => {
   const list = useMemo(() => buildSectionList(survey, onJump), [survey, onJump])
   // The head's progress summary: whole-form percent and sections complete.
@@ -120,8 +129,46 @@ export const FormSidebar = ({
           <List model={list} />
         </div>
       </div>
-      <div className="intake-sidebar__foot" />
+      <div className="intake-sidebar__foot">
+        <SaveState lastSavedAt={lastSavedAt} />
+        {onSaveExit && (
+          <button
+            type="button"
+            className="intake-sidebar__save-exit"
+            onClick={onSaveExit}
+          >
+            Save &amp; finish later
+          </button>
+        )}
+      </div>
     </nav>
+  )
+}
+
+// How long ago the answers were written down, in words. Kept coarse: the point
+// is "your work is not going anywhere", not the exact second.
+const savedAgo = (lastSavedAt: number): string => {
+  const minutes = Math.floor((Date.now() - lastSavedAt) / 60_000)
+  if (minutes < 1) return 'Saved just now'
+  if (minutes === 1) return 'Saved 1 minute ago'
+  if (minutes < 60) return `Saved ${minutes} minutes ago`
+  const hours = Math.floor(minutes / 60)
+  return hours === 1 ? 'Saved 1 hour ago' : `Saved ${hours} hours ago`
+}
+
+// The save state, re-read on a timer so "just now" doesn't sit there for an
+// hour while the user thinks about an answer.
+const SaveState = ({ lastSavedAt }: { lastSavedAt: number | null }) => {
+  const [, tick] = useState(0)
+  useEffect(() => {
+    if (lastSavedAt === null) return
+    const timer = setInterval(() => tick((n) => n + 1), 30_000)
+    return () => clearInterval(timer)
+  }, [lastSavedAt])
+  return (
+    <span className="intake-sidebar__saved">
+      {lastSavedAt === null ? 'Saves as you go' : savedAgo(lastSavedAt)}
+    </span>
   )
 }
 
