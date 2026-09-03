@@ -125,7 +125,8 @@ echo -e "\n>>> Recovery point: $rp_created ($rp_status)\n    $rp_arn"
 echo -e "\n>>> Restore destination: s3://$destination (new bucket in $region)"
 
 # Build the restore metadata from the recovery point's own template so we don't
-# have to hard-code the S3 metadata keys - just override where it lands.
+# have to hard-code the S3 metadata keys - just override where it lands and how
+# it is encrypted.
 template=$(
     aws backup get-recovery-point-restore-metadata \
         --backup-vault-name "$vault" --region "$region" \
@@ -141,6 +142,10 @@ meta = json.loads(sys.argv[1])
 meta = {k: v for k, v in meta.items() if not k.startswith("aws:")}
 meta["DestinationBucketName"] = sys.argv[2]
 meta["NewBucket"] = "true"
+# Encrypt the restored objects with SSE-S3, as the source bucket does. The
+# default, 'original', is refused for recovery points copied from another
+# region - which is every one in the air-gapped vault.
+meta["EncryptionType"] = "SSE-S3"
 print(json.dumps(meta))
 PY
 )
@@ -183,8 +188,9 @@ while true; do
 done
 
 echo -e "\n>>> Restore complete. Dumps are in s3://$destination"
-echo "    List:    aws s3 ls s3://$destination/ --region $region"
-echo "    Decrypt: aws s3 cp s3://$destination/<file>.sql.gpg - --region $region | \\"
-echo "               gpg --decrypt --passphrase <BACKUP_PASSPHRASE> > dump.sql"
+echo "    List:     aws s3 ls s3://$destination/ --region $region"
+echo "    Download: aws s3 cp s3://$destination/<file>.sql.gpg . --region $region"
+echo "    Decrypt:  gpg --decrypt --no-symkey-cache --output <file>.sql <file>.sql.gpg"
+echo "              (gpg prompts for the backup passphrase - Anika BitWarden)"
 
 exit 0
