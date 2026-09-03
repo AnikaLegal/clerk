@@ -51,7 +51,23 @@ def send_slack_direct_message(markdown_text: str, user_id: str):
     logger.info(f"Finished sending Slack message to user {user_id}")
 
 
+# Slack accounts can lag behind Clerk while the User Domain Migration is in
+# progress. Remove this fallback once everyone has confirmed the change in Slack.
+OLD_EMAIL_DOMAIN = "@anikalegal.com"
+NEW_EMAIL_DOMAIN = "@anikalegal.org.au"
+
+
 def get_slack_user_by_email(email: str):
+    slack_user = _lookup_slack_user(email)
+    if not slack_user and email.endswith(NEW_EMAIL_DOMAIN):
+        old_email = email.removesuffix(NEW_EMAIL_DOMAIN) + OLD_EMAIL_DOMAIN
+        slack_user = _lookup_slack_user(old_email)
+        if slack_user:
+            logger.info(f"Found Slack user for {email} via {old_email}")
+    return slack_user
+
+
+def _lookup_slack_user(email: str):
     url = "https://slack.com/api/users.lookupByEmail"
     data = {"email": email}
     resp = requests.get(url, params=data, headers=HEADERS)
