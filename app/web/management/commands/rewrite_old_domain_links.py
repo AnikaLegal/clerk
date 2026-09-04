@@ -22,8 +22,20 @@ NEEDS_A_TARGET = (
     "https://www.anikalegal.com/blog/rent-reduction-and-victorias-new-covid-19-laws-made-simple",
 )
 
-HREF = re.compile(r'href="([^"]*)"')
 MODELS = (BlogPage, JobPage, NewsPage, ResourcePage)
+
+# Matches an old-domain URL whether it sits in an href or in visible text, with
+# or without a scheme. The lookbehind keeps it out of email addresses and out of
+# longer hostnames, and the longest host is tried first so www. wins over the
+# bare apex.
+OLD_URL = re.compile(
+    r"(?<![\w.@-])"
+    r"(https?:)?(?://)?"
+    r"(" + "|".join(re.escape(h) for h in sorted(HOST_MAP, key=len, reverse=True)) + r")"
+    r"([^\s\"'<>]*)"
+)
+TRAILING_PUNCTUATION = ".,;:!?)]"
+REMAINING = re.compile(r"""[^\s"'<>]*anikalegal\.com[^\s"'<>]*""")
 
 
 def _identity(url):
@@ -74,22 +86,27 @@ class Command(BaseCommand):
                 found = []
 
                 def replace(match):
-                    new = rewrite_url(match.group(1))
+                    scheme, host, path = match.group(1), match.group(2), match.group(3)
+                    trailing = ""
+                    while path and path[-1] in TRAILING_PUNCTUATION:
+                        trailing = path[-1] + trailing
+                        path = path[:-1]
+                    new = rewrite_url(f"https://{host}{path}")
                     if new is None:
                         return match.group(0)
-                    found.append((match.group(1), new))
-                    return f'href="{new}"'
+                    # Text that named a host without a scheme keeps reading that
+                    # way rather than turning into a full URL.
+                    bare = new.removeprefix("https://")
+                    replacement = (new if scheme else bare) + trailing
+                    found.append((match.group(0), replacement))
+                    return replacement
 
                 for block in raw:
                     if isinstance(block.get("value"), str):
-                        block["value"] = HREF.sub(replace, block["value"])
-
-                for block in raw:
-                    if not isinstance(block.get("value"), str):
-                        continue
-                    for href in HREF.findall(block["value"]):
-                        if "anikalegal.com" in href:
-                            left_alone[href] += 1
+                        block["value"] = OLD_URL.sub(replace, block["value"])
+                    if isinstance(block.get("value"), str):
+                        for leftover in REMAINING.findall(block["value"]):
+                            left_alone[leftover] += 1
 
                 if not found:
                     continue

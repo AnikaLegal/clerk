@@ -98,6 +98,45 @@ def test_leaves_links_that_need_an_editorial_target_alone(blog_list):
 
 
 @pytest.mark.django_db
+def test_rewrites_an_old_domain_url_shown_as_visible_text(blog_list):
+    """
+    A rewritten href whose link text still shows the old domain contradicts
+    itself, which matters most in the privacy policy where the URL is the
+    definition of "the Website".
+    """
+    page = BlogPageFactory(
+        parent=blog_list,
+        body=body('<a href="https://anikalegal.org.au/">http://anikalegal.com/</a>'),
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    assert ">https://anikalegal.org.au/</a>" in raw_html(page)
+
+
+@pytest.mark.django_db
+def test_rewrites_a_bare_host_in_text_without_inventing_a_scheme(blog_list):
+    page = BlogPageFactory(
+        parent=blog_list, body=body("<p>Our site is www.anikalegal.com today</p>")
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    assert "Our site is anikalegal.org.au today" in raw_html(page)
+
+
+@pytest.mark.django_db
+def test_keeps_the_sentence_punctuation_after_a_url(blog_list):
+    page = BlogPageFactory(
+        parent=blog_list, body=body("<p>Read more at anikalegal.com.</p>")
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    assert "Read more at anikalegal.org.au." in raw_html(page)
+
+
+@pytest.mark.django_db
 def test_leaves_email_addresses_alone(blog_list):
     """Mailbox names are not ours to assume, so only web links are rewritten."""
     page = BlogPageFactory(
