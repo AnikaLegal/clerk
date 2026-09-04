@@ -108,7 +108,7 @@ urlpatterns = [
     # Dashboard.
     path("dash/", views.dashboard_view, name="dashboard"),
     # Robots.txt
-    path("robots.txt", views.robots_view),
+    path("robots.txt", views.robots_view, name="robots"),
     # Sitemap
     path(
         "sitemap.xml",

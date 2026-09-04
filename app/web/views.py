@@ -1,21 +1,21 @@
 import random
 
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods, require_safe
 
-from .models import BlogListPage, DashboardItem, Impact
 from .forms import ContactForm, ContentFeedbackForm
+from .models import BlogListPage, DashboardItem, Impact
 
 
-@require_http_methods(["GET"])
+@require_safe
 def robots_view(request):
     """robots.txt for web crawlers"""
     return render(request, "web/robots.txt", content_type="text/plain")
 
 
-@require_http_methods(["GET"])
+@require_safe
 def landing_view(request):
     return render(
         request,
@@ -24,13 +24,13 @@ def landing_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def impact_view(request):
     impact = Impact.objects.filter(live=True).prefetch_related("images").last()
     return render(request, "web/about/impact.html", {"impact": impact})
 
 
-@require_http_methods(["GET"])
+@require_safe
 def evictions_view(request):
     return render(
         request,
@@ -39,7 +39,7 @@ def evictions_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def bonds_view(request):
     return render(
         request,
@@ -48,7 +48,7 @@ def bonds_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def repairs_view(request):
     return render(
         request,
@@ -58,13 +58,13 @@ def repairs_view(request):
 
 
 @login_required
-@require_http_methods(["GET"])
+@require_safe
 def dashboard_view(request):
     context = {"items": DashboardItem.objects.all()}
     return render(request, "web/dashboard.html", context)
 
 
-@require_http_methods(["GET"])
+@require_safe
 def blog_search_view(request):
     blog_parent = BlogListPage.objects.get(slug="blog")
     context = blog_parent.get_context(request)
@@ -97,7 +97,7 @@ def content_feedback_form_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def team_view(request):
     return render(
         request,

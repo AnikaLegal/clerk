@@ -31,6 +31,7 @@ URLS_TO_TEST_BY_NAME = [
     ("corporate-partners", 200),
     ("university-partners", 200),
     ("law-student-partners", 200),
+    ("robots", 200),
     ("django.contrib.sitemaps.views.sitemap", 200),
 ]
 
@@ -43,6 +44,18 @@ def test_path_name_status_codes(client, name, status_code):
     """
     url = reverse(name)
     response = client.get(url)
+    msg = f"URL name {name} failed, expecting {status_code} got {response.status_code}"
+    assert response.status_code == status_code, msg
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("name, status_code", URLS_TO_TEST_BY_NAME)
+def test_path_name_head_status_codes(client, name, status_code):
+    """
+    Ensure URLs accept HEAD requests, which link checkers and crawlers use.
+    """
+    url = reverse(name)
+    response = client.head(url)
     msg = f"URL name {name} failed, expecting {status_code} got {response.status_code}"
     assert response.status_code == status_code, msg
 
