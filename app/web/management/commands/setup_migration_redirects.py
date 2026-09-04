@@ -1,8 +1,17 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from wagtail.contrib.redirects.models import Redirect
-from wagtail.models import Page
+from wagtail.models import Locale, Page
 from web.models import WebRedirect
+
+
+def page_for_slug(slug):
+    """
+    The page to redirect to. Translations share the English slug, so the
+    default locale wins rather than the match being arbitrary.
+    """
+    pages = Page.objects.filter(slug=slug)
+    return pages.filter(locale=Locale.get_default()).first() or pages.first()
 
 
 class Command(BaseCommand):
@@ -13,20 +22,25 @@ class Command(BaseCommand):
         for src, dest in NON_WAGTAIL_REDIRECTS:
             r = WebRedirect(source_path=src, destination_path=dest, is_permanent=True)
             r.normalise_paths()
-            WebRedirect.objects.get_or_create(
+            # A source may hold several rows and the middleware takes the first,
+            # so a superseded destination has to go rather than sit alongside
+            # the new one and keep winning.
+            WebRedirect.objects.filter(source_path=r.source_path).exclude(
+                destination_path=r.destination_path
+            ).delete()
+            WebRedirect.objects.update_or_create(
                 source_path=r.source_path,
                 destination_path=r.destination_path,
-                is_permanent=True,
+                defaults={"is_permanent": True},
             )
 
         for old_path, dest_slug in WAGTAIL_REDIRECTS:
-            try:
-                page = Page.objects.get(slug=dest_slug)
-            except Page.DoesNotExist:
-                print("ERROR:", dest_slug)
+            page = page_for_slug(dest_slug)
+            if page is None:
+                self.stderr.write(f"No page has the slug {dest_slug}")
                 continue
 
-            Redirect.objects.get_or_create(
+            Redirect.objects.update_or_create(
                 old_path=Redirect.normalise_path(old_path),
                 defaults={"redirect_page": page, "is_permanent": True},
             )
@@ -34,6 +48,8 @@ class Command(BaseCommand):
 
 # src, dest - all hard / 301
 NON_WAGTAIL_REDIRECTS = [
+    # There is no /services/ page, only the individual services beneath it.
+    ("services", ""),
     ("rental-repairs-support", "services/rental-repairs"),
     ("covid-19-rent-reduction-support", "services"),
     ("faq/the-service", "services"),
