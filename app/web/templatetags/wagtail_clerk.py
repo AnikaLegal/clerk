@@ -41,3 +41,7 @@ def clerk_slugurl(context, slug):
     if page:
         # call pageurl() instead of page.relative_url() here so we get the ``accepts_kwarg`` logic
         return pageurl(context, page)
+
+    # Most callers interpolate this straight into an href, so a missing page has
+    # to render as nothing rather than the string "None".
+    return ""
