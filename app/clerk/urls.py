@@ -43,7 +43,6 @@ urlpatterns = [
     # TODO: Move router to core
     path("api/", include(router.urls)),
     path("clerk/", include("case.urls")),
-    path("launch/", include("intake.urls")),
     re_path(r"^case/(?P<path>.*)", RedirectView.as_view(url="/clerk/%(path)s")),
     path("accounts/", include("accounts.urls")),
     path("email/", include(email_urls)),
