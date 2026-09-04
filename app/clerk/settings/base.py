@@ -258,6 +258,10 @@ WAGTAILUSERS_PASSWORD_REQUIRED = False  # Allow blank passwords for social auth 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = "public-read"
+# Uploads and the image renditions built from them are served straight from S3,
+# which sends no caching headers of its own. A week balances repeat visits
+# against a file being replaced under the same name.
+AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=604800"}
 AWS_REGION_NAME = "ap-southeast-2"
 AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each other
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
