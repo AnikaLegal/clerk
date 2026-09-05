@@ -86,6 +86,44 @@ def test_resolves_an_ambiguous_slug_to_the_default_locale():
 
 
 @pytest.mark.django_db
+def test_skips_a_destination_that_is_not_published():
+    """A redirect to an unpublished page answers with a 404."""
+    old_path, slug = A_WAGTAIL_REDIRECT
+    blog_list = BlogListPageFactory(slug="blog")
+    page = BlogPageFactory(parent=blog_list, slug=slug)
+    page.unpublish()
+
+    call_command("setup_migration_redirects")
+
+    assert not Redirect.objects.filter(
+        old_path=Redirect.normalise_path(old_path)
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_prefers_a_published_page_over_an_unpublished_one():
+    old_path, slug = A_WAGTAIL_REDIRECT
+    blog_list = BlogListPageFactory(slug="blog")
+    unpublished = BlogPageFactory(parent=blog_list, slug=slug)
+    unpublished.unpublish()
+    locale = Locale.objects.create(language_code="vi")
+    translated_list = BlogListPageFactory(
+        slug="blog-vi", locale=locale, translation_key=blog_list.translation_key
+    )
+    published = BlogPageFactory(
+        parent=translated_list,
+        slug=slug,
+        locale=locale,
+        translation_key=unpublished.translation_key,
+    )
+
+    call_command("setup_migration_redirects")
+
+    redirect = Redirect.objects.get(old_path=Redirect.normalise_path(old_path))
+    assert redirect.redirect_page.pk == published.pk
+
+
+@pytest.mark.django_db
 def test_running_twice_changes_nothing():
     call_command("setup_migration_redirects")
     web = set(WebRedirect.objects.values_list("source_path", "destination_path"))

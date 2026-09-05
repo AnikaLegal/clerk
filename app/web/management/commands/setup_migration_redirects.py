@@ -8,9 +8,10 @@ from web.models import WebRedirect
 def page_for_slug(slug):
     """
     The page to redirect to. Translations share the English slug, so the
-    default locale wins rather than the match being arbitrary.
+    default locale wins rather than the match being arbitrary. Unpublished
+    pages are no use as a destination, since a redirect to one answers 404.
     """
-    pages = Page.objects.filter(slug=slug)
+    pages = Page.objects.filter(slug=slug, live=True)
     return pages.filter(locale=Locale.get_default()).first() or pages.first()
 
 
