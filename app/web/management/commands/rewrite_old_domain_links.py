@@ -34,6 +34,18 @@ OLD_URL = re.compile(
     r"(" + "|".join(re.escape(h) for h in sorted(HOST_MAP, key=len, reverse=True)) + r")"
     r"([^\s\"'<>]*)"
 )
+# Every mailbox has moved, so any address on the old domain can be rewritten.
+OLD_MAIL_DOMAIN = "anikalegal.com"
+NEW_MAIL_DOMAIN = "anikalegal.org.au"
+_MAILBOX = r"([\w.+-]+)@" + re.escape(OLD_MAIL_DOMAIN)
+
+# An address written with an http scheme reads as a username rather than a
+# mailbox, so the link goes nowhere useful and a mailto was meant.
+MALFORMED_MAILTO = re.compile(r'href="https?://' + _MAILBOX + r'/?"')
+# Not preceded by more address, and not followed by another domain label, so a
+# sentence-ending full stop is fine but a longer domain is left alone.
+ADDRESS = re.compile(r"(?<![\w.-])" + _MAILBOX + r"(?!\w)(?!\.[a-zA-Z])")
+
 TRAILING_PUNCTUATION = ".,;:!?)]"
 REMAINING = re.compile(r"""[^\s"'<>]*anikalegal\.com[^\s"'<>]*""")
 
@@ -62,8 +74,8 @@ def rewrite_url(url):
 
 class Command(BaseCommand):
     help = (
-        "Rewrite anikalegal.com links in page content to anikalegal.org.au. "
-        "Reports what it would change; pass --apply to write."
+        "Rewrite anikalegal.com links and addresses in published page content "
+        "to anikalegal.org.au. Reports what it would change; --apply writes."
     )
 
     def add_arguments(self, parser):
@@ -81,7 +93,10 @@ class Command(BaseCommand):
         changed = skipped = 0
 
         for model in MODELS:
-            for page in model.objects.all():
+            # Only what the public can see. A draft is someone's work in
+            # progress, and rewriting it would edit content they have not
+            # shipped, on a page nobody can reach.
+            for page in model.objects.filter(live=True):
                 raw = page.body.raw_data
                 found = []
 
@@ -101,18 +116,30 @@ class Command(BaseCommand):
                     found.append((match.group(0), replacement))
                     return replacement
 
+                def repair_mailto(match):
+                    fixed = f'href="mailto:{match.group(1)}@{NEW_MAIL_DOMAIN}"'
+                    found.append((match.group(0), fixed))
+                    return fixed
+
+                def replace_address(match):
+                    new = f"{match.group(1)}@{NEW_MAIL_DOMAIN}"
+                    found.append((match.group(0), new))
+                    return new
+
                 for block in raw:
-                    if isinstance(block.get("value"), str):
-                        block["value"] = OLD_URL.sub(replace, block["value"])
-                    if isinstance(block.get("value"), str):
-                        for leftover in REMAINING.findall(block["value"]):
-                            left_alone[leftover] += 1
+                    if not isinstance(block.get("value"), str):
+                        continue
+                    value = MALFORMED_MAILTO.sub(repair_mailto, block["value"])
+                    value = OLD_URL.sub(replace, value)
+                    block["value"] = ADDRESS.sub(replace_address, value)
+                    for leftover in REMAINING.findall(block["value"]):
+                        left_alone[leftover] += 1
 
                 if not found:
                     continue
 
-                label = f"{page.url or page.slug}{'' if page.live else ' (unpublished)'}"
-                if page.live and page.has_unpublished_changes:
+                label = page.url or page.slug
+                if page.has_unpublished_changes:
                     skipped += 1
                     self.stdout.write(
                         f"  SKIP  {label}: has unpublished changes, so publishing it "
@@ -125,11 +152,7 @@ class Command(BaseCommand):
                     rewrites[(old, new)] += 1
                 if apply_changes:
                     page.body = raw
-                    if page.live:
-                        page.save_revision().publish()
-                    else:
-                        page.save()
-                        page.save_revision()
+                    page.save_revision().publish()
 
         verb = "Rewrote" if apply_changes else "Would rewrite"
         self.stdout.write("")
@@ -137,7 +160,7 @@ class Command(BaseCommand):
             self.stdout.write(f"  {count:4d}x  {old}\n          -> {new}")
         self.stdout.write("")
         self.stdout.write(
-            f"{verb} {sum(rewrites.values())} links across {changed} pages"
+            f"{verb} {sum(rewrites.values())} links across {changed} published pages"
             f"{f', skipped {skipped}' if skipped else ''}."
         )
         if left_alone:

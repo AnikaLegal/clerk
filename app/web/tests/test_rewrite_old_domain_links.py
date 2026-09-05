@@ -137,21 +137,93 @@ def test_keeps_the_sentence_punctuation_after_a_url(blog_list):
 
 
 @pytest.mark.django_db
-def test_leaves_email_addresses_alone(blog_list):
-    """Mailbox names are not ours to assume, so only web links are rewritten."""
+def test_rewrites_every_mailbox_to_the_new_domain(blog_list):
+    """Role and personal addresses alike; the whole mail domain has moved."""
     page = BlogPageFactory(
         parent=blog_list,
         body=body(
-            '<a href="mailto:people@anikalegal.com">mail</a>'
-            "<p>Contact contact@anikalegal.com for help</p>"
+            '<a href="mailto:people@anikalegal.com">Dale</a>'
+            '<a href="mailto:partnerships@anikalegal.com">click here</a>'
+            '<a href="mailto:gwilym.temple@anikalegal.com">mail</a>'
+            "<p>Contact contact@anikalegal.com or privacy@anikalegal.com</p>"
+            "<p>Or ask lucy.majstorovic@anikalegal.com.</p>"
         ),
     )
 
     call_command("rewrite_old_domain_links", "--apply")
 
     html = raw_html(page)
-    assert 'href="mailto:people@anikalegal.com"' in html
-    assert "contact@anikalegal.com" in html
+    assert 'href="mailto:people@anikalegal.org.au"' in html
+    assert 'href="mailto:partnerships@anikalegal.org.au"' in html
+    assert 'href="mailto:gwilym.temple@anikalegal.org.au"' in html
+    assert "contact@anikalegal.org.au" in html
+    assert "privacy@anikalegal.org.au" in html
+    assert "lucy.majstorovic@anikalegal.org.au." in html
+    assert "anikalegal.com" not in html
+
+
+@pytest.mark.django_db
+def test_leaves_other_organisations_addresses_alone(blog_list):
+    page = BlogPageFactory(
+        parent=blog_list,
+        body=body("<p>Try info@tenantsvic.org.au or help@anikalegal.example</p>"),
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    html = raw_html(page)
+    assert "info@tenantsvic.org.au" in html
+    assert "help@anikalegal.example" in html
+
+
+@pytest.mark.django_db
+def test_keeps_the_subject_line_on_a_rewritten_address(blog_list):
+    page = BlogPageFactory(
+        parent=blog_list,
+        body=body(
+            '<a href="mailto:people@anikalegal.com?subject=Lawyer%20Recruitment">x</a>'
+        ),
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    assert (
+        'href="mailto:people@anikalegal.org.au?subject=Lawyer%20Recruitment"'
+        in raw_html(page)
+    )
+
+
+@pytest.mark.django_db
+def test_rewrites_an_address_shown_as_text(blog_list):
+    """Half of these links use the address as their own link text."""
+    page = BlogPageFactory(
+        parent=blog_list,
+        body=body(
+            '<a href="mailto:people@anikalegal.com">people@anikalegal.com.</a>'
+        ),
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    html = raw_html(page)
+    assert ">people@anikalegal.org.au.</a>" in html
+    assert "anikalegal.com" not in html
+
+
+@pytest.mark.django_db
+def test_repairs_an_address_written_with_an_http_scheme(blog_list):
+    """
+    `http://people@anikalegal.com` reads the address as a username and goes
+    nowhere useful, and the link text is the address, so a mailto was meant.
+    """
+    page = BlogPageFactory(
+        parent=blog_list,
+        body=body('<a href="http://people@anikalegal.com/">people@anikalegal.com</a>'),
+    )
+
+    call_command("rewrite_old_domain_links", "--apply")
+
+    assert 'href="mailto:people@anikalegal.org.au"' in raw_html(page)
 
 
 @pytest.mark.django_db
@@ -167,10 +239,17 @@ def test_writes_nothing_without_the_apply_flag(blog_list):
 
 
 @pytest.mark.django_db
-def test_does_not_publish_an_unpublished_page(blog_list):
+def test_ignores_unpublished_pages(blog_list):
+    """
+    Only what the public can actually see is rewritten. A draft is someone's
+    work in progress, and editing it would touch content they have not shipped.
+    """
     page = BlogPageFactory(
         parent=blog_list,
-        body=body('<a href="http://intake.anikalegal.com/">Get help</a>'),
+        body=body(
+            '<a href="http://intake.anikalegal.com/">Get help</a>'
+            "<p>Email people@anikalegal.com</p>"
+        ),
     )
     page.unpublish()
 
@@ -178,7 +257,9 @@ def test_does_not_publish_an_unpublished_page(blog_list):
 
     page.refresh_from_db()
     assert not page.live
-    assert "intake.anikalegal.org.au" in raw_html(page)
+    html = raw_html(page)
+    assert 'href="http://intake.anikalegal.com/"' in html
+    assert "people@anikalegal.com" in html
 
 
 @pytest.mark.django_db
