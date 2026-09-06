@@ -1,21 +1,21 @@
 import random
 
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods, require_safe
 
-from .models import BlogListPage, DashboardItem, Impact
 from .forms import ContactForm, ContentFeedbackForm
+from .models import BlogListPage, DashboardItem, Impact
 
 
-@require_http_methods(["GET"])
+@require_safe
 def robots_view(request):
     """robots.txt for web crawlers"""
     return render(request, "web/robots.txt", content_type="text/plain")
 
 
-@require_http_methods(["GET"])
+@require_safe
 def landing_view(request):
     return render(
         request,
@@ -24,13 +24,13 @@ def landing_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def impact_view(request):
     impact = Impact.objects.filter(live=True).prefetch_related("images").last()
     return render(request, "web/about/impact.html", {"impact": impact})
 
 
-@require_http_methods(["GET"])
+@require_safe
 def evictions_view(request):
     return render(
         request,
@@ -39,7 +39,7 @@ def evictions_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def bonds_view(request):
     return render(
         request,
@@ -48,7 +48,7 @@ def bonds_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def repairs_view(request):
     return render(
         request,
@@ -58,13 +58,13 @@ def repairs_view(request):
 
 
 @login_required
-@require_http_methods(["GET"])
+@require_safe
 def dashboard_view(request):
     context = {"items": DashboardItem.objects.all()}
     return render(request, "web/dashboard.html", context)
 
 
-@require_http_methods(["GET"])
+@require_safe
 def blog_search_view(request):
     blog_parent = BlogListPage.objects.get(slug="blog")
     context = blog_parent.get_context(request)
@@ -97,7 +97,7 @@ def content_feedback_form_view(request):
     )
 
 
-@require_http_methods(["GET"])
+@require_safe
 def team_view(request):
     return render(
         request,
@@ -125,7 +125,7 @@ def _get_blog_posts(tag_slug=None, limit=3):
 
 BOARD = [
     {
-        "image": "web/img/photos/board/kim.png",
+        "image": "web/img/photos/board/kim.webp",
         "name": "Kim Shaw",
         "title": "Chair",
         "linkedin": "https://www.linkedin.com/in/kimshaw1/",
@@ -143,7 +143,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/simon-goodrich.png",
+        "image": "web/img/photos/board/simon-goodrich.webp",
         "name": "Simon Goodrich",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/simongoodrich/",
@@ -164,7 +164,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/agata.png",
+        "image": "web/img/photos/board/agata.webp",
         "name": "Agata Wierzbowski",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/agata-wierzbowski-9964b0125/",
@@ -180,7 +180,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/tricia-ciampa.png",
+        "image": "web/img/photos/board/tricia-ciampa.webp",
         "name": "Tricia Ciampa",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/tricia-ciampa-b8338629/",
@@ -199,7 +199,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/jacinta.png",
+        "image": "web/img/photos/board/jacinta.webp",
         "name": "Jacinta Lewin",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/jacinta-lewin-0675a156/",
@@ -213,7 +213,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/peter-dikranis.png",
+        "image": "web/img/photos/board/peter-dikranis.webp",
         "name": "Peter Dikranis",
         "title": "Treasurer",
         "linkedin": "https://www.linkedin.com/in/peter-dikranis-fca-0961422/",
@@ -234,7 +234,7 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/maggie.png",
+        "image": "web/img/photos/board/maggie.webp",
         "name": "Maggie Hill",
         "title": "Board Member",
         "linkedin": "https://www.linkedin.com/in/maggie-hill-735bb452/",
@@ -251,7 +251,7 @@ BOARD = [
 
 ADVISORS = [
     {
-        "image": "web/img/photos/advisors/madeleine-dupuche.png",
+        "image": "web/img/photos/advisors/madeleine-dupuche.webp",
         "name": "Madeleine Dupuche",
         "title": "Law School Work Integrated Learning Director at La Trobe University",
         "linkedin": "https://www.linkedin.com/in/madeleine-dupuche-b2939a47/",
@@ -266,7 +266,7 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/gary-adler.png",
+        "image": "web/img/photos/advisors/gary-adler.webp",
         "name": "Gary Adler",
         "title": "Chief Digital Officer at MinterEllison",
         "linkedin": "https://www.linkedin.com/in/gadler/",
@@ -284,7 +284,7 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/helga-svendsen.png",
+        "image": "web/img/photos/advisors/helga-svendsen.webp",
         "name": "Helga Svendsen OAM",
         "title": """Host of Take on Board podcast, Leadership & Executive Coach &
         Non Executive Director""",
@@ -305,7 +305,7 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/brendan-lacota.png",
+        "image": "web/img/photos/advisors/brendan-lacota.webp",
         "name": "Brendan Lacota",
         "title": "Lead Social Impact Programs at ANZ and Independent Consultant",
         "linkedin": "https://www.linkedin.com/in/brendan-lacota/",
@@ -322,7 +322,7 @@ ADVISORS = [
         ],
     },
     {
-        "image": "web/img/photos/advisors/alan-peckham.png",
+        "image": "web/img/photos/advisors/alan-peckham.webp",
         "name": "Alan Peckham",
         "title": """Head of Legal at Australian Institute of Company Directors
         and former Chief Administrative Officer at Herbert Smith Freehills""",
@@ -345,7 +345,7 @@ ADVISORS = [
 
 TEAM_MEMBERS = [
     {
-        "image": "web/img/photos/team/dale.png",
+        "image": "web/img/photos/team/dale.webp",
         "name": "Dale Clough",
         "title": "Chief Executive Officer",
         "linkedin": "https://www.linkedin.com/in/dale-clough/",
@@ -358,7 +358,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/noel.png",
+        "image": "web/img/photos/team/noel.webp",
         "name": "Noel Lim",
         "title": "Co-Founder",
         "linkedin": "https://www.linkedin.com/in/noel-lim-97356999/",
@@ -374,7 +374,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/jacqui.png",
+        "image": "web/img/photos/team/jacqui.webp",
         "name": "Jacqui Siebel",
         "title": "Head of Operations",
         "linkedin": "https://www.linkedin.com/in/jacqui-siebel-a4984337/",
@@ -388,7 +388,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/emily.png",
+        "image": "web/img/photos/team/emily.webp",
         "name": "Emily Southwell",
         "title": "Principal Lawyer",
         "linkedin": "https://www.linkedin.com/in/emily-southwell-95459213a/",
@@ -403,7 +403,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/annie.png",
+        "image": "web/img/photos/team/annie.webp",
         "name": "Annie Cassidy",
         "title": "Head of Partnerships & Fundraising",
         "linkedin": "https://www.linkedin.com/in/annie-cassidy-thehuman/",
@@ -422,7 +422,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/luca.png",
+        "image": "web/img/photos/team/luca.webp",
         "name": "Luca Vari",
         "title": "Lead Software Developer",
         "linkedin": "https://www.linkedin.com/in/luca-vari/",
@@ -437,7 +437,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/sharon.png",
+        "image": "web/img/photos/team/sharon.webp",
         "name": "Sharon Tate",
         "title": "Lawyer",
         "linkedin": "",
@@ -455,7 +455,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/kawshi.png",
+        "image": "web/img/photos/team/kawshi.webp",
         "name": "Kawshalya Manisegaran",
         "title": "Lawyer",
         "linkedin": "https://www.linkedin.com/in/kmanisegaran/",
@@ -468,7 +468,7 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/alex.png",
+        "image": "web/img/photos/team/alex.webp",
         "name": "Alexandra Wardlaw",
         "title": "Secondee Lawyer",
         "linkedin": "https://www.linkedin.com/in/alexandra-wardlaw-156904191/",

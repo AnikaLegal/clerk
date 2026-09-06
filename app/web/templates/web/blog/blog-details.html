@@ -64,7 +64,7 @@
           <div class="alt-lang-list">
             {% for translation in page.get_translations.live %}
               {% get_language_info for translation.locale.language_code as lang %}
-              <a class="alt-lang" href="{% pageurl translation %}" rel="alternate" hreflang="{{ language_code }}">{{ lang.name_local }}</a>
+              <a class="alt-lang" href="{% pageurl translation %}" rel="alternate" hreflang="{{ translation.locale.language_code }}">{{ lang.name_local }}</a>
             {% endfor %}
           </div>
         {% endif %}
