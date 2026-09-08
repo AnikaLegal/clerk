@@ -32,13 +32,11 @@ def reset_ms_access(user):
         logger.info("Skipping as User<%s> account is not created or too new", user.pk)
         return
 
-    for group in user.groups.all():
-        logger.info("Sending event for User<%s> added to Group<%s>", user.pk, group.pk)
-        events.user_added_to_group.send(
-            sender=User,
-            user=user,
-            group=group,
-        )
+    logger.info("Sending event for User<%s> role changed", user.pk)
+    events.user_role_changed.send(
+        sender=User,
+        user=user,
+    )
 
     # NOTE: Not sure why 2022 used below. Maybe that was when Sharepoint was
     # introduced?
