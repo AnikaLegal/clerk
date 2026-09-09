@@ -1,0 +1,193 @@
+{% extends 'web/_base.html' %}
+{% load static %}
+{% block title %}
+  Our model
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/about.css' %}" />
+{% endblock %}
+{% block social_meta %}
+  {% include 'web/snippets/_social_meta.html' with title='Our model' description='How Anika Legal delivers free legal help at scale: a small staff team supervising law students, volunteers and seconded lawyers, and how that work is funded.' %}
+{% endblock %}
+{% block content %}
+  <style>
+    .model-prose {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .panel .content li {
+      margin-bottom: 0.5rem;
+    }
+    /* components.css centres panel headings; the story sections either side of
+       this one are left aligned, so match them. */
+    .panel h2 {
+      text-align: left;
+    }
+    /* .container keeps 135px of side padding until 600px, which leaves the title
+       under 430px of room between 601px and 760px. The wide container and the
+       unconditional break hold the two-line split; balance tidies what is left. */
+    .brag h1 {
+      text-wrap: balance;
+    }
+  </style>
+
+  <div class="container wide">
+    <div class="brag">
+      <h1>
+        Our model: how a small team<br />
+        helps hundreds of renters
+      </h1>
+      <p style="max-width: 575px">
+        Renters face rising costs, unsafe homes and a legal system that is hard to
+        navigate alone, and traditional services cannot meet the scale of that need. So
+        we built a different way of working.
+      </p>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <div class="story right">
+        <img class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/photos/students.jpg' %}" />
+        <div class="content">
+          <h2>Who works on a case</h2>
+          <p>
+            Every case is assigned a law student paralegal, who is the renter's point of
+            contact throughout. Their work is supervised by a lawyer, who guides them
+            and signs off on all legal advice. Experienced paralegals triage new
+            enquiries and provide support, and our Principal Lawyer oversees the whole
+            practice.
+          </p>
+          <p>
+            This structure is how we can help more people. One full-time lawyer
+            supervising students and secondees can support up to 300 renters a year. In
+            2024-25, four staff, 136 law students, 90 volunteers and a group of lawyers
+            seconded from law firms delivered 508 legal services to 333 renters.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment" style="padding-top: 0">
+    <div class="container wide">
+      <div class="story left">
+        <div class="content">
+          <h2>A model where everyone wins</h2>
+          <p>
+            Anika’s student-powered service model creates <strong>shared value</strong> –
+            every participant benefits in a meaningful way:
+          </p>
+          <ul>
+            <li>
+              <strong>Renters</strong> receive free, high-quality support when they need it most.
+            </li>
+            <li>
+              <strong>Students</strong> gain practical legal experience that enhances their employability.
+            </li>
+            <li>
+              <strong>Universities</strong> improve law student learning outcomes with minimal additional investment.
+            </li>
+            <li>
+              <strong>The community legal sector</strong> gains a scalable workforce pipeline and dramatically increased capacity.
+            </li>
+          </ul>
+          <p>
+            This design unlocks value that already exists in the system — tens of
+            thousands of law students seeking experience and millions of Australians
+            needing legal help — and channels it into an efficient, high-impact service
+            model.
+          </p>
+        </div>
+        <img class="round not-responsive top-right bottom-left bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
+      </div>
+    </div>
+  </div>
+
+  <div class="panel left round top-right bottom-right">
+    <img class="round bottom-right" src="{% static 'web/img/photos/library.jpg' %}" />
+    <div class="content">
+      <h2>Our university partnerships</h2>
+      <p>
+        Universities and education providers play a critical role in sustaining our
+        service model. Law schools are increasingly required to provide authentic
+        workplace learning, and we deliver it at scale, at low cost, and with strong
+        student outcomes. In return, our education partners provide the funding and the
+        recurring student capacity that let us grow.
+      </p>
+      <p>
+        This is our only commercial activity, and it was under a tenth of our income in
+        2024-25. It supports the mission directly rather than sitting alongside it: the
+        students a university pays us to teach are the students who, supervised by our
+        lawyers, get a renter's home repaired or their bond returned.
+      </p>
+      <p>
+        In 2024-25 we worked with RMIT University, Deakin University and Swinburne
+        University of Technology.
+      </p>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>How the work is funded</h2>
+      <div class="divider"></div>
+      <p class="model-prose">
+        The service is paid for by a combination of philanthropic funding, earned
+        revenue from the university partnerships, and a large amount of donated time
+        and expertise.
+      </p>
+      <p class="model-prose">
+        Income in 2024-25 was $681,525, an increase of 46% year on year, reflecting
+        strong support from philanthropic partners and continued growth in both
+        corporate and education provider revenue. Of that, $65,400 came from the
+        university partnerships.
+      </p>
+      <p class="model-prose">
+        Volunteers, seconded lawyers and pro bono partners donated services valued at
+        $491,329, taking our total income to $1,172,853. That donated capacity is the
+        equivalent of several extra staff at no extra cost, and it is what lets the
+        model reach further than cash funding alone could pay for.
+      </p>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>Where the money goes</h2>
+      <div class="divider"></div>
+      <p class="model-prose">
+        Total expenditure in 2024-25 was $689,360, broadly in line with income. That
+        reflects continued investment in staff, program delivery, partnerships,
+        technology and infrastructure to meet rising demand for services. Employee
+        costs were $616,077 of the total, close to nine dollars in every ten, which is
+        what it costs to have a lawyer supervising every case. Including in-kind
+        contributions, total expenditure was $1,180,689.
+      </p>
+      <p class="model-prose">
+        Our operating result for the year, excluding in-kind contributions, was -$211:
+        close to break even in a year of deliberate growth.
+      </p>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>Where these numbers come from</h2>
+      <div class="divider"></div>
+      <p class="model-prose">
+        The financial figures are from our Special Purpose Financial Report for the year
+        ended 30 June 2025, which has been independently reviewed and is prepared to
+        meet the Australian Charities and Not-for-profits Commission Act 2012, the
+        Victorian Fundraising Appeals Act 1998 and the Corporations Act 2001. The
+        service figures are from our FY25 Impact Report.
+      </p>
+      <p class="model-prose">
+        Anika Legal Ltd, ABN 34 627 816 808, is a registered charity. You can read our
+        <a href="{% url 'reports' %}">full financial, annual and impact reports</a>, or see our entry on the
+        <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">ACNC charity register</a>.
+      </p>
+    </div>
+  </div>
+{% endblock %}

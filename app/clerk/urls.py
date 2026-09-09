@@ -51,6 +51,7 @@ urlpatterns = [
     # About
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
+    path("about/our-model/", template("web/about/our-model.html"), name="our-model"),
     path("about/team/", views.team_view, name="team"),
     path("about/impact/", views.impact_view, name="impact"),
     # Services
