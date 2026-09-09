@@ -27,15 +27,14 @@
       line-height: var(--header-line-height);
       text-align: left;
     }
-    /* .container keeps 135px of side padding until 600px, which leaves the title
-       under 430px of room between 601px and 760px. The wide container and the
-       unconditional break hold the two-line split; balance tidies what is left. */
+    /* The break in the title holds the two-line split; balance keeps the wrap
+       even on the narrowest phones, where the first line no longer fits. */
     .brag h1 {
       text-wrap: balance;
     }
   </style>
 
-  <div class="container wide">
+  <div class="container">
     <div class="brag">
       <h1>
         Our model: how a small team<br />
