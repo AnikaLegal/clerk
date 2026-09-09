@@ -19,9 +19,12 @@
     .panel .content li {
       margin-bottom: 0.5rem;
     }
-    /* components.css centres panel headings; the story sections either side of
-       this one are left aligned, so match them. */
+    /* components.css gives panel headings a smaller, bolder, centred style; the
+       story sections either side of this one use the default h2, so match them. */
     .panel h2 {
+      font-size: var(--header-font-size);
+      font-weight: 400;
+      line-height: var(--header-line-height);
       text-align: left;
     }
     /* .container keeps 135px of side padding until 600px, which leaves the title
@@ -70,8 +73,7 @@
     </div>
   </div>
 
-  <div class="panel left round top-right bottom-right">
-    <img class="round bottom-right" src="{% static 'web/img/photos/library.jpg' %}" />
+  <div class="panel right round top-left bottom-left">
     <div class="content">
       <h2>Our university partnerships</h2>
       <p>
@@ -90,11 +92,13 @@
         lawyers, get a renter's home repaired or their bond returned.
       </p>
     </div>
+    <img class="round bottom-left" src="{% static 'web/img/photos/library.jpg' %}" />
   </div>
 
   <div class="segment">
     <div class="container wide">
-      <div class="story left">
+      <div class="story right">
+        <img class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
         <div class="content">
           <h2>A model where everyone wins</h2>
           <p>
@@ -122,7 +126,6 @@
             model.
           </p>
         </div>
-        <img class="round not-responsive top-right bottom-left bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
       </div>
     </div>
   </div>
