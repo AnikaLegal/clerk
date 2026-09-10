@@ -20,6 +20,7 @@ URLS_TO_TEST_BY_NAME = [
     # url, status code expected
     ("about", 200),
     ("reports", 200),
+    ("our-model", 200),
     ("team", 200),
     ("impact", 200),
     ("repairs", 200),
