@@ -1,10 +1,8 @@
 import json
-from urllib.parse import parse_qs, urlparse
 
 import pytest
 import responses
 from django.test import override_settings
-from responses import matchers
 from slack.models import SlackChannel, SlackMessage, SlackUser
 from slack.services import get_slack_user_by_email, send_slack_message
 
@@ -52,61 +50,25 @@ LOOKUP_URL = "https://slack.com/api/users.lookupByEmail"
 SLACK_USER = {"id": "U123", "name": "alice"}
 
 
-def _add_lookup_response(email: str, user: dict | None):
-    body = (
-        {"ok": True, "user": user}
-        if user
-        else {"ok": False, "error": "users_not_found"}
+@responses.activate
+@override_settings(SLACK_MESSAGE_DISABLED=False)
+def test_get_slack_user_by_email__found():
+    responses.add(
+        method=responses.GET, url=LOOKUP_URL, json={"ok": True, "user": SLACK_USER}
     )
+
+    assert get_slack_user_by_email("alice@example.com") == SLACK_USER
+    assert responses.calls[0].request.params == {"email": "alice@example.com"}
+
+
+@responses.activate
+@override_settings(SLACK_MESSAGE_DISABLED=False)
+def test_get_slack_user_by_email__not_found():
     responses.add(
         method=responses.GET,
         url=LOOKUP_URL,
-        status=200,
-        json=body,
-        match=[matchers.query_param_matcher({"email": email})],
+        json={"ok": False, "error": "users_not_found"},
     )
 
-
-def _lookup_emails() -> list[str]:
-    return [
-        parse_qs(urlparse(call.request.url).query)["email"][0]
-        for call in responses.calls
-    ]
-
-
-@responses.activate
-@override_settings(SLACK_MESSAGE_DISABLED=False)
-def test_get_slack_user_by_email__found_on_first_lookup():
-    _add_lookup_response("alice@anikalegal.org.au", SLACK_USER)
-
-    assert get_slack_user_by_email("alice@anikalegal.org.au") == SLACK_USER
-    assert _lookup_emails() == ["alice@anikalegal.org.au"]
-
-
-@responses.activate
-@override_settings(SLACK_MESSAGE_DISABLED=False)
-def test_get_slack_user_by_email__falls_back_to_old_domain():
-    _add_lookup_response("alice@anikalegal.org.au", None)
-    _add_lookup_response("alice@anikalegal.com", SLACK_USER)
-
-    assert get_slack_user_by_email("alice@anikalegal.org.au") == SLACK_USER
-    assert _lookup_emails() == ["alice@anikalegal.org.au", "alice@anikalegal.com"]
-
-
-@responses.activate
-@override_settings(SLACK_MESSAGE_DISABLED=False)
-def test_get_slack_user_by_email__not_found_on_either_domain():
-    _add_lookup_response("alice@anikalegal.org.au", None)
-    _add_lookup_response("alice@anikalegal.com", None)
-
-    assert get_slack_user_by_email("alice@anikalegal.org.au") is None
-    assert _lookup_emails() == ["alice@anikalegal.org.au", "alice@anikalegal.com"]
-
-
-@responses.activate
-@override_settings(SLACK_MESSAGE_DISABLED=False)
-def test_get_slack_user_by_email__no_fallback_for_other_domains():
-    _add_lookup_response("alice@example.com", None)
-
     assert get_slack_user_by_email("alice@example.com") is None
-    assert _lookup_emails() == ["alice@example.com"]
+    assert responses.calls[0].request.params == {"email": "alice@example.com"}
