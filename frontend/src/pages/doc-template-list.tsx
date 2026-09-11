@@ -79,6 +79,7 @@ const App = () => {
       <Grid mt="md">
         <Grid.Col span={6}>
           <TextInput
+            autoComplete="off"
             placeholder="Search by template name..."
             rightSection={<IconSearch size={16} stroke={4} />}
             size="md"
@@ -361,8 +362,9 @@ const DocumentTemplateRenameModal = (
       title={<Text fw={700}>Rename Document Template</Text>}
       size="lg"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('name')}
           key={form.key('name')}
           data-autofocus

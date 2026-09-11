@@ -70,6 +70,7 @@ const App = () => {
         }}
       >
         <Input
+          autoComplete="off"
           icon="search"
           placeholder="Find paralegals by name or email..."
           value={search}

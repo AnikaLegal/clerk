@@ -38,6 +38,7 @@ const TextField = ({
   type,
 }: FieldComponentProps & { type: string }) => (
   <Input
+    autoComplete="off"
     placeholder={placeholder}
     value={value}
     name={name}
@@ -56,6 +57,7 @@ const NumberField = ({
 }: FieldComponentProps) => {
   return (
     <Input
+      autoComplete="off"
       placeholder={placeholder}
       value={!value && value !== 0 ? '' : value}
       name={name}

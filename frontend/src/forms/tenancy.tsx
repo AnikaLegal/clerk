@@ -23,10 +23,15 @@ export const TenancyForm: React.FC<TenancyFormProps> = ({
     setFieldValue,
   },
 }) => (
-  <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+  <Form
+    autoComplete="off"
+    onSubmit={handleSubmit}
+    error={Object.keys(errors).length > 0}
+  >
     <div className={`field ${errors.address && 'error'}`}>
       <label>Address</label>
       <Input
+        autoComplete="off"
         placeholder="123 Fake Street"
         value={values.address}
         name="address"
@@ -36,6 +41,7 @@ export const TenancyForm: React.FC<TenancyFormProps> = ({
     <div className={`field ${errors.suburb && 'error'}`}>
       <label>Suburb</label>
       <Input
+        autoComplete="off"
         placeholder="Fakeington"
         value={values.suburb}
         name="suburb"
@@ -45,6 +51,7 @@ export const TenancyForm: React.FC<TenancyFormProps> = ({
     <div className={`field ${errors.postcode && 'error'}`}>
       <label>Postcode</label>
       <Input
+        autoComplete="off"
         placeholder="1234"
         value={values.postcode}
         name="postcode"

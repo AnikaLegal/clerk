@@ -69,6 +69,7 @@ const App = () => {
       <Grid mt="lg">
         <Grid.Col>
           <TextInput
+            autoComplete="off"
             label="Search"
             placeholder="Search by name, email, phone or address ..."
             rightSection={<IconSearch size={16} stroke={4} />}

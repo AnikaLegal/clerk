@@ -129,7 +129,11 @@ export const AutoForm = ({
   FieldSchema.validateSync(fields)
   const labels = fields.reduce((acc, f) => ({ ...acc, [f.name]: f.label }), {})
   return (
-    <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+    <Form
+      autoComplete="off"
+      onSubmit={handleSubmit}
+      error={Object.keys(errors).length > 0}
+    >
       {fields.map((f) => {
         const FieldComponent = FIELD_COMPONENTS[f.type]
         return (

@@ -62,6 +62,7 @@ const App = () => {
         }}
       >
         <Input
+          autoComplete="off"
           icon="search"
           placeholder="Search by template name or subject..."
           value={name}

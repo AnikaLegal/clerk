@@ -64,6 +64,7 @@ export const ServiceForm = ({ issue, onCancel }: CaseDetailFormProps) => {
         {({ values, handleSubmit, isSubmitting, errors }) => {
           return (
             <Form
+              autoComplete="off"
               onSubmit={handleSubmit}
               error={Object.keys(errors).length > 0}
             >

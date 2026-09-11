@@ -149,7 +149,7 @@ const App = () => {
         Create a new case
       </Title>
       <CaseFormProvider form={form}>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
           <Select
             {...form.getInputProps('topic')}
             key={form.key('topic')}
