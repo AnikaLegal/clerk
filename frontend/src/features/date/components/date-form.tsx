@@ -65,7 +65,10 @@ export const DateForm = ({
   })
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}>
+    <form
+      autoComplete="off"
+      onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}
+    >
       <DateInput
         {...form.getInputProps('date')}
         key={form.key('date')}

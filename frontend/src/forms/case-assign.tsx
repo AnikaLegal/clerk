@@ -73,7 +73,7 @@ export const AssignForm: React.FC<CaseDetailFormProps> = ({
     <Paper withBorder shadow="sm" p="md">
       <Title order={3}>Assign a paralegal to this case</Title>
       <Text mt="md">Select the case paralegal and supervising lawyer.</Text>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
         <Stack mt="lg" gap="md">
           <UserSelect
             {...form.getInputProps('paralegal_id')}

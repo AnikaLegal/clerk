@@ -63,7 +63,7 @@ export const EmailTemplateForm = ({
   }
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form autoComplete="off" onSubmit={form.onSubmit(onSubmit)}>
       <Select
         {...form.getInputProps('topic')}
         key={form.key('topic')}
@@ -77,6 +77,7 @@ export const EmailTemplateForm = ({
         withCheckIcon={false}
       />
       <TextInput
+        autoComplete="off"
         {...form.getInputProps('name')}
         key={form.key('name')}
         label="Template name"
@@ -84,6 +85,7 @@ export const EmailTemplateForm = ({
         mt="md"
       />
       <TextInput
+        autoComplete="off"
         {...form.getInputProps('subject')}
         key={form.key('subject')}
         label="Email subject"

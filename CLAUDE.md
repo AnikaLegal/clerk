@@ -61,6 +61,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 - **Don't add `Co-Authored-By` trailers** (or any similar attribution lines) to commit messages.
 - **Don't include test output results in commit messages** (e.g. "Checks green: intake tsc/lint/86 tests").
 - **Keep code comments brief and evergreen** - say why the code is there and any constraint it can't show, in a few lines. Never reference conversation or project history ("the first drill proved...") - that's commit-message material. Never state facts owned by another file (e.g. "verify.py asserts this") - they go stale when that file changes; document them in the file that owns them. Prefer one short comment over a grouped block of related code to a narrative.
+- **Set `autoComplete="off"` on text inputs and forms in `frontend/src`** (the Clerk UI). Chrome records submitted values against the field's `name` attribute in a store that is not scoped to the origin, so client details typed into Clerk resurface as autofill suggestions on unrelated sites. Skip it where it is inert (`file`, `checkbox`).
 - **Don't assume the git repository state** - the user may have made changes manually or in another session. Check the actual state (`git status`, `git log`, etc.) before reporting it.
 - **Secrets are transcrypt-encrypted** `.env` files (`env/`). Never decrypt them into plaintext, commit decrypted values, or print their contents.
 - After any API change, regenerate with `just schema` and never edit the generated files directly.

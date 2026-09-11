@@ -74,8 +74,12 @@ const MinimalClientFormModal = (props: MinimalClientFormModalProps) => {
       size="lg"
       title={props.title}
     >
-      <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
+      <form
+        autoComplete="off"
+        onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}
+      >
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('first_name')}
           key={form.key('first_name')}
           label="First name"
@@ -83,6 +87,7 @@ const MinimalClientFormModal = (props: MinimalClientFormModalProps) => {
           data-autofocus
         />
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('last_name')}
           key={form.key('last_name')}
           label="Last name"
@@ -90,6 +95,7 @@ const MinimalClientFormModal = (props: MinimalClientFormModalProps) => {
           mt="md"
         />
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('email')}
           key={form.key('email')}
           label="Email"

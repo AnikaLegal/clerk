@@ -78,6 +78,7 @@ export const ReopenForm: React.FC<CaseDetailFormProps> = ({
           setFieldValue,
         }) => (
           <Form
+            autoComplete="off"
             onSubmit={handleSubmit}
             success={isSuccess}
             error={Object.keys(errors).length > 0}
