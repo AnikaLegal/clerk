@@ -17,15 +17,22 @@ ARG DJANGO_SECRET_KEY=not-a-secret
 # source does not shadow it (see docker/docker-compose.local.yml).
 ENV UV_PROJECT_ENVIRONMENT=/venv
 ENV PATH="/venv/bin:${PATH}"
+# The uv cache is a build cache mount rather than part of the image, so
+# packages must be copied into the venv (hardlinks cannot cross the mount).
+ENV UV_LINK_MODE=copy
+ENV UV_COMPILE_BYTECODE=1
+
+# Install python executable & dependencies from the lockfile alone so this
+# layer only rebuilds when dependencies change, not on every source edit.
+# uv is mounted temporarily as it is not needed in the final image.
+COPY app/pyproject.toml app/uv.lock /app/
+RUN --mount=from=ghcr.io/astral-sh/uv:0.12,source=/uv,target=/bin/uv \
+    --mount=type=cache,target=/root/.cache/uv \
+    echo "Installing python executable & dependencies..." && \
+    uv sync --frozen --no-install-project
 
 # Mount the codebase
-ADD app /app
-
-# Install python executable & dependencies. Note we use uv temporarily as it is
-# not needed in the final image.
-RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-    echo "Installing python executable & dependencies..." && \
-    uv sync --frozen
+COPY app /app
 
 # Copy frontend build assets (for production only)
 COPY --from=clerk-frontend:local /frontend/dist/ /dist/
