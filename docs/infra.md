@@ -85,7 +85,7 @@ So rebuilding the server means restoring the databases from those S3 backups (st
 Application code is packaged into Docker images, defined in the `docker` directory:
 
 - `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `just push-base` when it changes
-- `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built and pushed by the [Test workflow](../.github/workflows/test.yml) after tests pass - merges to `develop` produce the `staging` tag, merges to `master` produce the `prod` tag
+- `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built by the [Test workflow](../.github/workflows/test.yml) on every run and pushed once the tests pass on a push to `develop` (the `staging` tag) or `master` (the `prod` tag). Pull request runs only test. Running the Test workflow manually on any other branch pushes that branch as `staging`, which is how a feature branch can be tried out on staging. Every pushed build is also tagged `sha-<short commit sha>`, so the exact build behind an environment tag can always be identified
 - `Dockerfile.frontend`: builds the frontend, whose output is copied into the application image
 
 Compose files in the same directory define how the images run: `docker-compose.local.yml` (local development), `docker-compose.ci.yml` (tests in CI), and `docker-compose.staging.yml` / `docker-compose.prod.yml` (the Swarm stacks).
@@ -93,6 +93,8 @@ Compose files in the same directory define how the images run: `docker-compose.l
 ## Deployment
 
 Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy), which must be triggered manually from GitHub. It connects to the server's Docker daemon over SSH and updates the environment's Swarm stack to the latest image. It does not build anything: images come from the Test workflow (see above).
+
+To roll back, point the environment's services at an earlier build's sha tag on the server, e.g. `docker service update --image anikalaw/clerk:sha-1234567 clerk_prod_web` (and likewise `clerk_prod_worker`). The next Deploy run moves them back to the environment tag.
 
 When making a change or bugfix, you should:
 
