@@ -18,7 +18,7 @@ from web import views
 from web.sitemaps import SITEMAPS
 from webhooks.views import intake_no_email_view, jotform_form_view, webflow_form_view
 
-from .views import custom_403_handler, custom_404_handler
+from .views import custom_403_handler, custom_404_handler, health_view
 
 
 def template(name):
@@ -109,6 +109,8 @@ urlpatterns = [
     path("dash/", views.dashboard_view, name="dashboard"),
     # Robots.txt
     path("robots.txt", views.robots_view, name="robots"),
+    # Container health check (see docker/docker-compose.prod.yml)
+    path("health/", health_view, name="health"),
     # Sitemap
     path(
         "sitemap.xml",
