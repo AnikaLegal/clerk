@@ -7,12 +7,18 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     ports:
       - 25432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   # Test container.
   test:
     container_name: test
     image: anikalaw/clerk:${TAG}
-    links:
-      - clerk_db
+    depends_on:
+      clerk_db:
+        condition: service_healthy
     env_file:
       - ../env/test.env
