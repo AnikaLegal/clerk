@@ -94,6 +94,8 @@ Compose files in the same directory define how the images run: `docker-compose.l
 
 Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy), which must be triggered manually from GitHub. It connects to the server's Docker daemon over SSH and updates the environment's Swarm stack to the latest image. It does not build anything: images come from the Test workflow (see above).
 
+The web service has a health check (`/health/`, which also confirms the database connection). During a deploy Swarm stops the old container, starts the new one and only routes traffic to it once the check passes, so the site shows the maintenance page for the restart. If the new container never becomes healthy, or fails within its first minute, Swarm rolls the service back to the previous image automatically, and the Deploy run fails because it waits for the update to converge.
+
 To roll back, point the environment's services at an earlier build's sha tag on the server, e.g. `docker service update --image anikalaw/clerk:sha-1234567 clerk_prod_web` (and likewise `clerk_prod_worker`). The next Deploy run moves them back to the environment tag.
 
 When making a change or bugfix, you should:
