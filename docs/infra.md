@@ -117,6 +117,8 @@ To rebuild the server from scratch: launch a new Ubuntu instance, run the three 
 
 The scripts pin the versions of software that matter for reproducing the server: PostgreSQL, Docker Engine and the AWS CLI. Each pin is a variable at the top of the relevant script, plus an `ARG` in `Dockerfile.base` for the PostgreSQL client tools, whose major version must match the database server or backups taken with one may not restore with the other. When bumping a pin, upgrade the live server to match.
 
+Unattended upgrades run at 18:00 UTC rather than Ubuntu's default of 06:00 UTC. needrestart restarts PostgreSQL, NGINX and containerd after library updates, and the default window falls in the Melbourne afternoon; the timer drop-in lives in [infra/setup/security](../infra/setup/security).
+
 ## Infrastructure as code
 
 The resources behind the [restore check](./restore-check.md) - an OpenTofu state bucket, an EventBridge schedule, a Lambda, an ECS cluster and task definition, an ECR repository, IAM roles, and a Sentry cron monitor - are defined with [OpenTofu](https://opentofu.org) under [infra/tofu](../infra/tofu). This is the first slice of describing the cloud state as code: the rest of the AWS account (buckets, IAM, AWS Backup, DNS) is still console-managed and documented on these pages, and new AWS resources should be added under [infra/tofu](../infra/tofu) rather than made by hand. See [infra/tofu/README.md](../infra/tofu/README.md) for the layout.
