@@ -9,6 +9,28 @@ services:
       - /var/log/clerk/prod/web:/var/log
     env_file:
       - ../env/prod.env
+    # Swarm only routes traffic to a task once this passes, and a task that
+    # never passes fails the update, triggering the rollback below. The start
+    # period allows for the migrations the start command runs before gunicorn
+    # binds. $$ keeps the variable for the container shell rather than the
+    # deploying client.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${GUNICORN_PORT}/health/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+      start_interval: 5s
+    # Matches gunicorn's graceful timeout so in-flight requests can finish.
+    stop_grace_period: 30s
+    deploy:
+      update_config:
+        order: stop-first
+        failure_action: rollback
+        monitor: 60s
+      rollback_config:
+        order: stop-first
+        monitor: 60s
 
   worker:
     command: bash /app/scripts/worker/prod.sh
@@ -18,3 +40,12 @@ services:
       - /var/log/clerk/prod/worker:/var/log
     env_file:
       - ../env/prod.env
+    # Long enough for the task being worked on to finish; a killed task is not
+    # retried.
+    stop_grace_period: 60s
+    deploy:
+      update_config:
+        failure_action: rollback
+        monitor: 60s
+      rollback_config:
+        monitor: 60s
