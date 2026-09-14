@@ -39,6 +39,14 @@ apt-get update -qq
 # package since PostgreSQL 14.
 apt-get install --yes postgresql-$POSTGRES_VERSION
 
+# Hosts set up before the pin carry the distro's unversioned metapackages.
+# With the PGDG repository added, PGDG's versions of those become upgrade
+# candidates, so remove them and keep the versioned server package as the
+# manually installed anchor.
+apt-mark manual postgresql-$POSTGRES_VERSION
+apt-get remove --yes postgresql postgresql-contrib postgresql-client
+dpkg-query --show --showformat='${Status}\n' postgresql-$POSTGRES_VERSION | grep -q "install ok installed"
+
 echo -e "\n>>> Updating Postgres config"
 
 # Listen on all interfaces for Retool access. Use a conf.d drop-in file
