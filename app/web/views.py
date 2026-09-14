@@ -455,19 +455,6 @@ TEAM_MEMBERS = [
         ],
     },
     {
-        "image": "web/img/photos/team/kawshi.webp",
-        "name": "Kawshalya Manisegaran",
-        "title": "Lawyer",
-        "linkedin": "https://www.linkedin.com/in/kmanisegaran/",
-        "brags": [
-            """Kawshi is a member of our casework team and is responsible for
-            supporting our paralegals and delivering legal services directly to
-            clients.""",
-            """Kawshi is generously seconded to us from Barry Nilsson where she
-            works as National Pro Bono Manager & Senior Associate.""",
-        ],
-    },
-    {
         "image": "web/img/photos/team/alex.webp",
         "name": "Alexandra Wardlaw",
         "title": "Secondee Lawyer",
