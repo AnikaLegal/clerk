@@ -1,7 +1,12 @@
 import logging
 
 import requests
-from microsoft.endpoints.helpers import BASE_URL, HTTP_HEADERS, get_token
+from microsoft.endpoints.helpers import (
+    BASE_URL,
+    HTTP_HEADERS,
+    HTTP_TIMEOUT,
+    get_token,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,19 +36,25 @@ class BaseEndpoint:
         return HTTP_HEADERS
 
     def get(self, path):
-        resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)
+        resp = requests.get(
+            BASE_URL + path, headers=self.headers, stream=False, timeout=HTTP_TIMEOUT
+        )
         return self.handle(resp)
 
     def get_list(self, path) -> list:
         """Get request but follows pagination and always returns a list"""
-        resp = requests.get(BASE_URL + path, headers=self.headers, stream=False)
+        resp = requests.get(
+            BASE_URL + path, headers=self.headers, stream=False, timeout=HTTP_TIMEOUT
+        )
         json = self.handle(resp)
         resp_list = []
         if json:
             resp_list += json["value"]
             next_url = json.get("@odata.nextLink", "")
             while next_url:
-                resp = requests.get(next_url, headers=self.headers, stream=False)
+                resp = requests.get(
+                    next_url, headers=self.headers, stream=False, timeout=HTTP_TIMEOUT
+                )
                 next_json = self.handle(resp)
                 resp_list += next_json["value"]
                 next_url = next_json.get("@odata.nextLink", "")
@@ -52,18 +63,28 @@ class BaseEndpoint:
 
     def post(self, path, data):
         resp = requests.post(
-            BASE_URL + path, headers=self.headers, json=data, stream=False
+            BASE_URL + path,
+            headers=self.headers,
+            json=data,
+            stream=False,
+            timeout=HTTP_TIMEOUT,
         )
         return self.handle(resp)
 
     def patch(self, path, data):
         resp = requests.patch(
-            BASE_URL + path, headers=self.headers, json=data, stream=False
+            BASE_URL + path,
+            headers=self.headers,
+            json=data,
+            stream=False,
+            timeout=HTTP_TIMEOUT,
         )
         return self.handle(resp)
 
     def delete(self, path):
-        resp = requests.delete(BASE_URL + path, headers=self.headers, stream=False)
+        resp = requests.delete(
+            BASE_URL + path, headers=self.headers, stream=False, timeout=HTTP_TIMEOUT
+        )
         return self.handle(resp)
 
     def handle(self, resp):
