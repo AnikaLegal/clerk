@@ -47,7 +47,15 @@ INTAKE_URL = "https://localhost:3001"
 
 DJANGO_VITE["default"]["dev_mode"] = True
 
-INSTALLED_APPS += ["zeal"]
+INSTALLED_APPS += ["zeal", "debug_toolbar", "django_browser_reload"]
 MIDDLEWARE += ["zeal.middleware.zeal_middleware"]
+
+# The toolbar only reports on middleware below it, so put these back where they
+# sit in the shared list rather than appending them.
+_debug_middleware_at = MIDDLEWARE.index("whitenoise.middleware.WhiteNoiseMiddleware") + 1
+MIDDLEWARE[_debug_middleware_at:_debug_middleware_at] = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+]
 ZEAL_RAISE = False
 ZEAL_SHOW_ALL_CALLERS = False

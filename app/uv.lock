@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = "==3.12.5"
+requires-python = "==3.12.*"
 
 [manifest]
 overrides = [{ name = "django", specifier = ">=5" }]
@@ -247,6 +247,7 @@ dependencies = [
     { name = "django-cleanup" },
     { name = "django-contract-tester" },
     { name = "django-cors-headers" },
+    { name = "django-extensions" },
     { name = "django-fernet-encrypted-fields" },
     { name = "django-modelcluster" },
     { name = "django-override-storage" },
@@ -293,7 +294,6 @@ dev = [
     { name = "debugpy" },
     { name = "django-browser-reload" },
     { name = "django-debug-toolbar" },
-    { name = "django-extensions" },
     { name = "django-zeal" },
     { name = "ipython" },
     { name = "rust-just" },
@@ -312,6 +312,7 @@ requires-dist = [
     { name = "django-cleanup" },
     { name = "django-contract-tester", specifier = ">=1.8.2" },
     { name = "django-cors-headers" },
+    { name = "django-extensions" },
     { name = "django-fernet-encrypted-fields", specifier = ">=0.4.0" },
     { name = "django-modelcluster" },
     { name = "django-override-storage" },
@@ -358,7 +359,6 @@ dev = [
     { name = "debugpy" },
     { name = "django-browser-reload", specifier = ">=1.21.0" },
     { name = "django-debug-toolbar", specifier = ">=6.0.0" },
-    { name = "django-extensions" },
     { name = "django-zeal", specifier = ">=2.0.4" },
     { name = "ipython" },
     { name = "rust-just", specifier = ">=1.57.0" },

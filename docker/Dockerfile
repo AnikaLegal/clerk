@@ -4,14 +4,30 @@
 ARG BASE_TAG=2026-09-17
 
 # Build web CSS assets
-FROM node:lts-slim AS web-builder
+FROM node:24-slim AS web-builder
 WORKDIR /web
 COPY app/web/package.json .
 COPY app/web/package-lock.json .
 RUN echo "Installing Node modules." && \
     npm ci --silent
-ADD app/web /web
+COPY app/web /web
 RUN echo "Building web assets" && \
+    npm run build
+
+# Build the Clerk frontend here rather than copying it out of another image, so
+# that this image builds on its own, from a checkout alone. The dev server runs
+# on the frontend-deps stage (see the build-frontend recipe in the justfile), so
+# both use the same Node and the same install.
+FROM node:24-slim AS frontend-deps
+WORKDIR /frontend
+COPY frontend/package.json .
+COPY frontend/package-lock.json .
+RUN echo "Installing Node modules." && \
+    npm ci --silent
+COPY frontend /frontend
+
+FROM frontend-deps AS frontend-builder
+RUN echo "Building frontend" && \
     npm run build
 
 # Use Clerk base image
@@ -26,6 +42,10 @@ ENV PATH="/venv/bin:${PATH}"
 # packages must be copied into the venv (hardlinks cannot cross the mount).
 ENV UV_LINK_MODE=copy
 ENV UV_COMPILE_BYTECODE=1
+# Build on a uv-managed interpreter rather than whichever python3 the base
+# image happens to carry, so the version is the same here as in a local venv
+# and does not move when the base image is rebuilt.
+ENV UV_PYTHON_PREFERENCE=only-managed
 
 # Install python executable & dependencies from the lockfile alone so this
 # layer only rebuilds when dependencies change, not on every source edit.
@@ -39,8 +59,8 @@ RUN --mount=from=ghcr.io/astral-sh/uv:0.12,source=/uv,target=/bin/uv \
 # Mount the codebase
 COPY app /app
 
-# Copy frontend build assets (for production only)
-COPY --from=clerk-frontend:local /frontend/dist/ /dist/
+# Copy the built assets
+COPY --from=frontend-builder /frontend/dist/ /dist/
 COPY --from=web-builder /dist/web/ /dist/web/
 
 # Collect static files

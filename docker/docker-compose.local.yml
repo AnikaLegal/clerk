@@ -5,8 +5,13 @@ services:
     image: postgres:16
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+    # Mount PGDATA itself. The image declares that path as a volume, so mounting
+    # its parent instead leaves the cluster in an anonymous volume that is lost
+    # whenever the container is recreated. PGDATA moved to
+    # /var/lib/postgresql/<major>/docker in Postgres 18, so this path has to
+    # change with the major version above.
     volumes:
-      - clerk_postgres_data:/var/lib/postgresql
+      - clerk_postgres_data:/var/lib/postgresql/data
     ports:
       - 25432:5432
     # Over TCP so the check ignores the socket-only server the image runs

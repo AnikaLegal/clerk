@@ -2,7 +2,7 @@
 name = "clerk"
 version = "0.1.0"
 description = ""
-requires-python = "==3.12.5"
+requires-python = ">=3.12,<3.13"
 authors = [
     { name = "Matt Segal", email = "matt.segal@anikalegal.org.au" },
     { name = "Luca Vari", email = "luca.vari@anikalegal.org.au" },
@@ -13,6 +13,8 @@ dependencies = [
     "boto3",
     "django-cleanup",
     "django-cors-headers",
+    # shell_plus, which the staging restore script runs on the server.
+    "django-extensions",
     "django-modelcluster",
     "django-taggit",
     "django-override-storage",
@@ -63,7 +65,6 @@ dev = [
     "debugpy",
     "django-browser-reload>=1.21.0",
     "django-debug-toolbar>=6.0.0",
-    "django-extensions",
     "django-zeal>=2.0.4",
     "ipython",
     "rust-just>=1.57.0",

@@ -24,10 +24,9 @@ INSTALLED_APPS = [
     # Static files
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    # Dev tools
+    # shell_plus, used by the restore scripts (the dev-only tools are added by
+    # the dev settings).
     "django_extensions",
-    "django_browser_reload",
-    "debug_toolbar",
     # APIs
     "rest_framework",
     "drf_standardized_errors",
@@ -83,8 +82,6 @@ MIDDLEWARE = [
     "web.middleware.NoIndexMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
