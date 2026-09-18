@@ -59,11 +59,12 @@ build *args:
 build-backend *opts:
     docker build {{opts}} --file docker/Dockerfile --tag {{app_name}}:local .
 
-# Build the frontend image
+# Build the frontend dev server image: the app image's frontend stage, stopped
+# before the production build, so dev and prod share one toolchain.
 [private]
 [arg("opts", help="Options passed to docker build")]
 build-frontend *opts:
-    docker build {{opts}} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
+    docker build {{opts}} --target frontend-deps --file docker/Dockerfile --tag {{app_name}}-frontend:local .
 
 # Build the multi-platform base image. Nothing builds from the latest tag; it
 # is kept current for anyone pulling the base by hand.
