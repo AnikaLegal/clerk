@@ -42,6 +42,10 @@ ENV PATH="/venv/bin:${PATH}"
 # packages must be copied into the venv (hardlinks cannot cross the mount).
 ENV UV_LINK_MODE=copy
 ENV UV_COMPILE_BYTECODE=1
+# Build on a uv-managed interpreter rather than whichever python3 the base
+# image happens to carry, so the version is the same here as in a local venv
+# and does not move when the base image is rebuilt.
+ENV UV_PYTHON_PREFERENCE=only-managed
 
 # Install python executable & dependencies from the lockfile alone so this
 # layer only rebuilds when dependencies change, not on every source edit.

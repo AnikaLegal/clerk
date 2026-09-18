@@ -39,7 +39,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 
 ## Backend (`app/`)
 
-- Django 5 + Wagtail, DRF for the API. Python pinned to **3.12.5**, deps managed with **uv** (`uv.lock`, `pyproject.toml`).
+- Django 5 + Wagtail, DRF for the API. Python pinned to the **3.12** series, deps managed with **uv** (`uv.lock`, `pyproject.toml`).
 - Settings split by environment in `app/clerk/settings/` (`base`, `dev`, `staging`, `prod`, `test`). Tests use `clerk.settings.test`.
 - Apps (see [README.md](README.md) for the full list): `case` (the core CMS - serializers/views/urls live here), `core` (domain models), `accounts`, `emails`, `intake`, `web` (public site/blog), plus integrations: `microsoft`/`google`/`slack`/`caller`/`webhooks`/`notify`.
 - Tests: pytest (`pytest-django`, `pytest-factoryboy`, factory-based). Run via `just test` - **always run the suite before considering backend work done**. CI runs the same suite on pushes to `develop`/`master` and on PRs into them.
