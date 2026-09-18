@@ -84,7 +84,7 @@ So rebuilding the server means restoring the databases from those S3 backups (st
 
 Application code is packaged into Docker images, defined in the `docker` directory:
 
-- `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `just push-base` when it changes
+- `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually when it changes. Its tag is a date, set by `BASE_TAG` in `Dockerfile` and read from there by `just`: bump it, run `just push-base`, then push the commit, because a build cannot find a base that is not on Docker Hub yet. `just push-base` refuses to overwrite a published tag, since a machine that already had that tag would go on building from the old base
 - `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built by the [Test workflow](../.github/workflows/test.yml) on every run and pushed once the tests pass on a push to `develop` (the `staging` tag) or `master` (the `prod` tag). Pull request runs only test. Running the Test workflow manually on any other branch pushes that branch as `staging`, which is how a feature branch can be tried out on staging. Every pushed build is also tagged `sha-<short commit sha>`, so the exact build behind an environment tag can always be identified
 - `Dockerfile.frontend`: builds the frontend, whose output is copied into the application image
 

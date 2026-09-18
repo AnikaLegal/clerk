@@ -9,6 +9,9 @@ set default-list := true
 
 app_name := "clerk"
 base_image := "anikalaw/clerkbase"
+# The app Dockerfile is the single source of truth for the base image tag, so
+# that a plain `docker build` (what CI runs) and these recipes agree.
+base_tag := `grep -E '^ARG BASE_TAG=' docker/Dockerfile | cut -d= -f2`
 compose := "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 # Show usage for a recipe, e.g. `just help build`
@@ -62,19 +65,44 @@ build-backend *opts:
 build-frontend *opts:
     docker build {{opts}} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
 
-# Build the multi-platform base image
+# Build the multi-platform base image. Nothing builds from the latest tag; it
+# is kept current for anyone pulling the base by hand.
 [private]
 [arg("opts", help="Options passed to docker build")]
 build-base *opts:
-    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:latest .
+    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:{{base_tag}} --tag {{base_image}}:latest .
 
 # Log in to Docker Hub
 [private]
 docker-login:
     docker login --username anikalaw
 
+# Refuse to overwrite a published base tag: a machine that already has it would
+# go on building from the old base.
+[private]
+check-base-tag:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Asking the registry itself (docker manifest inspect) can hang; the Hub
+    # API answers immediately. Anything but a clear 404 stops the push.
+    url="https://hub.docker.com/v2/repositories/{{base_image}}/tags/{{base_tag}}"
+    status=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+    case "$status" in
+      404) ;;
+      200)
+        echo "{{base_image}}:{{base_tag}} is already on Docker Hub." >&2
+        echo "Bump BASE_TAG in docker/Dockerfile before pushing a new base." >&2
+        exit 1
+        ;;
+      *)
+        echo "Could not reach Docker Hub to check {{base_image}}:{{base_tag}} (HTTP $status)." >&2
+        exit 1
+        ;;
+    esac
+
 # Build the base image from scratch and push it to Docker Hub
-push-base: docker-login (build-base "--no-cache")
+push-base: check-base-tag docker-login (build-base "--no-cache")
+    docker push {{base_image}}:{{base_tag}}
     docker push {{base_image}}:latest
 
 # Restore check recipes, e.g. `just restore-check db` to trigger one by hand

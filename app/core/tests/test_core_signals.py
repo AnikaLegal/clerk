@@ -1,11 +1,13 @@
 from unittest import mock
 
 import pytest
+from django.conf import settings
 
 from core.factories import IssueFactory
 from core.models import Submission
 from core.services.slack import send_issue_slack
 from core.services.submission import process_submission
+from microsoft.tasks import set_up_new_case_task
 
 
 @pytest.mark.django_db
@@ -71,3 +73,24 @@ def test_slack_not_dispatched_when_already_sent(mock_async):
     issue.save()
     # Ensure only email task was dispatched
     mock_async.assert_has_calls([mock.call(send_issue_slack, str(issue.pk))])
+
+
+@pytest.mark.django_db
+@pytest.mark.enable_signals
+@mock.patch("core.signals.issue.async_task", autospec=True)
+def test_sharepoint_task_dispatched_with_its_own_timeout(mock_async):
+    """
+    Sharepoint setup makes one MS Graph call per template and per client upload,
+    so it needs a longer budget than the default task timeout.
+    """
+    issue = IssueFactory(is_sharepoint_set_up=False)
+    issue.save()
+
+    call = next(
+        c
+        for c in mock_async.call_args_list
+        if c.args and c.args[0] is set_up_new_case_task
+    )
+    timeout = call.kwargs.get("timeout")
+    assert timeout is not None, "Sharepoint task dispatched without a timeout"
+    assert timeout > settings.Q_CLUSTER["timeout"]

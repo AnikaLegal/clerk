@@ -17,6 +17,11 @@ from .service import (
 logger = logging.getLogger(__name__)
 
 
+# Setting up a case makes an MS Graph call per document template and per client
+# upload, so it needs a longer budget than the default task timeout allows.
+SET_UP_NEW_CASE_TIMEOUT = 600  # seconds
+
+
 def reset_ms_access(user):
     if not user.is_active:
         logger.info("Skipping as User<%s> is inactive", user.pk)

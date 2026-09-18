@@ -1,3 +1,8 @@
+# The Clerk base image (docker/Dockerfile.base), by dated tag rather than a
+# moving one: a build can otherwise keep using a months-old local copy without
+# noticing. Bump this and run `just push-base` when the base changes.
+ARG BASE_TAG=2026-09-17
+
 # Build web CSS assets
 FROM node:lts-slim AS web-builder
 WORKDIR /web
@@ -10,7 +15,7 @@ RUN echo "Building web assets" && \
     npm run build
 
 # Use Clerk base image
-FROM anikalaw/clerkbase:latest
+FROM anikalaw/clerkbase:${BASE_TAG}
 ARG DJANGO_SETTINGS_MODULE=clerk.settings.prod
 ARG DJANGO_SECRET_KEY=not-a-secret
 # Keep the virtualenv outside /app so that the local dev bind mount of the app
