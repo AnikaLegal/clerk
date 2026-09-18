@@ -1,6 +1,5 @@
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
-from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -124,6 +123,8 @@ urlpatterns = [
     re_path(r"^$", views.landing_view, name="landing"),
 ]
 if settings.DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
     ]
