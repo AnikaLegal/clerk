@@ -291,6 +291,18 @@ export const buildSurveyModel = (): Model => {
       edit: '',
     },
   }
+  // Put the primary action first in the tab order: Back sits left of Continue
+  // / Send on screen (the stylesheet orders the row) but comes after them in
+  // the DOM, so Tab reaches the way forward first. SurveyJS sorts the bar's
+  // actions by visibleIndex only when they are set, so re-sort after the move.
+  const bar = survey.navigationBar
+  const prev = bar.getActionById('sv-nav-prev')
+  if (prev) {
+    prev.visibleIndex = 60
+    bar.actions = [...bar.actions].sort(
+      (a, b) => a.visibleIndex - b.visibleIndex
+    )
+  }
   // Allow inline HTML (links etc) in question titles and descriptions.
   survey.onTextMarkdown.add((_, options) => {
     if (options.text.includes('<')) {

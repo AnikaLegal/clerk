@@ -224,6 +224,12 @@ header .h-\[63px\] img {
   position: relative;
 }
 
+/* Back stays on the left although it follows the primary button in the DOM
+   (see the navigation bar's order in form/model.ts). */
+.intake-form .sd-body__navigation .sv-action:has(input.intake-btn-outline) {
+  order: -1;
+}
+
 .intake-form
   .sd-body__navigation
   .sv-action:has(input.intake-btn-outline)::before,
