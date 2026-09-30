@@ -1210,8 +1210,8 @@ header .h-\[63px\] img {
 }
 
 /* The side navigation column: hidden until there is room for it beside the
-   720px question column (a narrow-screen affordance comes later), so the card
-   keeps its 720px width below the breakpoint. */
+   720px question column (the collapsed bar below stands in for it), so the
+   card keeps its 720px width below the breakpoint. */
 .intake-sidebar {
   display: none;
 }
@@ -1238,18 +1238,6 @@ header .h-\[63px\] img {
        draws above its Back / Continue buttons. */
     border-radius: 11px 0 0 11px;
     border-right: 1px solid #ebe8e2;
-    /* Warm the SurveyJS list's hover fill (a cool grey by default) to match the
-       tint - the same hover as the Back button's. */
-    --sjs-general-backcolor-dark: #f4f2ee;
-    /* SurveyJS's border colours, in the rail's palette (the list's focused-item
-       outline is the one that shows). These also have to be set for those
-       borders to render at all out here: the fallback chain ends in
-       var(--border), and the website defines --border as a width (1px), so the
-       colour slot resolves to a length and the whole border declaration is
-       dropped. The survey's own elements are unaffected - the theme sets these
-       variables on the survey root, so the fallback is never reached inside it. */
-    --sjs-border-default: #ebe8e2;
-    --sjs-border-light: #ebe8e2;
   }
 
   /* The rail's own bands. Both are the height of the survey's Back / Continue
@@ -1289,53 +1277,351 @@ header .h-\[63px\] img {
     flex: 1 1 auto;
     min-height: 0;
   }
+}
 
-  /* The TOC panel fills its band (by default it sizes itself for the survey's
-     own left column). Its surface and divider give way to the rail's, so the
-     tint carries the rounded corners and the divider spans the full height. */
-  .intake-sidebar .sv_progress-toc {
-    min-width: 0;
-    max-width: none;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border-right: none;
+/* The section list itself, shared by the rail and the narrow-screen sheet
+   (see comps/useSectionList). */
+.intake-nav-list {
+  /* Warm the SurveyJS list's hover fill (a cool grey by default) to match the
+     rail's tint - the same hover as the Back button's. */
+  --sjs-general-backcolor-dark: #f4f2ee;
+  /* SurveyJS's border colours, in the rail's palette (the list's focused-item
+     outline is the one that shows). These also have to be set for those
+     borders to render at all out here: the fallback chain ends in
+     var(--border), and the website defines --border as a width (1px), so the
+     colour slot resolves to a length and the whole border declaration is
+     dropped. The survey's own elements are unaffected - the theme sets these
+     variables on the survey root, so the fallback is never reached inside it. */
+  --sjs-border-default: #ebe8e2;
+  --sjs-border-light: #ebe8e2;
+}
+
+/* The TOC panel fills its band (by default it sizes itself for the survey's
+   own left column). Its surface and divider give way to its container's, so
+   the rail's tint carries the rounded corners and the divider spans the full
+   height. */
+.intake-nav-list .sv_progress-toc {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border-right: none;
+}
+
+/* The website's components.css tracks list text out (ul { letter-spacing:
+   0.05em }), which inherits into the SurveyJS list the rows render in. */
+.intake-nav-list .sv-list {
+  letter-spacing: normal;
+}
+
+/* Each row is a marker and a name (see comps/useSectionList). */
+.intake-nav-list .sv-list__item-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The current section's name carries emphasis (SurveyJS's own TOC rule pins
+   the selected row back to 400, so match its specificity). */
+.intake-nav-list .sv-list__item.sv-list__item--selected .sv-list__item-body {
+  font-weight: 600;
+}
+
+/* On the send and confirmation steps the list is a record of what was
+   answered, not a way to move: the rows keep their normal weight but offer
+   nothing to click. */
+.intake-sidebar--readonly .sv-list__item .sv-list__item-body,
+.intake-sheet--readonly .sv-list__item .sv-list__item-body {
+  color: #5c5850;
+  cursor: default;
+}
+
+.intake-sidebar--readonly .sv-list__item .sv-list__item-body:hover,
+.intake-sheet--readonly .sv-list__item .sv-list__item-body:hover {
+  background: none;
+}
+
+.intake-nav__label {
+  min-width: 0;
+}
+
+/* Below the rail's breakpoint the navigation folds into one bar above the
+   questions (see comps/MobileNav): the card stacks the two, and the bar stays
+   pinned at the top of the viewport while the questions scroll under it. The
+   card's overflow-x: clip, unlike hidden, makes no scroll container, so the
+   bar sticks to the viewport rather than to the card. */
+.intake-mobile-nav {
+  display: none;
+}
+
+@media (max-width: 1039.98px) {
+  .intake-form .intake-card--with-nav {
+    flex-direction: column;
   }
 
-  /* The website's components.css tracks list text out (ul { letter-spacing:
-     0.05em }), which inherits into the SurveyJS list the rows render in. */
-  .intake-sidebar .sv-list {
-    letter-spacing: normal;
+  /* Sticky pins the bar within the card's content box, which would leave it
+     sitting over the Back / Continue row at the card's end. So the row hangs
+     out of the content box (the negative margin) into card padding of its own
+     height, which the content box excludes: the bar scrolls away as the
+     buttons arrive. The 109px is the row's height - its 1px rule, 32px
+     padding, 44px button, 32px padding. Only on pages that have the row; the
+     message steps have no buttons to make room for. */
+  .intake-form .intake-card--with-nav:has(.sd-body__navigation) {
+    padding-bottom: 109px;
   }
 
-  /* Each row is a marker and a name (see comps/FormSidebar). */
-  .intake-sidebar .sv-list__item-body {
+  .intake-form .intake-card--with-nav .sd-body__navigation {
+    margin-bottom: -109px;
+  }
+
+  /* The row now overhangs the survey's scroll containers, which would clip
+     it. They have nothing to scroll (the survey sizes to its content, see
+     the height rule on the root), so let them overflow. */
+  .intake-form .intake-card--with-nav .sd-root-modern,
+  .intake-form .intake-card--with-nav .sv-scroll__scroller {
+    overflow: visible;
+  }
+
+  .intake-mobile-nav {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 9px;
+    /* Side inset matches the page count's below it. */
+    padding: 12px 40px 11px;
+    background: #fff;
+    border-bottom: 1px solid #ebe8e2;
+    /* The bar sits in the card's top corners, inside its 1px border. */
+    border-radius: 11px 11px 0 0;
   }
+}
 
-  /* The current section's name carries emphasis (SurveyJS's own TOC rule pins
-     the selected row back to 400, so match its specificity). */
-  .intake-sidebar .sv-list__item.sv-list__item--selected .sv-list__item-body {
-    font-weight: 600;
+@media (max-width: 650px) {
+  .intake-mobile-nav {
+    padding: 12px 24px 11px;
   }
+}
 
-  /* On the send and confirmation steps the rail is a record of what was
-     answered, not a way to move: the rows keep their normal weight but offer
-     nothing to click. */
-  .intake-sidebar--readonly .sv-list__item .sv-list__item-body {
-    color: #5c5850;
-    cursor: default;
-  }
+.intake-mobile-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
 
-  .intake-sidebar--readonly .sv-list__item .sv-list__item-body:hover {
-    background: none;
-  }
+.intake-mobile-nav__title {
+  min-width: 0;
+  font:
+    600 15px/1.3 system-ui,
+    sans-serif;
+  color: #1a1a1a;
+}
 
-  .intake-nav__label {
-    min-width: 0;
+.intake-mobile-nav__subtitle {
+  font-size: 12px;
+  line-height: 1.3;
+  color: #6f6f6f;
+}
+
+/* The way into the sheet, as a text link with a 44px target that reaches
+   past the bar's own padding so the bar stays one line tall. The site styles
+   bare buttons as large primary pills, so this strips that chrome back. */
+.intake-form button.intake-mobile-nav__open {
+  flex: none;
+  display: inline-flex;
+  /* The site stacks a bare button's content in a column. */
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  margin: -12px -8px;
+  padding: 0 8px;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font:
+    600 13px system-ui,
+    sans-serif;
+  font-family: system-ui, sans-serif !important;
+  letter-spacing: normal;
+  color: color-mix(in oklab, var(--color-primary), #000 20%);
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-mobile-nav__open:hover {
+  color: color-mix(in oklab, var(--color-primary), #000 35%);
+}
+
+.intake-form button.intake-mobile-nav__open:focus-visible {
+  outline: none;
+}
+
+/* The label carries the focus ring: the button's 44px target reaches past
+   the row's one line of text, over the meter, so a ring on the button would
+   be cut through by it. */
+.intake-mobile-nav__open-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 4px;
+}
+
+.intake-form
+  button.intake-mobile-nav__open:focus-visible
+  .intake-mobile-nav__open-label {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* A downward chevron drawn as a rotated two-edge border, like the tick. */
+.intake-mobile-nav__chevron {
+  width: 7px;
+  height: 7px;
+  margin-top: -4px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* The section list as a sheet from the bottom of the screen, over a scrim.
+   A native dialog: closed it renders nothing, open it is in the top layer. */
+.intake-sheet {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 88vh;
+  max-height: 88dvh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.intake-sheet[open] {
+  display: flex;
+  flex-direction: column;
+  animation: intake-sheet-up 220ms ease-out;
+}
+
+.intake-sheet::backdrop {
+  background: rgba(26, 26, 26, 0.32);
+}
+
+@keyframes intake-sheet-up {
+  from {
+    transform: translateY(100%);
   }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intake-sheet[open] {
+    animation: none;
+  }
+}
+
+.intake-sheet__panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* The dialog's own line-height inherits the page's (~34px), which would
+     space every row out. */
+  line-height: 1.4;
+}
+
+/* The title and completion summary on the left, the close button on the
+   right. No grab handle: the sheet does not drag, so it must not suggest it. */
+.intake-sheet__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #ebe8e2;
+}
+
+.intake-sheet__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* A cross drawn as two rotated bars inside a 44px target. The negative
+   margins keep the head as tall as its text, with the target reaching into
+   the padding. */
+.intake-form button.intake-sheet__close {
+  position: relative;
+  flex: none;
+  width: 44px;
+  min-width: 0;
+  height: 44px;
+  margin: -10px -12px -10px 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.intake-form button.intake-sheet__close::before,
+.intake-form button.intake-sheet__close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: #5c5850;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.intake-form button.intake-sheet__close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.intake-form button.intake-sheet__close:hover {
+  background: #f4f2ee;
+}
+
+.intake-form button.intake-sheet__close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* The rows scroll when the sheet has hit its height. */
+.intake-sheet__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 5px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.intake-sheet__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid #ebe8e2;
 }
 
 /* The head band's content: the rail's title, whole-form progress meter and

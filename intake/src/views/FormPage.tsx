@@ -6,7 +6,7 @@ import { events } from '../analytics'
 import { api } from '../api'
 import { ApiError } from '../api/client'
 import { ReviewContext } from '../comps/AnswerReview'
-import { FormSidebar } from '../comps/FormSidebar'
+import { FormNav } from '../comps/FormNav'
 import { SavedMessage, SaveExitConfirm } from '../comps/SavedMessage'
 import { SubmittedMessage } from '../comps/SubmittedMessage'
 import { resetFunnel } from '../form/funnel'
@@ -134,7 +134,7 @@ export const FormPage = () => {
       <div className="intake-form">
         <div className="intake-page">
           <div className="intake-card intake-card--with-nav">
-            <FormSidebar
+            <FormNav
               survey={survey}
               visited={visited}
               onJump={jumpToSection}
@@ -174,7 +174,7 @@ export const FormPage = () => {
       <div className="intake-form">
         <div className="intake-page">
           <div className="intake-card intake-card--with-nav">
-            <FormSidebar
+            <FormNav
               survey={survey}
               visited={visited}
               onJump={jumpToSection}
@@ -233,7 +233,7 @@ export const FormPage = () => {
       <div className="intake-page">
         <div className={cardClass}>
           {showNav && (
-            <FormSidebar
+            <FormNav
               survey={survey}
               visited={visited}
               onJump={jumpToSection}
