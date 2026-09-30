@@ -80,7 +80,7 @@ export const MobileNav = ({
           {/* The focus ring goes on the label: the button's 44px target
               reaches past the row's one line of text, over the meter. */}
           <span className="intake-mobile-nav__open-label">
-            All steps
+            All sections
             <span className="intake-mobile-nav__chevron" aria-hidden="true" />
           </span>
         </button>
