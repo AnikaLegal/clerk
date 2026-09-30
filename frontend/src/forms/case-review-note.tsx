@@ -72,6 +72,7 @@ export const ReviewForm: React.FC<CaseDetailFormProps> = ({
           touched,
         }) => (
           <Form
+            autoComplete="off"
             onSubmit={handleSubmit}
             success={isSuccess}
             error={Object.keys(errors).length > 0}

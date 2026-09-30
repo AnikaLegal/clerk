@@ -14,10 +14,10 @@ The moving parts at a glance:
 
 | What | Where | When | Retention | Encrypted |
 | --- | --- | --- | --- | --- |
-| Production database dump + client-info CSV | `anika-database-backups` bucket, Sydney | Nightly (2AM AEST) | Rolling ~30 days | Client-side GPG |
+| Production database dump + client-info CSV | `anika-database-backups` bucket, Sydney | Nightly (2AM AEST) | Rolling ~30 days, recoverable for ~60 | Client-side GPG |
 | All production S3 buckets (database dumps, uploaded documents, emails, call audio), via AWS Backup | Sydney vault + immutable air-gapped vault in Melbourne | Daily + monthly | 35 days daily, up to a year monthly | Vault-managed |
 | Latest production dump, pulled off AWS | Saved by hand to a local machine | Monthly | Kept manually | GPG (as-is) |
-| Staging database dump + client-info CSV | `anika-database-backups-staging` bucket, Sydney | On staging refresh | Rolling ~3 months | None (data is obfuscated) |
+| Staging database dump + client-info CSV | `anika-database-backups-staging` bucket, Sydney | On staging refresh | Rolling ~3 months, recoverable for ~6 | None (data is obfuscated) |
 
 Each of these is detailed in the sections below.
 
@@ -73,11 +73,24 @@ The dumps live in two private S3 buckets, one for production and one for staging
 in the Sydney region. Both keep old object versions, are encrypted at rest by S3,
 and block all public access. Both are pruned by an identically-named lifecycle
 rule (`expire-old-backups`), but with deliberately different windows: production
-keeps a rolling 30 days - current dumps and superseded versions alike - while
-staging keeps 90. Production can afford the shorter window because its deeper
-history lives in AWS Backup (see below), so the bucket itself stays slim; staging
-is not in AWS Backup, so its bucket is its only history and keeps a little more -
-cheap, given how little staging holds, and useful for spinning up local dev. That
+expires a dump 30 days after it is written, while staging keeps 90.
+
+Because the buckets are versioned, those windows are only half the story:
+expiring a current version writes a delete marker over it rather than deleting
+it, and the rule's separate noncurrent window - also 30 days for production, 90
+for staging - only starts counting then. A production dump is therefore really
+gone about 60 days after it was written, and each bucket sits at roughly twice
+the size of the dumps it is actively serving (about 22 GB for production's ~30
+nights of dumps, client CSVs and manifests). That second window is useful rather
+than wasted: it is the period in which an accidentally deleted dump can still be
+recovered by removing its delete marker. Once the last noncurrent version under a
+marker expires, S3 removes the now-standalone marker itself, so no extra cleanup
+rule is needed.
+
+Production can afford the shorter window because its deeper history lives in AWS
+Backup (see below), so the bucket itself stays slim; staging is not in AWS
+Backup, so its bucket is its only history and keeps a little more - cheap, given
+how little staging holds, and useful for spinning up local dev. That
 server-side encryption is only a second layer: because the production dumps are
 already GPG-encrypted before upload, the bucket holds nothing but ciphertext that
 AWS itself cannot read.

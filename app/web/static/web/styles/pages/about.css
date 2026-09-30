@@ -1,6 +1,9 @@
 .brag {
-  padding-top: 50px;
+  padding-top: 80px;
   padding-bottom: 100px;
+}
+.hero-gold .brag {
+  padding-top: 50px;
 }
 
 /* Impact carousel
@@ -189,8 +192,11 @@
 }
 @media (max-width: 1300px) {
   .brag {
-    padding-top: 30px;
+    padding-top: 50px;
     padding-bottom: 62px;
+  }
+  .hero-gold .brag {
+    padding-top: 30px;
   }
   #vision {
     .text {

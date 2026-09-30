@@ -24,6 +24,9 @@ const TextInputFilter = ({
   return (
     <TextInput
       size="md"
+      // Filter values are client PII. Chrome records submitted input values
+      // against the field name in a store shared across every origin.
+      autoComplete="off"
       onChange={(event) =>
         debouncedFilterChange(name, event.currentTarget.value)
       }

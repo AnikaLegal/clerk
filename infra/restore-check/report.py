@@ -213,8 +213,16 @@ def post(webhook: str, payload: dict) -> None:
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(request, timeout=30):
-        pass
+    try:
+        with urllib.request.urlopen(request, timeout=30):
+            pass
+    except urllib.error.HTTPError as error:
+        # Slack names the cause in the body - invalid_token for a revoked
+        # webhook, invalid_payload for malformed blocks - and the status
+        # alone does not. Raised as a new error rather than re-raising so
+        # the webhook URL, a secret, cannot reach a log.
+        reason = error.read()[:200].decode(errors="replace").strip()
+        raise RuntimeError(f"Slack rejected the post: HTTP {error.code} {reason}") from None
 
 
 def main() -> int:
@@ -252,7 +260,7 @@ def main() -> int:
     print(">>> Posting result to Slack")
     try:
         post(webhook, payload)
-    except (urllib.error.URLError, OSError) as error:
+    except (urllib.error.URLError, OSError, RuntimeError) as error:
         print(f">>> Error: failed to post the Slack message: {error}", file=sys.stderr)
         return 1
     print(">>> Slack message posted")

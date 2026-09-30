@@ -17,6 +17,11 @@ from .service import (
 logger = logging.getLogger(__name__)
 
 
+# Setting up a case makes an MS Graph call per document template and per client
+# upload, so it needs a longer budget than the default task timeout allows.
+SET_UP_NEW_CASE_TIMEOUT = 600  # seconds
+
+
 def reset_ms_access(user):
     if not user.is_active:
         logger.info("Skipping as User<%s> is inactive", user.pk)
@@ -32,13 +37,11 @@ def reset_ms_access(user):
         logger.info("Skipping as User<%s> account is not created or too new", user.pk)
         return
 
-    for group in user.groups.all():
-        logger.info("Sending event for User<%s> added to Group<%s>", user.pk, group.pk)
-        events.user_added_to_group.send(
-            sender=User,
-            user=user,
-            group=group,
-        )
+    logger.info("Sending event for User<%s> role changed", user.pk)
+    events.user_role_changed.send(
+        sender=User,
+        user=user,
+    )
 
     # NOTE: Not sure why 2022 used below. Maybe that was when Sharepoint was
     # introduced?

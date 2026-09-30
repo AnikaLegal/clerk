@@ -57,10 +57,15 @@ export const PersonForm: React.FC<PersonFormProps> = ({
     setFieldValue,
   },
 }) => (
-  <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+  <Form
+    autoComplete="off"
+    onSubmit={handleSubmit}
+    error={Object.keys(errors).length > 0}
+  >
     <div className={`field ${errors.full_name && 'error'}`}>
       <label>Full name</label>
       <Input
+        autoComplete="off"
         placeholder="Jane Doe"
         value={values.full_name}
         name="full_name"
@@ -71,6 +76,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
     <div className={`field ${errors.email && 'error'}`}>
       <label>Email</label>
       <Input
+        autoComplete="off"
         placeholder="jane.doe@example.com"
         value={values.email}
         name="email"
@@ -81,6 +87,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
     <div className={`field ${errors.address && 'error'}`}>
       <label>Address</label>
       <Input
+        autoComplete="off"
         placeholder="123 Fake Street"
         value={values.address}
         name="address"
@@ -92,6 +99,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
     <div className={`field ${errors.phone_number && 'error'}`}>
       <label>Phone number</label>
       <Input
+        autoComplete="off"
         placeholder="04123456"
         value={values.phone_number}
         name="phone_number"

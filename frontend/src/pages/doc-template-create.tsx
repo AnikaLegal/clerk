@@ -69,7 +69,7 @@ const App = () => {
   return (
     <Container size="xl">
       <Title order={1}>Create a new document template</Title>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
         <Select
           {...form.getInputProps('topic')}
           key={form.key('topic')}

@@ -68,6 +68,7 @@ export const ProgressForm: React.FC<CaseDetailFormProps> = ({
       >
         {({ values, errors, handleSubmit, isSubmitting, setFieldValue }) => (
           <Form
+            autoComplete="off"
             onSubmit={handleSubmit}
             success={isSuccess}
             error={Object.keys(errors).length > 0}

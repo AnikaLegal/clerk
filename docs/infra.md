@@ -78,16 +78,18 @@ So rebuilding the server means restoring the databases from those S3 backups (st
 
 Application code is packaged into Docker images, defined in the `docker` directory:
 
-- `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually with `just push-base` when it changes
-- `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), built and pushed by the [Test workflow](../.github/workflows/test.yml) after tests pass - merges to `develop` produce the `staging` tag, merges to `master` produce the `prod` tag
-- `Dockerfile.frontend`: builds the Clerk CMS SPA (`frontend/`), whose output is copied into the application image and served at `/clerk/`
-- `Dockerfile.intake`: builds the public intake form SPA (`intake/`), whose output is copied into the application image and served at `/intake/`
+- `Dockerfile.base`: the base image [anikalaw/clerkbase](https://hub.docker.com/r/anikalaw/clerkbase), built and pushed manually when it changes. Its tag is a date, set by `BASE_TAG` in `Dockerfile` and read from there by `just`: bump it, run `just push-base`, then push the commit, because a build cannot find a base that is not on Docker Hub yet. `just push-base` refuses to overwrite a published tag, since a machine that already had that tag would go on building from the old base
+- `Dockerfile`: the application image [anikalaw/clerk](https://hub.docker.com/r/anikalaw/clerk), which builds the Clerk CMS SPA (`frontend/`, served at `/clerk/`), the public intake form SPA (`intake/`, served at `/intake/`) and the web CSS in their own stages. The frontend and intake dev server images that `just dev` runs are the same file's `frontend-deps` and `intake-deps` stages, so dev and production share one Node version and one dependency install per SPA. The intake stage runs its tests before building. The image is built by the [Test workflow](../.github/workflows/test.yml) on every run and pushed once the tests pass on a push to `develop` (the `staging` tag) or `master` (the `prod` tag). Pull request runs only test. Running the Test workflow manually on any other branch pushes that branch as `staging`, which is how a feature branch can be tried out on staging. Every pushed build is also tagged `sha-<short commit sha>`, so the exact build behind an environment tag can always be identified
 
 Compose files in the same directory define how the images run: `docker-compose.local.yml` (local development), `docker-compose.ci.yml` (tests in CI), and `docker-compose.staging.yml` / `docker-compose.prod.yml` (the Swarm stacks).
 
 ## Deployment
 
 Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy), which must be triggered manually from GitHub. It connects to the server's Docker daemon over SSH and updates the environment's Swarm stack to the latest image. It does not build anything: images come from the Test workflow (see above).
+
+The web service has a health check (`/health/`, which also confirms the database connection). During a deploy Swarm stops the old container, starts the new one and only routes traffic to it once the check passes, so the site shows the maintenance page for the restart. If the new container never becomes healthy, or fails within its first minute, Swarm rolls the service back to the previous image automatically, and the Deploy run fails because it waits for the update to converge.
+
+To roll back, point the environment's services at an earlier build's sha tag on the server, e.g. `docker service update --image anikalaw/clerk:sha-1234567 clerk_prod_web` (and likewise `clerk_prod_worker`). The next Deploy run moves them back to the environment tag.
 
 When making a change or bugfix, you should:
 
@@ -107,6 +109,8 @@ The server is provisioned and environments are initialised with the scripts unde
 To rebuild the server from scratch: launch a new Ubuntu instance, run the three scripts against it, then update the new IP address in CloudFlare and in `CLERK_HOST` in the env files.
 
 The scripts pin the versions of software that matter for reproducing the server: PostgreSQL, Docker Engine and the AWS CLI. Each pin is a variable at the top of the relevant script, plus an `ARG` in `Dockerfile.base` for the PostgreSQL client tools, whose major version must match the database server or backups taken with one may not restore with the other. When bumping a pin, upgrade the live server to match.
+
+Unattended upgrades run at 18:00 UTC rather than Ubuntu's default of 06:00 UTC. needrestart restarts PostgreSQL, NGINX and containerd after library updates, and the default window falls in the Melbourne afternoon; the timer drop-in lives in [infra/setup/security](../infra/setup/security).
 
 ## Infrastructure as code
 

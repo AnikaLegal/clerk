@@ -1,0 +1,108 @@
+{% extends 'web/_base.html' %}
+{% load static %}
+{% block title %}
+  Our model
+{% endblock %}
+{% block styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'web/styles/pages/about.css' %}" />
+{% endblock %}
+{% block social_meta %}
+  {% include 'web/snippets/_social_meta.html' with title='Our model' description='How Anika Legal delivers free legal help at scale: a small staff team supervising law students, volunteers and seconded lawyers, and how that work is funded.' %}
+{% endblock %}
+{% block content %}
+  <style>
+    .model-prose {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .panel .content li {
+      margin-bottom: 0.5rem;
+    }
+    /* components.css gives panel headings a smaller, bolder, centred style; the
+           story sections either side of this one use the default h2, so match them. */
+    .panel h2 {
+      font-size: var(--header-font-size);
+      font-weight: 400;
+      line-height: var(--header-line-height);
+      text-align: left;
+    }
+    /* The break in the title holds the two-line split; balance keeps the wrap
+           even on the narrowest phones, where the first line no longer fits. */
+    .brag h1 {
+      text-wrap: balance;
+    }
+  </style>
+
+  <div class="container">
+    <div class="brag">
+      <h1>Our model: how a small team helps <br /> hundreds of renters each&nbsp;year</h1>
+      <p style="max-width: 575px">Renters face rising costs, unsafe homes and a legal system that is hard to navigate alone, and traditional services cannot meet the scale of that need. So we built a different way of working.</p>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <div class="story right">
+        <img class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/photos/students.jpg' %}" />
+        <div class="content">
+          <h2>Who works on a case</h2>
+          <p>Every case is assigned a law student paralegal, who is the renter's point of contact throughout. Their work is supervised by a lawyer, who guides them and signs off on all legal advice. Experienced paralegals triage new enquiries and provide support, and our Principal Lawyer oversees the whole practice.</p>
+          <p>All of this is done remotely, including client communications and intern supervision. This means students can work flexibly around their schedules, and renters can receive high-quality legal advice from their home, at a time that suits them, anywhere in Victoria.</p>
+          <p>This model lets us make the most of limited resources to help more renters. One full-time supervising lawyer – supported by law student paralegals and volunteer and secondee lawyers – can provide ongoing legal support to up to 300 renters a year.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel right round top-left bottom-left">
+    <div class="content">
+      <h2>Our university partnerships</h2>
+      <p>Universities and education providers play a critical role in sustaining our service model. Law schools are increasingly required to provide authentic workplace learning, and we deliver it at scale, at low cost, and with strong student outcomes. In return, education partners help to cover some of the costs of supervising their students.</p>
+      <p>As a charity, every dollar we receive goes back into the work that matters. Donations, grants, money received for internships – all of it funds free, ongoing legal support for renters and our push for a fairer housing system.</p>
+    </div>
+    <img class="round bottom-left" src="{% static 'web/img/photos/library.jpg' %}" />
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <div class="story right">
+        <img class="round not-responsive top-left bottom-left bottom-right" src="{% static 'web/img/services/coffee.jpg' %}" />
+        <div class="content">
+          <h2>A model where everyone wins</h2>
+          <p>
+            Anika’s student-powered service model creates <strong>shared value</strong> – every participant benefits in a meaningful way:
+          </p>
+          <ul>
+            <li>
+              <strong>Renters</strong> receive free, high-quality support when they need it most.
+            </li>
+            <li>
+              <strong>Students</strong> gain practical legal experience that enhances their employability.
+            </li>
+            <li>
+              <strong>Universities</strong> improve law student learning outcomes with minimal additional investment.
+            </li>
+            <li>
+              <strong>The community legal sector</strong> gains a scalable workforce pipeline and dramatically increased capacity.
+            </li>
+          </ul>
+          <p>This design unlocks value that already exists in the system — tens of thousands of law students seeking experience and millions of Australians needing legal help — and channels it into an efficient, high-impact service model.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="segment">
+    <div class="container wide">
+      <h2>How we are funded</h2>
+      <div class="divider"></div>
+      <p class="model-prose">The service is funded mostly by philanthropic grants, with corporate and community donations making up most of the rest. Only a small proportion is earned income, from our university partnerships. On top of that, a large amount of the work is done by volunteers, seconded lawyers and pro bono partners, whose time and expertise are worth a substantial share of what the service runs on.</p>
+      <p class="model-prose">
+        For the full figures, see our independently reviewed
+        <a href="{% url 'reports' %}">financial report</a> for the year to 30 June 2025. Anika Legal Ltd is a registered charity, listed on the
+        <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile">ACNC charity register</a>.
+      </p>
+    </div>
+  </div>
+{% endblock %}

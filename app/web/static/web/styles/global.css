@@ -45,8 +45,10 @@ Screen sizes to consider (https://screensiz.es/):
   --url-landing-hero-phone-img: url("/static/web/img/landing-hero-1080.webp");
 
   /* Responsive variables */
-  --container-padding: 135px;
-  --container-wide-padding: 100px;
+  /* Both scale with the viewport and reach their maximum at about 1350px. A
+     fixed value here left the container narrower at 601px than at 600px. */
+  --container-padding: clamp(24px, 15vw - 68px, 135px);
+  --container-wide-padding: clamp(24px, 11.5vw - 55px, 100px);
   --header-font-size: 50px;
   --header-line-height: 58px;
   --header-mini-font-size: 25px;
@@ -76,7 +78,9 @@ Screen sizes to consider (https://screensiz.es/):
 /* Responsive variables (phone) */
 @media (max-width: 600px) {
   :root {
-    --header-height: 46px;
+    /* The logo row is a fixed 63px plus its vertical spacing, on top of the 4px
+       secondary nav row. The hero offsets are calculated from this. */
+    --header-height: 91px;
     --hero-external-radius: 124px;
     --header-font-size: 26px;
     --header-line-height: 32px;

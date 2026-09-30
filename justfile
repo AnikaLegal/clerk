@@ -9,6 +9,9 @@ set default-list := true
 
 app_name := "clerk"
 base_image := "anikalaw/clerkbase"
+# The app Dockerfile is the single source of truth for the base image tag, so
+# that a plain `docker build` (what CI runs) and these recipes agree.
+base_tag := `grep -E '^ARG BASE_TAG=' docker/Dockerfile | cut -d= -f2`
 compose := "docker compose -p clerk -f docker/docker-compose.local.yml"
 
 # Show usage for a recipe, e.g. `just help build`
@@ -20,8 +23,8 @@ help recipe:
 schema:
     cd frontend && npm run schema
 
-# Build images locally, e.g. `just build backend -- --no-cache` (no target: frontend + backend)
-[arg("args", help="backend | frontend | base (default: frontend + backend), then docker build options after --")]
+# Build images locally, e.g. `just build backend -- --no-cache` (no target: frontend + intake + backend)
+[arg("args", help="backend | frontend | intake | base (default: frontend + intake + backend), then docker build options after --")]
 build *args:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -39,10 +42,10 @@ build *args:
         targets="$targets $a"
       fi
     done
-    [ -z "$targets" ] && targets="frontend backend"
+    [ -z "$targets" ] && targets="frontend intake backend"
     for t in $targets; do
       case "$t" in
-        backend|frontend|base) "$j" build-"$t" $opts ;;
+        backend|frontend|intake|base) "$j" build-"$t" $opts ;;
         *)
           echo "Unknown build target: $t (expected backend, frontend, intake, or base)" >&2
           exit 1
@@ -56,31 +59,58 @@ build *args:
 build-backend *opts:
     docker build {{opts}} --file docker/Dockerfile --tag {{app_name}}:local .
 
-# Build the frontend image
+# Build the frontend dev server image: the app image's frontend stage, stopped
+# before the production build, so dev and prod share one toolchain.
 [private]
 [arg("opts", help="Options passed to docker build")]
 build-frontend *opts:
-    docker build {{opts}} --file docker/Dockerfile.frontend --tag {{app_name}}-frontend:local .
+    docker build {{opts}} --target frontend-deps --file docker/Dockerfile --tag {{app_name}}-frontend:local .
 
-# Build the intake form image
+# Build the intake form dev server image: the app image's intake stage, stopped
+# before the test and production build.
 [private]
-[arg("no_cache", long="no-cache", short="n", value="1", help="Build without the Docker cache")]
-build-intake no_cache="":
-    docker build {{ if no_cache != "" { "--no-cache" } else { "" } }} --file docker/Dockerfile.intake --tag {{app_name}}-intake:local .
+[arg("opts", help="Options passed to docker build")]
+build-intake *opts:
+    docker build {{opts}} --target intake-deps --file docker/Dockerfile --tag {{app_name}}-intake:local .
 
-# Build the multi-platform base image
+# Build the multi-platform base image. Nothing builds from the latest tag; it
+# is kept current for anyone pulling the base by hand.
 [private]
 [arg("opts", help="Options passed to docker build")]
 build-base *opts:
-    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:latest .
+    docker build --platform=linux/amd64,linux/arm64 {{opts}} --file docker/Dockerfile.base --tag {{base_image}}:{{base_tag}} --tag {{base_image}}:latest .
 
 # Log in to Docker Hub
 [private]
 docker-login:
     docker login --username anikalaw
 
+# Refuse to overwrite a published base tag: a machine that already has it would
+# go on building from the old base.
+[private]
+check-base-tag:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Asking the registry itself (docker manifest inspect) can hang; the Hub
+    # API answers immediately. Anything but a clear 404 stops the push.
+    url="https://hub.docker.com/v2/repositories/{{base_image}}/tags/{{base_tag}}"
+    status=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+    case "$status" in
+      404) ;;
+      200)
+        echo "{{base_image}}:{{base_tag}} is already on Docker Hub." >&2
+        echo "Bump BASE_TAG in docker/Dockerfile before pushing a new base." >&2
+        exit 1
+        ;;
+      *)
+        echo "Could not reach Docker Hub to check {{base_image}}:{{base_tag}} (HTTP $status)." >&2
+        exit 1
+        ;;
+    esac
+
 # Build the base image from scratch and push it to Docker Hub
-push-base: docker-login (build-base "--no-cache")
+push-base: check-base-tag docker-login (build-base "--no-cache")
+    docker push {{base_image}}:{{base_tag}}
     docker push {{base_image}}:latest
 
 # Restore check recipes, e.g. `just restore-check db` to trigger one by hand

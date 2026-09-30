@@ -14,6 +14,10 @@ HTTP_HEADERS = {
     "Content-Type": "application/json",
 }
 
+# Graph calls run inside tasks with a limited time budget, so bound every
+# request: one hung connection must not be able to consume the whole budget.
+HTTP_TIMEOUT = (10, 60)  # (connect, read) seconds
+
 
 def create_client(client_id, authority_url, client_secret):
     """Authenticate our app with Azure Active Directory."""

@@ -103,6 +103,15 @@
       }
     }
     @media (max-width: 768px) {
+      /* Stacked content is taller than the desktop height cap, and a fixed
+         banner anchored to the bottom overflows off-screen. */
+      #banner {
+        max-height: none;
+        min-height: 0;
+      }
+      #banner .title {
+        font-size: x-large;
+      }
       #banner .content {
         flex-flow: column nowrap;
       }

@@ -19,7 +19,7 @@ export const InputField = ({
   return (
     <Form.Field error={meta.touched && meta.error} required={required}>
       {label && <label>{label}</label>}
-      <Input {...field} {...props} />
+      <Input autoComplete="off" {...field} {...props} />
       <ErrorMessage name={name} />
     </Form.Field>
   )

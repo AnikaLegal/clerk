@@ -3,6 +3,7 @@ Pytest configuration
 """
 
 import os
+import shutil
 from enum import Enum
 
 import debugpy
@@ -11,6 +12,7 @@ import pytest
 from accounts.models import CaseGroups, User
 from case.middleware import annotate_group_access
 from core import factories
+from django.conf import settings
 from django.contrib.auth.models import Group
 from openapi_tester import SchemaTester
 from openapi_tester.clients import OpenAPIClient
@@ -30,6 +32,19 @@ class CaseRole(Enum):
 def set_faker_locale():
     with factory.Faker.override_default_locale("en_AU"):
         yield
+
+
+@pytest.fixture(autouse=True, scope="session")
+def remove_test_media():
+    """
+    Delete the files tests upload to MEDIA_ROOT. The test container bind-mounts
+    the app directory, so they would otherwise accumulate on the host.
+    """
+    yield
+    media_root = os.path.normpath(settings.MEDIA_ROOT)
+    # Only ever delete the dedicated test directory, never a real media root.
+    if os.path.basename(media_root) == "test_media" and os.path.isdir(media_root):
+        shutil.rmtree(media_root)
 
 
 @pytest.fixture(autouse=True, scope="function")

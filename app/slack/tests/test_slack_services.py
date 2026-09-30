@@ -3,9 +3,8 @@ import json
 import pytest
 import responses
 from django.test import override_settings
-
 from slack.models import SlackChannel, SlackMessage, SlackUser
-from slack.services import send_slack_message
+from slack.services import get_slack_user_by_email, send_slack_message
 
 
 @responses.activate
@@ -45,3 +44,31 @@ def test_send_issue_slack(slug):
         "This is a cool Slack message!\n\n"
         ":heart: Client Bot :robot_face:"
     )
+
+
+LOOKUP_URL = "https://slack.com/api/users.lookupByEmail"
+SLACK_USER = {"id": "U123", "name": "alice"}
+
+
+@responses.activate
+@override_settings(SLACK_MESSAGE_DISABLED=False)
+def test_get_slack_user_by_email__found():
+    responses.add(
+        method=responses.GET, url=LOOKUP_URL, json={"ok": True, "user": SLACK_USER}
+    )
+
+    assert get_slack_user_by_email("alice@example.com") == SLACK_USER
+    assert responses.calls[0].request.params == {"email": "alice@example.com"}
+
+
+@responses.activate
+@override_settings(SLACK_MESSAGE_DISABLED=False)
+def test_get_slack_user_by_email__not_found():
+    responses.add(
+        method=responses.GET,
+        url=LOOKUP_URL,
+        json={"ok": False, "error": "users_not_found"},
+    )
+
+    assert get_slack_user_by_email("alice@example.com") is None
+    assert responses.calls[0].request.params == {"email": "alice@example.com"}

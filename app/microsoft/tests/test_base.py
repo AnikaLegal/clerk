@@ -171,3 +171,32 @@ def test_handle_other_http_error_logs_and_raises(endpoint):
     resp.request.url = "https://example.com"
     with pytest.raises(requests.exceptions.HTTPError):
         endpoint.handle(resp)
+
+
+@pytest.mark.parametrize(
+    "verb,method,method_args",
+    [
+        ("get", "get", ("/test",)),
+        ("get", "get_list", ("/test",)),
+        ("post", "post", ("/test", {"data": 1})),
+        ("patch", "patch", ("/test", {"data": 1})),
+        ("delete", "delete", ("/test",)),
+    ],
+)
+def test_requests_are_given_a_timeout(
+    verb, method, method_args, endpoint_with_headers
+):
+    """
+    Without a timeout a hung MS Graph connection blocks the caller forever.
+    """
+    mock_resp = MagicMock()
+    mock_resp.content = b"{}"
+    mock_resp.json.return_value = {}
+    mock_resp.raise_for_status.return_value = None
+
+    with patch(
+        f"microsoft.endpoints.base.requests.{verb}", return_value=mock_resp
+    ) as mock_request:
+        getattr(endpoint_with_headers, method)(*method_args)
+
+    assert mock_request.call_args.kwargs.get("timeout") is not None
