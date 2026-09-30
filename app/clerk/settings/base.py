@@ -24,10 +24,9 @@ INSTALLED_APPS = [
     # Static files
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
-    # Dev tools
+    # shell_plus, used by the restore scripts (the dev-only tools are added by
+    # the dev settings).
     "django_extensions",
-    "django_browser_reload",
-    "debug_toolbar",
     # APIs
     "rest_framework",
     "drf_standardized_errors",
@@ -83,8 +82,6 @@ MIDDLEWARE = [
     "web.middleware.NoIndexMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -265,6 +262,10 @@ WAGTAILUSERS_PASSWORD_REQUIRED = False  # Allow blank passwords for social auth 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = "public-read"
+# Uploads and the image renditions built from them are served straight from S3,
+# which sends no caching headers of its own. A week balances repeat visits
+# against a file being replaced under the same name.
+AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=604800"}
 AWS_REGION_NAME = "ap-southeast-2"
 AWS_S3_FILE_OVERWRITE = True  # Files with the same name will overwrite each other
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")

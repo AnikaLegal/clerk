@@ -136,13 +136,18 @@ def post_report(step_context, results: dict, outcome: str, run_url: str) -> None
 
 @durable_step
 def post_crash_alert(step_context, error: str, run_url: str) -> None:
+    """Best-effort: an undeliverable courtesy alert must not replace the
+    crash it is reporting as the execution's own error."""
     step_context.logger.error(f"S3 restore check reporter crashed: {error}")
-    report.post(
-        webhook(),
-        report.build_payload(
-            None, "FAIL", run_url=run_url, title=REPORT_TITLE, name=REPORT_NAME
-        ),
-    )
+    try:
+        report.post(
+            webhook(),
+            report.build_payload(
+                None, "FAIL", run_url=run_url, title=REPORT_TITLE, name=REPORT_NAME
+            ),
+        )
+    except Exception as post_error:
+        step_context.logger.error(f"Crash alert could not be posted: {post_error}")
 
 
 # --- Helpers -------------------------------------------------------------------
@@ -288,6 +293,10 @@ def handler(event, context: DurableContext):
         return results
 
     except Exception as error:
-        context.step(post_crash_alert(str(error), console_url()))
+        # Close the check-in before attempting Slack: Sentry is the alert
+        # of record, so an unreachable webhook must not stop it being
+        # told (an unclosed check-in only surfaces hours later, as a
+        # monitor timeout).
         context.step(close_checkin(checkin_id, "error"))
+        context.step(post_crash_alert(str(error), console_url()))
         raise

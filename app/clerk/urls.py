@@ -1,6 +1,5 @@
 from caller.views import answer_view, collect_view, message_view
 from core import views as core_views
-from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.i18n import i18n_patterns
@@ -18,7 +17,7 @@ from web import views
 from web.sitemaps import SITEMAPS
 from webhooks.views import intake_no_email_view, jotform_form_view, webflow_form_view
 
-from .views import custom_403_handler, custom_404_handler
+from .views import custom_403_handler, custom_404_handler, health_view
 
 
 def template(name):
@@ -52,6 +51,7 @@ urlpatterns = [
     # About
     path("about/", template("web/about/about.html"), name="about"),
     path("about/annual-reports/", template("web/about/reports.html"), name="reports"),
+    path("about/our-model/", template("web/about/our-model.html"), name="our-model"),
     path("about/team/", views.team_view, name="team"),
     path("about/impact/", views.impact_view, name="impact"),
     # Services
@@ -108,7 +108,9 @@ urlpatterns = [
     # Dashboard.
     path("dash/", views.dashboard_view, name="dashboard"),
     # Robots.txt
-    path("robots.txt", views.robots_view),
+    path("robots.txt", views.robots_view, name="robots"),
+    # Container health check (see docker/docker-compose.prod.yml)
+    path("health/", health_view, name="health"),
     # Sitemap
     path(
         "sitemap.xml",
@@ -122,6 +124,8 @@ urlpatterns = [
     re_path(r"^$", views.landing_view, name="landing"),
 ]
 if settings.DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
     ]

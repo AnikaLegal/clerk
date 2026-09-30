@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import time
+import urllib.error
 import urllib.request
 import uuid
 
@@ -109,8 +110,16 @@ def alert_slack(problems: list[str]) -> None:
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(request, timeout=30):
-        pass
+    try:
+        with urllib.request.urlopen(request, timeout=30):
+            pass
+    except urllib.error.HTTPError as error:
+        # Slack names the cause in the body - invalid_token for a revoked
+        # webhook, invalid_payload for malformed blocks - and the status
+        # alone does not. Raised as a new error rather than re-raising so
+        # the webhook URL, a secret, cannot reach a log.
+        reason = error.read()[:200].decode(errors="replace").strip()
+        raise RuntimeError(f"Slack rejected the alert: HTTP {error.code} {reason}") from None
 
 
 def sentry_checkin(status: str) -> None:
@@ -141,8 +150,10 @@ def handler(event, context):
     if problems:
         for problem in problems:
             logger.error(problem)
-        alert_slack(problems)
+        # Check in before attempting Slack: Sentry is the alert of
+        # record, so an unreachable webhook must not stop it being told.
         sentry_checkin("error")
+        alert_slack(problems)
     else:
         logger.info(f"All {len(PROTECTED_BUCKETS)} buckets have fresh recovery "
                     "points in both regions")

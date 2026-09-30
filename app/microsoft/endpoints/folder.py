@@ -7,7 +7,7 @@ import requests
 from django.conf import settings
 
 from .base import BaseEndpoint
-from .helpers import BASE_URL
+from .helpers import BASE_URL, HTTP_TIMEOUT
 
 if TYPE_CHECKING:
     from typing import Literal, TypeAlias
@@ -146,7 +146,9 @@ class FolderEndpoint(BaseEndpoint):
             BASE_URL,
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}/content",
         )
-        resp = requests.get(url, headers=self.headers, stream=False)
+        resp = requests.get(
+            url, headers=self.headers, stream=False, timeout=HTTP_TIMEOUT
+        )
         resp.raise_for_status()
 
         return file_name, mimetype, resp.content
@@ -221,7 +223,14 @@ class FolderEndpoint(BaseEndpoint):
         content_type = getattr(file, "content_type", "")
         if content_type:
             headers["Content-Type"] = content_type
-        resp = requests.put(url, params=params, data=file, headers=headers, stream=True)
+        resp = requests.put(
+            url,
+            params=params,
+            data=file,
+            headers=headers,
+            stream=True,
+            timeout=HTTP_TIMEOUT,
+        )
         return self.handle(resp)
 
     def _upload_large_file(
@@ -242,7 +251,12 @@ class FolderEndpoint(BaseEndpoint):
 
         data = {"name": filename}
         resp = requests.post(
-            url, params=params, json=data, headers=self.headers, stream=False
+            url,
+            params=params,
+            json=data,
+            headers=self.headers,
+            stream=False,
+            timeout=HTTP_TIMEOUT,
         )
 
         session_data = self.handle(resp)
@@ -264,6 +278,7 @@ class FolderEndpoint(BaseEndpoint):
                     **self.headers,
                 },
                 data=chunk,
+                timeout=HTTP_TIMEOUT,
             )
             resp.raise_for_status()
             start += bytes_read

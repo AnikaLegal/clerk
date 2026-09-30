@@ -16,6 +16,9 @@
               <a href="{% url 'about' %}">Anika</a>
             </li>
             <li>
+              <a href="{% url 'our-model' %}">Model</a>
+            </li>
+            <li>
               <a href="{% url 'impact' %}">Impact</a>
             </li>
             <li>
@@ -64,9 +67,9 @@
   <div class="flex justify-between items-center py-2 px-0 mb-2">
     <!-- Logo -->
     <div class="flex flex-wrap items-center gap-4 h-[63px] overflow-hidden">
-      <a href="{% url 'landing' %}"><img class="h-full" src="{% static 'web/brand/logo-color.svg' %}" alt="Anika Legal" /></a>
-      <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile"><img class="h-full" src="{% static 'web/brand/acnc-charity.png' %}" alt="ACNC Charity" /></a>
-      <a href="https://www.fclc.org.au/"><img class="h-full" src="{% static 'web/img/partners/federation-vic.png' %}" alt="Federation VIC" /></a>
+      <a href="{% url 'landing' %}" class="h-full"><img class="h-full" src="{% static 'web/brand/logo-color.svg' %}" alt="Anika Legal" /></a>
+      <a href="https://www.acnc.gov.au/charity/charities/bfa9e539-dfc5-e811-a962-000d3ad24182/profile" class="h-full"><img class="h-full" src="{% static 'web/brand/acnc-charity.png' %}" alt="ACNC Charity" /></a>
+      <a href="https://www.fclc.org.au/" class="h-full"><img class="h-full" src="{% static 'web/img/partners/federation-vic.png' %}" alt="Federation VIC" /></a>
     </div>
     <nav class="hidden lg:flex items-center gap-5 text-sm">
       <!-- Primary nav -->
@@ -139,6 +142,7 @@
           <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">About</div>
           <div class="flex flex-col gap-3 pl-3">
             <a href="{% url 'about' %}">Anika</a>
+            <a href="{% url 'our-model' %}">Model</a>
             <a href="{% url 'impact' %}">Impact</a>
             <a href="{% url 'team' %}">Team</a>
             <a href="{% clerk_slugurl 'news' %}">News</a>

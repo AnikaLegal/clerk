@@ -46,10 +46,15 @@ export const NotifyTemplateForm: React.FC<NotifyTemplateFormProps> = ({
     setFieldValue,
   },
 }) => (
-  <Form onSubmit={handleSubmit} error={Object.keys(errors).length > 0}>
+  <Form
+    autoComplete="off"
+    onSubmit={handleSubmit}
+    error={Object.keys(errors).length > 0}
+  >
     <div className={`field ${errors.name && 'error'}`}>
       <label>Name</label>
       <Input
+        autoComplete="off"
         placeholder="Describe this notification"
         value={values.name}
         name="name"

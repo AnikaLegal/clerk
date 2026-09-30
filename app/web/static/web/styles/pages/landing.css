@@ -137,8 +137,10 @@ Landing page only styles.
 @media (max-width: 600px) {
   :root {
     --hero-curve-height: 46px;
-    /* FIXME: CHRISTMAS */
-    --hero-padding-top: -72px;
+    /* Cancels the header offset so the photo starts at the very top of the
+       page, behind the header, however tall the header is. The 30px is the
+       header's own top padding. */
+    --hero-padding-top: calc(30px - var(--header-height-total));
     --hero-padding-bottom: 0;
     --hero-small-image-height: 275px;
   }

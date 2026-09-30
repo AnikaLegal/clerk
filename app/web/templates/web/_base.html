@@ -5,7 +5,7 @@
 {% load wagtail_clerk %}
 {% load banner %}
 
-<html lang="en">
+<html lang="{% firstof page.locale.language_code 'en' %}">
   <head>
     <title>
       {% block supertitle %}
@@ -27,6 +27,10 @@
       <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'web/brand/social-card.png' %}" />
       <meta name="twitter:card" content="summary_large_image" />
     {% endblock %}
+    {% hreflang_alternates page as language_alternates %}
+    {% for language_code, url in language_alternates %}
+      <link rel="alternate" hreflang="{{ language_code }}" href="{{ url }}" />
+    {% endfor %}
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'web/brand/logo-icon-color.png' %}" />
     <!-- Google fonts -->

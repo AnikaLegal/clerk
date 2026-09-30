@@ -70,8 +70,12 @@ const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
       size="lg"
       title={props.title}
     >
-      <form onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}>
+      <form
+        autoComplete="off"
+        onSubmit={form.onSubmit(handleSubmit, handleValidationFailure)}
+      >
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('address')}
           key={form.key('address')}
           label="Address"
@@ -80,6 +84,7 @@ const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
           data-autofocus
         />
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('suburb')}
           key={form.key('suburb')}
           label="Suburb"
@@ -88,6 +93,7 @@ const MinimalTenancyFormModal = (props: MinimalTenancyFormModalProps) => {
           placeholder="Collingwood"
         />
         <TextInput
+          autoComplete="off"
           {...form.getInputProps('postcode')}
           key={form.key('postcode')}
           label="Postcode"

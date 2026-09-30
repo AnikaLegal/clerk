@@ -1,9 +1,25 @@
+# Keep the build context small and out of the images. Only app/, app/web/,
+# frontend/ and intake/ are copied by the Dockerfile; everything else is
+# context weight.
+.git/
 .github/
-app/.venv/
+.claude/
+.vscode/
 build/
 docs/
+docker/
 env/
-frontend/node_modules/
 infra/
-intake/node_modules/
+openapi/
+
+# Host-side artefacts under the copied directories.
+app/.venv/
+app/clerk/media/
+frontend/dist/
 intake/dist/
+**/node_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/test_media/
+**/.DS_Store
+**/*.log

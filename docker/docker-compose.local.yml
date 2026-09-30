@@ -2,13 +2,25 @@ services:
   # Local development database.
   clerk_db:
     container_name: clerk_db
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+    # Mount PGDATA itself. The image declares that path as a volume, so mounting
+    # its parent instead leaves the cluster in an anonymous volume that is lost
+    # whenever the container is recreated. PGDATA moved to
+    # /var/lib/postgresql/<major>/docker in Postgres 18, so this path has to
+    # change with the major version above.
     volumes:
-      - clerk_postgres_data:/var/lib/postgresql
+      - clerk_postgres_data:/var/lib/postgresql/data
     ports:
       - 25432:5432
+    # Over TCP so the check ignores the socket-only server the image runs
+    # while initialising a fresh volume.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   # Django webserver.
   web:
     command: bash /app/scripts/web/local.sh
@@ -26,12 +38,17 @@ services:
     # `uv sync` would fire change events and restart the dev server.
     tmpfs:
       - /app/.venv
-    links:
-      - clerk_db
-      - worker
-      - css
-      - frontend
-      - intake
+    depends_on:
+      clerk_db:
+        condition: service_healthy
+      worker:
+        condition: service_started
+      css:
+        condition: service_started
+      frontend:
+        condition: service_started
+      intake:
+        condition: service_started
     env_file:
       - ../env/dev.env
     environment:
@@ -46,8 +63,9 @@ services:
       - ../app:/app
     tmpfs:
       - /app/.venv # Hide the host venv, as above
-    links:
-      - clerk_db
+    depends_on:
+      clerk_db:
+        condition: service_healthy
     env_file:
       - ../env/dev.env
   # Tailwind/DaisyUI watcher for Django web app styles.
@@ -88,8 +106,9 @@ services:
       - ../app:/app
     tmpfs:
       - /app/.venv # Hide the host venv, as above
-    links:
-      - clerk_db
+    depends_on:
+      clerk_db:
+        condition: service_healthy
     env_file:
       - ../env/test.env
 volumes:

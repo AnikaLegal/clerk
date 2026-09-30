@@ -1,6 +1,8 @@
-from django.views import defaults
 from case.utils import render_react_page
 from django.conf import settings
+from django.db import DatabaseError, connection
+from django.http import HttpResponse
+from django.views import defaults
 
 
 def custom_403_handler(request, exception):
@@ -17,3 +19,17 @@ def custom_404_handler(request, exception):
         return render_react_page(request, "Not Found", "404", {}, status=404)
     else:
         return defaults.page_not_found(request, exception)
+
+
+def health_view(request):
+    """
+    Liveness check for the container orchestrator: OK only if the database can
+    be reached. Deliberately cheap and independent of site content.
+    """
+    try:
+        connection.ensure_connection()
+    except DatabaseError:
+        return HttpResponse(
+            "database unavailable", status=503, content_type="text/plain"
+        )
+    return HttpResponse("ok", content_type="text/plain")

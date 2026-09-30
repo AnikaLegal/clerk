@@ -67,7 +67,10 @@ export const InviteForm = ({
   }
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}>
+    <form
+      autoComplete="off"
+      onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}
+    >
       <TagsInput
         {...form.getInputProps('users')}
         key={form.key('users')}

@@ -61,6 +61,7 @@ const App = () => {
       <Grid mt="md">
         <Grid.Col span={6}>
           <TextInput
+            autoComplete="off"
             placeholder="Search by template name or subject..."
             rightSection={<IconSearch size={16} stroke={4} />}
             size="md"

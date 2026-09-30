@@ -6,6 +6,10 @@ ENV LANG=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONIOENCODING=UTF-8
+# Read by tzdata's debconf config script when it is installed below (as a
+# dependency) and neither /etc/localtime nor /etc/timezone exists yet, which is
+# the case on the stock Ubuntu image. That is what puts the container clock,
+# and so log timestamps, on Melbourne time. Removing it gives a UTC image.
 ENV TIMEZONE=Australia/Melbourne
 
 # PostgreSQL major version for the client tools (pg_dump, pg_restore, psql).
@@ -15,22 +19,23 @@ ARG POSTGRES_VERSION=16
 
 WORKDIR /app
 
-RUN echo "Updating apt sources" && \
-    apt-get -qq update
-
-# Install generic useful stuff.
+# Each install refreshes the package index in its own layer and drops it again:
+# a cached index layer goes stale, and a later rebuild then fetches packages
+# that are no longer there.
 # wget + curl: for HTTP debugging.
 # iputils-ping: for pinging things.
 # gnupg: for decrypting encrypted database backups during restore.
 # unzip: for extracting the AWS CLI installer below.
 RUN echo "Installing generic stuff" && \
+    apt-get -qq update && \
     apt-get -qq install \
     ca-certificates \
     curl \
     wget \
     iputils-ping \
     gnupg \
-    unzip
+    unzip && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install the AWS CLI, used by the database restore scripts in
 # app/scripts/tasks. The same pinned version as the server and the restore
@@ -54,4 +59,5 @@ RUN echo "Installing PostgreSQL $POSTGRES_VERSION client" && \
     apt-get -qq update && \
     apt-get -qq install \
     postgresql-client-$POSTGRES_VERSION \
-    postgresql-common
+    postgresql-common && \
+    rm -rf /var/lib/apt/lists/*
