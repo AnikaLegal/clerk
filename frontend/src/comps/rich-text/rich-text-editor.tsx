@@ -105,7 +105,6 @@ export const RichTextEditor = ({
   variant = 'default',
   initialContent,
   updateOnContentChange = false,
-  content,
   disabled,
   placeholder,
   onUpdate,
@@ -163,11 +162,19 @@ export const RichTextEditor = ({
   }, [editor, disabled])
 
   useEffect(() => {
-    onUpdate ? editor?.on('update', onUpdate) : editor?.off('update')
+    if (!editor || !onUpdate) return
+    editor.on('update', onUpdate)
+    return () => {
+      editor.off('update', onUpdate)
+    }
   }, [editor, onUpdate])
 
   useEffect(() => {
-    onBlur ? editor?.on('blur', onBlur) : editor?.off('blur')
+    if (!editor || !onBlur) return
+    editor.on('blur', onBlur)
+    return () => {
+      editor.off('blur', onBlur)
+    }
   }, [editor, onBlur])
 
   return (
