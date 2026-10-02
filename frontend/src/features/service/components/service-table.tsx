@@ -1,4 +1,5 @@
-import { Center, Loader, Paper, Table, Text } from '@mantine/core'
+import { Center, Group, Loader, Table, Text } from '@mantine/core'
+import { IconExclamationCircle } from '@tabler/icons-react'
 import api, { Issue, Service, ServiceCategory } from 'api'
 import { RichTextDisplay } from 'comps/rich-text'
 import { enqueueSnackbar } from 'notistack'
@@ -38,29 +39,7 @@ export const ServiceTable = ({
     }
   }, [result.isError, result.error, noun])
 
-  if (result.isLoading) {
-    return (
-      <Center m="sm">
-        <Loader />
-      </Center>
-    )
-  }
-  if (result.isError) {
-    return (
-      <Text c="red" ta="center" m="sm">
-        Could not load {noun} services
-      </Text>
-    )
-  }
-  if (!result.data || result.data.length == 0) {
-    return (
-      <Paper withBorder p="md" mt="lg">
-        <Text ta="center" c="dimmed">
-          No {noun} services exist for this case.
-        </Text>
-      </Paper>
-    )
-  }
+  const columnCount = COLUMNS[category].length + (canChange ? 1 : 0)
 
   return (
     <Table
@@ -79,18 +58,86 @@ export const ServiceTable = ({
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {result.data.map((service) => (
-          <ServiceTableRow
-            key={service.id}
-            issue={issue}
-            service={service}
-            canChange={canChange}
-          />
-        ))}
+        <ServiceTableBody
+          result={result}
+          issue={issue}
+          category={category}
+          canChange={canChange}
+          columnCount={columnCount}
+        />
       </Table.Tbody>
     </Table>
   )
 }
+
+interface ServiceTableBodyProps extends ServiceTableProps {
+  result: ReturnType<typeof api.useGetCaseServicesQuery>
+  columnCount: number
+}
+
+const ServiceTableBody = ({
+  result,
+  issue,
+  category,
+  canChange,
+  columnCount,
+}: ServiceTableBodyProps) => {
+  const noun = category.toLowerCase()
+
+  if (result.isError) {
+    return (
+      <MessageRow columnCount={columnCount}>
+        <Group justify="center" gap="xs" c="red">
+          <IconExclamationCircle />
+          <Text>Could not load {noun} services</Text>
+        </Group>
+      </MessageRow>
+    )
+  }
+  if (result.isLoading) {
+    return (
+      <MessageRow columnCount={columnCount}>
+        <Loader />
+      </MessageRow>
+    )
+  }
+
+  const services = result.data || []
+  if (services.length < 1) {
+    return (
+      <MessageRow columnCount={columnCount}>
+        No {noun} services found
+      </MessageRow>
+    )
+  }
+
+  return (
+    <>
+      {services.map((service) => (
+        <ServiceTableRow
+          key={service.id}
+          issue={issue}
+          service={service}
+          canChange={canChange}
+        />
+      ))}
+    </>
+  )
+}
+
+const MessageRow = ({
+  columnCount,
+  children,
+}: {
+  columnCount: number
+  children: React.ReactNode
+}) => (
+  <Table.Tr>
+    <Table.Td colSpan={columnCount}>
+      <Center m="sm">{children}</Center>
+    </Table.Td>
+  </Table.Tr>
+)
 
 const ServiceTableRow = ({
   issue,
