@@ -176,6 +176,7 @@ export const RichTextEditor = ({
       editor={editor}
       classNames={{
         content: `${classes1.content} ${classes2.content}`,
+        control: classes1.control,
       }}
       {...props}
     >
