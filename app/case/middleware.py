@@ -22,7 +22,8 @@ def anonymous_clerk_404_redirect_middleware(get_response):
     """
     Send logged-out users to login instead of showing a 404 under /clerk/, so
     they can't tell which paths exist. Done on the response because Django
-    bypasses handler404 when DEBUG is on.
+    bypasses handler404 when DEBUG is on. API clients expect an error status
+    rather than a redirect, so /clerk/api/ is excluded.
     """
 
     def middleware(request):
@@ -30,6 +31,7 @@ def anonymous_clerk_404_redirect_middleware(get_response):
         if (
             response.status_code == 404
             and request.path.startswith("/clerk/")
+            and not request.path.startswith("/clerk/api/")
             and not request.user.is_authenticated
         ):
             return redirect_to_login(request.get_full_path())

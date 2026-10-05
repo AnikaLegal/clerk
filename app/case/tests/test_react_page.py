@@ -36,6 +36,13 @@ def test_unknown_clerk_path_redirects_anonymous_user_to_login_in_debug(
 
 
 @pytest.mark.django_db
+def test_unknown_clerk_api_path_is_not_redirected_for_anonymous_user(client: Client):
+    response = client.get("/clerk/api/this/path/does/not/exist/")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_unknown_clerk_path_renders_404_page_for_authenticated_user(
     client: Client, user: User
 ):
