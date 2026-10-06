@@ -51,6 +51,14 @@ get:
       schema:
         type: string
       required: false
+    - name: person
+      in: query
+      description: >-
+        ID of a person who is the support worker, tenancy agent or tenancy
+        landlord on the case
+      schema:
+        type: integer
+      required: false
   responses:
     "200":
       description: Successful response.
@@ -82,6 +90,8 @@ get:
               - page_count
               - item_count
               - results
+    "400":
+      $ref: ../responses/BadRequest.yaml
 post:
   operationId: createCase
   requestBody:

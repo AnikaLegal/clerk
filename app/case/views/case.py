@@ -291,6 +291,12 @@ class CaseApiViewset(
                         search_query = part_query
 
                 queryset = queryset.filter(search_query)
+            elif key == "person":
+                queryset = queryset.filter(
+                    Q(support_worker=value)
+                    | Q(tenancy__agent=value)
+                    | Q(tenancy__landlord=value)
+                )
             else:
                 # Apply basic field filtering
                 queryset = queryset.filter(**{key: value})

@@ -145,6 +145,61 @@ def test_case_list_view__support_workers_do_not_add_queries(superuser_client):
     assert len(four_cases) == len(one_case)
 
 
+@pytest.mark.django_db
+def test_case_list_view__filter_by_person(superuser_client):
+    """
+    Filtering by person matches cases where they are the support worker, tenancy
+    agent or tenancy landlord
+    """
+    person = factories.PersonFactory()
+    as_support_worker = factories.IssueFactory(support_worker=person)
+    as_agent = factories.IssueFactory(tenancy__agent=person)
+    as_landlord = factories.IssueFactory(tenancy__landlord=person)
+    # Other people in those roles don't match
+    factories.IssueFactory(support_worker=factories.PersonFactory())
+
+    url = reverse("case-api-list")
+    response = superuser_client.get(url, {"person": person.pk})
+    assert response.status_code == 200
+    resp_data = response.json()
+    assert resp_data["item_count"] == 3
+    assert set(r["id"] for r in resp_data["results"]) == {
+        str(as_support_worker.pk),
+        str(as_agent.pk),
+        str(as_landlord.pk),
+    }
+
+
+@pytest.mark.django_db
+def test_case_list_view__filter_by_unknown_person(superuser_client):
+    factories.IssueFactory()
+    url = reverse("case-api-list")
+    response = superuser_client.get(url, {"person": 999999})
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_case_list_view__filter_by_person_as_paralegal(
+    paralegal_user_client,
+    paralegal_user,
+):
+    """
+    Filtering by person doesn't show a paralegal cases they aren't assigned to
+    """
+    person = factories.PersonFactory()
+    matching = factories.IssueFactory(paralegal=paralegal_user, support_worker=person)
+    # Assigned to the paralegal but doesn't involve the person
+    factories.IssueFactory(paralegal=paralegal_user)
+    # Involves the person but isn't assigned to the paralegal
+    factories.IssueFactory(support_worker=person)
+
+    url = reverse("case-api-list")
+    response = paralegal_user_client.get(url, {"person": person.pk})
+    assert response.status_code == 200
+    results = response.json()["results"]
+    assert [r["id"] for r in results] == [str(matching.pk)]
+
+
 # TODO: Test permissions and who can see which notes
 @pytest.mark.django_db
 def test_case_get_view(superuser_client):
