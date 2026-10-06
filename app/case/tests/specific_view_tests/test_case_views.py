@@ -7,6 +7,8 @@ from core import factories
 from core.models import Issue, IssueNote
 from core.models.issue import CaseStage
 from core.models.service import ServiceCategory
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from rest_framework.reverse import reverse
 
@@ -126,6 +128,21 @@ def test_case_list_view__search(superuser_client):
     results = resp_data["results"]
     assert len(results) == 1
     assert results[0]["id"] == str(issue_a.pk)
+
+
+@pytest.mark.django_db
+def test_case_list_view__support_workers_do_not_add_queries(superuser_client):
+    url = reverse("case-api-list")
+    factories.IssueFactory(support_worker=factories.PersonFactory())
+    with CaptureQueriesContext(connection) as one_case:
+        assert superuser_client.get(url).status_code == 200
+
+    for _ in range(3):
+        factories.IssueFactory(support_worker=factories.PersonFactory())
+    with CaptureQueriesContext(connection) as four_cases:
+        assert superuser_client.get(url).status_code == 200
+
+    assert len(four_cases) == len(one_case)
 
 
 # TODO: Test permissions and who can see which notes

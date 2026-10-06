@@ -240,7 +240,7 @@ class CaseApiViewset(
         user = self.request.user
         queryset = (
             Issue.objects.select_related(
-                "client", "tenancy__agent", "tenancy__landlord"
+                "client", "tenancy__agent", "tenancy__landlord", "support_worker"
             )
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
