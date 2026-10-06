@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Header } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
+import { ApiRequestError, toReportableError } from 'comps/error/api-error'
 
 interface SentryContext {
   dsn: string
@@ -21,7 +22,14 @@ export const logException = (error) => {
   if (SENTRY_CONTEXT.dsn) {
     // Send error report to Sentry, if it is enabled.
     console.log('Sending error report to Sentry.')
-    Sentry.captureException(error)
+    const reportable = toReportableError(error)
+    Sentry.captureException(
+      reportable,
+      // These errors share this boundary's stack, so group them by message.
+      reportable instanceof ApiRequestError
+        ? { fingerprint: [reportable.message] }
+        : undefined
+    )
   } else {
     console.log('Sentry not enabled.')
   }
