@@ -23,6 +23,16 @@ const describe = (error: FetchBaseQueryError) => {
   return error.status
 }
 
+// A server error, or an error page from the proxy or CDN in front of it.
+export const isServerError = (thrown: unknown) => {
+  if (!isQueryError(thrown)) {
+    return false
+  }
+  const status =
+    thrown.status === 'PARSING_ERROR' ? thrown.originalStatus : thrown.status
+  return typeof status === 'number' && status >= 500
+}
+
 // Pages throw an RTK Query error as the plain object it is, which Sentry can
 // only report as "Object captured as exception". Give those a real error with a
 // readable message and leave anything else as it was.

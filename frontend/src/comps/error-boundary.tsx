@@ -1,8 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Header } from 'semantic-ui-react'
+import { Button, Header } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
-import { ApiRequestError, toReportableError } from 'comps/error/api-error'
+import {
+  ApiRequestError,
+  isServerError,
+  toReportableError,
+} from 'comps/error/api-error'
 
 interface SentryContext {
   dsn: string
@@ -37,24 +41,47 @@ export const logException = (error) => {
 
 export class ErrorBoundary extends React.Component<
   { noRender?: boolean; children?: React.ReactNode | undefined },
-  { hasError: boolean }
+  { hasError: boolean; isServerDown: boolean }
 > {
   constructor(props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, isServerDown: false }
   }
 
   componentDidCatch(error) {
-    this.setState({ hasError: true })
-    logException(error)
+    const isServerDown = isServerError(error)
+    this.setState({ hasError: true, isServerDown })
+    // The backend reports its own errors, and an outage is for uptime
+    // monitoring to catch, so a server error is not reported from here.
+    if (!isServerDown) {
+      logException(error)
+    }
   }
 
   render() {
-    const { hasError } = this.state
+    const { hasError, isServerDown } = this.state
     const { noRender, children } = this.props
     if (hasError) {
       if (noRender) {
         return null
+      }
+      if (isServerDown) {
+        return (
+          <Error>
+            <div>
+              <Header>
+                Anika Legal isn't responding right now
+                <Header.Subheader>
+                  This usually clears up within a few minutes, for example after
+                  an update. Wait a moment, then reload the page. If it is still
+                  not working after ten minutes, let us know in the{' '}
+                  <strong>#tech</strong> channel.
+                </Header.Subheader>
+              </Header>
+              <Button onClick={() => window.location.reload()}>Reload</Button>
+            </div>
+          </Error>
+        )
       }
       return (
         <Error>
@@ -87,4 +114,15 @@ const Error = styled.div`
   align-items: center;
   padding: 0 16px;
   box-sizing: border-box;
+
+  .ui.header {
+    max-width: 36rem;
+  }
+  .ui.header .sub.header {
+    margin-top: 0.5em;
+  }
+  .ui.button {
+    display: block;
+    margin: 1em auto 0;
+  }
 `
