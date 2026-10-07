@@ -28,6 +28,16 @@ const json = (status: number, body: unknown) =>
 
 const networkError = () => new TypeError('Failed to fetch')
 
+// A response whose body stream fails part way, like a connection dropped
+// mid-download.
+const droppedBody = (status = 200) =>
+  new Response(
+    new ReadableStream({
+      start: (controller) => controller.error(networkError()),
+    }),
+    { status }
+  )
+
 // Lets every retry backoff elapse so a test can await the final result.
 const settle = async <T>(request: PromiseLike<T>) => {
   await vi.advanceTimersByTimeAsync(10_000)
@@ -123,5 +133,67 @@ describe('baseApi', () => {
       await settle(request)
       expect(fetchMock).toHaveBeenCalledTimes(1)
     })
+  })
+
+  describe('a response whose body fails to download', () => {
+    it('retries a query', async () => {
+      fetchMock
+        .mockResolvedValueOnce(droppedBody())
+        .mockResolvedValueOnce(json(200, { ok: true }))
+      const result = await settle(
+        makeStore().dispatch(api.endpoints.getThing.initiate())
+      )
+      expect(result.data).toEqual({ ok: true })
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('gives up after two retries', async () => {
+      fetchMock.mockImplementation(async () => droppedBody())
+      const result = await settle(
+        makeStore().dispatch(api.endpoints.getThing.initiate())
+      )
+      expect(result.error).toMatchObject({ status: 'PARSING_ERROR' })
+      expect(fetchMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('is not retried when the response was an error status', async () => {
+      fetchMock.mockImplementation(async () => droppedBody(500))
+      const result = await settle(
+        makeStore().dispatch(api.endpoints.getThing.initiate())
+      )
+      expect(result.error).toMatchObject({
+        status: 'PARSING_ERROR',
+        originalStatus: 500,
+      })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('is not retried for a mutation, which may have taken effect', async () => {
+      fetchMock.mockImplementation(async () => droppedBody())
+      const result = await settle(
+        makeStore().dispatch(api.endpoints.saveThing.initiate())
+      )
+      expect(result.error).toMatchObject({ status: 'PARSING_ERROR' })
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('a response that is not JSON', () => {
+    it.each([200, 502])(
+      'is not retried when the status is %i',
+      async (status) => {
+        fetchMock.mockImplementation(
+          async () => new Response('<html>Bad gateway</html>', { status })
+        )
+        const result = await settle(
+          makeStore().dispatch(api.endpoints.getThing.initiate())
+        )
+        expect(result.error).toMatchObject({
+          status: 'PARSING_ERROR',
+          originalStatus: status,
+        })
+        expect(fetchMock).toHaveBeenCalledTimes(1)
+      }
+    )
   })
 })
