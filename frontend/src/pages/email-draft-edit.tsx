@@ -45,8 +45,10 @@ const { case_pk, email_pk, case_email_url, email_preview_url } = (window as any)
 const App = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [updateEmail] = useUpdateEmailMutation()
-  const [deleteEmail] = useDeleteEmailMutation()
+  const [deleteEmail, deleteEmailResult] = useDeleteEmailMutation()
   const [deleteAttachment] = useDeleteEmailAttachmentMutation()
+  // True while the delete runs and until the redirect, so only Delete spins.
+  const isDeleting = deleteEmailResult.isLoading || deleteEmailResult.isSuccess
 
   const caseResult = useGetCaseQuery({ id: case_pk })
   const emailResult = useGetEmailQuery({ id: case_pk, emailId: email_pk })
@@ -263,7 +265,7 @@ const App = () => {
                 labelPosition="left"
                 type="submit"
                 disabled={isSubmitting}
-                loading={isSubmitting}
+                loading={isSubmitting && !isDeleting}
               >
                 <Icon name="mail" />
                 Send
@@ -275,7 +277,7 @@ const App = () => {
                 labelPosition="left"
                 type="submit"
                 disabled={isSubmitting}
-                loading={isSubmitting}
+                loading={isSubmitting && !isDeleting}
               >
                 <Icon name="save" />
                 Save
@@ -284,7 +286,6 @@ const App = () => {
 
             <Button
               disabled={isSubmitting}
-              loading={isSubmitting}
               href={email_preview_url}
               target="_blank"
             >
@@ -294,7 +295,7 @@ const App = () => {
               color="red"
               type="button"
               disabled={isSubmitting}
-              loading={isSubmitting}
+              loading={isDeleting}
               onClick={() => onDelete(setSubmitting)}
             >
               Delete
