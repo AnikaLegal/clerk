@@ -1,6 +1,6 @@
 import React from 'react'
-import styled from 'styled-components'
-import { Button, Header } from 'semantic-ui-react'
+import { Button, Center, Container, List, Stack, Text } from '@mantine/core'
+import { IconAlertTriangle, IconCloudOff } from '@tabler/icons-react'
 import * as Sentry from '@sentry/browser'
 import {
   ApiRequestError,
@@ -39,8 +39,37 @@ export const logException = (error) => {
   }
 }
 
+const ErrorMessage = ({
+  icon,
+  title,
+  compact,
+  children,
+}: {
+  icon: React.ReactNode
+  title: string
+  compact?: boolean
+  children: React.ReactNode
+}) => (
+  <Container size="xl">
+    <Center mih={compact ? undefined : '65vh'} py={compact ? 'xl' : undefined}>
+      <Stack align="center" gap="xs" maw="36rem">
+        {icon}
+        <Text size="lg">{title}</Text>
+        <Stack gap="xs" w="100%">
+          {children}
+        </Stack>
+      </Stack>
+    </Center>
+  </Container>
+)
+
 export class ErrorBoundary extends React.Component<
-  { noRender?: boolean; children?: React.ReactNode | undefined },
+  {
+    noRender?: boolean
+    // For a boundary around part of a page, where a full page height is too tall.
+    compact?: boolean
+    children?: React.ReactNode | undefined
+  },
   { hasError: boolean; isServerDown: boolean }
 > {
   constructor(props) {
@@ -60,69 +89,67 @@ export class ErrorBoundary extends React.Component<
 
   render() {
     const { hasError, isServerDown } = this.state
-    const { noRender, children } = this.props
+    const { noRender, compact, children } = this.props
     if (hasError) {
       if (noRender) {
         return null
       }
       if (isServerDown) {
         return (
-          <Error>
-            <div>
-              <Header>
-                Anika Legal isn't responding right now
-                <Header.Subheader>
-                  This usually clears up within a few minutes, for example after
-                  an update. Wait a moment, then reload the page. If it is still
-                  not working after ten minutes, let us know in the{' '}
-                  <strong>#tech</strong> channel.
-                </Header.Subheader>
-              </Header>
+          <ErrorMessage
+            icon={
+              <IconCloudOff
+                size={64}
+                stroke={1.75}
+                color="var(--mantine-color-dark-4)"
+              />
+            }
+            title="Clerk is temporarily unavailable"
+            compact={compact}
+          >
+            <Text>
+              This usually clears up within a few minutes. Reload the page in a
+              moment. If it's still down after ten minutes, let us know in{' '}
+              <Text span fw={700}>
+                #tech
+              </Text>
+              .
+            </Text>
+            <Center>
               <Button onClick={() => window.location.reload()}>Reload</Button>
-            </div>
-          </Error>
+            </Center>
+          </ErrorMessage>
         )
       }
       return (
-        <Error>
-          <Header>
-            Something broke, sorry!
-            <Header.Subheader>
-              Try refreshing the page. If it's still broken, let us know in the{' '}
-              <strong>#tech</strong> channel, noting:
-              <ul>
-                <li>The page and URL you were visiting</li>
-                <li>When the error occurred</li>
-                <li>What you were trying to do</li>
-                <li>What you expected to happen</li>
-                <li>What actually happened</li>
-              </ul>
-            </Header.Subheader>
-          </Header>
-        </Error>
+        <ErrorMessage
+          icon={
+            <IconAlertTriangle
+              size={64}
+              stroke={1.75}
+              color="var(--mantine-color-red-7)"
+            />
+          }
+          title="Something broke, sorry!"
+          compact={compact}
+        >
+          <Text>
+            Try refreshing the page. If it's still broken, let us know in the{' '}
+            <Text span fw={700}>
+              #tech
+            </Text>{' '}
+            channel, noting:
+          </Text>
+          <List>
+            <List.Item>The page and URL you were visiting</List.Item>
+            <List.Item>When the error occurred</List.Item>
+            <List.Item>What you were trying to do</List.Item>
+            <List.Item>What you expected to happen</List.Item>
+            <List.Item>What actually happened</List.Item>
+          </List>
+        </ErrorMessage>
       )
     }
     return children
   }
 }
-
-const Error = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  padding: 0 16px;
-  box-sizing: border-box;
-
-  .ui.header {
-    max-width: 36rem;
-  }
-  .ui.header .sub.header {
-    margin-top: 0.5em;
-  }
-  .ui.button {
-    display: block;
-    margin: 1em auto 0;
-  }
-`
