@@ -18,6 +18,9 @@ if (SENTRY_CONTEXT.dsn) {
   Sentry.init({
     dsn: SENTRY_CONTEXT.dsn,
     environment: SENTRY_CONTEXT.environment,
+    // Console output can include raw response bodies, so keep it out of the
+    // breadcrumbs.
+    integrations: [Sentry.breadcrumbsIntegration({ console: false })],
   })
 }
 
