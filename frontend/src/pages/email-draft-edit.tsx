@@ -88,7 +88,9 @@ const App = () => {
         )
       })
   }
-  const onSubmit = async (values, { setSubmitting, setErrors }) => {
+  // Not async: Formik would clear isSubmitting as soon as this returns, which
+  // re-enables the form while the request and redirect are still pending.
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
     setSubmitting(true)
     const ccAddresses = values.cc_addresses
       .split(',')
@@ -99,7 +101,10 @@ const App = () => {
     if (values.send) {
       // Send the email
       const confirmed = confirm('Send this email?')
-      if (!confirmed) return
+      if (!confirmed) {
+        setSubmitting(false)
+        return
+      }
       // Mark email for sending.
       requestData.state = 'READY_TO_SEND'
     }
