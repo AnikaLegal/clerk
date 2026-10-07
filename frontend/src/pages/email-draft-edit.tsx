@@ -287,6 +287,7 @@ const App = () => {
             </Button>
             <Button
               color="red"
+              type="button"
               disabled={isSubmitting}
               loading={isSubmitting}
               onClick={() => onDelete(setSubmitting)}
