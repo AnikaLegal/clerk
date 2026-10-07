@@ -1,12 +1,12 @@
 import React from 'react'
-import { Button, Center, Container, List, Stack, Text } from '@mantine/core'
-import { IconAlertTriangle, IconCloudOff } from '@tabler/icons-react'
 import * as Sentry from '@sentry/browser'
 import {
   ApiRequestError,
   isServerError,
   toReportableError,
 } from 'comps/error/api-error'
+import ServerError from 'comps/error/server-error'
+import UnexpectedError from 'comps/error/unexpected-error'
 
 interface SentryContext {
   dsn: string
@@ -39,117 +39,50 @@ export const logException = (error) => {
   }
 }
 
-const ErrorMessage = ({
-  icon,
-  title,
-  compact,
-  children,
-}: {
-  icon: React.ReactNode
-  title: string
+interface ErrorBoundaryProps {
+  noRender?: boolean
+  // Sized for a boundary around part of a page, not the full page height.
   compact?: boolean
-  children: React.ReactNode
-}) => (
-  <Container size="xl">
-    <Center mih={compact ? undefined : '65vh'} py={compact ? 'xl' : undefined}>
-      <Stack align="center" gap="xs" maw="36rem">
-        {icon}
-        <Text size="lg">{title}</Text>
-        <Stack gap="xs" w="100%">
-          {children}
-        </Stack>
-      </Stack>
-    </Center>
-  </Container>
-)
+  children?: React.ReactNode | undefined
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: unknown
+}
 
 export class ErrorBoundary extends React.Component<
-  {
-    noRender?: boolean
-    // For a boundary around part of a page, where a full page height is too tall.
-    compact?: boolean
-    children?: React.ReactNode | undefined
-  },
-  { hasError: boolean; isServerDown: boolean }
+  ErrorBoundaryProps,
+  ErrorBoundaryState
 > {
-  constructor(props) {
-    super(props)
-    this.state = { hasError: false, isServerDown: false }
+  state: ErrorBoundaryState = { hasError: false, error: undefined }
+
+  // Anything can be thrown, including undefined, so the flag is kept apart.
+  static getDerivedStateFromError(error: unknown) {
+    return { hasError: true, error }
   }
 
-  componentDidCatch(error) {
-    const isServerDown = isServerError(error)
-    this.setState({ hasError: true, isServerDown })
+  componentDidCatch(error: unknown) {
     // The backend reports its own errors, and an outage is for uptime
     // monitoring to catch, so a server error is not reported from here.
-    if (!isServerDown) {
+    if (!isServerError(error)) {
       logException(error)
     }
   }
 
   render() {
-    const { hasError, isServerDown } = this.state
+    const { hasError, error } = this.state
     const { noRender, compact, children } = this.props
-    if (hasError) {
-      if (noRender) {
-        return null
-      }
-      if (isServerDown) {
-        return (
-          <ErrorMessage
-            icon={
-              <IconCloudOff
-                size={64}
-                stroke={1.75}
-                color="var(--mantine-color-dark-4)"
-              />
-            }
-            title="Clerk is temporarily unavailable"
-            compact={compact}
-          >
-            <Text>
-              This usually clears up within a few minutes. Reload the page in a
-              moment. If it's still down after ten minutes, let us know in{' '}
-              <Text span fw={700}>
-                #tech
-              </Text>
-              .
-            </Text>
-            <Center>
-              <Button onClick={() => window.location.reload()}>Reload</Button>
-            </Center>
-          </ErrorMessage>
-        )
-      }
-      return (
-        <ErrorMessage
-          icon={
-            <IconAlertTriangle
-              size={64}
-              stroke={1.75}
-              color="var(--mantine-color-red-7)"
-            />
-          }
-          title="Something broke, sorry!"
-          compact={compact}
-        >
-          <Text>
-            Try refreshing the page. If it's still broken, let us know in the{' '}
-            <Text span fw={700}>
-              #tech
-            </Text>{' '}
-            channel, noting:
-          </Text>
-          <List>
-            <List.Item>The page and URL you were visiting</List.Item>
-            <List.Item>When the error occurred</List.Item>
-            <List.Item>What you were trying to do</List.Item>
-            <List.Item>What you expected to happen</List.Item>
-            <List.Item>What actually happened</List.Item>
-          </List>
-        </ErrorMessage>
-      )
+    if (!hasError) {
+      return children
     }
-    return children
+    if (noRender) {
+      return null
+    }
+    return isServerError(error) ? (
+      <ServerError compact={compact} />
+    ) : (
+      <UnexpectedError compact={compact} />
+    )
   }
 }
