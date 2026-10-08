@@ -508,6 +508,40 @@ Very similar to a story.
 }
 
 /*
+A group photo has to stay whole. It shrinks beside the text rather than
+overflowing and being clipped, and stacks above the text once the slot is too
+narrow to show everyone.
+*/
+.hero-story.group-photo .inner img {
+  min-width: 0;
+}
+@media (max-width: 1300px) {
+  .hero-story.group-photo {
+    height: unset;
+  }
+  .hero-story.group-photo.tall {
+    margin: 28px 0 20px 0;
+  }
+  .hero-story.group-photo .inner {
+    position: static;
+    height: unset;
+    flex-direction: column-reverse;
+    align-items: center;
+    width: 100vw;
+  }
+  .hero-story.group-photo .inner .content {
+    align-self: flex-start;
+    padding: var(--container-wide-padding);
+  }
+  .hero-story.group-photo .inner img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 635px;
+    border-top-left-radius: 0 !important;
+  }
+}
+
+/*
 A panel is a big yellow section of the page
 with a image on one side and text on the other.
 Very similar to a story.
