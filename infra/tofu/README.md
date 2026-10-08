@@ -1,8 +1,9 @@
 # OpenTofu
 
 Cloud resources described as code with [OpenTofu](https://opentofu.org).
-Today this covers only the resources behind the
-[restore check](../../docs/restore-check.md); the rest of the AWS account is
+Today this covers the resources behind the
+[restore check](../../docs/restore-check.md), the AWS Backup scheme and
+Clerk's Sentry uptime monitors and alerts; the rest of the AWS account is
 still console-managed and documented in [docs/infra.md](../../docs/infra.md)
 and [docs/backups.md](../../docs/backups.md). The intent is that new AWS
 resources are born here rather than made by hand, so they never need
@@ -18,6 +19,7 @@ Each directory is an independent root with its own remote state in the
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
 | `backup` | the [AWS Backup scheme](../../docs/backups.md): both vaults and the protected-bucket selection, imported from the console-built originals (the plan itself stays console-managed - see the file header for why) | admin, rarely | `backup/terraform.tfstate` |
 | `restore-check/foundations` | everything behind the [restore checks](../../docs/restore-check.md): schedules, Lambdas, the db check's ECS cluster/task definition and ECR repository, the S3 restore testing plans, IAM roles, Sentry cron monitors and alerts | admin, rarely | `restore-check/foundations/terraform.tfstate` |
+| `monitoring` | Clerk's Sentry uptime monitors and the alerts for outages and new issues - change them here, not in the Sentry UI | admin, when alerting changes | `monitoring/terraform.tfstate` |
 | `rehearsal` | the throwaway host for the [bi-annual restore rehearsal](../../docs/restore-check.md#bi-annually-full-rebuild-rehearsal), applied and destroyed per drill via `just rehearsal up`/`down` - holds nothing between drills | admin, twice a year | `rehearsal/terraform.tfstate` |
 
 ## One-time setup
