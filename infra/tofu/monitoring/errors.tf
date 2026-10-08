@@ -22,6 +22,7 @@ resource "sentry_alert" "errors" {
   action_filters = [
     {
       logic_type = "all"
+      conditions = []
       actions = [{
         sentry_app = {
           sentry_app_id = local.linear_app_id
@@ -49,6 +50,8 @@ resource "sentry_alert" "errors" {
           integration_id = data.sentry_organization_integration.slack.id
           channel_name   = each.value.slack_channel.name
           channel_id     = each.value.slack_channel.id
+          notes          = ""
+          tags           = ""
         }
       }]
     },

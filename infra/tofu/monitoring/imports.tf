@@ -25,7 +25,7 @@ locals {
 import {
   for_each = local.imported_monitor_ids
   to       = sentry_uptime_monitor.this[each.key]
-  id       = "${local.organization}/${each.value}"
+  id       = "${local.organization}/${local.monitors[each.key].project}/${each.value}"
 }
 
 import {

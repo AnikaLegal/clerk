@@ -54,12 +54,15 @@ resource "sentry_alert" "uptime" {
 
   action_filters = [{
     logic_type = "all"
+    conditions = []
     actions = [
       {
         slack = {
           integration_id = data.sentry_organization_integration.slack.id
           channel_name   = each.value.slack_channel.name
           channel_id     = each.value.slack_channel.id
+          notes          = ""
+          tags           = ""
         }
       },
       {
