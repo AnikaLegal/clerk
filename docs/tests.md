@@ -28,6 +28,23 @@ just test -i
 pytest -vv path/to/test.py
 ```
 
+### Frontend
+
+Frontend unit tests use vitest and run in the frontend docker container:
+
+```
+just test-frontend
+```
+
+To run a subset, pass part of a test file name:
+
+```
+just test-frontend baseApi
+```
+
+The container image needs to include vitest, so run `just build frontend` after
+pulling a change that adds a frontend dependency.
+
 ### Debugging
 
 To debug tests using vscode use the `--debug` flag to run the python `debugpy`

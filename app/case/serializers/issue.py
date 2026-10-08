@@ -1,5 +1,5 @@
 from accounts.models import User
-from core.models import Client, Issue, IssueDate, IssueNote, Service, Tenancy
+from core.models import Client, Issue, IssueDate, IssueNote, Person, Service, Tenancy
 from core.models.issue import CaseStage, EmploymentType, ReferrerType, IncomeRange
 from core.models.service import ServiceCategory
 from django.db import transaction
@@ -194,11 +194,15 @@ class IssueSearchSerializer(serializers.ModelSerializer):
             "lawyer",
             "paralegal",
             "client",
+            "person",
             "search",
         )
         extra_kwargs = {f: {"required": False} for f in fields}
 
     client = serializers.UUIDField(required=False)
+    person = serializers.PrimaryKeyRelatedField(
+        queryset=Person.objects.all(), required=False
+    )
     search = serializers.CharField(required=False)
 
 

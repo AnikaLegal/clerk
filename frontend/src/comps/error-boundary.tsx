@@ -1,7 +1,12 @@
 import React from 'react'
-import styled from 'styled-components'
-import { Header } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
+import {
+  ApiRequestError,
+  isServerError,
+  toReportableError,
+} from 'comps/error/api-error'
+import ServerError from 'comps/error/server-error'
+import UnexpectedError from 'comps/error/unexpected-error'
 
 interface SentryContext {
   dsn: string
@@ -13,6 +18,9 @@ if (SENTRY_CONTEXT.dsn) {
   Sentry.init({
     dsn: SENTRY_CONTEXT.dsn,
     environment: SENTRY_CONTEXT.environment,
+    // Console output can include raw response bodies, so keep it out of the
+    // breadcrumbs.
+    integrations: [Sentry.breadcrumbsIntegration({ console: false })],
   })
 }
 
@@ -21,62 +29,63 @@ export const logException = (error) => {
   if (SENTRY_CONTEXT.dsn) {
     // Send error report to Sentry, if it is enabled.
     console.log('Sending error report to Sentry.')
-    Sentry.captureException(error)
+    const reportable = toReportableError(error)
+    Sentry.captureException(
+      reportable,
+      // These errors share this boundary's stack, so group them by message.
+      reportable instanceof ApiRequestError
+        ? { fingerprint: [reportable.message] }
+        : undefined
+    )
   } else {
     console.log('Sentry not enabled.')
   }
 }
 
+interface ErrorBoundaryProps {
+  noRender?: boolean
+  // Sized for a boundary around part of a page, not the full page height.
+  compact?: boolean
+  children?: React.ReactNode | undefined
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: unknown
+}
+
 export class ErrorBoundary extends React.Component<
-  { noRender?: boolean; children?: React.ReactNode | undefined },
-  { hasError: boolean }
+  ErrorBoundaryProps,
+  ErrorBoundaryState
 > {
-  constructor(props) {
-    super(props)
-    this.state = { hasError: false }
+  state: ErrorBoundaryState = { hasError: false, error: undefined }
+
+  // Anything can be thrown, including undefined, so the flag is kept apart.
+  static getDerivedStateFromError(error: unknown) {
+    return { hasError: true, error }
   }
 
-  componentDidCatch(error) {
-    this.setState({ hasError: true })
-    logException(error)
+  componentDidCatch(error: unknown) {
+    // The backend reports its own errors, and an outage is for uptime
+    // monitoring to catch, so a server error is not reported from here.
+    if (!isServerError(error)) {
+      logException(error)
+    }
   }
 
   render() {
-    const { hasError } = this.state
-    const { noRender, children } = this.props
-    if (hasError) {
-      if (noRender) {
-        return null
-      }
-      return (
-        <Error>
-          <Header>
-            Something broke, sorry!
-            <Header.Subheader>
-              Try refreshing the page. If it's still broken, let us know in the{' '}
-              <strong>#tech</strong> channel, noting:
-              <ul>
-                <li>The page and URL you were visiting</li>
-                <li>When the error occurred</li>
-                <li>What you were trying to do</li>
-                <li>What you expected to happen</li>
-                <li>What actually happened</li>
-              </ul>
-            </Header.Subheader>
-          </Header>
-        </Error>
-      )
+    const { hasError, error } = this.state
+    const { noRender, compact, children } = this.props
+    if (!hasError) {
+      return children
     }
-    return children
+    if (noRender) {
+      return null
+    }
+    return isServerError(error) ? (
+      <ServerError compact={compact} />
+    ) : (
+      <UnexpectedError compact={compact} />
+    )
   }
 }
-
-const Error = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  padding: 0 16px;
-  box-sizing: border-box;
-`

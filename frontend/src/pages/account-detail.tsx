@@ -247,7 +247,7 @@ const MicrosoftAccountAccessTabsPanel = ({
 }: AccountTabsPanelProps) => {
   return (
     <TabPanelWithBorder {...props}>
-      <ErrorBoundary>
+      <ErrorBoundary compact>
         <MicrosoftAccountAccess account={account} />
       </ErrorBoundary>
     </TabPanelWithBorder>

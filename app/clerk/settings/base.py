@@ -93,6 +93,7 @@ MIDDLEWARE = [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "web.middleware.RedirectMiddleware",
     "case.middleware.annotate_group_access_middleware",
+    "case.middleware.anonymous_clerk_404_redirect_middleware",
     "django.middleware.locale.LocaleMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
 ]

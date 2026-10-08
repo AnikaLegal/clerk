@@ -264,6 +264,11 @@ test interactive="" debug="" *FLAGS:
     fi
     {{compose}} run --rm $debug_args test $cmd
 
+# Run the frontend (vitest) tests in the frontend container; extra args pass through to vitest
+[arg("FLAGS", help="Args passed to vitest, e.g. part of a test file name (dashed flags after --)")]
+test-frontend *FLAGS:
+    {{compose}} run --rm frontend npm test -- {{FLAGS}}
+
 # Obfuscate personally identifiable info
 [arg("debug", long="debug", short="d", value="1", help="Run under debugpy on port 8123")]
 obfuscate debug="":
