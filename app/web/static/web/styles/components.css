@@ -314,9 +314,11 @@ Each image/icon can have some descriptive test below it.
   .card-grid .card {
     max-width: 100%;
   }
+  .card-grid .card:has(> img:not(.icon)) {
+    max-width: 344px;
+  }
   .card-grid .card img {
-    width: calc(100vw - 2 * var(--container-padding));
-    max-height: 130px;
+    width: 100%;
     object-fit: cover;
     margin-bottom: 6px;
   }
