@@ -1,4 +1,8 @@
+from datetime import date, timedelta
+
 import pytest
+
+from office.factories import ClosureFactory
 
 INTAKE_PATHS = [
     "/intake/",
@@ -68,3 +72,25 @@ def test_intake_page_hides_get_free_help_cta(client):
     """
     content = client.get("/intake/").content.decode()
     assert "Get free help</button>" not in content
+
+
+@pytest.mark.django_db
+def test_intake_page_shows_office_closure_notice(client):
+    """
+    An active office closure is announced on the intake pages as it is on the
+    website: the form is where someone most needs to know a reply will wait.
+    """
+    ClosureFactory(
+        template__notice_html="We are closed until {reopen_date}.",
+        close_date=date.today() - timedelta(days=1),
+        reopen_date=date.today() + timedelta(days=7),
+    )
+    content = client.get("/intake/").content.decode()
+    assert 'id="closure-notice"' in content
+    assert "We are closed until" in content
+
+
+@pytest.mark.django_db
+def test_intake_page_without_closure_has_no_notice(client):
+    content = client.get("/intake/").content.decode()
+    assert 'id="closure-notice"' not in content

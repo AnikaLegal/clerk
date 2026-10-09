@@ -1,4 +1,4 @@
-{% load static django_vite analytics %}
+{% load static django_vite analytics notice %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,6 +22,7 @@
   {% vite_asset 'main.tsx' app="intake" %}
 </head>
 <body>
+  {% notice %}
   {% include 'web/snippets/_navbar.html' %}
   <div id="app"></div>
   {% include 'web/snippets/_footer.html' %}
