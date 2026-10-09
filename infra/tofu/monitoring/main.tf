@@ -13,11 +13,11 @@ terraform {
 
   required_providers {
     sentry = {
-      # Provider versions 0.15.5 to 0.15.8 import an uptime monitor without
-      # its project, which forces a replacement: stay on 0.15.4 while
-      # imports.tf exists.
+      # Import uptime monitors with 0.15.4: provider versions 0.15.5 to
+      # 0.15.8 import them without their project, which forces a
+      # replacement.
       source  = "jianyuan/sentry"
-      version = "0.15.4"
+      version = "~> 0.15"
     }
   }
 
