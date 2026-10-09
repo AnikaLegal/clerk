@@ -53,6 +53,13 @@ jobs:
       - name: Run unit tests
         run: docker compose -f docker/docker-compose.ci.yml run --rm test  pytest -vv
 
+      # Run frontend unit tests in the frontend stage of the same Dockerfile, the
+      # image the local frontend container is built from
+      - name: Run frontend unit tests
+        run: |
+          docker build --target frontend-deps -t "clerk-frontend:ci" -f docker/Dockerfile .
+          docker run --rm clerk-frontend:ci npm test
+
       # Publish the image the Deploy workflow will pull. Pull request runs only
       # test. Pushes to develop and master publish, as does running this
       # workflow manually on a branch, which is how a feature branch is put on

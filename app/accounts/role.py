@@ -2,11 +2,24 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from accounts.models import CaseGroups
 from django.db.models import prefetch_related_objects
+
+from accounts.models import CaseGroups
 
 if TYPE_CHECKING:
     from accounts.models import User
+
+
+ROLE_FLAGS = (
+    "is_admin",
+    "is_coordinator",
+    "is_lawyer",
+    "is_paralegal",
+    "is_admin_or_better",
+    "is_coordinator_or_better",
+    "is_lawyer_or_better",
+    "is_paralegal_or_better",
+)
 
 
 class UserRole:
@@ -62,15 +75,8 @@ class UserRole:
         paralegal, coordinator etc.) & the comparative level of their role.
         """
         role = UserRole(user)
-        setattr(user, "is_admin", role.is_admin)
-        setattr(user, "is_coordinator", role.is_coordinator)
-        setattr(user, "is_lawyer", role.is_lawyer)
-        setattr(user, "is_paralegal", role.is_paralegal)
-
-        setattr(user, "is_admin_or_better", role.is_admin_or_better)
-        setattr(user, "is_coordinator_or_better", role.is_coordinator_or_better)
-        setattr(user, "is_lawyer_or_better", role.is_lawyer_or_better)
-        setattr(user, "is_paralegal_or_better", role.is_paralegal_or_better)
+        for flag in ROLE_FLAGS:
+            setattr(user, flag, getattr(role, flag))
 
     def reset(self):
         self._group_names = set()

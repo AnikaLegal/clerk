@@ -1,8 +1,9 @@
 # OpenTofu
 
 Cloud resources described as code with [OpenTofu](https://opentofu.org).
-Today this covers only the resources behind the
-[restore check](../../docs/restore-check.md); the rest of the AWS account is
+Today this covers the resources behind the
+[restore check](../../docs/restore-check.md), the AWS Backup scheme and
+Clerk's Sentry uptime monitors and alerts; the rest of the AWS account is
 still console-managed and documented in [docs/infra.md](../../docs/infra.md)
 and [docs/backups.md](../../docs/backups.md). The intent is that new AWS
 resources are born here rather than made by hand, so they never need
@@ -18,6 +19,7 @@ Each directory is an independent root with its own remote state in the
 | `bootstrap` | the state bucket itself | admin, once ever | `bootstrap/terraform.tfstate` |
 | `backup` | the [AWS Backup scheme](../../docs/backups.md): both vaults and the protected-bucket selection, imported from the console-built originals (the plan itself stays console-managed - see the file header for why) | admin, rarely | `backup/terraform.tfstate` |
 | `restore-check/foundations` | everything behind the [restore checks](../../docs/restore-check.md): schedules, Lambdas, the db check's ECS cluster/task definition and ECR repository, the S3 restore testing plans, IAM roles, Sentry cron monitors and alerts | admin, rarely | `restore-check/foundations/terraform.tfstate` |
+| `monitoring` | Clerk's Sentry uptime monitors and the alerts for outages and new issues - change them here, not in the Sentry UI | admin, when alerting changes | `monitoring/terraform.tfstate` |
 | `rehearsal` | the throwaway host for the [bi-annual restore rehearsal](../../docs/restore-check.md#bi-annually-full-rebuild-rehearsal), applied and destroyed per drill via `just rehearsal up`/`down` - holds nothing between drills | admin, twice a year | `rehearsal/terraform.tfstate` |
 
 ## One-time setup
@@ -26,8 +28,9 @@ Each directory is an independent root with its own remote state in the
    creates, so the first apply runs on local state and is then migrated -
    the steps are in the header of [bootstrap/main.tf](bootstrap/main.tf).
 2. Create the Sentry internal integration whose token OpenTofu uses to
-   manage the restore check's cron monitor and alert rule. Once, in the
-   Sentry UI, as an org Owner or Manager:
+   manage Sentry: the restore check's cron monitors and alerts, and the
+   `monitoring` root's uptime monitors and alerts. Once, in the Sentry UI,
+   as an org Owner or Manager:
    1. Settings > Developer Settings > Custom Integrations > Create New
       Integration > Internal Integration.
    2. Name it `Clerk OpenTofu`. Leave everything else empty - no webhook URL,
@@ -54,9 +57,9 @@ Each directory is an independent root with its own remote state in the
       screen if one ever leaks. The auto-generated client secret is for
       verifying webhook signatures and is not used here - no need to
       save it.
-3. Apply `restore-check/foundations` with admin AWS credentials and the
-   Sentry token exported: `export SENTRY_AUTH_TOKEN=...` (plan and apply
-   need it; validate does not).
+3. Apply `restore-check/foundations` and `monitoring` with admin AWS
+   credentials and the Sentry token exported: `export SENTRY_AUTH_TOKEN=...`
+   (plan and apply need it; validate does not).
 4. Create the SecureString parameters by hand, so no secret ever enters
    state or the public repo - each check's parameters and the commands
    are in the headers of the per-check files in
@@ -75,4 +78,5 @@ Each directory is an independent root with its own remote state in the
   URL at run time. State is readable to anyone with access to the state
   bucket (and this repo is public), so treat both accordingly.
 - Never `tofu destroy` in `bootstrap` or `foundations` unless
-  decommissioning the restore check entirely.
+  decommissioning the restore check entirely, nor in `monitoring`, which
+  would delete Clerk's live Sentry monitors and alerts and their history.

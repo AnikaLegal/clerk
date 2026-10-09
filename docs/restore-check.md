@@ -69,9 +69,10 @@ Operating it:
   `just restore-check db-image` - the task pulls `:latest`, so the push
   alone deploys it. Changes to db-lambda.py, report.py or the tofu need a
   foundations apply instead.
-- **Alerting**: Slack carries every run's result table; Sentry alerts
-  when a run is missed, times out, or fails. The monitor's schedule
-  mirrors the EventBridge schedule in tofu - change both together.
+- **Alerting**: Slack carries every run's result table; Sentry posts to
+  #sentry in Slack when a run is missed, times out, or fails. The
+  monitor's schedule mirrors the EventBridge schedule in tofu - change
+  both together.
 
 ## Monthly: automated S3 restore check
 

@@ -29,8 +29,9 @@ locals {
   passphrase_parameter = "/backup/passphrase"
   sentry_parameter     = "/restore-check-db/sentry-cron-url"
 
-  sentry_organization = "anika-legal"
-  sentry_project      = "clerk"
+  sentry_organization  = "anika-legal"
+  sentry_project       = "clerk"
+  sentry_alert_channel = "#sentry"
 }
 
 # --- Task networking: no ingress at all, egress for S3/ECR/logs --------------
@@ -445,7 +446,7 @@ resource "sentry_cron_monitor" "db" {
 
 resource "sentry_alert" "db" {
   organization      = local.sentry_organization
-  name              = local.db_name
+  name              = "Backups: monthly database restore check"
   monitor_ids       = [sentry_cron_monitor.db.id]
   frequency_minutes = 1440
 
@@ -457,9 +458,11 @@ resource "sentry_alert" "db" {
   action_filters = [{
     logic_type = "all"
     actions = [{
-      email = {
-        target_type      = "issue_owners"
-        fallthrough_type = "AllMembers"
+      slack = {
+        integration_id = data.sentry_organization_integration.slack.id
+        channel_name   = local.sentry_alert_channel
+        notes          = ""
+        tags           = ""
       }
     }]
   }]

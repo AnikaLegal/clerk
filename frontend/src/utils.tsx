@@ -86,7 +86,7 @@ export const mount = (App: React.ComponentType) => {
     <Provider store={store}>
       <SnackbarProvider maxSnack={3}>
         <MantineProvider theme={theme}>
-          <DatesProvider settings={{ locale: 'en-au' }}>
+          <DatesProvider settings={{ locale: 'en-au', consistentWeeks: true }}>
             <ModalsProvider>
               <ErrorBoundary>
                 <FadeInOnLoad>
