@@ -28,8 +28,9 @@ Each directory is an independent root with its own remote state in the
    creates, so the first apply runs on local state and is then migrated -
    the steps are in the header of [bootstrap/main.tf](bootstrap/main.tf).
 2. Create the Sentry internal integration whose token OpenTofu uses to
-   manage the restore check's cron monitor and alert rule. Once, in the
-   Sentry UI, as an org Owner or Manager:
+   manage Sentry: the restore check's cron monitors and alerts, and the
+   `monitoring` root's uptime monitors and alerts. Once, in the Sentry UI,
+   as an org Owner or Manager:
    1. Settings > Developer Settings > Custom Integrations > Create New
       Integration > Internal Integration.
    2. Name it `Clerk OpenTofu`. Leave everything else empty - no webhook URL,
@@ -56,9 +57,9 @@ Each directory is an independent root with its own remote state in the
       screen if one ever leaks. The auto-generated client secret is for
       verifying webhook signatures and is not used here - no need to
       save it.
-3. Apply `restore-check/foundations` with admin AWS credentials and the
-   Sentry token exported: `export SENTRY_AUTH_TOKEN=...` (plan and apply
-   need it; validate does not).
+3. Apply `restore-check/foundations` and `monitoring` with admin AWS
+   credentials and the Sentry token exported: `export SENTRY_AUTH_TOKEN=...`
+   (plan and apply need it; validate does not).
 4. Create the SecureString parameters by hand, so no secret ever enters
    state or the public repo - each check's parameters and the commands
    are in the headers of the per-check files in
@@ -77,4 +78,5 @@ Each directory is an independent root with its own remote state in the
   URL at run time. State is readable to anyone with access to the state
   bucket (and this repo is public), so treat both accordingly.
 - Never `tofu destroy` in `bootstrap` or `foundations` unless
-  decommissioning the restore check entirely.
+  decommissioning the restore check entirely, nor in `monitoring`, which
+  would delete Clerk's live Sentry monitors and alerts and their history.
