@@ -240,7 +240,7 @@ class CaseApiViewset(
         user = self.request.user
         queryset = (
             Issue.objects.select_related(
-                "client", "tenancy__agent", "tenancy__landlord"
+                "client", "tenancy__agent", "tenancy__landlord", "support_worker"
             )
             .prefetch_related("paralegal__groups", "lawyer__groups")
             .order_by("-created_at")
@@ -291,6 +291,12 @@ class CaseApiViewset(
                         search_query = part_query
 
                 queryset = queryset.filter(search_query)
+            elif key == "person":
+                queryset = queryset.filter(
+                    Q(support_worker=value)
+                    | Q(tenancy__agent=value)
+                    | Q(tenancy__landlord=value)
+                )
             else:
                 # Apply basic field filtering
                 queryset = queryset.filter(**{key: value})

@@ -18,6 +18,7 @@ const injectedRtkApi = api.injectEndpoints({
           paralegal: queryArg.paralegal,
           lawyer: queryArg.lawyer,
           client: queryArg.client,
+          person: queryArg.person,
         },
       }),
     }),
@@ -521,6 +522,8 @@ export type GetCasesApiArg = {
   paralegal?: string;
   lawyer?: string;
   client?: string;
+  /** ID of a person who is the support worker, tenancy agent or tenancy landlord on the case */
+  person?: number;
 };
 export type CreateCaseApiResponse =
   /** status 201 Successful response. */ IssueRead;

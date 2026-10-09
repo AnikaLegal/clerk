@@ -234,6 +234,12 @@ paths:
           schema:
             type: string
           required: false
+        - name: person
+          in: query
+          description: ID of a person who is the support worker, tenancy agent or tenancy landlord on the case
+          schema:
+            type: integer
+          required: false
       responses:
         "200":
           description: Successful response.
@@ -265,6 +271,8 @@ paths:
                   - page_count
                   - item_count
                   - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
     post:
       operationId: createCase
       requestBody:

@@ -3,3 +3,9 @@
     padding: var(--mantine-spacing-xs);
   }
 }
+
+/* Lift the focused control so the focus ring is not covered by its neighbours. */
+.control:focus-visible {
+  position: relative;
+  z-index: 1;
+}

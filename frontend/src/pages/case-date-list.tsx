@@ -170,7 +170,7 @@ const CaseDateTable = ({ issue }: CaseDateTableProps) => {
       <Table.Th>Hearing location</Table.Th>
       <Table.Th>Notes</Table.Th>
       <Table.Th>Reviewed?</Table.Th>
-      <Table.Th></Table.Th>
+      <Table.Th w="1%"></Table.Th>
     </Table.Tr>
   )
 
@@ -210,7 +210,7 @@ const DateTableDataRow = ({ date }: { date: IssueDate }) => {
       <DateTableHearingLocationCell date={date} />
       <DateTableNotesCell date={date} />
       <DateTableIsReviewedCell date={date} />
-      <Table.Td>
+      <Table.Td w="1%">
         <Center>
           <DateActionIconGroup date={date} user={CONTEXT.user} />
         </Center>

@@ -199,20 +199,6 @@ BOARD = [
         ],
     },
     {
-        "image": "web/img/photos/board/jacinta.webp",
-        "name": "Jacinta Lewin",
-        "title": "Board Member",
-        "linkedin": "https://www.linkedin.com/in/jacinta-lewin-0675a156/",
-        "brags": [
-            """Jacinta brings experience in governance, business, human rights
-            and administrative law. She is a Principal Lawyer in Maurice
-            Blackburn Lawyers' Social Justice Practice, a board member of the
-            Victoria Legal Services Board + Commissioner, and has Board director
-            and Committee member experience in Social Security Rights Victoria
-            and the Law Institute of Victoria respectively."""
-        ],
-    },
-    {
         "image": "web/img/photos/board/peter-dikranis.webp",
         "name": "Peter Dikranis",
         "title": "Treasurer",

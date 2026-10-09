@@ -47,31 +47,25 @@ const App = () => {
   const [updateEmail] = useUpdateEmailMutation()
   const [deleteEmail, deleteEmailResult] = useDeleteEmailMutation()
   const [deleteAttachment] = useDeleteEmailAttachmentMutation()
+  // True while the delete runs and until the redirect, so only Delete spins.
+  const isDeleting = deleteEmailResult.isLoading || deleteEmailResult.isSuccess
 
   const caseResult = useGetCaseQuery({ id: case_pk })
   const emailResult = useGetEmailQuery({ id: case_pk, emailId: email_pk })
 
-  if (
-    caseResult.isLoading ||
-    emailResult.isLoading ||
-    /* Awaiting deletion to complete. We get a render after deleting an email but
-     * before redirecting. The email query will fail, so we return null to avoid
-     * an error. This doesn't matter because we redirect immediately.
-     *
-     * TODO: This is messy, we shouldn't make a query for an email we know is
-     * deleted; refactor so that it isn't necessary. */
-    deleteEmailResult.isLoading ||
-    deleteEmailResult.isSuccess
-  ) {
+  if (caseResult.isLoading || emailResult.isLoading) {
     return null
   }
-  if (caseResult.isError) {
+  // A refetch that fails keeps the data it had, e.g. when the page redirects
+  // away mid-request or a save fails because the email was deleted elsewhere.
+  // Only a query that never loaded is fatal.
+  if (caseResult.isError && !caseResult.data) {
     throw caseResult.error
   }
-  if (emailResult.isError) {
+  if (emailResult.isError && !emailResult.data) {
     throw emailResult.error
   }
-  if (!caseResult.isSuccess || !emailResult.isSuccess) {
+  if (!caseResult.data || !emailResult.data) {
     throw new Error('Unexpected query state')
   }
 
@@ -96,7 +90,9 @@ const App = () => {
         )
       })
   }
-  const onSubmit = async (values, { setSubmitting, setErrors }) => {
+  // Not async: Formik would clear isSubmitting as soon as this returns, which
+  // re-enables the form while the request and redirect are still pending.
+  const onSubmit = (values, { setSubmitting, setErrors }) => {
     setSubmitting(true)
     const ccAddresses = values.cc_addresses
       .split(',')
@@ -107,7 +103,10 @@ const App = () => {
     if (values.send) {
       // Send the email
       const confirmed = confirm('Send this email?')
-      if (!confirmed) return
+      if (!confirmed) {
+        setSubmitting(false)
+        return
+      }
       // Mark email for sending.
       requestData.state = 'READY_TO_SEND'
     }
@@ -266,7 +265,7 @@ const App = () => {
                 labelPosition="left"
                 type="submit"
                 disabled={isSubmitting}
-                loading={isSubmitting}
+                loading={isSubmitting && !isDeleting}
               >
                 <Icon name="mail" />
                 Send
@@ -278,7 +277,7 @@ const App = () => {
                 labelPosition="left"
                 type="submit"
                 disabled={isSubmitting}
-                loading={isSubmitting}
+                loading={isSubmitting && !isDeleting}
               >
                 <Icon name="save" />
                 Save
@@ -287,7 +286,6 @@ const App = () => {
 
             <Button
               disabled={isSubmitting}
-              loading={isSubmitting}
               href={email_preview_url}
               target="_blank"
             >
@@ -295,8 +293,9 @@ const App = () => {
             </Button>
             <Button
               color="red"
+              type="button"
               disabled={isSubmitting}
-              loading={isSubmitting}
+              loading={isDeleting}
               onClick={() => onDelete(setSubmitting)}
             >
               Delete
