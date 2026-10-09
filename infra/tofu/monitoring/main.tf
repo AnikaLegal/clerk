@@ -36,8 +36,8 @@ provider "sentry" {}
 locals {
   organization = "anika-legal"
 
-  # The tech@ Sentry user. Alerts email it directly: it has issue alert
-  # notifications turned off, which silences team-addressed email.
+  # The tech@ Sentry user. Alerts email it directly rather than a team, so
+  # delivery follows that one user's Issue Alerts setting.
   tech_user_id = "441920"
 
   # The Linear Sentry app, and the Tech team and Triage status the issues
