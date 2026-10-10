@@ -376,10 +376,10 @@ def test_person_api_list_perms(
         ("unprivileged_user", CaseRole.NONE, 403),
         ("unprivileged_user", CaseRole.PARALEGAL, 403),
         ("unprivileged_user", CaseRole.LAWYER, 403),
-        ("paralegal_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("paralegal_user", CaseRole.NONE, 403),
         ("paralegal_user", CaseRole.PARALEGAL, 200),
-        ("paralegal_user", CaseRole.LAWYER, 200),  # TODO: fix - should be 403.
-        ("lawyer_user", CaseRole.NONE, 200),  # TODO: fix - should be 403.
+        ("paralegal_user", CaseRole.LAWYER, 403),
+        ("lawyer_user", CaseRole.NONE, 403),
         ("lawyer_user", CaseRole.PARALEGAL, 200),
         ("lawyer_user", CaseRole.LAWYER, 200),
         ("coordinator_user", CaseRole.NONE, 200),
