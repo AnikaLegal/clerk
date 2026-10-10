@@ -15,6 +15,7 @@ from case.utils.react import render_react_page
 
 from .auth import (
     CoordinatorOrBetterCanWritePermission,
+    ParalegalOrBetterObjectPermission,
     coordinator_or_better_required,
     paralegal_or_better_required,
 )
@@ -61,7 +62,10 @@ class PersonApiViewset(ModelViewSet):
     queryset = Person.objects.order_by("full_name").all()
     serializer_class = PersonSerializer
     pagination_class = PersonPaginator
-    permission_classes = [CoordinatorOrBetterCanWritePermission]
+    permission_classes = [
+        CoordinatorOrBetterCanWritePermission,
+        ParalegalOrBetterObjectPermission,
+    ]
 
     def get_queryset(self):
         queryset = super().get_queryset()
