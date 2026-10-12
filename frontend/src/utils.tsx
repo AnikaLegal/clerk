@@ -8,10 +8,10 @@ import { SnackbarProvider } from 'notistack'
 import React, { useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
-import { Converter, setFlavor } from 'showdown'
 import slackifyMarkdown from 'slackify-markdown'
 import styled from 'styled-components'
-import xss, { OnTagAttrHandler } from 'xss'
+
+import { markdownToHtml } from 'markdown-to-html'
 
 import { DatesProvider } from '@mantine/dates'
 import 'dayjs/locale/en-au'
@@ -30,9 +30,6 @@ const theme = createTheme({
   fontFamily: "Lato,'Helvetica Neue',Arial,Helvetica,sans-serif",
 })
 
-const converter = new Converter()
-setFlavor('github')
-
 export const MarkdownAsHtmlDisplay = ({ markdown, ...props }) => (
   <div
     dangerouslySetInnerHTML={{ __html: markdownToHtml(markdown) }}
@@ -47,26 +44,7 @@ export const markdownToSlackyMarkdown = (markdownText) => {
   return slackyMarkdown
 }
 
-/* It is safe to allow the HTML class attribute. See
- * https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html#safe-sinks
- * We allow this for styling.
- */
-const ignoreTagAttrHandler: OnTagAttrHandler = (
-  tag,
-  name,
-  value,
-  isWhiteAttr
-) => {
-  if (name == 'class') {
-    return `${name}="${value}"`
-  }
-}
-
-export const markdownToHtml = (markdownText) => {
-  const html = converter.makeHtml(markdownText)
-  // Sanitise HTML removing <script> tags and the like.
-  return xss(html, { onIgnoreTagAttr: ignoreTagAttrHandler })
-}
+export { markdownToHtml }
 
 // Skips first update
 export const useEffectLazy = (func: () => void, vars: React.DependencyList) => {
