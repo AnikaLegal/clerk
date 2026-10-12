@@ -192,7 +192,7 @@ resource "sentry_cron_monitor" "backup_check" {
 
 resource "sentry_alert" "backup_check" {
   organization      = local.sentry_organization
-  name              = local.backup_check_name
+  name              = "Backups: daily S3 backup check"
   monitor_ids       = [sentry_cron_monitor.backup_check.id]
   frequency_minutes = 1440
 
@@ -204,9 +204,11 @@ resource "sentry_alert" "backup_check" {
   action_filters = [{
     logic_type = "all"
     actions = [{
-      email = {
-        target_type      = "issue_owners"
-        fallthrough_type = "AllMembers"
+      slack = {
+        integration_id = data.sentry_organization_integration.slack.id
+        channel_name   = local.sentry_alert_channel
+        notes          = ""
+        tags           = ""
       }
     }]
   }]

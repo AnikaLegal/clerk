@@ -53,6 +53,13 @@ provider "aws" {
 # running plan or apply (validate needs no token).
 provider "sentry" {}
 
+# The Anika Legal Slack workspace, which the checks' Sentry alerts post to.
+data "sentry_organization_integration" "slack" {
+  organization = local.sentry_organization
+  provider_key = "slack"
+  name         = "Anika Legal"
+}
+
 locals {
   region = "ap-southeast-2"
 }

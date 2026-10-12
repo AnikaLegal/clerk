@@ -539,7 +539,7 @@ resource "sentry_cron_monitor" "s3" {
 
 resource "sentry_alert" "s3" {
   organization      = local.sentry_organization
-  name              = local.s3_name
+  name              = "Backups: monthly S3 restore check"
   monitor_ids       = [sentry_cron_monitor.s3.id]
   frequency_minutes = 1440
 
@@ -551,9 +551,11 @@ resource "sentry_alert" "s3" {
   action_filters = [{
     logic_type = "all"
     actions = [{
-      email = {
-        target_type      = "issue_owners"
-        fallthrough_type = "AllMembers"
+      slack = {
+        integration_id = data.sentry_organization_integration.slack.id
+        channel_name   = local.sentry_alert_channel
+        notes          = ""
+        tags           = ""
       }
     }]
   }]
