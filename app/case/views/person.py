@@ -42,12 +42,8 @@ def person_detail_page_view(request, pk):
     except Person.DoesNotExist:
         raise Http404()
 
-    q_filter = Q(tenancy__agent=person) | Q(tenancy__landlord=person)
-    issues = Issue.objects.filter(q_filter).order_by("-created_at").all()
-
     context = {
-        "issues": IssueSerializer(issues, many=True).data,
-        "person": PersonSerializer(instance=person).data,
+        "personId": pk,
         "is_editable": request.user.is_coordinator_or_better,
         "list_url": reverse("person-list"),
     }
