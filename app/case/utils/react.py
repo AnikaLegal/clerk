@@ -1,6 +1,6 @@
 import json
 
-from accounts.role import ROLE_FLAGS
+from accounts.role import UserRole
 from django.conf import settings
 from django.shortcuts import render
 
@@ -8,11 +8,7 @@ from django.shortcuts import render
 def render_react_page(
     request, title, react_page_name, react_context, public=False, status=None
 ):
-    # Role flags are only annotated on authenticated users, but the 403/404
-    # handlers also render this page for anonymous visitors.
-    react_context.update(
-        {"user": {flag: getattr(request.user, flag, False) for flag in ROLE_FLAGS}}
-    )
+    react_context.update({"user": UserRole.flags_for(request.user)})
     sentry_context = {
         "dsn": settings.SENTRY_JS_DSN or "",
         "environment": settings.ENVIRONMENT or "",
