@@ -6,6 +6,7 @@ const ENTITY_TYPES = [
   'CLIENT',
   'DOCUMENT_TEMPLATE',
   'EMAIL',
+  'PERSON',
   'SERVICE',
   'POTENTIAL_USER',
   'USER',
@@ -93,6 +94,12 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     deleteCaseDate: {
       invalidatesTags: [{ type: 'CASE_DATE' }],
+    },
+    getPerson: {
+      providesTags: [{ type: 'PERSON' }],
+    },
+    updatePerson: {
+      invalidatesTags: [{ type: 'PERSON' }],
     },
     getUser: {
       providesTags: [{ type: 'USER' }],
