@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Formik } from 'formik'
 import { Container, Header, Loader, Message } from 'semantic-ui-react'
 import { useSnackbar } from 'notistack'
@@ -11,7 +11,6 @@ import {
   useUpdatePersonMutation,
   useGetPersonQuery,
   useGetCasesQuery,
-  Person,
 } from 'api'
 
 interface DjangoContext {
@@ -37,14 +36,9 @@ const { personId, is_editable, list_url } = (window as any)
 
 export const PersonInfo = ({ personId }: { personId: number }) => {
   const personQuery = useGetPersonQuery({ id: personId })
-  const [person, setPerson] = useState<Person | null>(null)
   const { enqueueSnackbar } = useSnackbar()
   const [deletePerson] = useDeletePersonMutation()
   const [updatePerson] = useUpdatePersonMutation()
-
-  useEffect(() => {
-    setPerson(null)
-  }, [personId])
 
   if (personQuery.isLoading) {
     return <Loader active inline="centered" />
@@ -55,7 +49,7 @@ export const PersonInfo = ({ personId }: { personId: number }) => {
     throw personQuery.error
   }
 
-  const currentPerson = person ?? personQuery.data
+  const currentPerson = personQuery.data
   if (!currentPerson) {
     return null
   }
@@ -64,6 +58,7 @@ export const PersonInfo = ({ personId }: { personId: number }) => {
     e.preventDefault()
     if (window.confirm('Are you sure you want to delete this person?')) {
       deletePerson({ id: currentPerson.id })
+        .unwrap()
         .then(() => {
           window.location.href = list_url
         })
@@ -97,9 +92,8 @@ export const PersonInfo = ({ personId }: { personId: number }) => {
         onSubmit={(values, { setSubmitting, setErrors }) => {
           updatePerson({ id: currentPerson.id, personCreate: values })
             .unwrap()
-            .then((updatedPerson) => {
+            .then(() => {
               enqueueSnackbar('Updated person', { variant: 'success' })
-              setPerson(updatedPerson)
               setSubmitting(false)
             })
             .catch((err) => {
