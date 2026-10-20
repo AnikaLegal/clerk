@@ -25,7 +25,9 @@ const TABLE_FIELDS = [
   'topic',
   'client',
   'paralegal',
+  'created_at',
   'stage',
+  'provided_legal_services',
   'outcome',
 ]
 
@@ -49,17 +51,8 @@ export const PersonInfo = ({ personId }: { personId: number }) => {
   }
 
   if (personQuery.isError) {
-    const isForbidden =
-      personQuery.error &&
-      'status' in personQuery.error &&
-      personQuery.error.status === 403
-    return (
-      <Message negative>
-        {isForbidden
-          ? 'You do not have permission to access info about this person'
-          : 'Could not load person'}
-      </Message>
-    )
+    // person_detail_page_view handles 403 and 404, so anything here is unexpected.
+    throw personQuery.error
   }
 
   const currentPerson = person ?? personQuery.data
