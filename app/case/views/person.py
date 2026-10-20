@@ -3,6 +3,7 @@ from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ModelViewSet
 
 from case.serializers import (
@@ -42,8 +43,11 @@ def person_detail_page_view(request, pk):
     except Person.DoesNotExist:
         raise Http404()
 
+    if not person.check_permission(request.user):
+        raise PermissionDenied()
+
     context = {
-        "personId": pk,
+        "personId": person.pk,
         "is_editable": request.user.is_coordinator_or_better,
         "list_url": reverse("person-list"),
     }
