@@ -2,8 +2,9 @@
 
 Cloud resources described as code with [OpenTofu](https://opentofu.org).
 Today this covers the resources behind the
-[restore check](../../docs/restore-check.md), the AWS Backup scheme and
-Clerk's Sentry uptime monitors and alerts; the rest of the AWS account is
+[restore check](../../docs/restore-check.md), the AWS Backup scheme,
+Clerk's Sentry uptime monitors and alerts, and Microsoft Sentinel's Azure
+resources; the rest of the AWS account is
 still console-managed and documented in [docs/infra.md](../../docs/infra.md)
 and [docs/backups.md](../../docs/backups.md). The intent is that new AWS
 resources are born here rather than made by hand, so they never need
@@ -21,6 +22,7 @@ Each directory is an independent root with its own remote state in the
 | `restore-check/foundations` | everything behind the [restore checks](../../docs/restore-check.md): schedules, Lambdas, the db check's ECS cluster/task definition and ECR repository, the S3 restore testing plans, IAM roles, Sentry cron monitors and alerts | admin, rarely | `restore-check/foundations/terraform.tfstate` |
 | `monitoring` | Clerk's Sentry uptime monitors and the alerts for outages and new issues - change them here, not in the Sentry UI | admin, when alerting changes | `monitoring/terraform.tfstate` |
 | `rehearsal` | the throwaway host for the [bi-annual restore rehearsal](../../docs/restore-check.md#bi-annually-full-rebuild-rehearsal), applied and destroyed per drill via `just rehearsal up`/`down` - holds nothing between drills | admin, twice a year | `rehearsal/terraform.tfstate` |
+| `sentinel` | the Azure side of Microsoft Sentinel: its resource group and Log Analytics workspace, the spend budget, Sentinel onboarding and the Microsoft 365 and Entra ID connectors - the Google Workspace connector and Content hub solutions are set up in the Defender portal | Azure subscription Owner, when log collection changes | `sentinel/terraform.tfstate` |
 
 ## One-time setup
 
