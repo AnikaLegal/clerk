@@ -1,4 +1,4 @@
-from core.models import Issue, Person, Tenancy
+from core.models import Person
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
@@ -7,7 +7,6 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ModelViewSet
 
 from case.serializers import (
-    IssueSerializer,
     PersonSearchRequestSerializer,
     PersonSerializer,
 )
