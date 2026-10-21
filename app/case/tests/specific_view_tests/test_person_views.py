@@ -4,6 +4,7 @@ from conftest import CaseRole
 from core.factories import IssueFactory, PersonFactory, TenancyFactory, UserFactory
 from core.models import Person
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -414,6 +415,45 @@ def test_person_api_retrieve_perms(
 
     url = reverse("person-api-detail", args=(person.pk,))
     response = user_client.get(url)
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("link", ["support_worker", "landlord", "agent"])
+def test_person_api_retrieve__each_link(link, paralegal_user, paralegal_user_client):
+    person = PersonFactory()
+    if link == "support_worker":
+        IssueFactory(paralegal=paralegal_user, support_worker=person)
+    else:
+        IssueFactory(paralegal=paralegal_user, tenancy=TenancyFactory(**{link: person}))
+
+    url = reverse("person-api-detail", args=(person.pk,))
+    response = paralegal_user_client.get(url)
+
+    assert response.status_code == 200, response.json()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "has_permission, expected_status",
+    [
+        (True, 200),
+        (False, 403),
+    ],
+)
+def test_person_detail_page_view(has_permission, expected_status, paralegal_user):
+    person = PersonFactory()
+    if has_permission:
+        IssueFactory(paralegal=paralegal_user, support_worker=person)
+    else:
+        IssueFactory(support_worker=person)
+
+    client = APIClient()
+    client.force_login(user=paralegal_user)
+
+    url = reverse("person-detail", args=(person.pk,))
+    response = client.get(url)
 
     assert response.status_code == expected_status
 
