@@ -23,6 +23,25 @@ def test_account_api_create(superuser_client):
     assert User.objects.count() == 2  # superuser + new user
     user = User.objects.get(email="charlie.brown@anikalegal.org.au")
     assert list(user.groups.values_list("name", flat=True)) == ["Paralegal"]
+    assert user.is_intern is False
+    assert user.case_capacity == 0
+
+
+@pytest.mark.django_db
+def test_account_api_create__intern(superuser_client):
+    url = reverse("account-api-list")
+    data = {
+        "first_name": "Charlie",
+        "last_name": "Brown",
+        "email": "charlie.brown@anikalegal.org.au",
+        "groups": ["Paralegal"],
+        "is_intern": True,
+    }
+    response = superuser_client.post(url, data=data)
+    assert response.status_code == 201, response.json()
+    assert response.json()["is_intern"] is True
+    user = User.objects.get(email="charlie.brown@anikalegal.org.au")
+    assert user.is_intern is True
 
 
 @pytest.mark.django_db

@@ -3314,6 +3314,9 @@ components:
           type: array
           items:
             type: string
+        is_intern:
+          type: boolean
+          default: false
       required:
         - first_name
         - last_name

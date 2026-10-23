@@ -1,4 +1,4 @@
-import { Loader, MultiSelect, TagsInput } from '@mantine/core'
+import { Checkbox, Loader, MultiSelect, TagsInput } from '@mantine/core'
 import { useForm, UseFormInput } from '@mantine/form'
 import { useGetPotentialUsersQuery } from 'api'
 import { UsersCreate, UsersInvite, UsersInviteSchema } from 'features/invite'
@@ -34,6 +34,7 @@ export const InviteForm = ({
   )
   const form = useForm<UsersInvite>({
     mode: 'uncontrolled',
+    initialValues: { users: [], groups: [], is_intern: true },
     validate: yupResolver(UsersInviteSchema),
     ...input,
   })
@@ -55,7 +56,11 @@ export const InviteForm = ({
     }
 
     const mapped = values.users.map((n) => usersByEmail[n]).filter(Boolean)
-    onSubmit(form, { users: mapped, groups: values.groups })
+    onSubmit(form, {
+      users: mapped,
+      groups: values.groups,
+      is_intern: values.is_intern,
+    })
   }
 
   const onValidationFailure = (
@@ -92,6 +97,13 @@ export const InviteForm = ({
         data={groups}
         searchable
         clearable
+        size="md"
+        mt="md"
+      />
+      <Checkbox
+        {...form.getInputProps('is_intern', { type: 'checkbox' })}
+        key={form.key('is_intern')}
+        label="Intern"
         size="md"
         mt="md"
       />

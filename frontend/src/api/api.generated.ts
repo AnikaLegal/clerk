@@ -1627,6 +1627,7 @@ export type UserCreate = {
   last_name: string;
   email: string;
   groups: string[];
+  is_intern?: boolean;
 };
 export type UserCreateRead = {
   first_name: string;
@@ -1634,6 +1635,7 @@ export type UserCreateRead = {
   email: string;
   url: string;
   groups: string[];
+  is_intern?: boolean;
 };
 export type UserUpdate = {
   first_name?: string;

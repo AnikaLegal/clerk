@@ -9,11 +9,13 @@ export type UserInfo = {
 export type UsersCreate = {
   users: UserInfo[]
   groups: string[]
+  is_intern: boolean
 }
 
 export type UsersInvite = {
   users: string[]
   groups: string[]
+  is_intern: boolean
 }
 
 const required = 'This field is required.'

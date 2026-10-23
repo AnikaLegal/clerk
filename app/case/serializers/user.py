@@ -20,7 +20,7 @@ class PotentialUserSerializer(serializers.Serializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "groups", "url")
+        fields = ("first_name", "last_name", "email", "groups", "is_intern", "url")
 
     groups = serializers.SlugRelatedField(
         many=True,

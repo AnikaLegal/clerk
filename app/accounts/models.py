@@ -43,7 +43,7 @@ class User(AbstractUser):
 
     _role = None
 
-    case_capacity = models.PositiveIntegerField(default=4)
+    case_capacity = models.PositiveIntegerField(default=0)
     is_intern = models.BooleanField(default=False)
     issue_notes = GenericRelation("core.IssueNote")
     email = models.EmailField("email address", unique=True)
