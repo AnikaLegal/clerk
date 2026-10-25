@@ -5,6 +5,7 @@ from accounts.models import User
 from core.factories import UserFactory
 from microsoft.service import MicrosoftUserPermissions
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -252,17 +253,33 @@ def test_account_api_list_potential_users__returns_active_users(
 def test_account_api_list_potential_users__excludes_suspended_users(
     mock_list_directory_users, superuser_client
 ):
-    """Test that suspended users are excluded from potential users list."""
+    """Test that Google is asked to leave out suspended users."""
+    mock_list_directory_users.return_value = []
+
+    url = reverse("account-api-potential")
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    mock_list_directory_users.assert_called_once_with(query="isSuspended=false")
+
+
+@pytest.mark.django_db
+@patch("case.views.accounts.list_directory_users")
+def test_account_api_list_potential_users__excludes_delegated_mailboxes(
+    mock_list_directory_users, superuser_client
+):
     mock_list_directory_users.return_value = [
         {
             "primaryEmail": "charlie.brown@example.com",
             "name": {"givenName": "Charlie", "familyName": "Brown"},
             "suspended": False,
+            "orgUnitPath": "/",
         },
         {
-            "primaryEmail": "suspended.user@example.com",
-            "name": {"givenName": "Suspended", "familyName": "User"},
-            "suspended": True,
+            "primaryEmail": "accounts@example.com",
+            "name": {"givenName": "Accounts", "familyName": "Anika"},
+            "suspended": False,
+            "orgUnitPath": "/Delegated mailboxes",
         },
     ]
 
@@ -270,9 +287,7 @@ def test_account_api_list_potential_users__excludes_suspended_users(
     response = superuser_client.get(url)
 
     assert response.status_code == 200, response.json()
-    data = response.json()
-    assert len(data) == 1
-    assert data[0]["email"] == "charlie.brown@example.com"
+    assert [user["email"] for user in response.json()] == ["charlie.brown@example.com"]
 
 
 @pytest.mark.django_db
@@ -421,4 +436,20 @@ def test_account_api_list_potential_users_permissions(
     url = reverse("account-api-potential")
     response = client.get(url)
 
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "user_name, expected_status",
+    [
+        ("coordinator_user", 403),
+        ("admin_user", 200),
+    ],
+)
+def test_account_create_page_permissions(user_name, expected_status, request):
+    # The invite page only works for users who can call the create API.
+    client = APIClient()
+    client.force_login(request.getfixturevalue(user_name))
+    response = client.get(reverse("account-create"))
     assert response.status_code == expected_status

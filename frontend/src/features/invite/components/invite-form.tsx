@@ -15,6 +15,7 @@ export interface InviteFormControlProps {
 
 export interface InviteFormProps {
   groups: string[]
+  workspaceDomain: string
   onSubmit: (form: InviteFormType, values: UsersCreate) => void
   onCancel: () => void
   input?: UseFormInput<UsersInvite>
@@ -23,6 +24,7 @@ export interface InviteFormProps {
 
 export const InviteForm = ({
   groups,
+  workspaceDomain,
   onSubmit,
   onCancel,
   input,
@@ -30,7 +32,8 @@ export const InviteForm = ({
 }: InviteFormProps) => {
   const potentialUserResult = useGetPotentialUsersQuery()
   const usersByEmail = Object.fromEntries(
-    potentialUserResult.data?.map((user) => [user.email, user]) || []
+    potentialUserResult.data?.map((user) => [user.email.toLowerCase(), user]) ||
+      []
   )
   const form = useForm<UsersInvite>({
     mode: 'uncontrolled',
@@ -46,12 +49,29 @@ export const InviteForm = ({
   ) => {
     event?.stopPropagation()
 
-    const notFound = values.users.filter((e) => !usersByEmail[e])
-    if (notFound.length > 0) {
+    if (potentialUserResult.isLoading) {
       form.setFieldError(
         'users',
-        `User${notFound.length > 1 ? 's' : ''} not found: ${notFound.join(', ')}`
+        'Still loading the Google directory, try again in a moment.'
       )
+      return
+    }
+    if (potentialUserResult.isError) {
+      return
+    }
+
+    const suffix = `@${workspaceDomain}`
+    const external = values.users.filter((e) => !e.endsWith(suffix))
+    const notFound = values.users.filter(
+      (e) => e.endsWith(suffix) && !usersByEmail[e]
+    )
+    const errors = [
+      external.length > 0 && `Not an ${suffix} address: ${external.join(', ')}`,
+      notFound.length > 0 &&
+        `Not in the Google directory or already has an account: ${notFound.join(', ')}`,
+    ].filter(Boolean)
+    if (errors.length > 0) {
+      form.setFieldError('users', errors.join('. '))
       return
     }
 
@@ -71,18 +91,29 @@ export const InviteForm = ({
     event?.stopPropagation()
   }
 
+  const usersInputProps = form.getInputProps('users')
+
   return (
     <form
       autoComplete="off"
       onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}
     >
       <TagsInput
-        {...form.getInputProps('users')}
+        {...usersInputProps}
+        onChange={(value) =>
+          usersInputProps.onChange([
+            ...new Set(value.map((e) => e.trim().toLowerCase())),
+          ])
+        }
+        error={
+          usersInputProps.error ||
+          (potentialUserResult.isError &&
+            "Couldn't load the Google directory. Reload the page to try again.")
+        }
         key={form.key('users')}
         label="Users"
         placeholder="Enter, select or paste email addresses..."
         data={Object.keys(usersByEmail)}
-        disabled={potentialUserResult.isLoading}
         rightSection={
           potentialUserResult.isLoading ? <Loader size="sm" /> : undefined
         }

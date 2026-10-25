@@ -1,4 +1,5 @@
 from accounts.models import User
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.urls import reverse
@@ -34,10 +35,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return reverse("account-detail", args=(obj.pk,))
 
     def validate_email(self, value: str):
-        if not value.endswith("@anikalegal.org.au"):
-            raise ValidationError(
-                "Can only invite users with an anikalegal.org.au email"
-            )
+        domain = settings.GOOGLE_WORKSPACE_DOMAIN
+        if not value.endswith(f"@{domain}"):
+            raise ValidationError(f"Can only invite users with an {domain} email")
         return value
 
     @transaction.atomic

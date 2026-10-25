@@ -8,10 +8,11 @@ import {
   UsersCreate,
 } from 'features/invite'
 import React from 'react'
-import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
   group_values: string[]
+  workspace_domain: string
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
@@ -35,7 +36,10 @@ const App = () => {
     )
     Promise.allSettled(promises)
       .then((results) => {
+        const failed = new Set<string>()
+        const failures: string[] = []
         results.forEach((result, index) => {
+          const email = values.users[index].email
           if (result.status === 'fulfilled') {
             showNotification({
               type: 'success',
@@ -48,22 +52,27 @@ const App = () => {
               autoClose: 4000,
             })
           } else {
-            const email = values.users[index].email
+            const message = getAPIErrorMessage(result.reason)
+            failed.add(email.toLowerCase())
+            failures.push(`${email}: ${message}`)
             showNotification({
               type: 'error',
               title: `Failed to create user ${email}`,
-              message: getAPIErrorMessage(result.reason),
-              autoClose: 4000,
+              message,
+              autoClose: false,
             })
-            const requestErrors = getAPIFormErrors(result.reason)
-            if (requestErrors) {
-              form.setErrors(requestErrors)
-            }
           }
         })
-        if (results.every((result) => result.status === 'fulfilled')) {
+        if (failures.length === 0) {
           form.reset()
+          return
         }
+        // Keep only the failed emails so a retry doesn't re-invite the rest.
+        form.setFieldValue(
+          'users',
+          form.getValues().users.filter((email) => failed.has(email))
+        )
+        form.setFieldError('users', failures.join('. '))
       })
       .finally(() => {
         form.setSubmitting(false)
@@ -77,6 +86,7 @@ const App = () => {
       </Title>
       <InviteForm
         groups={CONTEXT.group_values}
+        workspaceDomain={CONTEXT.workspace_domain}
         onSubmit={handleSubmit}
         onCancel={() => {
           /* Do nothing */
