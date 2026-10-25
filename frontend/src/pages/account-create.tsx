@@ -1,5 +1,5 @@
 import { Button, Container, Group, Title } from '@mantine/core'
-import api, { useAppDispatch, useCreateUserMutation } from 'api'
+import api, { useAppDispatch, useCreateUserMutation, UserCreateRead } from 'api'
 import { showNotification } from 'comps/notification'
 import {
   InviteForm,
@@ -11,6 +11,7 @@ import React from 'react'
 import { getAPIErrorMessage, mount } from 'utils'
 
 interface DjangoContext {
+  accounts_url: string
   group_values: string[]
   workspace_domain: string
 }
@@ -37,37 +38,27 @@ const App = () => {
     )
     Promise.allSettled(promises)
       .then((results) => {
+        const created: UserCreateRead[] = []
         const failed = new Set<string>()
-        const failures: string[] = []
         results.forEach((result, index) => {
-          const email = values.users[index].email
           if (result.status === 'fulfilled') {
-            showNotification({
-              type: 'success',
-              title: 'User created',
-              message: `Invitation sent to ${result.value.email}.`,
-              link: {
-                text: 'View user',
-                url: result.value.url,
-              },
-              autoClose: 4000,
-            })
-          } else {
-            const message = getAPIErrorMessage(result.reason)
-            failed.add(email.toLowerCase())
-            failures.push(`${email}: ${message}`)
-            showNotification({
-              type: 'error',
-              title: `Failed to create user ${email}`,
-              message,
-              autoClose: false,
-            })
+            created.push(result.value)
+            return
           }
+          const email = values.users[index].email
+          failed.add(email.toLowerCase())
+          showNotification({
+            type: 'error',
+            title: `Couldn't invite ${email}`,
+            message: getAPIErrorMessage(result.reason),
+            autoClose: false,
+          })
         })
-        if (failed.size < results.length) {
+        if (created.length > 0) {
+          showInvitedNotification(created)
           dispatch(api.util.invalidateTags(['POTENTIAL_USER']))
         }
-        if (failures.length === 0) {
+        if (failed.size === 0) {
           form.reset()
           return
         }
@@ -76,7 +67,6 @@ const App = () => {
           'users',
           form.getValues().users.filter((email) => failed.has(email))
         )
-        form.setFieldError('users', failures.join('. '))
       })
       .finally(() => {
         form.setSubmitting(false)
@@ -100,6 +90,28 @@ const App = () => {
     </Container>
   )
 }
+
+const showInvitedNotification = (created: UserCreateRead[]) => {
+  const [first] = created
+  showNotification({
+    type: 'success',
+    title: `Invited ${pluralise(created.length, 'user')}`,
+    message:
+      created.length === 1
+        ? `Invitation sent to ${first.email}.`
+        : 'Invitations sent.',
+    // One link per user doesn't fit in a toast, so larger batches link to the
+    // accounts list.
+    link:
+      created.length === 1
+        ? { text: 'View user', url: first.url }
+        : { text: 'View accounts', url: CONTEXT.accounts_url },
+    autoClose: 4000,
+  })
+}
+
+const pluralise = (count: number, noun: string) =>
+  `${count} ${noun}${count === 1 ? '' : 's'}`
 
 const InviteFormControls = ({ form }: InviteFormControlProps) => {
   return (

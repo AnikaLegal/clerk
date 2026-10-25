@@ -46,6 +46,24 @@ def test_account_api_create__intern(superuser_client):
 
 
 @pytest.mark.django_db
+def test_account_api_create__existing_email(superuser_client):
+    UserFactory(email="charlie.brown@anikalegal.org.au")
+    url = reverse("account-api-list")
+    data = {
+        "first_name": "Charlie",
+        "last_name": "Brown",
+        "email": "charlie.brown@anikalegal.org.au",
+        "groups": ["Paralegal"],
+    }
+    response = superuser_client.post(url, data=data)
+    assert response.status_code == 400, response.json()
+    errors = response.json()["errors"]
+    assert [e["detail"] for e in errors] == [
+        "User with this email address already exists."
+    ]
+
+
+@pytest.mark.django_db
 def test_account_api_create__with_external_email(superuser_client):
     assert User.objects.count() == 1
     url = reverse("account-api-list")

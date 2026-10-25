@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.validators import UniqueValidator
 
 from case.middleware import annotate_group_access
 
@@ -22,6 +23,17 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "groups", "is_intern", "url")
+        extra_kwargs = {
+            "email": {
+                # DRF's default leaves Django's message uncapitalised.
+                "validators": [
+                    UniqueValidator(
+                        queryset=User.objects.all(),
+                        message="User with this email address already exists.",
+                    )
+                ]
+            }
+        }
 
     groups = serializers.SlugRelatedField(
         many=True,

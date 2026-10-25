@@ -70,6 +70,7 @@ def account_detail_page_view(request, pk):
 @admin_or_better_required
 def account_create_page_view(request):
     context = {
+        "accounts_url": reverse("account-list"),
         "group_values": CaseGroups.values,
         "workspace_domain": settings.GOOGLE_WORKSPACE_DOMAIN,
     }
