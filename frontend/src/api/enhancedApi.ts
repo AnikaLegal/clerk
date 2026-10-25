@@ -101,7 +101,9 @@ const enhancedApi = generatedApi.enhanceEndpoints({
       providesTags: [{ type: 'POTENTIAL_USER' }],
     },
     createUser: {
-      invalidatesTags: [{ type: 'USER' }, { type: 'POTENTIAL_USER' }],
+      // POTENTIAL_USER is left out because listing it is slow and users are
+      // created in batches: callers invalidate it once per batch.
+      invalidatesTags: [{ type: 'USER' }],
     },
     updateUser: {
       invalidatesTags: [{ type: 'USER' }, { type: 'USER_PERMISSIONS' }],

@@ -1,5 +1,5 @@
 import { Button, Container, Group, Title } from '@mantine/core'
-import { useCreateUserMutation } from 'api'
+import api, { useAppDispatch, useCreateUserMutation } from 'api'
 import { showNotification } from 'comps/notification'
 import {
   InviteForm,
@@ -19,6 +19,7 @@ const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
 const App = () => {
   const [createUser] = useCreateUserMutation()
+  const dispatch = useAppDispatch()
 
   const handleSubmit = (form: InviteFormType, values: UsersCreate) => {
     form.setSubmitting(true)
@@ -63,6 +64,9 @@ const App = () => {
             })
           }
         })
+        if (failed.size < results.length) {
+          dispatch(api.util.invalidateTags(['POTENTIAL_USER']))
+        }
         if (failures.length === 0) {
           form.reset()
           return
