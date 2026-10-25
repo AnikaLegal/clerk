@@ -1,11 +1,25 @@
-import { Checkbox, Loader, MultiSelect, TagsInput } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  List,
+  Loader,
+  MultiSelect,
+  TagsInput,
+  Text,
+} from '@mantine/core'
 import { useForm, UseFormInput } from '@mantine/form'
 import { useGetPotentialUsersQuery } from 'api'
 import { UsersCreate, UsersInvite, UsersInviteSchema } from 'features/invite'
 import { yupResolver } from 'mantine-form-yup-resolver'
-import React from 'react'
+import React, { useState } from 'react'
 
 export type InviteFormType = ReturnType<typeof useForm<UsersInvite>>
+
+interface EmailProblem {
+  reason: string
+  emails: string[]
+}
 
 export interface InviteFormControlProps {
   form: InviteFormType
@@ -42,6 +56,33 @@ export const InviteForm = ({
     ...input,
   })
   const Controls = controls || undefined
+  const [problems, setProblems] = useState<EmailProblem[]>([])
+  const problemCount = problems.reduce((n, p) => n + p.emails.length, 0)
+
+  const showProblems = (next: EmailProblem[]) => {
+    const remaining = next.filter((p) => p.emails.length > 0)
+    const count = remaining.reduce((n, p) => n + p.emails.length, 0)
+    setProblems(remaining)
+    if (count > 0) {
+      form.setFieldError(
+        'users',
+        count === 1
+          ? "1 address can't be invited"
+          : `${count} addresses can't be invited`
+      )
+    } else {
+      form.clearFieldError('users')
+    }
+  }
+
+  const removeProblemEmails = () => {
+    const bad = new Set(problems.flatMap((p) => p.emails))
+    form.setFieldValue(
+      'users',
+      form.getValues().users.filter((e) => !bad.has(e))
+    )
+    showProblems([])
+  }
 
   const handleSubmit = (
     values: UsersInvite,
@@ -61,17 +102,20 @@ export const InviteForm = ({
     }
 
     const suffix = `@${workspaceDomain}`
-    const external = values.users.filter((e) => !e.endsWith(suffix))
-    const notFound = values.users.filter(
-      (e) => e.endsWith(suffix) && !usersByEmail[e]
-    )
-    const errors = [
-      external.length > 0 && `Not an ${suffix} address: ${external.join(', ')}`,
-      notFound.length > 0 &&
-        `Not in the Google directory or already has an account: ${notFound.join(', ')}`,
-    ].filter(Boolean)
-    if (errors.length > 0) {
-      form.setFieldError('users', errors.join('. '))
+    const found: EmailProblem[] = [
+      {
+        reason: `Not an ${suffix} address`,
+        emails: values.users.filter((e) => !e.endsWith(suffix)),
+      },
+      {
+        reason: 'Not in the Google directory or already has an account',
+        emails: values.users.filter(
+          (e) => e.endsWith(suffix) && !usersByEmail[e]
+        ),
+      },
+    ]
+    if (found.some((p) => p.emails.length > 0)) {
+      showProblems(found)
       return
     }
 
@@ -100,11 +144,19 @@ export const InviteForm = ({
     >
       <TagsInput
         {...usersInputProps}
-        onChange={(value) =>
-          usersInputProps.onChange([
-            ...new Set(value.map((e) => e.trim().toLowerCase())),
-          ])
-        }
+        onChange={(value) => {
+          const users = [...new Set(value.map((e) => e.trim().toLowerCase()))]
+          usersInputProps.onChange(users)
+          if (problems.length > 0) {
+            // Drop problems whose emails were removed by hand.
+            showProblems(
+              problems.map((p) => ({
+                ...p,
+                emails: p.emails.filter((e) => users.includes(e)),
+              }))
+            )
+          }
+        }}
         error={
           usersInputProps.error ||
           (potentialUserResult.isError &&
@@ -121,6 +173,32 @@ export const InviteForm = ({
         clearable
         size="md"
       />
+      {problemCount > 0 && (
+        <Alert color="red" variant="light" mt="xs">
+          {problems.map((p) => (
+            <React.Fragment key={p.reason}>
+              <Text size="sm" fw={500}>
+                {p.reason}
+              </Text>
+              <List size="sm" mb="xs">
+                {p.emails.map((e) => (
+                  <List.Item key={e}>{e}</List.Item>
+                ))}
+              </List>
+            </React.Fragment>
+          ))}
+          <Button
+            size="xs"
+            variant="light"
+            color="red"
+            onClick={removeProblemEmails}
+          >
+            {problemCount === 1
+              ? 'Remove this address'
+              : `Remove these ${problemCount} addresses`}
+          </Button>
+        </Alert>
+      )}
       <MultiSelect
         {...form.getInputProps('groups')}
         key={form.key('groups')}
