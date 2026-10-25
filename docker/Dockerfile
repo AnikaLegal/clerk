@@ -4,7 +4,7 @@
 ARG BASE_TAG=2026-09-17
 
 # Build web CSS assets
-FROM node:24-slim AS web-builder
+FROM node:24.22.1-slim AS web-builder
 WORKDIR /web
 COPY app/web/package.json .
 COPY app/web/package-lock.json .
@@ -18,7 +18,7 @@ RUN echo "Building web assets" && \
 # that this image builds on its own, from a checkout alone. The dev server runs
 # on the frontend-deps stage (see the build-frontend recipe in the justfile), so
 # both use the same Node and the same install.
-FROM node:24-slim AS frontend-deps
+FROM node:24.22.1-slim AS frontend-deps
 WORKDIR /frontend
 COPY frontend/package.json .
 COPY frontend/package-lock.json .

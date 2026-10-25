@@ -68,7 +68,7 @@ services:
       - ../env/dev.env
   # Tailwind/DaisyUI watcher for Django web app styles.
   css:
-    image: node:lts-slim
+    image: node:24.22.1-slim
     working_dir: /app/web
     command: sh -c "npm ci && npm run watch"
     volumes:

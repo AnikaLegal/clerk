@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import AnonymousUser
 
 from accounts.role import UserRole
 
@@ -212,3 +213,23 @@ def test_reset_recomputes_on_group_change(user, paralegal_group, coordinator_gro
     user.groups.set([])
     role.reset()
     _assert_all_false(role)
+
+
+def test_flags_for_anonymous_user_is_all_false():
+    flags = UserRole.flags_for(AnonymousUser())
+
+    assert set(flags.values()) == {False}
+    assert "is_admin" in flags
+    assert "is_paralegal_or_better" in flags
+
+
+@pytest.mark.django_db
+def test_flags_for_annotated_user(user, admin_group):
+    user.groups.set([admin_group])
+    UserRole.annotate_user(user)
+
+    flags = UserRole.flags_for(user)
+
+    assert flags["is_admin"] is True
+    assert flags["is_admin_or_better"] is True
+    assert flags["is_paralegal"] is False

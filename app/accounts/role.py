@@ -10,18 +10,6 @@ if TYPE_CHECKING:
     from accounts.models import User
 
 
-ROLE_FLAGS = (
-    "is_admin",
-    "is_coordinator",
-    "is_lawyer",
-    "is_paralegal",
-    "is_admin_or_better",
-    "is_coordinator_or_better",
-    "is_lawyer_or_better",
-    "is_paralegal_or_better",
-)
-
-
 class UserRole:
     """
     Encapsulates a users role as a collection of boolean attributes determined
@@ -61,6 +49,17 @@ class UserRole:
     is_lawyer_or_better = False
     is_paralegal_or_better = False
 
+    _FLAGS = (
+        "is_admin",
+        "is_coordinator",
+        "is_lawyer",
+        "is_paralegal",
+        "is_admin_or_better",
+        "is_coordinator_or_better",
+        "is_lawyer_or_better",
+        "is_paralegal_or_better",
+    )
+
     _user: User | None = None
     _group_names: set[str] = set()
 
@@ -75,8 +74,17 @@ class UserRole:
         paralegal, coordinator etc.) & the comparative level of their role.
         """
         role = UserRole(user)
-        for flag in ROLE_FLAGS:
+        for flag in UserRole._FLAGS:
             setattr(user, flag, getattr(role, flag))
+
+    @staticmethod
+    def flags_for(user) -> dict[str, bool]:
+        """
+        The user's role attributes as a dict. Users that haven't been
+        annotated (e.g. anonymous visitors) have no role, so every flag is
+        false.
+        """
+        return {flag: getattr(user, flag, False) for flag in UserRole._FLAGS}
 
     def reset(self):
         self._group_names = set()
