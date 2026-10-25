@@ -33,7 +33,7 @@ RUN echo "Building frontend" && \
 # The public intake form, built the same way. The dev server runs on the
 # intake-deps stage (see the build-intake recipe in the justfile). The build
 # runs the tests first so a broken flow cannot ship.
-FROM node:24-slim AS intake-deps
+FROM node:24.22.1-slim AS intake-deps
 WORKDIR /intake
 COPY intake/package.json .
 COPY intake/package-lock.json .
