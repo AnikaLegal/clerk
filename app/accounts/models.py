@@ -1,7 +1,7 @@
+from auditlog.registry import auditlog
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from auditlog.registry import auditlog
 from encrypted_fields.fields import EncryptedCharField
 
 
@@ -21,6 +21,15 @@ class CaseGroups(models.TextChoices):
     COORDINATOR = "Coordinator"
     LAWYER = "Lawyer"
     PARALEGAL = "Paralegal"
+
+
+# Most privileged first. Every CaseGroups member must appear exactly once.
+CASE_GROUPS_BY_PRIVILEGE = [
+    CaseGroups.ADMIN,
+    CaseGroups.COORDINATOR,
+    CaseGroups.LAWYER,
+    CaseGroups.PARALEGAL,
+]
 
 
 class University(models.Model):

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from accounts.models import CaseGroups, User
+from accounts.models import CASE_GROUPS_BY_PRIVILEGE, CaseGroups, User
 from django.conf import settings
 from django.db.models import QuerySet, Value
 from django.db.models.functions import Concat
@@ -71,7 +71,8 @@ def account_detail_page_view(request, pk):
 def account_create_page_view(request):
     context = {
         "accounts_url": reverse("account-list"),
-        "group_values": CaseGroups.values,
+        # Least privileged first: most invites are for paralegals.
+        "group_values": list(reversed(CASE_GROUPS_BY_PRIVILEGE)),
         "workspace_domain": settings.GOOGLE_WORKSPACE_DOMAIN,
     }
     return render_react_page(request, "Invite users", "account-create", context)
