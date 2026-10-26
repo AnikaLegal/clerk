@@ -2,9 +2,13 @@ import {
   Alert,
   Button,
   Checkbox,
+  ComboboxItem,
+  ComboboxLikeRenderOptionInput,
+  ComboboxStringItem,
   List,
   Loader,
   MultiSelect,
+  OptionsFilter,
   TagsInput,
   Text,
 } from '@mantine/core'
@@ -49,6 +53,30 @@ export const InviteForm = ({
     potentialUserResult.data?.map((user) => [user.email.toLowerCase(), user]) ||
       []
   )
+  const fullName = (email: string) => {
+    const user = usersByEmail[email]
+    return user ? `${user.first_name} ${user.last_name}` : ''
+  }
+
+  // Match on name as well as email, so people can be found by name.
+  const filterByNameOrEmail: OptionsFilter = ({ options, search }) => {
+    const query = search.trim().toLowerCase()
+    return (options as ComboboxItem[]).filter((option) =>
+      `${fullName(option.value)} ${option.value}`.toLowerCase().includes(query)
+    )
+  }
+
+  const renderUserOption = ({
+    option,
+  }: ComboboxLikeRenderOptionInput<ComboboxStringItem>) => (
+    <div>
+      <Text size="md">{fullName(option.value) || option.value}</Text>
+      <Text size="sm" opacity={0.5}>
+        {option.value}
+      </Text>
+    </div>
+  )
+
   const form = useForm<UsersInvite>({
     mode: 'uncontrolled',
     initialValues: { users: [], groups: [], is_intern: true },
@@ -57,6 +85,7 @@ export const InviteForm = ({
   })
   const Controls = controls || undefined
   const [problems, setProblems] = useState<EmailProblem[]>([])
+  const [search, setSearch] = useState('')
   const problemCount = problems.reduce((n, p) => n + p.emails.length, 0)
 
   const showProblems = (next: EmailProblem[]) => {
@@ -166,6 +195,13 @@ export const InviteForm = ({
         label="Users"
         placeholder="Enter, select or paste email addresses..."
         data={Object.keys(usersByEmail)}
+        filter={filterByNameOrEmail}
+        renderOption={renderUserOption}
+        searchValue={search}
+        onSearchChange={setSearch}
+        // Enter picks the highlighted person rather than adding a name as
+        // typed. Only while searching, or picking scrolls the list to the top.
+        selectFirstOptionOnChange={search !== ''}
         rightSection={
           potentialUserResult.isLoading ? <Loader size="sm" /> : undefined
         }
