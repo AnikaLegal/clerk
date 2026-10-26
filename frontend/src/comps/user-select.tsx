@@ -2,14 +2,15 @@ import { Loader, Select, SelectProps } from '@mantine/core'
 import { GetUsersApiArg, useGetUsersQuery, User } from 'api'
 import React, { useEffect, useState } from 'react'
 
-interface UserSelectProps extends SelectProps {
-  filter: GetUsersApiArg
+// UserSelect supplies its own data, fetched with `usersQuery`.
+interface UserSelectProps extends Omit<SelectProps, 'data'> {
+  usersQuery: GetUsersApiArg
 }
 
-export const UserSelect = ({ filter, ...props }: UserSelectProps) => {
+export const UserSelect = ({ usersQuery, ...props }: UserSelectProps) => {
   const [data, setData] = useState<User[]>([])
   const [args, setArgs] = useState<GetUsersApiArg>({
-    ...filter,
+    ...usersQuery,
     page: 1,
     pageSize: 100,
   })

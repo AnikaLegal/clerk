@@ -43,7 +43,7 @@ const App = () => {
         label="Lawyer"
         placeholder="Only show the cases supervised by the selected lawyer"
         onChange={(value) => setLawyer(Number(value) || null)}
-        filter={{
+        usersQuery={{
           group: 'Lawyer',
           sort: 'email',
         }}
