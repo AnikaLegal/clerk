@@ -1,104 +1,32 @@
-import { Button, Container, Group, Title } from '@mantine/core'
-import { useCreateUserMutation } from 'api'
-import { showNotification } from 'comps/notification'
-import {
-  InviteForm,
-  InviteFormControlProps,
-  InviteFormType,
-  UsersCreate,
-} from 'features/invite'
+import { Anchor, Container, Text, Title } from '@mantine/core'
+import { InviteForm } from 'features/invite'
 import React from 'react'
-import { getAPIErrorMessage, getAPIFormErrors, mount } from 'utils'
+import { mount } from 'utils'
 
 interface DjangoContext {
+  accounts_url: string
   group_values: string[]
+  workspace_domain: string
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CONTEXT = (window as any).REACT_CONTEXT as DjangoContext
 
-const App = () => {
-  const [createUser] = useCreateUserMutation()
-
-  const handleSubmit = (form: InviteFormType, values: UsersCreate) => {
-    form.setSubmitting(true)
-
-    const promises = values.users.map((user) =>
-      createUser({
-        userCreate: {
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          groups: values.groups,
-        },
-      }).unwrap()
-    )
-    Promise.allSettled(promises)
-      .then((results) => {
-        results.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
-            showNotification({
-              type: 'success',
-              title: 'User created',
-              message: `Invitation sent to ${result.value.email}.`,
-              link: {
-                text: 'View user',
-                url: result.value.url,
-              },
-              autoClose: 4000,
-            })
-          } else {
-            const email = values.users[index].email
-            showNotification({
-              type: 'error',
-              title: `Failed to create user ${email}`,
-              message: getAPIErrorMessage(result.reason),
-              autoClose: 4000,
-            })
-            const requestErrors = getAPIFormErrors(result.reason)
-            if (requestErrors) {
-              form.setErrors(requestErrors)
-            }
-          }
-        })
-        if (results.every((result) => result.status === 'fulfilled')) {
-          form.reset()
-        }
-      })
-      .finally(() => {
-        form.setSubmitting(false)
-      })
-  }
-
-  return (
-    <Container size="xl">
-      <Title order={1} mb="md">
-        Invite users
-      </Title>
-      <InviteForm
-        groups={CONTEXT.group_values}
-        onSubmit={handleSubmit}
-        onCancel={() => {
-          /* Do nothing */
-        }}
-        controls={InviteFormControls}
-      />
-    </Container>
-  )
-}
-
-const InviteFormControls = ({ form }: InviteFormControlProps) => {
-  return (
-    <Group mt="lg">
-      <Button
-        type="submit"
-        disabled={form.submitting}
-        loading={form.submitting}
-        size="md"
-      >
-        Invite users
-      </Button>
-    </Group>
-  )
-}
+const App = () => (
+  <Container size="md">
+    <Title order={1}>Invite users</Title>
+    <Anchor href={CONTEXT.accounts_url} size="sm">
+      Back to accounts
+    </Anchor>
+    <Text c="dimmed" mt="xs" mb="md">
+      Creates a Clerk account and Microsoft 365 login, and emails the sign-in
+      details. Microsoft access can take up to 15 minutes.
+    </Text>
+    <InviteForm
+      groups={CONTEXT.group_values}
+      workspaceDomain={CONTEXT.workspace_domain}
+      accountsUrl={CONTEXT.accounts_url}
+    />
+  </Container>
+)
 
 mount(App)

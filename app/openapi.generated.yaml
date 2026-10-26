@@ -667,6 +667,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /clerk/api/note/:
     get:
       operationId: getNotes
@@ -3314,6 +3316,9 @@ components:
           type: array
           items:
             type: string
+        is_intern:
+          type: boolean
+          default: false
       required:
         - first_name
         - last_name

@@ -1,10 +1,10 @@
 import logging
 from typing import Optional
 
-from accounts.models import CaseGroups, User
-from django.db.models import QuerySet
+from accounts.models import CASE_GROUPS_BY_PRIVILEGE, CaseGroups, User
+from django.conf import settings
+from django.db.models import QuerySet, Value
 from django.db.models.functions import Concat
-from django.db.models import Value
 from django.http import Http404
 from django.urls import reverse
 from google.service import list_directory_users
@@ -30,10 +30,15 @@ from case.utils.react import render_react_page
 from case.views.auth import (
     AdminOrBetterPermission,
     CoordinatorOrBetterPermission,
+    admin_or_better_required,
     coordinator_or_better_required,
 )
 
 logger = logging.getLogger(__name__)
+
+# Accounts in this Google Workspace OU aren't individual people, so they
+# shouldn't be invited.
+DELEGATED_MAILBOX_OU = "/Delegated mailboxes"
 
 
 @api_view(["GET"])
@@ -62,10 +67,13 @@ def account_detail_page_view(request, pk):
 
 
 @api_view(["GET"])
-@coordinator_or_better_required
+@admin_or_better_required
 def account_create_page_view(request):
     context = {
-        "group_values": CaseGroups.values,
+        "accounts_url": reverse("account-list"),
+        # Least privileged first: most invites are for paralegals.
+        "group_values": list(reversed(CASE_GROUPS_BY_PRIVILEGE)),
+        "workspace_domain": settings.GOOGLE_WORKSPACE_DOMAIN,
     }
     return render_react_page(request, "Invite users", "account-create", context)
 
@@ -175,15 +183,13 @@ class AccountApiViewset(
         permission_classes=[AdminOrBetterPermission],
     )
     def account_list_potential_users(self, request):
-        # Fetch active users from Google Directory.
-        active_users = [
-            user for user in list_directory_users() if user.get("suspended") is False
-        ]
-
         # Exclude users that are already in the system.
         existing_emails = set(self.get_queryset().values_list("email", flat=True))
         potential_users = [
-            user for user in active_users if user["primaryEmail"] not in existing_emails
+            user
+            for user in list_directory_users(query="isSuspended=false")
+            if not user.get("orgUnitPath", "").startswith(DELEGATED_MAILBOX_OU)
+            and user["primaryEmail"].lower() not in existing_emails
         ]
         potential_users.sort(key=lambda u: u["primaryEmail"])
 

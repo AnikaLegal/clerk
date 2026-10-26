@@ -249,7 +249,7 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
         }
         instance = super().to_representation(instance)
         if all(value is None for value in instance.values()):
-            return None
+            return {}
         return instance
 
 

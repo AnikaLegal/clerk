@@ -1,10 +1,12 @@
 from accounts.models import User
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.validators import UniqueValidator
 
 from case.middleware import annotate_group_access
 
@@ -20,7 +22,18 @@ class PotentialUserSerializer(serializers.Serializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "groups", "url")
+        fields = ("first_name", "last_name", "email", "groups", "is_intern", "url")
+        extra_kwargs = {
+            "email": {
+                # DRF's default leaves Django's message uncapitalised.
+                "validators": [
+                    UniqueValidator(
+                        queryset=User.objects.all(),
+                        message="User with this email address already exists.",
+                    )
+                ]
+            }
+        }
 
     groups = serializers.SlugRelatedField(
         many=True,
@@ -34,10 +47,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return reverse("account-detail", args=(obj.pk,))
 
     def validate_email(self, value: str):
-        if not value.endswith("@anikalegal.org.au"):
-            raise ValidationError(
-                "Can only invite users with an anikalegal.org.au email"
-            )
+        domain = settings.GOOGLE_WORKSPACE_DOMAIN
+        if not value.endswith(f"@{domain}"):
+            raise ValidationError(f"Can only invite users with an {domain} email")
         return value
 
     @transaction.atomic

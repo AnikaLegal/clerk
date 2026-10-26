@@ -25,14 +25,28 @@ def _get_credentials(scope_list):
     )
 
 
-def list_directory_users(order_by="email"):
+# Only request what callers use: it keeps responses small and leaves out
+# personal details such as recovery emails and phone numbers.
+DIRECTORY_USER_FIELDS = "nextPageToken,users(primaryEmail,name,suspended,orgUnitPath)"
+
+
+def list_directory_users(order_by="email", query=None):
+    """
+    List users in the Google Directory. `query` uses the Directory API search
+    syntax, e.g. "isSuspended=false".
+    """
     credentials = _get_credentials(
         scope_list=["https://www.googleapis.com/auth/admin.directory.user.readonly"],
     )
 
     service = build("admin", "directory_v1", credentials=credentials)
-    # TODO: can we add caching here?
-    request = service.users().list(domain="anikalegal.org.au", orderBy=order_by)
+    request = service.users().list(
+        domain=settings.GOOGLE_WORKSPACE_DOMAIN,
+        orderBy=order_by,
+        query=query,
+        maxResults=500,
+        fields=DIRECTORY_USER_FIELDS,
+    )
 
     users = []
     while request is not None:

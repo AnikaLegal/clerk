@@ -16,6 +16,20 @@ def test_submission_retrieve_api(superuser_client):
 
 
 @pytest.mark.django_db
+def test_submission_retrieve_api__blank_eviction_arrears_answers(superuser_client):
+    # Generate without topic answers, then switch topic so they are all blank.
+    submission = SubmissionFactory(update_answers={"ISSUES": "OTHER"})
+    submission.answers["ISSUES"] = "EVICTION_ARREARS"
+    submission.answers.pop("OTHER_ISSUE_DESCRIPTION", None)
+    submission.save()
+    url = reverse("submission-api-detail", args=(submission.pk,))
+    response = superuser_client.get(url)
+
+    assert response.status_code == 200, response.json()
+    assert response.json()["answers"]["topic_specific"] is None
+
+
+@pytest.mark.django_db
 def test_submission_retrieve_api__unprocessed_not_accessible(superuser_client):
     submission = SubmissionFactory(is_processed=False)
     url = reverse("submission-api-detail", args=(submission.pk,))

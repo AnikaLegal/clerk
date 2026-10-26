@@ -1,10 +1,11 @@
 from datetime import datetime
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-from django.db import transaction
-from web.models import BlogPage
 
 from accounts.models import User
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.utils import timezone
+from web.models import BlogPage
 
 
 class Command(BaseCommand):
@@ -16,7 +17,7 @@ class Command(BaseCommand):
             print("Processing page", slug)
             dt = datetime.strptime(published_date, "%d %B %Y")
             first, last = name.split(" ")
-            email = f"{first}.{last}@anikalegal.org.au".lower()
+            email = f"{first}.{last}@{settings.GOOGLE_WORKSPACE_DOMAIN}".lower()
             user, _ = User.objects.get_or_create(
                 first_name=first,
                 last_name=last,

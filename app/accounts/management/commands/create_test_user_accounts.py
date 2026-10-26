@@ -14,7 +14,6 @@ USER_ACCOUNTS = {
     "test-lawyer": [CaseGroups.LAWYER],
     "test-coordinator": [CaseGroups.COORDINATOR],
 }
-DOMAIN = "anikalegal.org.au"
 
 
 class Command(BaseCommand):
@@ -26,7 +25,7 @@ class Command(BaseCommand):
         self.stdout.write("\nCreating test user accounts...")
 
         for user_name, group_names in USER_ACCOUNTS.items():
-            email = f"{user_name}@{DOMAIN}"
+            email = f"{user_name}@{settings.GOOGLE_WORKSPACE_DOMAIN}"
 
             first_name = user_name.split("-", 2)[0].capitalize()
             last_name = user_name.split("-", 2)[1].capitalize()

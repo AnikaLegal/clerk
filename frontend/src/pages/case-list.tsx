@@ -136,7 +136,7 @@ const App = () => {
                 onChange={(value) =>
                   setArgs({ ...args, paralegal: value || undefined, page: 1 })
                 }
-                filter={{
+                usersQuery={{
                   group: 'Paralegal',
                   sort: 'email',
                 }}
@@ -148,7 +148,7 @@ const App = () => {
                 onChange={(value) =>
                   setArgs({ ...args, lawyer: value || undefined, page: 1 })
                 }
-                filter={{
+                usersQuery={{
                   group: 'Lawyer',
                   sort: 'email',
                 }}
