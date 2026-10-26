@@ -78,7 +78,8 @@ export const InviteForm = ({
   )
 
   const form = useForm<UsersInvite>({
-    mode: 'uncontrolled',
+    // Controlled, so the pills show the normalised (lowercased) emails.
+    mode: 'controlled',
     initialValues: { users: [], groups: [], is_intern: true },
     validate: yupResolver(UsersInviteSchema),
     ...input,
