@@ -192,6 +192,7 @@ class EvictionArrearsSpecificSerializer(serializers.Serializer):
     delivery_method_other_docs = serializers.CharField(allow_null=True)
     delivery_method_possession_order = serializers.CharField(allow_null=True)
     doc_delivery_time_other_docs = serializers.DateField(allow_null=True)
+    doc_delivery_time_possession_order = serializers.DateField(allow_null=True)
     is_on_payment_plan = BooleanYesNoDisplayField(allow_null=True)
     miscellaneous = serializers.CharField(allow_null=True)
     payment_amount = serializers.IntegerField(allow_null=True)
@@ -319,7 +320,7 @@ class RentReductionSpecificSerializer(serializers.Serializer):
             "issue_start": string_to_date(instance.get("RENT_REDUCTION_ISSUE_START")),
             "issue_photos": instance.get("RENT_REDUCTION_ISSUE_PHOTO"),
             "is_notice_to_vacate": instance.get("RENT_REDUCTION_IS_NOTICE_TO_VACATE"),
-            "notice_to_vacate_documents": instance.get(
+            "notice_to_vacate": instance.get(
                 "RENT_REDUCTION_NOTICE_TO_VACATE_DOCUMENT"
             ),
         }
