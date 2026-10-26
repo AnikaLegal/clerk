@@ -165,11 +165,11 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.profile",
 ]
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["anikalegal.com", "anikalegal.org.au"]
-
 # Primary domain of our Google Workspace, the directory Clerk users are invited
 # from. Not EMAIL_DOMAIN, which is where transactional mail is sent from.
 GOOGLE_WORKSPACE_DOMAIN = "anikalegal.org.au"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = [GOOGLE_WORKSPACE_DOMAIN]
 
 # See https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
 SOCIAL_AUTH_PIPELINE = (
