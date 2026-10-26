@@ -93,7 +93,9 @@ Compose files in the same directory define how the images run: `docker-compose.l
 
 Deployment is done via the [Deploy workflow](https://github.com/AnikaLegal/clerk/actions?query=workflow%3ADeploy), which must be triggered manually from GitHub. It connects to the server's Docker daemon over SSH and updates the environment's Swarm stack to the latest image. It does not build anything: images come from the Test workflow (see above).
 
-The web service has a health check (`/health/`, which also confirms the database connection). During a deploy Swarm stops the old container, starts the new one and only routes traffic to it once the check passes, so the site shows the maintenance page for the restart. If the new container never becomes healthy, or fails within its first minute, Swarm rolls the service back to the previous image automatically, and the Deploy run fails because it waits for the update to converge.
+The web service has a health check (`/health/`, which also confirms the database connection). During a deploy Swarm starts the new container alongside the old one, routes traffic to it once the check passes, and only then stops the old one, so there is no maintenance page. If the new container never becomes healthy, or fails within its first minute, Swarm rolls the service back to the previous image automatically and the Deploy run fails, because it waits for the update to converge. A failed deploy costs no downtime either, since the old container is never stopped.
+
+The two containers overlap for as long as the new one takes to run migrations and pass its health check, and the old code serves traffic against the migrated schema throughout. Adding tables and columns is safe. Dropping or renaming one is not, so split that work across two deploys: ship the code that stops using the column first, and drop the column in a later deploy.
 
 To roll back, point the environment's services at an earlier build's sha tag on the server, e.g. `docker service update --image anikalaw/clerk:sha-1234567 clerk_prod_web` (and likewise `clerk_prod_worker`). The next Deploy run moves them back to the environment tag.
 
@@ -101,6 +103,7 @@ When making a change or bugfix, you should:
 
 - create a branch from `develop` named `<your-name>/<commit-type>/<short-description>`, e.g. `jane/proj/my-project-name`, or Linear's suggested branch name when working from an issue, e.g. `jane/tec-1234-my-issue-title`, and test it locally
 - merge the branch into `develop` and trigger a release to the staging environment
+- if the change drops or renames a database column or model, ship that in a separate, later deploy than the code that stopped using it (see above)
 - check your changes in the staging environment
 - merge the `develop` branch into `master` and trigger a release to the production environment
 

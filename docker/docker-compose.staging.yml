@@ -25,11 +25,15 @@ services:
     stop_grace_period: 30s
     deploy:
       update_config:
-        order: stop-first
+        # No maintenance page: the new task has to be healthy before the old
+        # one stops. The old code therefore serves traffic against the migrated
+        # schema until then, so a migration that drops or renames a column must
+        # ship in a later deploy than the code that stopped using it.
+        order: start-first
         failure_action: rollback
         monitor: 60s
       rollback_config:
-        order: stop-first
+        order: start-first
         monitor: 60s
 
   worker:
