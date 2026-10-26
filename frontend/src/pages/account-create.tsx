@@ -1,4 +1,4 @@
-import { Button, Container, Group, Title } from '@mantine/core'
+import { Button, Container, Group, Text, Title } from '@mantine/core'
 import api, { useAppDispatch, useCreateUserMutation, UserCreateRead } from 'api'
 import { showNotification } from 'comps/notification'
 import {
@@ -75,9 +75,11 @@ const App = () => {
 
   return (
     <Container size="xl">
-      <Title order={1} mb="md">
-        Invite users
-      </Title>
+      <Title order={1}>Invite users</Title>
+      <Text c="dimmed" mb="md">
+        Creates a Clerk account and Microsoft 365 login, and emails the sign-in
+        details. Microsoft access can take up to 15 minutes.
+      </Text>
       <InviteForm
         groups={CONTEXT.group_values}
         workspaceDomain={CONTEXT.workspace_domain}
