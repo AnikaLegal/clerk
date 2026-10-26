@@ -27,3 +27,5 @@ post:
       $ref: ../responses/BadRequest.yaml
     "403":
       $ref: ../responses/PermissionDenied.yaml
+    "404":
+      $ref: ../responses/NotFound.yaml

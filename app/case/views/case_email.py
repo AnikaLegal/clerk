@@ -20,6 +20,7 @@ from emails.utils.threads import EmailThread
 from microsoft.endpoints import MSGraphAPI
 from microsoft.service import save_email_attachment
 from rest_framework.decorators import action, api_view
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -302,7 +303,13 @@ class EmailApiViewset(GenericViewSet):
 
         # Download attachment from SharePoint.
         api = MSGraphAPI()
-        filename, content_type, file_bytes = api.folder.download_file(sharepoint_id)
+        download = api.folder.download_file(sharepoint_id)
+        if download is None:
+            # Deleted or moved since the user loaded the document list.
+            raise NotFound(
+                "This file is no longer in SharePoint. Refresh the page and try again."
+            )
+        filename, content_type, file_bytes = download
 
         # Save as email attachment
         f = InMemoryUploadedFile(

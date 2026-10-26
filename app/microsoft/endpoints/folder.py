@@ -134,11 +134,14 @@ class FolderEndpoint(BaseEndpoint):
 
     def download_file(self, file_id):
         """
-        Returns file name, MIME type, file bytes
+        Returns file name, MIME type, file bytes, or None if the file doesn't exist.
         """
         file_data = super().get(
             f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
         )
+        if file_data is None:
+            return None
+
         file_name = file_data["name"]
         mimetype = file_data["file"]["mimeType"]
 

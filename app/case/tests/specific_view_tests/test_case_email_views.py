@@ -216,6 +216,26 @@ def test_case_email_download_attachment_from_sharepoint_view(
     assert attachment.file.read() == b"Hello World!"
 
 
+@pytest.mark.django_db
+@patch("case.views.case_email.MSGraphAPI")
+def test_case_email_download_attachment_from_sharepoint_view__missing_file(
+    mock_microsoft_api, superuser_client
+):
+    mock_api = Mock()
+    mock_api.folder.download_file.return_value = None
+    mock_microsoft_api.return_value = mock_api
+
+    email = EmailFactory(state=EmailState.DRAFT)
+    url = reverse(
+        "email-api-attachment-sharepoint-download",
+        args=(email.issue.pk, email.pk, "ABCD-1234"),
+    )
+    response = superuser_client.post(url)
+
+    assert response.status_code == 404
+    assert EmailAttachment.objects.count() == 0
+
+
 def dt(day):
     return datetime(2022, 1, day, tzinfo=timezone.utc)
 
