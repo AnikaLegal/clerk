@@ -1,12 +1,12 @@
-from core.models import Issue, Person, Tenancy
+from core.models import Person
 from django.db.models import Q, QuerySet
 from django.http import Http404
 from django.urls import reverse
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.viewsets import ModelViewSet
 
 from case.serializers import (
-    IssueSerializer,
     PersonSearchRequestSerializer,
     PersonSerializer,
 )
@@ -15,6 +15,7 @@ from case.utils.react import render_react_page
 
 from .auth import (
     CoordinatorOrBetterCanWritePermission,
+    ParalegalOrBetterObjectPermission,
     coordinator_or_better_required,
     paralegal_or_better_required,
 )
@@ -41,12 +42,11 @@ def person_detail_page_view(request, pk):
     except Person.DoesNotExist:
         raise Http404()
 
-    q_filter = Q(tenancy__agent=person) | Q(tenancy__landlord=person)
-    issues = Issue.objects.filter(q_filter).order_by("-created_at").all()
+    if not person.check_permission(request.user):
+        raise PermissionDenied()
 
     context = {
-        "issues": IssueSerializer(issues, many=True).data,
-        "person": PersonSerializer(instance=person).data,
+        "personId": person.pk,
         "is_editable": request.user.is_coordinator_or_better,
         "list_url": reverse("person-list"),
     }
@@ -61,7 +61,10 @@ class PersonApiViewset(ModelViewSet):
     queryset = Person.objects.order_by("full_name").all()
     serializer_class = PersonSerializer
     pagination_class = PersonPaginator
-    permission_classes = [CoordinatorOrBetterCanWritePermission]
+    permission_classes = [
+        CoordinatorOrBetterCanWritePermission,
+        ParalegalOrBetterObjectPermission,
+    ]
 
     def get_queryset(self):
         queryset = super().get_queryset()

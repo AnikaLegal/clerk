@@ -1,17 +1,21 @@
 import React from 'react'
 import { Formik } from 'formik'
-import { Container, Header } from 'semantic-ui-react'
+import { Container, Header, Loader, Message } from 'semantic-ui-react'
 import { useSnackbar } from 'notistack'
 
 import { mount, getAPIErrorMessage, getAPIFormErrors } from 'utils'
 import { PersonForm } from 'forms/person'
 import { CaseListTable } from 'comps/case-table'
-import { useDeletePersonMutation, useUpdatePersonMutation, Person } from 'api'
+import {
+  useDeletePersonMutation,
+  useUpdatePersonMutation,
+  useGetPersonQuery,
+  useGetCasesQuery,
+} from 'api'
 
 interface DjangoContext {
-  person: Person
+  personId: number
   is_editable: boolean
-  issues: any
   list_url: string
 }
 
@@ -26,22 +30,35 @@ const TABLE_FIELDS = [
   'outcome',
 ]
 
-const {
-  person: initialPerson,
-  is_editable,
-  issues,
-  list_url,
-} = (window as any).REACT_CONTEXT as DjangoContext
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const { personId, is_editable, list_url } = (window as any)
+  .REACT_CONTEXT as DjangoContext
 
-const App = () => {
-  const [person, setPerson] = React.useState<Person>(initialPerson)
+export const PersonInfo = ({ personId }: { personId: number }) => {
+  const personQuery = useGetPersonQuery({ id: personId })
   const { enqueueSnackbar } = useSnackbar()
   const [deletePerson] = useDeletePersonMutation()
   const [updatePerson] = useUpdatePersonMutation()
-  const handleDelete = (e) => {
+
+  if (personQuery.isLoading) {
+    return <Loader active inline="centered" />
+  }
+
+  if (personQuery.isError) {
+    // person_detail_page_view handles 403 and 404, so anything here is unexpected.
+    throw personQuery.error
+  }
+
+  const currentPerson = personQuery.data
+  if (!currentPerson) {
+    return null
+  }
+
+  const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     if (window.confirm('Are you sure you want to delete this person?')) {
-      deletePerson({ id: person.id })
+      deletePerson({ id: currentPerson.id })
+        .unwrap()
         .then(() => {
           window.location.href = list_url
         })
@@ -52,29 +69,31 @@ const App = () => {
         })
     }
   }
+
   return (
-    <Container>
+    <>
       <Header as="h1">
-        {person.full_name}
+        {currentPerson.full_name}
         <Header.Subheader>
           <a href={list_url}>Back to parties</a>
         </Header.Subheader>
       </Header>
       <Formik
+        enableReinitialize
         initialValues={{
-          full_name: person.full_name,
-          email: person.email,
-          address: person.address,
-          phone_number: person.phone_number,
-          support_contact_preferences: person.support_contact_preferences.value,
+          full_name: currentPerson.full_name,
+          email: currentPerson.email,
+          address: currentPerson.address,
+          phone_number: currentPerson.phone_number,
+          support_contact_preferences:
+            currentPerson.support_contact_preferences?.value ?? '',
         }}
-        validate={(values) => {}}
+        validate={() => {}}
         onSubmit={(values, { setSubmitting, setErrors }) => {
-          updatePerson({ id: person.id, personCreate: values })
+          updatePerson({ id: currentPerson.id, personCreate: values })
             .unwrap()
-            .then((person) => {
+            .then(() => {
               enqueueSnackbar('Updated person', { variant: 'success' })
-              setPerson(person)
               setSubmitting(false)
             })
             .catch((err) => {
@@ -101,7 +120,39 @@ const App = () => {
           />
         )}
       </Formik>
-      <CaseListTable issues={issues} fields={TABLE_FIELDS} />
+      <PersonCaseList personId={currentPerson.id} />
+    </>
+  )
+}
+
+export const PersonCaseList = ({ personId }: { personId: number }) => {
+  // Cases where this person is the support worker, tenancy agent or tenancy landlord.
+  // A negative pageSize returns every case instead of the first 14.
+  const cases = useGetCasesQuery({ person: personId, pageSize: -1 })
+
+  if (cases.isLoading) {
+    return (
+      <Loader active inline="centered">
+        Loading cases
+      </Loader>
+    )
+  }
+
+  if (cases.isError) {
+    return <Message negative>Could not load cases</Message>
+  }
+
+  if (!cases.data) {
+    return null
+  }
+
+  return <CaseListTable issues={cases.data.results} fields={TABLE_FIELDS} />
+}
+
+const App = () => {
+  return (
+    <Container>
+      <PersonInfo personId={personId} />
     </Container>
   )
 }

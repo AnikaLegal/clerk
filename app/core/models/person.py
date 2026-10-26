@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models import Q
+
+from accounts.models import User
 
 from .timestamped import TimestampedModel
 
@@ -41,3 +44,27 @@ class Person(TimestampedModel):
     support_contact_preferences = models.CharField(
         max_length=16, choices=SupportContactPreferences.choices, blank=True, default=""
     )
+
+    def check_permission(self, user: User) -> bool:
+        """
+        Returns True if the user has object level permission to access this instance.
+
+        A Person is linked to an Issue either directly (as support_worker) or
+        indirectly via a Tenancy on which they are listed as landlord or agent.
+        """
+        if user.role.is_coordinator_or_better:
+            return True
+
+        # Local import - issue.py imports Person at the top level, so a
+        # module-level import here would create a circular dependency.
+        from .issue import Issue
+
+        issues = Issue.objects.filter(
+            Q(support_worker=self)
+            | Q(tenancy__landlord=self)
+            | Q(tenancy__agent=self)
+        )
+        for issue in issues:
+            if issue.check_permission(user):
+                return True
+        return False
