@@ -5,6 +5,7 @@ import {
   ComboboxItem,
   ComboboxLikeRenderOptionInput,
   ComboboxStringItem,
+  Group,
   List,
   Loader,
   MultiSelect,
@@ -12,51 +13,37 @@ import {
   TagsInput,
   Text,
 } from '@mantine/core'
-import { useForm, UseFormInput } from '@mantine/form'
-import { useGetPotentialUsersQuery } from 'api'
-import { UsersCreate, UsersInvite, UsersInviteSchema } from 'features/invite'
+import { useForm } from '@mantine/form'
+import {
+  EmailProblem,
+  useInviteUsers,
+} from 'features/invite/hooks/use-invite-users'
+import { UsersInvite, UsersInviteSchema } from 'features/invite/schema'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import React, { useState } from 'react'
-
-export type InviteFormType = ReturnType<typeof useForm<UsersInvite>>
-
-interface EmailProblem {
-  reason: string
-  emails: string[]
-}
-
-export interface InviteFormControlProps {
-  form: InviteFormType
-  onSubmit: (form: InviteFormType, values: UsersCreate) => void
-  onCancel: () => void
-}
 
 export interface InviteFormProps {
   groups: string[]
   workspaceDomain: string
-  onSubmit: (form: InviteFormType, values: UsersCreate) => void
-  onCancel: () => void
-  input?: UseFormInput<UsersInvite>
-  controls?: React.ComponentType<InviteFormControlProps>
+  accountsUrl: string
 }
 
 export const InviteForm = ({
   groups,
   workspaceDomain,
-  onSubmit,
-  onCancel,
-  input,
-  controls,
+  accountsUrl,
 }: InviteFormProps) => {
-  const potentialUserResult = useGetPotentialUsersQuery()
-  const usersByEmail = Object.fromEntries(
-    potentialUserResult.data?.map((user) => [user.email.toLowerCase(), user]) ||
-      []
-  )
-  const fullName = (email: string) => {
-    const user = usersByEmail[email]
-    return user ? `${user.first_name} ${user.last_name}` : ''
-  }
+  const { directory, emails, fullName, findProblems, inviteUsers } =
+    useInviteUsers({ workspaceDomain, accountsUrl })
+  const form = useForm<UsersInvite>({
+    // Controlled, so the pills show the normalised (lowercased) emails.
+    mode: 'controlled',
+    initialValues: { users: [], groups: [], is_intern: true },
+    validate: yupResolver(UsersInviteSchema),
+  })
+  const [problems, setProblems] = useState<EmailProblem[]>([])
+  const [search, setSearch] = useState('')
+  const problemCount = problems.reduce((n, p) => n + p.emails.length, 0)
 
   // Match on name as well as email, so people can be found by name.
   const filterByNameOrEmail: OptionsFilter = ({ options, search }) => {
@@ -76,18 +63,6 @@ export const InviteForm = ({
       </Text>
     </div>
   )
-
-  const form = useForm<UsersInvite>({
-    // Controlled, so the pills show the normalised (lowercased) emails.
-    mode: 'controlled',
-    initialValues: { users: [], groups: [], is_intern: true },
-    validate: yupResolver(UsersInviteSchema),
-    ...input,
-  })
-  const Controls = controls || undefined
-  const [problems, setProblems] = useState<EmailProblem[]>([])
-  const [search, setSearch] = useState('')
-  const problemCount = problems.reduce((n, p) => n + p.emails.length, 0)
 
   const showProblems = (next: EmailProblem[]) => {
     const remaining = next.filter((p) => p.emails.length > 0)
@@ -114,64 +89,41 @@ export const InviteForm = ({
     showProblems([])
   }
 
-  const handleSubmit = (
-    values: UsersInvite,
-    event: React.FormEvent<HTMLFormElement> | undefined
-  ) => {
-    event?.stopPropagation()
-
-    if (potentialUserResult.isLoading) {
+  const handleSubmit = async (values: UsersInvite) => {
+    if (directory.isLoading) {
       form.setFieldError(
         'users',
         'Still loading the Google directory, try again in a moment.'
       )
       return
     }
-    if (potentialUserResult.isError) {
+    if (directory.isError) {
       return
     }
-
-    const suffix = `@${workspaceDomain}`
-    const found: EmailProblem[] = [
-      {
-        reason: `Not an ${suffix} address`,
-        emails: values.users.filter((e) => !e.endsWith(suffix)),
-      },
-      {
-        reason: 'Not in the Google directory or already has an account',
-        emails: values.users.filter(
-          (e) => e.endsWith(suffix) && !usersByEmail[e]
-        ),
-      },
-    ]
-    if (found.some((p) => p.emails.length > 0)) {
+    const found = findProblems(values.users)
+    if (found.length > 0) {
       showProblems(found)
       return
     }
 
-    const mapped = values.users.map((n) => usersByEmail[n]).filter(Boolean)
-    onSubmit(form, {
-      users: mapped,
-      groups: values.groups,
-      is_intern: values.is_intern,
-    })
-  }
-
-  const onValidationFailure = (
-    errors,
-    values,
-    event: React.FormEvent<HTMLFormElement> | undefined
-  ) => {
-    event?.stopPropagation()
+    form.setSubmitting(true)
+    try {
+      const failed = await inviteUsers(values)
+      if (failed.length === 0) {
+        form.reset()
+      } else {
+        // Keep only the failed emails so a retry doesn't re-invite the rest.
+        form.setFieldValue('users', failed)
+      }
+    } finally {
+      form.setSubmitting(false)
+    }
   }
 
   const usersInputProps = form.getInputProps('users')
 
   return (
-    <form
-      autoComplete="off"
-      onSubmit={form.onSubmit(handleSubmit, onValidationFailure)}
-    >
+    <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
       <TagsInput
         {...usersInputProps}
         onChange={(value) => {
@@ -189,13 +141,12 @@ export const InviteForm = ({
         }}
         error={
           usersInputProps.error ||
-          (potentialUserResult.isError &&
+          (directory.isError &&
             "Couldn't load the Google directory. Reload the page to try again.")
         }
-        key={form.key('users')}
         label="Users"
         placeholder="Enter, select or paste email addresses..."
-        data={Object.keys(usersByEmail)}
+        data={emails}
         filter={filterByNameOrEmail}
         renderOption={renderUserOption}
         searchValue={search}
@@ -203,9 +154,7 @@ export const InviteForm = ({
         // Enter picks the highlighted person rather than adding a name as
         // typed. Only while searching, or picking scrolls the list to the top.
         selectFirstOptionOnChange={search !== ''}
-        rightSection={
-          potentialUserResult.isLoading ? <Loader size="sm" /> : undefined
-        }
+        rightSection={directory.isLoading ? <Loader size="sm" /> : undefined}
         splitChars={[',', ' ', '|', ';', '\n']}
         clearable
         size="md"
@@ -238,7 +187,6 @@ export const InviteForm = ({
       )}
       <MultiSelect
         {...form.getInputProps('groups')}
-        key={form.key('groups')}
         label="Groups"
         data={groups}
         searchable
@@ -248,14 +196,20 @@ export const InviteForm = ({
       />
       <Checkbox
         {...form.getInputProps('is_intern', { type: 'checkbox' })}
-        key={form.key('is_intern')}
         label="Intern"
         size="md"
         mt="md"
       />
-      {Controls && (
-        <Controls form={form} onSubmit={onSubmit} onCancel={onCancel} />
-      )}
+      <Group mt="lg">
+        <Button
+          type="submit"
+          disabled={form.submitting}
+          loading={form.submitting}
+          size="md"
+        >
+          Invite users
+        </Button>
+      </Group>
     </form>
   )
 }

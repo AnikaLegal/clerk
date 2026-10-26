@@ -1,17 +1,5 @@
 import * as Yup from 'yup'
 
-export type UserInfo = {
-  email: string
-  first_name: string
-  last_name: string
-}
-
-export type UsersCreate = {
-  users: UserInfo[]
-  groups: string[]
-  is_intern: boolean
-}
-
 export type UsersInvite = {
   users: string[]
   groups: string[]
