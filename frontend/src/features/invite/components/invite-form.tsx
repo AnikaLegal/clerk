@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Checkbox,
   ComboboxItem,
@@ -193,12 +194,23 @@ export const InviteForm = ({
         clearable
         size="md"
         mt="md"
-      />
-      <Checkbox
-        {...form.getInputProps('is_intern', { type: 'checkbox' })}
-        label="Intern"
-        size="md"
-        mt="md"
+        // The Intern checkbox sits beside the select box itself. The gap
+        // above an error moves from the box to the error, so the box's
+        // container stays the box's height and the checkbox stays level.
+        styles={{
+          wrapper: { marginBottom: 0 },
+          error: { marginTop: 'calc(var(--mantine-spacing-xs) / 2)' },
+        }}
+        inputContainer={(children) => (
+          <Group wrap="nowrap" gap="lg">
+            <Box flex={1}>{children}</Box>
+            <Checkbox
+              {...form.getInputProps('is_intern', { type: 'checkbox' })}
+              label="Intern"
+              size="md"
+            />
+          </Group>
+        )}
       />
       <Group mt="lg">
         <Button
