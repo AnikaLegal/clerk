@@ -36,6 +36,10 @@ sentry_sdk.init(
     integrations=[DjangoIntegration()],
     environment=ENVIRONMENT,
     enable_logs=True,
+    # Local variables and request bodies can hold client details, which the
+    # default scrubber does not remove.
+    include_local_variables=False,
+    max_request_body_size="never",
 )
 
 
