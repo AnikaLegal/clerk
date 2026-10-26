@@ -1,14 +1,14 @@
 import logging
-from utils.sentry import sentry_task
-from django.db import transaction
-from django.conf import settings
-from bs4 import BeautifulSoup
 
+from bs4 import BeautifulSoup
 from core.models import Issue
-from emails.utils.html import render_email_template
+from django.conf import settings
+from django.db import transaction
 from emails.models import Email, EmailState
 from emails.service.send import build_clerk_address
+from emails.utils.html import render_email_template
 from office.closure.service import get_closure_email
+from utils.sentry import sentry_task
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,8 @@ def send_welcome_email(issue_pk: str):
     html = get_email_html(name, issue.fileref, case_email)
     text = get_email_text(html)
 
-    if (not settings.IS_PROD) and (not client.email.endswith("@anikalegal.org.au")):
+    is_staff_email = client.email.endswith(f"@{settings.GOOGLE_WORKSPACE_DOMAIN}")
+    if (not settings.IS_PROD) and (not is_staff_email):
         msg = "Not sending welcome email for Issue<%s> - only Anika emails allowed in non-prod environments"
         logger.error(msg, issue_pk)
     else:
