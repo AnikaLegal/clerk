@@ -133,7 +133,7 @@ BOARD = [
             """Kim is an experienced Board Director with strong governance, legal,
             risk, and strategic expertise. She also serves on the Board of the
             Queen Elizabeth Centre, focusing on early parenting and child
-            wellbeing, and is Director and Chair of ARC at CUFA, an NGO
+            wellbeing, and is Director and Chair of ARC at AMF-CUFA, an NGO
             supporting economic sustainability in vulnerable Asia Pacific
             communities.""",
             """Kim retired from legal practice in June 2025 after 34
