@@ -1,7 +1,7 @@
 # The Clerk base image (docker/Dockerfile.base), by dated tag rather than a
 # moving one: a build can otherwise keep using a months-old local copy without
 # noticing. Bump this and run `just push-base` when the base changes.
-ARG BASE_TAG=2026-09-17
+ARG BASE_TAG=2026-11-02
 
 # Build web CSS assets
 FROM node:24.22.1-slim AS web-builder
