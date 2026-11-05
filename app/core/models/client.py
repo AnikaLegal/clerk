@@ -157,7 +157,7 @@ class Client(TimestampedModel):
 
     # Language
     primary_language_non_english = models.BooleanField(default=False)
-    primary_language = models.CharField(max_length=32, blank=True, default="")
+    primary_language = models.CharField(max_length=128, blank=True, default="")
 
     requires_interpreter = models.CharField(
         max_length=32,

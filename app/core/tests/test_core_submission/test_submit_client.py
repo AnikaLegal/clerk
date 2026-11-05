@@ -156,12 +156,28 @@ CASE_4_CLIENT = {
 }
 
 
+"""
+Case 5:
+- describes several languages in the free-text language answer
+"""
+LONG_LANGUAGE = "Arabic, and some French and Turkish when needed"
+CASE_5_ANSWERS = {
+    **CASE_4_ANSWERS,
+    "FIRST_LANGUAGE": LONG_LANGUAGE,
+}
+CASE_5_CLIENT = {
+    **CASE_4_CLIENT,
+    "primary_language": LONG_LANGUAGE,
+}
+
+
 PROCESS_TESTS = [
     # answers, expected_client, expected_landlord, expected_agent, expected_tenancy, expected_issue
     (CASE_1_ANSWERS, CASE_1_CLIENT),
     (CASE_2_ANSWERS, CASE_2_CLIENT),
     (CASE_3_ANSWERS, CASE_3_CLIENT),
     (CASE_4_ANSWERS, CASE_4_CLIENT),
+    (CASE_5_ANSWERS, CASE_5_CLIENT),
 ]
 
 
