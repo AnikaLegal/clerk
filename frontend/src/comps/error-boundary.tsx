@@ -32,9 +32,8 @@ export const logException = (error) => {
     const reportable = toReportableError(error)
     Sentry.captureException(
       reportable,
-      // These errors share this boundary's stack, so group them by message.
       reportable instanceof ApiRequestError
-        ? { fingerprint: [reportable.message] }
+        ? { fingerprint: reportable.fingerprint }
         : undefined
     )
   } else {
