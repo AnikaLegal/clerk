@@ -61,6 +61,22 @@ def test_large_file_upload_is_given_a_timeout(endpoint, mock_resp):
     assert mock_put.call_args.kwargs.get("timeout") is not None
 
 
+def test_child_lookup_fetches_the_child_directly(endpoint, mock_resp):
+    """
+    The name is a path segment, so characters like # must be encoded.
+    """
+    with patch(
+        "microsoft.endpoints.base.requests.get", return_value=mock_resp
+    ) as mock_get:
+        child = endpoint.get_child_if_exists("lease #1.pdf", "parent123")
+
+    assert child == {"id": "abc123", "uploadUrl": "https://example.com/upload"}
+    mock_get.assert_called_once()
+    assert mock_get.call_args.args[0].endswith(
+        "/drive/items/parent123:/lease%20%231.pdf"
+    )
+
+
 def test_file_download_is_given_a_timeout(endpoint):
     """
     Without a timeout a hung MS Graph connection blocks the caller forever.

@@ -121,12 +121,8 @@ class FolderEndpoint(BaseEndpoint):
         return data
 
     def get_child_if_exists(self, filename, parent_id):
-        # Check for existing file.
-        url = f"/groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}/children"
-        children = super().get_list(url)
-        for f in children:
-            if filename == f["name"]:
-                return f
+        url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{parent_id}:/{quote(filename)}"
+        return super().get(url)
 
     def delete_file(self, file_id):
         url = f"groups/{settings.MS_GRAPH_GROUP_ID}/drive/items/{file_id}"
