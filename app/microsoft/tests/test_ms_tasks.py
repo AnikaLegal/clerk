@@ -51,18 +51,22 @@ def test_ms_tasks__reset_ms_access_sends_added_to_case(mock_api, paralegal_user)
     )
 
 
-def _http_error(status_code):
+def _http_error(status_code, code=None):
     response = MagicMock(status_code=status_code)
+    response.json.return_value = {"error": {"code": code}}
     return requests.HTTPError(response=response)
 
 
 @pytest.mark.django_db
 @patch("microsoft.tasks.time.sleep")
-def test_ms_tasks__assign_user_licence_retries_conflict(
+def test_ms_tasks__assign_user_licence_retries_concurrency_violation(
     mock_sleep, mock_api, paralegal_user
 ):
-    """A 409 from Graph is retried rather than ending the task"""
-    mock_api.user.assign_license.side_effect = [_http_error(409), {"id": "x"}]
+    """A transient conflict from Graph is retried rather than ending the task"""
+    mock_api.user.assign_license.side_effect = [
+        _http_error(409, "Directory_ConcurrencyViolation"),
+        {"id": "x"},
+    ]
 
     assign_user_licence(paralegal_user.pk)
 
@@ -71,11 +75,15 @@ def test_ms_tasks__assign_user_licence_retries_conflict(
 
 @pytest.mark.django_db
 @patch("microsoft.tasks.time.sleep")
-def test_ms_tasks__assign_user_licence_raises_other_errors(
-    mock_sleep, mock_api, paralegal_user
+@pytest.mark.parametrize(
+    "status_code, code",
+    [(409, "ObjectConflict"), (400, "Request_BadRequest")],
+)
+def test_ms_tasks__assign_user_licence_stops_on_other_errors(
+    mock_sleep, mock_api, paralegal_user, status_code, code
 ):
-    """Errors other than 409 end the task on the first attempt"""
-    mock_api.user.assign_license.side_effect = _http_error(400)
+    """Other errors end the task on the first attempt"""
+    mock_api.user.assign_license.side_effect = _http_error(status_code, code)
 
     assign_user_licence(paralegal_user.pk)
 

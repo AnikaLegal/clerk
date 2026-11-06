@@ -68,6 +68,18 @@ def set_up_new_case_task(issue_pk: str):
     logger.info("Finished setting up folder on Sharepoint for Issue<%s>", issue_pk)
 
 
+def _is_concurrency_violation(error: requests.HTTPError) -> bool:
+    # Graph rejects a write while another write to the same object is still
+    # settling. Other 409s are permanent conflicts, so retrying won't help.
+    if error.response is None or error.response.status_code != 409:
+        return False
+    try:
+        code = error.response.json()["error"]["code"]
+    except (ValueError, KeyError, TypeError):
+        return False
+    return code == "Directory_ConcurrencyViolation"
+
+
 @sentry_task
 def assign_user_licence(user_pk: int):
     # Try multiple times with some delay in between to allow for eventual
@@ -77,9 +89,7 @@ def assign_user_licence(user_pk: int):
         try:
             result = add_office_licence(user)
         except requests.HTTPError as e:
-            # Graph answers 409 while another write to the new account is
-            # still settling.
-            if e.response is None or e.response.status_code != 409:
+            if not _is_concurrency_violation(e):
                 raise
             result = None
         if result:
