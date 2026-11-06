@@ -10,6 +10,7 @@ import {
   useUpdateEmailMutation,
 } from 'api'
 import { FormErrors } from 'comps/auto-form'
+import { NotFound } from 'comps/error'
 import { MarkdownEditor } from 'comps/markdown-editor'
 import { Formik } from 'formik'
 import { useSnackbar } from 'notistack'
@@ -63,6 +64,10 @@ const App = () => {
     throw caseResult.error
   }
   if (emailResult.isError && !emailResult.data) {
+    // The page can outlive its draft, e.g. one deleted in another tab.
+    if ('status' in emailResult.error && emailResult.error.status === 404) {
+      return <NotFound />
+    }
     throw emailResult.error
   }
   if (!caseResult.data || !emailResult.data) {

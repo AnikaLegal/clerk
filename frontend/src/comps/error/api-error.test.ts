@@ -66,6 +66,20 @@ describe('toReportableError', () => {
     })
   })
 
+  it.each([
+    [{ status: 403, data: {} }, 'HTTP four-zero-three'],
+    [{ status: 404, data: {} }, 'HTTP four-zero-four'],
+    [
+      { status: 'PARSING_ERROR', originalStatus: 502, data: '', error: 'x' },
+      'PARSING_ERROR (HTTP five-zero-two)',
+    ],
+    [{ status: 'FETCH_ERROR', error: 'x' }, 'FETCH_ERROR'],
+  ])('fingerprints %o without digits', (thrown, expected) => {
+    expect(toReportableError(thrown)).toMatchObject({
+      fingerprint: ['ApiRequestError', expected],
+    })
+  })
+
   it('keeps the message free of anything from the response body', () => {
     const result = toReportableError({
       status: 400,

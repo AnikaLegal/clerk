@@ -1,9 +1,34 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 
+const DIGIT_NAMES = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+]
+
+// Sentry replaces numbers in a fingerprint with a placeholder, which would put
+// every HTTP status in one issue, so the digits are spelled out.
+const spellNumbers = (text: string) =>
+  text.replace(/\d+/g, (digits) =>
+    [...digits].map((digit) => DIGIT_NAMES[Number(digit)]).join('-')
+  )
+
 export class ApiRequestError extends Error {
+  // These errors share the error boundary's stack, so they are grouped by
+  // what failed instead.
+  readonly fingerprint: string[]
+
   constructor(description: string) {
     super(`API request failed: ${description}`)
     this.name = 'ApiRequestError'
+    this.fingerprint = ['ApiRequestError', spellNumbers(description)]
   }
 }
 
