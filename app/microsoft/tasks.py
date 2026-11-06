@@ -1,6 +1,7 @@
 import logging
 import time
 
+import requests
 from accounts import events
 from accounts.models import User
 from core.models import Issue
@@ -73,7 +74,14 @@ def assign_user_licence(user_pk: int):
     # consistency in Microsoft Graph after account creation.
     user = User.objects.get(pk=user_pk)
     for _ in range(10):
-        result = add_office_licence(user)
+        try:
+            result = add_office_licence(user)
+        except requests.HTTPError as e:
+            # Graph answers 409 while another write to the new account is
+            # still settling.
+            if e.response is None or e.response.status_code != 409:
+                raise
+            result = None
         if result:
             logger.info("Successfully assigned Microsoft licence to User<%s>", user.pk)
             return

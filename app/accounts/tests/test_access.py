@@ -46,6 +46,7 @@ def test_microsoft_adapter_user_activation(
     mock_ms_service, user_type, is_ms_account_set_up, is_added_to_group, request
 ):
     user = request.getfixturevalue(user_type)
+    mock_ms_service.set_up_new_user.return_value = False
     adapter = UserAccessEventAdapter()
 
     adapter.user_activated(user)
@@ -99,6 +100,7 @@ def test_microsoft_adapter_user_role_change(
     mock_ms_service, user_type, is_ms_account_set_up, is_added_to_group, request
 ):
     user = request.getfixturevalue(user_type)
+    mock_ms_service.set_up_new_user.return_value = False
     adapter = UserAccessEventAdapter()
     adapter.user_role_changed(user)
 
@@ -117,3 +119,18 @@ def test_microsoft_adapter_user_role_change(
     else:
         mock_ms_service.remove_group_member.assert_called_once_with(user)
         mock_ms_service.add_group_member.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["user_activated", "user_role_changed"])
+def test_microsoft_adapter_new_account_leaves_licence_to_task(
+    mock_ms_service, paralegal_user, method
+):
+    """A new account's licence comes from the ms_account_created task alone"""
+    mock_ms_service.set_up_new_user.return_value = True
+    adapter = UserAccessEventAdapter()
+
+    getattr(adapter, method)(paralegal_user)
+
+    mock_ms_service.set_up_new_user.assert_called_once_with(paralegal_user)
+    mock_ms_service.add_office_licence.assert_not_called()
