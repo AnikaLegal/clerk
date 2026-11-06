@@ -173,6 +173,22 @@ def test_handle_other_http_error_logs_and_raises(endpoint):
         endpoint.handle(resp)
 
 
+
+def test_handle_http_error_includes_graph_error(endpoint):
+    resp = MagicMock()
+    body = {"error": {"code": "Request_BadRequest", "message": "Invalid value."}}
+    resp.content = b"{...}"
+    resp.json.return_value = body
+    resp.raise_for_status.side_effect = requests.exceptions.HTTPError(
+        "400 Client Error"
+    )
+    resp.status_code = 400
+    with pytest.raises(requests.exceptions.HTTPError) as exc_info:
+        endpoint.handle(resp)
+    assert str(exc_info.value) == (
+        "400 Client Error - Request_BadRequest: Invalid value."
+    )
+
 @pytest.mark.parametrize(
     "verb,method,method_args",
     [

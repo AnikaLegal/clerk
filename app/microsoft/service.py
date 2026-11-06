@@ -1,4 +1,3 @@
-from PIL.IptcImagePlugin import i
 import logging
 from dataclasses import dataclass
 from os.path import basename
@@ -79,9 +78,9 @@ def get_user_permissions(user):
     return user_perms
 
 
-def set_up_new_user(user):
+def set_up_new_user(user) -> bool:
     """
-    Create MS account for new user and assign license.
+    Create MS account for new user. Returns True if an account was created.
     """
     api = MSGraphAPI()
     ms_account = api.user.get(user.email)
@@ -98,6 +97,9 @@ def set_up_new_user(user):
             sender=User,
             user=user,
         )
+        return True
+
+    return False
 
 
 def add_office_licence(user):

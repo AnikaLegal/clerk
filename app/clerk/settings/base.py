@@ -89,7 +89,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "social_django.middleware.SocialAuthExceptionMiddleware",
+    "accounts.middleware.LoginErrorMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "web.middleware.RedirectMiddleware",
     "case.middleware.annotate_group_access_middleware",
@@ -158,6 +158,7 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_LOGIN_ERROR_URL = "login"
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("GOOGLE_OAUTH2_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [

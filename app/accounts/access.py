@@ -47,10 +47,17 @@ class UserAccessEventAdapter(UserAccessEventManagerInterface):
 
         self._service = ms_service
 
+    def _set_up_licensed_user(self, user: User) -> None:
+        created = self._service.set_up_new_user(user)
+        if not created:
+            # An existing account may have lost its licence on deactivation or
+            # demotion. A new account gets one from the ms_account_created task,
+            # and assigning it here too would race that task (Graph 409).
+            self._service.add_office_licence(user)
+
     def user_activated(self, user: User) -> None:
         if user.role.is_paralegal_or_better:
-            self._service.set_up_new_user(user)
-            self._service.add_office_licence(user)
+            self._set_up_licensed_user(user)
 
         if user.role.is_coordinator_or_better:
             self._service.add_group_member(user)
@@ -69,8 +76,7 @@ class UserAccessEventAdapter(UserAccessEventManagerInterface):
         if not user.role.is_paralegal_or_better:
             self._service.remove_office_licence(user)
         else:
-            self._service.set_up_new_user(user)
-            self._service.add_office_licence(user)
+            self._set_up_licensed_user(user)
 
         if not user.role.is_coordinator_or_better:
             self._service.remove_group_member(user)
