@@ -1,4 +1,3 @@
-from PIL.IptcImagePlugin import i
 import logging
 from dataclasses import dataclass
 from os.path import basename
