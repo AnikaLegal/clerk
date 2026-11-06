@@ -94,9 +94,14 @@ class BaseEndpoint:
         # Deal with unsuccessful requests.
         try:
             resp.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as e:
             if resp.status_code == 404:
                 return None
+            # Graph explains the failure in the body, which the default message
+            # omits and Sentry does not capture.
+            error = json.get("error", {}) if isinstance(json, dict) else {}
+            if error:
+                e.args = (f"{e} - {error.get('code')}: {error.get('message')}",)
             raise
 
         return json
