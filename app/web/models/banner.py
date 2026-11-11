@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, PublishingPanel
 from wagtail.models import DraftStateMixin, RevisionMixin
 
 
@@ -24,6 +24,12 @@ class Banner(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
     )
     call_to_action_text = models.CharField(max_length=32)
     call_to_action_url = models.URLField()
+    use_as_donate_url = models.BooleanField(
+        default=False,
+        verbose_name="Use the call to action URL as the site's Donate link",
+        help_text="""Applies only while this banner is live, and overrides the
+        Donate URL in Settings > Links.""",
+    )
 
     _revisions = GenericRelation("wagtailcore.Revision")
 
@@ -33,6 +39,8 @@ class Banner(DraftStateMixin, RevisionMixin, models.Model):  # pyright: ignore[r
         FieldPanel("image"),
         FieldPanel("call_to_action_text"),
         FieldPanel("call_to_action_url"),
+        FieldPanel("use_as_donate_url"),
+        PublishingPanel(),
     ]
 
     def save(self, *args, **kwargs):

@@ -59,7 +59,7 @@
           </ul>
         </div>
         <a href="{% url 'refer' %}" class="py-1">Refer</a>
-        <a href="{{ settings.web.LinkSettings.donate_url }}" class="py-1">Donate</a>
+        <a href="{{ settings.web.LinkSettings.current_donate_url }}" class="py-1">Donate</a>
       </nav>
     </div>
   </div>
@@ -162,7 +162,7 @@
         </div>
 
         <a href="{% url 'refer' %}">Refer</a>
-        <a href="{{ settings.web.LinkSettings.donate_url }}">Donate</a>
+        <a href="{{ settings.web.LinkSettings.current_donate_url }}">Donate</a>
         <div class="flex justify-center">
           <a class="d-btn-wide" href="{{ INTAKE_URL }}"><button class="d-btn d-btn-primary d-btn-wide">Get free help</button></a>
         </div>
