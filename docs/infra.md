@@ -48,7 +48,7 @@ The EC2 instance runs Docker Swarm with one stack per environment. Each stack ha
 
 The instance also hosts two services outside of Docker:
 
-- PostgreSQL, with one database per environment. The containers connect to it over a unix socket; [Retool](https://retool.com) connects directly over TCP for internal reporting (see `infra/setup/postgres/pg_hba.conf`).
+- PostgreSQL, with one database per environment. The containers connect to it over a unix socket; [Retool](https://retool.com) connects directly over TCP for internal reporting, and must use TLS (see [pg_hba.conf](../infra/setup/postgres/pg_hba.conf)).
 - NGINX, which reverse proxies each environment's domain to its web service.
 
 [CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, so the instance itself only serves plain HTTP on port 80.
