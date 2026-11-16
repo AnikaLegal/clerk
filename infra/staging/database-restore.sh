@@ -27,10 +27,21 @@ echo -e "\n>>> Setting up Docker context"
 docker context create remote --docker "host=ssh://root@${CLERK_HOST}"
 docker context use remote
 
+# The worker's scheduler would run production's schedules as soon as the
+# backup lands. It stays down if the restore fails, so a half-restored
+# database never runs them.
+WORKER_SERVICE="clerk_staging_worker"
+WORKER_REPLICAS=$(docker service inspect "$WORKER_SERVICE" --format "{{.Spec.Mode.Replicated.Replicas}}")
+echo -e "\n>>> Stopping $WORKER_SERVICE (currently $WORKER_REPLICAS replicas)"
+docker service scale --detach=false "${WORKER_SERVICE}=0"
+
 echo -e "\n>>> Restoring staging environment on host $CLERK_HOST"
 docker compose \
     --project-name task \
     --file docker/docker-compose.staging.yml \
     run --pull always --rm -e BACKUP_PASSPHRASE web /app/scripts/tasks/staging-restore.sh
+
+echo -e "\n>>> Restarting $WORKER_SERVICE"
+docker service scale --detach=false "${WORKER_SERVICE}=${WORKER_REPLICAS}"
 
 echo -e "\n>>> Restore finished"
