@@ -51,6 +51,7 @@ PAGE_TEST_CASE = [
     PageTestCase(name="account-list", factory=factories.UserFactory, is_detail=False),
     PageTestCase(name="account-create", factory=None, is_detail=False),
     PageTestCase(name="account-detail", factory=factories.UserFactory, is_detail=True),
+    PageTestCase(name="enquiry-list", factory=None, is_detail=False),
     PageTestCase(name="paralegal-list", factory=factories.UserFactory, is_detail=False),
     PageTestCase(name="template-list", factory=None, is_detail=False),
     PageTestCase(

@@ -1712,6 +1712,177 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/call/:
+    get:
+      operationId: getCalls
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: requires_callback
+          in: query
+          schema:
+            type: boolean
+          required: false
+        - name: topic
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Call"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/call/{id}/:
+    patch:
+      operationId: updateCall
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnquiryUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Call"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /clerk/api/contact/:
+    get:
+      operationId: getContacts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: requires_callback
+          in: query
+          schema:
+            type: boolean
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  next:
+                    type: number
+                    nullable: true
+                  prev:
+                    type: number
+                    nullable: true
+                  page_count:
+                    type: number
+                  item_count:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Contact"
+                required:
+                  - current
+                  - next
+                  - prev
+                  - page_count
+                  - item_count
+                  - results
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+  /clerk/api/contact/{id}/:
+    patch:
+      operationId: updateContact
+      parameters:
+        - description: Entity ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnquiryUpdate"
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
   schemas:
     BooleanYesNo:
@@ -3494,6 +3665,85 @@ components:
           type: string
       required:
         - name
+    Call:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+        phone_number:
+          type: string
+        topic:
+          type: string
+        topic_display:
+          type: string
+        requires_callback:
+          type: boolean
+        number_callbacks:
+          type: integer
+        comments:
+          type: string
+      required:
+        - id
+        - created_at
+        - modified_at
+        - phone_number
+        - topic
+        - topic_display
+        - requires_callback
+        - number_callbacks
+        - comments
+    EnquiryUpdate:
+      type: object
+      properties:
+        requires_callback:
+          type: boolean
+        number_callbacks:
+          type: integer
+          minimum: 0
+        comments:
+          type: string
+    Contact:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        referral:
+          type: string
+        requires_callback:
+          type: boolean
+        number_callbacks:
+          type: integer
+        comments:
+          type: string
+      required:
+        - id
+        - created_at
+        - modified_at
+        - name
+        - email
+        - phone
+        - referral
+        - requires_callback
+        - number_callbacks
+        - comments
   responses:
     BadRequest:
       description: Bad request

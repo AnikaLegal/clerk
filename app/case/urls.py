@@ -9,6 +9,7 @@ from .views import (
     date,
     document_templates,
     email_templates,
+    enquiry,
     note,
     notification_templates,
     paralegal,
@@ -38,6 +39,8 @@ router.register("note", note.NoteApiViewset, basename="note-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
+router.register("call", enquiry.CallApiViewset, basename="call-api")
+router.register("contact", enquiry.ContactApiViewset, basename="contact-api")
 router.register(
     "template-email",
     email_templates.EmailTemplateApiViewset,
@@ -137,6 +140,8 @@ urlpatterns = [
         accounts.account_detail_page_view,
         name="account-detail",
     ),
+    # Enquiries
+    path("enquiries/", enquiry.enquiry_list_page_view, name="enquiry-list"),
     # Paralegals
     path("paralegals/", paralegal.paralegal_list_page_view, name="paralegal-list"),
     # Templates

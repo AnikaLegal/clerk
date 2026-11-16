@@ -11,7 +11,7 @@ import ActionConfirmationButton, {
 } from './action-confirmation-button'
 
 export interface ActionIconWithConfirmationProps {
-  actionIcon?: ActionIconProps
+  actionIcon?: ActionIconProps & { 'aria-label'?: string }
   tooltip: TooltipProps
   icon: React.ReactNode
   onClick: () => void

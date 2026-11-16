@@ -1,0 +1,9 @@
+type: object
+properties:
+  requires_callback:
+    type: boolean
+  number_callbacks:
+    type: integer
+    minimum: 0
+  comments:
+    type: string

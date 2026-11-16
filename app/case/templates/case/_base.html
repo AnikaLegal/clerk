@@ -33,6 +33,7 @@
               <a href="{% url 'case-inbox' %}" class="item">Inbox</a>
               <a href="{% url 'case-review' %}" class="item">Review</a>
               <a href="{% url 'date-list' %}" class="item">Dates</a>
+              <a href="{% url 'enquiry-list' %}" class="item">Enquiries</a>
             {% endif %}
             {% if request.user.is_authenticated %}
               <a href="{% url 'person-list' %}" class="item">Parties</a>

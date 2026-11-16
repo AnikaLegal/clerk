@@ -1,0 +1,35 @@
+type: object
+properties:
+  id:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  modified_at:
+    type: string
+    format: date-time
+  name:
+    type: string
+  email:
+    type: string
+  phone:
+    type: string
+  referral:
+    type: string
+  requires_callback:
+    type: boolean
+  number_callbacks:
+    type: integer
+  comments:
+    type: string
+required:
+  - id
+  - created_at
+  - modified_at
+  - name
+  - email
+  - phone
+  - referral
+  - requires_callback
+  - number_callbacks
+  - comments

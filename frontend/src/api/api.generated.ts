@@ -493,6 +493,44 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.documentTemplateRename,
       }),
     }),
+    getCalls: build.query<GetCallsApiResponse, GetCallsApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/call/`,
+        params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
+          requires_callback: queryArg.requiresCallback,
+          topic: queryArg.topic,
+        },
+      }),
+    }),
+    updateCall: build.mutation<UpdateCallApiResponse, UpdateCallApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/call/${queryArg.id}/`,
+        method: "PATCH",
+        body: queryArg.enquiryUpdate,
+      }),
+    }),
+    getContacts: build.query<GetContactsApiResponse, GetContactsApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/contact/`,
+        params: {
+          page: queryArg.page,
+          page_size: queryArg.pageSize,
+          requires_callback: queryArg.requiresCallback,
+        },
+      }),
+    }),
+    updateContact: build.mutation<
+      UpdateContactApiResponse,
+      UpdateContactApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/contact/${queryArg.id}/`,
+        method: "PATCH",
+        body: queryArg.enquiryUpdate,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -969,6 +1007,46 @@ export type RenameDocumentTemplateApiArg = {
   id: number;
   /** Successful response. */
   documentTemplateRename: DocumentTemplateRename;
+};
+export type GetCallsApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: Call[];
+};
+export type GetCallsApiArg = {
+  page?: number;
+  pageSize?: number;
+  requiresCallback?: boolean;
+  topic?: string;
+};
+export type UpdateCallApiResponse = /** status 200 Successful response. */ Call;
+export type UpdateCallApiArg = {
+  /** Entity ID */
+  id: number;
+  enquiryUpdate: EnquiryUpdate;
+};
+export type GetContactsApiResponse = /** status 200 Successful response. */ {
+  current: number;
+  next: number | null;
+  prev: number | null;
+  page_count: number;
+  item_count: number;
+  results: Contact[];
+};
+export type GetContactsApiArg = {
+  page?: number;
+  pageSize?: number;
+  requiresCallback?: boolean;
+};
+export type UpdateContactApiResponse =
+  /** status 200 Successful response. */ Contact;
+export type UpdateContactApiArg = {
+  /** Entity ID */
+  id: number;
+  enquiryUpdate: EnquiryUpdate;
 };
 export type BooleanYesNo = {
   label: "Yes" | "No";
@@ -1706,6 +1784,34 @@ export type DocumentTemplateCreate = {
 export type DocumentTemplateRename = {
   name: string;
 };
+export type Call = {
+  id: number;
+  created_at: string;
+  modified_at: string;
+  phone_number: string;
+  topic: string;
+  topic_display: string;
+  requires_callback: boolean;
+  number_callbacks: number;
+  comments: string;
+};
+export type EnquiryUpdate = {
+  requires_callback?: boolean;
+  number_callbacks?: number;
+  comments?: string;
+};
+export type Contact = {
+  id: number;
+  created_at: string;
+  modified_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  referral: string;
+  requires_callback: boolean;
+  number_callbacks: number;
+  comments: string;
+};
 export const {
   useGetSubmissionQuery,
   useGetCasesQuery,
@@ -1765,4 +1871,8 @@ export const {
   useCreateDocumentTemplateMutation,
   useDeleteDocumentTemplateMutation,
   useRenameDocumentTemplateMutation,
+  useGetCallsQuery,
+  useUpdateCallMutation,
+  useGetContactsQuery,
+  useUpdateContactMutation,
 } = injectedRtkApi;

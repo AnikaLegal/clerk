@@ -1,0 +1,32 @@
+type: object
+properties:
+  id:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  modified_at:
+    type: string
+    format: date-time
+  phone_number:
+    type: string
+  topic:
+    type: string
+  topic_display:
+    type: string
+  requires_callback:
+    type: boolean
+  number_callbacks:
+    type: integer
+  comments:
+    type: string
+required:
+  - id
+  - created_at
+  - modified_at
+  - phone_number
+  - topic
+  - topic_display
+  - requires_callback
+  - number_callbacks
+  - comments

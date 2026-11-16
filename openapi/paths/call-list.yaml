@@ -1,0 +1,58 @@
+get:
+  operationId: getCalls
+  parameters:
+    - name: page
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: page_size
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: requires_callback
+      in: query
+      schema:
+        type: boolean
+      required: false
+    - name: topic
+      in: query
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              current:
+                type: number
+              next:
+                type: number
+                nullable: true
+              prev:
+                type: number
+                nullable: true
+              page_count:
+                type: number
+              item_count:
+                type: number
+              results:
+                type: array
+                items:
+                  $ref: ../schemas/Call.yaml
+            required:
+              - current
+              - next
+              - prev
+              - page_count
+              - item_count
+              - results
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
