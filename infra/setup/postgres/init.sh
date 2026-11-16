@@ -25,4 +25,18 @@ else
     echo -e "\n>>> Not creating database $PGDATABASE - already exists."
 fi
 
+# Read-only role for Retool. pg_read_all_data covers every database on the
+# server, so pg_hba.conf limits each reader to its own environment's
+# database. Created without a password: it's set by hand on the server and
+# kept out of the env files.
+READER="${PGUSER}_reader"
+READER_EXISTS=$(sudo -Hiu postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$READER'")
+if [ -z "$READER_EXISTS" ]
+then
+    echo -e "\n>>> Creating read-only user $READER."
+    sudo -Hiu postgres psql -tAc "CREATE ROLE $READER LOGIN IN ROLE pg_read_all_data;"
+else
+    echo -e "\n>>> Not creating read-only user $READER - already exists."
+fi
+
 echo -e "\n>>> Finished initialising Postgres"
