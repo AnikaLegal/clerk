@@ -7,12 +7,7 @@ import {
   Table,
   Text,
 } from '@mantine/core'
-import {
-  IconArrowBackUp,
-  IconCheck,
-  IconPencil,
-  IconPhonePlus,
-} from '@tabler/icons-react'
+import { IconArrowBackUp, IconCheck } from '@tabler/icons-react'
 import api, {
   Call,
   Contact,
@@ -26,8 +21,8 @@ import dayjs from 'dayjs'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
+import CallbacksCell from './callbacks-cell'
 import CommentCell from './comment-cell'
-import CommentsModal from './comments-modal'
 
 export type EnquiryKind = 'call' | 'contact'
 
@@ -68,9 +63,6 @@ export const CallTable = ({
         call.phone_number,
         call.topic_display,
       ]}
-      modalSubtitle={(call) =>
-        `${call.phone_number} · Received ${formatTime(call.created_at)} · ${call.topic_display}`
-      }
     />
   )
 }
@@ -96,9 +88,6 @@ export const ContactTable = () => {
         contact.phone,
         contact.referral,
       ]}
-      modalSubtitle={(contact) =>
-        `${contact.name} · Received ${formatTime(contact.created_at)}`
-      }
     />
   )
 }
@@ -124,7 +113,6 @@ interface EnquiryTableProps<T extends Call | Contact> {
   topicOptions?: TopicOption[]
   headers: string[]
   cells: (record: T) => React.ReactNode[]
-  modalSubtitle: (record: T) => string
 }
 
 const EnquiryTable = <T extends Call | Contact>({
@@ -135,9 +123,7 @@ const EnquiryTable = <T extends Call | Contact>({
   topicOptions,
   headers,
   cells,
-  modalSubtitle,
 }: EnquiryTableProps<T>) => {
-  const [editing, setEditing] = useState<T | null>(null)
   const page = args.page || 1
   const columnCount = headers.length + 4
 
@@ -250,7 +236,18 @@ const EnquiryTable = <T extends Call | Contact>({
                     {cell}
                   </Table.Td>
                 ))}
-                <Table.Td>{record.number_callbacks}</Table.Td>
+                <Table.Td>
+                  <CallbacksCell
+                    callbacks={record.number_callbacks}
+                    onSave={(callbacks) =>
+                      saveWithMessage(
+                        record.id,
+                        { number_callbacks: callbacks },
+                        'Enquiry updated'
+                      )
+                    }
+                  />
+                </Table.Td>
                 <Table.Td>
                   <CommentCell
                     comments={record.comments}
@@ -267,11 +264,7 @@ const EnquiryTable = <T extends Call | Contact>({
                   {formatTime(record.modified_at)}
                 </Table.Td>
                 <Table.Td>
-                  <RowActions
-                    record={record}
-                    save={saveWithMessage}
-                    onComments={() => setEditing(record)}
-                  />
+                  <DoneAction record={record} save={saveWithMessage} />
                 </Table.Td>
               </Table.Tr>
             ))
@@ -286,17 +279,6 @@ const EnquiryTable = <T extends Call | Contact>({
           mt="md"
           withEdges
           withControls
-        />
-      )}
-      {editing && (
-        <CommentsModal
-          opened
-          record={editing}
-          subtitle={modalSubtitle(editing)}
-          onClose={() => setEditing(null)}
-          onSave={(update) =>
-            saveWithMessage(editing.id, update, 'Enquiry updated')
-          }
         />
       )}
     </>
@@ -317,70 +299,38 @@ const MessageRow = ({
   </Table.Tr>
 )
 
-interface RowActionsProps {
+interface DoneActionProps {
   record: Call | Contact
   save: (id: number, update: EnquiryUpdate, ok: string) => Promise<unknown>
-  onComments: () => void
 }
 
-const RowActions = ({ record, save, onComments }: RowActionsProps) => {
-  const [busy, setBusy] = useState<'attempt' | 'done' | null>(null)
+const DoneAction = ({ record, save }: DoneActionProps) => {
+  const [isBusy, setIsBusy] = useState(false)
   const isDone = !record.requires_callback
 
-  // The icons stay disabled until the refreshed row arrives, so a second
-  // click can't resend a count the list hasn't caught up with.
-  useEffect(() => setBusy(null), [record.modified_at])
+  // Stays disabled until the refreshed row arrives, so a second click can't
+  // toggle the flag back before the list catches up.
+  useEffect(() => setIsBusy(false), [record.modified_at])
 
-  const run = (
-    action: 'attempt' | 'done',
-    update: EnquiryUpdate,
-    ok: string
-  ) => {
-    setBusy(action)
-    save(record.id, update, ok).catch(() => setBusy(null))
+  const label = isDone ? 'Mark pending' : 'Mark done'
+  const handleClick = () => {
+    setIsBusy(true)
+    save(
+      record.id,
+      { requires_callback: isDone },
+      isDone ? 'Marked pending' : 'Marked done'
+    ).catch(() => setIsBusy(false))
   }
 
   return (
     <ActionIconWithConfirmation.Group>
       <ActionIconWithConfirmation
-        tooltip={{ label: 'Log a callback attempt' }}
-        icon={<IconPhonePlus stroke={1.5} />}
-        actionIcon={{
-          'aria-label': 'Log a callback attempt',
-          loading: busy === 'attempt',
-          disabled: busy !== null,
-        }}
-        onClick={() =>
-          run(
-            'attempt',
-            { number_callbacks: record.number_callbacks + 1 },
-            'Attempt logged'
-          )
-        }
-      />
-      <ActionIconWithConfirmation
-        tooltip={{ label: 'Update enquiry' }}
-        icon={<IconPencil stroke={1.5} />}
-        actionIcon={{ 'aria-label': 'Update enquiry', disabled: busy !== null }}
-        onClick={onComments}
-      />
-      <ActionIconWithConfirmation
-        tooltip={{ label: isDone ? 'Mark pending' : 'Mark done' }}
+        tooltip={{ label }}
         icon={
           isDone ? <IconArrowBackUp stroke={1.5} /> : <IconCheck stroke={1.5} />
         }
-        actionIcon={{
-          'aria-label': isDone ? 'Mark pending' : 'Mark done',
-          loading: busy === 'done',
-          disabled: busy !== null,
-        }}
-        onClick={() =>
-          run(
-            'done',
-            { requires_callback: isDone },
-            isDone ? 'Marked pending' : 'Marked done'
-          )
-        }
+        actionIcon={{ 'aria-label': label, loading: isBusy, disabled: isBusy }}
+        onClick={handleClick}
         confirmButton={{
           label: isDone ? 'Confirm pending' : 'Confirm done',
         }}

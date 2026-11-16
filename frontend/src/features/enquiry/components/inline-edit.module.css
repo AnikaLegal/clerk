@@ -1,0 +1,55 @@
+.display {
+  display: block;
+  width: 100%;
+  min-height: 1.5em;
+  white-space: pre-wrap;
+  cursor: text;
+  border-radius: 4px;
+}
+
+.display:hover,
+.display:focus-visible {
+  background-color: var(--mantine-color-gray-0);
+  outline: 1px dashed var(--mantine-color-gray-4);
+  outline-offset: 2px;
+}
+
+.placeholder {
+  color: var(--mantine-color-gray-5);
+  font-style: italic;
+  visibility: hidden;
+}
+
+.display:hover .placeholder,
+.display:focus-visible .placeholder {
+  visibility: visible;
+}
+
+/* Callbacks: a number input that reads as table text until used. */
+.numberRoot {
+  --input-height: 24px;
+}
+
+.numberInput {
+  font-size: inherit;
+  height: 24px;
+  min-height: 24px;
+  background-color: transparent;
+  border-color: transparent;
+  padding-left: 6px;
+}
+
+.numberRoot:hover .numberInput,
+.numberInput:focus {
+  background-color: var(--mantine-color-white);
+  border-color: var(--mantine-color-gray-4);
+}
+
+.numberSection {
+  opacity: 0;
+}
+
+.numberRoot:hover .numberSection,
+.numberRoot:focus-within .numberSection {
+  opacity: 1;
+}
