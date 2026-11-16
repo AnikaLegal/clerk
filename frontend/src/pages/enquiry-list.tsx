@@ -10,20 +10,9 @@ import {
 } from '@mantine/core'
 import { IconMail, IconPhone } from '@tabler/icons-react'
 import api from 'api'
-import {
-  CallTable,
-  ContactTable,
-  EnquiryKind,
-  TopicOption,
-} from 'features/enquiry'
+import { CallTable, ContactTable, EnquiryKind } from 'features/enquiry'
 import React, { useState } from 'react'
 import { mount } from 'utils'
-
-interface DjangoContext {
-  topic_options: TopicOption[]
-}
-const CONTEXT = (window as unknown as { REACT_CONTEXT: DjangoContext })
-  .REACT_CONTEXT
 
 const App = () => {
   const [kind, setKind] = useState<EnquiryKind>('call')
@@ -58,7 +47,7 @@ const App = () => {
       </SimpleGrid>
       {/* Both stay mounted so each list keeps its filters and page. */}
       <Box display={kind === 'call' ? undefined : 'none'}>
-        <CallTable topicOptions={CONTEXT.topic_options} />
+        <CallTable />
       </Box>
       <Box display={kind === 'contact' ? undefined : 'none'}>
         <ContactTable />

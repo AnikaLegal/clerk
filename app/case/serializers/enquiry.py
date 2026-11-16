@@ -1,5 +1,4 @@
 from caller.models import Call
-from core.models.issue import CaseTopic
 from rest_framework import serializers
 from webhooks.models import WebflowContact
 
@@ -41,10 +40,5 @@ class ContactSerializer(serializers.ModelSerializer):
         extra_kwargs = {"number_callbacks": {"min_value": 0}}
 
 
-class CallSearchSerializer(serializers.Serializer):
-    requires_callback = serializers.BooleanField(required=False)
-    topic = serializers.ChoiceField(choices=CaseTopic.CHOICES, required=False)
-
-
-class ContactSearchSerializer(serializers.Serializer):
+class EnquirySearchSerializer(serializers.Serializer):
     requires_callback = serializers.BooleanField(required=False)

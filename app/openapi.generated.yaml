@@ -1731,11 +1731,6 @@ paths:
           schema:
             type: boolean
           required: false
-        - name: topic
-          in: query
-          schema:
-            type: string
-          required: false
       responses:
         "200":
           description: Successful response.

@@ -500,7 +500,6 @@ const injectedRtkApi = api.injectEndpoints({
           page: queryArg.page,
           page_size: queryArg.pageSize,
           requires_callback: queryArg.requiresCallback,
-          topic: queryArg.topic,
         },
       }),
     }),
@@ -1020,7 +1019,6 @@ export type GetCallsApiArg = {
   page?: number;
   pageSize?: number;
   requiresCallback?: boolean;
-  topic?: string;
 };
 export type UpdateCallApiResponse = /** status 200 Successful response. */ Call;
 export type UpdateCallApiArg = {

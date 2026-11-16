@@ -1,12 +1,4 @@
-import {
-  Center,
-  Group,
-  Loader,
-  Pagination,
-  Switch,
-  Table,
-  Text,
-} from '@mantine/core'
+import { Center, Loader, Pagination, Switch, Table, Text } from '@mantine/core'
 import { IconArrowBackUp, IconCheck } from '@tabler/icons-react'
 import api, {
   Call,
@@ -16,7 +8,6 @@ import api, {
   GetContactsApiArg,
 } from 'api'
 import { ActionIconWithConfirmation } from 'comps/action-icon'
-import { SelectFilter } from 'comps/filter'
 import dayjs from 'dayjs'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
@@ -26,11 +17,6 @@ import CommentCell from './comment-cell'
 
 export type EnquiryKind = 'call' | 'contact'
 
-export interface TopicOption {
-  value: string
-  label: string
-}
-
 const formatTime = (value: string) => dayjs(value).format('DD/MM/YY h:mma')
 
 const NO_WRAP = { whiteSpace: 'nowrap' } as const
@@ -39,11 +25,7 @@ const DEFAULT_ARGS = { requiresCallback: true, page: 1 }
 
 type Save = (id: number, update: EnquiryUpdate) => Promise<unknown>
 
-export const CallTable = ({
-  topicOptions,
-}: {
-  topicOptions: TopicOption[]
-}) => {
+export const CallTable = () => {
   const [args, setArgs] = useState<GetCallsApiArg>(DEFAULT_ARGS)
   const result = api.useGetCallsQuery(args)
   const [updateCall] = api.useUpdateCallMutation()
@@ -56,7 +38,6 @@ export const CallTable = ({
       setArgs={setArgs}
       result={result}
       save={save}
-      topicOptions={topicOptions}
       headers={['Received', 'Phone number', 'Topic']}
       cells={(call) => [
         formatTime(call.created_at),
@@ -94,7 +75,6 @@ export const ContactTable = () => {
 
 interface ListArgs {
   requiresCallback?: boolean
-  topic?: string
   page?: number
 }
 
@@ -110,7 +90,6 @@ interface EnquiryTableProps<T extends Call | Contact> {
   setArgs: React.Dispatch<React.SetStateAction<ListArgs>>
   result: ListResult<T>
   save: Save
-  topicOptions?: TopicOption[]
   headers: string[]
   cells: (record: T) => React.ReactNode[]
 }
@@ -120,7 +99,6 @@ const EnquiryTable = <T extends Call | Contact>({
   setArgs,
   result,
   save,
-  topicOptions,
   headers,
   cells,
 }: EnquiryTableProps<T>) => {
@@ -166,30 +144,18 @@ const EnquiryTable = <T extends Call | Contact>({
 
   return (
     <>
-      <Group justify="space-between" align="flex-end" mt="md">
-        <Switch
-          label="Show done"
-          size="md"
-          checked={args.requiresCallback === undefined}
-          onChange={(e) =>
-            handleFilterChange(
-              'requiresCallback',
-              e.currentTarget.checked ? undefined : true
-            )
-          }
-        />
-        {topicOptions && (
-          <SelectFilter
-            name="topic"
-            label="Topic"
-            placeholder="Any"
-            w={260}
-            data={topicOptions}
-            value={args.topic ?? null}
-            onFilterChange={handleFilterChange}
-          />
-        )}
-      </Group>
+      <Switch
+        label="Show done"
+        size="md"
+        mt="xl"
+        checked={args.requiresCallback === undefined}
+        onChange={(e) =>
+          handleFilterChange(
+            'requiresCallback',
+            e.currentTarget.checked ? undefined : true
+          )
+        }
+      />
       <Table
         withColumnBorders
         withTableBorder

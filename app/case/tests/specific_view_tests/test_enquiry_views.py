@@ -17,14 +17,11 @@ def raw_client(superuser):
 
 @pytest.mark.django_db
 def test_call_list_filters(superuser_client):
-    waiting = CallFactory(requires_callback=True, topic=CaseTopic.OTHER)
-    CallFactory(requires_callback=True, topic=CaseTopic.REPAIRS)
-    CallFactory(requires_callback=False, topic=CaseTopic.OTHER)
+    waiting = CallFactory(requires_callback=True)
+    CallFactory(requires_callback=False)
 
     url = reverse("call-api-list")
-    response = superuser_client.get(
-        url, {"requires_callback": "true", "topic": CaseTopic.OTHER}
-    )
+    response = superuser_client.get(url, {"requires_callback": "true"})
 
     assert response.status_code == 200, response.json()
     assert [c["id"] for c in response.json()["results"]] == [waiting.pk]
