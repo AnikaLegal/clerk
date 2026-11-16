@@ -3,6 +3,7 @@ Test that password login is refused and Google is the only way in
 """
 
 import pytest
+from accounts.models import User
 from core.factories import UserFactory
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, Permission
@@ -75,3 +76,61 @@ def test_google_user_keeps_permissions(client):
 
     assert resp.status_code == 200
     assert resp.wsgi_request.user.has_perm("wagtailadmin.access_admin")
+
+
+@pytest.mark.django_db
+def test_admin_adds_user_without_password(client):
+    admin_user = UserFactory(username="admin", is_staff=True, is_superuser=True)
+    client.force_login(admin_user, backend=GOOGLE_BACKEND)
+
+    # Even a crafted request asking for a password gets none.
+    resp = client.post(
+        "/admin/accounts/user/add/",
+        {
+            "username": "jane.doe@anikalegal.org.au",
+            "email": "jane.doe@anikalegal.org.au",
+            "usable_password": "true",
+            "password1": PASSWORD,
+            "password2": PASSWORD,
+        },
+    )
+
+    assert resp.status_code == 302
+    user = User.objects.get(username="jane.doe@anikalegal.org.au")
+    assert not user.has_usable_password()
+
+
+@pytest.mark.django_db
+def test_admin_add_user_rejects_case_duplicate(client):
+    admin_user = UserFactory(username="admin", is_staff=True, is_superuser=True)
+    client.force_login(admin_user, backend=GOOGLE_BACKEND)
+    UserFactory(username="jane.doe@anikalegal.org.au")
+
+    resp = client.post(
+        "/admin/accounts/user/add/",
+        {"username": "Jane.Doe@anikalegal.org.au", "email": "jane@example.com"},
+    )
+
+    assert resp.status_code == 200
+    assert list(resp.context["adminform"].form.errors) == ["username"]
+
+
+@pytest.mark.django_db
+def test_admin_set_password_refused(client, password_user):
+    client.force_login(password_user, backend=GOOGLE_BACKEND)
+    target = UserFactory(username="jane")
+
+    resp = client.get(f"/admin/accounts/user/{target.pk}/password/")
+
+    assert resp.status_code == 403
+
+
+@pytest.mark.django_db
+@override_settings(PASSWORD_LOGIN_ENABLED=True)
+def test_admin_set_password_allowed_when_enabled(client, password_user):
+    client.force_login(password_user, backend=GOOGLE_BACKEND)
+    target = UserFactory(username="jane")
+
+    resp = client.get(f"/admin/accounts/user/{target.pk}/password/")
+
+    assert resp.status_code == 200
