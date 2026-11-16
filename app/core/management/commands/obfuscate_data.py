@@ -6,6 +6,8 @@ import factory
 from accounts.models import CaseGroups, User
 from auditlog.context import disable_auditlog
 from auditlog.models import LogEntry
+from blacklist.models import Blacklist
+from caller.models import Call
 from core.factories import SubmissionFactory
 from core.models import (
     AuditEvent,
@@ -29,6 +31,8 @@ from emails.models import Email, EmailAttachment
 from faker import Faker
 from utils.signals import disable_signals, restore_signals
 from core.services.submission import UPLOAD_ANSWERS
+from web.models.feedback import ContentFeedback
+from webhooks.models import ClosedContact, JotformSubmission, WebflowContact
 
 logger = logging.getLogger(__name__)
 
@@ -172,6 +176,39 @@ class Command(BaseCommand):
                 if d.notes:
                     d.notes = " ".join(fake.sentences())
                     d.save()
+
+        for call in Call.objects.iterator():
+            call.phone_number = fake.numerify("+614########")
+            if call.comments:
+                call.comments = " ".join(fake.sentences())
+            call.save()
+
+        for contact in WebflowContact.objects.iterator():
+            contact.name = fake.name()
+            contact.email = get_email(contact.email)
+            contact.phone = fake.phone_number()
+            if contact.comments:
+                contact.comments = " ".join(fake.sentences())
+            contact.save()
+
+        for contact in ClosedContact.objects.iterator():
+            contact.name = fake.name()
+            contact.email = get_email(contact.email)
+            contact.save()
+
+        Blacklist.objects.all().delete()
+
+        for feedback in ContentFeedback.objects.iterator():
+            if feedback.name:
+                feedback.name = fake.first_name()
+            if feedback.email:
+                feedback.email = get_email(feedback.email)
+            if feedback.reason:
+                feedback.reason = fake.sentence()
+            feedback.save()
+
+        # Legacy Jotform answers are free-form, so there is nothing to keep.
+        JotformSubmission.objects.all().delete()
 
         # We just delete audit events and log entries as it's too fiddly to
         # update them with obfuscated data.
