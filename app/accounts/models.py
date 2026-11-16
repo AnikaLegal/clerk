@@ -86,4 +86,6 @@ class User(AbstractUser):
         return self.email
 
 
-auditlog.register(User, exclude_fields=["last_login", "password"])
+auditlog.register(
+    User, exclude_fields=["last_login", "password", "ms_account_initial_password"]
+)

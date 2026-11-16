@@ -155,8 +155,10 @@ LOGOUT_REDIRECT_URL = "login"
 LOGIN_REDIRECT_URL = "case-list"
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
+    "accounts.backends.PermissionsBackend",
 ]
+# Google is the only way to sign in. Dev turns this on for the local admin user.
+PASSWORD_LOGIN_ENABLED = False
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_LOGIN_ERROR_URL = "login"
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH2_KEY")
@@ -256,7 +258,8 @@ DJANGO_VITE = {
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 WAGTAIL_SITE_NAME = "Anika Legal"
 WAGTAILDOCS_DOCUMENT_MODEL = "web.CustomDocument"
-WAGTAILUSERS_PASSWORD_REQUIRED = False  # Allow blank passwords for social auth users
+WAGTAILUSERS_PASSWORD_ENABLED = False
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
 
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False

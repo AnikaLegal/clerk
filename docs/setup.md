@@ -85,6 +85,11 @@ You should now be able to access:
 - The Django Admin Interface at
   [`http://localhost:8000/admin`](http://localhost:8000/admin).
 
+Locally you can log in to the Django admin as `admin` with password `admin`
+(created by `just reset` and `just restore`), which also signs you in to Clerk
+and the Wagtail admin. Password login only works with the dev settings:
+everywhere else, everyone signs in with Google.
+
 You can list all available recipes by running `just` with no arguments (or
 `just --list`):
 

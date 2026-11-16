@@ -18,6 +18,9 @@ AWS_STORAGE_BUCKET_NAME = "anika-clerk-staging"
 
 ADMIN_PREFIX = "local"
 
+# Lets the admin user from dev-post-reset.sh log in at /admin/.
+PASSWORD_LOGIN_ENABLED = True
+
 # Reminder emails via MailChimp
 MAILCHIMP_COVID_LIST_ID = "9749f1f08c"
 MAILCHIMP_COVID_WORKFLOW_ID = "fb4daa69fe"
