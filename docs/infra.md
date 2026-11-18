@@ -16,7 +16,7 @@ flowchart LR
     cloudflare["CloudFlare<br>DNS + SSL termination"]
 
     subgraph ec2["AWS EC2 instance"]
-        nginx["NGINX :80"]
+        nginx["NGINX :443"]
         subgraph swarm["Docker Swarm"]
             subgraph stack_prod["clerk_prod stack"]
                 web_prod["Django web"]
@@ -30,11 +30,10 @@ flowchart LR
         postgres[("PostgreSQL<br>clerk_prod + clerk_staging")]
     end
 
-    user -->|"anikalegal.org.au"| cloudflare
-    user --> intake
+    user -->|"HTTPS"| cloudflare
     user --> retool
-    intake -->|"REST API"| cloudflare
-    cloudflare -->|"HTTP :80"| nginx
+    cloudflare -->|"HTTP"| intake
+    cloudflare -->|"HTTPS :443"| nginx
     nginx -->|":8000"| web_prod
     nginx -->|":8001"| web_staging
     web_prod --> postgres
@@ -51,9 +50,14 @@ The instance also hosts two services outside of Docker:
 - PostgreSQL, with one database per environment. The containers connect to it over a unix socket; [Retool](https://retool.com) connects directly over TCP for internal reporting, and must use TLS (see [pg_hba.conf](../infra/setup/postgres/pg_hba.conf)). Each environment has a read-only `<user>_reader` role for Retool, created by [init.sh](../infra/setup/postgres/init.sh); its password is set by hand on the server, not in the env files.
 - NGINX, which reverse proxies each environment's domain to its web service.
 
-[CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL. NGINX listens on port 80 and on 443 with a [Cloudflare Origin CA certificate](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/) for `anikalegal.org.au` and `*.anikalegal.org.au`, which only Cloudflare trusts. The private key exists only in `/etc/ssl/cloudflare` on the server, never in the repo or a password manager: if it is lost, create a new certificate (SSL/TLS > Origin Server in CloudFlare), install it and revoke the old one.
+[CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, then connects to NGINX on port 443 in Full (strict) mode, checking NGINX's [Cloudflare Origin CA certificate](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/) for `anikalegal.org.au` and `*.anikalegal.org.au`, which only Cloudflare trusts. The private key exists only in `/etc/ssl/cloudflare` on the server, never in the repo or a password manager: if it is lost, create a new certificate (SSL/TLS > Origin Server in CloudFlare), install it and revoke the old one.
 
-The intake frontend is a separate static site hosted on S3, which talks to the backend via its REST API.
+The instance's security group (`sg-0188bcd154eb59e27`) accepts HTTPS only from [Cloudflare's published ranges](https://www.cloudflare.com/ips/), and port 80 is closed, so the site cannot be reached without going through CloudFlare. If Cloudflare adds a range, add it to the security group, or visitors routed through it get errors. Two CloudFlare settings depend on this setup:
+
+- **Always Use HTTPS** must stay on. In Full (strict) mode CloudFlare connects to the origin with the visitor's scheme, so plain-HTTP visitors would otherwise be sent to the closed port 80.
+- A Configuration Rule keeps `intake` and `intake-staging` on Flexible mode, because their S3 website endpoints only serve HTTP.
+
+The intake frontend is a separate static site hosted on S3, served through CloudFlare, which talks to the backend via its REST API.
 
 ## Environments
 
