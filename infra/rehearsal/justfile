@@ -86,6 +86,21 @@ setup host:
         fi
         sleep 10
     done
+    # NGINX setup needs an origin certificate. The drill host is not behind
+    # Cloudflare, so a throwaway self-signed one stands in for it.
+    ssh -o StrictHostKeyChecking=accept-new root@{{host}} '
+        cert_dir="/etc/ssl/cloudflare"
+        if [ ! -f "$cert_dir/origin.pem" ]; then
+            echo ">>> Installing a self-signed stand-in origin certificate"
+            install -d -m 755 "$cert_dir"
+            umask 077
+            openssl req -x509 -newkey rsa:2048 -nodes -days 7 \
+                -subj "/CN=anikalegal.org.au" \
+                -addext "subjectAltName=DNS:anikalegal.org.au,DNS:*.anikalegal.org.au" \
+                -keyout "$cert_dir/origin.key" -out "$cert_dir/origin.pem" 2> /dev/null
+            chmod 644 "$cert_dir/origin.pem"
+        fi
+    '
     # Skip provisioning on a rerun (mirroring provision.sh's own guard,
     # which aborts rather than skips), so a failure in the deploy half
     # leaves this recipe safely re-runnable.

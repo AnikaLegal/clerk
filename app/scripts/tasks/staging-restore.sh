@@ -40,14 +40,6 @@ aws s3 cp ${S3_BUCKET}/${LATEST_BACKUP} - |
         --no-privileges \
         --if-exists
 
-echo -e "\nSyncing AWS S3 assets"
-aws s3 sync --acl public-read s3://anika-clerk/action-documents s3://anika-clerk-staging/action-documents
-aws s3 sync --acl public-read s3://anika-clerk/documents s3://anika-clerk-staging/documents
-aws s3 sync --acl public-read s3://anika-clerk/images s3://anika-clerk-staging/images
-aws s3 sync --acl public-read s3://anika-clerk/impact_images s3://anika-clerk-staging/impact_images
-aws s3 sync --acl public-read s3://anika-clerk/original_images s3://anika-clerk-staging/original_images
-aws s3 sync --acl public-read s3://anika-twilio-audio s3://anika-twilio-audio-staging
-
 echo -e "\nRunning migrations"
 ./manage.py migrate
 
@@ -67,5 +59,19 @@ OrmQ.objects.all().delete()"
 
 ./manage.py obfuscate_data
 ./manage.py create_test_user_accounts
+
+# Last, after the data is made safe, so a failed copy can't leave real data
+# behind. Skip object tags: copying them needs s3:GetObjectTagging on the
+# production buckets, which the staging user doesn't have.
+echo -e "\nSyncing AWS S3 assets"
+sync_to_staging() {
+    aws s3 sync --acl "public-read" --copy-props "metadata-directive" "$1" "$2"
+}
+sync_to_staging "s3://anika-clerk/action-documents" "s3://anika-clerk-staging/action-documents"
+sync_to_staging "s3://anika-clerk/documents" "s3://anika-clerk-staging/documents"
+sync_to_staging "s3://anika-clerk/images" "s3://anika-clerk-staging/images"
+sync_to_staging "s3://anika-clerk/impact_images" "s3://anika-clerk-staging/impact_images"
+sync_to_staging "s3://anika-clerk/original_images" "s3://anika-clerk-staging/original_images"
+sync_to_staging "s3://anika-twilio-audio" "s3://anika-twilio-audio-staging"
 
 echo -e "\nDatabase restore finished"

@@ -10,6 +10,14 @@ export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 apt-get install --yes nginx
 
+# website.conf serves HTTPS with the Cloudflare origin certificate, so nginx
+# will not start without it.
+if [ ! -f /etc/ssl/cloudflare/origin.pem ] || [ ! -f /etc/ssl/cloudflare/origin.key ]; then
+    echo "Error: origin certificate missing from /etc/ssl/cloudflare." >&2
+    echo "Run install-origin-cert.sh against this host first." >&2
+    exit 1
+fi
+
 echo -e "\n>>> Copying NGINX config"
 cp /srv/infra/nginx/nginx.conf /etc/nginx/nginx.conf
 rm -f /etc/nginx/sites-enabled/default
