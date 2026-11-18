@@ -16,7 +16,7 @@ flowchart LR
     cloudflare["CloudFlare<br>DNS + SSL termination"]
 
     subgraph ec2["AWS EC2 instance"]
-        nginx["NGINX :80"]
+        nginx["NGINX :443"]
         subgraph swarm["Docker Swarm"]
             subgraph stack_prod["clerk_prod stack"]
                 web_prod["Django web"]
@@ -30,11 +30,10 @@ flowchart LR
         postgres[("PostgreSQL<br>clerk_prod + clerk_staging")]
     end
 
-    user -->|"anikalegal.org.au"| cloudflare
-    user --> intake
+    user -->|"HTTPS"| cloudflare
     user --> retool
-    intake -->|"REST API"| cloudflare
-    cloudflare -->|"HTTP :80"| nginx
+    cloudflare -->|"HTTP"| intake
+    cloudflare -->|"HTTPS :443"| nginx
     nginx -->|":8000"| web_prod
     nginx -->|":8001"| web_staging
     web_prod --> postgres
@@ -51,9 +50,14 @@ The instance also hosts two services outside of Docker:
 - PostgreSQL, with one database per environment. The containers connect to it over a unix socket; [Retool](https://retool.com) connects directly over TCP for internal reporting, and must use TLS (see [pg_hba.conf](../infra/setup/postgres/pg_hba.conf)). Each environment has a read-only `<user>_reader` role for Retool, created by [init.sh](../infra/setup/postgres/init.sh); its password is set by hand on the server, not in the env files.
 - NGINX, which reverse proxies each environment's domain to its web service.
 
-[CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, so the instance itself only serves plain HTTP on port 80.
+[CloudFlare](https://dash.cloudflare.com/7de9e8b83e7f8e80bdb5f40ec9e0ef22/anikalegal.org.au/dns/records) provides DNS and terminates SSL, then connects to NGINX on port 443 in Full (strict) mode, checking NGINX's [Cloudflare Origin CA certificate](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/) for `anikalegal.org.au` and `*.anikalegal.org.au`, which only Cloudflare trusts. The private key exists only in `/etc/ssl/cloudflare` on the server, never in the repo or a password manager: if it is lost, create a new certificate (SSL/TLS > Origin Server in CloudFlare), install it and revoke the old one.
 
-The intake frontend is a separate static site hosted on S3, which talks to the backend via its REST API.
+The instance's security group (`sg-0188bcd154eb59e27`) accepts HTTPS only from [Cloudflare's published ranges](https://www.cloudflare.com/ips/), and port 80 is closed, so the site cannot be reached without going through CloudFlare. If Cloudflare adds a range, add it to the security group, or visitors routed through it get errors. Nothing checks this automatically: run `just cloudflare-ips` (read-only, using your AWS credentials) when Cloudflare announces a change, and every few months anyway. It compares the security group's 443 rules with [Cloudflare's API](https://api.cloudflare.com/client/v4/ips) and prints the commands to fix any difference. Two CloudFlare settings depend on this setup:
+
+- **Always Use HTTPS** must stay on. In Full (strict) mode CloudFlare connects to the origin with the visitor's scheme, so plain-HTTP visitors would otherwise be sent to the closed port 80.
+- A Configuration Rule keeps `intake` and `intake-staging` on Flexible mode, because their S3 website endpoints only serve HTTP.
+
+The intake frontend is a separate static site hosted on S3, served through CloudFlare, which talks to the backend via its REST API.
 
 ## Environments
 
@@ -111,11 +115,12 @@ When making a change or bugfix, you should:
 
 The server is provisioned and environments are initialised with the scripts under [infra/setup](../infra/setup):
 
-1. `provision.sh <HOST>` makes a fresh Ubuntu 24.04 machine a Clerk server: NGINX, PostgreSQL, Docker Swarm, the AWS CLI and SSH hardening.
-2. `init-env.sh <HOST> <staging|prod>` initialises an environment on a provisioned host: it creates the Postgres user and database and deploys the Swarm stack.
-3. `restore-databases.sh <HOST>` restores the staging and production databases from the latest S3 backups. It refuses to target the current server.
+1. `install-origin-cert.sh <HOST> <CERT_FILE> <KEY_FILE>` installs a Cloudflare origin certificate and its key, and reloads NGINX if it is running. NGINX setup refuses to run without them, so do this first. A new server gets a new certificate: create one in CloudFlare, install it and delete the downloaded key file.
+2. `provision.sh <HOST>` makes a fresh Ubuntu 24.04 machine a Clerk server: NGINX, PostgreSQL, Docker Swarm, the AWS CLI and SSH hardening.
+3. `init-env.sh <HOST> <staging|prod>` initialises an environment on a provisioned host: it creates the Postgres user and database and deploys the Swarm stack.
+4. `restore-databases.sh <HOST>` restores the staging and production databases from the latest S3 backups. It refuses to target the current server.
 
-To rebuild the server from scratch: launch a new Ubuntu instance, run the three scripts against it, then update the new IP address in CloudFlare and in `CLERK_HOST` in the env files.
+To rebuild the server from scratch: launch a new Ubuntu instance, run the four scripts against it in order, then update the new IP address in CloudFlare and in `CLERK_HOST` in the env files. Once traffic has moved, revoke the old server's origin certificate in CloudFlare.
 
 The scripts pin the versions of software that matter for reproducing the server: PostgreSQL, Docker Engine and the AWS CLI. Each pin is a variable at the top of the relevant script, plus an `ARG` in `Dockerfile.base` for the PostgreSQL client tools, whose major version must match the database server or backups taken with one may not restore with the other. When bumping a pin, upgrade the live server to match.
 

@@ -145,10 +145,13 @@ def sentry_resolution(host: str) -> str:
 def staging_app_status(host: str) -> int:
     """The HTTP status nginx returns for the staging site on the host;
     0 when nothing answered at all (curl's failure is caught remotely so
-    a dead socket reports rather than crashes)."""
+    a dead socket reports rather than crashes). --resolve sends the
+    hostname in the TLS handshake, which nginx needs to pick the staging
+    site; -k because the drill host's certificate is self-signed."""
     curl = (
-        "status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "
-        f"-H 'Host: {STAGING_SERVER_NAME}' http://127.0.0.1/) "
+        "status=$(curl -sk -o /dev/null -w '%{http_code}' --max-time 30 "
+        f"--resolve {STAGING_SERVER_NAME}:443:127.0.0.1 "
+        f"https://{STAGING_SERVER_NAME}/) "
         "|| status=000; echo $status"
     )
     return int(ssh(host, curl).strip() or 0)
