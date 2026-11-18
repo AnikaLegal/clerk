@@ -14,7 +14,9 @@ const getCookie = (name: string): string | undefined => {
 // would 403 without the token, so send it whenever the cookie exists.
 const baseHeaders = (): Record<string, string> => {
   const headers: Record<string, string> = {}
-  const csrfToken = getCookie('csrftoken')
+  // Prod and staging use a __Host- cookie name. Local dev and tests run on
+  // plain HTTP, which that prefix doesn't allow, so they keep Django's default.
+  const csrfToken = getCookie('__Host-csrftoken') ?? getCookie('csrftoken')
   if (csrfToken) {
     headers['x-csrftoken'] = csrfToken
   }
