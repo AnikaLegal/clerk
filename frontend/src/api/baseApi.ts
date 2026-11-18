@@ -19,7 +19,9 @@ const baseQuery = fetchBaseQuery({
   baseUrl: '/',
 
   prepareHeaders: (headers) => {
-    const csrfToken = getCookie('csrftoken')
+    // Prod and staging use a __Host- cookie name. Local dev and tests run on
+    // plain HTTP, which that prefix doesn't allow, so they keep Django's default.
+    const csrfToken = getCookie('__Host-csrftoken') ?? getCookie('csrftoken')
     if (csrfToken) {
       headers.set('x-csrftoken', csrfToken)
     }

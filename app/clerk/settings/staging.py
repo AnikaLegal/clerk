@@ -13,9 +13,11 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-SESSION_COOKIE_DOMAIN = ".anikalegal.org.au"
+# __Host- cookies must be Secure and host-only, so browsers keep them to this
+# hostname: no other subdomain can read or set them.
+SESSION_COOKIE_NAME = "__Host-sessionid"
+CSRF_COOKIE_NAME = "__Host-csrftoken"
 SESSION_SAVE_EVERY_REQUEST = True
-CSRF_COOKIE_DOMAIN = ".anikalegal.org.au"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ["https://*.anikalegal.org.au"]

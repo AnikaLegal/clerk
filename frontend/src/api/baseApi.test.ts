@@ -68,6 +68,16 @@ describe('baseApi', () => {
       expect(request.headers.get('x-csrftoken')).toBe('abc123')
     })
 
+    it('prefers the __Host-csrftoken cookie', async () => {
+      vi.stubGlobal('document', {
+        cookie: 'csrftoken=stale; __Host-csrftoken=current',
+      })
+      fetchMock.mockResolvedValue(json(200, { ok: true }))
+      await settle(makeStore().dispatch(api.endpoints.getThing.initiate()))
+      const [request] = fetchMock.mock.calls[0]
+      expect(request.headers.get('x-csrftoken')).toBe('current')
+    })
+
     it('sends no header when there is no csrftoken cookie', async () => {
       vi.stubGlobal('document', { cookie: 'other=1' })
       fetchMock.mockResolvedValue(json(200, { ok: true }))
