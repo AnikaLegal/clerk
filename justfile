@@ -155,6 +155,59 @@ ssh env="prod":
     echo "$cmd"
     exec $cmd
 
+# Check the server's security group allows exactly Cloudflare's published ranges on 443
+cloudflare-ips:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    group="sg-0188bcd154eb59e27"
+    region="ap-southeast-2"
+    tmp=$(mktemp -d)
+    trap 'rm -rf "$tmp"' EXIT
+    curl -fsS "https://api.cloudflare.com/client/v4/ips" -o "$tmp/cloudflare.json"
+    aws ec2 describe-security-group-rules --region "$region" \
+        --filters "Name=group-id,Values=$group" --output json > "$tmp/rules.json"
+    python3 -I - "$tmp/cloudflare.json" "$tmp/rules.json" "$group" "$region" << 'EOF'
+    import json
+    import sys
+
+    cloudflare_file, rules_file, group, region = sys.argv[1:]
+    result = json.load(open(cloudflare_file))["result"]
+    published = set(result["ipv4_cidrs"]) | set(result["ipv6_cidrs"])
+    rules = {}
+    for rule in json.load(open(rules_file))["SecurityGroupRules"]:
+        if rule["IsEgress"] or rule.get("FromPort") != 443:
+            continue
+        cidr = rule.get("CidrIpv4") or rule.get("CidrIpv6")
+        rules[cidr] = rule["SecurityGroupRuleId"]
+
+    missing = sorted(published - rules.keys())
+    extra = sorted(rules.keys() - published)
+    if not missing and not extra:
+        print(f"OK: {group} allows exactly Cloudflare's {len(published)} ranges on 443")
+        sys.exit(0)
+
+    target = f"--region {region} --group-id {group}"
+    if missing:
+        print("Cloudflare ranges missing from the security group (visitors may get errors):")
+        for cidr in missing:
+            print(f"  {cidr}")
+        print("Add them:")
+        for cidr in missing:
+            key = "CidrIpv6" if ":" in cidr else "CidrIp"
+            ranges = "Ipv6Ranges" if ":" in cidr else "IpRanges"
+            permission = json.dumps([{"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443,
+                                      ranges: [{key: cidr, "Description": "Cloudflare proxy HTTPS"}]}])
+            print(f"  aws ec2 authorize-security-group-ingress {target} --ip-permissions '{permission}'")
+    if extra:
+        print("Rules on 443 for ranges Cloudflare doesn't publish:")
+        for cidr in extra:
+            print(f"  {cidr} ({rules[cidr]})")
+        print("Remove them:")
+        ids = " ".join(rules[cidr] for cidr in extra)
+        print(f"  aws ec2 revoke-security-group-ingress {target} --security-group-rule-ids {ids}")
+    sys.exit(1)
+    EOF
+
 # Add ngrok URL to SendGrid to receive emails on dev address
 [arg("url", help="Public ngrok URL to register with SendGrid")]
 ngrok url:
