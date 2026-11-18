@@ -179,8 +179,10 @@ outline:
      Host <drill host IP>       # update each drill; `up` prints the IP
          IdentityAgent SSH_AUTH_SOCK
      ```
-4. `just rehearsal setup <ip>` -
-   [provision.sh](../infra/setup/provision.sh) then the staging stack via
+4. `just rehearsal setup <ip>` - a self-signed stand-in for the
+   Cloudflare origin certificate (the drill host is not behind
+   Cloudflare), [provision.sh](../infra/setup/provision.sh), then the
+   staging stack via
    [init-env.sh](../infra/setup/init-env.sh) (staging only; the recipe
    accepts no other environment).
 5. `just rehearsal restore <ip>` -
