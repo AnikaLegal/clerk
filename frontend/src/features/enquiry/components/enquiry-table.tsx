@@ -164,6 +164,8 @@ const EnquiryTable = <T extends Call | Contact>({
         label="Show done"
         size="md"
         mt="xl"
+        // Its label otherwise spans the full width, so the whole row toggles.
+        w="fit-content"
         checked={args.requiresCallback === undefined}
         onChange={(e) =>
           handleFilterChange(
