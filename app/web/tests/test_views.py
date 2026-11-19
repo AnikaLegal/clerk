@@ -5,6 +5,7 @@ import pytest
 from django.test import RequestFactory
 from django.urls import reverse
 from django_recaptcha.client import RecaptchaResponse
+
 from web.factories import (
     BlogListPageFactory,
     BlogPageFactory,
@@ -68,7 +69,6 @@ def test_contact_form(mocked_submit, client):
         "name": contact_stub.name,
         "email": contact_stub.email,
         "phone": contact_stub.phone,
-        "referral": contact_stub.referral,
         "captcha": "dummy-captcha-response",
     }
     response = client.post(url, data)
@@ -80,7 +80,6 @@ def test_contact_form(mocked_submit, client):
     assert contact.name == data["name"]
     assert contact.email == data["email"]
     assert contact.phone == data["phone"]
-    assert contact.referral == data["referral"]
 
 
 @pytest.mark.django_db
@@ -98,7 +97,6 @@ def test_contact_form_captcha_required_and_valid(client):
         "name": contact_stub.name,
         "email": contact_stub.email,
         "phone": contact_stub.phone,
-        "referral": contact_stub.referral,
     }
     response = client.post(url, data)
 
