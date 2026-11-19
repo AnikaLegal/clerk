@@ -3660,6 +3660,69 @@ components:
           type: string
       required:
         - name
+    EnquiryMatch:
+      description: The client an enquiry came from, if they were already a client when it arrived.
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - OPEN_CASE
+            - FORMER_CLIENT
+        matched_on:
+          type: array
+          items:
+            type: string
+            enum:
+              - PHONE
+              - EMAIL
+        client:
+          type: object
+          properties:
+            full_name:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+            url:
+              type: string
+          required:
+            - full_name
+            - created_at
+            - url
+        case:
+          description: The open case, or the latest closed one for a former client.
+          nullable: true
+          type: object
+          properties:
+            fileref:
+              type: string
+            topic_display:
+              type: string
+            stage_display:
+              type: string
+            closed_at:
+              description: When the case was last closed. Null if open, or closed before close events were recorded.
+              type: string
+              format: date-time
+              nullable: true
+            paralegal_name:
+              type: string
+              nullable: true
+            url:
+              type: string
+          required:
+            - fileref
+            - topic_display
+            - stage_display
+            - closed_at
+            - paralegal_name
+            - url
+      required:
+        - state
+        - matched_on
+        - client
+        - case
     Call:
       type: object
       properties:
@@ -3683,6 +3746,10 @@ components:
           type: integer
         comments:
           type: string
+        match:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/EnquiryMatch"
       required:
         - id
         - created_at
@@ -3693,6 +3760,7 @@ components:
         - requires_callback
         - number_callbacks
         - comments
+        - match
     EnquiryUpdate:
       type: object
       properties:
@@ -3728,6 +3796,10 @@ components:
           type: integer
         comments:
           type: string
+        match:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/EnquiryMatch"
       required:
         - id
         - created_at
@@ -3739,6 +3811,7 @@ components:
         - requires_callback
         - number_callbacks
         - comments
+        - match
   responses:
     BadRequest:
       description: Bad request

@@ -1,0 +1,217 @@
+from datetime import datetime, timedelta
+
+import pytest
+from caller.factories import CallFactory
+from core.factories import (
+    ClientFactory,
+    IssueEventFactory,
+    IssueFactory,
+    UserFactory,
+)
+from core.models.issue_event import EventType
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
+from rest_framework.reverse import reverse
+from webhooks.factories import WebflowContactFactory
+
+NOW = timezone.now()
+BEFORE = NOW - timedelta(days=30)
+AFTER = NOW + timedelta(days=1)
+
+
+def get_calls(client):
+    response = client.get(reverse("call-api-list"))
+    assert response.status_code == 200, response.json()
+    return response.json()["results"]
+
+
+def get_contacts(client):
+    response = client.get(reverse("contact-api-list"))
+    assert response.status_code == 200, response.json()
+    return response.json()["results"]
+
+
+@pytest.mark.django_db
+def test_call_from_client_with_open_case(superuser_client):
+    paralegal = UserFactory(first_name="Jo", last_name="Paralegal")
+    client = ClientFactory(phone_number="0400 123 456", created_at=BEFORE)
+    case = IssueFactory(client=client, is_open=True, paralegal=paralegal)
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"] == {
+        "state": "OPEN_CASE",
+        "matched_on": ["PHONE"],
+        "client": {
+            "full_name": client.get_full_name(),
+            "created_at": call["match"]["client"]["created_at"],
+            "url": reverse("client-detail", args=(client.pk,)),
+        },
+        "case": {
+            "fileref": case.fileref,
+            "topic_display": case.get_topic_display(),
+            "stage_display": case.get_stage_display(),
+            "closed_at": None,
+            "paralegal_name": "Jo Paralegal",
+            "url": reverse("case-detail", args=(case.pk,)),
+        },
+    }
+
+
+@pytest.mark.django_db
+def test_former_client_without_close_events_shows_latest_case(superuser_client):
+    client = ClientFactory(phone_number="+61400123456", created_at=BEFORE)
+    IssueFactory(client=client, is_open=False, created_at=BEFORE)
+    latest = IssueFactory(
+        client=client, is_open=False, created_at=BEFORE + timedelta(days=1)
+    )
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["state"] == "FORMER_CLIENT"
+    assert call["match"]["case"]["fileref"] == latest.fileref
+
+
+@pytest.mark.django_db
+def test_call_from_former_client_shows_latest_closed_case(superuser_client):
+    client = ClientFactory(phone_number="+61400123456", created_at=BEFORE)
+    closed_last = IssueFactory(client=client, is_open=False, created_at=BEFORE)
+    created_last = IssueFactory(
+        client=client, is_open=False, created_at=BEFORE + timedelta(days=1)
+    )
+    close_case(closed_last, at=BEFORE + timedelta(days=20))
+    close_case(created_last, at=BEFORE + timedelta(days=10))
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["case"]["fileref"] == closed_last.fileref
+    closed_at = datetime.fromisoformat(call["match"]["case"]["closed_at"])
+    assert closed_at == BEFORE + timedelta(days=20)
+
+
+def close_case(case, at):
+    IssueEventFactory(
+        issue=case,
+        event_type=EventType.OPEN,
+        prev_is_open=True,
+        next_is_open=False,
+        created_at=at,
+    )
+
+
+@pytest.mark.django_db
+def test_call_from_client_without_cases(superuser_client):
+    ClientFactory(phone_number="+61400123456", created_at=BEFORE)
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["state"] == "FORMER_CLIENT"
+    assert call["match"]["case"] is None
+
+
+@pytest.mark.django_db
+def test_call_before_they_became_a_client_has_no_match(superuser_client):
+    client = ClientFactory(phone_number="+61400123456", created_at=AFTER)
+    IssueFactory(client=client, is_open=True)
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"] is None
+
+
+@pytest.mark.django_db
+def test_open_case_wins_over_former_client(superuser_client):
+    former = ClientFactory(phone_number="0400123456", created_at=BEFORE)
+    IssueFactory(client=former, is_open=False)
+    current = ClientFactory(
+        phone_number="0400123456", created_at=BEFORE - timedelta(days=1)
+    )
+    case = IssueFactory(client=current, is_open=True)
+    CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["state"] == "OPEN_CASE"
+    assert call["match"]["case"]["fileref"] == case.fileref
+
+
+@pytest.mark.parametrize("number", ["anonymous", "+266696687", "12345", ""])
+@pytest.mark.django_db
+def test_call_without_a_usable_number_has_no_match(superuser_client, number):
+    client = ClientFactory(phone_number=number, created_at=BEFORE)
+    IssueFactory(client=client, is_open=True)
+    CallFactory(phone_number=number, created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"] is None
+
+
+@pytest.mark.django_db
+def test_contact_matches_on_email_ignoring_case(superuser_client):
+    client = ClientFactory(
+        email="jane@example.com", phone_number="0400111222", created_at=BEFORE
+    )
+    IssueFactory(client=client, is_open=True)
+    WebflowContactFactory(
+        email=" Jane@Example.com ", phone="0499999999", created_at=NOW
+    )
+
+    [contact] = get_contacts(superuser_client)
+
+    assert contact["match"]["state"] == "OPEN_CASE"
+    assert contact["match"]["matched_on"] == ["EMAIL"]
+
+
+@pytest.mark.django_db
+def test_contact_matching_phone_and_email(superuser_client):
+    client = ClientFactory(
+        email="jane@example.com", phone_number="0400111222", created_at=BEFORE
+    )
+    IssueFactory(client=client, is_open=True)
+    WebflowContactFactory(
+        email="jane@example.com", phone="+61 400 111 222", created_at=NOW
+    )
+
+    [contact] = get_contacts(superuser_client)
+
+    assert contact["match"]["matched_on"] == ["PHONE", "EMAIL"]
+
+
+@pytest.mark.django_db
+def test_call_update_returns_match(superuser_client):
+    client = ClientFactory(phone_number="+61400123456", created_at=BEFORE)
+    IssueFactory(client=client, is_open=True)
+    call = CallFactory(phone_number="+61400123456", created_at=NOW)
+
+    url = reverse("call-api-detail", args=(call.pk,))
+    response = superuser_client.patch(url, data={"number_callbacks": 1})
+
+    assert response.status_code == 200, response.json()
+    assert response.json()["match"]["state"] == "OPEN_CASE"
+
+
+@pytest.mark.django_db
+def test_matching_query_count_does_not_grow_with_rows(superuser_client):
+    def count_queries():
+        with CaptureQueriesContext(connection) as queries:
+            get_calls(superuser_client)
+        return len(queries)
+
+    def add_matched_call(number):
+        client = ClientFactory(phone_number=number, created_at=BEFORE)
+        IssueFactory(client=client, is_open=True, paralegal=UserFactory())
+        CallFactory(phone_number=number, created_at=NOW)
+
+    add_matched_call("+61400000001")
+    one_row = count_queries()
+    add_matched_call("+61400000002")
+    add_matched_call("+61400000003")
+
+    assert count_queries() == one_row

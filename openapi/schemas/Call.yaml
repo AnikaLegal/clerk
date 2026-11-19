@@ -20,6 +20,10 @@ properties:
     type: integer
   comments:
     type: string
+  match:
+    nullable: true
+    allOf:
+      - $ref: ./EnquiryMatch.yaml
 required:
   - id
   - created_at
@@ -30,3 +34,4 @@ required:
   - requires_callback
   - number_callbacks
   - comments
+  - match

@@ -1782,6 +1782,25 @@ export type DocumentTemplateCreate = {
 export type DocumentTemplateRename = {
   name: string;
 };
+export type EnquiryMatch = {
+  state: "OPEN_CASE" | "FORMER_CLIENT";
+  matched_on: ("PHONE" | "EMAIL")[];
+  client: {
+    full_name: string;
+    created_at: string;
+    url: string;
+  };
+  /** The open case, or the latest closed one for a former client. */
+  case: {
+    fileref: string;
+    topic_display: string;
+    stage_display: string;
+    /** When the case was last closed. Null if open, or closed before close events were recorded. */
+    closed_at: string | null;
+    paralegal_name: string | null;
+    url: string;
+  } | null;
+};
 export type Call = {
   id: number;
   created_at: string;
@@ -1792,6 +1811,7 @@ export type Call = {
   requires_callback: boolean;
   number_callbacks: number;
   comments: string;
+  match: EnquiryMatch | null;
 };
 export type EnquiryUpdate = {
   requires_callback?: boolean;
@@ -1809,6 +1829,7 @@ export type Contact = {
   requires_callback: boolean;
   number_callbacks: number;
   comments: string;
+  match: EnquiryMatch | null;
 };
 export const {
   useGetSubmissionQuery,

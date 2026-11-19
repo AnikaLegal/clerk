@@ -23,6 +23,12 @@ export const STAGES = {
   CLOSED: 'Closed',
 } as const
 
+// Semantic UI and Mantine share these colour names.
+export const CASE_STATUS_COLORS = {
+  OPEN: 'blue',
+  CLOSED: 'green',
+} as const
+
 export const OUTCOMES = {
   OUT_OF_SCOPE: 'Out of scope',
   CHANGE_OF_SCOPE: 'Change of scope',

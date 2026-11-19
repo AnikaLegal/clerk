@@ -1,4 +1,5 @@
 from caller.models import Call
+from core.services.enquiry_match import Enquiry, find_client_matches
 from django.db.models import QuerySet
 from rest_framework.decorators import api_view
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin
@@ -48,12 +49,36 @@ class EnquiryApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
             queryset = queryset.filter(**serializer.validated_data)
         return queryset
 
+    def get_serializer(self, *args, **kwargs):
+        # Match the whole page at once rather than querying per row.
+        instance = args[0] if args else None
+        if instance is not None:
+            enquiries = instance if kwargs.get("many") else [instance]
+            kwargs["context"] = {
+                **self.get_serializer_context(),
+                "client_matches": find_client_matches(
+                    [self.to_enquiry(e) for e in enquiries]
+                ),
+            }
+        return super().get_serializer(*args, **kwargs)
+
+    def to_enquiry(self, obj) -> Enquiry:
+        raise NotImplementedError
+
 
 class CallApiViewset(EnquiryApiViewset):
     queryset = Call.objects.all()
     serializer_class = CallSerializer
 
+    def to_enquiry(self, obj: Call) -> Enquiry:
+        return Enquiry(id=obj.pk, created_at=obj.created_at, phone=obj.phone_number)
+
 
 class ContactApiViewset(EnquiryApiViewset):
     queryset = WebflowContact.objects.all()
     serializer_class = ContactSerializer
+
+    def to_enquiry(self, obj: WebflowContact) -> Enquiry:
+        return Enquiry(
+            id=obj.pk, created_at=obj.created_at, phone=obj.phone, email=obj.email
+        )

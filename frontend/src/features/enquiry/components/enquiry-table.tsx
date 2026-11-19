@@ -13,6 +13,7 @@ import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
 import CallbacksCell from './callbacks-cell'
+import { getMatchEdgeStyle, MatchedValue } from './client-match'
 import CommentCell from './comment-cell'
 
 export type EnquiryKind = 'call' | 'contact'
@@ -41,7 +42,12 @@ export const CallTable = () => {
       headers={['Received', 'Phone number', 'Topic']}
       cells={(call) => [
         formatTime(call.created_at),
-        call.phone_number,
+        <MatchedValue
+          key="phone"
+          value={call.phone_number}
+          match={call.match}
+          matchedOn="PHONE"
+        />,
         call.topic_display,
       ]}
     />
@@ -65,8 +71,18 @@ export const ContactTable = () => {
       cells={(contact) => [
         formatTime(contact.created_at),
         contact.name,
-        contact.email,
-        contact.phone,
+        <MatchedValue
+          key="email"
+          value={contact.email}
+          match={contact.match}
+          matchedOn="EMAIL"
+        />,
+        <MatchedValue
+          key="phone"
+          value={contact.phone}
+          match={contact.match}
+          matchedOn="PHONE"
+        />,
         contact.referral,
       ]}
     />
@@ -197,7 +213,11 @@ const EnquiryTable = <T extends Call | Contact>({
                   <Table.Td
                     key={headers[i]}
                     // Received is always the first column.
-                    style={i === 0 ? NO_WRAP : undefined}
+                    style={
+                      i === 0
+                        ? { ...NO_WRAP, ...getMatchEdgeStyle(record.match) }
+                        : undefined
+                    }
                   >
                     {cell}
                   </Table.Td>

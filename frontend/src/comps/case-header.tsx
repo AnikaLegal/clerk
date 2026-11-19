@@ -1,4 +1,5 @@
 import { Client, Issue } from 'api'
+import { CASE_STATUS_COLORS } from 'consts'
 import React from 'react'
 import { Header, Icon, Label, Menu, Segment } from 'semantic-ui-react'
 import { MarkdownAsHtmlDisplay } from 'utils'
@@ -66,9 +67,9 @@ export const CaseHeader: React.FC<CaseHeaderProps> = ({
       </Header>
       <span id="case-status" hx-swap-oob="true">
         {issue.is_open ? (
-          <Label color="blue">Case open</Label>
+          <Label color={CASE_STATUS_COLORS.OPEN}>Case open</Label>
         ) : (
-          <Label color="green">Case closed</Label>
+          <Label color={CASE_STATUS_COLORS.CLOSED}>Case closed</Label>
         )}
 
         {issue.provided_legal_services ? (
