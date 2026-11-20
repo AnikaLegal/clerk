@@ -1,6 +1,11 @@
 from datetime import datetime, timedelta
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
+from rest_framework.reverse import reverse
+
 from caller.factories import CallFactory
 from core.factories import (
     ClientFactory,
@@ -9,10 +14,6 @@ from core.factories import (
     UserFactory,
 )
 from core.models.issue_event import EventType
-from django.db import connection
-from django.test.utils import CaptureQueriesContext
-from django.utils import timezone
-from rest_framework.reverse import reverse
 from webhooks.factories import WebflowContactFactory
 
 NOW = timezone.now()
@@ -191,7 +192,7 @@ def test_call_update_returns_match(superuser_client):
     call = CallFactory(phone_number="+61400123456", created_at=NOW)
 
     url = reverse("call-api-detail", args=(call.pk,))
-    response = superuser_client.patch(url, data={"number_callbacks": 1})
+    response = superuser_client.patch(url, data={"requires_callback": False})
 
     assert response.status_code == 200, response.json()
     assert response.json()["match"]["state"] == "OPEN_CASE"

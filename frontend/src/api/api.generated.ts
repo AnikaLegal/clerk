@@ -507,7 +507,7 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/call/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.enquiryUpdate,
+        body: queryArg.callUpdate,
       }),
     }),
     getContacts: build.query<GetContactsApiResponse, GetContactsApiArg>({
@@ -527,7 +527,26 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({
         url: `/clerk/api/contact/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.enquiryUpdate,
+        body: queryArg.contactUpdate,
+      }),
+    }),
+    getCallbacks: build.query<GetCallbacksApiResponse, GetCallbacksApiArg>({
+      query: (queryArg) => ({
+        url: `/clerk/api/callback/`,
+        params: {
+          call: queryArg.call,
+          contact: queryArg.contact,
+        },
+      }),
+    }),
+    createCallback: build.mutation<
+      CreateCallbackApiResponse,
+      CreateCallbackApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/clerk/api/callback/`,
+        method: "POST",
+        body: queryArg.callbackCreate,
       }),
     }),
   }),
@@ -1024,7 +1043,7 @@ export type UpdateCallApiResponse = /** status 200 Successful response. */ Call;
 export type UpdateCallApiArg = {
   /** Entity ID */
   id: number;
-  enquiryUpdate: EnquiryUpdate;
+  callUpdate: CallUpdate;
 };
 export type GetContactsApiResponse = /** status 200 Successful response. */ {
   current: number;
@@ -1044,7 +1063,18 @@ export type UpdateContactApiResponse =
 export type UpdateContactApiArg = {
   /** Entity ID */
   id: number;
-  enquiryUpdate: EnquiryUpdate;
+  contactUpdate: ContactUpdate;
+};
+export type GetCallbacksApiResponse =
+  /** status 200 Successful response. */ Callback[];
+export type GetCallbacksApiArg = {
+  call?: number;
+  contact?: number;
+};
+export type CreateCallbackApiResponse =
+  /** status 201 Successful response. */ Callback;
+export type CreateCallbackApiArg = {
+  callbackCreate: CallbackCreate;
 };
 export type BooleanYesNo = {
   label: "Yes" | "No";
@@ -1801,6 +1831,16 @@ export type EnquiryMatch = {
     url: string;
   } | null;
 };
+export type Callback = {
+  id: number;
+  created_at: string;
+  logged_by_name: string | null;
+  is_answered: boolean;
+  purpose: string;
+  /** The call summary, or a short note when there was no answer. */
+  summary: string;
+  action_items: string;
+};
 export type Call = {
   id: number;
   created_at: string;
@@ -1812,11 +1852,14 @@ export type Call = {
   number_callbacks: number;
   comments: string;
   match: EnquiryMatch | null;
+  caller_name: string;
+  caller_email: string;
+  latest_callback: Callback | null;
 };
-export type EnquiryUpdate = {
+export type CallUpdate = {
   requires_callback?: boolean;
-  number_callbacks?: number;
-  comments?: string;
+  caller_name?: string;
+  caller_email?: string;
 };
 export type Contact = {
   id: number;
@@ -1830,6 +1873,24 @@ export type Contact = {
   number_callbacks: number;
   comments: string;
   match: EnquiryMatch | null;
+  latest_callback: Callback | null;
+};
+export type ContactUpdate = {
+  requires_callback?: boolean;
+  name?: string;
+  email?: string;
+};
+export type CallbackCreate = {
+  call?: number;
+  contact?: number;
+  is_answered: boolean;
+  purpose?: string;
+  summary?: string;
+  action_items?: string;
+  /** Saved on the call. Calls only. */
+  caller_name?: string;
+  /** Saved on the call. Calls only. */
+  caller_email?: string;
 };
 export const {
   useGetSubmissionQuery,
@@ -1894,4 +1955,6 @@ export const {
   useUpdateCallMutation,
   useGetContactsQuery,
   useUpdateContactMutation,
+  useGetCallbacksQuery,
+  useCreateCallbackMutation,
 } = injectedRtkApi;

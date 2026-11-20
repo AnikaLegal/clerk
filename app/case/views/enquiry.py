@@ -1,12 +1,13 @@
-from caller.models import Call
-from core.services.enquiry_match import Enquiry, find_client_matches
-from django.db.models import QuerySet
+from django.db.models import Prefetch, QuerySet
 from rest_framework.decorators import api_view
-from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
-from webhooks.models import WebflowContact
 
+from caller.models import Call, Callback
 from case.serializers.enquiry import (
+    CallbackCreateSerializer,
+    CallbackSearchSerializer,
+    CallbackSerializer,
     CallSerializer,
     ContactSerializer,
     EnquirySearchSerializer,
@@ -16,6 +17,8 @@ from case.views.auth import (
     CoordinatorOrBetterPermission,
     coordinator_or_better_required,
 )
+from core.services.enquiry_match import Enquiry, find_client_matches
+from webhooks.models import WebflowContact
 
 
 @api_view(["GET"])
@@ -36,11 +39,19 @@ class EnquiryApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
 
     pagination_class = EnquiryPaginator
     permission_classes = [CoordinatorOrBetterPermission]
-    # PATCH only: a PUT would need every field, and only three can change.
+    # PATCH only: a PUT would need every field, and only one can change.
     http_method_names = ["get", "patch", "head", "options"]
 
     def get_queryset(self) -> QuerySet:
-        queryset = self.queryset.order_by("-created_at")
+        queryset = self.queryset.order_by("-created_at").prefetch_related(
+            Prefetch(
+                "callbacks",
+                queryset=Callback.objects.select_related("logged_by").order_by(
+                    "-created_at"
+                ),
+                to_attr="callback_list",
+            )
+        )
         if self.action == "list":
             serializer = EnquirySearchSerializer(
                 data=self.request.query_params, partial=True
@@ -82,3 +93,30 @@ class ContactApiViewset(EnquiryApiViewset):
         return Enquiry(
             id=obj.pk, created_at=obj.created_at, phone=obj.phone, email=obj.email
         )
+
+
+class CallbackApiViewset(GenericViewSet, ListModelMixin, CreateModelMixin):
+    """
+    Lists and logs the calls staff make back to people who got in touch.
+    """
+
+    queryset = Callback.objects.select_related("logged_by").order_by("-created_at")
+    permission_classes = [CoordinatorOrBetterPermission]
+    # An enquiry's history is short, so it comes back whole.
+    pagination_class = None
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CallbackCreateSerializer
+        return CallbackSerializer
+
+    def get_queryset(self) -> QuerySet:
+        queryset = super().get_queryset()
+        if self.action == "list":
+            serializer = CallbackSearchSerializer(data=self.request.query_params)
+            serializer.is_valid(raise_exception=True)
+            queryset = queryset.filter(**serializer.validated_data)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(logged_by=self.request.user)

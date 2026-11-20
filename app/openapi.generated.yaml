@@ -1781,7 +1781,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EnquiryUpdate"
+              $ref: "#/components/schemas/CallUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1864,7 +1864,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EnquiryUpdate"
+              $ref: "#/components/schemas/ContactUpdate"
       responses:
         "200":
           description: Successful response.
@@ -1878,6 +1878,53 @@ paths:
           $ref: "#/components/responses/PermissionDenied"
         "404":
           $ref: "#/components/responses/NotFound"
+  /clerk/api/callback/:
+    get:
+      operationId: getCallbacks
+      description: The callbacks for one call or contact form submission, newest first.
+      parameters:
+        - name: call
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: contact
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Callback"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
+    post:
+      operationId: createCallback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CallbackCreate"
+      responses:
+        "201":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Callback"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/PermissionDenied"
 components:
   schemas:
     BooleanYesNo:
@@ -3723,6 +3770,35 @@ components:
         - matched_on
         - client
         - case
+    Callback:
+      description: A call staff made back to someone who called or used the contact form.
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        logged_by_name:
+          type: string
+          nullable: true
+        is_answered:
+          type: boolean
+        purpose:
+          type: string
+        summary:
+          description: The call summary, or a short note when there was no answer.
+          type: string
+        action_items:
+          type: string
+      required:
+        - id
+        - created_at
+        - logged_by_name
+        - is_answered
+        - purpose
+        - summary
+        - action_items
     Call:
       type: object
       properties:
@@ -3750,6 +3826,14 @@ components:
           nullable: true
           allOf:
             - $ref: "#/components/schemas/EnquiryMatch"
+        caller_name:
+          type: string
+        caller_email:
+          type: string
+        latest_callback:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Callback"
       required:
         - id
         - created_at
@@ -3761,15 +3845,17 @@ components:
         - number_callbacks
         - comments
         - match
-    EnquiryUpdate:
+        - caller_name
+        - caller_email
+        - latest_callback
+    CallUpdate:
       type: object
       properties:
         requires_callback:
           type: boolean
-        number_callbacks:
-          type: integer
-          minimum: 0
-        comments:
+        caller_name:
+          type: string
+        caller_email:
           type: string
     Contact:
       type: object
@@ -3800,6 +3886,10 @@ components:
           nullable: true
           allOf:
             - $ref: "#/components/schemas/EnquiryMatch"
+        latest_callback:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Callback"
       required:
         - id
         - created_at
@@ -3812,6 +3902,40 @@ components:
         - number_callbacks
         - comments
         - match
+        - latest_callback
+    ContactUpdate:
+      type: object
+      properties:
+        requires_callback:
+          type: boolean
+        name:
+          type: string
+        email:
+          type: string
+    CallbackCreate:
+      description: Logs a callback for exactly one of a call or a contact form submission.
+      type: object
+      properties:
+        call:
+          type: integer
+        contact:
+          type: integer
+        is_answered:
+          type: boolean
+        purpose:
+          type: string
+        summary:
+          type: string
+        action_items:
+          type: string
+        caller_name:
+          description: Saved on the call. Calls only.
+          type: string
+        caller_email:
+          description: Saved on the call. Calls only.
+          type: string
+      required:
+        - is_answered
   responses:
     BadRequest:
       description: Bad request

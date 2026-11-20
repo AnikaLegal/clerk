@@ -1,0 +1,8 @@
+type: object
+properties:
+  requires_callback:
+    type: boolean
+  name:
+    type: string
+  email:
+    type: string

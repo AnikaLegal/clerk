@@ -1,22 +1,25 @@
 import { Center, Loader, Pagination, Switch, Table, Text } from '@mantine/core'
-import { IconArrowBackUp, IconCheck } from '@tabler/icons-react'
-import api, {
-  Call,
-  Contact,
-  EnquiryUpdate,
-  GetCallsApiArg,
-  GetContactsApiArg,
-} from 'api'
+import {
+  IconArrowBackUp,
+  IconCheck,
+  IconHistory,
+  IconPhoneCheck,
+  IconPhoneX,
+} from '@tabler/icons-react'
+import api, { Call, Contact, GetCallsApiArg, GetContactsApiArg } from 'api'
 import { ActionIconWithConfirmation } from 'comps/action-icon'
 import dayjs from 'dayjs'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
-import CallbacksCell from './callbacks-cell'
+import { CallbackModal, CallbackModalTarget } from './callback-modal'
 import { getMatchEdgeStyle, MatchedValue } from './client-match'
-import CommentCell from './comment-cell'
+import { PersonDetails } from '../schema'
+import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
 
 export type EnquiryKind = 'call' | 'contact'
+
+export type EnquiryDetail = [label: string, value: string]
 
 const formatTime = (value: string) => dayjs(value).format('DD/MM/YY h:mma')
 
@@ -24,24 +27,44 @@ const NO_WRAP = { whiteSpace: 'nowrap' } as const
 
 const DEFAULT_ARGS = { requiresCallback: true, page: 1 }
 
-type Save = (id: number, update: EnquiryUpdate) => Promise<unknown>
+// Marks an enquiry done or pending; the one change made from the table.
+type DoneUpdate = { requires_callback: boolean }
+type Save = (id: number, update: DoneUpdate) => Promise<unknown>
+type SavePerson = (id: number, person: PersonDetails) => Promise<unknown>
 
 export const CallTable = () => {
   const [args, setArgs] = useState<GetCallsApiArg>(DEFAULT_ARGS)
   const result = api.useGetCallsQuery(args)
   const [updateCall] = api.useUpdateCallMutation()
-  const save: Save = (id, enquiryUpdate) =>
-    updateCall({ id, enquiryUpdate }).unwrap()
+  const save: Save = (id, update) =>
+    updateCall({ id, callUpdate: update }).unwrap()
+  const savePerson: SavePerson = (id, { name, email }) =>
+    updateCall({
+      id,
+      callUpdate: { caller_name: name, caller_email: email },
+    }).unwrap()
 
   return (
     <EnquiryTable<Call>
+      kind="call"
+      person={(call) => ({ name: call.caller_name, email: call.caller_email })}
+      isPersonRequired={false}
+      savePerson={savePerson}
+      describe={(call) => [
+        ['Name', call.caller_name],
+        ['Email', call.caller_email],
+        ['Phone', call.phone_number],
+        ['Topic', call.topic_display],
+      ]}
       args={args}
       setArgs={setArgs}
       result={result}
       save={save}
-      headers={['Received', 'Phone number', 'Topic']}
+      headers={['Received', 'Name', 'Email', 'Phone number', 'Topic']}
       cells={(call) => [
         formatTime(call.created_at),
+        call.caller_name,
+        call.caller_email,
         <MatchedValue
           key="phone"
           value={call.phone_number}
@@ -58,11 +81,22 @@ export const ContactTable = () => {
   const [args, setArgs] = useState<GetContactsApiArg>(DEFAULT_ARGS)
   const result = api.useGetContactsQuery(args)
   const [updateContact] = api.useUpdateContactMutation()
-  const save: Save = (id, enquiryUpdate) =>
-    updateContact({ id, enquiryUpdate }).unwrap()
+  const save: Save = (id, update) =>
+    updateContact({ id, contactUpdate: update }).unwrap()
+  const savePerson: SavePerson = (id, person) =>
+    updateContact({ id, contactUpdate: person }).unwrap()
 
   return (
     <EnquiryTable<Contact>
+      kind="contact"
+      person={(contact) => ({ name: contact.name, email: contact.email })}
+      isPersonRequired
+      savePerson={savePerson}
+      describe={(contact) => [
+        ['Name', contact.name],
+        ['Email', contact.email],
+        ['Phone', contact.phone],
+      ]}
       args={args}
       setArgs={setArgs}
       result={result}
@@ -102,19 +136,31 @@ interface ListResult<T> {
 }
 
 interface EnquiryTableProps<T extends Call | Contact> {
+  kind: EnquiryKind
+  // Labelled details that identify the enquiry in the modal and drawer.
+  describe: (record: T) => EnquiryDetail[]
   args: ListArgs
   setArgs: React.Dispatch<React.SetStateAction<ListArgs>>
   result: ListResult<T>
   save: Save
+  // The name and email shown in the drawer, and how to correct them.
+  person: (record: T) => PersonDetails
+  isPersonRequired: boolean
+  savePerson: SavePerson
   headers: string[]
   cells: (record: T) => React.ReactNode[]
 }
 
 const EnquiryTable = <T extends Call | Contact>({
+  kind,
+  describe,
   args,
   setArgs,
   result,
   save,
+  person,
+  isPersonRequired,
+  savePerson,
   headers,
   cells,
 }: EnquiryTableProps<T>) => {
@@ -122,6 +168,40 @@ const EnquiryTable = <T extends Call | Contact>({
   const columnCount = headers.length + 4
 
   const results = result.data?.results
+  const [callbackTarget, setCallbackTarget] =
+    useState<CallbackModalTarget | null>(null)
+  const [historyRecord, setHistoryRecord] = useState<T | null>(null)
+
+  const details = (record: T): EnquiryDetail[] => [
+    ...describe(record).filter(([, value]) => value),
+    ['Received', formatTime(record.created_at)],
+  ]
+  const logCallback = (record: T, isAnswered: boolean) =>
+    setCallbackTarget({
+      kind,
+      record,
+      isAnswered,
+      details: details(record)
+        .map(([, value]) => value)
+        .join(' · '),
+    })
+  // The row from the latest fetch, so the drawer shows edits once saved.
+  const historyFresh =
+    historyRecord &&
+    (results?.find((record) => record.id === historyRecord.id) ?? historyRecord)
+  const historyTarget: HistoryDrawerTarget | null = historyFresh && {
+    kind,
+    record: historyFresh,
+    details: details(historyFresh),
+    person: {
+      values: person(historyFresh),
+      isRequired: isPersonRequired,
+      onSave: (details) =>
+        savePerson(historyFresh.id, details).then(() =>
+          enqueueSnackbar('Name and email saved', { variant: 'success' })
+        ),
+    },
+  }
 
   // A save can empty the last page, which the API then answers with a 404;
   // step back a page rather than show an error.
@@ -148,7 +228,7 @@ const EnquiryTable = <T extends Call | Contact>({
   const handleFilterChange = (key: string, value: unknown) =>
     setArgs((prev) => ({ ...prev, [key]: value ?? undefined, page: 1 }))
 
-  const saveWithMessage = (id: number, update: EnquiryUpdate, ok: string) =>
+  const saveWithMessage = (id: number, update: DoneUpdate, ok: string) =>
     save(id, update)
       .then(() => enqueueSnackbar(ok, { variant: 'success' }))
       .catch((e) => {
@@ -187,7 +267,7 @@ const EnquiryTable = <T extends Call | Contact>({
               <Table.Th key={header}>{header}</Table.Th>
             ))}
             <Table.Th>Callbacks</Table.Th>
-            <Table.Th>Comments</Table.Th>
+            <Table.Th>Latest</Table.Th>
             <Table.Th>Updated</Table.Th>
             <Table.Th w="1%"></Table.Th>
           </Table.Tr>
@@ -224,35 +304,22 @@ const EnquiryTable = <T extends Call | Contact>({
                     {cell}
                   </Table.Td>
                 ))}
+                <Table.Td>{record.number_callbacks}</Table.Td>
                 <Table.Td>
-                  <CallbacksCell
-                    callbacks={record.number_callbacks}
-                    onSave={(callbacks) =>
-                      saveWithMessage(
-                        record.id,
-                        { number_callbacks: callbacks },
-                        'Enquiry updated'
-                      )
-                    }
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <CommentCell
-                    comments={record.comments}
-                    onSave={(comments) =>
-                      saveWithMessage(
-                        record.id,
-                        { comments },
-                        'Enquiry updated'
-                      )
-                    }
-                  />
+                  <LatestCell record={record} />
                 </Table.Td>
                 <Table.Td style={NO_WRAP}>
                   {formatTime(record.modified_at)}
                 </Table.Td>
                 <Table.Td>
-                  <DoneAction record={record} save={saveWithMessage} />
+                  <RowActions
+                    record={record}
+                    save={saveWithMessage}
+                    onShowHistory={() => setHistoryRecord(record)}
+                    onLogCallback={(isAnswered) =>
+                      logCallback(record, isAnswered)
+                    }
+                  />
                 </Table.Td>
               </Table.Tr>
             ))
@@ -269,7 +336,33 @@ const EnquiryTable = <T extends Call | Contact>({
           withControls
         />
       )}
+      <CallbackModal
+        target={callbackTarget}
+        onClose={() => setCallbackTarget(null)}
+      />
+      <HistoryDrawer
+        target={historyTarget}
+        onClose={() => setHistoryRecord(null)}
+      />
     </>
+  )
+}
+
+// The latest callback, or comments recorded before callbacks were logged.
+const LatestCell = ({ record }: { record: Call | Contact }) => {
+  const latest = record.latest_callback
+  const text = latest
+    ? [latest.is_answered ? 'Answered' : 'No answer', latest.summary]
+        .filter(Boolean)
+        .join(' · ')
+    : record.comments
+  if (!text) {
+    return null
+  }
+  return (
+    <Text inherit lineClamp={3} style={{ whiteSpace: 'pre-wrap' }}>
+      {text}
+    </Text>
   )
 }
 
@@ -287,12 +380,19 @@ const MessageRow = ({
   </Table.Tr>
 )
 
-interface DoneActionProps {
+interface RowActionsProps {
   record: Call | Contact
-  save: (id: number, update: EnquiryUpdate, ok: string) => Promise<unknown>
+  save: (id: number, update: DoneUpdate, ok: string) => Promise<unknown>
+  onShowHistory: () => void
+  onLogCallback: (isAnswered: boolean) => void
 }
 
-const DoneAction = ({ record, save }: DoneActionProps) => {
+const RowActions = ({
+  record,
+  save,
+  onShowHistory,
+  onLogCallback,
+}: RowActionsProps) => {
   const [isBusy, setIsBusy] = useState(false)
   const isDone = !record.requires_callback
 
@@ -312,6 +412,24 @@ const DoneAction = ({ record, save }: DoneActionProps) => {
 
   return (
     <ActionIconWithConfirmation.Group>
+      <ActionIconWithConfirmation
+        tooltip={{ label: 'Log answered call' }}
+        icon={<IconPhoneCheck stroke={1.5} />}
+        actionIcon={{ 'aria-label': 'Log answered call' }}
+        onClick={() => onLogCallback(true)}
+      />
+      <ActionIconWithConfirmation
+        tooltip={{ label: 'Log missed call' }}
+        icon={<IconPhoneX stroke={1.5} />}
+        actionIcon={{ 'aria-label': 'Log missed call' }}
+        onClick={() => onLogCallback(false)}
+      />
+      <ActionIconWithConfirmation
+        tooltip={{ label: 'Callback history' }}
+        icon={<IconHistory stroke={1.5} />}
+        actionIcon={{ 'aria-label': 'Callback history' }}
+        onClick={onShowHistory}
+      />
       <ActionIconWithConfirmation
         tooltip={{ label }}
         icon={

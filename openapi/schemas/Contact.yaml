@@ -26,6 +26,10 @@ properties:
     nullable: true
     allOf:
       - $ref: ./EnquiryMatch.yaml
+  latest_callback:
+    nullable: true
+    allOf:
+      - $ref: ./Callback.yaml
 required:
   - id
   - created_at
@@ -38,3 +42,4 @@ required:
   - number_callbacks
   - comments
   - match
+  - latest_callback

@@ -2,6 +2,7 @@ import { generatedApi } from './api.generated'
 
 const ENTITY_TYPES = [
   'CALL',
+  'CALLBACK',
   'CASE',
   'CASE_DATE',
   'CLIENT',
@@ -108,6 +109,16 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     },
     updateContact: {
       invalidatesTags: [{ type: 'CONTACT' }],
+    },
+    getCallbacks: {
+      providesTags: [{ type: 'CALLBACK' }],
+    },
+    createCallback: {
+      invalidatesTags: [
+        { type: 'CALL' },
+        { type: 'CONTACT' },
+        { type: 'CALLBACK' },
+      ],
     },
     getPerson: {
       providesTags: [{ type: 'PERSON' }],

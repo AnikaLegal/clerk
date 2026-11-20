@@ -1,10 +1,99 @@
-from caller.models import Call
-from core.models import Client, Issue
+from django.db import transaction
+from django.db.models import F
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+
+from caller.models import Call, Callback
+from core.models import Client, Issue
 from webhooks.models import WebflowContact
 
-EDITABLE_FIELDS = ("requires_callback", "number_callbacks", "comments")
+# Callbacks and comments change only through logged callbacks.
+EDITABLE_FIELDS = ("requires_callback",)
+
+CALLER_FIELDS = ("caller_name", "caller_email")
+
+
+class CallbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Callback
+        fields = (
+            "id",
+            "created_at",
+            "logged_by_name",
+            "is_answered",
+            "purpose",
+            "summary",
+            "action_items",
+        )
+
+    logged_by_name = serializers.SerializerMethodField()
+
+    def get_logged_by_name(self, obj):
+        return obj.logged_by.get_full_name() if obj.logged_by else None
+
+
+class CallbackCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Callback
+        fields = (
+            "call",
+            "contact",
+            "is_answered",
+            "purpose",
+            "summary",
+            "action_items",
+            *CALLER_FIELDS,
+        )
+
+    caller_name = serializers.CharField(
+        max_length=255, required=False, allow_blank=True, write_only=True
+    )
+    caller_email = serializers.EmailField(
+        max_length=255, required=False, allow_blank=True, write_only=True
+    )
+
+    def validate(self, attrs):
+        call, contact = attrs.get("call"), attrs.get("contact")
+        if bool(call) == bool(contact):
+            raise serializers.ValidationError(
+                "Log a callback for either a call or a contact form submission."
+            )
+        if contact and any(field in attrs for field in CALLER_FIELDS):
+            raise serializers.ValidationError(
+                "Caller details can only be saved on a call."
+            )
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        caller = {
+            field: validated_data.pop(field)
+            for field in CALLER_FIELDS
+            if field in validated_data
+        }
+        callback = super().create(validated_data)
+        enquiry = callback.call or callback.contact
+        # update() rather than save(), which reruns the contact's alert signal.
+        type(enquiry).objects.filter(pk=enquiry.pk).update(
+            number_callbacks=F("number_callbacks") + 1,
+            modified_at=timezone.now(),
+            **caller,
+        )
+        return callback
+
+    def to_representation(self, instance):
+        return CallbackSerializer(instance, context=self.context).data
+
+
+class CallbackSearchSerializer(serializers.Serializer):
+    call = serializers.IntegerField(required=False)
+    contact = serializers.IntegerField(required=False)
+
+    def validate(self, attrs):
+        if len(attrs) != 1:
+            raise serializers.ValidationError("Filter by either call or contact.")
+        return attrs
 
 
 class EnquiryMatchClientSerializer(serializers.ModelSerializer):
@@ -59,10 +148,21 @@ class EnquirySerializer(serializers.ModelSerializer):
     """
 
     match = serializers.SerializerMethodField()
+    latest_callback = serializers.SerializerMethodField()
 
     def get_match(self, obj):
         match = self.context.get("client_matches", {}).get(obj.pk)
         return EnquiryMatchSerializer(match).data if match else None
+
+    def get_latest_callback(self, obj):
+        # The view prefetches callbacks newest first as callback_list.
+        callbacks = getattr(obj, "callback_list", None)
+        if callbacks is None:
+            callbacks = obj.callbacks.select_related("logged_by").order_by(
+                "-created_at"
+            )
+        latest = next(iter(callbacks), None)
+        return CallbackSerializer(latest).data if latest else None
 
 
 class CallSerializer(EnquirySerializer):
@@ -75,11 +175,17 @@ class CallSerializer(EnquirySerializer):
             "phone_number",
             "topic",
             "topic_display",
-            *EDITABLE_FIELDS,
+            *CALLER_FIELDS,
+            "requires_callback",
+            "number_callbacks",
+            "comments",
             "match",
+            "latest_callback",
         )
-        read_only_fields = tuple(f for f in fields if f not in EDITABLE_FIELDS)
-        extra_kwargs = {"number_callbacks": {"min_value": 0}}
+        # Staff can correct the caller's details without logging a call.
+        read_only_fields = tuple(
+            f for f in fields if f not in (*EDITABLE_FIELDS, *CALLER_FIELDS)
+        )
 
     topic_display = serializers.CharField(source="get_topic_display", read_only=True)
 
@@ -95,11 +201,19 @@ class ContactSerializer(EnquirySerializer):
             "email",
             "phone",
             "referral",
-            *EDITABLE_FIELDS,
+            "requires_callback",
+            "number_callbacks",
+            "comments",
             "match",
+            "latest_callback",
         )
-        read_only_fields = tuple(f for f in fields if f not in EDITABLE_FIELDS)
-        extra_kwargs = {"number_callbacks": {"min_value": 0}}
+        # Staff can correct what the person typed, or switch their email.
+        read_only_fields = tuple(
+            f for f in fields if f not in (*EDITABLE_FIELDS, "name", "email")
+        )
+
+    # The column has no email validation of its own.
+    email = serializers.EmailField(max_length=255)
 
 
 class EnquirySearchSerializer(serializers.Serializer):

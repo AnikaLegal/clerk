@@ -41,6 +41,7 @@ router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
 router.register("call", enquiry.CallApiViewset, basename="call-api")
 router.register("contact", enquiry.ContactApiViewset, basename="contact-api")
+router.register("callback", enquiry.CallbackApiViewset, basename="callback-api")
 router.register(
     "template-email",
     email_templates.EmailTemplateApiViewset,

@@ -1,0 +1,46 @@
+get:
+  operationId: getCallbacks
+  description: The callbacks for one call or contact form submission, newest first.
+  parameters:
+    - name: call
+      in: query
+      schema:
+        type: integer
+      required: false
+    - name: contact
+      in: query
+      schema:
+        type: integer
+      required: false
+  responses:
+    "200":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../schemas/Callback.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml
+post:
+  operationId: createCallback
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../schemas/CallbackCreate.yaml
+  responses:
+    "201":
+      description: Successful response.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/Callback.yaml
+    "400":
+      $ref: ../responses/BadRequest.yaml
+    "403":
+      $ref: ../responses/PermissionDenied.yaml

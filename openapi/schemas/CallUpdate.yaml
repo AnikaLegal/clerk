@@ -2,8 +2,7 @@ type: object
 properties:
   requires_callback:
     type: boolean
-  number_callbacks:
-    type: integer
-    minimum: 0
-  comments:
+  caller_name:
+    type: string
+  caller_email:
     type: string

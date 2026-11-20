@@ -1,0 +1,23 @@
+description: Logs a callback for exactly one of a call or a contact form submission.
+type: object
+properties:
+  call:
+    type: integer
+  contact:
+    type: integer
+  is_answered:
+    type: boolean
+  purpose:
+    type: string
+  summary:
+    type: string
+  action_items:
+    type: string
+  caller_name:
+    description: Saved on the call. Calls only.
+    type: string
+  caller_email:
+    description: Saved on the call. Calls only.
+    type: string
+required:
+  - is_answered

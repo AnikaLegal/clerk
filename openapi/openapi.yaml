@@ -94,3 +94,6 @@ paths:
     $ref: paths/contact-list.yaml
   /clerk/api/contact/{id}/:
     $ref: paths/contact-detail.yaml
+
+  /clerk/api/callback/:
+    $ref: paths/callback-list.yaml

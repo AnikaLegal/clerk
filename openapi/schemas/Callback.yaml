@@ -1,0 +1,28 @@
+description: A call staff made back to someone who called or used the contact form.
+type: object
+properties:
+  id:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  logged_by_name:
+    type: string
+    nullable: true
+  is_answered:
+    type: boolean
+  purpose:
+    type: string
+  summary:
+    description: The call summary, or a short note when there was no answer.
+    type: string
+  action_items:
+    type: string
+required:
+  - id
+  - created_at
+  - logged_by_name
+  - is_answered
+  - purpose
+  - summary
+  - action_items

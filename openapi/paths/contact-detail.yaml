@@ -12,7 +12,7 @@ patch:
     content:
       application/json:
         schema:
-          $ref: ../schemas/EnquiryUpdate.yaml
+          $ref: ../schemas/ContactUpdate.yaml
   responses:
     "200":
       description: Successful response.
