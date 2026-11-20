@@ -4,13 +4,12 @@ from dataclasses import dataclass
 from factory.django import DjangoModelFactory
 
 from accounts.models import User
-from caller.factories import CallbackFactory, CallFactory
 from core.factories import (
     EmailTemplateFactory,
     NotificationFactory,
     UserFactory,
 )
-from webhooks.factories import WebflowContactFactory
+from enquiry.factories import CallbackFactory, CallEnquiryFactory
 
 
 class Action:
@@ -60,15 +59,8 @@ GENERIC_API_TEST_CASES = [
         actions=Action.ALL,
     ),
     APIViewTestCase(
-        factory=CallFactory,
-        base_view_name="call-api",
-        test_read_permissions=lambda user: user.is_coordinator_or_better,
-        test_write_permissions=lambda user: user.is_coordinator_or_better,
-        actions=[Action.LIST, Action.UPDATE],
-    ),
-    APIViewTestCase(
-        factory=WebflowContactFactory,
-        base_view_name="contact-api",
+        factory=CallEnquiryFactory,
+        base_view_name="enquiry-api",
         test_read_permissions=lambda user: user.is_coordinator_or_better,
         test_write_permissions=lambda user: user.is_coordinator_or_better,
         actions=[Action.LIST, Action.UPDATE],

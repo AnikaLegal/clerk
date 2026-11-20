@@ -1,9 +1,7 @@
-description: Logs a callback for exactly one of a call or a contact form submission.
+description: Logs a callback for an enquiry.
 type: object
 properties:
-  call:
-    type: integer
-  contact:
+  enquiry:
     type: integer
   is_answered:
     type: boolean
@@ -13,11 +11,12 @@ properties:
     type: string
   action_items:
     type: string
-  caller_name:
-    description: Saved on the call. Calls only.
+  name:
+    description: Saved on the enquiry. Calls only.
     type: string
-  caller_email:
-    description: Saved on the call. Calls only.
+  email:
+    description: Saved on the enquiry. Calls only.
     type: string
 required:
+  - enquiry
   - is_answered

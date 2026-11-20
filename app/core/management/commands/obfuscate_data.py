@@ -14,7 +14,7 @@ from faker import Faker
 
 from accounts.models import CaseGroups, User
 from blacklist.models import Blacklist
-from caller.models import Call, Callback
+from caller.models import Call
 from core.factories import SubmissionFactory
 from core.models import (
     AuditEvent,
@@ -31,6 +31,7 @@ from core.models import (
 from core.models.issue_note import NoteType
 from core.services.submission import UPLOAD_ANSWERS
 from emails.models import Email, EmailAttachment
+from enquiry.models import Callback, Enquiry, EnquirySource
 from utils.signals import disable_signals, restore_signals
 from web.models.feedback import ContentFeedback
 from webhooks.models import ClosedContact, JotformSubmission, WebflowContact
@@ -178,15 +179,18 @@ class Command(BaseCommand):
                     d.notes = " ".join(fake.sentences())
                     d.save()
 
-        for call in Call.objects.iterator():
-            call.phone_number = fake.numerify("+614########")
-            if call.comments:
-                call.comments = " ".join(fake.sentences())
-            if call.caller_name:
-                call.caller_name = fake.name()
-            if call.caller_email:
-                call.caller_email = get_email(call.caller_email)
-            call.save()
+        for enquiry in Enquiry.objects.iterator():
+            if enquiry.source == EnquirySource.CALL:
+                enquiry.phone = fake.numerify("+614########")
+            elif enquiry.phone:
+                enquiry.phone = fake.phone_number()
+            if enquiry.name:
+                enquiry.name = fake.name()
+            if enquiry.email:
+                enquiry.email = get_email(enquiry.email)
+            if enquiry.comments:
+                enquiry.comments = " ".join(fake.sentences())
+            enquiry.save()
 
         for callback in Callback.objects.iterator():
             for field in ("purpose", "summary", "action_items"):
@@ -194,13 +198,9 @@ class Command(BaseCommand):
                     setattr(callback, field, " ".join(fake.sentences()))
             callback.save()
 
-        for contact in WebflowContact.objects.iterator():
-            contact.name = fake.name()
-            contact.email = get_email(contact.email)
-            contact.phone = fake.phone_number()
-            if contact.comments:
-                contact.comments = " ".join(fake.sentences())
-            contact.save()
+        # Replaced by Enquiry, and dropped once production has switched over.
+        Call.objects.all().delete()
+        WebflowContact.objects.all().delete()
 
         for contact in ClosedContact.objects.iterator():
             contact.name = fake.name()

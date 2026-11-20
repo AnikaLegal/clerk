@@ -2,15 +2,15 @@ from django import forms
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV3
 
+from enquiry.models import Enquiry, EnquirySource
 from web.fields import HtmxReCaptchaV3Field
 from web.models import ContentFeedback, DocumentLog
 from web.models.document import ReferrerChoices, SectorChoices, StateChoices
-from webhooks.models import WebflowContact
 
 
 class ContactForm(forms.ModelForm):
     class Meta:
-        model = WebflowContact
+        model = Enquiry
         fields = [
             "name",
             "email",
@@ -19,6 +19,16 @@ class ContactForm(forms.ModelForm):
         ]
 
     captcha = HtmxReCaptchaV3Field(action="contact")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in ("name", "email", "phone"):
+            self.fields[field].required = True
+
+    def save(self, commit=True):
+        self.instance.source = EnquirySource.CONTACT_FORM
+        self.instance.requires_callback = True
+        return super().save(commit)
 
 
 class ContentFeedbackForm(forms.ModelForm):

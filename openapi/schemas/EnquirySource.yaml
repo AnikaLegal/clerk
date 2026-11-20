@@ -1,0 +1,4 @@
+type: string
+enum:
+  - CALL
+  - CONTACT_FORM

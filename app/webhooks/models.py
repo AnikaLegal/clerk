@@ -3,8 +3,8 @@ import uuid
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
-from core.models.timestamped import TimestampedModel
 from core.models.issue import CaseTopic
+from core.models.timestamped import TimestampedModel
 
 
 class ClosedContact(TimestampedModel):
@@ -20,6 +20,8 @@ class ClosedContact(TimestampedModel):
 class WebflowContact(TimestampedModel):
     """
     A client contact form submission.
+
+    Replaced by enquiry.Enquiry, and kept until the table is dropped.
     """
 
     name = models.CharField(max_length=255)

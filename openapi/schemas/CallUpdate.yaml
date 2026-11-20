@@ -1,8 +1,0 @@
-type: object
-properties:
-  requires_callback:
-    type: boolean
-  caller_name:
-    type: string
-  caller_email:
-    type: string

@@ -1,0 +1,10 @@
+type: object
+properties:
+  requires_callback:
+    type: boolean
+  name:
+    description: Can't be blank for a contact form submission.
+    type: string
+  email:
+    description: Can't be blank for a contact form submission.
+    type: string

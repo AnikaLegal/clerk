@@ -1712,9 +1712,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/call/:
+  /clerk/api/enquiry/:
     get:
-      operationId: getCalls
+      operationId: getEnquiries
       parameters:
         - name: page
           in: query
@@ -1730,6 +1730,11 @@ paths:
           in: query
           schema:
             type: boolean
+          required: false
+        - name: source
+          in: query
+          schema:
+            $ref: "#/components/schemas/EnquirySource"
           required: false
       responses:
         "200":
@@ -1754,7 +1759,7 @@ paths:
                   results:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Call"
+                      $ref: "#/components/schemas/Enquiry"
                 required:
                   - current
                   - next
@@ -1766,9 +1771,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/call/{id}/:
+  /clerk/api/enquiry/{id}/:
     patch:
-      operationId: updateCall
+      operationId: updateEnquiry
       parameters:
         - description: Entity ID
           in: path
@@ -1781,97 +1786,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CallUpdate"
+              $ref: "#/components/schemas/EnquiryUpdate"
       responses:
         "200":
           description: Successful response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Call"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
-        "404":
-          $ref: "#/components/responses/NotFound"
-  /clerk/api/contact/:
-    get:
-      operationId: getContacts
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-          required: false
-        - name: page_size
-          in: query
-          schema:
-            type: integer
-          required: false
-        - name: requires_callback
-          in: query
-          schema:
-            type: boolean
-          required: false
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  current:
-                    type: number
-                  next:
-                    type: number
-                    nullable: true
-                  prev:
-                    type: number
-                    nullable: true
-                  page_count:
-                    type: number
-                  item_count:
-                    type: number
-                  results:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Contact"
-                required:
-                  - current
-                  - next
-                  - prev
-                  - page_count
-                  - item_count
-                  - results
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/PermissionDenied"
-  /clerk/api/contact/{id}/:
-    patch:
-      operationId: updateContact
-      parameters:
-        - description: Entity ID
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ContactUpdate"
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Contact"
+                $ref: "#/components/schemas/Enquiry"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -1881,18 +1803,13 @@ paths:
   /clerk/api/callback/:
     get:
       operationId: getCallbacks
-      description: The callbacks for one call or contact form submission, newest first.
+      description: The callbacks for one enquiry, newest first.
       parameters:
-        - name: call
+        - name: enquiry
           in: query
           schema:
             type: integer
-          required: false
-        - name: contact
-          in: query
-          schema:
-            type: integer
-          required: false
+          required: true
       responses:
         "200":
           description: Successful response.
@@ -3707,6 +3624,11 @@ components:
           type: string
       required:
         - name
+    EnquirySource:
+      type: string
+      enum:
+        - CALL
+        - CONTACT_FORM
     EnquiryMatch:
       description: The client an enquiry came from, if they were already a client when it arrived.
       type: object
@@ -3799,7 +3721,8 @@ components:
         - purpose
         - summary
         - action_items
-    Call:
+    Enquiry:
+      description: Someone who got in touch by phone or through the website contact form.
       type: object
       properties:
         id:
@@ -3810,71 +3733,23 @@ components:
         modified_at:
           type: string
           format: date-time
-        phone_number:
+        source:
+          $ref: "#/components/schemas/EnquirySource"
+        source_display:
           type: string
-        topic:
-          type: string
-        topic_display:
-          type: string
-        requires_callback:
-          type: boolean
-        number_callbacks:
-          type: integer
-        comments:
-          type: string
-        match:
-          nullable: true
-          allOf:
-            - $ref: "#/components/schemas/EnquiryMatch"
-        caller_name:
-          type: string
-        caller_email:
-          type: string
-        latest_callback:
-          nullable: true
-          allOf:
-            - $ref: "#/components/schemas/Callback"
-      required:
-        - id
-        - created_at
-        - modified_at
-        - phone_number
-        - topic
-        - topic_display
-        - requires_callback
-        - number_callbacks
-        - comments
-        - match
-        - caller_name
-        - caller_email
-        - latest_callback
-    CallUpdate:
-      type: object
-      properties:
-        requires_callback:
-          type: boolean
-        caller_name:
-          type: string
-        caller_email:
-          type: string
-    Contact:
-      type: object
-      properties:
-        id:
-          type: integer
-        created_at:
-          type: string
-          format: date-time
-        modified_at:
-          type: string
-          format: date-time
         name:
           type: string
         email:
           type: string
         phone:
           type: string
+        topic:
+          description: Calls only. The option the caller picked in the phone menu.
+          type: string
+        topic_display:
+          type: string
         referral:
+          description: Contact form only. Answers saved before the question was removed.
           type: string
         requires_callback:
           type: boolean
@@ -3894,31 +3769,35 @@ components:
         - id
         - created_at
         - modified_at
+        - source
+        - source_display
         - name
         - email
         - phone
+        - topic
+        - topic_display
         - referral
         - requires_callback
         - number_callbacks
         - comments
         - match
         - latest_callback
-    ContactUpdate:
+    EnquiryUpdate:
       type: object
       properties:
         requires_callback:
           type: boolean
         name:
+          description: Can't be blank for a contact form submission.
           type: string
         email:
+          description: Can't be blank for a contact form submission.
           type: string
     CallbackCreate:
-      description: Logs a callback for exactly one of a call or a contact form submission.
+      description: Logs a callback for an enquiry.
       type: object
       properties:
-        call:
-          type: integer
-        contact:
+        enquiry:
           type: integer
         is_answered:
           type: boolean
@@ -3928,13 +3807,14 @@ components:
           type: string
         action_items:
           type: string
-        caller_name:
-          description: Saved on the call. Calls only.
+        name:
+          description: Saved on the enquiry. Calls only.
           type: string
-        caller_email:
-          description: Saved on the call. Calls only.
+        email:
+          description: Saved on the enquiry. Calls only.
           type: string
       required:
+        - enquiry
         - is_answered
   responses:
     BadRequest:

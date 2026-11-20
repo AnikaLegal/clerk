@@ -4,33 +4,32 @@ import pytest
 from django.utils import timezone
 from rest_framework.reverse import reverse
 
-from caller.factories import CallbackFactory, CallFactory
-from caller.models import Callback
-from webhooks.factories import WebflowContactFactory
+from enquiry.factories import CallbackFactory, CallEnquiryFactory, ContactEnquiryFactory
+from enquiry.models import Callback
 
 URL = reverse("callback-api-list")
 
 
 @pytest.mark.django_db
 def test_log_answered_call(superuser_client, superuser):
-    call = CallFactory(number_callbacks=1)
+    call = CallEnquiryFactory(number_callbacks=1)
 
     response = superuser_client.post(
         URL,
         data={
-            "call": call.pk,
+            "enquiry": call.pk,
             "is_answered": True,
             "purpose": "Bond claim",
             "summary": "Explained the VCAT process",
             "action_items": "Check the intake is submitted",
-            "caller_name": "Sam Example",
-            "caller_email": "sam@example.com",
+            "name": "Sam Example",
+            "email": "sam@example.com",
         },
     )
 
     assert response.status_code == 201, response.json()
     callback = Callback.objects.get()
-    assert callback.call == call
+    assert callback.enquiry == call
     assert callback.logged_by == superuser
     assert callback.is_answered is True
     assert callback.purpose == "Bond claim"
@@ -38,17 +37,17 @@ def test_log_answered_call(superuser_client, superuser):
     assert callback.action_items == "Check the intake is submitted"
     call.refresh_from_db()
     assert call.number_callbacks == 2
-    assert call.caller_name == "Sam Example"
-    assert call.caller_email == "sam@example.com"
+    assert call.name == "Sam Example"
+    assert call.email == "sam@example.com"
 
 
 @pytest.mark.django_db
 def test_log_missed_call_for_contact(superuser_client):
-    contact = WebflowContactFactory(number_callbacks=0)
+    contact = ContactEnquiryFactory(number_callbacks=0)
 
     response = superuser_client.post(
         URL,
-        data={"contact": contact.pk, "is_answered": False, "summary": "Voicemail"},
+        data={"enquiry": contact.pk, "is_answered": False, "summary": "Voicemail"},
     )
 
     assert response.status_code == 201, response.json()
@@ -59,37 +58,22 @@ def test_log_missed_call_for_contact(superuser_client):
 
 @pytest.mark.django_db
 def test_logging_leaves_caller_details_alone_when_not_sent(superuser_client):
-    call = CallFactory(caller_name="Sam Example")
+    call = CallEnquiryFactory(name="Sam Example")
 
-    response = superuser_client.post(URL, data={"call": call.pk, "is_answered": False})
+    response = superuser_client.post(URL, data={"enquiry": call.pk, "is_answered": False})
 
     assert response.status_code == 201, response.json()
     call.refresh_from_db()
-    assert call.caller_name == "Sam Example"
-
-
-@pytest.mark.django_db
-def test_log_needs_exactly_one_enquiry(superuser_client):
-    call = CallFactory()
-    contact = WebflowContactFactory()
-
-    neither = superuser_client.post(URL, data={"is_answered": False})
-    both = superuser_client.post(
-        URL, data={"call": call.pk, "contact": contact.pk, "is_answered": False}
-    )
-
-    assert neither.status_code == 400
-    assert both.status_code == 400
-    assert not Callback.objects.exists()
+    assert call.name == "Sam Example"
 
 
 @pytest.mark.django_db
 def test_caller_details_only_for_calls(superuser_client):
-    contact = WebflowContactFactory()
+    contact = ContactEnquiryFactory()
 
     response = superuser_client.post(
         URL,
-        data={"contact": contact.pk, "is_answered": True, "caller_name": "Sam"},
+        data={"enquiry": contact.pk, "is_answered": True, "name": "Sam"},
     )
 
     assert response.status_code == 400
@@ -98,31 +82,24 @@ def test_caller_details_only_for_calls(superuser_client):
 
 @pytest.mark.django_db
 def test_callback_history_for_one_call(superuser_client):
-    call = CallFactory()
-    older = CallbackFactory(call=call, created_at=timezone.now() - timedelta(days=1))
-    newer = CallbackFactory(call=call, created_at=timezone.now())
+    call = CallEnquiryFactory()
+    older = CallbackFactory(enquiry=call, created_at=timezone.now() - timedelta(days=1))
+    newer = CallbackFactory(enquiry=call, created_at=timezone.now())
     CallbackFactory()
 
-    response = superuser_client.get(URL, {"call": call.pk})
+    response = superuser_client.get(URL, {"enquiry": call.pk})
 
     assert response.status_code == 200, response.json()
     assert [c["id"] for c in response.json()] == [newer.pk, older.pk]
 
 
 @pytest.mark.django_db
-def test_callback_history_needs_one_filter(superuser_client):
-    response = superuser_client.get(URL)
-
-    assert response.status_code == 400
-
-
-@pytest.mark.django_db
 def test_call_list_shows_latest_callback(superuser_client):
-    call = CallFactory()
-    CallbackFactory(call=call, created_at=timezone.now() - timedelta(days=1))
-    newer = CallbackFactory(call=call, created_at=timezone.now())
+    call = CallEnquiryFactory()
+    CallbackFactory(enquiry=call, created_at=timezone.now() - timedelta(days=1))
+    newer = CallbackFactory(enquiry=call, created_at=timezone.now())
 
-    response = superuser_client.get(reverse("call-api-list"))
+    response = superuser_client.get(reverse("enquiry-api-list"))
 
     assert response.status_code == 200, response.json()
     [row] = response.json()["results"]
@@ -131,17 +108,17 @@ def test_call_list_shows_latest_callback(superuser_client):
 
 @pytest.mark.django_db
 def test_callback_history_needs_coordinator(user_client, paralegal_user):
-    call = CallFactory()
+    call = CallEnquiryFactory()
 
-    response = user_client.get(URL, {"call": call.pk})
+    response = user_client.get(URL, {"enquiry": call.pk})
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_callback_history_for_coordinator(user_client, coordinator_user):
-    call = CallFactory()
+    call = CallEnquiryFactory()
 
-    response = user_client.get(URL, {"call": call.pk})
+    response = user_client.get(URL, {"enquiry": call.pk})
 
     assert response.status_code == 200

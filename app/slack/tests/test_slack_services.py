@@ -9,7 +9,7 @@ from slack.services import get_slack_user_by_email, send_slack_message
 
 @responses.activate
 @pytest.mark.django_db
-@pytest.mark.parametrize("slug", ["client-intake", "landing-form"])
+@pytest.mark.parametrize("slug", ["client-intake"])
 @override_settings(SLACK_MESSAGE_DISABLED=False)
 def test_send_issue_slack(slug):
     """

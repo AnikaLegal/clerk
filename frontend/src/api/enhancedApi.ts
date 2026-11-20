@@ -1,14 +1,13 @@
 import { generatedApi } from './api.generated'
 
 const ENTITY_TYPES = [
-  'CALL',
   'CALLBACK',
   'CASE',
   'CASE_DATE',
   'CLIENT',
-  'CONTACT',
   'DOCUMENT_TEMPLATE',
   'EMAIL',
+  'ENQUIRY',
   'PERSON',
   'SERVICE',
   'POTENTIAL_USER',
@@ -98,27 +97,17 @@ const enhancedApi = generatedApi.enhanceEndpoints({
     deleteCaseDate: {
       invalidatesTags: [{ type: 'CASE_DATE' }],
     },
-    getCalls: {
-      providesTags: [{ type: 'CALL' }],
+    getEnquiries: {
+      providesTags: [{ type: 'ENQUIRY' }],
     },
-    updateCall: {
-      invalidatesTags: [{ type: 'CALL' }],
-    },
-    getContacts: {
-      providesTags: [{ type: 'CONTACT' }],
-    },
-    updateContact: {
-      invalidatesTags: [{ type: 'CONTACT' }],
+    updateEnquiry: {
+      invalidatesTags: [{ type: 'ENQUIRY' }],
     },
     getCallbacks: {
       providesTags: [{ type: 'CALLBACK' }],
     },
     createCallback: {
-      invalidatesTags: [
-        { type: 'CALL' },
-        { type: 'CONTACT' },
-        { type: 'CALLBACK' },
-      ],
+      invalidatesTags: [{ type: 'ENQUIRY' }, { type: 'CALLBACK' }],
     },
     getPerson: {
       providesTags: [{ type: 'PERSON' }],

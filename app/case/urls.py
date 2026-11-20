@@ -39,8 +39,7 @@ router.register("note", note.NoteApiViewset, basename="note-api")
 router.register("client", client.ClientApiViewset, basename="client-api")
 router.register("account", accounts.AccountApiViewset, basename="account-api")
 router.register("email", case_email.EmailApiViewset, basename="email-api")
-router.register("call", enquiry.CallApiViewset, basename="call-api")
-router.register("contact", enquiry.ContactApiViewset, basename="contact-api")
+router.register("enquiry", enquiry.EnquiryApiViewset, basename="enquiry-api")
 router.register("callback", enquiry.CallbackApiViewset, basename="callback-api")
 router.register(
     "template-email",

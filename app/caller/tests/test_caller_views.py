@@ -3,11 +3,11 @@ from unittest import mock
 import pytest
 from django.urls import reverse
 
-from caller.models import Call
-from caller.choices import Choice
-
 from blacklist.models import Blacklist
+from caller.choices import Choice
 from caller.views import BLACKLIST_COMMENT
+from enquiry.models import Enquiry
+
 
 @mock.patch("caller.views.MessagingResponse")
 def test_message_view(mock_MR, client):
@@ -40,8 +40,8 @@ def test_answer_view(mock_VR, mock_G, client):
 
     mock_response.append.assert_called_once()
     mock_gather.play.assert_called_once()
-    call = Call.objects.last()
-    assert call.phone_number == from_number
+    call = Enquiry.objects.last()
+    assert call.phone == from_number
     assert resp.status_code == 200
 
 
@@ -68,8 +68,8 @@ def test_collect_view(mock_VR, mock_G, mock_C, client):
     )
 
     mock_client.messages.create.assert_called_once()
-    call = Call.objects.last()
-    assert call.phone_number == from_number and call.requires_callback == True
+    call = Enquiry.objects.last()
+    assert call.phone == from_number and call.requires_callback == True
     assert resp.status_code == 200
 
 @mock.patch("caller.views.Client")
@@ -99,7 +99,7 @@ def test_collect_view_blacklist(mock_VR, mock_G, mock_C, client):
     mock_client.messages.create.assert_called_once()
     assert resp.status_code == 200
 
-    call = Call.objects.last()
-    assert call.phone_number == from_number
+    call = Enquiry.objects.last()
+    assert call.phone == from_number
     assert not call.requires_callback
     assert call.comments == BLACKLIST_COMMENT

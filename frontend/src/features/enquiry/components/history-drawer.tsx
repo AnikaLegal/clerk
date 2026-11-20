@@ -14,14 +14,14 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconPencil } from '@tabler/icons-react'
-import api, { Call, Callback, Contact } from 'api'
+import api, { Callback, Enquiry } from 'api'
 import dayjs from 'dayjs'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { getAPIErrorMessage } from 'utils'
 import { PersonDetails, personSchema } from '../schema'
-import type { EnquiryDetail, EnquiryKind } from './enquiry-table'
+import type { EnquiryDetail } from './enquiry-table'
 
 export interface EditablePerson {
   values: PersonDetails
@@ -30,8 +30,7 @@ export interface EditablePerson {
 }
 
 export interface HistoryDrawerTarget {
-  kind: EnquiryKind
-  record: Call | Contact
+  enquiry: Enquiry
   details: EnquiryDetail[]
   // The name and email, which staff can correct here.
   person: EditablePerson
@@ -58,7 +57,7 @@ export const HistoryDrawer = ({ target, onClose }: HistoryDrawerProps) => (
   >
     {target && (
       <>
-        <DetailsSection key={target.record.id} target={target} />
+        <DetailsSection key={target.enquiry.id} target={target} />
         <History target={target} />
       </>
     )}
@@ -171,10 +170,8 @@ const Details = ({ rows }: { rows: EnquiryDetail[] }) => (
 )
 
 const History = ({ target }: { target: HistoryDrawerTarget }) => {
-  const { kind, record } = target
-  const result = api.useGetCallbacksQuery(
-    kind === 'call' ? { call: record.id } : { contact: record.id }
-  )
+  const { enquiry: record } = target
+  const result = api.useGetCallbacksQuery({ enquiry: record.id })
 
   if (result.isLoading) {
     return <Loader mt="lg" />

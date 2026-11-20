@@ -5,12 +5,16 @@ see when someone getting in touch is already a client.
 
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from typing import TYPE_CHECKING
+
+from django.db.models import CharField, F, Func, Max, Prefetch, Q, QuerySet, Value
+from django.db.models.functions import Lower, Right, Trim
 
 from core.models import Client, Issue
 from core.models.issue_event import EventType
-from django.db.models import CharField, F, Func, Max, Prefetch, Q, QuerySet, Value
-from django.db.models.functions import Lower, Right, Trim
+
+if TYPE_CHECKING:
+    from enquiry.models import Enquiry
 
 # Comparing the last 9 digits ignores the +61 or leading 0, and any spacing.
 PHONE_DIGITS = 9
@@ -27,14 +31,6 @@ class MatchState:
 class MatchedOn:
     PHONE = "PHONE"
     EMAIL = "EMAIL"
-
-
-@dataclass(frozen=True)
-class Enquiry:
-    id: int
-    created_at: datetime
-    phone: str
-    email: str = ""
 
 
 @dataclass(frozen=True)
@@ -56,7 +52,7 @@ def get_email_key(email: str) -> str | None:
     return email.strip().lower() or None
 
 
-def find_client_matches(enquiries: list[Enquiry]) -> dict[int, ClientMatch]:
+def find_client_matches(enquiries: list["Enquiry"]) -> dict[int, ClientMatch]:
     """
     Matches enquiries to clients in two queries, however many there are.
     Client details are stored as typed, so they are normalised in the query.
@@ -111,7 +107,7 @@ def annotate_closed_at(cases: QuerySet[Issue]) -> QuerySet[Issue]:
     return cases.annotate(closed_at=closed_at)
 
 
-def match_enquiry(enquiry: Enquiry, clients: list[Client]) -> ClientMatch | None:
+def match_enquiry(enquiry: "Enquiry", clients: list[Client]) -> ClientMatch | None:
     phone_key = get_phone_key(enquiry.phone)
     email_key = get_email_key(enquiry.email)
 

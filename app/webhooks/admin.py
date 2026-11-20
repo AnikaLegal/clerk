@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from utils.admin import dict_to_json_html
 
-from .models import JotformSubmission, WebflowContact, ClosedContact
+from .models import ClosedContact, JotformSubmission
 
 
 @admin.register(ClosedContact)
@@ -16,23 +16,6 @@ class ClosedContactAdmin(admin.ModelAdmin):
         "created_at",
     )
     list_filter = ("topic",)
-
-
-@admin.register(WebflowContact)
-class WebflowContactAdmin(admin.ModelAdmin):
-    ordering = ("-created_at",)
-    list_display = (
-        "id",
-        "name",
-        "referral",
-        "email",
-        "phone",
-        "created_at",
-        "requires_callback",
-        "number_callbacks",
-        "comments",
-    )
-    list_filter = ("referral",)
 
 
 @admin.register(JotformSubmission)

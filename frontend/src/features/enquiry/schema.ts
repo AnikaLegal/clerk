@@ -1,8 +1,8 @@
 import * as Yup from 'yup'
 
 export type CallbackFormValues = {
-  caller_name: string
-  caller_email: string
+  name: string
+  email: string
   purpose: string
   summary: string
   action_items: string
@@ -10,8 +10,8 @@ export type CallbackFormValues = {
 
 export const CallbackSchema: Yup.ObjectSchema<CallbackFormValues> =
   Yup.object().shape({
-    caller_name: Yup.string().max(255).defined(),
-    caller_email: Yup.string()
+    name: Yup.string().max(255).defined(),
+    email: Yup.string()
       .email('Enter a valid email address.')
       .max(255)
       .defined(),

@@ -1,17 +1,12 @@
 get:
   operationId: getCallbacks
-  description: The callbacks for one call or contact form submission, newest first.
+  description: The callbacks for one enquiry, newest first.
   parameters:
-    - name: call
+    - name: enquiry
       in: query
       schema:
         type: integer
-      required: false
-    - name: contact
-      in: query
-      schema:
-        type: integer
-      required: false
+      required: true
   responses:
     "200":
       description: Successful response.

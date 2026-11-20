@@ -1,4 +1,13 @@
-import { Center, Loader, Pagination, Switch, Table, Text } from '@mantine/core'
+import {
+  Center,
+  Group,
+  Loader,
+  Pagination,
+  Select,
+  Switch,
+  Table,
+  Text,
+} from '@mantine/core'
 import {
   IconArrowBackUp,
   IconCheck,
@@ -6,18 +15,16 @@ import {
   IconPhoneCheck,
   IconPhoneX,
 } from '@tabler/icons-react'
-import api, { Call, Contact, GetCallsApiArg, GetContactsApiArg } from 'api'
+import api, { Enquiry, EnquirySource, GetEnquiriesApiArg } from 'api'
 import { ActionIconWithConfirmation } from 'comps/action-icon'
 import dayjs from 'dayjs'
 import { enqueueSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
+import { PersonDetails } from '../schema'
 import { CallbackModal, CallbackModalTarget } from './callback-modal'
 import { getMatchEdgeStyle, MatchedValue } from './client-match'
-import { PersonDetails } from '../schema'
 import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
-
-export type EnquiryKind = 'call' | 'contact'
 
 export type EnquiryDetail = [label: string, value: string]
 
@@ -25,179 +32,63 @@ const formatTime = (value: string) => dayjs(value).format('DD/MM/YY h:mma')
 
 const NO_WRAP = { whiteSpace: 'nowrap' } as const
 
-const DEFAULT_ARGS = { requiresCallback: true, page: 1 }
+const HEADERS = [
+  'Received',
+  'From',
+  'Name',
+  'Email',
+  'Phone number',
+  'Callbacks',
+  'Latest',
+  '',
+]
 
-// Marks an enquiry done or pending; the one change made from the table.
-type DoneUpdate = { requires_callback: boolean }
-type Save = (id: number, update: DoneUpdate) => Promise<unknown>
-type SavePerson = (id: number, person: PersonDetails) => Promise<unknown>
+const SOURCE_OPTIONS: { value: EnquirySource; label: string }[] = [
+  { value: 'CALL', label: 'Call' },
+  { value: 'CONTACT_FORM', label: 'Contact form' },
+]
 
-export const CallTable = () => {
-  const [args, setArgs] = useState<GetCallsApiArg>(DEFAULT_ARGS)
-  const result = api.useGetCallsQuery(args)
-  const [updateCall] = api.useUpdateCallMutation()
-  const save: Save = (id, update) =>
-    updateCall({ id, callUpdate: update }).unwrap()
-  const savePerson: SavePerson = (id, { name, email }) =>
-    updateCall({
-      id,
-      callUpdate: { caller_name: name, caller_email: email },
-    }).unwrap()
+// The changes staff make from the table and drawer.
+type EnquiryChange = Partial<PersonDetails> & { requires_callback?: boolean }
 
-  return (
-    <EnquiryTable<Call>
-      kind="call"
-      person={(call) => ({ name: call.caller_name, email: call.caller_email })}
-      isPersonRequired={false}
-      savePerson={savePerson}
-      describe={(call) => [
-        ['Name', call.caller_name],
-        ['Email', call.caller_email],
-        ['Phone', call.phone_number],
-        ['Topic', call.topic_display],
-      ]}
-      args={args}
-      setArgs={setArgs}
-      result={result}
-      save={save}
-      headers={['Received', 'Name', 'Email', 'Phone number', 'Topic']}
-      cells={(call) => [
-        formatTime(call.created_at),
-        call.caller_name,
-        call.caller_email,
-        <MatchedValue
-          key="phone"
-          value={call.phone_number}
-          match={call.match}
-          matchedOn="PHONE"
-        />,
-        call.topic_display,
-      ]}
-    />
-  )
-}
+export const EnquiryTable = () => {
+  const [args, setArgs] = useState<GetEnquiriesApiArg>({
+    requiresCallback: true,
+    page: 1,
+  })
+  const result = api.useGetEnquiriesQuery(args)
+  const [updateEnquiry] = api.useUpdateEnquiryMutation()
+  const save = (id: number, enquiryUpdate: EnquiryChange) =>
+    updateEnquiry({ id, enquiryUpdate }).unwrap()
 
-export const ContactTable = () => {
-  const [args, setArgs] = useState<GetContactsApiArg>(DEFAULT_ARGS)
-  const result = api.useGetContactsQuery(args)
-  const [updateContact] = api.useUpdateContactMutation()
-  const save: Save = (id, update) =>
-    updateContact({ id, contactUpdate: update }).unwrap()
-  const savePerson: SavePerson = (id, person) =>
-    updateContact({ id, contactUpdate: person }).unwrap()
-
-  return (
-    <EnquiryTable<Contact>
-      kind="contact"
-      person={(contact) => ({ name: contact.name, email: contact.email })}
-      isPersonRequired
-      savePerson={savePerson}
-      describe={(contact) => [
-        ['Name', contact.name],
-        ['Email', contact.email],
-        ['Phone', contact.phone],
-      ]}
-      args={args}
-      setArgs={setArgs}
-      result={result}
-      save={save}
-      headers={['Received', 'Name', 'Email', 'Phone number', 'Referral']}
-      cells={(contact) => [
-        formatTime(contact.created_at),
-        contact.name,
-        <MatchedValue
-          key="email"
-          value={contact.email}
-          match={contact.match}
-          matchedOn="EMAIL"
-        />,
-        <MatchedValue
-          key="phone"
-          value={contact.phone}
-          match={contact.match}
-          matchedOn="PHONE"
-        />,
-        contact.referral,
-      ]}
-    />
-  )
-}
-
-interface ListArgs {
-  requiresCallback?: boolean
-  page?: number
-}
-
-interface ListResult<T> {
-  data?: { results: T[]; page_count: number }
-  isLoading: boolean
-  isError: boolean
-  error?: unknown
-}
-
-interface EnquiryTableProps<T extends Call | Contact> {
-  kind: EnquiryKind
-  // Labelled details that identify the enquiry in the modal and drawer.
-  describe: (record: T) => EnquiryDetail[]
-  args: ListArgs
-  setArgs: React.Dispatch<React.SetStateAction<ListArgs>>
-  result: ListResult<T>
-  save: Save
-  // The name and email shown in the drawer, and how to correct them.
-  person: (record: T) => PersonDetails
-  isPersonRequired: boolean
-  savePerson: SavePerson
-  headers: string[]
-  cells: (record: T) => React.ReactNode[]
-}
-
-const EnquiryTable = <T extends Call | Contact>({
-  kind,
-  describe,
-  args,
-  setArgs,
-  result,
-  save,
-  person,
-  isPersonRequired,
-  savePerson,
-  headers,
-  cells,
-}: EnquiryTableProps<T>) => {
   const page = args.page || 1
-  const columnCount = headers.length + 4
-
   const results = result.data?.results
   const [callbackTarget, setCallbackTarget] =
     useState<CallbackModalTarget | null>(null)
-  const [historyRecord, setHistoryRecord] = useState<T | null>(null)
+  const [historyEnquiry, setHistoryEnquiry] = useState<Enquiry | null>(null)
 
-  const details = (record: T): EnquiryDetail[] => [
-    ...describe(record).filter(([, value]) => value),
-    ['Received', formatTime(record.created_at)],
-  ]
-  const logCallback = (record: T, isAnswered: boolean) =>
+  const logCallback = (enquiry: Enquiry, isAnswered: boolean) =>
     setCallbackTarget({
-      kind,
-      record,
+      enquiry,
       isAnswered,
-      details: details(record)
+      details: describe(enquiry)
         .map(([, value]) => value)
         .join(' · '),
     })
   // The row from the latest fetch, so the drawer shows edits once saved.
   const historyFresh =
-    historyRecord &&
-    (results?.find((record) => record.id === historyRecord.id) ?? historyRecord)
+    historyEnquiry &&
+    (results?.find((enquiry) => enquiry.id === historyEnquiry.id) ??
+      historyEnquiry)
   const historyTarget: HistoryDrawerTarget | null = historyFresh && {
-    kind,
-    record: historyFresh,
-    details: details(historyFresh),
+    enquiry: historyFresh,
+    details: describe(historyFresh),
     person: {
-      values: person(historyFresh),
-      isRequired: isPersonRequired,
-      onSave: (details) =>
-        savePerson(historyFresh.id, details).then(() =>
+      values: { name: historyFresh.name, email: historyFresh.email },
+      // A contact typed both in; a caller may have given neither.
+      isRequired: historyFresh.source === 'CONTACT_FORM',
+      onSave: (person) =>
+        save(historyFresh.id, person).then(() =>
           enqueueSnackbar('Name and email saved', { variant: 'success' })
         ),
     },
@@ -228,7 +119,7 @@ const EnquiryTable = <T extends Call | Contact>({
   const handleFilterChange = (key: string, value: unknown) =>
     setArgs((prev) => ({ ...prev, [key]: value ?? undefined, page: 1 }))
 
-  const saveWithMessage = (id: number, update: DoneUpdate, ok: string) =>
+  const saveWithMessage = (id: number, update: EnquiryChange, ok: string) =>
     save(id, update)
       .then(() => enqueueSnackbar(ok, { variant: 'success' }))
       .catch((e) => {
@@ -240,20 +131,35 @@ const EnquiryTable = <T extends Call | Contact>({
 
   return (
     <>
-      <Switch
-        label="Show done"
-        size="md"
-        mt="xl"
-        // Its label otherwise spans the full width, so the whole row toggles.
-        w="fit-content"
-        checked={args.requiresCallback === undefined}
-        onChange={(e) =>
-          handleFilterChange(
-            'requiresCallback',
-            e.currentTarget.checked ? undefined : true
-          )
-        }
-      />
+      <Group mt="xl" gap="lg" align="flex-end">
+        <Select
+          label="From"
+          placeholder="All"
+          size="md"
+          data={SOURCE_OPTIONS}
+          value={args.source ?? null}
+          onChange={(value) => handleFilterChange('source', value)}
+          clearable
+          allowDeselect
+          withCheckIcon={false}
+          w={200}
+        />
+        <Switch
+          label="Show done"
+          size="md"
+          // Centres it on the select's input rather than its label.
+          mb={9}
+          // Its label otherwise spans the full width, so the whole row toggles.
+          w="fit-content"
+          checked={args.requiresCallback === undefined}
+          onChange={(e) =>
+            handleFilterChange(
+              'requiresCallback',
+              e.currentTarget.checked ? undefined : true
+            )
+          }
+        />
+      </Group>
       <Table
         withColumnBorders
         withTableBorder
@@ -263,61 +169,65 @@ const EnquiryTable = <T extends Call | Contact>({
       >
         <Table.Thead>
           <Table.Tr>
-            {headers.map((header) => (
-              <Table.Th key={header}>{header}</Table.Th>
+            {HEADERS.map((header, i) => (
+              <Table.Th key={i} w={header ? undefined : '1%'}>
+                {header}
+              </Table.Th>
             ))}
-            <Table.Th>Callbacks</Table.Th>
-            <Table.Th>Latest</Table.Th>
-            <Table.Th>Updated</Table.Th>
-            <Table.Th w="1%"></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {result.isLoading ? (
-            <MessageRow columnCount={columnCount}>
+            <MessageRow>
               <Loader />
             </MessageRow>
           ) : result.isError ? (
-            <MessageRow columnCount={columnCount}>
+            <MessageRow>
               <Text c="red">Could not load enquiries</Text>
             </MessageRow>
           ) : !results || results.length === 0 ? (
-            <MessageRow columnCount={columnCount}>
-              No enquiries found
-            </MessageRow>
+            <MessageRow>No enquiries found</MessageRow>
           ) : (
-            results.map((record) => (
+            results.map((enquiry) => (
               <Table.Tr
-                key={record.id}
-                c={record.requires_callback ? undefined : 'dimmed'}
+                key={enquiry.id}
+                c={enquiry.requires_callback ? undefined : 'dimmed'}
               >
-                {cells(record).map((cell, i) => (
-                  <Table.Td
-                    key={headers[i]}
-                    // Received is always the first column.
-                    style={
-                      i === 0
-                        ? { ...NO_WRAP, ...getMatchEdgeStyle(record.match) }
-                        : undefined
-                    }
-                  >
-                    {cell}
-                  </Table.Td>
-                ))}
-                <Table.Td>{record.number_callbacks}</Table.Td>
-                <Table.Td>
-                  <LatestCell record={record} />
+                <Table.Td
+                  style={{ ...NO_WRAP, ...getMatchEdgeStyle(enquiry.match) }}
+                >
+                  {dayjs(enquiry.created_at).format('DD/MM/YY')}
+                  <Text inherit c="dimmed" fz="sm">
+                    {dayjs(enquiry.created_at).format('h:mma')}
+                  </Text>
                 </Table.Td>
-                <Table.Td style={NO_WRAP}>
-                  {formatTime(record.modified_at)}
+                <Table.Td style={NO_WRAP}>{describeSource(enquiry)}</Table.Td>
+                <Table.Td>{enquiry.name}</Table.Td>
+                <Table.Td>
+                  <MatchedValue
+                    value={enquiry.email}
+                    match={enquiry.match}
+                    matchedOn="EMAIL"
+                  />
+                </Table.Td>
+                <Table.Td>
+                  <MatchedValue
+                    value={enquiry.phone}
+                    match={enquiry.match}
+                    matchedOn="PHONE"
+                  />
+                </Table.Td>
+                <Table.Td>{enquiry.number_callbacks}</Table.Td>
+                <Table.Td>
+                  <LatestCell record={enquiry} />
                 </Table.Td>
                 <Table.Td>
                   <RowActions
-                    record={record}
+                    record={enquiry}
                     save={saveWithMessage}
-                    onShowHistory={() => setHistoryRecord(record)}
+                    onShowHistory={() => setHistoryEnquiry(enquiry)}
                     onLogCallback={(isAnswered) =>
-                      logCallback(record, isAnswered)
+                      logCallback(enquiry, isAnswered)
                     }
                   />
                 </Table.Td>
@@ -342,47 +252,71 @@ const EnquiryTable = <T extends Call | Contact>({
       />
       <HistoryDrawer
         target={historyTarget}
-        onClose={() => setHistoryRecord(null)}
+        onClose={() => setHistoryEnquiry(null)}
       />
     </>
   )
 }
 
+const describeSource = (enquiry: Enquiry) =>
+  [enquiry.source_display, enquiry.topic_display].filter(Boolean).join(' · ')
+
+// Labelled details that identify the enquiry in the modal and drawer.
+const describe = (enquiry: Enquiry): EnquiryDetail[] =>
+  (
+    [
+      ['From', describeSource(enquiry)],
+      ['Name', enquiry.name],
+      ['Email', enquiry.email],
+      ['Phone', enquiry.phone],
+      ['Received', formatTime(enquiry.created_at)],
+    ] as EnquiryDetail[]
+  ).filter(([, value]) => value)
+
 // The latest callback, or comments recorded before callbacks were logged.
-const LatestCell = ({ record }: { record: Call | Contact }) => {
+const LatestCell = ({ record }: { record: Enquiry }) => {
   const latest = record.latest_callback
-  const text = latest
-    ? [latest.is_answered ? 'Answered' : 'No answer', latest.summary]
-        .filter(Boolean)
-        .join(' · ')
-    : record.comments
-  if (!text) {
-    return null
+  if (!latest) {
+    return record.comments ? <CellText>{record.comments}</CellText> : null
   }
   return (
-    <Text inherit lineClamp={3} style={{ whiteSpace: 'pre-wrap' }}>
-      {text}
-    </Text>
+    <>
+      <Text inherit c="dimmed" fz="sm" title={formatTime(latest.created_at)}>
+        {latest.is_answered ? 'Answered' : 'No answer'} ·{' '}
+        {formatAge(latest.created_at)}
+      </Text>
+      {latest.summary && <CellText>{latest.summary}</CellText>}
+    </>
   )
 }
 
-const MessageRow = ({
-  columnCount,
-  children,
-}: {
-  columnCount: number
-  children: React.ReactNode
-}) => (
+const CellText = ({ children }: { children: React.ReactNode }) => (
+  <Text inherit lineClamp={3} style={{ whiteSpace: 'pre-wrap' }}>
+    {children}
+  </Text>
+)
+
+// How long ago, in the largest whole unit: 5m, 3h or 2d ago.
+const formatAge = (value: string) => {
+  const minutes = dayjs().diff(value, 'minute')
+  if (minutes < 60) {
+    return minutes < 1 ? 'just now' : `${minutes}m ago`
+  }
+  const hours = Math.floor(minutes / 60)
+  return hours < 24 ? `${hours}h ago` : `${Math.floor(hours / 24)}d ago`
+}
+
+const MessageRow = ({ children }: { children: React.ReactNode }) => (
   <Table.Tr>
-    <Table.Td colSpan={columnCount}>
+    <Table.Td colSpan={HEADERS.length}>
       <Center m="sm">{children}</Center>
     </Table.Td>
   </Table.Tr>
 )
 
 interface RowActionsProps {
-  record: Call | Contact
-  save: (id: number, update: DoneUpdate, ok: string) => Promise<unknown>
+  record: Enquiry
+  save: (id: number, update: EnquiryChange, ok: string) => Promise<unknown>
   onShowHistory: () => void
   onLogCallback: (isAnswered: boolean) => void
 }

@@ -1,16 +1,14 @@
 import { Button, Group, Modal, Text, Textarea, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import api, { Call, CallbackCreate, Contact } from 'api'
+import api, { CallbackCreate, Enquiry } from 'api'
 import { yupResolver } from 'mantine-form-yup-resolver'
 import { enqueueSnackbar } from 'notistack'
 import React from 'react'
 import { getAPIErrorMessage } from 'utils'
 import { CallbackFormValues, CallbackSchema } from '../schema'
-import type { EnquiryKind } from './enquiry-table'
 
 export interface CallbackModalTarget {
-  kind: EnquiryKind
-  record: Call | Contact
+  enquiry: Enquiry
   isAnswered: boolean
   // Shown under the title so staff can see who they're logging for.
   details: string
@@ -42,7 +40,7 @@ export const CallbackModal = ({ target, onClose }: CallbackModalProps) => (
     {/* Keyed so each opening starts from a fresh form. */}
     {target && (
       <CallbackForm
-        key={`${target.kind}-${target.record.id}-${target.isAnswered}`}
+        key={`${target.enquiry.id}-${target.isAnswered}`}
         target={target}
         onClose={onClose}
       />
@@ -57,15 +55,16 @@ const CallbackForm = ({
   target: CallbackModalTarget
   onClose: () => void
 }) => {
-  const { kind, record, isAnswered } = target
-  const call = kind === 'call' ? (record as Call) : null
+  const { enquiry, isAnswered } = target
+  // Contact form submissions already hold the name and email they gave.
+  const isCall = enquiry.source === 'CALL'
   const [createCallback] = api.useCreateCallbackMutation()
   const form = useForm<CallbackFormValues>({
     mode: 'uncontrolled',
     validate: yupResolver(CallbackSchema),
     initialValues: {
-      caller_name: call?.caller_name ?? '',
-      caller_email: call?.caller_email ?? '',
+      name: enquiry.name,
+      email: enquiry.email,
       purpose: '',
       summary: '',
       action_items: '',
@@ -74,16 +73,16 @@ const CallbackForm = ({
 
   const handleSubmit = (values: CallbackFormValues) => {
     const callbackCreate: CallbackCreate = {
-      ...(kind === 'call' ? { call: record.id } : { contact: record.id }),
+      enquiry: enquiry.id,
       is_answered: isAnswered,
       summary: values.summary,
     }
     if (isAnswered) {
       callbackCreate.purpose = values.purpose
       callbackCreate.action_items = values.action_items
-      if (call) {
-        callbackCreate.caller_name = values.caller_name
-        callbackCreate.caller_email = values.caller_email
+      if (isCall) {
+        callbackCreate.name = values.name
+        callbackCreate.email = values.email
       }
     }
     return createCallback({ callbackCreate })
@@ -101,18 +100,18 @@ const CallbackForm = ({
 
   return (
     <form autoComplete="off" onSubmit={form.onSubmit(handleSubmit)}>
-      {isAnswered && call && (
+      {isAnswered && isCall && (
         <>
           <TextInput
-            {...form.getInputProps('caller_name')}
-            key={form.key('caller_name')}
+            {...form.getInputProps('name')}
+            key={form.key('name')}
             label="Caller's name"
             size="md"
             autoComplete="off"
           />
           <TextInput
-            {...form.getInputProps('caller_email')}
-            key={form.key('caller_email')}
+            {...form.getInputProps('email')}
+            key={form.key('email')}
             label="Email (if needed)"
             description="If we need to contact the caller again, consider getting their email address."
             size="md"
@@ -127,7 +126,7 @@ const CallbackForm = ({
           key={form.key('purpose')}
           label="Purpose of the call"
           size="md"
-          mt={call ? 'md' : 0}
+          mt={isCall ? 'md' : 0}
           autosize
           minRows={2}
           autoComplete="off"

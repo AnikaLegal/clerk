@@ -4,19 +4,17 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
-from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
-from twilio.twiml.voice_response import Gather, VoiceResponse, Say
+from twilio.twiml.voice_response import Gather, Say, VoiceResponse
 
-
-from core.models.issue import CaseTopic
+from blacklist.service import is_phone_blacklisted
 from caller.choices import Choice
 from caller.messages import sms
+from core.models.issue import CaseTopic
+from enquiry.models import Enquiry, EnquirySource
 from office.closure.service import get_closure_call
-from blacklist.service import is_phone_blacklisted
-
-from .models import Call
 
 # Greet user, introduce Anika, explain options.
 CALL_INTRO_AUDIO = "call-intro.wav"
@@ -58,8 +56,7 @@ def answer_view(request):  # Normal view
 
     # Create an entry for this new call.
     number = request.GET.get("From")
-    call = Call(phone_number=number)
-    call.save()
+    Enquiry.objects.create(source=EnquirySource.CALL, phone=number)
 
     # Play message and record user's choice.
     gather = Gather(
@@ -112,7 +109,11 @@ def collect_view(request):
     response.play(audio_url)
 
     # Retrieve and update corresponding entry for valid choices.
-    call = Call.objects.filter(phone_number=number).order_by("-created_at").first()
+    call = (
+        Enquiry.objects.filter(source=EnquirySource.CALL, phone=number)
+        .order_by("-created_at")
+        .first()
+    )
     call.topic = TOPIC_MAPPING[choice]
     call.requires_callback = choice == Choice.CALLBACK
 

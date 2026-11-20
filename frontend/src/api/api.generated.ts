@@ -493,49 +493,32 @@ const injectedRtkApi = api.injectEndpoints({
         body: queryArg.documentTemplateRename,
       }),
     }),
-    getCalls: build.query<GetCallsApiResponse, GetCallsApiArg>({
+    getEnquiries: build.query<GetEnquiriesApiResponse, GetEnquiriesApiArg>({
       query: (queryArg) => ({
-        url: `/clerk/api/call/`,
+        url: `/clerk/api/enquiry/`,
         params: {
           page: queryArg.page,
           page_size: queryArg.pageSize,
           requires_callback: queryArg.requiresCallback,
+          source: queryArg.source,
         },
       }),
     }),
-    updateCall: build.mutation<UpdateCallApiResponse, UpdateCallApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/call/${queryArg.id}/`,
-        method: "PATCH",
-        body: queryArg.callUpdate,
-      }),
-    }),
-    getContacts: build.query<GetContactsApiResponse, GetContactsApiArg>({
-      query: (queryArg) => ({
-        url: `/clerk/api/contact/`,
-        params: {
-          page: queryArg.page,
-          page_size: queryArg.pageSize,
-          requires_callback: queryArg.requiresCallback,
-        },
-      }),
-    }),
-    updateContact: build.mutation<
-      UpdateContactApiResponse,
-      UpdateContactApiArg
+    updateEnquiry: build.mutation<
+      UpdateEnquiryApiResponse,
+      UpdateEnquiryApiArg
     >({
       query: (queryArg) => ({
-        url: `/clerk/api/contact/${queryArg.id}/`,
+        url: `/clerk/api/enquiry/${queryArg.id}/`,
         method: "PATCH",
-        body: queryArg.contactUpdate,
+        body: queryArg.enquiryUpdate,
       }),
     }),
     getCallbacks: build.query<GetCallbacksApiResponse, GetCallbacksApiArg>({
       query: (queryArg) => ({
         url: `/clerk/api/callback/`,
         params: {
-          call: queryArg.call,
-          contact: queryArg.contact,
+          enquiry: queryArg.enquiry,
         },
       }),
     }),
@@ -1026,50 +1009,31 @@ export type RenameDocumentTemplateApiArg = {
   /** Successful response. */
   documentTemplateRename: DocumentTemplateRename;
 };
-export type GetCallsApiResponse = /** status 200 Successful response. */ {
+export type GetEnquiriesApiResponse = /** status 200 Successful response. */ {
   current: number;
   next: number | null;
   prev: number | null;
   page_count: number;
   item_count: number;
-  results: Call[];
+  results: Enquiry[];
 };
-export type GetCallsApiArg = {
+export type GetEnquiriesApiArg = {
   page?: number;
   pageSize?: number;
   requiresCallback?: boolean;
+  source?: EnquirySource;
 };
-export type UpdateCallApiResponse = /** status 200 Successful response. */ Call;
-export type UpdateCallApiArg = {
+export type UpdateEnquiryApiResponse =
+  /** status 200 Successful response. */ Enquiry;
+export type UpdateEnquiryApiArg = {
   /** Entity ID */
   id: number;
-  callUpdate: CallUpdate;
-};
-export type GetContactsApiResponse = /** status 200 Successful response. */ {
-  current: number;
-  next: number | null;
-  prev: number | null;
-  page_count: number;
-  item_count: number;
-  results: Contact[];
-};
-export type GetContactsApiArg = {
-  page?: number;
-  pageSize?: number;
-  requiresCallback?: boolean;
-};
-export type UpdateContactApiResponse =
-  /** status 200 Successful response. */ Contact;
-export type UpdateContactApiArg = {
-  /** Entity ID */
-  id: number;
-  contactUpdate: ContactUpdate;
+  enquiryUpdate: EnquiryUpdate;
 };
 export type GetCallbacksApiResponse =
   /** status 200 Successful response. */ Callback[];
 export type GetCallbacksApiArg = {
-  call?: number;
-  contact?: number;
+  enquiry: number;
 };
 export type CreateCallbackApiResponse =
   /** status 201 Successful response. */ Callback;
@@ -1812,6 +1776,7 @@ export type DocumentTemplateCreate = {
 export type DocumentTemplateRename = {
   name: string;
 };
+export type EnquirySource = "CALL" | "CONTACT_FORM";
 export type EnquiryMatch = {
   state: "OPEN_CASE" | "FORMER_CLIENT";
   matched_on: ("PHONE" | "EMAIL")[];
@@ -1841,33 +1806,19 @@ export type Callback = {
   summary: string;
   action_items: string;
 };
-export type Call = {
+export type Enquiry = {
   id: number;
   created_at: string;
   modified_at: string;
-  phone_number: string;
-  topic: string;
-  topic_display: string;
-  requires_callback: boolean;
-  number_callbacks: number;
-  comments: string;
-  match: EnquiryMatch | null;
-  caller_name: string;
-  caller_email: string;
-  latest_callback: Callback | null;
-};
-export type CallUpdate = {
-  requires_callback?: boolean;
-  caller_name?: string;
-  caller_email?: string;
-};
-export type Contact = {
-  id: number;
-  created_at: string;
-  modified_at: string;
+  source: EnquirySource;
+  source_display: string;
   name: string;
   email: string;
   phone: string;
+  /** Calls only. The option the caller picked in the phone menu. */
+  topic: string;
+  topic_display: string;
+  /** Contact form only. Answers saved before the question was removed. */
   referral: string;
   requires_callback: boolean;
   number_callbacks: number;
@@ -1875,22 +1826,23 @@ export type Contact = {
   match: EnquiryMatch | null;
   latest_callback: Callback | null;
 };
-export type ContactUpdate = {
+export type EnquiryUpdate = {
   requires_callback?: boolean;
+  /** Can't be blank for a contact form submission. */
   name?: string;
+  /** Can't be blank for a contact form submission. */
   email?: string;
 };
 export type CallbackCreate = {
-  call?: number;
-  contact?: number;
+  enquiry: number;
   is_answered: boolean;
   purpose?: string;
   summary?: string;
   action_items?: string;
-  /** Saved on the call. Calls only. */
-  caller_name?: string;
-  /** Saved on the call. Calls only. */
-  caller_email?: string;
+  /** Saved on the enquiry. Calls only. */
+  name?: string;
+  /** Saved on the enquiry. Calls only. */
+  email?: string;
 };
 export const {
   useGetSubmissionQuery,
@@ -1951,10 +1903,8 @@ export const {
   useCreateDocumentTemplateMutation,
   useDeleteDocumentTemplateMutation,
   useRenameDocumentTemplateMutation,
-  useGetCallsQuery,
-  useUpdateCallMutation,
-  useGetContactsQuery,
-  useUpdateContactMutation,
+  useGetEnquiriesQuery,
+  useUpdateEnquiryMutation,
   useGetCallbacksQuery,
   useCreateCallbackMutation,
 } = injectedRtkApi;

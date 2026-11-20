@@ -1,13 +1,15 @@
 import json
 import logging
 
+from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django.conf import settings
 
 from emails.models import Email, EmailState
-from .models import JotformSubmission, WebflowContact
+from enquiry.models import Enquiry, EnquirySource
+
+from .models import JotformSubmission
 from .serializers import NoEmailSerializer
 
 logger = logging.getLogger(__file__)
@@ -54,6 +56,8 @@ def webflow_form_view(request):
     try:
         data = request.data["data"]
         model_kwargs = {
+            "source": EnquirySource.CONTACT_FORM,
+            "requires_callback": True,
             "name": data["Name"],
             "email": data["Email"],
             "phone": data["Phone Number"],
@@ -62,7 +66,7 @@ def webflow_form_view(request):
     except KeyError:
         raise ValidationError("Invalid request format.")
 
-    WebflowContact.objects.create(**model_kwargs)
+    Enquiry.objects.create(**model_kwargs)
     return Response({"message": "We got the form. :)"}, status=201)
 
 

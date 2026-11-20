@@ -6,6 +6,8 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django_recaptcha.client import RecaptchaResponse
 
+from enquiry.factories import ContactEnquiryFactory
+from enquiry.models import Enquiry, EnquirySource
 from web.factories import (
     BlogListPageFactory,
     BlogPageFactory,
@@ -13,8 +15,6 @@ from web.factories import (
     DocumentLogFactory,
 )
 from web.models import DocumentLog
-from webhooks.factories import WebflowContactFactory
-from webhooks.models import WebflowContact
 
 # By default, search only works for specific fields (e.g., title) but others can
 # be enabled explicitly (see Wagtail docs).
@@ -61,10 +61,10 @@ def test_contact_form(mocked_submit, client):
         is_valid=True, action="contact", extra_data={"score": 1.0}
     )
 
-    assert WebflowContact.objects.count() == 0
+    assert Enquiry.objects.count() == 0
     url = reverse("landing-contact")
 
-    contact_stub = WebflowContactFactory.stub()
+    contact_stub = ContactEnquiryFactory.stub()
     data = {
         "name": contact_stub.name,
         "email": contact_stub.email,
@@ -74,12 +74,14 @@ def test_contact_form(mocked_submit, client):
     response = client.post(url, data)
     assert response.status_code == 200
 
-    assert WebflowContact.objects.count() == 1
-    contact = WebflowContact.objects.first()
+    assert Enquiry.objects.count() == 1
+    contact = Enquiry.objects.first()
     assert contact is not None
     assert contact.name == data["name"]
     assert contact.email == data["email"]
     assert contact.phone == data["phone"]
+    assert contact.source == EnquirySource.CONTACT_FORM
+    assert contact.requires_callback
 
 
 @pytest.mark.django_db
@@ -89,10 +91,10 @@ def test_contact_form_captcha_required_and_valid(client):
     with an invalid captcha.
     """
 
-    assert WebflowContact.objects.count() == 0
+    assert Enquiry.objects.count() == 0
     url = reverse("landing-contact")
 
-    contact_stub = WebflowContactFactory.stub()
+    contact_stub = ContactEnquiryFactory.stub()
     data = {
         "name": contact_stub.name,
         "email": contact_stub.email,
@@ -102,14 +104,14 @@ def test_contact_form_captcha_required_and_valid(client):
 
     assert response.status_code == 200
     assert "captcha: this field is required" in response.content.decode().lower()
-    assert WebflowContact.objects.count() == 0
+    assert Enquiry.objects.count() == 0
 
     data["captcha"] = "invalid-captcha-response"
     response = client.post(url, data)
 
     assert response.status_code == 200
     assert "captcha: error verifying recaptcha" in response.content.decode().lower()
-    assert WebflowContact.objects.count() == 0
+    assert Enquiry.objects.count() == 0
 
 
 @pytest.mark.django_db

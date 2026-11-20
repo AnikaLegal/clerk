@@ -1,5 +1,5 @@
 get:
-  operationId: getCalls
+  operationId: getEnquiries
   parameters:
     - name: page
       in: query
@@ -15,6 +15,11 @@ get:
       in: query
       schema:
         type: boolean
+      required: false
+    - name: source
+      in: query
+      schema:
+        $ref: ../schemas/EnquirySource.yaml
       required: false
   responses:
     "200":
@@ -39,7 +44,7 @@ get:
               results:
                 type: array
                 items:
-                  $ref: ../schemas/Call.yaml
+                  $ref: ../schemas/Enquiry.yaml
             required:
               - current
               - next

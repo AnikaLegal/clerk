@@ -1,3 +1,4 @@
+description: Someone who got in touch by phone or through the website contact form.
 type: object
 properties:
   id:
@@ -8,11 +9,23 @@ properties:
   modified_at:
     type: string
     format: date-time
-  phone_number:
+  source:
+    $ref: ./EnquirySource.yaml
+  source_display:
+    type: string
+  name:
+    type: string
+  email:
+    type: string
+  phone:
     type: string
   topic:
+    description: Calls only. The option the caller picked in the phone menu.
     type: string
   topic_display:
+    type: string
+  referral:
+    description: Contact form only. Answers saved before the question was removed.
     type: string
   requires_callback:
     type: boolean
@@ -24,10 +37,6 @@ properties:
     nullable: true
     allOf:
       - $ref: ./EnquiryMatch.yaml
-  caller_name:
-    type: string
-  caller_email:
-    type: string
   latest_callback:
     nullable: true
     allOf:
@@ -36,13 +45,16 @@ required:
   - id
   - created_at
   - modified_at
-  - phone_number
+  - source
+  - source_display
+  - name
+  - email
+  - phone
   - topic
   - topic_display
+  - referral
   - requires_callback
   - number_callbacks
   - comments
   - match
-  - caller_name
-  - caller_email
   - latest_callback

@@ -1,14 +1,12 @@
-from unittest import mock
-
 import pytest
 from django.urls import reverse
 
-from webhooks.models import JotformSubmission, WebflowContact
+from enquiry.models import Enquiry, EnquirySource
+from webhooks.models import JotformSubmission
 
 
 @pytest.mark.django_db
-@mock.patch("webhooks.services.slack.send_slack_message")
-def test_webflow_form_create(mock_slack, client):
+def test_webflow_form_create(client):
     """
     Webflow webhooks create a contact entry
     """
@@ -29,11 +27,13 @@ def test_webflow_form_create(mock_slack, client):
     resp = client.post(url, data=data, content_type="application/json")
     assert resp.status_code == 201
     assert resp.json() == {"message": "We got the form. :)"}
-    contact = WebflowContact.objects.last()
+    contact = Enquiry.objects.last()
     assert contact.name == "sorry alex I need to do this quite a few times"
     assert contact.email == "name@example.com"
     assert contact.phone == "1111111"
     assert contact.referral == "Google Maps"
+    assert contact.source == EnquirySource.CONTACT_FORM
+    assert contact.requires_callback
 
 
 @pytest.mark.django_db
@@ -47,7 +47,7 @@ def test_webflow_form_create_fails(client):
     assert resp.status_code == 400
     assert resp.json()["type"] == "validation_error"
     assert resp.json()["errors"][0]["detail"] == "Invalid request format."
-    assert WebflowContact.objects.count() == 0
+    assert Enquiry.objects.count() == 0
 
 
 @pytest.mark.django_db

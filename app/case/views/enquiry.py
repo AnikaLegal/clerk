@@ -3,22 +3,20 @@ from rest_framework.decorators import api_view
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from caller.models import Call, Callback
 from case.serializers.enquiry import (
     CallbackCreateSerializer,
     CallbackSearchSerializer,
     CallbackSerializer,
-    CallSerializer,
-    ContactSerializer,
     EnquirySearchSerializer,
+    EnquirySerializer,
 )
 from case.utils import ClerkPaginator, render_react_page
 from case.views.auth import (
     CoordinatorOrBetterPermission,
     coordinator_or_better_required,
 )
-from core.services.enquiry_match import Enquiry, find_client_matches
-from webhooks.models import WebflowContact
+from core.services.enquiry_match import find_client_matches
+from enquiry.models import Callback, Enquiry
 
 
 @api_view(["GET"])
@@ -37,13 +35,14 @@ class EnquiryApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
     record their follow-up.
     """
 
+    serializer_class = EnquirySerializer
     pagination_class = EnquiryPaginator
     permission_classes = [CoordinatorOrBetterPermission]
-    # PATCH only: a PUT would need every field, and only one can change.
+    # PATCH only: a PUT would need every field, and only a few can change.
     http_method_names = ["get", "patch", "head", "options"]
 
     def get_queryset(self) -> QuerySet:
-        queryset = self.queryset.order_by("-created_at").prefetch_related(
+        queryset = Enquiry.objects.order_by("-created_at").prefetch_related(
             Prefetch(
                 "callbacks",
                 queryset=Callback.objects.select_related("logged_by").order_by(
@@ -67,32 +66,9 @@ class EnquiryApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
             enquiries = instance if kwargs.get("many") else [instance]
             kwargs["context"] = {
                 **self.get_serializer_context(),
-                "client_matches": find_client_matches(
-                    [self.to_enquiry(e) for e in enquiries]
-                ),
+                "client_matches": find_client_matches(list(enquiries)),
             }
         return super().get_serializer(*args, **kwargs)
-
-    def to_enquiry(self, obj) -> Enquiry:
-        raise NotImplementedError
-
-
-class CallApiViewset(EnquiryApiViewset):
-    queryset = Call.objects.all()
-    serializer_class = CallSerializer
-
-    def to_enquiry(self, obj: Call) -> Enquiry:
-        return Enquiry(id=obj.pk, created_at=obj.created_at, phone=obj.phone_number)
-
-
-class ContactApiViewset(EnquiryApiViewset):
-    queryset = WebflowContact.objects.all()
-    serializer_class = ContactSerializer
-
-    def to_enquiry(self, obj: WebflowContact) -> Enquiry:
-        return Enquiry(
-            id=obj.pk, created_at=obj.created_at, phone=obj.phone, email=obj.email
-        )
 
 
 class CallbackApiViewset(GenericViewSet, ListModelMixin, CreateModelMixin):

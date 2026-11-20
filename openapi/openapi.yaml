@@ -85,15 +85,10 @@ paths:
   /clerk/api/template-doc/{id}/rename-file/:
     $ref: paths/template-doc-rename.yaml
 
-  /clerk/api/call/:
-    $ref: paths/call-list.yaml
-  /clerk/api/call/{id}/:
-    $ref: paths/call-detail.yaml
-
-  /clerk/api/contact/:
-    $ref: paths/contact-list.yaml
-  /clerk/api/contact/{id}/:
-    $ref: paths/contact-detail.yaml
+  /clerk/api/enquiry/:
+    $ref: paths/enquiry-list.yaml
+  /clerk/api/enquiry/{id}/:
+    $ref: paths/enquiry-detail.yaml
 
   /clerk/api/callback/:
     $ref: paths/callback-list.yaml
