@@ -12,6 +12,7 @@ from core.factories import (
     IssueFactory,
     UserFactory,
 )
+from core.models.client import ContactRestriction
 from core.models.issue_event import EventType
 from enquiry.factories import CallEnquiryFactory, ContactEnquiryFactory
 
@@ -48,6 +49,9 @@ def test_call_from_client_with_open_case(superuser_client):
             "full_name": client.get_full_name(),
             "created_at": call["match"]["client"]["created_at"],
             "url": reverse("client-detail", args=(client.pk,)),
+            "contact_restriction": None,
+            "contact_restriction_display": None,
+            "contact_notes": "",
         },
         "case": {
             "fileref": case.fileref,
@@ -139,6 +143,45 @@ def test_open_case_wins_over_former_client(superuser_client):
 
     assert call["match"]["state"] == "OPEN_CASE"
     assert call["match"]["case"]["fileref"] == case.fileref
+
+
+@pytest.mark.django_db
+def test_do_not_contact_client_is_chosen_first(superuser_client):
+    duplicate = ClientFactory(phone_number="0400123456", created_at=BEFORE)
+    IssueFactory(client=duplicate, is_open=True)
+    restricted = ClientFactory(
+        phone_number="0400123456",
+        created_at=BEFORE - timedelta(days=1),
+        contact_restriction=ContactRestriction.DO_NOT_CONTACT,
+        contact_notes="Only contact their support worker.",
+    )
+    IssueFactory(client=restricted, is_open=False)
+    CallEnquiryFactory(phone="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["state"] == "FORMER_CLIENT"
+    client = call["match"]["client"]
+    assert client["full_name"] == restricted.get_full_name()
+    assert client["contact_restriction"] == "DO_NOT_CONTACT"
+    assert client["contact_restriction_display"] == "Do not contact"
+    assert client["contact_notes"] == "Only contact their support worker."
+
+
+@pytest.mark.django_db
+def test_other_restrictions_do_not_change_the_choice(superuser_client):
+    current = ClientFactory(phone_number="0400123456", created_at=BEFORE)
+    IssueFactory(client=current, is_open=True)
+    ClientFactory(
+        phone_number="0400123456",
+        created_at=BEFORE - timedelta(days=1),
+        contact_restriction=ContactRestriction.DO_NOT_CONTACT_MARKETING,
+    )
+    CallEnquiryFactory(phone="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["client"]["full_name"] == current.get_full_name()
 
 
 @pytest.mark.parametrize("number", ["anonymous", "+266696687", "12345", ""])

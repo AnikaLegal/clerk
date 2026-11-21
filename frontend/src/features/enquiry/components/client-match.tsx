@@ -1,5 +1,19 @@
-import { Anchor, Group, HoverCard, Stack, Text, ThemeIcon } from '@mantine/core'
-import { Icon, IconBriefcase, IconFolder, IconUser } from '@tabler/icons-react'
+import {
+  Anchor,
+  Group,
+  HoverCard,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+} from '@mantine/core'
+import {
+  Icon,
+  IconAlertTriangle,
+  IconBriefcase,
+  IconFolder,
+  IconUser,
+} from '@tabler/icons-react'
 import { EnquiryMatch } from 'api'
 import { CASE_STATUS_COLORS } from 'consts'
 import dayjs from 'dayjs'
@@ -9,6 +23,15 @@ const STYLES = {
   OPEN_CASE: { label: 'Open case', color: CASE_STATUS_COLORS.OPEN },
   FORMER_CLIENT: { label: 'Former client', color: CASE_STATUS_COLORS.CLOSED },
 } as const
+
+// The case page's colour for contact restrictions.
+const DO_NOT_CONTACT_COLOR = 'orange'
+
+const isDoNotContact = (match: EnquiryMatch) =>
+  match.client.contact_restriction === 'DO_NOT_CONTACT'
+
+const getMatchColor = (match: EnquiryMatch) =>
+  isDoNotContact(match) ? DO_NOT_CONTACT_COLOR : STYLES[match.state].color
 
 const formatMonth = (value: string) => dayjs(value).format('MMM YYYY')
 
@@ -20,7 +43,7 @@ export const getMatchEdgeStyle = (
 ): React.CSSProperties | undefined =>
   match
     ? {
-        boxShadow: `inset 4px 0 0 var(--mantine-color-${STYLES[match.state].color}-6)`,
+        boxShadow: `inset 4px 0 0 var(--mantine-color-${getMatchColor(match)}-6)`,
       }
     : undefined
 
@@ -52,9 +75,14 @@ const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
         <ThemeIcon
           size={18}
           radius="xl"
-          color={color}
+          color={getMatchColor(match)}
           tabIndex={0}
-          aria-label={`${label}: ${client.full_name}`}
+          aria-label={[
+            `${label}: ${client.full_name}`,
+            isDoNotContact(match) && 'do not contact',
+          ]
+            .filter(Boolean)
+            .join(', ')}
           style={{ cursor: 'default', flexShrink: 0 }}
         >
           <IconUser size={12} stroke={2.5} />
@@ -93,11 +121,55 @@ const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
               )}
             </>
           )}
+          <ContactRestriction match={match} />
         </Stack>
       </HoverCard.Dropdown>
     </HoverCard>
   )
 }
+
+// The client's contact restriction and notes, as the case page shows them.
+const ContactRestriction = ({ match }: { match: EnquiryMatch }) => {
+  const { contact_restriction_display: restriction, contact_notes: notes } =
+    match.client
+  if (isDoNotContact(match)) {
+    return (
+      <Paper
+        withBorder
+        p="xs"
+        mt={4}
+        bg="var(--mantine-color-orange-0)"
+        bd="1px solid var(--mantine-color-orange-4)"
+        c="var(--mantine-color-orange-9)"
+      >
+        <Group gap={6} wrap="nowrap">
+          <IconAlertTriangle size={16} stroke={1.8} aria-hidden />
+          <Text fz="sm" fw={700}>
+            {restriction}
+          </Text>
+        </Group>
+        {notes && <NotesText>{notes}</NotesText>}
+      </Paper>
+    )
+  }
+  if (!restriction && !notes) {
+    return null
+  }
+  return (
+    <Paper withBorder p="xs" mt={4} bg="var(--mantine-color-gray-0)">
+      <Text fz="sm" fw={700}>
+        {restriction ?? 'Contact notes'}
+      </Text>
+      {notes && <NotesText>{notes}</NotesText>}
+    </Paper>
+  )
+}
+
+const NotesText = ({ children }: { children: React.ReactNode }) => (
+  <Text fz="sm" mt={2} style={{ whiteSpace: 'pre-wrap' }}>
+    {children}
+  </Text>
+)
 
 interface IconRowProps {
   icon: Icon

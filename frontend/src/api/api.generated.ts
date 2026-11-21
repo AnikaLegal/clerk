@@ -1784,6 +1784,16 @@ export type EnquiryMatch = {
     full_name: string;
     created_at: string;
     url: string;
+    contact_restriction:
+      | (
+          | "DO_NOT_CONTACT"
+          | "DO_NOT_CONTACT_MARKETING"
+          | "DO_NOT_CONTACT_ACTION_RESEARCH"
+          | null
+        )
+      | null;
+    contact_restriction_display: string | null;
+    contact_notes: string;
   };
   /** The open case, or the latest closed one for a former client. */
   case: {

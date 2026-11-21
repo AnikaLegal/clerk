@@ -11,6 +11,7 @@ from django.db.models import CharField, F, Func, Max, Prefetch, Q, QuerySet, Val
 from django.db.models.functions import Lower, Right, Trim
 
 from core.models import Client, Issue
+from core.models.client import ContactRestriction
 from core.models.issue_event import EventType
 
 if TYPE_CHECKING:
@@ -127,11 +128,16 @@ def match_enquiry(enquiry: "Enquiry", clients: list[Client]) -> ClientMatch | No
     if not candidates:
         return None
 
-    # A shared number can match several clients: prefer one with an open
-    # case, then the most recent.
+    # A shared number or a duplicate record can match several clients:
+    # prefer one staff mustn't contact, so the warning can't be hidden, then
+    # one with an open case, then the most recent.
     client, matched_on = max(
         candidates,
-        key=lambda c: (any(case.is_open for case in c[0].cases), c[0].created_at),
+        key=lambda c: (
+            c[0].contact_restriction == ContactRestriction.DO_NOT_CONTACT,
+            any(case.is_open for case in c[0].cases),
+            c[0].created_at,
+        ),
     )
     open_cases = [case for case in client.cases if case.is_open]
     if open_cases:

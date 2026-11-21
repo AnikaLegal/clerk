@@ -87,13 +87,30 @@ class CallbackSearchSerializer(serializers.Serializer):
 class EnquiryMatchClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ("full_name", "created_at", "url")
+        fields = (
+            "full_name",
+            "created_at",
+            "url",
+            "contact_restriction",
+            "contact_restriction_display",
+            "contact_notes",
+        )
 
     full_name = serializers.CharField(source="get_full_name")
+    contact_restriction = serializers.SerializerMethodField()
+    contact_restriction_display = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
         return reverse("client-detail", args=(obj.pk,))
+
+    def get_contact_restriction(self, obj):
+        return obj.contact_restriction or None
+
+    def get_contact_restriction_display(self, obj):
+        if not obj.contact_restriction:
+            return None
+        return obj.get_contact_restriction_display()
 
 
 class EnquiryMatchCaseSerializer(serializers.ModelSerializer):
