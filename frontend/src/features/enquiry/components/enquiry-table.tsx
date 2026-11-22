@@ -23,7 +23,7 @@ import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
 import { PersonDetails } from '../schema'
 import { CallbackModal, CallbackModalTarget } from './callback-modal'
-import { MATCH_INDENT, MatchedValue } from './client-match'
+import { hasMatchOn, MatchedOn, MatchedValue } from './client-match'
 import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
 import classes from './row-actions.module.css'
 
@@ -43,9 +43,6 @@ const HEADERS = [
   'Latest',
   '',
 ]
-
-// Headers over columns that can show a match icon before the value.
-const MATCHABLE_HEADERS = ['Email', 'Phone number']
 
 const SOURCE_OPTIONS: { value: EnquirySource; label: string }[] = [
   { value: 'CALL', label: 'Call' },
@@ -69,6 +66,9 @@ export const EnquiryTable = () => {
 
   const page = args.page || 1
   const results = result.data?.results
+  // A column keeps the icon's space only when a row on this page has one.
+  const isIndented = (matchedOn: MatchedOn) =>
+    Boolean(results?.some((enquiry) => hasMatchOn(enquiry, matchedOn)))
   const [callbackTarget, setCallbackTarget] =
     useState<CallbackModalTarget | null>(null)
   const [historyEnquiry, setHistoryEnquiry] = useState<Enquiry | null>(null)
@@ -176,15 +176,7 @@ export const EnquiryTable = () => {
         <Table.Thead>
           <Table.Tr>
             {HEADERS.map((header, i) => (
-              <Table.Th
-                key={i}
-                w={header ? undefined : '1%'}
-                pl={
-                  MATCHABLE_HEADERS.includes(header)
-                    ? `calc(var(--table-horizontal-spacing, var(--mantine-spacing-xs)) + ${MATCH_INDENT}px)`
-                    : undefined
-                }
-              >
+              <Table.Th key={i} w={header ? undefined : '1%'}>
                 {header}
               </Table.Th>
             ))}
@@ -220,6 +212,7 @@ export const EnquiryTable = () => {
                     value={enquiry.email}
                     enquiry={enquiry}
                     matchedOn="EMAIL"
+                    isIndented={isIndented('EMAIL')}
                   />
                 </Table.Td>
                 <Table.Td>
@@ -227,6 +220,7 @@ export const EnquiryTable = () => {
                     value={enquiry.phone}
                     enquiry={enquiry}
                     matchedOn="PHONE"
+                    isIndented={isIndented('PHONE')}
                   />
                 </Table.Td>
                 <Table.Td>{enquiry.number_callbacks}</Table.Td>

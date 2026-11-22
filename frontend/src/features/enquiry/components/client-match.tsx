@@ -37,7 +37,7 @@ const getMatchColor = (match: EnquiryMatch) =>
 
 const formatMonth = (value: string) => dayjs(value).format('MMM YYYY')
 
-type MatchedOn = EnquiryMatch['matched_on'][number]
+export type MatchedOn = EnquiryMatch['matched_on'][number]
 
 const BLACKLIST_COLOR = 'red'
 
@@ -45,26 +45,35 @@ interface MatchedValueProps {
   value: string
   enquiry: Enquiry
   matchedOn: MatchedOn
+  // Keeps the icon's space when another row in the column has an icon.
+  isIndented: boolean
 }
 
 const ICON_SIZE = 18
 const ICON_GAP = 8
 
-// Space before every value in a matchable column, so values and the
-// header line up whether or not a row has an icon.
-export const MATCH_INDENT = ICON_SIZE + ICON_GAP
+// The space an icon takes before a value, so values line up in a column
+// where some rows have an icon.
+const MATCH_INDENT = ICON_SIZE + ICON_GAP
+
+export const hasMatchOn = (enquiry: Enquiry, matchedOn: MatchedOn) =>
+  Boolean(
+    enquiry.blacklist?.matched_on.includes(matchedOn) ||
+      enquiry.match?.matched_on.includes(matchedOn)
+  )
 
 // Shows each icon only before the detail that matched.
 export const MatchedValue = ({
   value,
   enquiry,
   matchedOn,
+  isIndented,
 }: MatchedValueProps) => {
   const { blacklist, match } = enquiry
   const isBlacklisted = blacklist?.matched_on.includes(matchedOn)
   const isClient = match?.matched_on.includes(matchedOn)
   if (!isBlacklisted && !isClient) {
-    return <Box pl={MATCH_INDENT}>{value}</Box>
+    return <Box pl={isIndented ? MATCH_INDENT : undefined}>{value}</Box>
   }
   return (
     <Group gap={ICON_GAP} wrap="nowrap">
