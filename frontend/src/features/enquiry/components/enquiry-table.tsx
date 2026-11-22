@@ -56,7 +56,9 @@ export const EnquiryTable = () => {
     requiresCallback: true,
     page: 1,
   })
-  const result = api.useGetEnquiriesQuery(args)
+  // Picks up new enquiries and colleagues' callbacks when staff come back.
+  const result = api.useGetEnquiriesQuery(args, { refetchOnFocus: true })
+  const now = useNow()
   const [updateEnquiry] = api.useUpdateEnquiryMutation()
   const save = (id: number, enquiryUpdate: EnquiryChange) =>
     updateEnquiry({ id, enquiryUpdate }).unwrap()
@@ -217,7 +219,7 @@ export const EnquiryTable = () => {
                 </Table.Td>
                 <Table.Td>{enquiry.number_callbacks}</Table.Td>
                 <Table.Td>
-                  <LatestCell record={enquiry} />
+                  <LatestCell record={enquiry} now={now} />
                 </Table.Td>
                 <Table.Td>
                   <RowActions
@@ -272,7 +274,22 @@ const describe = (enquiry: Enquiry): EnquiryDetail[] =>
   ).filter(([, value]) => value)
 
 // The latest callback, or comments recorded before callbacks were logged.
-const LatestCell = ({ record }: { record: Enquiry }) => {
+// The current time, ticking once a minute so the ages stay current.
+const useNow = () => {
+  const [now, setNow] = useState(() => dayjs())
+  useEffect(() => {
+    const id = setInterval(() => setNow(dayjs()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+  return now
+}
+
+interface LatestCellProps {
+  record: Enquiry
+  now: dayjs.Dayjs
+}
+
+const LatestCell = ({ record, now }: LatestCellProps) => {
   const latest = record.latest_callback
   if (!latest) {
     return record.comments ? <CellText>{record.comments}</CellText> : null
@@ -281,7 +298,7 @@ const LatestCell = ({ record }: { record: Enquiry }) => {
     <>
       <Text inherit c="dimmed" fz="sm" title={formatTime(latest.created_at)}>
         {latest.is_answered ? 'Answered' : 'No answer'} ·{' '}
-        {formatAge(latest.created_at)}
+        {formatAge(latest.created_at, now)}
       </Text>
       {latest.summary && <CellText>{latest.summary}</CellText>}
     </>
@@ -295,8 +312,8 @@ const CellText = ({ children }: { children: React.ReactNode }) => (
 )
 
 // How long ago, in the largest whole unit: 5m, 3h or 2d ago.
-const formatAge = (value: string) => {
-  const minutes = dayjs().diff(value, 'minute')
+const formatAge = (value: string, now: dayjs.Dayjs) => {
+  const minutes = now.diff(value, 'minute')
   if (minutes < 60) {
     return minutes < 1 ? 'just now' : `${minutes}m ago`
   }
