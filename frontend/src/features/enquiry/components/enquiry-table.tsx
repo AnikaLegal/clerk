@@ -25,6 +25,7 @@ import { PersonDetails } from '../schema'
 import { CallbackModal, CallbackModalTarget } from './callback-modal'
 import { getMatchEdgeStyle, MatchedValue } from './client-match'
 import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
+import classes from './row-actions.module.css'
 
 export type EnquiryDetail = [label: string, value: string]
 
@@ -337,7 +338,13 @@ interface RowActionsProps {
 }
 
 // Answered and No answer match the history drawer's header colours.
-const tinted = (color: string) => ({ variant: 'light', color, size: 'lg' })
+const hoverColor = (color: string) => ({
+  variant: 'subtle',
+  color: 'gray',
+  size: 'lg',
+  className: classes.action,
+  style: { '--action-hover-color': `var(--mantine-color-${color}-7)` },
+})
 
 const RowActions = ({
   record,
@@ -367,19 +374,22 @@ const RowActions = ({
       <ActionIconWithConfirmation
         tooltip={{ label: 'Log answered call' }}
         icon={<IconPhoneCheck stroke={1.5} />}
-        actionIcon={{ ...tinted('green'), 'aria-label': 'Log answered call' }}
+        actionIcon={{
+          ...hoverColor('green'),
+          'aria-label': 'Log answered call',
+        }}
         onClick={() => onLogCallback(true)}
       />
       <ActionIconWithConfirmation
         tooltip={{ label: 'Log missed call' }}
         icon={<IconPhoneX stroke={1.5} />}
-        actionIcon={{ ...tinted('gray'), 'aria-label': 'Log missed call' }}
+        actionIcon={{ ...hoverColor('gray'), 'aria-label': 'Log missed call' }}
         onClick={() => onLogCallback(false)}
       />
       <ActionIconWithConfirmation
         tooltip={{ label: 'Callback history' }}
         icon={<IconHistory stroke={1.5} />}
-        actionIcon={{ ...tinted('blue'), 'aria-label': 'Callback history' }}
+        actionIcon={{ ...hoverColor('blue'), 'aria-label': 'Callback history' }}
         onClick={onShowHistory}
       />
       <ActionIconWithConfirmation
@@ -388,7 +398,7 @@ const RowActions = ({
           isDone ? <IconArrowBackUp stroke={1.5} /> : <IconCheck stroke={1.5} />
         }
         actionIcon={{
-          ...tinted('green'),
+          ...hoverColor('green'),
           'aria-label': label,
           loading: isBusy,
           disabled: isBusy,

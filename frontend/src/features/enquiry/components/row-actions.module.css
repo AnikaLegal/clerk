@@ -1,0 +1,4 @@
+/* Grey at rest, taking the action's colour on hover. */
+.action:hover:not(:disabled, [data-disabled]) {
+  color: var(--action-hover-color);
+}
