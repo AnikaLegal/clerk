@@ -1,11 +1,11 @@
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .models import Blacklist
+from .models import BlacklistEntry
 
 
 class BlacklistAdmin(SnippetViewSet):
-    model = Blacklist
+    model = BlacklistEntry
     menu_label = "Blacklist"
     icon = "warning"
     menu_order = 205

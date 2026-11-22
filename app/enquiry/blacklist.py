@@ -3,15 +3,15 @@ from typing import TYPE_CHECKING
 
 from core.services.enquiry_match import MatchedOn, get_email_key, get_phone_key
 
-from .models import Blacklist
+from .models import BlacklistEntry
 
 if TYPE_CHECKING:
-    from enquiry.models import Enquiry
+    from .models import Enquiry
 
 
 @dataclass(frozen=True)
 class BlacklistMatch:
-    entry: Blacklist
+    entry: BlacklistEntry
     matched_on: list[str]
 
 
@@ -23,8 +23,8 @@ def find_blacklist_matches(enquiries: list["Enquiry"]) -> dict[int, BlacklistMat
     if not enquiries:
         return {}
     entries = [
-        (entry, get_phone_key(entry.phone or ""), get_email_key(entry.email or ""))
-        for entry in Blacklist.objects.order_by("-created_at")
+        (entry, get_phone_key(entry.phone), get_email_key(entry.email))
+        for entry in BlacklistEntry.objects.order_by("-created_at")
     ]
     matches = {}
     for enquiry in enquiries:

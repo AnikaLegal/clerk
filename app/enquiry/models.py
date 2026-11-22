@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
+from wagtail.admin.panels import FieldPanel
 
 from core.models.issue import CaseTopic
 from core.models.timestamped import TimestampedModel
@@ -57,3 +59,36 @@ class Callback(TimestampedModel):
     # The call summary, or a short note when there was no answer.
     summary = models.TextField(blank=True, default="")
     action_items = models.TextField(blank=True, default="")
+
+
+class BlacklistEntry(TimestampedModel):
+    """
+    Someone staff have decided not to call back. Matching enquiries are
+    flagged on the Enquiries page.
+    """
+
+    name = models.CharField(max_length=255, blank=True, default="")
+    email = models.CharField(max_length=255, blank=True, default="")
+    phone = models.CharField(max_length=255, blank=True, default="")
+    reason = models.TextField(blank=True, default="")
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("email"),
+        FieldPanel("phone"),
+        FieldPanel("reason"),
+    ]
+
+    class Meta:
+        verbose_name = "blacklist entry"
+        verbose_name_plural = "blacklist"
+        constraints = [
+            models.CheckConstraint(
+                name="blacklist_entry_has_email_or_phone",
+                condition=~Q(email="", phone=""),
+                violation_error_message="Enter an email or a phone number.",
+            )
+        ]
+
+    def __str__(self):
+        return self.name or self.email or self.phone

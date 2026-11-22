@@ -31,7 +31,7 @@ from core.models import (
 from core.models.issue_note import NoteType
 from core.services.submission import UPLOAD_ANSWERS
 from emails.models import Email, EmailAttachment
-from enquiry.models import Callback, Enquiry, EnquirySource
+from enquiry.models import BlacklistEntry, Callback, Enquiry, EnquirySource
 from utils.signals import disable_signals, restore_signals
 from web.models.feedback import ContentFeedback
 from webhooks.models import ClosedContact, JotformSubmission, WebflowContact
@@ -208,6 +208,7 @@ class Command(BaseCommand):
             contact.save()
 
         Blacklist.objects.all().delete()
+        BlacklistEntry.objects.all().delete()
 
         for feedback in ContentFeedback.objects.iterator():
             if feedback.name:

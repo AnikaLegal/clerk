@@ -3,7 +3,6 @@ from rest_framework.decorators import api_view
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from blacklist.service import find_blacklist_matches
 from case.serializers.enquiry import (
     CallbackCreateSerializer,
     CallbackSearchSerializer,
@@ -17,6 +16,7 @@ from case.views.auth import (
     coordinator_or_better_required,
 )
 from core.services.enquiry_match import find_client_matches
+from enquiry.blacklist import find_blacklist_matches
 from enquiry.models import Callback, Enquiry
 
 

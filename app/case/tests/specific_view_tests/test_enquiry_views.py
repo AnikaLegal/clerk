@@ -2,9 +2,9 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from blacklist.models import Blacklist
 from core.models.issue import CaseTopic
 from enquiry.factories import CallEnquiryFactory, ContactEnquiryFactory
+from enquiry.models import BlacklistEntry
 
 
 # For requests that break the contract on purpose: superuser_client checks
@@ -176,7 +176,7 @@ def test_enquiry_list_filters_by_source(superuser_client):
 
 @pytest.mark.django_db
 def test_enquiry_list_shows_blacklist_match(superuser_client):
-    entry = Blacklist.objects.create(
+    entry = BlacklistEntry.objects.create(
         name="Pat", phone="0412 345 678", reason="Abusive to staff."
     )
     CallEnquiryFactory(phone="+61412345678")
