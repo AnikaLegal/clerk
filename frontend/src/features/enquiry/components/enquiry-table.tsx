@@ -23,7 +23,7 @@ import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
 import { PersonDetails } from '../schema'
 import { CallbackModal, CallbackModalTarget } from './callback-modal'
-import { MatchedValue } from './client-match'
+import { MATCH_INDENT, MatchedValue } from './client-match'
 import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
 import classes from './row-actions.module.css'
 
@@ -43,6 +43,9 @@ const HEADERS = [
   'Latest',
   '',
 ]
+
+// Headers over columns that can show a match icon before the value.
+const MATCHABLE_HEADERS = ['Email', 'Phone number']
 
 const SOURCE_OPTIONS: { value: EnquirySource; label: string }[] = [
   { value: 'CALL', label: 'Call' },
@@ -173,7 +176,15 @@ export const EnquiryTable = () => {
         <Table.Thead>
           <Table.Tr>
             {HEADERS.map((header, i) => (
-              <Table.Th key={i} w={header ? undefined : '1%'}>
+              <Table.Th
+                key={i}
+                w={header ? undefined : '1%'}
+                pl={
+                  MATCHABLE_HEADERS.includes(header)
+                    ? `calc(var(--table-horizontal-spacing, var(--mantine-spacing-xs)) + ${MATCH_INDENT}px)`
+                    : undefined
+                }
+              >
                 {header}
               </Table.Th>
             ))}

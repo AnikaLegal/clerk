@@ -1,5 +1,6 @@
 import {
   Anchor,
+  Box,
   Group,
   HoverCard,
   Paper,
@@ -46,7 +47,14 @@ interface MatchedValueProps {
   matchedOn: MatchedOn
 }
 
-// Shows each icon only beside the detail that matched.
+const ICON_SIZE = 18
+const ICON_GAP = 8
+
+// Space before every value in a matchable column, so values and the
+// header line up whether or not a row has an icon.
+export const MATCH_INDENT = ICON_SIZE + ICON_GAP
+
+// Shows each icon only before the detail that matched.
 export const MatchedValue = ({
   value,
   enquiry,
@@ -56,15 +64,15 @@ export const MatchedValue = ({
   const isBlacklisted = blacklist?.matched_on.includes(matchedOn)
   const isClient = match?.matched_on.includes(matchedOn)
   if (!isBlacklisted && !isClient) {
-    return value
+    return <Box pl={MATCH_INDENT}>{value}</Box>
   }
   return (
-    <Group gap={6} wrap="nowrap" justify="space-between">
-      <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+    <Group gap={ICON_GAP} wrap="nowrap">
       <Group gap={4} wrap="nowrap">
         {isBlacklisted && blacklist && <BlacklistIcon blacklist={blacklist} />}
         {isClient && match && <ClientMatchIcon match={match} />}
       </Group>
+      <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
     </Group>
   )
 }
@@ -73,7 +81,7 @@ const BlacklistIcon = ({ blacklist }: { blacklist: EnquiryBlacklistMatch }) => (
   <HoverCard width={300} shadow="md" openDelay={100} withinPortal>
     <HoverCard.Target>
       <ThemeIcon
-        size={18}
+        size={ICON_SIZE}
         radius="xl"
         color={BLACKLIST_COLOR}
         tabIndex={0}
@@ -112,7 +120,7 @@ const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
     <HoverCard width={300} shadow="md" openDelay={100} withinPortal>
       <HoverCard.Target>
         <ThemeIcon
-          size={18}
+          size={ICON_SIZE}
           radius="xl"
           color={getMatchColor(match)}
           tabIndex={0}
