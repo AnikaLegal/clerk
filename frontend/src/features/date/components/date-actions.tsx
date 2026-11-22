@@ -130,6 +130,7 @@ const DateActionIconGroup = ({ date, user }: DateActionIconGroupProps) => {
               label: date.is_reviewed
                 ? 'Confirm not reviewed'
                 : 'Confirm reviewed',
+              color: 'green',
             }}
           />
         )}
