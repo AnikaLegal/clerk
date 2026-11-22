@@ -1,6 +1,8 @@
 import {
   ActionIcon,
   ActionIconProps,
+  Group,
+  MantineSpacing,
   Tooltip,
   TooltipProps,
 } from '@mantine/core'
@@ -63,12 +65,28 @@ const ActionIconWithConfirmation = ({
 
 interface ActionIconWithConfirmationGroupProps {
   children: React.ReactNode
+  // Spaces the icons apart instead of joining them into one strip.
+  gap?: MantineSpacing
 }
 
 export const ActionIconWithConfirmationGroup = ({
   children,
+  gap,
 }: ActionIconWithConfirmationGroupProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  // A confirm button on its own is centred where the icons were.
+  const wrap = (content: React.ReactNode, isConfirming = false) =>
+    gap === undefined ? (
+      <ActionIcon.Group>{content}</ActionIcon.Group>
+    ) : (
+      <Group
+        gap={gap}
+        wrap="nowrap"
+        justify={isConfirming ? 'center' : undefined}
+      >
+        {content}
+      </Group>
+    )
 
   // Ensure children are ReactElements with the expected props
   const childrenArray = React.Children.toArray(children)
@@ -89,38 +107,32 @@ export const ActionIconWithConfirmationGroup = ({
         ...child.props.confirmButton,
         options: { ...options, onClose },
       }
-      return (
-        <ActionIcon.Group>
-          {React.cloneElement(child, { confirmButton })}
-        </ActionIcon.Group>
-      )
+      return wrap(React.cloneElement(child, { confirmButton }), true)
     }
-    return <ActionIcon.Group>{child}</ActionIcon.Group>
+    return wrap(child)
   }
 
-  return (
-    <ActionIcon.Group>
-      {childrenArray.map((child, index) => {
-        if (
-          React.isValidElement<ActionIconWithConfirmationProps>(child) &&
-          child.props.confirmButton
-        ) {
-          const options = child.props.confirmButton.options
-          const onOpen = () => {
-            setActiveIndex(index)
-            if (options && options.onOpen) {
-              options.onOpen()
-            }
+  return wrap(
+    childrenArray.map((child, index) => {
+      if (
+        React.isValidElement<ActionIconWithConfirmationProps>(child) &&
+        child.props.confirmButton
+      ) {
+        const options = child.props.confirmButton.options
+        const onOpen = () => {
+          setActiveIndex(index)
+          if (options && options.onOpen) {
+            options.onOpen()
           }
-          const confirmButton = {
-            ...child.props.confirmButton,
-            options: { ...options, onOpen },
-          }
-          return React.cloneElement(child, { confirmButton })
         }
-        return child
-      })}
-    </ActionIcon.Group>
+        const confirmButton = {
+          ...child.props.confirmButton,
+          options: { ...options, onOpen },
+        }
+        return React.cloneElement(child, { confirmButton })
+      }
+      return child
+    })
   )
 }
 

@@ -336,6 +336,9 @@ interface RowActionsProps {
   onLogCallback: (isAnswered: boolean) => void
 }
 
+// Answered and No answer match the history drawer's header colours.
+const tinted = (color: string) => ({ variant: 'light', color, size: 'lg' })
+
 const RowActions = ({
   record,
   save,
@@ -360,23 +363,23 @@ const RowActions = ({
   }
 
   return (
-    <ActionIconWithConfirmation.Group>
+    <ActionIconWithConfirmation.Group gap={4}>
       <ActionIconWithConfirmation
         tooltip={{ label: 'Log answered call' }}
         icon={<IconPhoneCheck stroke={1.5} />}
-        actionIcon={{ 'aria-label': 'Log answered call' }}
+        actionIcon={{ ...tinted('green'), 'aria-label': 'Log answered call' }}
         onClick={() => onLogCallback(true)}
       />
       <ActionIconWithConfirmation
         tooltip={{ label: 'Log missed call' }}
         icon={<IconPhoneX stroke={1.5} />}
-        actionIcon={{ 'aria-label': 'Log missed call' }}
+        actionIcon={{ ...tinted('gray'), 'aria-label': 'Log missed call' }}
         onClick={() => onLogCallback(false)}
       />
       <ActionIconWithConfirmation
         tooltip={{ label: 'Callback history' }}
         icon={<IconHistory stroke={1.5} />}
-        actionIcon={{ 'aria-label': 'Callback history' }}
+        actionIcon={{ ...tinted('blue'), 'aria-label': 'Callback history' }}
         onClick={onShowHistory}
       />
       <ActionIconWithConfirmation
@@ -384,10 +387,16 @@ const RowActions = ({
         icon={
           isDone ? <IconArrowBackUp stroke={1.5} /> : <IconCheck stroke={1.5} />
         }
-        actionIcon={{ 'aria-label': label, loading: isBusy, disabled: isBusy }}
+        actionIcon={{
+          ...tinted('green'),
+          'aria-label': label,
+          loading: isBusy,
+          disabled: isBusy,
+        }}
         onClick={handleClick}
         confirmButton={{
           label: isDone ? 'Confirm pending' : 'Confirm done',
+          color: 'green',
         }}
       />
     </ActionIconWithConfirmation.Group>
