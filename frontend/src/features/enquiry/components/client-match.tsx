@@ -158,7 +158,7 @@ const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
                 <Anchor href={matchedCase.url}>{matchedCase.fileref}</Anchor>
                 {` ${matchedCase.topic_display} · `}
                 {matchedCase.closed_at
-                  ? `closed ${formatMonth(matchedCase.closed_at)}`
+                  ? `Closed ${formatMonth(matchedCase.closed_at)}`
                   : matchedCase.stage_display}
               </IconRow>
               {isOpenCase && (
