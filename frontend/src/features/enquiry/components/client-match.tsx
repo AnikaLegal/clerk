@@ -38,20 +38,7 @@ const formatMonth = (value: string) => dayjs(value).format('MMM YYYY')
 
 type MatchedOn = EnquiryMatch['matched_on'][number]
 
-// A blacklisted enquiry outranks any client colour.
 const BLACKLIST_COLOR = 'red'
-
-// Inset shadow rather than a border, so the table's own borders stay intact.
-export const getMatchEdgeStyle = (
-  enquiry: Enquiry
-): React.CSSProperties | undefined => {
-  const color = enquiry.blacklist
-    ? BLACKLIST_COLOR
-    : enquiry.match && getMatchColor(enquiry.match)
-  return color
-    ? { boxShadow: `inset 4px 0 0 var(--mantine-color-${color}-6)` }
-    : undefined
-}
 
 interface MatchedValueProps {
   value: string

@@ -23,7 +23,7 @@ import React, { useEffect, useState } from 'react'
 import { ErrorResult, getAPIErrorMessage } from 'utils'
 import { PersonDetails } from '../schema'
 import { CallbackModal, CallbackModalTarget } from './callback-modal'
-import { getMatchEdgeStyle, MatchedValue } from './client-match'
+import { MatchedValue } from './client-match'
 import { HistoryDrawer, HistoryDrawerTarget } from './history-drawer'
 import classes from './row-actions.module.css'
 
@@ -196,7 +196,7 @@ export const EnquiryTable = () => {
                 key={enquiry.id}
                 c={enquiry.requires_callback ? undefined : 'dimmed'}
               >
-                <Table.Td style={{ ...NO_WRAP, ...getMatchEdgeStyle(enquiry) }}>
+                <Table.Td style={NO_WRAP}>
                   {dayjs(enquiry.created_at).format('DD/MM/YY')}
                   <Text inherit c="dimmed" fz="sm">
                     {dayjs(enquiry.created_at).format('h:mma')}
