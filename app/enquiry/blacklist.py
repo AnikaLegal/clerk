@@ -24,7 +24,9 @@ def find_blacklist_matches(enquiries: list["Enquiry"]) -> dict[int, BlacklistMat
         return {}
     entries = [
         (entry, get_phone_key(entry.phone), get_email_key(entry.email))
-        for entry in BlacklistEntry.objects.order_by("-created_at")
+        for entry in BlacklistEntry.objects.select_related("created_by").order_by(
+            "-created_at"
+        )
     ]
     matches = {}
     for enquiry in enquiries:

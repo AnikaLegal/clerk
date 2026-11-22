@@ -109,6 +109,7 @@ const BlacklistIcon = ({ blacklist }: { blacklist: EnquiryBlacklistMatch }) => (
         )}
         <Text fz="xs" c="dimmed">
           Added {dayjs(blacklist.created_at).format('DD/MM/YY')}
+          {blacklist.created_by_name && ` by ${blacklist.created_by_name}`}
         </Text>
       </Stack>
     </HoverCard.Dropdown>

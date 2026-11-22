@@ -3757,11 +3757,16 @@ components:
         created_at:
           type: string
           format: date-time
+        created_by_name:
+          description: Who added the entry, if known.
+          type: string
+          nullable: true
       required:
         - matched_on
         - name
         - reason
         - created_at
+        - created_by_name
     Enquiry:
       description: Someone who got in touch by phone or through the website contact form.
       type: object

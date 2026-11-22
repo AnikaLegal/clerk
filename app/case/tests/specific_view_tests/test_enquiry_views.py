@@ -2,6 +2,7 @@ import pytest
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
+from core.factories import UserFactory
 from core.models.issue import CaseTopic
 from enquiry.factories import CallEnquiryFactory, ContactEnquiryFactory
 from enquiry.models import BlacklistEntry
@@ -176,8 +177,12 @@ def test_enquiry_list_filters_by_source(superuser_client):
 
 @pytest.mark.django_db
 def test_enquiry_list_shows_blacklist_match(superuser_client):
+    added_by = UserFactory(first_name="Jo", last_name="Coordinator")
     entry = BlacklistEntry.objects.create(
-        name="Pat", phone="0412 345 678", reason="Abusive to staff."
+        name="Pat",
+        phone="0412 345 678",
+        reason="Abusive to staff.",
+        created_by=added_by,
     )
     CallEnquiryFactory(phone="+61412345678")
 
@@ -188,3 +193,4 @@ def test_enquiry_list_shows_blacklist_match(superuser_client):
     assert enquiry["blacklist"]["matched_on"] == ["PHONE"]
     assert enquiry["blacklist"]["name"] == entry.name
     assert enquiry["blacklist"]["reason"] == entry.reason
+    assert enquiry["blacklist"]["created_by_name"] == "Jo Coordinator"

@@ -71,6 +71,14 @@ class BlacklistEntry(TimestampedModel):
     email = models.CharField(max_length=255, blank=True, default="")
     phone = models.CharField(max_length=255, blank=True, default="")
     reason = models.TextField(blank=True, default="")
+    # Set by the Wagtail create view.
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     panels = [
         FieldPanel("name"),

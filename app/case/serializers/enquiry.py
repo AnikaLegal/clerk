@@ -144,6 +144,11 @@ class EnquiryBlacklistMatchSerializer(serializers.Serializer):
     name = serializers.CharField(source="entry.name", allow_null=True)
     reason = serializers.CharField(source="entry.reason", allow_null=True)
     created_at = serializers.DateTimeField(source="entry.created_at")
+    created_by_name = serializers.SerializerMethodField()
+
+    def get_created_by_name(self, match) -> str | None:
+        user = match.entry.created_by
+        return user.get_full_name() if user else None
 
 
 class EnquiryMatchSerializer(serializers.Serializer):

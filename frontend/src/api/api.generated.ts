@@ -1821,6 +1821,8 @@ export type EnquiryBlacklistMatch = {
   name: string | null;
   reason: string | null;
   created_at: string;
+  /** Who added the entry, if known. */
+  created_by_name: string | null;
 };
 export type Enquiry = {
   id: number;
