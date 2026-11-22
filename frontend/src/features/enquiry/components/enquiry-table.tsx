@@ -193,9 +193,7 @@ export const EnquiryTable = () => {
                 key={enquiry.id}
                 c={enquiry.requires_callback ? undefined : 'dimmed'}
               >
-                <Table.Td
-                  style={{ ...NO_WRAP, ...getMatchEdgeStyle(enquiry.match) }}
-                >
+                <Table.Td style={{ ...NO_WRAP, ...getMatchEdgeStyle(enquiry) }}>
                   {dayjs(enquiry.created_at).format('DD/MM/YY')}
                   <Text inherit c="dimmed" fz="sm">
                     {dayjs(enquiry.created_at).format('h:mma')}
@@ -206,14 +204,14 @@ export const EnquiryTable = () => {
                 <Table.Td>
                   <MatchedValue
                     value={enquiry.email}
-                    match={enquiry.match}
+                    enquiry={enquiry}
                     matchedOn="EMAIL"
                   />
                 </Table.Td>
                 <Table.Td>
                   <MatchedValue
                     value={enquiry.phone}
-                    match={enquiry.match}
+                    enquiry={enquiry}
                     matchedOn="PHONE"
                   />
                 </Table.Td>

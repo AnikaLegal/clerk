@@ -1,37 +1,42 @@
-from django.db.models import Q
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+from core.services.enquiry_match import MatchedOn, get_email_key, get_phone_key
+
 from .models import Blacklist
 
-
-def _replace_au_prefix(number: str) -> str | None:
-    prefix = "+61"
-    if number.startswith(prefix):
-        return "0" + number.removeprefix(prefix)
-
-    return None
+if TYPE_CHECKING:
+    from enquiry.models import Enquiry
 
 
-def is_blacklisted(email: str, phone: str) -> bool:
-    return is_email_blacklisted(email) or is_phone_blacklisted(phone)
+@dataclass(frozen=True)
+class BlacklistMatch:
+    entry: Blacklist
+    matched_on: list[str]
 
 
-def is_email_blacklisted(email: str) -> bool:
-    if email:
-        email = "".join(email.split())  # Remove whitespace.
-        return Blacklist.objects.filter(email__iexact=email).exists()
-
-    return False
-
-
-def is_phone_blacklisted(number: str) -> bool:
-    if number:
-        number = "".join(number.split())  # Remove whitespace.
-        condition = Q(phone=number)
-
-        # Also look for numbers without the AU country code.
-        number = _replace_au_prefix(number)
-        if number:
-            condition |= Q(phone=number)
-
-        return Blacklist.objects.filter(condition).exists()
-
-    return False
+def find_blacklist_matches(enquiries: list["Enquiry"]) -> dict[int, BlacklistMatch]:
+    """
+    Matches enquiries to blacklist entries with the client matching's phone
+    and email keys. The list is short, so it's read whole in one query.
+    """
+    if not enquiries:
+        return {}
+    entries = [
+        (entry, get_phone_key(entry.phone or ""), get_email_key(entry.email or ""))
+        for entry in Blacklist.objects.order_by("-created_at")
+    ]
+    matches = {}
+    for enquiry in enquiries:
+        phone_key = get_phone_key(enquiry.phone)
+        email_key = get_email_key(enquiry.email)
+        for entry, entry_phone, entry_email in entries:
+            matched_on = []
+            if phone_key and entry_phone == phone_key:
+                matched_on.append(MatchedOn.PHONE)
+            if email_key and entry_email == email_key:
+                matched_on.append(MatchedOn.EMAIL)
+            if matched_on:
+                matches[enquiry.id] = BlacklistMatch(entry, matched_on)
+                break
+    return matches

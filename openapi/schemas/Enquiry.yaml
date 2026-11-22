@@ -41,6 +41,10 @@ properties:
     nullable: true
     allOf:
       - $ref: ./Callback.yaml
+  blacklist:
+    nullable: true
+    allOf:
+      - $ref: ./EnquiryBlacklistMatch.yaml
 required:
   - id
   - created_at
@@ -58,3 +62,4 @@ required:
   - comments
   - match
   - latest_callback
+  - blacklist

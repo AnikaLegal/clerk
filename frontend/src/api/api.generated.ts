@@ -1816,6 +1816,12 @@ export type Callback = {
   summary: string;
   action_items: string;
 };
+export type EnquiryBlacklistMatch = {
+  matched_on: ("PHONE" | "EMAIL")[];
+  name: string | null;
+  reason: string | null;
+  created_at: string;
+};
 export type Enquiry = {
   id: number;
   created_at: string;
@@ -1835,6 +1841,7 @@ export type Enquiry = {
   comments: string;
   match: EnquiryMatch | null;
   latest_callback: Callback | null;
+  blacklist: EnquiryBlacklistMatch | null;
 };
 export type EnquiryUpdate = {
   requires_callback?: boolean;

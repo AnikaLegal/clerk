@@ -1,0 +1,24 @@
+description: The blacklist entry an enquiry matches.
+type: object
+properties:
+  matched_on:
+    type: array
+    items:
+      type: string
+      enum:
+        - PHONE
+        - EMAIL
+  name:
+    type: string
+    nullable: true
+  reason:
+    type: string
+    nullable: true
+  created_at:
+    type: string
+    format: date-time
+required:
+  - matched_on
+  - name
+  - reason
+  - created_at

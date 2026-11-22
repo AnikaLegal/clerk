@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from blacklist.service import find_blacklist_matches
 from case.serializers.enquiry import (
     CallbackCreateSerializer,
     CallbackSearchSerializer,
@@ -64,9 +65,11 @@ class EnquiryApiViewset(GenericViewSet, ListModelMixin, UpdateModelMixin):
         instance = args[0] if args else None
         if instance is not None:
             enquiries = instance if kwargs.get("many") else [instance]
+            enquiries = list(enquiries)
             kwargs["context"] = {
                 **self.get_serializer_context(),
-                "client_matches": find_client_matches(list(enquiries)),
+                "client_matches": find_client_matches(enquiries),
+                "blacklist_matches": find_blacklist_matches(enquiries),
             }
         return super().get_serializer(*args, **kwargs)
 

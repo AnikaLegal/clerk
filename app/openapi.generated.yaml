@@ -3737,6 +3737,31 @@ components:
         - purpose
         - summary
         - action_items
+    EnquiryBlacklistMatch:
+      description: The blacklist entry an enquiry matches.
+      type: object
+      properties:
+        matched_on:
+          type: array
+          items:
+            type: string
+            enum:
+              - PHONE
+              - EMAIL
+        name:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - matched_on
+        - name
+        - reason
+        - created_at
     Enquiry:
       description: Someone who got in touch by phone or through the website contact form.
       type: object
@@ -3781,6 +3806,10 @@ components:
           nullable: true
           allOf:
             - $ref: "#/components/schemas/Callback"
+        blacklist:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/EnquiryBlacklistMatch"
       required:
         - id
         - created_at
@@ -3798,6 +3827,7 @@ components:
         - comments
         - match
         - latest_callback
+        - blacklist
     EnquiryUpdate:
       type: object
       properties:

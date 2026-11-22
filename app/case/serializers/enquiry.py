@@ -139,6 +139,13 @@ class EnquiryMatchCaseSerializer(serializers.ModelSerializer):
         return reverse("case-detail", args=(obj.pk,))
 
 
+class EnquiryBlacklistMatchSerializer(serializers.Serializer):
+    matched_on = serializers.ListField(child=serializers.CharField())
+    name = serializers.CharField(source="entry.name", allow_null=True)
+    reason = serializers.CharField(source="entry.reason", allow_null=True)
+    created_at = serializers.DateTimeField(source="entry.created_at")
+
+
 class EnquiryMatchSerializer(serializers.Serializer):
     state = serializers.CharField()
     matched_on = serializers.ListField(child=serializers.CharField())
@@ -148,8 +155,9 @@ class EnquiryMatchSerializer(serializers.Serializer):
 
 class EnquirySerializer(serializers.ModelSerializer):
     """
-    The view finds client matches for a whole page at once and passes them
-    in the "client_matches" context, keyed by enquiry id.
+    The view finds client and blacklist matches for a whole page at once and
+    passes them in the "client_matches" and "blacklist_matches" context,
+    keyed by enquiry id.
     """
 
     class Meta:
@@ -171,6 +179,7 @@ class EnquirySerializer(serializers.ModelSerializer):
             "comments",
             "match",
             "latest_callback",
+            "blacklist",
         )
         read_only_fields = tuple(f for f in fields if f not in EDITABLE_FIELDS)
 
@@ -182,6 +191,7 @@ class EnquirySerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, allow_blank=True, required=False)
     match = serializers.SerializerMethodField()
     latest_callback = serializers.SerializerMethodField()
+    blacklist = serializers.SerializerMethodField()
 
     def validate(self, attrs):
         # A contact typed in both, so neither can be cleared; a caller's are
@@ -197,6 +207,10 @@ class EnquirySerializer(serializers.ModelSerializer):
     def get_match(self, obj):
         match = self.context.get("client_matches", {}).get(obj.pk)
         return EnquiryMatchSerializer(match).data if match else None
+
+    def get_blacklist(self, obj):
+        match = self.context.get("blacklist_matches", {}).get(obj.pk)
+        return EnquiryBlacklistMatchSerializer(match).data if match else None
 
     def get_latest_callback(self, obj):
         # The view prefetches callbacks newest first as callback_list.

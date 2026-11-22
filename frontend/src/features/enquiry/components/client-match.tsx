@@ -10,11 +10,12 @@ import {
 import {
   Icon,
   IconAlertTriangle,
+  IconBan,
   IconBriefcase,
   IconFolder,
   IconUser,
 } from '@tabler/icons-react'
-import { EnquiryMatch } from 'api'
+import { Enquiry, EnquiryBlacklistMatch, EnquiryMatch } from 'api'
 import { CASE_STATUS_COLORS } from 'consts'
 import dayjs from 'dayjs'
 import React from 'react'
@@ -37,32 +38,82 @@ const formatMonth = (value: string) => dayjs(value).format('MMM YYYY')
 
 type MatchedOn = EnquiryMatch['matched_on'][number]
 
+// A blacklisted enquiry outranks any client colour.
+const BLACKLIST_COLOR = 'red'
+
 // Inset shadow rather than a border, so the table's own borders stay intact.
 export const getMatchEdgeStyle = (
-  match: EnquiryMatch | null
-): React.CSSProperties | undefined =>
-  match
-    ? {
-        boxShadow: `inset 4px 0 0 var(--mantine-color-${getMatchColor(match)}-6)`,
-      }
+  enquiry: Enquiry
+): React.CSSProperties | undefined => {
+  const color = enquiry.blacklist
+    ? BLACKLIST_COLOR
+    : enquiry.match && getMatchColor(enquiry.match)
+  return color
+    ? { boxShadow: `inset 4px 0 0 var(--mantine-color-${color}-6)` }
     : undefined
+}
 
 interface MatchedValueProps {
   value: string
-  match: EnquiryMatch | null
+  enquiry: Enquiry
   matchedOn: MatchedOn
 }
 
-// Shows the icon only beside the detail that matched.
-export const MatchedValue = ({ value, match, matchedOn }: MatchedValueProps) =>
-  match?.matched_on.includes(matchedOn) ? (
+// Shows each icon only beside the detail that matched.
+export const MatchedValue = ({
+  value,
+  enquiry,
+  matchedOn,
+}: MatchedValueProps) => {
+  const { blacklist, match } = enquiry
+  const isBlacklisted = blacklist?.matched_on.includes(matchedOn)
+  const isClient = match?.matched_on.includes(matchedOn)
+  if (!isBlacklisted && !isClient) {
+    return value
+  }
+  return (
     <Group gap={6} wrap="nowrap" justify="space-between">
       <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
-      <ClientMatchIcon match={match} />
+      <Group gap={4} wrap="nowrap">
+        {isBlacklisted && blacklist && <BlacklistIcon blacklist={blacklist} />}
+        {isClient && match && <ClientMatchIcon match={match} />}
+      </Group>
     </Group>
-  ) : (
-    value
   )
+}
+
+const BlacklistIcon = ({ blacklist }: { blacklist: EnquiryBlacklistMatch }) => (
+  <HoverCard width={300} shadow="md" openDelay={100} withinPortal>
+    <HoverCard.Target>
+      <ThemeIcon
+        size={18}
+        radius="xl"
+        color={BLACKLIST_COLOR}
+        tabIndex={0}
+        aria-label={`Blacklisted${blacklist.name ? `: ${blacklist.name}` : ''}`}
+        style={{ cursor: 'default', flexShrink: 0 }}
+      >
+        <IconBan size={12} stroke={2.5} />
+      </ThemeIcon>
+    </HoverCard.Target>
+    <HoverCard.Dropdown>
+      <Stack gap={4}>
+        <Text fz="xs" fw={700} c={`${BLACKLIST_COLOR}.7`} tt="uppercase">
+          Blacklisted
+        </Text>
+        {blacklist.name && <Text fz="sm">{blacklist.name}</Text>}
+        {blacklist.reason && (
+          <Text fz="sm" style={{ whiteSpace: 'pre-wrap' }}>
+            {blacklist.reason}
+          </Text>
+        )}
+        <Text fz="xs" c="dimmed">
+          Added {dayjs(blacklist.created_at).format('DD/MM/YY')}
+        </Text>
+      </Stack>
+    </HoverCard.Dropdown>
+  </HoverCard>
+)
 
 const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
   const { label, color } = STYLES[match.state]

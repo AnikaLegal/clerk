@@ -9,7 +9,6 @@ from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.twiml.voice_response import Gather, Say, VoiceResponse
 
-from blacklist.service import is_phone_blacklisted
 from caller.choices import Choice
 from caller.messages import sms
 from core.models.issue import CaseTopic
@@ -35,9 +34,6 @@ TOPIC_MAPPING = {
     Choice.EVICTIONS: CaseTopic.EVICTION_RETALIATORY,
     Choice.CALLBACK: CaseTopic.OTHER,
 }
-
-BLACKLIST_COMMENT = "The caller's phone number is blacklisted."
-
 
 @require_http_methods(["GET"])
 def answer_view(request):  # Normal view
@@ -116,11 +112,6 @@ def collect_view(request):
     )
     call.topic = TOPIC_MAPPING[choice]
     call.requires_callback = choice == Choice.CALLBACK
-
-    if is_phone_blacklisted(number):
-        call.requires_callback = False
-        call.comments = BLACKLIST_COMMENT
-
     call.save()
 
     return TwimlResponse(response)
