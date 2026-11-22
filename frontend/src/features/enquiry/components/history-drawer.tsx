@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Drawer,
@@ -41,7 +40,7 @@ interface HistoryDrawerProps {
   onClose: () => void
 }
 
-const formatTime = (value: string) => dayjs(value).format('DD/MM/YY h:mma')
+const formatTime = (value: string) => dayjs(value).format('DD/MM/YY [at] hA')
 
 export const HistoryDrawer = ({ target, onClose }: HistoryDrawerProps) => (
   <Drawer
@@ -202,30 +201,73 @@ const History = ({ target }: { target: HistoryDrawerTarget }) => {
         </Stack>
       )}
       {(unlogged > 0 || record.comments) && (
-        <>
-          <SectionTitle>Earlier</SectionTitle>
-          <Paper withBorder p="sm" bg="var(--mantine-color-gray-0)">
-            {unlogged > 0 && (
-              <Text fz="sm" c="dimmed">
-                {unlogged} {unlogged === 1 ? 'callback' : 'callbacks'} with no
-                details
-              </Text>
-            )}
-            {record.comments && (
-              <Text
-                fz="sm"
-                mt={unlogged > 0 ? 'xs' : 0}
-                style={{ whiteSpace: 'pre-wrap' }}
-              >
-                {record.comments}
-              </Text>
-            )}
-          </Paper>
-        </>
+        <TimelineCard
+          title="Earlier"
+          label={
+            unlogged > 0 &&
+            `${unlogged} ${unlogged === 1 ? 'callback' : 'callbacks'} with no details`
+          }
+          color={GREY_HEADER}
+          mt="sm"
+        >
+          {record.comments && (
+            <Text fz="sm" style={{ whiteSpace: 'pre-wrap' }}>
+              {record.comments}
+            </Text>
+          )}
+        </TimelineCard>
       )}
     </>
   )
 }
+
+// Header colours echo the case timeline's labels.
+const GREEN_HEADER = { bg: 'green.6', c: 'white' }
+const GREY_HEADER = { bg: 'gray.2', c: 'gray.7' }
+
+interface TimelineCardProps {
+  title: React.ReactNode
+  detail?: string
+  label?: React.ReactNode
+  color: { bg: string; c: string }
+  mt?: string
+  children?: React.ReactNode
+}
+
+// A card in the style of the case page's timeline items.
+const TimelineCard = ({
+  title,
+  detail,
+  label,
+  color,
+  mt,
+  children,
+}: TimelineCardProps) => (
+  <Paper withBorder shadow="xs" mt={mt} style={{ overflow: 'hidden' }}>
+    <Group
+      justify="space-between"
+      gap="xs"
+      wrap="nowrap"
+      px="sm"
+      py={6}
+      fz="xs"
+      fw={700}
+      bg={color.bg}
+      c={color.c}
+    >
+      <Text inherit>
+        {title}
+        {detail && (
+          <Text span inherit fw={400} ml="xs" opacity={0.85}>
+            {detail}
+          </Text>
+        )}
+      </Text>
+      {label && <Text inherit>{label}</Text>}
+    </Group>
+    {children && <Box p="sm">{children}</Box>}
+  </Paper>
+)
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   <Text fw={700} fz="sm" mt="lg" mb="xs">
@@ -234,36 +276,44 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 )
 
 const CallbackCard = ({ callback }: { callback: Callback }) => {
-  const fields: EnquiryDetail[] = callback.is_answered
-    ? [
-        ['Purpose', callback.purpose],
-        ['Summary', callback.summary],
-        ['Actions', callback.action_items],
-      ]
-    : [['Note', callback.summary]]
+  const fields: EnquiryDetail[] = [
+    ['Purpose', callback.purpose],
+    ['Summary', callback.summary],
+    ['Action items', callback.action_items],
+  ]
   const filled = fields.filter(([, value]) => value)
 
   return (
-    <Paper withBorder p="sm">
-      <Group justify="space-between" gap="xs" wrap="nowrap">
-        <Badge
-          variant="light"
-          color={callback.is_answered ? 'green' : 'gray'}
-          radius="sm"
-        >
-          {callback.is_answered ? 'Answered' : 'No answer'}
-        </Badge>
-        <Text fz="xs" c="dimmed">
-          {[formatTime(callback.created_at), callback.logged_by_name]
-            .filter(Boolean)
-            .join(' · ')}
-        </Text>
-      </Group>
-      {filled.length > 0 && (
-        <Box mt="xs">
-          <Details rows={filled} />
-        </Box>
-      )}
-    </Paper>
+    <TimelineCard
+      title={callback.logged_by_name ?? 'Unknown'}
+      detail={formatTime(callback.created_at)}
+      label={callback.is_answered ? 'Answered' : 'No answer'}
+      color={callback.is_answered ? GREEN_HEADER : GREY_HEADER}
+    >
+      {callback.is_answered
+        ? filled.length > 0 && (
+            <Stack gap={6}>
+              {filled.map(([label, value]) => (
+                <Box key={label} fz="sm">
+                  <Text inherit c="dimmed" fz="xs">
+                    {label}
+                  </Text>
+                  <MultilineText>{value}</MultilineText>
+                </Box>
+              ))}
+            </Stack>
+          )
+        : callback.summary && (
+            <Box fz="sm">
+              <MultilineText>{callback.summary}</MultilineText>
+            </Box>
+          )}
+    </TimelineCard>
   )
 }
+
+const MultilineText = ({ children }: { children: React.ReactNode }) => (
+  <Text inherit style={{ whiteSpace: 'pre-wrap' }}>
+    {children}
+  </Text>
+)
