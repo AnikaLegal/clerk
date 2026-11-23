@@ -13,6 +13,7 @@ import {
   IconAlertTriangle,
   IconBan,
   IconBriefcase,
+  IconClock,
   IconFolder,
   IconUser,
 } from '@tabler/icons-react'
@@ -157,6 +158,11 @@ const ClientMatchIcon = ({ match }: { match: EnquiryMatch }) => {
               </Text>
             )}
           </IconRow>
+          {client.call_times_display.length > 0 && (
+            <IconRow icon={IconClock}>
+              {client.call_times_display.join(', ')}
+            </IconRow>
+          )}
           {matchedCase && (
             <>
               <IconRow icon={IconFolder}>

@@ -1794,6 +1794,8 @@ export type EnquiryMatch = {
       | null;
     contact_restriction_display: string | null;
     contact_notes: string;
+    /** When the client prefers to be called. */
+    call_times_display: string[];
   };
   /** The open case, or the latest closed one for a former client. */
   case: {

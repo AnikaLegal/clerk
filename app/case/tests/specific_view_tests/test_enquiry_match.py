@@ -52,6 +52,7 @@ def test_call_from_client_with_open_case(superuser_client):
             "contact_restriction": None,
             "contact_restriction_display": None,
             "contact_notes": "",
+            "call_times_display": ["Weekday"],
         },
         "case": {
             "fileref": case.fileref,
@@ -182,6 +183,21 @@ def test_other_restrictions_do_not_change_the_choice(superuser_client):
     [call] = get_calls(superuser_client)
 
     assert call["match"]["client"]["full_name"] == current.get_full_name()
+
+
+@pytest.mark.django_db
+def test_call_times_are_listed_in_a_fixed_order(superuser_client):
+    client = ClientFactory(
+        phone_number="0400123456",
+        created_at=BEFORE,
+        call_times=["SUNDAY", "WEEK_DAY"],
+    )
+    IssueFactory(client=client, is_open=True)
+    CallEnquiryFactory(phone="+61400123456", created_at=NOW)
+
+    [call] = get_calls(superuser_client)
+
+    assert call["match"]["client"]["call_times_display"] == ["Weekday", "Sunday"]
 
 
 @pytest.mark.parametrize("number", ["anonymous", "+266696687", "12345", ""])

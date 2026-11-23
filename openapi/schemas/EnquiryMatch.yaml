@@ -36,6 +36,11 @@ properties:
         nullable: true
       contact_notes:
         type: string
+      call_times_display:
+        description: When the client prefers to be called.
+        type: array
+        items:
+          type: string
     required:
       - full_name
       - created_at
@@ -43,6 +48,7 @@ properties:
       - contact_restriction
       - contact_restriction_display
       - contact_notes
+      - call_times_display
   case:
     description: The open case, or the latest closed one for a former client.
     nullable: true

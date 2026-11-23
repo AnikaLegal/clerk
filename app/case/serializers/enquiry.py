@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from core.models import Client, Issue
+from core.models.client import CallTime
 from enquiry.models import Callback, Enquiry, EnquirySource
 
 # Callbacks and comments change only through logged callbacks.
@@ -94,11 +95,13 @@ class EnquiryMatchClientSerializer(serializers.ModelSerializer):
             "contact_restriction",
             "contact_restriction_display",
             "contact_notes",
+            "call_times_display",
         )
 
     full_name = serializers.CharField(source="get_full_name")
     contact_restriction = serializers.SerializerMethodField()
     contact_restriction_display = serializers.SerializerMethodField()
+    call_times_display = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
@@ -111,6 +114,10 @@ class EnquiryMatchClientSerializer(serializers.ModelSerializer):
         if not obj.contact_restriction:
             return None
         return obj.get_contact_restriction_display()
+
+    def get_call_times_display(self, obj):
+        # In the choices' order, whatever order the client picked them in.
+        return [label for value, label in CallTime.choices if value in obj.call_times]
 
 
 class EnquiryMatchCaseSerializer(serializers.ModelSerializer):
