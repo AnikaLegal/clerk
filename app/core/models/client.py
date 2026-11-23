@@ -11,8 +11,8 @@ from .timestamped import TimestampedModel
 
 
 class CallTime(models.TextChoices):
-    WEEK_DAY = "WEEK_DAY", "Week day"
-    WEEK_EVENING = "WEEK_EVENING", "Week evening"
+    WEEK_DAY = "WEEK_DAY", "Weekday"
+    WEEK_EVENING = "WEEK_EVENING", "Weekday evening"
     SATURDAY = "SATURDAY", "Saturday"
     SUNDAY = "SUNDAY", "Sunday"
 
