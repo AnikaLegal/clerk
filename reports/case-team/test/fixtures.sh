@@ -4,7 +4,7 @@
 set -euo pipefail
 month="$1"
 here="$(cd "$(dirname "$0")" && pwd)"
-for slide in 4 5 6 7; do
+for slide in 4 5 6 7 8 9; do
     query="$(sed -e 's/;[[:space:]]*$//' "$here/../blocks/slide$slide.sql")"
     docker exec -i clerk_db psql -U postgres -At -v month="'$month'" \
         > "$here/fixtures/slide$slide-$month.json" <<SQL

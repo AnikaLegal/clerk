@@ -146,14 +146,16 @@ drop_rows(t7, [3, 4, 6, 7])
 for r, (key, label) in enumerate(TOPICS + [("total", "Total")], start=1):
     set_cell(t7, r, 0, label)
     set_cell(t7, r, 1, ph("s7_%s_closed" % key))
-    set_cell(t7, r, 2, ph("s7_%s_legal_advice" % key))
+    set_cell(t7, r, 2, ph("s7_%s_legal_services" % key))
+set_cell(t7, 0, 2, "Cases with legal services")
 replace_paragraphs(shape(s7, 185), {
+    "In this slide": "In this slide, we track the number of cases closed with legal services provided (advice, tasks or representation). Ideally, we want as many cases as possible closed with legal services provided.",
     "This month, we closed": "This month, we closed %s cases, %s." % (ph("s7_total_closed"), ph("s7_closed_change")),
-    "59% cases closed": "%s%% of cases were closed with legal advice:" % ph("s7_legal_advice_pct"),
-    "67% in Repairs": "%s%% of Repairs cases" % ph("s7_repairs_legal_advice_pct"),
-    "67% in Bonds": "%s%% of Bonds cases" % ph("s7_bonds_legal_advice_pct"),
-    "39% in Evictions": "%s%% of Eviction (Retaliatory) cases" % ph("s7_eviction_retaliatory_legal_advice_pct"),
-    "This is an increase": ph("s7_legal_advice_change"),
+    "59% cases closed": "%s%% of cases were closed with legal services provided:" % ph("s7_legal_services_pct"),
+    "67% in Repairs": "%s%% of Repairs cases" % ph("s7_repairs_legal_services_pct"),
+    "67% in Bonds": "%s%% of Bonds cases" % ph("s7_bonds_legal_services_pct"),
+    "39% in Evictions": "%s%% of Eviction (Retaliatory) cases" % ph("s7_eviction_retaliatory_legal_services_pct"),
+    "This is an increase": ph("s7_legal_services_change"),
 })
 # Same arrangement as slide 5: table at the top left, chart below it, and
 # the commentary on the right starting level with the table.

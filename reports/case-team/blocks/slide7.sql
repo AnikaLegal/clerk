@@ -27,7 +27,7 @@ SELECT
     which,
     topic,
     count(*) AS closed,
-    count(*) FILTER (WHERE provided_legal_services) AS closed_with_legal_advice
+    count(*) FILTER (WHERE provided_legal_services) AS closed_with_legal_services
 FROM closed
 GROUP BY which, topic
 ORDER BY which, topic;

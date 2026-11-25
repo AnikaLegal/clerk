@@ -33,6 +33,8 @@ CLONE_FROM = {
     "slide4": "slide5",
     "slide6": "slide5",
     "slide7": "slide5",
+    "slide8": "slide5",
+    "slide9": "slide5",
     "snapshotDone": "existingLink",
     "snapshotSaved": "existingLink",
     "isSnapshot": "alreadyMade",
@@ -40,7 +42,7 @@ CLONE_FROM = {
 
 # Run order. Each path is a chain; a path that starts at a branch names the
 # branch and which way it leaves it (0 = condition true, 1 = else).
-MAIN = ["startTrigger", "whoami", "setup", "readPrevious", "slide4", "slide5", "slide6", "slide7", "figures", "isSnapshot"]
+MAIN = ["startTrigger", "whoami", "setup", "readPrevious", "slide4", "slide5", "slide6", "slide7", "slide8", "slide9", "figures", "isSnapshot"]
 SNAPSHOT_PATH = ("isSnapshot", 0, ["saveSnapshotOnly", "snapshotDone"])
 REPORT_PATH = ("isSnapshot", 1, ["folders", "findExisting", "alreadyMade"])
 EXISTS_PATH = ("alreadyMade", 0, ["existingLink"])

@@ -13,7 +13,7 @@ and kept. Change a file here first, then copy it into Retool.
 1. `whoami` and `setup` work out the environment from the database user
    (`clerk_staging_reader` is staging; `clerk_prod_reader` and `clerk_prod`
    are production; anything else stops the run), and read the inputs.
-2. `readPrevious` and `slide4` to `slide7` read last month's saved figures and
+2. `readPrevious` and `slide4` to `slide9` read last month's saved figures and
    this month's from Clerk; `figures` turns them into placeholder values,
    chart data and the sentences.
 3. `isSnapshot`: in snapshot mode, `saveSnapshotOnly` saves the month's row
