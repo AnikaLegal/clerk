@@ -1,0 +1,7 @@
+[{"category":"DISCRETE","quarter":1,"services":78,"services_excluding_referrals":54}, 
+ {"category":"DISCRETE","quarter":2,"services":79,"services_excluding_referrals":47}, 
+ {"category":"DISCRETE","quarter":3,"services":50,"services_excluding_referrals":27}, 
+ {"category":"ONGOING","quarter":1,"services":79,"services_excluding_referrals":79}, 
+ {"category":"ONGOING","quarter":2,"services":88,"services_excluding_referrals":88}, 
+ {"category":"ONGOING","quarter":3,"services":35,"services_excluding_referrals":35}, 
+ {"category":"STILL_OPEN","quarter":null,"services":82,"services_excluding_referrals":null}]

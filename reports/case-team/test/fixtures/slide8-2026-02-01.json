@@ -1,0 +1,12 @@
+[{"which":"fy","topic":"BONDS","open_cases":179,"progressed":169,"helped":126,"helped_clients":126}, 
+ {"which":"fy","topic":"EVICTION_RETALIATORY","open_cases":105,"progressed":100,"helped":64,"helped_clients":64}, 
+ {"which":"fy","topic":"REPAIRS","open_cases":237,"progressed":212,"helped":124,"helped_clients":124}, 
+ {"which":"fy","topic":null,"open_cases":521,"progressed":481,"helped":314,"helped_clients":306}, 
+ {"which":"last","topic":"BONDS","open_cases":58,"progressed":35,"helped":45,"helped_clients":45}, 
+ {"which":"last","topic":"EVICTION_RETALIATORY","open_cases":28,"progressed":14,"helped":21,"helped_clients":21}, 
+ {"which":"last","topic":"REPAIRS","open_cases":66,"progressed":35,"helped":47,"helped_clients":47}, 
+ {"which":"last","topic":null,"open_cases":152,"progressed":84,"helped":113,"helped_clients":113}, 
+ {"which":"this","topic":"BONDS","open_cases":54,"progressed":30,"helped":47,"helped_clients":47}, 
+ {"which":"this","topic":"EVICTION_RETALIATORY","open_cases":32,"progressed":16,"helped":26,"helped_clients":26}, 
+ {"which":"this","topic":"REPAIRS","open_cases":75,"progressed":32,"helped":49,"helped_clients":49}, 
+ {"which":"this","topic":null,"open_cases":161,"progressed":78,"helped":122,"helped_clients":121}]

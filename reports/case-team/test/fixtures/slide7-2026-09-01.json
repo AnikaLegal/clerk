@@ -1,0 +1,6 @@
+[{"which":"last","topic":"BONDS","closed":11,"closed_with_legal_services":8}, 
+ {"which":"last","topic":"EVICTION_RETALIATORY","closed":8,"closed_with_legal_services":3}, 
+ {"which":"last","topic":"REPAIRS","closed":29,"closed_with_legal_services":11}, 
+ {"which":"this","topic":"BONDS","closed":25,"closed_with_legal_services":17}, 
+ {"which":"this","topic":"EVICTION_RETALIATORY","closed":23,"closed_with_legal_services":9}, 
+ {"which":"this","topic":"REPAIRS","closed":34,"closed_with_legal_services":23}]

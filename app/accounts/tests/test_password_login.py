@@ -3,11 +3,12 @@ Test that password login is refused and Google is the only way in
 """
 
 import pytest
-from accounts.models import User
-from core.factories import UserFactory
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group, Permission
 from django.test import override_settings
+
+from accounts.models import User
+from core.factories import UserFactory
 
 PASSWORD = "correct-horse-battery-staple"
 GOOGLE_BACKEND = "social_core.backends.google.GoogleOAuth2"
@@ -55,6 +56,22 @@ def test_admin_login_forbidden_when_signed_in(client):
     # A signed-in user without admin access must not bounce between logins.
     client.force_login(UserFactory(), backend=GOOGLE_BACKEND)
     assert client.get("/admin/login/").status_code == 403
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "next_param, expected",
+    [
+        ("", "/admin/"),
+        ("?next=/admin/accounts/user/", "/admin/accounts/user/"),
+        ("?next=https://evil.example.com/", "/admin/"),
+    ],
+)
+def test_admin_login_sends_staff_on(client, next_param, expected):
+    client.force_login(UserFactory(is_staff=True), backend=GOOGLE_BACKEND)
+    resp = client.get(f"/admin/login/{next_param}")
+    assert resp.status_code == 302
+    assert resp.url == expected
 
 
 @pytest.mark.django_db
