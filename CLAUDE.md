@@ -43,6 +43,7 @@ Backend responses are validated against the contract in tests (`django-contract-
 - Settings split by environment in `app/clerk/settings/` (`base`, `dev`, `staging`, `prod`, `test`). Tests use `clerk.settings.test`.
 - Apps (see [README.md](README.md) for the full list): `case` (the core CMS - serializers/views/urls live here), `core` (domain models), `accounts`, `emails`, `intake`, `web` (public site/blog), plus integrations: `microsoft`/`google`/`slack`/`caller`/`webhooks`/`notify`.
 - Tests: pytest (`pytest-django`, `pytest-factoryboy`, factory-based). Run via `just test` - **always run the suite before considering backend work done**. CI runs the same suite on pushes to `develop`/`master` and on PRs into them.
+- **Sort imports with ruff in the Python files you change**: `uvx ruff check --select I --fix <files>`. It puts third-party and Clerk's own app imports in separate blocks. Only the files you touch, never the whole repo.
 - **Don't run black/isort/flake8** as a finishing step - they aren't wired into CI or a documented flow. Match the surrounding style instead.
 
 ## Frontend (`frontend/`)

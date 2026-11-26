@@ -1,11 +1,11 @@
 from django import forms
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV3
-from webhooks.models import WebflowContact
 
 from web.fields import HtmxReCaptchaV3Field
 from web.models import ContentFeedback, DocumentLog
 from web.models.document import ReferrerChoices, SectorChoices, StateChoices
+from webhooks.models import WebflowContact
 
 
 class ContactForm(forms.ModelForm):
@@ -15,7 +15,6 @@ class ContactForm(forms.ModelForm):
             "name",
             "email",
             "phone",
-            "referral",
             "captcha",
         ]
 

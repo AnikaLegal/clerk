@@ -79,6 +79,11 @@ dev = [
 # updated which is likely why its dependencies haven't been updated.
 override-dependencies = ["django>=5"]
 
+[tool.ruff]
+# Clerk's apps sit beside this file, so their imports sort as first-party
+# wherever ruff runs from (the repo root in an editor, app/ on the command line).
+src = ["."]
+
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::django.utils.deprecation.RemovedInDjango60Warning"]
 addopts = "--reuse-db --ds=clerk.settings.test --ignore=.venv"
