@@ -9,21 +9,25 @@ const path = require("node:path");
 const here = __dirname;
 const block = (name, ...scope) =>
   new Function(...scope, fs.readFileSync(path.join(here, "..", "blocks", `${name}.js`), "utf8"));
-const fixture = (slide, month) =>
-  JSON.parse(fs.readFileSync(path.join(here, "fixtures", `slide${slide}-${month}.json`), "utf8"));
+const fixture = (query, month) => {
+  const name = typeof query === "number" ? `slide${query}` : query;
+  return JSON.parse(fs.readFileSync(path.join(here, "fixtures", `${name}-${month}.json`), "utf8"));
+};
 
 const setupBlock = block("setup", "whoami", "startTrigger");
-const figuresBlock = block("figures", "setup", "readPrevious", "slide4", "slide5", "slide6", "slide7", "slide8", "slide9");
+const figuresBlock = block("figures", "setup", "readPrevious", "readHistory", "readSettings", "slide4", "slide5", "slide6", "slide7", "slide8", "slide9", "renters");
 const whoami = { data: [{ current_user: "clerk_staging_reader" }] };
 
-const run = (month, previousFigures) => {
+const run = (month, previousFigures, history = [], settings = []) => {
   const setup = { data: setupBlock(whoami, { data: { month } }) };
   const readPrevious = { data: previousFigures ? [{ figures: previousFigures }] : [] };
-  const [s4, s5, s6, s7, s8, s9] = [4, 5, 6, 7, 8, 9].map((n) => ({ data: fixture(n, setup.data.month) }));
+  const readHistory = { data: history };
+  const readSettings = { data: settings };
+  const [s4, s5, s6, s7, s8, s9, renters] = [4, 5, 6, 7, 8, 9, "renters"].map((n) => ({ data: fixture(n, setup.data.month) }));
   const log = console.log;
   console.log = () => {};
   try {
-    return figuresBlock(setup, readPrevious, s4, s5, s6, s7, s8, s9);
+    return figuresBlock(setup, readPrevious, readHistory, readSettings, s4, s5, s6, s7, s8, s9, renters);
   } finally {
     console.log = log;
   }
@@ -78,6 +82,41 @@ assert.equal(s.s8_eviction_retaliatory_progressed, 28);
 assert.equal(s.s9_total_q1, 330);
 assert.equal(s.s9_total_q2, "");
 assert.equal(s.s9_total_total, 330);
+
+// September's forecast: 207 renters helped by month 3, 101 of them on day
+// one. Last year went from 81 to 438, 21 to 38 a month.
+const targets = (...rows) => rows.map(([fy, target]) => ({ "Financial year": fy, Target: target }));
+const sf = run("2026-09-01", null, [], targets(["FY25/26", "400"], ["FY26/27", "425"]));
+assert.equal(sf.values.s8_total_helped_fy, 207);
+assert.equal(sf.values.s10_day_one, 101);
+assert.equal(sf.values.s10_projected, 475);
+assert.equal(sf.values.s10_ambitious, 549);
+assert.equal(sf.values.s10_conservative, 396);
+assert.equal(sf.values.s10_average_progression, 525);
+assert.equal(sf.values.s10_on_track, 470);
+// The Target line rises from day one's 101 to 425, 182 by September.
+assert.equal(sf.values.s10_target, 425);
+assert.equal(sf.values.s10_target_basis, "The board's target is to help 425 renters this year.");
+assert.equal(sf.values.s10_target_position, "We are 25 renters ahead of our target for this point in the year.");
+assert.deepEqual(sf.warnings, []);
+assert.deepEqual(sf.charts.slide10[1], ["Jul", 143, 128, "", "", "", ""]);
+assert.deepEqual(sf.charts.slide10[3], ["Sep", 207, 182, 207, 207, 207, 207]);
+assert.deepEqual(sf.charts.slide10[12], ["Jun", "", 425, 475, 549, 396, 525]);
+// No target for this year: last year's, with a warning.
+const fallback = run("2026-09-01", null, [], targets(["FY25/26", "400"]));
+assert.equal(fallback.values.s10_target, 400);
+assert.equal(fallback.values.s10_target_basis, "A target hasn't been set for FY26/27 yet, so this uses FY25/26's target of 400 renters.");
+assert.equal(fallback.warnings.length, 1);
+// Neither: no Target line.
+const none = run("2026-09-01");
+assert.equal(none.values.s10_target, "");
+assert.equal(none.charts.slide10[12][2], "");
+assert.equal(none.warnings.length, 1);
+assert.equal(run("2026-09-01", null, [], targets(["FY26/27", "1,200"])).values.s10_target, 1200);
+assert.throws(() => run("2026-09-01", null, [], targets(["FY26/27", "about 400"])), /"about 400" isn't a whole number/);
+// Saved months win over recalculating.
+const sh = run("2026-09-01", null, [{ month: "2026-07-01", figures: { s8_total_helped_fy: 58 } }]);
+assert.equal(sh.charts.slide10[1][1], 58);
 
 // Last month's saved row wins over recalculating.
 const saved = run("2026-02-01", { s5_total_received: 56, s6_total_total: 115, s7_total_closed: 42, s7_legal_services_pct: 45, s8_total_progressed: 78 });

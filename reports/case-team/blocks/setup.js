@@ -6,6 +6,8 @@ const TEMPLATE_DECK_ID = "1x1Z7Zzm7uz6qkNB_9b-AvIEPg7Rv2ad3Qu-LTJHM3g4";
 const TEMPLATE_CHART_SHEET_ID = "12Sbhp5_NR3EGKN2HCKrAtwGDYGOc0ZahWONhTOO7UUw";
 const SHARED_DRIVE_ID = "0ALSw4lHqZw42Uk9PVA";
 const TEST_FOLDER_ID = "159_Q-NQdHAcDNyWaWzt5xN0jpr4aYVyB";
+// "Case Team report settings" in Templates: each year's target.
+const SETTINGS_SHEET_ID = "1dOJTx_IWVnpHwSQjQXf-IO55oZ0E398bv0qB6nuirdo";
 
 // The chart IDs inside the chart template, one per chart placeholder.
 // Copies of the spreadsheet are expected to keep the same IDs.
@@ -61,6 +63,7 @@ if (mode !== "report" && mode !== "snapshot") {
 const [monthYear, monthNumber] = month.split("-").map(Number);
 const fyStart = monthNumber >= 7 ? monthYear : monthYear - 1;
 const yy = (y) => String(y % 100).padStart(2, "0");
+const fyFolderName = `FY${yy(fyStart)}-${yy(fyStart + 1)}`;
 
 return {
   month,
@@ -72,9 +75,13 @@ return {
   environment,
   templateDeckId: TEMPLATE_DECK_ID,
   templateChartSheetId: TEMPLATE_CHART_SHEET_ID,
+  settingsSheetId: SETTINGS_SHEET_ID,
   sharedDriveId: SHARED_DRIVE_ID,
   chartIds: CHART_IDS,
-  fyFolderName: `FY${yy(fyStart)}-${yy(fyStart + 1)}`,
+  fyFolderName,
+  // July is month 1.
+  fyMonth: ((monthNumber + 5) % 12) + 1,
+  lastFyStart: `${fyStart - 1}-07-01`,
   // Staging builds the same folders inside Test, so the folder steps run
   // there too.
   rootFolderId: isProduction ? SHARED_DRIVE_ID : TEST_FOLDER_ID,

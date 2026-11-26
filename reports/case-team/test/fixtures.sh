@@ -4,10 +4,10 @@
 set -euo pipefail
 month="$1"
 here="$(cd "$(dirname "$0")" && pwd)"
-for slide in 4 5 6 7 8 9; do
-    query="$(sed -e 's/;[[:space:]]*$//' "$here/../blocks/slide$slide.sql")"
+for name in slide4 slide5 slide6 slide7 slide8 slide9 renters; do
+    query="$(sed -e 's/;[[:space:]]*$//' "$here/../blocks/$name.sql")"
     docker exec -i clerk_db psql -U postgres -At -v month="'$month'" \
-        > "$here/fixtures/slide$slide-$month.json" <<SQL
+        > "$here/fixtures/$name-$month.json" <<SQL
 SELECT coalesce(json_agg(t), '[]') FROM ($query) t;
 SQL
 done

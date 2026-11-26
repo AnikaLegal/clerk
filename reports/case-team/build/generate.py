@@ -28,6 +28,7 @@ blocks = {b["pluginId"]: b for b in export["blockData"]}
 # Blocks a missing block is cloned from.
 CLONE_FROM = {
     "readPrevious": "readPrevious",
+    "readHistory": "readPrevious",
     "saveSnapshot": "readPrevious",
     "saveSnapshotOnly": "readPrevious",
     "slide4": "slide5",
@@ -35,6 +36,7 @@ CLONE_FROM = {
     "slide7": "slide5",
     "slide8": "slide5",
     "slide9": "slide5",
+    "renters": "slide5",
     "snapshotDone": "existingLink",
     "snapshotSaved": "existingLink",
     "isSnapshot": "alreadyMade",
@@ -42,7 +44,7 @@ CLONE_FROM = {
 
 # Run order. Each path is a chain; a path that starts at a branch names the
 # branch and which way it leaves it (0 = condition true, 1 = else).
-MAIN = ["startTrigger", "whoami", "setup", "readPrevious", "slide4", "slide5", "slide6", "slide7", "slide8", "slide9", "figures", "isSnapshot"]
+MAIN = ["startTrigger", "whoami", "setup", "readPrevious", "readHistory", "readSettings", "slide4", "slide5", "slide6", "slide7", "slide8", "slide9", "renters", "figures", "isSnapshot"]
 SNAPSHOT_PATH = ("isSnapshot", 0, ["saveSnapshotOnly", "snapshotDone"])
 REPORT_PATH = ("isSnapshot", 1, ["folders", "findExisting", "alreadyMade"])
 EXISTS_PATH = ("alreadyMade", 0, ["existingLink"])
@@ -118,6 +120,10 @@ BRANCH_PORTS = {
     if blocks[name].get("outgoingPorts") and name not in cloned
 }
 ports = {name: set_branch(name, statement) for name, statement in BRANCHES.items()}
+
+
+missing = [name for name in MAIN + [n for path in (SNAPSHOT_PATH, REPORT_PATH, EXISTS_PATH, MAKE_PATH) for n in path[2]] if name not in blocks]
+assert not missing, f"set up in Retool first (see the README): {missing}"
 
 
 def chain(names):
