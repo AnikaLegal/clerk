@@ -13,9 +13,11 @@ and kept. Change a file here first, then copy it into Retool.
 1. `whoami` and `setup` work out the environment from the database user
    (`clerk_staging_reader` is staging; `clerk_prod_reader` and `clerk_prod`
    are production; anything else stops the run), and read the inputs.
-2. `readPrevious` and `slide4` to `slide9` read last month's saved figures and
-   this month's from Clerk; `figures` turns them into placeholder values,
-   chart data and the sentences.
+2. `readPrevious` and `readHistory` read last month's saved figures and
+   every saved month back to the start of last financial year, and
+   `readSettings` reads the settings sheet. `slide4` to
+   `slide9` and `renters` read this month's figures from Clerk. `figures`
+   turns them into placeholder values, chart data and the sentences.
 3. `isSnapshot`: in snapshot mode, `saveSnapshotOnly` saves the month's row
    and the run ends.
 4. Otherwise `folders` finds or creates the financial year folder, and
@@ -80,6 +82,7 @@ These blocks have no code file. Drive calls pass `supportsAllDrives=true`.
 
 | Block | Resource | Call |
 | --- | --- | --- |
+| `readSettings` | Reports Sheets | Read `{{ setup.data.settingsSheetId }}`, range `targets!A:B`, first row as headers |
 | `findExisting` | Reports Drive | `GET /files`, the month's deck by name in the deck folder |
 | `copyChartSheet` | Reports Drive | `POST /files/{id}/copy` of the chart template into `Chart data` |
 | `writeChart`, `writeChart6`, `writeChart7` | Reports Sheets | Update the copy's `slide5`, `slide6` and `slide7` tabs, with A1 ranges that name the tab |
@@ -111,7 +114,20 @@ Case Team Reports/
   Test/               staging runs, with the same folders inside
 ```
 
-`blocks/setup.js` holds the templates' IDs and their chart IDs. A copied
+The **Case Team report settings** sheet in Templates holds each year's target
+number of renters helped, set by the board, on its `targets` tab:
+
+| Financial year | Target |
+| --- | --- |
+| FY26/27 | 425 |
+
+Add each year's row once the board sets it, and keep past years' rows so
+re-running an old month uses the target it had. Without a row for the year,
+the report uses last year's target and warns; anything but a whole number
+stops the run.
+
+`blocks/setup.js` holds the templates' and settings sheet's IDs and the
+templates' chart IDs. A copied
 spreadsheet keeps its chart IDs, so a template's chart IDs work for every
 copy; after replacing a template, update them.
 

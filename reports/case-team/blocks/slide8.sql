@@ -4,10 +4,9 @@
 -- open at some point in the month:
 --   open_cases: all of them;
 --   progressed: those closed or moved to another stage during the month;
---   helped: those with legal services provided.
--- And for the financial year to this month's end ("fy"): clients and cases
--- with legal services provided that were open at some point in the year.
--- A row with no topic is the total, so a client with cases of two topics
+--   helped: those with legal services provided, and helped_clients their
+--   renters.
+-- A row with no topic is the total, so a renter with cases of two topics
 -- counts once in it. Open means not yet closed for the last time: a case
 -- reopened later counts as open in between. Month boundaries are midnight
 -- in Melbourne.
@@ -15,15 +14,12 @@ WITH bounds AS (
     SELECT
         ((CAST(:month AS date) - interval '1 month')::timestamp AT TIME ZONE 'Australia/Melbourne') AS prev_start_at,
         (CAST(:month AS date)::timestamp AT TIME ZONE 'Australia/Melbourne') AS start_at,
-        ((CAST(:month AS date) + interval '1 month')::timestamp AT TIME ZONE 'Australia/Melbourne') AS end_at,
-        (make_date(extract(year FROM CAST(:month AS date) - interval '6 months')::int, 7, 1)::timestamp AT TIME ZONE 'Australia/Melbourne') AS fy_start_at
+        ((CAST(:month AS date) + interval '1 month')::timestamp AT TIME ZONE 'Australia/Melbourne') AS end_at
 ),
 periods AS (
     SELECT 'this' AS which, start_at AS from_at, end_at AS to_at FROM bounds
     UNION ALL
     SELECT 'last', prev_start_at, start_at FROM bounds
-    UNION ALL
-    SELECT 'fy', fy_start_at, end_at FROM bounds
 ),
 cases AS (
     SELECT

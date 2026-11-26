@@ -210,31 +210,38 @@ charts.slide7 = [
   ...TOPICS.map(([, key, label]) => [label, values[`s7_${key}_closed`]]),
 ];
 
-// Slide 8: case progress, and renters helped this month and this FY. Rows
+// Renters helped and legal problems this FY, from the "provided legal
+// services" tick on cases open during the year. Rows
 // without a topic are totals across topics; a renter with cases of two
 // types counts once in them, so they can be less than the sum of the rows.
+const rentersRows = toRows(renters.data);
+const fyMonth = setup.data.fyMonth;
+const rentersAt = (fy, k) => rentersRows.filter((r) => r.fy === fy && n(r.fy_month) === k);
+const rentersNow = rentersAt("this", fyMonth);
+unshown(rentersNow.filter((r) => r.topic), "Renters helped this FY");
+const rentersTotal = (fy, k) => rentersAt(fy, k).find((r) => !r.topic) || {};
+
+// Slide 8: case progress, and renters helped this month and this FY.
 const s8 = toRows(slide8.data);
 const s8Rows = (which) => s8.filter((r) => r.which === which && r.topic);
 const s8Total = (which) => s8.find((r) => r.which === which && !r.topic) || {};
 unshown(s8Rows("this"), "Slide 8");
-unshown(s8Rows("fy"), "Slide 8");
 const s8This = Object.fromEntries(s8Rows("this").map((r) => [r.topic, r]));
-const s8Fy = Object.fromEntries(s8Rows("fy").map((r) => [r.topic, r]));
+const s8Fy = Object.fromEntries(rentersNow.filter((r) => r.topic).map((r) => [r.topic, r]));
 let s8Progressed = 0;
 let s8Open = 0;
 for (const [topic, key] of TOPICS) {
   const r = s8This[topic] || {};
   values[`s8_${key}_helped`] = n(r.helped_clients);
   values[`s8_${key}_progressed`] = n(r.progressed);
-  values[`s8_${key}_helped_fy`] = n((s8Fy[topic] || {}).helped_clients);
+  values[`s8_${key}_helped_fy`] = n((s8Fy[topic] || {}).renters);
   s8Progressed += n(r.progressed);
   s8Open += n(r.open_cases);
 }
 values.s8_total_helped = n(s8Total("this").helped_clients);
 values.s8_total_progressed = s8Progressed;
-values.s8_total_helped_fy = n(s8Total("fy").helped_clients);
-// Each case is one legal problem.
-values.s8_legal_problems_fy = n(s8Total("fy").helped);
+values.s8_total_helped_fy = n(rentersTotal("this", fyMonth).renters);
+values.s8_legal_problems_fy = n(rentersTotal("this", fyMonth).legal_problems);
 values.s8_open_cases = s8Open;
 values.s8_progression_pct = pct(s8Progressed, s8Open);
 const s8LastProgressed = fromPrevious(
@@ -277,6 +284,119 @@ values.s9_total_total = s9Totals.all;
 values.s9_excluding_referrals_total = s9Totals.excluding_referrals;
 values.s9_ongoing_still_open = s9Cell("STILL_OPEN", 0, "services");
 
+// Slide 10: forecast of renters helped by the end of the financial year.
+// Past months come from their saved figures where there are any, so the
+// lines match what earlier reports showed; otherwise they are recalculated.
+const history = Object.fromEntries(
+  toRows(readHistory.data).map((r) => [
+    String(r.month).slice(0, 7),
+    typeof r.figures === "string" ? JSON.parse(r.figures) : r.figures,
+  ]),
+);
+const fyStartYear = Number(setup.data.lastFyStart.slice(0, 4)) + 1;
+const monthKey = (startYear, k) => {
+  const m = ((k + 5) % 12) + 1;
+  return `${m >= 7 ? startYear : startYear + 1}-${String(m).padStart(2, "0")}`;
+};
+const helpedBy = (fy, k) => {
+  const saved = history[monthKey(fy === "this" ? fyStartYear : fyStartYear - 1, k)];
+  return saved && typeof saved.s8_total_helped_fy === "number"
+    ? saved.s8_total_helped_fy
+    : n(rentersTotal(fy, k).renters);
+};
+const MONTHS = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+const now = values.s8_total_helped_fy;
+const actual = MONTHS.map((_, i) => (i + 1 < fyMonth ? helpedBy("this", i + 1) : i + 1 === fyMonth ? now : null));
+const lastYear = MONTHS.map((_, i) => helpedBy("last", i + 1));
+// Day one: renters whose ticked cases were carried over from the year
+// before, so already count when the year starts.
+const dayOne = n(rentersTotal("this", 0).renters);
+const lastDayOne = n(rentersTotal("last", 0).renters);
+// Renters added each month last year.
+const lastYearMonthly = lastYear.map((v, i) => v - (i ? lastYear[i - 1] : lastDayOne));
+const rates = {
+  projected: (lastYear[11] - lastDayOne) / 12,
+  ambitious: Math.max(...lastYearMonthly),
+  conservative: Math.min(...lastYearMonthly),
+  average_progression: (now - dayOne) / fyMonth,
+};
+const line = (rate) => MONTHS.map((_, i) => (i + 1 >= fyMonth ? Math.round(now + rate * (i + 1 - fyMonth)) : null));
+const lines = Object.fromEntries(Object.entries(rates).map(([key, rate]) => [key, line(rate)]));
+for (const [key, rate] of Object.entries(rates)) {
+  values[`s10_${key}_rate`] = Math.round(rate);
+  values[`s10_${key}`] = lines[key][11];
+}
+values.s10_day_one = dayOne;
+values.s10_last_year_total = lastYear[11];
+
+// The target is set by the board each year, in the settings sheet. Without
+// one for this year the report uses last year's and says so; with neither
+// there is no Target line.
+const fyLabel = setup.data.fyFolderName.replace("-", "/");
+const lastFyLabel = `FY${setup.data.lastFyStart.slice(2, 4)}/${fyLabel.slice(2, 4)}`;
+const normalise = (v) => String(v ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const cell = (row, header) => {
+  const key = Object.keys(row).find((k) => normalise(k) === normalise(header));
+  return key === undefined ? "" : String(row[key] ?? "").trim();
+};
+const settingsRows = toRows(readSettings.data);
+// Blank is allowed; anything else must be a whole number, so a typo stops
+// the run rather than quietly changing the target.
+const targetFor = (label) => {
+  const row = settingsRows.find((r) => normalise(cell(r, "Financial year")) === normalise(label));
+  const v = row ? cell(row, "Target").replace(/,/g, "") : "";
+  if (v === "") return null;
+  if (!/^\d+$/.test(v)) {
+    throw new Error(`Settings sheet, ${label} "Target": "${v}" isn't a whole number.`);
+  }
+  return Number(v);
+};
+const warnings = [];
+const thisYearTarget = targetFor(fyLabel);
+const lastYearTarget = targetFor(lastFyLabel);
+const target = thisYearTarget ?? lastYearTarget;
+if (thisYearTarget === null) {
+  warnings.push(
+    lastYearTarget === null
+      ? `No target for ${fyLabel} or ${lastFyLabel} in the settings sheet, so the forecast has no Target line.`
+      : `No target for ${fyLabel} in the settings sheet, so the forecast uses ${lastFyLabel}'s ${lastYearTarget}.`,
+  );
+}
+values.s10_target = target ?? "";
+values.s10_target_basis =
+  thisYearTarget !== null
+    ? `The board's target is to help ${target} renters this year.`
+    : target !== null
+      ? `A target hasn't been set for ${fyLabel} yet, so this uses ${lastFyLabel}'s target of ${target} renters.`
+      : `A target hasn't been set for ${fyLabel} yet.`;
+// The Target line rises evenly from day one to the target in June.
+const targetAt = (k) => Math.round(dayOne + ((target - dayOne) * k) / 12);
+if (target === null) {
+  values.s10_target_position = "";
+} else {
+  const behind = targetAt(fyMonth) - now;
+  values.s10_target_position =
+    behind === 0
+      ? "We are exactly on our target for this point in the year."
+      : `We are ${Math.abs(behind)} renters ${behind > 0 ? "behind" : "ahead of"} our target for this point in the year.`;
+}
+values.s10_fy_label = fyLabel;
+// Rounded down to a multiple of 10, for "on track to help over N renters".
+values.s10_on_track = Math.floor(values.s10_projected / 10) * 10;
+charts.slide10 = [
+  ["Month", "Actual", "Target", "Projected", "Ambitious", "Conservative", "Average progression"],
+  ...MONTHS.map((label, i) => [
+    label,
+    actual[i] ?? "",
+    target === null ? "" : targetAt(i + 1),
+    lines.projected[i] ?? "",
+    lines.ambitious[i] ?? "",
+    lines.conservative[i] ?? "",
+    lines.average_progression[i] ?? "",
+  ]),
+];
+for (const warning of warnings) console.log(`Warning: ${warning}`);
+
 // One replaceAllText request per placeholder: the name in double braces.
 // The braces are built from single characters because Retool's editor reads
 // a literal double brace as its own template syntax.
@@ -307,6 +427,8 @@ return {
     capacitySource: setup.data.isLatestMonth ? "calculated" : "current",
   },
   lastMonthFrom: previous ? "snapshot" : "recalculated",
+  // Problems someone should fix, for the run's Slack post.
+  warnings,
   charts,
   textRequests,
   deckName,
